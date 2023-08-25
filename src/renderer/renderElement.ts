@@ -20,7 +20,7 @@ import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
 import { StaticCanvasRenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import { distance, isRTL } from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import {
@@ -46,6 +46,8 @@ import {
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
+  getFontFamilyString,
+  getFontString,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {

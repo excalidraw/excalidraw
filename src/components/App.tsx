@@ -231,7 +231,6 @@ import {
 import {
   debounce,
   distance,
-  getFontString,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -298,6 +297,7 @@ import {
   getContainerCenter,
   getContainerElement,
   getDefaultLineHeight,
+  getFontString,
   getLineHeightInPx,
   getTextBindableContainerAtPosition,
   isMeasureTextSupported,

@@ -798,7 +798,7 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello World!");
       editor.blur();
-      expect(text.fontFamily).toEqual(FONT_FAMILY.Virgil);
+      expect(text.fontFamily).toEqual(FONT_FAMILY.HAND_DRAWN.fontFamilyId);
       UI.clickTool("text");
 
       mouse.clickAt(
@@ -815,7 +815,7 @@ describe("textWysiwyg", () => {
       editor.blur();
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.CODE.fontFamilyId);
 
       //undo
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -823,7 +823,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Virgil);
+      ).toEqual(FONT_FAMILY.HAND_DRAWN.fontFamilyId);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
@@ -831,7 +831,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.CODE.fontFamilyId);
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
@@ -1220,7 +1220,7 @@ describe("textWysiwyg", () => {
 
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.CODE.fontFamilyId);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
       fireEvent.click(screen.getByTitle(/Very large/i));
@@ -1247,7 +1247,7 @@ describe("textWysiwyg", () => {
       fireEvent.click(screen.getByTitle(/code/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY.CODE.fontFamilyId);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
       ).toEqual(1.2);
@@ -1255,7 +1255,7 @@ describe("textWysiwyg", () => {
       fireEvent.click(screen.getByTitle(/normal/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Helvetica);
+      ).toEqual(FONT_FAMILY.NORMAL.fontFamilyId);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
       ).toEqual(1.15);

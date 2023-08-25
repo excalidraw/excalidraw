@@ -10,6 +10,7 @@ import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
+  getFontString,
   measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
@@ -31,7 +32,6 @@ import {
 } from "../element/types";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
-import { getFontString } from "../utils";
 import { register } from "./register";
 
 export const actionUnbindText = register({

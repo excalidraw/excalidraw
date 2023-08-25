@@ -10,7 +10,7 @@ import {
   ExcalidrawBindableElement,
   Arrowhead,
   ChartType,
-  FontFamilyValues,
+  FontFamilyId,
   FileId,
   ExcalidrawImageElement,
   Theme,
@@ -221,7 +221,7 @@ export type AppState = {
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemOpacity: number;
-  currentItemFontFamily: FontFamilyValues;
+  currentItemFontFamily: FontFamilyId;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;

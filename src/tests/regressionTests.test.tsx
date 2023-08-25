@@ -666,9 +666,13 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil);
+    expect(h.state.currentItemFontFamily).toEqual(
+      FONT_FAMILY.HAND_DRAWN.fontFamilyId,
+    );
     fireEvent.click(screen.getByTitle(/code/i));
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia);
+    expect(h.state.currentItemFontFamily).toEqual(
+      FONT_FAMILY.CODE.fontFamilyId,
+    );
   });
 
   it("deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element", () => {

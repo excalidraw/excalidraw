@@ -2,7 +2,6 @@ import {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
-  FontFamilyValues,
   PointBinding,
   StrokeRoundness,
 } from "../element/types";
@@ -22,11 +21,9 @@ import {
 import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
 import { randomId } from "../random";
 import {
-  DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   PRECEDING_ELEMENT_KEY,
-  FONT_FAMILY,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
   DEFAULT_ELEMENT_PROPS,
@@ -34,12 +31,14 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import { getFontString, getUpdatedTimestamp, updateActiveTool } from "../utils";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getDefaultLineHeight,
+  getFontFamilyIdByName,
+  getFontString,
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
@@ -73,15 +72,6 @@ export type RestoredDataState = {
   elements: ExcalidrawElement[];
   appState: RestoredAppState;
   files: BinaryFiles;
-};
-
-const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
-  if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
-    return FONT_FAMILY[
-      fontFamilyName as keyof typeof FONT_FAMILY
-    ] as FontFamilyValues;
-  }
-  return DEFAULT_FONT_FAMILY;
 };
 
 const repairBinding = (binding: PointBinding | null) => {
@@ -186,7 +176,7 @@ const restoreElement = (
           element as any
         ).font.split(" ");
         fontSize = parseFloat(fontPx);
-        fontFamily = getFontFamilyByName(_fontFamily);
+        fontFamily = getFontFamilyIdByName(_fontFamily);
       }
       const text = element.text ?? "";
 

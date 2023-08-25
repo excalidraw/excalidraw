@@ -17,6 +17,7 @@ import {
 } from "../element/newElement";
 import {
   getDefaultLineHeight,
+  getFontString,
   measureText,
   normalizeText,
 } from "../element/textElement";
@@ -33,12 +34,12 @@ import {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FileId,
-  FontFamilyValues,
+  FontFamilyId,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, getFontString } from "../utils";
+import { assertNever } from "../utils";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -47,7 +48,7 @@ export type ValidLinearElement = {
   label?: {
     text: string;
     fontSize?: number;
-    fontFamily?: FontFamilyValues;
+    fontFamily?: FontFamilyId;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
   } & MarkOptional<ElementConstructorOpts, "x" | "y">;
@@ -124,7 +125,7 @@ export type ValidContainer =
       label?: {
         text: string;
         fontSize?: number;
-        fontFamily?: FontFamilyValues;
+        fontFamily?: FontFamilyId;
         textAlign?: TextAlign;
         verticalAlign?: VerticalAlign;
       } & MarkOptional<ElementConstructorOpts, "x" | "y">;

@@ -4,17 +4,11 @@ import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
-  FONT_FAMILY,
   isDarwin,
   MIME_TYPES,
   THEME,
-  WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import {
-  FontFamilyValues,
-  FontString,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
+import { NonDeletedExcalidrawElement } from "./element/types";
 import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
@@ -84,30 +78,6 @@ export const isWritableElement = (
   target instanceof HTMLTextAreaElement ||
   (target instanceof HTMLInputElement &&
     (target.type === "text" || target.type === "number"));
-
-export const getFontFamilyString = ({
-  fontFamily,
-}: {
-  fontFamily: FontFamilyValues;
-}) => {
-  for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
-    if (id === fontFamily) {
-      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
-    }
-  }
-  return WINDOWS_EMOJI_FALLBACK_FONT;
-};
-
-/** returns fontSize+fontFamily string for assignment to DOM elements */
-export const getFontString = ({
-  fontSize,
-  fontFamily,
-}: {
-  fontSize: number;
-  fontFamily: FontFamilyValues;
-}) => {
-  return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
-};
 
 export const debounce = <T extends any[]>(
   fn: (...args: T) => void,

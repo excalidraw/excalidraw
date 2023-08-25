@@ -2,9 +2,9 @@ import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
-import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
+import { setCursorForShape, updateActiveTool } from "../utils";
 import { newTextElement } from "./newElement";
-import { getContainerElement, wrapText } from "./textElement";
+import { getContainerElement, getFontString, wrapText } from "./textElement";
 import { isEmbeddableElement } from "./typeChecks";
 import {
   ExcalidrawElement,
@@ -218,7 +218,7 @@ export const createPlaceholderEmbeddableLabel = (
     Math.min(element.width / 2, element.width / text.length),
     element.width / 30,
   );
-  const fontFamily = FONT_FAMILY.Helvetica;
+  const fontFamily = FONT_FAMILY.NORMAL.fontFamilyId;
 
   const fontString = getFontString({
     fontSize,

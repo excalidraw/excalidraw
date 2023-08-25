@@ -1,10 +1,5 @@
 import { CODES, KEYS } from "../keys";
-import {
-  isWritableElement,
-  getFontString,
-  getFontFamilyString,
-  isTestEnv,
-} from "../utils";
+import { isWritableElement, isTestEnv } from "../utils";
 import Scene from "../scene/Scene";
 import {
   isArrowElement,
@@ -34,6 +29,8 @@ import {
   computeContainerDimensionForBoundText,
   detectLineHeight,
   computeBoundTextPosition,
+  getFontString,
+  getFontFamilyString,
 } from "./textElement";
 import {
   actionDecreaseFontSize,

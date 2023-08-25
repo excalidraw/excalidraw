@@ -1,5 +1,6 @@
 import { ExcalidrawElementSkeleton } from "../../../data/transform";
 import { FileId } from "../../../element/types";
+import { FONT_FAMILY } from "../entry";
 
 const elements: ExcalidrawElementSkeleton[] = [
   {
@@ -39,7 +40,10 @@ const elements: ExcalidrawElementSkeleton[] = [
 ];
 export default {
   elements,
-  appState: { viewBackgroundColor: "#AFEEEE", currentItemFontFamily: 1 },
+  appState: {
+    viewBackgroundColor: "#AFEEEE",
+    currentItemFontFamily: FONT_FAMILY.HAND_DRAWN.fontFamilyId,
+  },
   scrollToContent: true,
   libraryItems: [
     [
