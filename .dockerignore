@@ -9,3 +9,5 @@
 !src/
 !tsconfig.json
 !yarn.lock
+!index.html
+!vite.config.ts
