@@ -14,6 +14,7 @@ import {
   ElementConstructorOpts,
   newImageElement,
   newTextElement,
+  newFrameElement
 } from "../element/newElement";
 import {
   getDefaultLineHeight,
@@ -477,8 +478,14 @@ export const convertToExcalidrawElements = (
 
         break;
       }
+      case "frame": {
+        excalidrawElement = newFrameElement({
+          ...element,
+        });
+
+        break;
+      }
       case "freedraw":
-      case "frame":
       case "embeddable": {
         excalidrawElement = element;
         break;
