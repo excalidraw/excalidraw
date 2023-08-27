@@ -12,6 +12,7 @@ import {
 import { bindLinearElement } from "../element/binding";
 import {
   ElementConstructorOpts,
+  newFrameElement,
   newImageElement,
   newTextElement,
 } from "../element/newElement";
@@ -52,111 +53,114 @@ export type ValidLinearElement = {
     verticalAlign?: VerticalAlign;
   } & MarkOptional<ElementConstructorOpts, "x" | "y">;
   end?:
-    | (
-        | (
-            | {
-                type: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
-                >;
-                id?: ExcalidrawGenericElement["id"];
-              }
-            | {
-                id: ExcalidrawGenericElement["id"];
-                type?: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
-                >;
-              }
-          )
-        | ((
-            | {
-                type: "text";
-                text: string;
-              }
-            | {
-                type?: "text";
-                id: ExcalidrawTextElement["id"];
-                text: string;
-              }
-          ) &
-            Partial<ExcalidrawTextElement>)
-      ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
+    & (
+      | (
+        | {
+          type: Exclude<
+            ExcalidrawBindableElement["type"],
+            "image" | "text" | "frame" | "embeddable"
+          >;
+          id?: ExcalidrawGenericElement["id"];
+        }
+        | {
+          id: ExcalidrawGenericElement["id"];
+          type?: Exclude<
+            ExcalidrawBindableElement["type"],
+            "image" | "text" | "frame" | "embeddable"
+          >;
+        }
+      )
+      | (
+        & (
+          | {
+            type: "text";
+            text: string;
+          }
+          | {
+            type?: "text";
+            id: ExcalidrawTextElement["id"];
+            text: string;
+          }
+        )
+        & Partial<ExcalidrawTextElement>
+      )
+    )
+    & MarkOptional<ElementConstructorOpts, "x" | "y">;
   start?:
-    | (
-        | (
-            | {
-                type: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
-                >;
-                id?: ExcalidrawGenericElement["id"];
-              }
-            | {
-                id: ExcalidrawGenericElement["id"];
-                type?: Exclude<
-                  ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
-                >;
-              }
-          )
-        | ((
-            | {
-                type: "text";
-                text: string;
-              }
-            | {
-                type?: "text";
-                id: ExcalidrawTextElement["id"];
-                text: string;
-              }
-          ) &
-            Partial<ExcalidrawTextElement>)
-      ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
+    & (
+      | (
+        | {
+          type: Exclude<
+            ExcalidrawBindableElement["type"],
+            "image" | "text" | "frame" | "embeddable"
+          >;
+          id?: ExcalidrawGenericElement["id"];
+        }
+        | {
+          id: ExcalidrawGenericElement["id"];
+          type?: Exclude<
+            ExcalidrawBindableElement["type"],
+            "image" | "text" | "frame" | "embeddable"
+          >;
+        }
+      )
+      | (
+        & (
+          | {
+            type: "text";
+            text: string;
+          }
+          | {
+            type?: "text";
+            id: ExcalidrawTextElement["id"];
+            text: string;
+          }
+        )
+        & Partial<ExcalidrawTextElement>
+      )
+    )
+    & MarkOptional<ElementConstructorOpts, "x" | "y">;
 } & Partial<ExcalidrawLinearElement>;
 
-export type ValidContainer =
-  | {
-      type: Exclude<ExcalidrawGenericElement["type"], "selection">;
-      id?: ExcalidrawGenericElement["id"];
-      label?: {
-        text: string;
-        fontSize?: number;
-        fontFamily?: FontFamilyValues;
-        textAlign?: TextAlign;
-        verticalAlign?: VerticalAlign;
-      } & MarkOptional<ElementConstructorOpts, "x" | "y">;
-    } & ElementConstructorOpts;
+export type ValidContainer = {
+  type: Exclude<ExcalidrawGenericElement["type"], "selection">;
+  id?: ExcalidrawGenericElement["id"];
+  label?: {
+    text: string;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    textAlign?: TextAlign;
+    verticalAlign?: VerticalAlign;
+  } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+} & ElementConstructorOpts;
 
 export type ExcalidrawElementSkeleton =
   | Extract<
-      Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      | ExcalidrawEmbeddableElement
-      | ExcalidrawFreeDrawElement
-      | ExcalidrawFrameElement
-    >
+    Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+    | ExcalidrawEmbeddableElement
+    | ExcalidrawFreeDrawElement
+    | ExcalidrawFrameElement
+  >
   | ({
-      type: Extract<ExcalidrawLinearElement["type"], "line">;
-      x: number;
-      y: number;
-    } & Partial<ExcalidrawLinearElement>)
+    type: Extract<ExcalidrawLinearElement["type"], "line">;
+    x: number;
+    y: number;
+  } & Partial<ExcalidrawLinearElement>)
   | ValidContainer
   | ValidLinearElement
   | ({
-      type: "text";
-      text: string;
-      x: number;
-      y: number;
-      id?: ExcalidrawTextElement["id"];
-    } & Partial<ExcalidrawTextElement>)
+    type: "text";
+    text: string;
+    x: number;
+    y: number;
+    id?: ExcalidrawTextElement["id"];
+  } & Partial<ExcalidrawTextElement>)
   | ({
-      type: Extract<ExcalidrawImageElement["type"], "image">;
-      x: number;
-      y: number;
-      fileId: FileId;
-    } & Partial<ExcalidrawImageElement>);
+    type: Extract<ExcalidrawImageElement["type"], "image">;
+    x: number;
+    y: number;
+    fileId: FileId;
+  } & Partial<ExcalidrawImageElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 300,
@@ -400,14 +404,12 @@ export const convertToExcalidrawElements = (
       case "rectangle":
       case "ellipse":
       case "diamond": {
-        const width =
-          element?.label?.text && element.width === undefined
-            ? 0
-            : element?.width || DEFAULT_DIMENSION;
-        const height =
-          element?.label?.text && element.height === undefined
-            ? 0
-            : element?.height || DEFAULT_DIMENSION;
+        const width = element?.label?.text && element.width === undefined
+          ? 0
+          : element?.width || DEFAULT_DIMENSION;
+        const height = element?.label?.text && element.height === undefined
+          ? 0
+          : element?.height || DEFAULT_DIMENSION;
         excalidrawElement = newElement({
           ...element,
           width,
@@ -449,8 +451,8 @@ export const convertToExcalidrawElements = (
       case "text": {
         const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
-        const lineHeight =
-          element?.lineHeight || getDefaultLineHeight(fontFamily);
+        const lineHeight = element?.lineHeight ||
+          getDefaultLineHeight(fontFamily);
         const text = element.text ?? "";
         const normalizedText = normalizeText(text);
         const metrics = measureText(
@@ -477,8 +479,17 @@ export const convertToExcalidrawElements = (
 
         break;
       }
+      case "frame": {
+        excalidrawElement = newFrameElement({
+          width: element?.width || DEFAULT_DIMENSION,
+          height: element?.height || DEFAULT_DIMENSION,
+          ...element,
+        });
+
+        break;
+      }
+
       case "freedraw":
-      case "frame":
       case "embeddable": {
         excalidrawElement = element;
         break;
@@ -520,10 +531,12 @@ export const convertToExcalidrawElements = (
           elementStore.add(text);
 
           if (container.type === "arrow") {
-            const originalStart =
-              element.type === "arrow" ? element?.start : undefined;
-            const originalEnd =
-              element.type === "arrow" ? element?.end : undefined;
+            const originalStart = element.type === "arrow"
+              ? element?.start
+              : undefined;
+            const originalEnd = element.type === "arrow"
+              ? element?.end
+              : undefined;
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
                 container as ExcalidrawArrowElement,
