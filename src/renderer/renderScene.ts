@@ -172,14 +172,14 @@ const strokeGrid = (
   zoom: Zoom,
   width: number,
   height: number,
-  color: string, //zsviczian
+  GridLineColor: {Bold: string, Regular: string}, //zsviczian
 ) => {
   const BOLD_LINE_FREQUENCY = 5;
 
-  enum GridLineColor {
+  /*enum GridLineColor {
     Bold = "#cccccc",
     Regular = "#e5e5e5",
-  }
+  }*/
 
   const offsetX =
     -Math.round(zoom.value / gridSize) * gridSize + (scrollX % gridSize);
@@ -192,7 +192,6 @@ const strokeGrid = (
   const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
   context.save();
-  context.strokeStyle = color; //zsviczian
   context.lineWidth = lineWidth;
 
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
@@ -936,14 +935,12 @@ const _renderStaticScene = ({
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
-        (appState.scrollX % appState.gridSize),
-      -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
-        (appState.scrollY % appState.gridSize),
+      appState.scrollX,
+      appState.scrollY,
       appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
-      appState.gridColor,
+      appState.gridColor, //zsviczian
     );
   }
 
