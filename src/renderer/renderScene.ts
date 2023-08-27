@@ -934,10 +934,8 @@ const _renderStaticScene = ({
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
-        (appState.scrollX % appState.gridSize),
-      -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
-        (appState.scrollY % appState.gridSize),
+      appState.scrollX,
+      appState.scrollY,
       appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
