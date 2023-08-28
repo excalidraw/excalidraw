@@ -14,7 +14,7 @@ import {
   ElementConstructorOpts,
   newImageElement,
   newTextElement,
-  newFrameElement
+  newFrameElement,
 } from "../element/newElement";
 import {
   getDefaultLineHeight,
