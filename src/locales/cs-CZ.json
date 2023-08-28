@@ -8,6 +8,7 @@
     "moveCanvas": "Posunout plátno",
     "cut": "Vyjmout",
     "copy": "Kopírovat",
+    "copyLink": "",
     "copyAsPng": "Zkopírovat do schránky jako PNG",
     "copyAsSvg": "Zkopírovat do schránky jako SVG",
     "copyText": "Zkopírovat do schránky jako text",

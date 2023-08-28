@@ -8,6 +8,7 @@
     "moveCanvas": "Siirrä piirtoaluetta",
     "cut": "Leikkaa",
     "copy": "Kopioi",
+    "copyLink": "",
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
     "copyText": "Kopioi tekstinä",

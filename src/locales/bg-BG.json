@@ -8,6 +8,7 @@
     "moveCanvas": "Премести платно",
     "cut": "Изрежи",
     "copy": "Копирай",
+    "copyLink": "",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копирано в клипборда като SVG",
     "copyText": "",

@@ -8,6 +8,7 @@
     "moveCanvas": "Leinwand verschieben",
     "cut": "Ausschneiden",
     "copy": "Kopieren",
+    "copyLink": "",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
     "copyText": "In die Zwischenablage als Text kopieren",

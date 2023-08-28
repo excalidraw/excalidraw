@@ -8,6 +8,7 @@
     "moveCanvas": "Mou el llenç",
     "cut": "Retalla",
     "copy": "Copia",
+    "copyLink": "",
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
     "copyText": "Copia al porta-retalls com a text",

@@ -8,6 +8,7 @@
     "moveCanvas": "Mutare pânză",
     "cut": "Decupare",
     "copy": "Copiere",
+    "copyLink": "",
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
     "copyText": "Copiere în memoria temporară ca text",

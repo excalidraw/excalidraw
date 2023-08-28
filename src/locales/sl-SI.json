@@ -8,6 +8,7 @@
     "moveCanvas": "Premakni platno",
     "cut": "Izreži",
     "copy": "Kopiraj",
+    "copyLink": "",
     "copyAsPng": "Kopiraj v odložišče kot PNG",
     "copyAsSvg": "Kopiraj v odložišče kot SVG",
     "copyText": "Kopiraj v odložišče kot besedilo",

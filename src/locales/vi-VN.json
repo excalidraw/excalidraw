@@ -8,6 +8,7 @@
     "moveCanvas": "Di chuyển canvas",
     "cut": "Cắt",
     "copy": "Sao chép",
+    "copyLink": "",
     "copyAsPng": "Sao chép vào bộ nhớ tạm dưới dạng PNG",
     "copyAsSvg": "Sao chép vào bộ nhớ tạm dưới dạng SVG",
     "copyText": "Sao chép vào bộ nhớ tạm dưới dạng chữ",
