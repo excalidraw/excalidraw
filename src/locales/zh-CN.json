@@ -11,6 +11,7 @@
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
     "copyText": "复制文本到剪贴板",
+    "copylink": "复制链接",
     "bringForward": "上移一层",
     "sendToBack": "置于底层",
     "bringToFront": "置于顶层",
@@ -312,7 +313,7 @@
     "shortcuts": "快捷键列表",
     "textFinish": "完成编辑 (文本编辑器)",
     "textNewLine": "添加新行(文本编辑器)",
-    "title": "帮助",
+    "title": "提示",
     "view": "视图",
     "zoomToFit": "缩放以适应所有元素",
     "zoomToSelection": "缩放到选区",
@@ -440,7 +441,7 @@
       "menuHint": "导出、首选项……",
       "center_heading": "图，化繁为简。",
       "toolbarHint": "选择工具并开始绘图！",
-      "helpHint": "快捷键和帮助"
+      "helpHint": "使用提示"
     }
   },
   "colorPicker": {
