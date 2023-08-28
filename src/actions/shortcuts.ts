@@ -19,7 +19,7 @@ export type ShortcutName =
       | "deleteSelectedElements"
       | "duplicateSelection"
       | "sendBackward"
-      | "bringForward"
+      |     "bringForward"
       | "sendToBack"
       | "bringToFront"
       | "copyAsPng"

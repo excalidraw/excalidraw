@@ -184,7 +184,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
-        "name": "bringForward",
+        "name":     "bringForward",
         "perform": [Function],
         "trackEvent": {
           "category": "element",
@@ -4804,7 +4804,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
-        "name": "bringForward",
+        "name":     "bringForward",
         "perform": [Function],
         "trackEvent": {
           "category": "element",
@@ -5384,7 +5384,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
-        "name": "bringForward",
+        "name":     "bringForward",
         "perform": [Function],
         "trackEvent": {
           "category": "element",
@@ -6284,7 +6284,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
-        "name": "bringForward",
+        "name":     "bringForward",
         "perform": [Function],
         "trackEvent": {
           "category": "element",
@@ -6658,7 +6658,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
-        "name": "bringForward",
+        "name":     "bringForward",
         "perform": [Function],
         "trackEvent": {
           "category": "element",

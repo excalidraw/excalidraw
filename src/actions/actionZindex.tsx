@@ -46,7 +46,7 @@ export const actionSendBackward = register({
 });
 
 export const actionBringForward = register({
-  name: "bringForward",
+  name:     "bringForward",
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
