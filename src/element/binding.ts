@@ -548,6 +548,12 @@ const getElligibleElementsForBindableElementAndWhere = (
       if (!canBindStart && !canBindEnd) {
         return null;
       }
+      // don't bind linear element if it's in a group
+      if (canBindStart || canBindEnd) {
+        if (element.groupIds.length > 0) {
+          return null;
+        }
+      }
       return [
         element,
         canBindStart && canBindEnd ? "both" : canBindStart ? "start" : "end",

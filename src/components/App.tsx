@@ -7050,9 +7050,20 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
+        // grouped arrows shouldn't bind to an element, unless they're explicitly selected and dragged to that element
+        let selectedElements = this.scene.getSelectedElements(this.state);
+        if (this.state.selectedLinearElement && this.state.selectedLinearElement.isDragging) {
+          selectedElements = selectedElements.filter(
+            (elem) => !((elem.id === this.state.selectedLinearElement?.elementId) && elem.groupIds.length > 0)
+          );
+        } else {
+          selectedElements = selectedElements.filter(
+            (elem) => elem.groupIds.length === 0
+          );
+        }
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(this.scene.getSelectedElements(this.state));
+          : unbindLinearElements)(selectedElements);
       }
 
       if (activeTool.type === "laser") {
