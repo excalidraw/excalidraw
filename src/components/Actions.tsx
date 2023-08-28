@@ -150,7 +150,7 @@ export const SelectedShapeActions = ({
           {renderAction("sendToBack")}
           {renderAction("sendBackward")}
           {renderAction("bringToFront")}
-          {renderAction(    "bringForward")}
+          {renderAction("bringForward")}
         </div>
       </fieldset>
 

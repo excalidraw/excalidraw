@@ -65,7 +65,7 @@ export const ShareableLinkDialog = ({
             <Popover.Trigger asChild>
               <FilledButton
                 size="large"
-                label={t("bottons.copyLink)}
+                label={t("buttons.copyLink)}
                 startIcon={copyIcon}
                 onClick={copyRoomLink}
               />
