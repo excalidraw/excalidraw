@@ -3,11 +3,12 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
 import {
+  convertToExportPadding,
   distance,
   expandToAspectRatio,
   isOnlyExportingSingleFrame,
 } from "../utils";
-import { AppState, BinaryFiles, Dimensions } from "../types";
+import { AppState, BinaryFiles, Dimensions, ExportPadding } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
   FANCY_BACKGROUND_IMAGES,
@@ -37,10 +38,12 @@ export const exportToCanvas = async (
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
+    exportLogo = true,
     viewBackgroundColor,
   }: {
     exportBackground: boolean;
-    exportPadding?: number;
+    exportPadding?: number | ExportPadding;
+    exportLogo?: boolean;
     viewBackgroundColor: string;
   },
   createCanvas: (
@@ -58,9 +61,15 @@ export const exportToCanvas = async (
     appState.fancyBackgroundImageKey &&
     appState.fancyBackgroundImageKey !== "solid" &&
     elements.length > 0;
+
   const padding = !exportWithFancyBackground
-    ? exportPadding
-    : getFancyBackgroundPadding(exportPadding);
+    ? convertToExportPadding(exportPadding)
+    : getFancyBackgroundPadding(
+        convertToExportPadding(exportPadding),
+        exportLogo,
+      );
+
+  console.log(padding, exportPadding);
 
   const [minX, minY, width, height] = !exportWithFancyBackground
     ? getCanvasSize(elements, padding)
@@ -83,7 +92,7 @@ export const exportToCanvas = async (
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
   let scrollXAdjustment = 0;
-  let scrollYAdjustment = 0;
+  const scrollYAdjustment = 0;
 
   if (
     exportWithFancyBackground &&
@@ -102,10 +111,11 @@ export const exportToCanvas = async (
       exportScale: scale,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
       contentSize,
+      includeLogo: exportLogo,
     });
 
-    scrollXAdjustment = (width - contentSize.width - padding * 2) / 2;
-    scrollYAdjustment = (height - contentSize.height - padding * 2) / 2;
+    scrollXAdjustment =
+      (width - contentSize.width - (padding[1] + padding[3])) / 2;
   }
 
   renderStaticScene({
@@ -121,9 +131,9 @@ export const exportToCanvas = async (
           ? viewBackgroundColor
           : null,
       scrollX:
-        -minX + (onlyExportingSingleFrame ? 0 : padding + scrollXAdjustment),
+        -minX + (onlyExportingSingleFrame ? 0 : padding[3] + scrollXAdjustment),
       scrollY:
-        -minY + (onlyExportingSingleFrame ? 0 : padding + scrollYAdjustment),
+        -minY + (onlyExportingSingleFrame ? 0 : padding[0] + scrollYAdjustment),
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
@@ -172,8 +182,8 @@ export const exportToSvg = async (
     appState.fancyBackgroundImageKey !== "solid";
 
   const padding = !exportWithFancyBackground
-    ? exportPadding
-    : getFancyBackgroundPadding(exportPadding) * exportScale;
+    ? convertToExportPadding(exportPadding)
+    : getFancyBackgroundPadding(convertToExportPadding(exportPadding), true);
 
   let metadata = "";
   if (exportEmbedScene) {
@@ -228,8 +238,10 @@ export const exportToSvg = async (
 
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
-  const offsetX = -minX + (onlyExportingSingleFrame ? 0 : padding);
-  const offsetY = -minY + (onlyExportingSingleFrame ? 0 : padding);
+  const offsetX = -minX + (onlyExportingSingleFrame ? 0 : padding[3]);
+  const offsetY = -minY + (onlyExportingSingleFrame ? 0 : padding[0]);
+
+  console.log(offsetX, offsetY);
 
   const exportingFrame =
     isExportingWholeCanvas || !onlyExportingSingleFrame
@@ -293,10 +305,13 @@ export const exportToSvg = async (
         exportScale,
         theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
         contentSize,
+        includeLogo: true,
       });
 
-      offsetXAdjustment = (width - contentSize.width - padding * 2) / 2;
-      offsetYAdjustment = (height - contentSize.height - padding * 2) / 2;
+      offsetXAdjustment =
+        (width - contentSize.width - (padding[1] + padding[3])) / 2;
+      offsetYAdjustment =
+        (height - contentSize.height - (padding[0] + padding[2])) / 2;
     } else {
       const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
       rect.setAttribute("x", "0");
@@ -323,7 +338,7 @@ export const exportToSvg = async (
 // calculate smallest area to fit the contents in
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
-  exportPadding: number,
+  exportPadding: ExportPadding,
   opts?: { aspectRatio: Dimensions },
 ): [number, number, number, number] => {
   // we should decide if we are exporting the whole canvas
@@ -351,11 +366,18 @@ const getCanvasSize = (
     );
   }
 
-  const padding = onlyExportingSingleFrame ? 0 : exportPadding * 2;
-
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = distance(minX, maxX) + padding;
-  const height = distance(minY, maxY) + padding;
+
+  let width = 0;
+  let height = 0;
+
+  if (onlyExportingSingleFrame) {
+    width = distance(minX, maxX);
+    height = distance(minY, maxY);
+  } else {
+    width = distance(minX, maxX) + exportPadding[1] + exportPadding[3];
+    height = distance(minY, maxY) + exportPadding[0] + exportPadding[2];
+  }
 
   if (opts?.aspectRatio) {
     const expandedDimensions = expandToAspectRatio(
@@ -374,9 +396,10 @@ export const getExportSize = (
   exportPadding: number,
   scale: number,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(elements, exportPadding).map(
-    (dimension) => Math.trunc(dimension * scale),
-  );
+  const [, , width, height] = getCanvasSize(
+    elements,
+    convertToExportPadding(exportPadding),
+  ).map((dimension) => Math.trunc(dimension * scale));
 
   return [width, height];
 };

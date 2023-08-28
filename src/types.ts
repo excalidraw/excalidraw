@@ -659,3 +659,4 @@ export type FrameNameBoundsCache = {
 };
 
 export type Dimensions = { width: number; height: number };
+export type ExportPadding = [number, number, number, number];

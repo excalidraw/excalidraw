@@ -1,7 +1,10 @@
 import {
   DEFAULT_EXPORT_PADDING,
+  EXPORT_LOGO_URL,
+  EXPORT_LOGO_URL_DARK,
   FANCY_BACKGROUND_IMAGES,
   FANCY_BG_BORDER_RADIUS,
+  FANCY_BG_LOGO_PADDING,
   FANCY_BG_PADDING,
   IMAGE_INVERT_FILTER,
   SVG_NS,
@@ -11,11 +14,24 @@ import {
 import { loadHTMLImageElement, loadSVGElement } from "../element/image";
 import { getScaleToFill } from "../packages/utils";
 import { roundRect } from "../renderer/roundRect";
-import { AppState, DataURL, Dimensions } from "../types";
+import { AppState, DataURL, Dimensions, ExportPadding } from "../types";
 
 export const getFancyBackgroundPadding = (
-  exportPadding = DEFAULT_EXPORT_PADDING,
-) => FANCY_BG_PADDING + FANCY_BG_BORDER_RADIUS + exportPadding;
+  exportPadding: ExportPadding = [
+    DEFAULT_EXPORT_PADDING,
+    DEFAULT_EXPORT_PADDING,
+    DEFAULT_EXPORT_PADDING,
+    DEFAULT_EXPORT_PADDING,
+  ],
+  includeLogo = false,
+): ExportPadding =>
+  exportPadding.map(
+    (padding, index) =>
+      FANCY_BG_PADDING +
+      FANCY_BG_BORDER_RADIUS +
+      padding +
+      (index === 2 && includeLogo ? 20 : 0),
+  ) as [number, number, number, number];
 
 const addImageBackground = (
   context: CanvasRenderingContext2D,
@@ -65,6 +81,7 @@ const getContentBackgound = (
   contentSize: Dimensions,
   normalizedDimensions: Dimensions,
   exportScale: number,
+  includeLogo: boolean,
 ): { x: number; y: number; width: number; height: number } => {
   const x =
     (normalizedDimensions.width - contentSize.width * exportScale) / 2 -
@@ -80,7 +97,8 @@ const getContentBackgound = (
     exportScale;
 
   const height =
-    (contentSize.height +
+    (contentSize.height -
+      (includeLogo ? FANCY_BG_LOGO_PADDING : 0) +
       (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
     exportScale;
 
@@ -94,6 +112,7 @@ const addContentBackground = (
   exportScale: AppState["exportScale"],
   theme: AppState["theme"],
   contentSize: Dimensions,
+  includeLogo: boolean,
 ) => {
   const shadows = [
     {
@@ -129,6 +148,7 @@ const addContentBackground = (
       contentSize,
       normalizedDimensions,
       exportScale,
+      includeLogo,
     );
 
     if (context.roundRect) {
@@ -162,6 +182,26 @@ const addContentBackground = (
   });
 };
 
+const addLogo = (
+  context: CanvasRenderingContext2D,
+  canvasDimensions: Dimensions,
+  logoImage: HTMLImageElement,
+  exportScale: number,
+) => {
+  context.save();
+  context.beginPath();
+  context.drawImage(
+    logoImage,
+    ((canvasDimensions.width - logoImage.width) / 2) * exportScale, // center horizontally
+    (canvasDimensions.height - logoImage.height - 12) * exportScale, // 12px from bottom
+    logoImage.width * exportScale,
+    logoImage.height * exportScale,
+  );
+
+  context.closePath();
+  context.restore();
+};
+
 export const applyFancyBackgroundOnCanvas = async ({
   canvas,
   fancyBackgroundImageKey,
@@ -169,6 +209,7 @@ export const applyFancyBackgroundOnCanvas = async ({
   exportScale,
   theme,
   contentSize,
+  includeLogo,
 }: {
   canvas: HTMLCanvasElement;
   fancyBackgroundImageKey: Exclude<
@@ -179,6 +220,7 @@ export const applyFancyBackgroundOnCanvas = async ({
   exportScale: AppState["exportScale"];
   theme: AppState["theme"];
   contentSize: Dimensions;
+  includeLogo: boolean;
 }) => {
   const context = canvas.getContext("2d")!;
 
@@ -208,7 +250,15 @@ export const applyFancyBackgroundOnCanvas = async ({
     exportScale,
     theme,
     contentSize,
+    includeLogo,
   );
+
+  if (includeLogo) {
+    const logoImage = await loadHTMLImageElement(
+      theme === THEME.DARK ? EXPORT_LOGO_URL_DARK : EXPORT_LOGO_URL,
+    );
+    addLogo(context, canvasDimensions, logoImage, exportScale);
+  }
 };
 
 const addImageBackgroundToSvg = async ({
@@ -241,12 +291,14 @@ const addContentBackgroundToSvg = ({
   contentSize,
   backgroundColor,
   dimensions,
+  includeLogo,
 }: {
   svgRoot: SVGSVGElement;
   exportScale: number;
   contentSize: Dimensions;
   backgroundColor: string;
   dimensions: Dimensions;
+  includeLogo: boolean;
 }) => {
   // Create the shadow filter
   const filter = svgRoot.ownerDocument!.createElementNS(SVG_NS, "filter");
@@ -305,6 +357,7 @@ const addContentBackgroundToSvg = ({
     contentSize,
     dimensions,
     exportScale,
+    includeLogo,
   );
   const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
   rect.setAttribute("x", x.toString());
@@ -318,6 +371,23 @@ const addContentBackgroundToSvg = ({
   svgRoot.appendChild(rect);
 };
 
+const addLogoToSvg = (
+  svgRoot: SVGSVGElement,
+  canvasDimensions: Dimensions,
+  logoImage: SVGSVGElement,
+  exportScale: number,
+) => {
+  const logoWidth = parseFloat(logoImage.getAttribute("width") || "0");
+  const logoHeight = parseFloat(logoImage.getAttribute("height") || "0");
+
+  const x = (canvasDimensions.width - logoWidth) / 2; // center horizontally
+  const y = canvasDimensions.height - logoHeight - 12; // 12px from bottom
+
+  logoImage.setAttribute("x", `${x}`);
+  logoImage.setAttribute("y", `${y * exportScale}`);
+  svgRoot.appendChild(logoImage);
+};
+
 export const applyFancyBackgroundOnSvg = async ({
   svgRoot,
   fancyBackgroundImageKey,
@@ -326,6 +396,7 @@ export const applyFancyBackgroundOnSvg = async ({
   exportScale,
   theme,
   contentSize,
+  includeLogo,
 }: {
   svgRoot: SVGSVGElement;
   fancyBackgroundImageKey: Exclude<
@@ -337,6 +408,7 @@ export const applyFancyBackgroundOnSvg = async ({
   exportScale: AppState["exportScale"];
   theme: AppState["theme"];
   contentSize: Dimensions;
+  includeLogo: boolean;
 }) => {
   // Image background
   const fancyBackgroundImageUrl =
@@ -355,5 +427,13 @@ export const applyFancyBackgroundOnSvg = async ({
     contentSize,
     backgroundColor,
     dimensions,
+    includeLogo,
   });
+
+  if (includeLogo) {
+    const logoImage = await loadSVGElement(
+      theme === THEME.DARK ? EXPORT_LOGO_URL_DARK : EXPORT_LOGO_URL,
+    );
+    addLogoToSvg(svgRoot, dimensions, logoImage, exportScale);
+  }
 };

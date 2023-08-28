@@ -39,7 +39,7 @@ import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
 import Select, { convertToSelectItems } from "./Select";
 import { getCommonBounds } from "../element";
-import { defaultExportScale, distance } from "../utils";
+import { convertToExportPadding, defaultExportScale, distance } from "../utils";
 import { getFancyBackgroundPadding } from "../scene/fancyBackground";
 
 const supportsContextFilters =
@@ -137,12 +137,17 @@ const ImageExportModal = ({
       const maxWidth = previewNode.offsetWidth;
       const maxHeight = previewNode.offsetHeight;
 
+      const padding = getFancyBackgroundPadding(
+        convertToExportPadding(DEFAULT_EXPORT_PADDING),
+        true,
+      );
+
       const scale =
         Math.floor(
           (getScaleToFit(
             {
-              width: distance(minX, maxX) + getFancyBackgroundPadding() * 2,
-              height: distance(minY, maxY) + getFancyBackgroundPadding() * 2,
+              width: distance(minX, maxX) + padding[1] + padding[3],
+              height: distance(minY, maxY) + padding[0] + padding[2],
             },
             { width: maxWidth, height: maxHeight },
           ) +

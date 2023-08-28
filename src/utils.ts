@@ -16,7 +16,14 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppState, DataURL, Dimensions, LastActiveTool, Zoom } from "./types";
+import {
+  AppState,
+  DataURL,
+  Dimensions,
+  ExportPadding,
+  LastActiveTool,
+  Zoom,
+} from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
@@ -1051,4 +1058,26 @@ export const expandToAspectRatio = (
     width: newWidth,
     height: newHeight,
   };
+};
+
+const isExportPadding = (value: any): value is ExportPadding => {
+  return (
+    Array.isArray(value) &&
+    value.length === 4 &&
+    value.every((item) => typeof item === "number")
+  );
+};
+
+export const convertToExportPadding = (
+  padding: number | ExportPadding,
+): ExportPadding => {
+  if (typeof padding === "number") {
+    return [padding, padding, padding, padding];
+  }
+
+  if (isExportPadding(padding)) {
+    return padding;
+  }
+
+  throw new Error("Invalid padding value");
 };
