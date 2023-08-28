@@ -8,6 +8,7 @@
     "moveCanvas": "キャンバスを移動",
     "cut": "切り取り",
     "copy": "コピー",
+    "copyLink": "",
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
     "copyText": "テキストとしてクリップボードにコピー",

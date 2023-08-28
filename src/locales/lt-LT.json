@@ -8,6 +8,7 @@
     "moveCanvas": "Judinti drobę",
     "cut": "Iškirpti",
     "copy": "Kopijuoti",
+    "copyLink": "",
     "copyAsPng": "Kopijuoti į iškarpinę kaip PNG",
     "copyAsSvg": "Kopijuoti į iškarpinę kaip SVG",
     "copyText": "Kopijuoti į iškarpinę kaip tekstą",

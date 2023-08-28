@@ -8,6 +8,7 @@
     "moveCanvas": "Déplacer le canevas",
     "cut": "Couper",
     "copy": "Copier",
+    "copyLink": "",
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
     "copyText": "Copier dans le presse-papier en tant que texte",

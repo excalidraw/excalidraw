@@ -8,6 +8,7 @@
     "moveCanvas": "Mover tela",
     "cut": "Recortar",
     "copy": "Copiar",
+    "copyLink": "",
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
     "copyText": "Copiar para área de transferência como texto",

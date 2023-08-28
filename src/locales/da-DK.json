@@ -8,6 +8,7 @@
     "moveCanvas": "Flyt lærred",
     "cut": "Klip",
     "copy": "Kopier",
+    "copyLink": "",
     "copyAsPng": "Kopier til klippebord som PNG",
     "copyAsSvg": "Kopier til klippebord som SVG",
     "copyText": "Kopiér til udklipsholder som tekst",

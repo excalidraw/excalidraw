@@ -8,6 +8,7 @@
     "moveCanvas": "Pindahkan kanvas",
     "cut": "Potong",
     "copy": "Salin",
+    "copyLink": "",
     "copyAsPng": "Salin ke papan klip sebagai PNG",
     "copyAsSvg": "Salin ke papan klip sebagai SVG",
     "copyText": "Salin ke papan klip sebagai teks",

@@ -8,6 +8,7 @@
     "moveCanvas": "Mover el lienzo",
     "cut": "Cortar",
     "copy": "Copiar",
+    "copyLink": "",
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
     "copyText": "Copiar al portapapeles como texto",

@@ -8,6 +8,7 @@
     "moveCanvas": "Desplaçar lo canabàs",
     "cut": "Talhar",
     "copy": "Copiar",
+    "copyLink": "",
     "copyAsPng": "Copiar al quichapapièrs coma PNG",
     "copyAsSvg": "Copiar al quichapapièrs coma SVG",
     "copyText": "Copiar al quichapapièrs coma tèxt",
