@@ -11,6 +11,7 @@
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
     "copyText": "Copier dans le presse-papier en tant que texte",
+    "copyLink": "",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Déplacer à l'arrière-plan",
     "bringToFront": "Mettre au premier plan",
