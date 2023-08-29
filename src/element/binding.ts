@@ -497,6 +497,9 @@ export const getEligibleElementsForBinding = (
 const getElligibleElementsForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
+  if (linearElement.groupIds.length > 0) {
+    return [];
+  }
   return [
     getElligibleElementForBindingElement(linearElement, "start"),
     getElligibleElementForBindingElement(linearElement, "end"),
