@@ -474,7 +474,7 @@
       "saveToDisk": {
         "title": "Guardar en el disco",
         "button": "Guardar en el disco",
-        "description": ""
+        "description": "Exporta los datos de la escena a un archivo desde el cual podrás importar más tarde."
       },
       "excalidrawPlus": {
         "title": "",
