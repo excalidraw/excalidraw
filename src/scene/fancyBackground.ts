@@ -4,6 +4,7 @@ import {
   EXPORT_LOGO_URL_DARK,
   FANCY_BACKGROUND_IMAGES,
   FANCY_BG_BORDER_RADIUS,
+  FANCY_BG_LOGO_BOTTOM_PADDING,
   FANCY_BG_LOGO_PADDING,
   FANCY_BG_PADDING,
   IMAGE_INVERT_FILTER,
@@ -35,7 +36,7 @@ export const getFancyBackgroundPadding = (
 
 const addImageBackground = (
   context: CanvasRenderingContext2D,
-  canvasDimensions: Dimensions,
+  normalizedCanvasDimensions: Dimensions,
   fancyBackgroundImage: HTMLImageElement,
   exportScale: AppState["exportScale"],
 ) => {
@@ -45,8 +46,8 @@ const addImageBackground = (
     context.roundRect(
       0,
       0,
-      canvasDimensions.width,
-      canvasDimensions.height,
+      normalizedCanvasDimensions.width,
+      normalizedCanvasDimensions.height,
       FANCY_BG_BORDER_RADIUS * exportScale,
     );
   } else {
@@ -54,17 +55,23 @@ const addImageBackground = (
       context,
       0,
       0,
-      canvasDimensions.width,
-      canvasDimensions.height,
+      normalizedCanvasDimensions.width,
+      normalizedCanvasDimensions.height,
       FANCY_BG_BORDER_RADIUS * exportScale,
     );
   }
   const scale = getScaleToFill(
     { width: fancyBackgroundImage.width, height: fancyBackgroundImage.height },
-    { width: canvasDimensions.width, height: canvasDimensions.height },
+    {
+      width: normalizedCanvasDimensions.width,
+      height: normalizedCanvasDimensions.height,
+    },
   );
-  const x = (canvasDimensions.width - fancyBackgroundImage.width * scale) / 2;
-  const y = (canvasDimensions.height - fancyBackgroundImage.height * scale) / 2;
+  const x =
+    (normalizedCanvasDimensions.width - fancyBackgroundImage.width * scale) / 2;
+  const y =
+    (normalizedCanvasDimensions.height - fancyBackgroundImage.height * scale) /
+    2;
   context.clip();
   context.drawImage(
     fancyBackgroundImage,
@@ -79,16 +86,19 @@ const addImageBackground = (
 
 const getContentBackgound = (
   contentSize: Dimensions,
-  normalizedDimensions: Dimensions,
+  normalizedCanvasDimensions: Dimensions,
   exportScale: number,
   includeLogo: boolean,
 ): { x: number; y: number; width: number; height: number } => {
   const x =
-    (normalizedDimensions.width - contentSize.width * exportScale) / 2 -
+    (normalizedCanvasDimensions.width - contentSize.width * exportScale) / 2 -
     FANCY_BG_PADDING * exportScale;
 
   const y =
-    (normalizedDimensions.height - contentSize.height * exportScale) / 2 -
+    (normalizedCanvasDimensions.height -
+      (contentSize.height + DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) *
+        exportScale) /
+      2 -
     FANCY_BG_PADDING * exportScale;
 
   const width =
@@ -97,7 +107,9 @@ const getContentBackgound = (
     exportScale;
 
   const height =
-    (contentSize.height -
+    (contentSize.height +
+      DEFAULT_EXPORT_PADDING +
+      FANCY_BG_BORDER_RADIUS -
       (includeLogo ? FANCY_BG_LOGO_PADDING : 0) +
       (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
     exportScale;
@@ -107,7 +119,7 @@ const getContentBackgound = (
 
 const addContentBackground = (
   context: CanvasRenderingContext2D,
-  normalizedDimensions: Dimensions,
+  normalizedCanvasDimensions: Dimensions,
   contentBackgroundColor: string,
   exportScale: AppState["exportScale"],
   theme: AppState["theme"],
@@ -146,7 +158,7 @@ const addContentBackground = (
 
     const { x, y, width, height } = getContentBackgound(
       contentSize,
-      normalizedDimensions,
+      normalizedCanvasDimensions,
       exportScale,
       includeLogo,
     );
@@ -184,7 +196,7 @@ const addContentBackground = (
 
 const addLogo = (
   context: CanvasRenderingContext2D,
-  canvasDimensions: Dimensions,
+  normalizedCanvasDimensions: Dimensions,
   logoImage: HTMLImageElement,
   exportScale: number,
 ) => {
@@ -192,8 +204,10 @@ const addLogo = (
   context.beginPath();
   context.drawImage(
     logoImage,
-    ((canvasDimensions.width - logoImage.width) / 2) * exportScale, // center horizontally
-    (canvasDimensions.height - logoImage.height - 12) * exportScale, // 12px from bottom
+    (normalizedCanvasDimensions.width - logoImage.width * exportScale) / 2,
+    normalizedCanvasDimensions.height -
+      logoImage.height * exportScale -
+      FANCY_BG_LOGO_BOTTOM_PADDING * exportScale,
     logoImage.width * exportScale,
     logoImage.height * exportScale,
   );
@@ -231,21 +245,21 @@ export const applyFancyBackgroundOnCanvas = async ({
     fancyBackgroundImageUrl,
   );
 
-  const canvasDimensions: Dimensions = {
+  const normalizedCanvasDimensions: Dimensions = {
     width: canvas.width,
     height: canvas.height,
   };
 
   addImageBackground(
     context,
-    canvasDimensions,
+    normalizedCanvasDimensions,
     fancyBackgroundImage,
     exportScale,
   );
 
   addContentBackground(
     context,
-    canvasDimensions,
+    normalizedCanvasDimensions,
     backgroundColor,
     exportScale,
     theme,
@@ -257,7 +271,7 @@ export const applyFancyBackgroundOnCanvas = async ({
     const logoImage = await loadHTMLImageElement(
       theme === THEME.DARK ? EXPORT_LOGO_URL_DARK : EXPORT_LOGO_URL,
     );
-    addLogo(context, canvasDimensions, logoImage, exportScale);
+    addLogo(context, normalizedCanvasDimensions, logoImage, exportScale);
   }
 };
 
@@ -373,15 +387,15 @@ const addContentBackgroundToSvg = ({
 
 const addLogoToSvg = (
   svgRoot: SVGSVGElement,
-  canvasDimensions: Dimensions,
+  normalizedCanvasDimensions: Dimensions,
   logoImage: SVGSVGElement,
   exportScale: number,
 ) => {
   const logoWidth = parseFloat(logoImage.getAttribute("width") || "0");
   const logoHeight = parseFloat(logoImage.getAttribute("height") || "0");
 
-  const x = (canvasDimensions.width - logoWidth) / 2; // center horizontally
-  const y = canvasDimensions.height - logoHeight - 12; // 12px from bottom
+  const x = (normalizedCanvasDimensions.width - logoWidth) / 2; // center horizontally
+  const y = normalizedCanvasDimensions.height - logoHeight - 12; // 12px from bottom
 
   logoImage.setAttribute("x", `${x}`);
   logoImage.setAttribute("y", `${y * exportScale}`);

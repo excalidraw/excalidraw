@@ -234,8 +234,9 @@ export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
 export const FANCY_BG_PADDING = 24; // px
-export const FANCY_BG_LOGO_PADDING = 20; // px
 export const FANCY_BG_BORDER_RADIUS = 12; // px
+export const FANCY_BG_LOGO_PADDING = 20; // px
+export const FANCY_BG_LOGO_BOTTOM_PADDING = 12; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 
@@ -358,3 +359,6 @@ export const FANCY_BACKGROUND_IMAGES = {
 
 export const DEFAULT_FANCY_BACKGROUND_IMAGE: keyof typeof FANCY_BACKGROUND_IMAGES =
   "solid" as const;
+
+export const EXPORT_LOGO_URL = "/backgrounds/logo.svg" as DataURL;
+export const EXPORT_LOGO_URL_DARK = "/backgrounds/logo-dark.svg" as DataURL;
