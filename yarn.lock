@@ -1527,17 +1527,17 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
   integrity sha512-GemHNF5Z6ga0BWBSX7GJaNBUchLu6RwTcAB84eX1MeckRNhNasAsPCdelDlFalz27iS4RuYEQh0bPE8SRxJgbQ==
 
-"@excalidraw/markdown-to-text@^0.1.2":
+"@excalidraw/markdown-to-text@0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/mermaid-to-excalidraw@0.1.0-test-named-export":
-  version "0.1.0-test-named-export"
-  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.0-test-named-export.tgz#0d8415c36166954f5fbb658d3c3458c27ac2ed4f"
-  integrity sha512-GmLBqWlT3UEce+9MsdHoNIEBwDhNrE0oXnS6fxoXbqO1bmoOfxpbzVe7M9DBlHt/TYWUFEANzvXzFZqjQCt1UA==
+"@excalidraw/mermaid-to-excalidraw@0.1.0-test-undefined":
+  version "0.1.0-test-undefined"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.0-test-undefined.tgz#ac0000d6f38f2dd4d3dbadaf0375acccc63809b4"
+  integrity sha512-XiAZ6BfX1rDO9EGFNYAwfOxLH/ohKF0ZZhSgqYsln+xhqRqthWcEPjvkFFnKG8KuTfoUr8slK1gNCa/qxdVWjA==
   dependencies:
-    "@excalidraw/markdown-to-text" "^0.1.2"
+    "@excalidraw/markdown-to-text" "0.1.2"
     mermaid "10.2.3"
     nanoid "4.0.2"
 
