@@ -389,6 +389,7 @@ const addLogoToSvg = (
   normalizedCanvasDimensions: Dimensions,
   logoImage: SVGSVGElement,
   exportScale: number,
+  theme: AppState["theme"],
 ) => {
   const logoWidth = parseFloat(logoImage.getAttribute("width") || "0");
   const logoHeight = parseFloat(logoImage.getAttribute("height") || "0");
@@ -398,6 +399,9 @@ const addLogoToSvg = (
 
   logoImage.setAttribute("x", `${x}`);
   logoImage.setAttribute("y", `${y * exportScale}`);
+  if (theme === THEME.DARK) {
+    logoImage.setAttribute("filter", IMAGE_INVERT_FILTER);
+  }
   svgRoot.appendChild(logoImage);
 };
 
@@ -447,6 +451,6 @@ export const applyFancyBackgroundOnSvg = async ({
     const logoImage = await loadSVGElement(
       theme === THEME.DARK ? EXPORT_LOGO_URL_DARK : EXPORT_LOGO_URL,
     );
-    addLogoToSvg(svgRoot, dimensions, logoImage, exportScale);
+    addLogoToSvg(svgRoot, dimensions, logoImage, exportScale, theme);
   }
 };
