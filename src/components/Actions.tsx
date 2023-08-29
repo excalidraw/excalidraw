@@ -36,7 +36,12 @@ import {
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { EmbedIcon, extraToolsIcon, frameToolIcon } from "./icons";
+import {
+  EmbedIcon,
+  extraToolsIcon,
+  frameToolIcon,
+  mermaidLogoIcon,
+} from "./icons";
 import { KEYS } from "../keys";
 
 export const SelectedShapeActions = ({
@@ -408,7 +413,7 @@ export const ShapesSwitcher = ({
                   selectedElementIds: {},
                 });
               }}
-              icon={EmbedIcon}
+              icon={mermaidLogoIcon}
               data-testid="toolbar-embeddable"
             >
               {t("toolBar.mermaidToExcalidraw")}
