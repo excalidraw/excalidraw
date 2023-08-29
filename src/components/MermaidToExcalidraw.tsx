@@ -92,7 +92,16 @@ const MermaidToExcalidraw = ({
         );
       } catch (e) {
         console.error(e);
-        canvasNode.replaceChildren();
+        if (text) {
+          const errorEle = document.createElement("div");
+          errorEle.innerHTML = "ERROR!!!!";
+          errorEle.style.color = "red";
+          errorEle.style.fontWeight = "800";
+          errorEle.style.fontSize = "40px";
+          canvasNode.replaceChildren(errorEle);
+        } else {
+          canvasNode.replaceChildren();
+        }
       }
 
       if (mermaidGraphData) {
@@ -169,7 +178,7 @@ const MermaidToExcalidraw = ({
           className="mermaid-to-excalidraw-wrapper-text"
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <label>Describe</label>
+          <label>Mermaid Syntax</label>
           <textarea
             style={{
               padding: "0.85rem",
