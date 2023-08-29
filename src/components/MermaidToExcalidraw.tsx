@@ -149,7 +149,20 @@ const MermaidToExcalidraw = ({
   };
 
   return (
-    <Dialog onCloseRequest={onClose} title="Mermaid to Excalidraw">
+    <Dialog
+      onCloseRequest={onClose}
+      title={
+        <>
+          <p style={{ marginBottom: "5px" }}>Mermaid to Excalidraw</p>
+          <span
+            style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
+          >
+            Currently only flowcharts are supported. The other types would be
+            rendered as image in Excalidraw
+          </span>
+        </>
+      }
+    >
       <div className="mermaid-to-excalidraw-wrapper">
         <div
           className="mermaid-to-excalidraw-wrapper-text"
