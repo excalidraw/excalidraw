@@ -1,4 +1,4 @@
-import { AppState } from "../../src/types";
+import { AppState, Primitive } from "../../src/types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -117,26 +117,44 @@ const changeProperty = (
   });
 };
 
-const getFormValue = function <T>(
+const getFormValue = function <T extends Primitive>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-  isRelevantElement: (element: ExcalidrawElement) => boolean,
-  defaultValue: T,
+  isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
+  defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
   const editingElement = appState.editingElement;
   const nonDeletedElements = getNonDeletedElements(elements);
-  return (
-    (editingElement && getAttribute(editingElement)) ??
-    (isSomeElementSelected(nonDeletedElements, appState)
-      ? getCommonAttributeOfSelectedElements(
-          nonDeletedElements.filter((el) => isRelevantElement(el)),
+
+  let ret: T | null = null;
+
+  if (editingElement) {
+    ret = getAttribute(editingElement);
+  }
+
+  if (!ret) {
+    const hasSelection = isSomeElementSelected(nonDeletedElements, appState);
+
+    if (hasSelection) {
+      ret =
+        getCommonAttributeOfSelectedElements(
+          isRelevantElement === true
+            ? nonDeletedElements
+            : nonDeletedElements.filter((el) => isRelevantElement(el)),
           appState,
           getAttribute,
-        )
-      : defaultValue) ??
-    defaultValue
-  );
+        ) ??
+        (typeof defaultValue === "function"
+          ? defaultValue(true)
+          : defaultValue);
+    } else {
+      ret =
+        typeof defaultValue === "function" ? defaultValue(false) : defaultValue;
+    }
+  }
+
+  return ret;
 };
 
 const offsetElementAfterFontResize = (
@@ -247,7 +265,7 @@ export const actionChangeStrokeColor = register({
           elements,
           appState,
           (element) => element.strokeColor,
-          (element) => true,
+          true,
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
@@ -290,7 +308,7 @@ export const actionChangeBackgroundColor = register({
           elements,
           appState,
           (element) => element.backgroundColor,
-          (element) => true,
+          true,
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
@@ -357,9 +375,8 @@ export const actionChangeFillStyle = register({
             appState,
             (element) => element.fillStyle,
             (element) => element.hasOwnProperty("fillStyle"),
-            getSelectedElements(elements, appState).length >= 2
-              ? null
-              : appState.currentItemFillStyle,
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemFillStyle,
           )}
           onClick={(value, event) => {
             const nextValue =
@@ -418,9 +435,8 @@ export const actionChangeStrokeWidth = register({
           appState,
           (element) => element.strokeWidth,
           (element) => element.hasOwnProperty("strokeWidth"),
-          getSelectedElements(elements, appState).length >= 2
-            ? null
-            : appState.currentItemStrokeWidth,
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemStrokeWidth,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -470,9 +486,8 @@ export const actionChangeSloppiness = register({
           appState,
           (element) => element.roughness,
           (element) => element.hasOwnProperty("roughness"),
-          getSelectedElements(elements, appState).length >= 2
-            ? null
-            : appState.currentItemRoughness,
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemRoughness,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -521,9 +536,8 @@ export const actionChangeStrokeStyle = register({
           appState,
           (element) => element.strokeStyle,
           (element) => element.hasOwnProperty("strokeStyle"),
-          getSelectedElements(elements, appState).length >= 2
-            ? null
-            : appState.currentItemStrokeStyle,
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemStrokeStyle,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -563,7 +577,7 @@ export const actionChangeOpacity = register({
             elements,
             appState,
             (element) => element.opacity,
-            (element) => true,
+            true,
             appState.currentItemOpacity,
           ) ?? undefined
         }
@@ -624,9 +638,10 @@ export const actionChangeFontSize = register({
           },
           (element) =>
             isTextElement(element) || getBoundTextElement(element) !== null,
-          getSelectedElements(elements, appState).length >= 2
-            ? null
-            : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+          (hasSelection) =>
+            hasSelection
+              ? null
+              : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -750,9 +765,10 @@ export const actionChangeFontFamily = register({
             },
             (element) =>
               isTextElement(element) || getBoundTextElement(element) !== null,
-            getSelectedElements(elements, appState).length >= 2
-              ? null
-              : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -831,9 +847,8 @@ export const actionChangeTextAlign = register({
             },
             (element) =>
               isTextElement(element) || getBoundTextElement(element) !== null,
-            getSelectedElements(elements, appState).length >= 2
-              ? null
-              : appState.currentItemTextAlign,
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemTextAlign,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -911,9 +926,7 @@ export const actionChangeVerticalAlign = register({
             },
             (element) =>
               isTextElement(element) || getBoundTextElement(element) !== null,
-            getSelectedElements(elements, appState).length >= 2
-              ? null
-              : VERTICAL_ALIGN.MIDDLE,
+            (hasSelection) => (hasSelection ? null : VERTICAL_ALIGN.MIDDLE),
           )}
           onChange={(value) => updateData(value)}
         />
@@ -979,9 +992,8 @@ export const actionChangeRoundness = register({
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
             (element) => element.hasOwnProperty("roundness"),
-            getSelectedElements(elements, appState).length >= 2
-              ? null
-              : appState.currentItemRoundness,
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemRoundness,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -1075,7 +1087,7 @@ export const actionChangeArrowhead = register({
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.startArrowhead
                   : appState.currentItemStartArrowhead,
-              (element) => true,
+              true,
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
@@ -1122,7 +1134,7 @@ export const actionChangeArrowhead = register({
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.endArrowhead
                   : appState.currentItemEndArrowhead,
-              (element) => true,
+              true,
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
