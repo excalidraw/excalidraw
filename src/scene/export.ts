@@ -69,8 +69,6 @@ export const exportToCanvas = async (
         exportLogo,
       );
 
-  console.log(padding, exportPadding);
-
   const [minX, minY, width, height] = !exportWithFancyBackground
     ? getCanvasSize(elements, padding)
     : getCanvasSize(elements, padding, {
@@ -240,8 +238,6 @@ export const exportToSvg = async (
 
   const offsetX = -minX + (onlyExportingSingleFrame ? 0 : padding[3]);
   const offsetY = -minY + (onlyExportingSingleFrame ? 0 : padding[0]);
-
-  console.log(offsetX, offsetY);
 
   const exportingFrame =
     isExportingWholeCanvas || !onlyExportingSingleFrame

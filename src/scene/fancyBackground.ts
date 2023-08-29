@@ -206,8 +206,7 @@ const addLogo = (
     logoImage,
     (normalizedCanvasDimensions.width - logoImage.width * exportScale) / 2,
     normalizedCanvasDimensions.height -
-      logoImage.height * exportScale -
-      FANCY_BG_LOGO_BOTTOM_PADDING * exportScale,
+      (logoImage.height + FANCY_BG_LOGO_BOTTOM_PADDING) * exportScale,
     logoImage.width * exportScale,
     logoImage.height * exportScale,
   );
