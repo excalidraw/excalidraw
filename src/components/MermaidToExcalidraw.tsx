@@ -79,6 +79,10 @@ const MermaidToExcalidraw = ({
   useEffect(() => {
     const convertMermaidToExcal = async () => {
       let mermaidGraphData;
+      const canvasNode = canvasRef.current;
+      if (!canvasNode) {
+        return;
+      }
       try {
         mermaidGraphData = await mermaidToExcalidrawLib.current.parseMermaid(
           text,
@@ -87,7 +91,8 @@ const MermaidToExcalidraw = ({
           },
         );
       } catch (e) {
-        // Parse error, displaying error message to users
+        console.error(e);
+        canvasNode.replaceChildren();
       }
 
       if (mermaidGraphData) {
@@ -99,10 +104,6 @@ const MermaidToExcalidraw = ({
           files,
         };
 
-        const canvasNode = canvasRef.current;
-        if (!canvasNode) {
-          return;
-        }
         const maxWidth = canvasNode.offsetWidth;
         const maxHeight = canvasNode.offsetHeight;
         let dimension = Math.max(maxWidth, maxHeight);
