@@ -39,6 +39,7 @@ import {
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
 import { assertNever, getFontString } from "../utils";
+import { getSizeFromPoints } from "../points";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -444,6 +445,11 @@ export const convertToExcalidrawElements = (
           ],
           ...element,
         });
+
+        Object.assign(
+          excalidrawElement,
+          getSizeFromPoints(excalidrawElement.points),
+        );
         break;
       }
       case "text": {
