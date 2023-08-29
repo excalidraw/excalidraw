@@ -140,9 +140,8 @@ describe("restoreElements", () => {
     expect(restoredArrow).toMatchSnapshot({ seed: expect.any(Number) });
   });
 
-  it("when arrow element has defined endArrowHead", () => {
+  it('should set arrow element endArrowHead as "arrow" when arrow element endArrowHead is null', () => {
     const arrowElement = API.createElement({ type: "arrow" });
-
     const restoredElements = restore.restoreElements([arrowElement], null);
 
     const restoredArrow = restoredElements[0] as ExcalidrawLinearElement;
@@ -150,7 +149,7 @@ describe("restoreElements", () => {
     expect(arrowElement.endArrowhead).toBe(restoredArrow.endArrowhead);
   });
 
-  it("when arrow element has undefined endArrowHead", () => {
+  it('should set arrow element endArrowHead as "arrow" when arrow element endArrowHead is undefined', () => {
     const arrowElement = API.createElement({ type: "arrow" });
     Object.defineProperty(arrowElement, "endArrowhead", {
       get: vi.fn(() => undefined),

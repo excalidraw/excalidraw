@@ -2,7 +2,9 @@ import { ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import { AppState } from "../types";
+import { AppState, Zoom } from "../types";
+import { getElementBounds } from "./bounds";
+import { viewportCoordsToSceneCoords } from "../utils";
 
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
@@ -11,6 +13,42 @@ export const isInvisiblySmallElement = (
     return element.points.length < 2;
   }
   return element.width === 0 && element.height === 0;
+};
+
+export const isElementInViewport = (
+  element: ExcalidrawElement,
+  width: number,
+  height: number,
+  viewTransformations: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
+) => {
+  const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
+  const topLeftSceneCoords = viewportCoordsToSceneCoords(
+    {
+      clientX: viewTransformations.offsetLeft,
+      clientY: viewTransformations.offsetTop,
+    },
+    viewTransformations,
+  );
+  const bottomRightSceneCoords = viewportCoordsToSceneCoords(
+    {
+      clientX: viewTransformations.offsetLeft + width,
+      clientY: viewTransformations.offsetTop + height,
+    },
+    viewTransformations,
+  );
+
+  return (
+    topLeftSceneCoords.x <= x2 &&
+    topLeftSceneCoords.y <= y2 &&
+    bottomRightSceneCoords.x >= x1 &&
+    bottomRightSceneCoords.y >= y1
+  );
 };
 
 /**

@@ -116,7 +116,7 @@ export const textWysiwyg = ({
   }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   excalidrawContainer: HTMLDivElement | null;
   app: App;
 }) => {
