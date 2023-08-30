@@ -291,7 +291,7 @@ const addImageBackgroundToSvg = async ({
   fancyBackgroundImage.setAttribute("y", "0");
   fancyBackgroundImage.setAttribute("width", `${dimensions.width}`);
   fancyBackgroundImage.setAttribute("height", `${dimensions.height}`);
-  fancyBackgroundImage.setAttribute("preserveAspectRatio", "none");
+  fancyBackgroundImage.setAttribute("preserveAspectRatio", "xMidYMid slice");
   if (theme === THEME.DARK) {
     fancyBackgroundImage.setAttribute("filter", IMAGE_INVERT_FILTER);
   }
@@ -300,14 +300,12 @@ const addImageBackgroundToSvg = async ({
 };
 const addContentBackgroundToSvg = ({
   svgRoot,
-  exportScale,
   contentSize,
   backgroundColor,
   dimensions,
   includeLogo,
 }: {
   svgRoot: SVGSVGElement;
-  exportScale: number;
   contentSize: Dimensions;
   backgroundColor: string;
   dimensions: Dimensions;
@@ -369,16 +367,17 @@ const addContentBackgroundToSvg = ({
   const { x, y, width, height } = getContentBackgound(
     contentSize,
     dimensions,
-    exportScale,
+    1, // svg is scaled on root
     includeLogo,
   );
+
   const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
   rect.setAttribute("x", x.toString());
   rect.setAttribute("y", y.toString());
   rect.setAttribute("width", width.toString());
   rect.setAttribute("height", height.toString());
-  rect.setAttribute("rx", (FANCY_BG_BORDER_RADIUS * exportScale).toString());
-  rect.setAttribute("ry", (FANCY_BG_BORDER_RADIUS * exportScale).toString());
+  rect.setAttribute("rx", FANCY_BG_BORDER_RADIUS.toString());
+  rect.setAttribute("ry", FANCY_BG_BORDER_RADIUS.toString());
   rect.setAttribute("fill", backgroundColor);
   rect.setAttribute("filter", "url(#shadow)");
   svgRoot.appendChild(rect);
@@ -388,17 +387,18 @@ const addLogoToSvg = (
   svgRoot: SVGSVGElement,
   normalizedCanvasDimensions: Dimensions,
   logoImage: SVGSVGElement,
-  exportScale: number,
   theme: AppState["theme"],
 ) => {
   const logoWidth = parseFloat(logoImage.getAttribute("width") || "0");
   const logoHeight = parseFloat(logoImage.getAttribute("height") || "0");
 
-  const x = (normalizedCanvasDimensions.width - logoWidth) / 2; // center horizontally
-  const y = normalizedCanvasDimensions.height - logoHeight - 12; // 12px from bottom
+  const x = (normalizedCanvasDimensions.width - logoWidth) / 2;
+  const y =
+    normalizedCanvasDimensions.height -
+    (logoHeight + FANCY_BG_LOGO_BOTTOM_PADDING);
 
   logoImage.setAttribute("x", `${x}`);
-  logoImage.setAttribute("y", `${y * exportScale}`);
+  logoImage.setAttribute("y", `${y}`);
   if (theme === THEME.DARK) {
     logoImage.setAttribute("filter", IMAGE_INVERT_FILTER);
   }
@@ -409,8 +409,7 @@ export const applyFancyBackgroundOnSvg = async ({
   svgRoot,
   fancyBackgroundImageKey,
   backgroundColor,
-  dimensions,
-  exportScale,
+  canvasDimensions,
   theme,
   contentSize,
   includeLogo,
@@ -421,8 +420,7 @@ export const applyFancyBackgroundOnSvg = async ({
     "solid"
   >;
   backgroundColor: string;
-  dimensions: Dimensions;
-  exportScale: AppState["exportScale"];
+  canvasDimensions: Dimensions;
   theme: AppState["theme"];
   contentSize: Dimensions;
   includeLogo: boolean;
@@ -434,16 +432,18 @@ export const applyFancyBackgroundOnSvg = async ({
   await addImageBackgroundToSvg({
     svgRoot,
     fancyBackgroundImageUrl,
-    dimensions,
+    dimensions: canvasDimensions,
     theme,
   });
 
   addContentBackgroundToSvg({
     svgRoot,
-    exportScale,
     contentSize,
     backgroundColor,
-    dimensions,
+    dimensions: {
+      width: canvasDimensions.width,
+      height: canvasDimensions.height,
+    },
     includeLogo,
   });
 
@@ -451,6 +451,14 @@ export const applyFancyBackgroundOnSvg = async ({
     const logoImage = await loadSVGElement(
       theme === THEME.DARK ? EXPORT_LOGO_URL_DARK : EXPORT_LOGO_URL,
     );
-    addLogoToSvg(svgRoot, dimensions, logoImage, exportScale, theme);
+    addLogoToSvg(
+      svgRoot,
+      {
+        width: canvasDimensions.width,
+        height: canvasDimensions.height,
+      },
+      logoImage,
+      theme,
+    );
   }
 };

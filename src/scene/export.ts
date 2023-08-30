@@ -297,8 +297,10 @@ export const exportToSvg = async (
         svgRoot,
         fancyBackgroundImageKey: `${appState.fancyBackgroundImageKey}`,
         backgroundColor: viewBackgroundColor,
-        dimensions: { width, height },
-        exportScale,
+        canvasDimensions: {
+          width,
+          height,
+        },
         theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
         contentSize,
         includeLogo: true,
