@@ -302,13 +302,13 @@ const addContentBackgroundToSvg = ({
   svgRoot,
   contentSize,
   backgroundColor,
-  dimensions,
+  canvasDimensions,
   includeLogo,
 }: {
   svgRoot: SVGSVGElement;
   contentSize: Dimensions;
   backgroundColor: string;
-  dimensions: Dimensions;
+  canvasDimensions: Dimensions;
   includeLogo: boolean;
 }) => {
   // Create the shadow filter
@@ -366,7 +366,7 @@ const addContentBackgroundToSvg = ({
   // Solid color background
   const { x, y, width, height } = getContentBackgound(
     contentSize,
-    dimensions,
+    canvasDimensions,
     1, // svg is scaled on root
     includeLogo,
   );
@@ -383,19 +383,23 @@ const addContentBackgroundToSvg = ({
   svgRoot.appendChild(rect);
 };
 
-const addLogoToSvg = (
-  svgRoot: SVGSVGElement,
-  normalizedCanvasDimensions: Dimensions,
-  logoImage: SVGSVGElement,
-  theme: AppState["theme"],
-) => {
+const addLogoToSvg = ({
+  svgRoot,
+  canvasDimensions,
+  logoImage,
+  theme,
+}: {
+  svgRoot: SVGSVGElement;
+  canvasDimensions: Dimensions;
+  logoImage: SVGSVGElement;
+  theme: AppState["theme"];
+}) => {
   const logoWidth = parseFloat(logoImage.getAttribute("width") || "0");
   const logoHeight = parseFloat(logoImage.getAttribute("height") || "0");
 
-  const x = (normalizedCanvasDimensions.width - logoWidth) / 2;
+  const x = (canvasDimensions.width - logoWidth) / 2;
   const y =
-    normalizedCanvasDimensions.height -
-    (logoHeight + FANCY_BG_LOGO_BOTTOM_PADDING);
+    canvasDimensions.height - (logoHeight + FANCY_BG_LOGO_BOTTOM_PADDING);
 
   logoImage.setAttribute("x", `${x}`);
   logoImage.setAttribute("y", `${y}`);
@@ -440,7 +444,7 @@ export const applyFancyBackgroundOnSvg = async ({
     svgRoot,
     contentSize,
     backgroundColor,
-    dimensions: {
+    canvasDimensions: {
       width: canvasDimensions.width,
       height: canvasDimensions.height,
     },
@@ -451,14 +455,11 @@ export const applyFancyBackgroundOnSvg = async ({
     const logoImage = await loadSVGElement(
       theme === THEME.DARK ? EXPORT_LOGO_URL_DARK : EXPORT_LOGO_URL,
     );
-    addLogoToSvg(
+    addLogoToSvg({
       svgRoot,
-      {
-        width: canvasDimensions.width,
-        height: canvasDimensions.height,
-      },
+      canvasDimensions,
       logoImage,
       theme,
-    );
+    });
   }
 };
