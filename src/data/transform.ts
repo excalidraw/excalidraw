@@ -40,6 +40,7 @@ import {
 import { MarkOptional } from "../utility-types";
 import { assertNever, getFontString } from "../utils";
 import { getSizeFromPoints } from "../points";
+import { nanoid } from "nanoid";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -368,7 +369,7 @@ const bindLinearElementToElement = (
 class ElementStore {
   excalidrawElements = new Map<string, ExcalidrawElement>();
 
-  add = (ele?: ExcalidrawElement) => {
+  add = (ele?: ExcalidrawElement, originalId?: string) => {
     if (!ele) {
       return;
     }
@@ -386,6 +387,7 @@ class ElementStore {
 
 export const convertToExcalidrawElements = (
   elements: ExcalidrawElementSkeleton[] | null,
+  regenerateIds = false,
 ) => {
   if (!elements) {
     return [];
@@ -393,10 +395,15 @@ export const convertToExcalidrawElements = (
 
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
+  const oldToNewElementIdMap = new Map<string, string>();
 
   // Create individual elements
   for (const element of elements) {
     let excalidrawElement: ExcalidrawElement;
+    const originalId = element.id;
+    if (regenerateIds) {
+      Object.assign(element, { id: nanoid() });
+    }
     switch (element.type) {
       case "rectangle":
       case "ellipse":
@@ -505,6 +512,9 @@ export const convertToExcalidrawElements = (
     } else {
       elementStore.add(excalidrawElement);
       elementsWithIds.set(excalidrawElement.id, element);
+      if (originalId) {
+        oldToNewElementIdMap.set(originalId, excalidrawElement.id);
+      }
     }
   }
 
@@ -530,6 +540,14 @@ export const convertToExcalidrawElements = (
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
               element.type === "arrow" ? element?.end : undefined;
+            if (originalStart && originalStart.id) {
+              const newStartId = oldToNewElementIdMap.get(originalStart.id);
+              Object.assign(originalStart, { id: newStartId });
+            }
+            if (originalEnd && originalEnd.id) {
+              const newEndId = oldToNewElementIdMap.get(originalEnd.id);
+              Object.assign(originalEnd, { id: newEndId });
+            }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
                 container as ExcalidrawArrowElement,
@@ -545,11 +563,20 @@ export const convertToExcalidrawElements = (
         } else {
           switch (element.type) {
             case "arrow": {
+              const { start, end } = element;
+              if (start && start.id) {
+                const newStartId = oldToNewElementIdMap.get(start.id);
+                Object.assign(start, { id: newStartId });
+              }
+              if (end && end.id) {
+                const newEndId = oldToNewElementIdMap.get(end.id);
+                Object.assign(end, { id: newEndId });
+              }
               const { linearElement, startBoundElement, endBoundElement } =
                 bindLinearElementToElement(
                   excalidrawElement as ExcalidrawArrowElement,
-                  element.start,
-                  element.end,
+                  start,
+                  end,
                   elementStore,
                 );
               elementStore.add(linearElement);

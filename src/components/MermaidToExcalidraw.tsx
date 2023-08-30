@@ -140,7 +140,7 @@ const MermaidToExcalidraw = ({
           mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
 
         data.current = {
-          elements: convertToExcalidrawElements(elements),
+          elements: convertToExcalidrawElements(elements, true),
           files,
         };
         const parent = canvasNode.parentElement!;
