@@ -39,6 +39,24 @@ const importMermaidDataFromStorage = () => {
   return null;
 };
 
+const ErrorComp = ({ error }: { error: string }) => {
+  return (
+    <div
+      style={{
+        color: "red",
+        fontWeight: 800,
+        fontSize: "30px",
+        wordBreak: "break-word",
+        overflow: "auto",
+        maxHeight: "100%",
+        textAlign: "center",
+      }}
+    >
+      Error!! <p style={{ fontSize: "18px", fontWeight: "600" }}>{error}</p>
+    </div>
+  );
+};
+
 const MermaidToExcalidraw = ({
   appState,
   elements,
@@ -49,6 +67,8 @@ const MermaidToExcalidraw = ({
   const mermaidToExcalidrawLib = useRef<any>(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const canvasRef = useRef<HTMLDivElement>(null);
   const data = useRef<{
     elements: readonly NonDeletedExcalidrawElement[];
@@ -90,20 +110,12 @@ const MermaidToExcalidraw = ({
             fontSize: DEFAULT_FONT_SIZE,
           },
         );
-      } catch (e) {
-        console.error(e);
-        if (text) {
-          const errorEle = document.createElement("div");
-          errorEle.innerHTML = "ERROR!!!!";
-          errorEle.style.color = "red";
-          errorEle.style.fontWeight = "800";
-          errorEle.style.fontSize = "40px";
-          canvasNode.replaceChildren(errorEle);
-        } else {
-          canvasNode.replaceChildren();
-        }
+        setError(null);
+      } catch (e: any) {
+        console.error(e.message);
+        canvasNode.replaceChildren();
+        setError(e.message);
       }
-
       if (mermaidGraphData) {
         const { elements, files } =
           mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
@@ -112,15 +124,15 @@ const MermaidToExcalidraw = ({
           elements: convertToExcalidrawElements(elements),
           files,
         };
-
-        const maxWidth = canvasNode.offsetWidth;
-        const maxHeight = canvasNode.offsetHeight;
+        const parent = canvasNode.parentElement!;
+        const maxWidth = parent.offsetWidth;
+        const maxHeight = parent.offsetHeight;
         let dimension = Math.max(maxWidth, maxHeight);
-        if (dimension > canvasNode.offsetWidth) {
-          dimension = canvasNode.offsetWidth - 10;
+        if (dimension > parent.offsetWidth) {
+          dimension = parent.offsetWidth - 10;
         }
-        if (dimension > canvasNode.offsetHeight) {
-          dimension = canvasNode.offsetHeight;
+        if (dimension > parent.offsetHeight) {
+          dimension = parent.offsetHeight;
         }
         exportToCanvas({
           elements: data.current.elements,
@@ -194,10 +206,10 @@ const MermaidToExcalidraw = ({
           style={{ display: "flex", flexDirection: "column" }}
         >
           <label>Preview</label>
-          <div
-            className="mermaid-to-excalidraw-wrapper-preview-canvas"
-            ref={canvasRef}
-          ></div>
+          <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
+            {error && <ErrorComp error={error} />}
+            <div ref={canvasRef} />
+          </div>
           <Button
             className="mermaid-to-excalidraw-wrapper-preview-insert"
             onSelect={onSelect}
