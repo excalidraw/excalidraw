@@ -7050,7 +7050,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        // grouped arrows shouldn't bind/unbind to an element, unless they're explicitly selected and dragged to that element
+        // Grouped arrows shouldn't bind/unbind to an element unless they're explicitly selected and dragged to that element.
+        // If a grouped arrow is bound, unbind when necessary.
         let selectedElements = this.scene.getSelectedElements(this.state);
         if (
           this.state.selectedLinearElement &&
@@ -7065,9 +7066,14 @@ class App extends React.Component<AppProps, AppState> {
           );
         } else {
           selectedElements = selectedElements.filter(
-            (elem) => elem.groupIds.length === 0,
+            (elem) =>
+              (isArrowElement(elem) && (
+                (elem as ExcalidrawLinearElement).endBinding !== null ||
+                (elem as ExcalidrawLinearElement).startBinding !== null
+              )) || elem.groupIds.length === 0
           );
         }
+
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(selectedElements);
