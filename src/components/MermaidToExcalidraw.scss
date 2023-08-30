@@ -9,6 +9,8 @@
       font-size: 14px;
       font-style: normal;
       font-weight: 600;
+      margin-bottom: 8px;
+      margin-left: 4px;
     }
 
     &-text {
@@ -19,7 +21,6 @@
         width: 20rem;
         height: 22rem;
         resize: none;
-        border: 1px solid var(--ImageExportModal-preview-border);
         border-radius: 8px;
         padding: 1rem;
       }
@@ -35,16 +36,18 @@
       height: 22rem;
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
         left center;
-
-      border: 1px solid var(--ImageExportModal-preview-border);
       border-radius: 8px;
+      border: 1px solid #e4e4eb;
     }
 
     &-preview-insert.excalidraw-button {
+      font-family: "Assistant";
+      font-weight: 600;
       height: 2.5rem;
       margin-top: 1em;
       margin-bottom: 0.3em;
-      width: 5rem;
+      width: 7.5rem;
+      font-size: 12px;
       background-color: var(--color-primary);
       &:hover {
         background-color: var(--color-primary-darker);

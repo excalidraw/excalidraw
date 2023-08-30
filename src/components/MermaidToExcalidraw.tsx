@@ -13,6 +13,7 @@ import {
 } from "../packages/excalidraw/index";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
+import { ArrowRightIcon } from "./icons";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 
@@ -77,6 +78,20 @@ const MermaidToExcalidraw = ({
 
   const app = useApp();
 
+  const resetPreview = () => {
+    const canvasNode = canvasRef.current;
+
+    if (!canvasNode) {
+      return;
+    }
+    const parent = canvasNode.parentElement;
+    if (!parent) {
+      return;
+    }
+    parent.style.background = "";
+    canvasNode.replaceChildren();
+  };
+
   useEffect(() => {
     const loadMermaidToExcalidrawLib = async () => {
       mermaidToExcalidrawLib.current = await import(
@@ -113,8 +128,10 @@ const MermaidToExcalidraw = ({
         setError(null);
       } catch (e: any) {
         console.error(e.message);
-        canvasNode.replaceChildren();
-        setError(e.message);
+        resetPreview();
+        if (text) {
+          setError(e.message);
+        }
       }
       if (mermaidGraphData) {
         const { elements, files } =
@@ -143,6 +160,7 @@ const MermaidToExcalidraw = ({
           // if converting to blob fails, there's some problem that will
           // likely prevent preview and export (e.g. canvas too big)
           return canvasToBlob(canvas).then(() => {
+            parent.style.background = "#fff";
             canvasNode.replaceChildren(canvas);
           });
         });
@@ -195,7 +213,8 @@ const MermaidToExcalidraw = ({
             style={{
               padding: "0.85rem",
               borderRadius: "8px",
-              border: "1px solid var(--ImageExportModal-preview-border)",
+              border: "1px solid #e4e4eb",
+              whiteSpace: "pre-wrap",
             }}
             onChange={(event) => setText(event.target.value)}
             value={text}
@@ -214,7 +233,10 @@ const MermaidToExcalidraw = ({
             className="mermaid-to-excalidraw-wrapper-preview-insert"
             onSelect={onSelect}
           >
-            Insert
+            Insert{" "}
+            <span style={{ paddingLeft: "8px", display: "flex" }}>
+              {ArrowRightIcon}
+            </span>
           </Button>
         </div>
       </div>
