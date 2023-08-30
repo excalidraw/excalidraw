@@ -56,7 +56,7 @@ const ErrorComp = ({ error }: { error: string }) => {
         textAlign: "center",
       }}
     >
-      Error!! <p style={{ fontSize: "18px", fontWeight: "600" }}>{error}</p>
+      Error! <p style={{ fontSize: "18px", fontWeight: "600" }}>{error}</p>
     </div>
   );
 };
@@ -198,7 +198,7 @@ const MermaidToExcalidraw = ({
           <span
             style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
           >
-            Currently only flowcharts are supported. The other types would be
+            Currently only flowcharts are supported. The other types will be
             rendered as image in Excalidraw. <br />
             Refer to the{" "}
             <a href="https://mermaid.js.org/syntax/flowchart.html">docs</a> to
