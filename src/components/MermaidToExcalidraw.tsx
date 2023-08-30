@@ -14,6 +14,7 @@ import {
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
+import Spinner from "./Spinner";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
@@ -212,6 +213,7 @@ const MermaidToExcalidraw = ({
           style={{ display: "flex", flexDirection: "column" }}
         >
           <label>Mermaid Syntax</label>
+
           <textarea
             style={{
               padding: "0.85rem",
@@ -230,6 +232,7 @@ const MermaidToExcalidraw = ({
           <label>Preview</label>
           <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
             {error && <ErrorComp error={error} />}
+            {loading && <Spinner size="2rem" />}
             <div ref={canvasRef} />
           </div>
           <Button
