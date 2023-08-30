@@ -1668,23 +1668,23 @@ export const ArrowRightIcon = createIcon(
     <path
       d="M4.16602 10H15.8327"
       stroke="white"
-      stroke-width="1.25"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M12.5 13.3333L15.8333 10"
       stroke="white"
-      stroke-width="1.25"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M12.5 6.66666L15.8333 9.99999"
       stroke="white"
-      stroke-width="1.25"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </>,
   { width: 20, height: 20 },
