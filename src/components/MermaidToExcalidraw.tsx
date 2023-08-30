@@ -16,6 +16,8 @@ import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
+const MERMAID_EXAMPLE =
+  "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[test]";
 
 const saveMermaidDataToStorage = (data: string) => {
   try {
@@ -104,10 +106,9 @@ const MermaidToExcalidraw = ({
 
   useEffect(() => {
     if (!loading) {
-      const data = importMermaidDataFromStorage();
-      if (data) {
-        setText(data);
-      }
+      const data = importMermaidDataFromStorage() || MERMAID_EXAMPLE;
+
+      setText(data);
     }
   }, [loading]);
 
@@ -198,7 +199,10 @@ const MermaidToExcalidraw = ({
             style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
           >
             Currently only flowcharts are supported. The other types would be
-            rendered as image in Excalidraw
+            rendered as image in Excalidraw. <br />
+            Refer to the{" "}
+            <a href="https://mermaid.js.org/syntax/flowchart.html">docs</a> to
+            get started.
           </span>
         </>
       }
