@@ -90,7 +90,7 @@ export const exportToCanvas = async (
   const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
   let scrollXAdjustment = 0;
-  const scrollYAdjustment = 0;
+  let scrollYAdjustment = 0;
 
   if (
     exportWithFancyBackground &&
@@ -114,6 +114,9 @@ export const exportToCanvas = async (
 
     scrollXAdjustment =
       (width - contentSize.width - (padding[1] + padding[3])) / 2;
+
+    scrollYAdjustment =
+      (height - contentSize.height - (padding[0] + padding[2])) / 2;
   }
 
   renderStaticScene({

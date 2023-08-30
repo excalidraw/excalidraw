@@ -90,31 +90,26 @@ const getContentBackgound = (
   exportScale: number,
   includeLogo: boolean,
 ): { x: number; y: number; width: number; height: number } => {
-  const x =
-    (normalizedCanvasDimensions.width - contentSize.width * exportScale) / 2 -
-    FANCY_BG_PADDING * exportScale;
-
-  const y =
-    (normalizedCanvasDimensions.height -
-      (contentSize.height + DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) *
-        exportScale) /
-      2 -
-    FANCY_BG_PADDING * exportScale;
+  const totalPaddingAndRadius = DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS;
 
   const width =
-    (contentSize.width +
-      (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
-    exportScale;
-
+    (Math.round(contentSize.width) + totalPaddingAndRadius * 2) * exportScale;
   const height =
-    (contentSize.height +
-      DEFAULT_EXPORT_PADDING +
-      FANCY_BG_BORDER_RADIUS -
-      (includeLogo ? FANCY_BG_LOGO_PADDING : 0) +
-      (DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS) * 2) *
-    exportScale;
+    (Math.round(contentSize.height) + totalPaddingAndRadius * 2) * exportScale;
 
-  return { x, y, width, height };
+  const x = (normalizedCanvasDimensions.width - width) / 2;
+  let y = (normalizedCanvasDimensions.height - height) / 2;
+
+  if (includeLogo) {
+    y -= (FANCY_BG_LOGO_PADDING / 2) * exportScale;
+  }
+
+  return {
+    x,
+    y,
+    width,
+    height,
+  };
 };
 
 const addContentBackground = (
