@@ -7067,10 +7067,10 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           selectedElements = selectedElements.filter(
             (elem) =>
-              (isArrowElement(elem) && (
-                (elem as ExcalidrawLinearElement).endBinding !== null ||
-                (elem as ExcalidrawLinearElement).startBinding !== null
-              )) || elem.groupIds.length === 0
+              (isArrowElement(elem) &&
+                ((elem as ExcalidrawLinearElement).endBinding !== null ||
+                  (elem as ExcalidrawLinearElement).startBinding !== null)) ||
+              elem.groupIds.length === 0,
           );
         }
 
