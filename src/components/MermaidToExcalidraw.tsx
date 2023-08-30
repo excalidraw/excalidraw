@@ -146,12 +146,9 @@ const MermaidToExcalidraw = ({
         const maxWidth = parent.offsetWidth;
         const maxHeight = parent.offsetHeight;
         let dimension = Math.max(maxWidth, maxHeight);
-        if (dimension > parent.offsetWidth) {
-          dimension = parent.offsetWidth - 10;
-        }
-        if (dimension > parent.offsetHeight) {
-          dimension = parent.offsetHeight;
-        }
+        dimension = Math.min(dimension, parent.offsetWidth - 10);
+        dimension = Math.min(dimension, parent.offsetHeight - 10);
+
         exportToCanvas({
           elements: data.current.elements,
           files: data.current.files,
@@ -194,7 +191,9 @@ const MermaidToExcalidraw = ({
       onCloseRequest={onClose}
       title={
         <>
-          <p style={{ marginBottom: "5px" }}>Mermaid to Excalidraw</p>
+          <p style={{ marginBottom: "5px", marginTop: "2px" }}>
+            Mermaid to Excalidraw
+          </p>
           <span
             style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
           >
