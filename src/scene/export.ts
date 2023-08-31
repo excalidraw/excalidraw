@@ -166,6 +166,7 @@ export const exportToSvg = async (
   opts?: {
     serializeAsJSON?: () => string;
     renderEmbeddables?: boolean;
+    includeLogo?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const {
@@ -182,9 +183,14 @@ export const exportToSvg = async (
     appState.fancyBackgroundImageKey &&
     appState.fancyBackgroundImageKey !== "solid";
 
+  const includeLogo = (exportWithFancyBackground && opts?.includeLogo) ?? true;
+
   const padding = !exportWithFancyBackground
     ? convertToExportPadding(exportPadding)
-    : getFancyBackgroundPadding(convertToExportPadding(exportPadding), true);
+    : getFancyBackgroundPadding(
+        convertToExportPadding(exportPadding),
+        includeLogo,
+      );
 
   let metadata = "";
   if (exportEmbedScene) {
@@ -306,7 +312,7 @@ export const exportToSvg = async (
         },
         theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
         contentSize,
-        includeLogo: true,
+        includeLogo,
       });
 
       offsetXAdjustment =
