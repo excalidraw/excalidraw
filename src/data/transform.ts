@@ -38,9 +38,14 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, getFontString } from "../utils";
+import {
+  assertNever,
+  getFontString,
+  viewportCoordsToSceneCoords,
+} from "../utils";
 import { getSizeFromPoints } from "../points";
 import { nanoid } from "nanoid";
+import { AppState } from "../types";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -387,7 +392,8 @@ class ElementStore {
 
 export const convertToExcalidrawElements = (
   elements: ExcalidrawElementSkeleton[] | null,
-  regenerateIds = false,
+  appState: AppState,
+  { regenerateIds = false, transformViewportToSceneCoords = false },
 ) => {
   if (!elements) {
     return [];
@@ -404,6 +410,20 @@ export const convertToExcalidrawElements = (
     if (regenerateIds) {
       Object.assign(element, { id: nanoid() });
     }
+
+    // transform viewport coords to scene coordinates
+    if (transformViewportToSceneCoords) {
+      const { x, y } = viewportCoordsToSceneCoords(
+        {
+          clientX: element.x,
+          clientY: element.y,
+        },
+        appState,
+      );
+
+      Object.assign(element, { x, y });
+    }
+
     switch (element.type) {
       case "rectangle":
       case "ellipse":

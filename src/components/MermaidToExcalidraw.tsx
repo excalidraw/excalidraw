@@ -114,7 +114,7 @@ const MermaidToExcalidraw = ({
   }, [loading]);
 
   useEffect(() => {
-    const convertMermaidToExcal = async () => {
+    const renderExcalidrawPreview = async () => {
       let mermaidGraphData;
       const canvasNode = canvasRef.current;
       if (!canvasNode) {
@@ -140,7 +140,10 @@ const MermaidToExcalidraw = ({
           mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
 
         data.current = {
-          elements: convertToExcalidrawElements(elements, true),
+          elements: convertToExcalidrawElements(elements, appState, {
+            regenerateIds: true,
+            transformViewportToSceneCoords: true,
+          }),
           files,
         };
         const parent = canvasNode.parentElement!;
@@ -150,23 +153,21 @@ const MermaidToExcalidraw = ({
         dimension = Math.min(dimension, parent.offsetWidth - 10);
         dimension = Math.min(dimension, parent.offsetHeight - 10);
 
-        exportToCanvas({
+        const canvas = await exportToCanvas({
           elements: data.current.elements,
           files: data.current.files,
           exportPadding: DEFAULT_EXPORT_PADDING,
           maxWidthOrHeight: dimension,
-        }).then((canvas) => {
-          // if converting to blob fails, there's some problem that will
-          // likely prevent preview and export (e.g. canvas too big)
-          return canvasToBlob(canvas).then(() => {
-            parent.style.background = "#fff";
-            canvasNode.replaceChildren(canvas);
-          });
         });
+        // if converting to blob fails, there's some problem that will
+        // likely prevent preview and export (e.g. canvas too big)
+        await canvasToBlob(canvas);
+        parent.style.background = "#fff";
+        canvasNode.replaceChildren(canvas);
       }
     };
-    convertMermaidToExcal();
-  }, [text]);
+    renderExcalidrawPreview();
+  }, [text, appState]);
 
   const setAppState = useExcalidrawSetAppState();
 
