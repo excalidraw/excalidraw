@@ -360,5 +360,5 @@ export const FANCY_BACKGROUND_IMAGES = {
 export const DEFAULT_FANCY_BACKGROUND_IMAGE: keyof typeof FANCY_BACKGROUND_IMAGES =
   "solid" as const;
 
-export const EXPORT_LOGO_URL = "/backgrounds/logo.png" as DataURL;
-export const EXPORT_LOGO_URL_DARK = "/backgrounds/logo-dark.png" as DataURL;
+export const EXPORT_LOGO_URL = "/backgrounds/logo.svg" as DataURL;
+export const EXPORT_LOGO_URL_DARK = "/backgrounds/logo_dark.svg" as DataURL;
