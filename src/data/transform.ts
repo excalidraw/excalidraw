@@ -392,8 +392,8 @@ class ElementStore {
 
 export const convertToExcalidrawElements = (
   elements: ExcalidrawElementSkeleton[] | null,
-  appState: AppState,
-  { regenerateIds = false, transformViewportToSceneCoords = false },
+  appState?: AppState,
+  opts?: { regenerateIds: boolean; transformViewportToSceneCoords: boolean },
 ) => {
   if (!elements) {
     return [];
@@ -407,12 +407,12 @@ export const convertToExcalidrawElements = (
   for (const element of elements) {
     let excalidrawElement: ExcalidrawElement;
     const originalId = element.id;
-    if (regenerateIds) {
+    if (opts?.regenerateIds) {
       Object.assign(element, { id: nanoid() });
     }
 
     // transform viewport coords to scene coordinates
-    if (transformViewportToSceneCoords) {
+    if (opts?.transformViewportToSceneCoords && appState) {
       const { x, y } = viewportCoordsToSceneCoords(
         {
           clientX: element.x,

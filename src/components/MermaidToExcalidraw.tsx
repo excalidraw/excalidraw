@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { AppState, BinaryFiles } from "../types";
+import { AppState, BinaryFiles, NormalizedZoomValue } from "../types";
 import { updateActiveTool } from "../utils";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
@@ -140,10 +140,17 @@ const MermaidToExcalidraw = ({
           mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
 
         data.current = {
-          elements: convertToExcalidrawElements(elements, appState, {
-            regenerateIds: true,
-            transformViewportToSceneCoords: true,
-          }),
+          elements: convertToExcalidrawElements(
+            elements,
+            {
+              ...appState,
+              zoom: { ...appState.zoom, value: 1 as NormalizedZoomValue },
+            },
+            {
+              regenerateIds: true,
+              transformViewportToSceneCoords: true,
+            },
+          ),
           files,
         };
         const parent = canvasNode.parentElement!;
