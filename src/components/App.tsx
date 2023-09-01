@@ -4742,7 +4742,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
   ): boolean => {
     const isMainClickOn = event.button === POINTER_BUTTON.MAIN;
-    const areKeysPressed = isHoldingSpace && event.ctrlKey;
+    const areKeysPressed = isHoldingSpace && (event.metaKey || event.ctrlKey);
     if (
       !(gesture.pointers.size <= 1) ||
       !(areKeysPressed && isMainClickOn) ||
