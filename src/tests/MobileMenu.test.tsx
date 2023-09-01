@@ -11,14 +11,14 @@ describe("Test MobileMenu", () => {
   const { h } = window;
   const dimensions = { height: 400, width: 800 };
 
+  beforeAll(() => {
+    mockBoundingClientRect(dimensions);
+  });
+
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
     //@ts-ignore
     h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
-  });
-
-  beforeAll(() => {
-    mockBoundingClientRect(dimensions);
   });
 
   afterAll(() => {
@@ -27,7 +27,7 @@ describe("Test MobileMenu", () => {
 
   it("should set device correctly", () => {
     expect(h.app.device).toMatchInlineSnapshot(`
-      Object {
+      {
         "canDeviceFitSidebar": false,
         "isLandscape": true,
         "isMobile": true,
@@ -39,7 +39,6 @@ describe("Test MobileMenu", () => {
 
   it("should initialize with welcome screen and hide once user interacts", async () => {
     expect(document.querySelector(".welcome-screen-center")).toMatchSnapshot();
-
     UI.clickTool("rectangle");
     expect(document.querySelector(".welcome-screen-center")).toBeNull();
   });

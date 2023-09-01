@@ -23,7 +23,7 @@ describe("<Excalidraw/>", () => {
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(false);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -43,7 +43,7 @@ describe("<Excalidraw/>", () => {
       ).toBe(0);
       expect(h.state.zenModeEnabled).toBe(true);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -74,7 +74,8 @@ describe("<Excalidraw/>", () => {
         </Footer>
       </Excalidraw>,
     ));
-    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(`
+    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(
+      `
       <div
         class="footer-center zen-mode-transition"
       >
@@ -82,7 +83,8 @@ describe("<Excalidraw/>", () => {
           This is a custom footer
         </div>
       </div>
-    `);
+    `,
+    );
   });
 
   describe("Test gridModeEnabled prop", () => {
@@ -93,7 +95,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -112,7 +114,7 @@ describe("<Excalidraw/>", () => {
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
@@ -199,6 +201,23 @@ describe("<Excalidraw/>", () => {
         );
         //open menu
         toggleMenu(container);
+        expect(queryByTestId(container, "canvas-background-label")).toBeNull();
+        expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
+      });
+
+      it("should hide the canvas background picker even if passed if the `canvasActions.changeViewBackgroundColor` is set to false", async () => {
+        const { container } = await render(
+          <Excalidraw
+            UIOptions={{ canvasActions: { changeViewBackgroundColor: false } }}
+          >
+            <MainMenu>
+              <MainMenu.DefaultItems.ChangeCanvasBackground />
+            </MainMenu>
+          </Excalidraw>,
+        );
+        //open menu
+        toggleMenu(container);
+        expect(queryByTestId(container, "canvas-background-label")).toBeNull();
         expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
       });
 
