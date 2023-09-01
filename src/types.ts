@@ -528,6 +528,7 @@ export type AppClassProperties = {
   scrollToContent: App["scrollToContent"];
   addFiles: App["addFiles"];
   setSelection: App["setSelection"];
+  addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
 };
 
 export type PointerDownState = Readonly<{

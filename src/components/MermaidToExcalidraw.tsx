@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { AppState, BinaryFiles, NormalizedZoomValue } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { updateActiveTool } from "../utils";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
@@ -140,17 +140,9 @@ const MermaidToExcalidraw = ({
           mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
 
         data.current = {
-          elements: convertToExcalidrawElements(
-            elements,
-            {
-              ...appState,
-              zoom: { ...appState.zoom, value: 1 as NormalizedZoomValue },
-            },
-            {
-              regenerateIds: true,
-              transformViewportToSceneCoords: true,
-            },
-          ),
+          elements: convertToExcalidrawElements(elements, {
+            regenerateIds: true,
+          }),
           files,
         };
         const parent = canvasNode.parentElement!;
@@ -186,12 +178,12 @@ const MermaidToExcalidraw = ({
 
   const onSelect = () => {
     const { elements: newElements, files } = data.current;
-    app.scene.replaceAllElements([...elements, ...newElements]);
-    app.addFiles(Object.values(files || []));
-    app.scrollToContent(newElements);
-
-    app.setSelection(newElements);
-
+    app.addElementsFromPasteOrLibrary({
+      elements: newElements,
+      files,
+      position: "center",
+      fitToContent: true,
+    });
     onClose();
   };
 
