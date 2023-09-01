@@ -33,6 +33,7 @@ JSX.Element | null: The JSX component representing the custom rendering, or null
 
 ### Features
 
+- Add a `subtype` attribute to `ExcalidrawElement` to allow self-contained extensions of any `ExcalidrawElement` type. Implement MathJax support on stem.excalidraw.com as a `math` subtype of `ExcalidrawTextElement`. Both standard Latex input and simplified AsciiMath input are supported. [#6037](https://github.com/excalidraw/excalidraw/pull/6037).
 - Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateEmbeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/ref#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
 - Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
@@ -495,12 +496,6 @@ For more details refer to the [docs](https://docs.excalidraw.com)
 ### Excalidraw API
 
 #### Features
-
-- Render math notation using the MathJax library. Both standard Latex input and simplified AsciiMath input are supported.
-
-  Also added plugin-like subtypes for `ExcalidrawElement`. These allow easily supporting custom extensions of `ExcalidrawElement`s such as for MathJax, Markdown, or inline code.
-
-  Also created an `@excalidraw/extensions` package. This package holds the MathJax extension to make it completely decoupled from `@excalidraw/excalidraw`. The MathJax extension is implemented as a `math` subtype of `ExcalidrawTextElement`. [#2993](https://github.com/excalidraw/excalidraw/pull/2993).
 
 - `restoreElements()` now takes an optional parameter to indicate whether we should also recalculate text element dimensions. Defaults to `true`, but since this is a potentially costly operation, you may want to disable it if you restore elements in tight loops, such as during collaboration [#5432](https://github.com/excalidraw/excalidraw/pull/5432).
 - Support rendering custom sidebar using [`renderSidebar`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderSidebar) prop ([#5663](https://github.com/excalidraw/excalidraw/pull/5663)).

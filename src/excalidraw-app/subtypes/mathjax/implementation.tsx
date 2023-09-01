@@ -1,7 +1,7 @@
 // Some imports
 import fallbackMathJaxLangData from "./locales/en.json";
-import { FONT_FAMILY, SVG_NS } from "../../../../constants";
-import { getFontString, getFontFamilyString, isRTL } from "../../../../utils";
+import { FONT_FAMILY, SVG_NS } from "../../../constants";
+import { getFontString, getFontFamilyString, isRTL } from "../../../utils";
 import {
   getBoundTextElement,
   getBoundTextMaxWidth,
@@ -10,44 +10,41 @@ import {
   getTextWidth,
   measureText,
   wrapText,
-} from "../../../../element/textElement";
+} from "../../../element/textElement";
 import {
   hasBoundTextElement,
   isTextElement,
-} from "../../../../element/typeChecks";
+} from "../../../element/typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeleted,
-} from "../../../../element/types";
-import { newElementWith } from "../../../../element/mutateElement";
-import { getElementAbsoluteCoords } from "../../../../element/bounds";
-import Scene from "../../../../scene/Scene";
+} from "../../../element/types";
+import { newElementWith } from "../../../element/mutateElement";
+import { getElementAbsoluteCoords } from "../../../element/bounds";
+import Scene from "../../../scene/Scene";
 
 // Imports for actions
-import { t, registerAuxLangData } from "../../../../i18n";
-import { Action } from "../../../../actions/types";
-import { AppState } from "../../../../types";
+import { t, registerAuxLangData } from "../../../i18n";
+import { Action } from "../../../actions/types";
+import { AppState } from "../../../types";
 import {
   changeProperty,
   getFormValue,
-} from "../../../../actions/actionProperties";
-import { getSelectedElements } from "../../../../scene";
-import {
-  getNonDeletedElements,
-  redrawTextBoundingBox,
-} from "../../../../element";
-import { ButtonIconSelect } from "../../../../components/ButtonIconSelect";
+} from "../../../actions/actionProperties";
+import { getSelectedElements } from "../../../scene";
+import { getNonDeletedElements, redrawTextBoundingBox } from "../../../element";
+import { ButtonIconSelect } from "../../../components/ButtonIconSelect";
 
 // Subtype imports
 import {
   SubtypeLoadedCb,
   SubtypeMethods,
   SubtypePrepFn,
-} from "../../../../subtypes";
+} from "../../../subtypes";
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
-import { SubtypeButton } from "../../../../components/Subtypes";
+import { SubtypeButton } from "../../../components/Subtypes";
 
 const mathSubtype = getMathSubtypeRecord().subtype;
 const FONT_FAMILY_MATH = FONT_FAMILY.Helvetica;

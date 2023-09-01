@@ -46,7 +46,6 @@ interface ImportMetaEnv {
   VITE_PKG_NAME: string;
   VITE_PKG_VERSION: string;
   VITE_IS_EXCALIDRAW_NPM_PACKAGE: string;
-  VITE_IS_EXCALIDRAW_EXTENSIONS_NPM_PACKAGE: string;
 
   VITE_WORKER_ID: string;
   MODE: string;
