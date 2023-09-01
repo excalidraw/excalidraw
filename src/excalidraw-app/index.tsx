@@ -234,7 +234,7 @@ const initializeScene = async (opts: {
           ...restoreAppState(
             {
               ...scene?.appState,
-              ...localDataState?.appState,
+              theme: localDataState?.appState?.theme || scene?.appState?.theme,
             },
             excalidrawAPI.getAppState(),
           ),
@@ -590,8 +590,6 @@ const ExcalidrawWrapper = () => {
           }
         }
       });
-    } else {
-      LocalData.saveAppState(appState);
     }
   };
 

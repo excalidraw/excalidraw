@@ -46,15 +46,12 @@ class LocalFileManager extends FileManager {
 const saveDataStateToLocalStorage = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  appStateOnly = false,
 ) => {
   try {
-    if (!appStateOnly) {
-      localStorage.setItem(
-        STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-        JSON.stringify(clearElementsForLocalStorage(elements)),
-      );
-    }
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+      JSON.stringify(clearElementsForLocalStorage(elements)),
+    );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
       JSON.stringify(clearAppStateForLocalStorage(appState)),
@@ -75,12 +72,8 @@ export class LocalData {
       appState: AppState,
       files: BinaryFiles,
       onFilesSaved: () => void,
-      appStateOnly = false,
     ) => {
-      saveDataStateToLocalStorage(elements, appState, appStateOnly);
-      if (appStateOnly) {
-        return;
-      }
+      saveDataStateToLocalStorage(elements, appState);
 
       await this.fileStorage.saveFiles({
         elements,
@@ -101,14 +94,6 @@ export class LocalData {
     // we need to make the `isSavePaused` check synchronously (undebounced)
     if (!this.isSavePaused()) {
       this._save(elements, appState, files, onFilesSaved);
-    }
-  };
-
-  /** Saves the AppState, only if saving is paused. */
-  static saveAppState = (appState: AppState) => {
-    // we need to make the `isSavePaused` check synchronously (undebounced)
-    if (this.isSavePaused()) {
-      this._save([], appState, {}, () => {}, true);
     }
   };
 
