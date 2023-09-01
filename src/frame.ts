@@ -16,7 +16,7 @@ import {
 } from "./element/textElement";
 import { arrayToMap, findIndex } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppClassProperties, AppState } from "./types";
+import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
@@ -471,7 +471,6 @@ export const addElementsToFrame = (
   let nextElements = allElements.slice();
 
   const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
-
   for (const element of omitGroupsContainingFrames(
     allElements,
     _elementsToAdd,
@@ -648,7 +647,7 @@ export const omitGroupsContainingFrames = (
  */
 export const getTargetFrame = (
   element: ExcalidrawElement,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element) || element
@@ -660,11 +659,12 @@ export const getTargetFrame = (
     : getContainingFrame(_element);
 };
 
+// TODO: this a huge bottleneck for large scenes, optimise
 // given an element, return if the element is in some frame
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElements: ExcalidrawElementsIncludingDeleted,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const frame = getTargetFrame(element, appState);
   const _element = isTextElement(element)
