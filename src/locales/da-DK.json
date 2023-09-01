@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Indsæt",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Indsæt som klartekst",
     "pasteCharts": "Indsæt diagrammer",
     "selectAll": "Marker alle",
     "multiSelect": "Tilføj element til markering",
@@ -50,7 +50,7 @@
     "veryLarge": "Meget stor",
     "solid": "Solid",
     "hachure": "Skravering",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Krydsskravering",
     "thin": "Tynd",
     "bold": "Fed",
@@ -69,8 +69,8 @@
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Sprog",
-    "liveCollaboration": "",
-    "duplicateSelection": "",
+    "liveCollaboration": "Live samarbejde...",
+    "duplicateSelection": "Duplikér",
     "untitled": "Unavngivet",
     "name": "Navn",
     "yourName": "Dit navn",
