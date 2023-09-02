@@ -236,7 +236,7 @@
     "frame": "",
     "embeddable": "",
     "hand": "دست (ابزار پانینگ)",
-    "extraTools": ""
+    "extraTools": "ابزارهای بیشتر"
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -374,7 +374,7 @@
   "imageExportDialog": {
     "header": "",
     "label": {
-      "withBackground": "",
+      "withBackground": "پس زمینه",
       "onlySelected": "",
       "darkMode": "",
       "embedScene": "",
