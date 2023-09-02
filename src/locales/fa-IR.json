@@ -472,8 +472,8 @@
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "ذخیره در دیسک",
+        "button": "ذخیره در دیسک",
         "description": ""
       },
       "excalidrawPlus": {
@@ -484,8 +484,8 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "بارگذاری از فایل",
+        "button": "بارگذاری از فایل",
         "description": ""
       },
       "shareableLink": {
