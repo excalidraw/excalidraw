@@ -104,35 +104,38 @@ class History {
   ): DehydratedHistoryEntry =>
     this.dehydrateHistoryEntry({
       appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.reduce((elements, element) => {
-        if (
-          isLinearElement(element) &&
-          appState.multiElement &&
-          appState.multiElement.id === element.id
-        ) {
-          // don't store multi-point arrow if still has only one point
+      elements: elements.reduce(
+        (elements, element) => {
           if (
+            isLinearElement(element) &&
             appState.multiElement &&
-            appState.multiElement.id === element.id &&
-            element.points.length < 2
+            appState.multiElement.id === element.id
           ) {
-            return elements;
-          }
+            // don't store multi-point arrow if still has only one point
+            if (
+              appState.multiElement &&
+              appState.multiElement.id === element.id &&
+              element.points.length < 2
+            ) {
+              return elements;
+            }
 
-          elements.push({
-            ...element,
-            // don't store last point if not committed
-            points:
-              element.lastCommittedPoint !==
-              element.points[element.points.length - 1]
-                ? element.points.slice(0, -1)
-                : element.points,
-          });
-        } else {
-          elements.push(element);
-        }
-        return elements;
-      }, [] as Mutable<typeof elements>),
+            elements.push({
+              ...element,
+              // don't store last point if not committed
+              points:
+                element.lastCommittedPoint !==
+                element.points[element.points.length - 1]
+                  ? element.points.slice(0, -1)
+                  : element.points,
+            });
+          } else {
+            elements.push(element);
+          }
+          return elements;
+        },
+        [] as Mutable<typeof elements>,
+      ),
     });
 
   shouldCreateEntry(nextEntry: HistoryEntry): boolean {

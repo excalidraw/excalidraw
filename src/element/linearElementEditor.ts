@@ -404,7 +404,7 @@ export class LinearElementEditor {
   static getEditorMidPoints = (
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: InteractiveCanvasAppState,
-  ): typeof editorMidPointsCache["points"] => {
+  ): (typeof editorMidPointsCache)["points"] => {
     const boundText = getBoundTextElement(element);
 
     // Since its not needed outside editor unless 2 pointer lines or bound text
@@ -501,7 +501,7 @@ export class LinearElementEditor {
       }
     }
     let index = 0;
-    const midPoints: typeof editorMidPointsCache["points"] =
+    const midPoints: (typeof editorMidPointsCache)["points"] =
       LinearElementEditor.getEditorMidPoints(element, appState);
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
@@ -609,7 +609,7 @@ export class LinearElementEditor {
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
-    const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
+    const ret: ReturnType<(typeof LinearElementEditor)["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
       linearElementEditor: null,

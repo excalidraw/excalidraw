@@ -3080,7 +3080,7 @@ class App extends React.Component<AppProps, AppState> {
     tool:
       | {
           type:
-            | typeof SHAPES[number]["value"]
+            | (typeof SHAPES)[number]["value"]
             | "eraser"
             | "hand"
             | "frame"
@@ -4770,12 +4770,13 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // we need to duplicate because we'll be updating this state
       lastCoords: { ...origin },
-      originalElements: this.scene
-        .getNonDeletedElements()
-        .reduce((acc, element) => {
+      originalElements: this.scene.getNonDeletedElements().reduce(
+        (acc, element) => {
           acc.set(element.id, deepCopyElement(element));
           return acc;
-        }, new Map() as PointerDownState["originalElements"]),
+        },
+        new Map() as PointerDownState["originalElements"],
+      ),
       resize: {
         handleType: false,
         isResizing: false,

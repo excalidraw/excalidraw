@@ -70,20 +70,26 @@ export const getElementWithTransformHandleType = (
   zoom: Zoom,
   pointerType: PointerType,
 ) => {
-  return elements.reduce((result, element) => {
-    if (result) {
-      return result;
-    }
-    const transformHandleType = resizeTest(
-      element,
-      appState,
-      scenePointerX,
-      scenePointerY,
-      zoom,
-      pointerType,
-    );
-    return transformHandleType ? { element, transformHandleType } : null;
-  }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
+  return elements.reduce(
+    (result, element) => {
+      if (result) {
+        return result;
+      }
+      const transformHandleType = resizeTest(
+        element,
+        appState,
+        scenePointerX,
+        scenePointerY,
+        zoom,
+        pointerType,
+      );
+      return transformHandleType ? { element, transformHandleType } : null;
+    },
+    null as {
+      element: NonDeletedExcalidrawElement;
+      transformHandleType: MaybeTransformHandleType;
+    } | null,
+  );
 };
 
 export const getTransformHandleTypeFromCoords = (
