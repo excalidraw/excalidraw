@@ -172,9 +172,9 @@ const strokeGrid = (
   zoom: Zoom,
   width: number,
   height: number,
-  GridLineColor: {Bold: string, Regular: string}, //zsviczian
+  GridLineColor: {Bold: string, Regular: string, MajorGridFrequency?: number}, //zsviczian
 ) => {
-  const BOLD_LINE_FREQUENCY = 5;
+  let BOLD_LINE_FREQUENCY = GridLineColor?.MajorGridFrequency ?? 5; //zsviczian
 
   /*enum GridLineColor {
     Bold = "#cccccc",
