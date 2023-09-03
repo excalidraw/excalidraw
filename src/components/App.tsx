@@ -2055,6 +2055,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldAnimate:
           isViewportOutsideOfConstrainedArea &&
           this.state.cursorButton !== "down" &&
+          prevState.cursorButton === "down" &&
           prevState.zoom.value === this.state.zoom.value &&
           elementsIncludingDeleted.length > 0, // Do not animate when app is initialized but scene is empty - this would cause flickering
       });
