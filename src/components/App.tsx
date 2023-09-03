@@ -2050,14 +2050,16 @@ class App extends React.Component<AppProps, AppState> {
           scrollConstraints,
         });
 
+      const shouldAnimate =
+        isViewportOutsideOfConstrainedArea &&
+        this.state.cursorButton !== "down" &&
+        prevState.cursorButton === "down" &&
+        prevState.zoom.value === this.state.zoom.value &&
+        !this.state.isLoading; // Do not animate when app is initialized but scene is empty - it would cause flickering
+
       constraintedScrollState = this.handleConstrainedScrollStateChange({
         ...constrainedScrollValues,
-        shouldAnimate:
-          isViewportOutsideOfConstrainedArea &&
-          this.state.cursorButton !== "down" &&
-          prevState.cursorButton === "down" &&
-          prevState.zoom.value === this.state.zoom.value &&
-          elementsIncludingDeleted.length > 0, // Do not animate when app is initialized but scene is empty - this would cause flickering
+        shouldAnimate,
       });
     }
 
@@ -8313,16 +8315,13 @@ class App extends React.Component<AppProps, AppState> {
       return { scrollX, scrollY, zoom };
     }
 
-    const { zoomLevelX, zoomLevelY, maxZoomLevel } = this.calculateZoomLevel(
-      scrollConstraints,
-      width,
-      height,
-    );
+    const { zoomLevelX, zoomLevelY, initialZoomLevel } =
+      this.calculateZoomLevel(scrollConstraints, width, height);
 
     // The zoom level to contain the whole constrained area in view
     const _zoom = {
       value: getNormalizedZoom(
-        maxZoomLevel ?? Math.min(zoomLevelX, zoomLevelY),
+        initialZoomLevel ?? Math.min(zoomLevelX, zoomLevelY),
       ),
     };
 
@@ -8361,7 +8360,6 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.7;
 
-    const lockZoom = scrollConstraints.lockZoom ?? false;
     const viewportZoomFactor = scrollConstraints.viewportZoomFactor
       ? Math.min(1, Math.max(scrollConstraints.viewportZoomFactor, 0.1))
       : DEFAULT_VIEWPORT_ZOOM_FACTOR;
@@ -8370,10 +8368,10 @@ class App extends React.Component<AppProps, AppState> {
     const scrollableHeight = scrollConstraints.height;
     const zoomLevelX = width / scrollableWidth;
     const zoomLevelY = height / scrollableHeight;
-    const maxZoomLevel = lockZoom
-      ? getNormalizedZoom(Math.min(zoomLevelX, zoomLevelY) * viewportZoomFactor)
-      : null;
-    return { zoomLevelX, zoomLevelY, maxZoomLevel };
+    const initialZoomLevel = getNormalizedZoom(
+      Math.min(zoomLevelX, zoomLevelY) * viewportZoomFactor,
+    );
+    return { zoomLevelX, zoomLevelY, initialZoomLevel };
   };
 
   private calculateConstraints = ({
@@ -8473,14 +8471,13 @@ class App extends React.Component<AppProps, AppState> {
       return { maxScrollX, minScrollX, maxScrollY, minScrollY };
     };
 
-    const { zoomLevelX, zoomLevelY, maxZoomLevel } = this.calculateZoomLevel(
-      scrollConstraints,
-      width,
-      height,
-    );
+    const { zoomLevelX, zoomLevelY, initialZoomLevel } =
+      this.calculateZoomLevel(scrollConstraints, width, height);
 
     const constrainedZoom = getNormalizedZoom(
-      maxZoomLevel ? Math.max(maxZoomLevel, zoom.value) : zoom.value,
+      scrollConstraints.lockZoom
+        ? Math.max(initialZoomLevel, zoom.value)
+        : zoom.value,
     );
     const { constrainedScrollCenterX, constrainedScrollCenterY } =
       calculateConstrainedScrollCenter(constrainedZoom);
@@ -8506,6 +8503,7 @@ class App extends React.Component<AppProps, AppState> {
       constrainedZoom: {
         value: constrainedZoom,
       },
+      initialZoomLevel,
     };
   };
 
