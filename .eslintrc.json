@@ -1,5 +1,13 @@
 {
-  "extends": ["@excalidraw/eslint-config", "react-app"],
+  "extends": [
+    "plugin:react-hooks/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "react",
+    "@typescript-eslint"
+  ],
+  "root": true,
   "rules": {
     "import/no-anonymous-default-export": "off",
     "no-restricted-globals": "off"
