@@ -559,7 +559,7 @@ describe("Test Transform", () => {
       });
     });
 
-    it.only("should bind arrows to existing elements if ids are correct", () => {
+    it("should bind arrows to existing elements if ids are correct", () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")
         .mockImplementationOnce(() => void 0);
