@@ -585,11 +585,15 @@ export const convertToExcalidrawElements = (
               element.type === "arrow" ? element?.end : undefined;
             if (originalStart && originalStart.id) {
               const newStartId = oldToNewElementIdMap.get(originalStart.id);
-              Object.assign(originalStart, { id: newStartId });
+              if (newStartId) {
+                Object.assign(originalStart, { id: newStartId });
+              }
             }
             if (originalEnd && originalEnd.id) {
               const newEndId = oldToNewElementIdMap.get(originalEnd.id);
-              Object.assign(originalEnd, { id: newEndId });
+              if (newEndId) {
+                Object.assign(originalEnd, { id: newEndId });
+              }
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
