@@ -4056,6 +4056,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
+
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
       hitElement,
