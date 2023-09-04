@@ -199,11 +199,12 @@ const MermaidToExcalidraw = ({
           <span
             style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
           >
-            Currently only flowcharts are supported. The other types will be
-            rendered as image in Excalidraw. <br />
-            Refer to the{" "}
-            <a href="https://mermaid.js.org/syntax/flowchart.html">docs</a> to
-            get started.
+            Currently only{" "}
+            <a href="https://mermaid.js.org/syntax/flowchart.html">
+              flowcharts
+            </a>{" "}
+            are supported. The other types will be rendered as image in
+            Excalidraw. <br />
           </span>
         </>
       }
