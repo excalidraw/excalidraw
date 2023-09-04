@@ -11,6 +11,10 @@
       font-weight: 600;
       margin-bottom: 4px;
       margin-left: 4px;
+
+      @media screen and (max-width: 860px) {
+        margin-top: 4px;
+      }
     }
 
     &-text {
@@ -23,6 +27,11 @@
         resize: none;
         border-radius: 8px;
         padding: 1rem;
+
+        @media screen and (max-width: 860px) {
+          width: 100%;
+          height: 10rem;
+        }
       }
     }
 
@@ -38,6 +47,10 @@
         left center;
       border-radius: 8px;
       border: 1px solid #e4e4eb;
+
+      @media screen and (max-width: 860px) {
+        width: 100%;
+      }
     }
 
     &-preview-insert.excalidraw-button {
@@ -57,6 +70,13 @@
       }
 
       color: $oc-white;
+
+      @media screen and (max-width: 860px) {
+        width: 100%;
+      }
+    }
+    @media screen and (max-width: 860px) {
+      flex-direction: column;
     }
   }
 }
