@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useDeferredValue } from "react";
 import { AppState, BinaryFiles } from "../types";
 import { updateActiveTool } from "../utils";
 import { useApp, useExcalidrawSetAppState } from "./App";
@@ -70,6 +70,7 @@ const MermaidToExcalidraw = ({
 }) => {
   const mermaidToExcalidrawLib = useRef<any>(null);
   const [text, setText] = useState("");
+  const deferredText = useDeferredValue(text);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -122,7 +123,7 @@ const MermaidToExcalidraw = ({
       }
       try {
         mermaidGraphData = await mermaidToExcalidrawLib.current.parseMermaid(
-          text,
+          deferredText,
           {
             fontSize: DEFAULT_FONT_SIZE,
           },
@@ -131,7 +132,7 @@ const MermaidToExcalidraw = ({
       } catch (e: any) {
         console.error(e.message);
         resetPreview();
-        if (text) {
+        if (deferredText) {
           setError(e.message);
         }
       }
@@ -166,7 +167,7 @@ const MermaidToExcalidraw = ({
       }
     };
     renderExcalidrawPreview();
-  }, [text, appState]);
+  }, [deferredText, appState]);
 
   const setAppState = useExcalidrawSetAppState();
 
