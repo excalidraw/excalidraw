@@ -1,8 +1,10 @@
-name: "Bundle Size check @excalidraw/excalidraw"
+  name: "Bundle Size check @excalidraw/excalidraw"
 on:
   pull_request:
     branches:
       - master
+permissions:
+  pull-requests: read
 jobs:
   size:
     runs-on: ubuntu-latest
