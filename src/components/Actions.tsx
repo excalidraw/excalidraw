@@ -286,7 +286,6 @@ export const ShapesSwitcher = ({
         );
       })}
       <div className="App-toolbar__divider" />
-      {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
 
       <DropdownMenu open={isExtraToolsMenuOpen}>
         <DropdownMenu.Trigger

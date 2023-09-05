@@ -165,6 +165,11 @@
       width: var(--lg-button-size);
       height: var(--lg-button-size);
 
+      @include isMobile {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+
       svg {
         width: var(--lg-icon-size);
         height: var(--lg-icon-size);
