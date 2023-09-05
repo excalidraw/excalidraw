@@ -8417,7 +8417,8 @@ class App extends React.Component<AppProps, AppState> {
 
     /**
      * Calculates the minimum and maximum scroll values based on the current state.
-     * @param shouldAdjustForCenteredView - Whether the view should be adjusted for centered view - when constrained area fits the viewport.
+     * @param shouldAdjustForCenteredViewX - Whether the view should be adjusted for centered view on X axis - when constrained area width fits the viewport.
+     * @param shouldAdjustForCenteredViewY - Whether the view should be adjusted for centered view on Y axis - when constrained area height fits the viewport.
      * @param overscrollAllowanceX - The overscroll allowance value for the X axis.
      * @param overscrollAllowanceY - The overscroll allowance value for the Y axis.
      * @param constrainedScrollCenterX - The X coordinate of the constrained scroll area center.
@@ -8425,7 +8426,8 @@ class App extends React.Component<AppProps, AppState> {
      * @returns The minimum and maximum scroll values for the X and Y axes.
      */
     const calculateMinMaxScrollValues = (
-      shouldAdjustForCenteredView: boolean,
+      shouldAdjustForCenteredViewX: boolean,
+      shouldAdjustForCenteredViewY: boolean,
       overscrollAllowance: number,
       constrainedScrollCenterX: number,
       constrainedScrollCenterY: number,
@@ -8436,33 +8438,45 @@ class App extends React.Component<AppProps, AppState> {
       let maxScrollY;
       let minScrollY;
 
-      if (cursorButton === "down" && shouldAdjustForCenteredView) {
-        maxScrollX = constrainedScrollCenterX + overscrollAllowance;
-        minScrollX = constrainedScrollCenterX - overscrollAllowance;
-        maxScrollY = constrainedScrollCenterY + overscrollAllowance;
-        minScrollY = constrainedScrollCenterY - overscrollAllowance;
-      } else if (cursorButton === "down" && !shouldAdjustForCenteredView) {
-        maxScrollX = scrollConstraints.x + overscrollAllowance;
-        minScrollX =
-          scrollConstraints.x -
-          scrollConstraints.width +
-          width / zoom -
-          overscrollAllowance;
-        maxScrollY = scrollConstraints.y + overscrollAllowance;
-        minScrollY =
-          scrollConstraints.y -
-          scrollConstraints.height +
-          height / zoom -
-          overscrollAllowance;
-      } else if (cursorButton !== "down" && shouldAdjustForCenteredView) {
+      // Handling the X-axis
+      if (cursorButton === "down") {
+        if (shouldAdjustForCenteredViewX) {
+          maxScrollX = constrainedScrollCenterX + overscrollAllowance;
+          minScrollX = constrainedScrollCenterX - overscrollAllowance;
+        } else {
+          maxScrollX = scrollConstraints.x + overscrollAllowance;
+          minScrollX =
+            scrollConstraints.x -
+            scrollConstraints.width +
+            width / zoom -
+            overscrollAllowance;
+        }
+      } else if (shouldAdjustForCenteredViewX) {
         maxScrollX = constrainedScrollCenterX;
         minScrollX = constrainedScrollCenterX;
-        maxScrollY = constrainedScrollCenterY;
-        minScrollY = constrainedScrollCenterY;
       } else {
         maxScrollX = scrollConstraints.x;
         minScrollX =
           scrollConstraints.x - scrollConstraints.width + width / zoom;
+      }
+
+      // Handling the Y-axis
+      if (cursorButton === "down") {
+        if (shouldAdjustForCenteredViewY) {
+          maxScrollY = constrainedScrollCenterY + overscrollAllowance;
+          minScrollY = constrainedScrollCenterY - overscrollAllowance;
+        } else {
+          maxScrollY = scrollConstraints.y + overscrollAllowance;
+          minScrollY =
+            scrollConstraints.y -
+            scrollConstraints.height +
+            height / zoom -
+            overscrollAllowance;
+        }
+      } else if (shouldAdjustForCenteredViewY) {
+        maxScrollY = constrainedScrollCenterY;
+        minScrollY = constrainedScrollCenterY;
+      } else {
         maxScrollY = scrollConstraints.y;
         minScrollY =
           scrollConstraints.y - scrollConstraints.height + height / zoom;
@@ -8482,11 +8496,12 @@ class App extends React.Component<AppProps, AppState> {
     const { constrainedScrollCenterX, constrainedScrollCenterY } =
       calculateConstrainedScrollCenter(constrainedZoom);
     const overscrollAllowance = calculateOverscrollAllowance();
-    const shouldAdjustForCenteredView =
-      constrainedZoom <= zoomLevelX || constrainedZoom <= zoomLevelY;
+    const shouldAdjustForCenteredViewX = constrainedZoom <= zoomLevelX;
+    const shouldAdjustForCenteredViewY = constrainedZoom <= zoomLevelY;
     const { maxScrollX, minScrollX, maxScrollY, minScrollY } =
       calculateMinMaxScrollValues(
-        shouldAdjustForCenteredView,
+        shouldAdjustForCenteredViewX,
+        shouldAdjustForCenteredViewY,
         overscrollAllowance,
         constrainedScrollCenterX,
         constrainedScrollCenterY,
