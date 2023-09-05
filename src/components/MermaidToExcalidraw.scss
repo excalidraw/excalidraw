@@ -29,7 +29,7 @@
         padding: 1rem;
 
         @media screen and (max-width: 860px) {
-          width: 100%;
+          width: auto;
           height: 10rem;
         }
       }
@@ -49,7 +49,7 @@
       border: 1px solid #e4e4eb;
 
       @media screen and (max-width: 860px) {
-        width: 100%;
+        width: auto;
       }
     }
 
