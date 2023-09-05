@@ -1509,4 +1509,30 @@ describe("textWysiwyg", () => {
       expect(text.text).toBe("Excalidraw");
     });
   });
+
+  it("should bump the version of labelled arrow when label updated", async () => {
+    await render(<ExcalidrawApp />);
+    const arrow = UI.createElement("arrow", {
+      width: 300,
+      height: 0,
+    });
+
+    mouse.select(arrow);
+    Keyboard.keyPress(KEYS.ENTER);
+    let editor = getTextEditor();
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello");
+    editor.blur();
+
+    const { version } = arrow;
+
+    mouse.select(arrow);
+    Keyboard.keyPress(KEYS.ENTER);
+    editor = getTextEditor();
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello\nworld!");
+    editor.blur();
+
+    expect(arrow.version).toEqual(version + 1);
+  });
 });
