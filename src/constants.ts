@@ -237,6 +237,7 @@ export const FANCY_BG_PADDING = 24; // px
 export const FANCY_BG_BORDER_RADIUS = 12; // px
 export const FANCY_BG_LOGO_PADDING = 20; // px
 export const FANCY_BG_LOGO_BOTTOM_PADDING = 12; // px
+export const FANCY_BG_INCLUDE_LOGO = true;
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 

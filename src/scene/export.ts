@@ -12,6 +12,7 @@ import { AppState, BinaryFiles, Dimensions, ExportPadding } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
   FANCY_BACKGROUND_IMAGES,
+  FANCY_BG_INCLUDE_LOGO,
   SVG_NS,
   THEME,
   THEME_FILTER,
@@ -38,12 +39,10 @@ export const exportToCanvas = async (
   {
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
-    exportLogo = true,
     viewBackgroundColor,
   }: {
     exportBackground: boolean;
     exportPadding?: number | ExportPadding;
-    exportLogo?: boolean;
     viewBackgroundColor: string;
   },
   createCanvas: (
@@ -66,7 +65,7 @@ export const exportToCanvas = async (
     ? convertToExportPadding(exportPadding)
     : getFancyBackgroundPadding(
         convertToExportPadding(exportPadding),
-        exportLogo,
+        FANCY_BG_INCLUDE_LOGO,
       );
 
   const [minX, minY, width, height] = !exportWithFancyBackground
@@ -109,7 +108,7 @@ export const exportToCanvas = async (
       exportScale: scale,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
       contentSize,
-      includeLogo: exportLogo,
+      includeLogo: FANCY_BG_INCLUDE_LOGO,
     });
 
     scrollXAdjustment =
@@ -166,7 +165,6 @@ export const exportToSvg = async (
   opts?: {
     serializeAsJSON?: () => string;
     renderEmbeddables?: boolean;
-    includeLogo?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const {
@@ -183,13 +181,11 @@ export const exportToSvg = async (
     appState.fancyBackgroundImageKey &&
     appState.fancyBackgroundImageKey !== "solid";
 
-  const includeLogo = (exportWithFancyBackground && opts?.includeLogo) ?? true;
-
   const padding = !exportWithFancyBackground
     ? convertToExportPadding(exportPadding)
     : getFancyBackgroundPadding(
         convertToExportPadding(exportPadding),
-        includeLogo,
+        FANCY_BG_INCLUDE_LOGO,
       );
 
   let metadata = "";
@@ -312,7 +308,7 @@ export const exportToSvg = async (
         },
         theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
         contentSize,
-        includeLogo,
+        includeLogo: FANCY_BG_INCLUDE_LOGO,
       });
 
       offsetXAdjustment =
