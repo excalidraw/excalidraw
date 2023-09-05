@@ -231,7 +231,6 @@ export const ShapesSwitcher = ({
   appState: UIAppState;
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
-  const device = useDevice();
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -288,31 +287,22 @@ export const ShapesSwitcher = ({
       })}
       <div className="App-toolbar__divider" />
       {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
-      {device.isMobile ? (
-        <>
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
-            icon={frameToolIcon}
-            checked={activeTool.type === "frame"}
-            name="editor-current-shape"
-            title={`${capitalizeString(
-              t("toolBar.frame"),
-            )} — ${KEYS.F.toLocaleUpperCase()}`}
-            keyBindingLabel={KEYS.F.toLocaleUpperCase()}
-            aria-label={capitalizeString(t("toolBar.frame"))}
-            aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
-            data-testid={`toolbar-frame`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "frame", "ui");
+
+      <DropdownMenu open={isExtraToolsMenuOpen}>
+        <DropdownMenu.Trigger
+          className="App-toolbar__extra-tools-trigger"
+          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+          title={t("toolBar.extraTools")}
+        >
+          {extraToolsIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
+          onSelect={() => setIsExtraToolsMenuOpen(false)}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <DropdownMenu.Item
+            onSelect={() => {
               const nextActiveTool = updateActiveTool(appState, {
                 type: "frame",
               });
@@ -320,29 +310,16 @@ export const ShapesSwitcher = ({
                 activeTool: nextActiveTool,
                 multiElement: null,
                 selectedElementIds: {},
-                activeEmbeddable: null,
               });
             }}
-          />
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
-            icon={EmbedIcon}
-            checked={activeTool.type === "embeddable"}
-            name="editor-current-shape"
-            title={capitalizeString(t("toolBar.embeddable"))}
-            aria-label={capitalizeString(t("toolBar.embeddable"))}
-            data-testid={`toolbar-embeddable`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "embeddable", "ui");
+            icon={frameToolIcon}
+            shortcut={KEYS.F.toLocaleUpperCase()}
+            data-testid="toolbar-frame"
+          >
+            {t("toolBar.frame")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => {
               const nextActiveTool = updateActiveTool(appState, {
                 type: "embeddable",
               });
@@ -350,77 +327,31 @@ export const ShapesSwitcher = ({
                 activeTool: nextActiveTool,
                 multiElement: null,
                 selectedElementIds: {},
-                activeEmbeddable: null,
               });
             }}
-          />
-        </>
-      ) : (
-        <DropdownMenu open={isExtraToolsMenuOpen}>
-          <DropdownMenu.Trigger
-            className="App-toolbar__extra-tools-trigger"
-            onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
-            title={t("toolBar.extraTools")}
+            icon={EmbedIcon}
+            data-testid="toolbar-embeddable"
           >
-            {extraToolsIcon}
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content
-            onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-            onSelect={() => setIsExtraToolsMenuOpen(false)}
-            className="App-toolbar__extra-tools-dropdown"
+            {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => {
+              const nextActiveTool = updateActiveTool(appState, {
+                type: "mermaid",
+              });
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+              });
+            }}
+            icon={mermaidLogoIcon}
+            data-testid="toolbar-embeddable"
           >
-            <DropdownMenu.Item
-              onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "frame",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
-              }}
-              icon={frameToolIcon}
-              shortcut={KEYS.F.toLocaleUpperCase()}
-              data-testid="toolbar-frame"
-            >
-              {t("toolBar.frame")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "embeddable",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
-              }}
-              icon={EmbedIcon}
-              data-testid="toolbar-embeddable"
-            >
-              {t("toolBar.embeddable")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "mermaid",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
-              }}
-              icon={mermaidLogoIcon}
-              data-testid="toolbar-embeddable"
-            >
-              {t("toolBar.mermaidToExcalidraw")}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu>
-      )}
+            {t("toolBar.mermaidToExcalidraw")}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
     </>
   );
 };

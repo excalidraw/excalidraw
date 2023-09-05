@@ -278,6 +278,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px;
+
+    .dropdown-menu--mobile {
+      bottom: 55px;
+      top: auto;
+    }
   }
 
   .App-mobile-menu {
@@ -609,7 +614,7 @@
   }
 
   .App-toolbar--mobile {
-    overflow-x: auto;
+    overflow: visible;
     max-width: 90vw;
 
     .ToolIcon__keybinding {
