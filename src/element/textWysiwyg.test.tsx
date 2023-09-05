@@ -19,6 +19,7 @@ import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
 import { resize } from "../tests/utils";
 import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
+import { getElementBounds } from ".";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -1508,5 +1509,34 @@ describe("textWysiwyg", () => {
       expect(text.containerId).toBe(null);
       expect(text.text).toBe("Excalidraw");
     });
+  });
+
+  it("should update labeled arrow bounds", async () => {
+    await render(<ExcalidrawApp />);
+    const arrow = UI.createElement("arrow", {
+      width: 300,
+      height: 0,
+    });
+
+    Keyboard.keyPress(KEYS.ENTER);
+    let editor = getTextEditor();
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello");
+    editor.blur();
+
+    const bounds = getElementBounds(arrow.get());
+    const lineHeight = bounds[3] - bounds[1];
+
+    mouse.select(arrow);
+    Keyboard.keyPress(KEYS.ENTER);
+    editor = getTextEditor();
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello\nworld!");
+    editor.blur();
+
+    const newBounds = getElementBounds(arrow.get());
+
+    expect(newBounds[1]).toBeCloseTo(bounds[1] - lineHeight / 2);
+    expect(newBounds[3]).toBeCloseTo(bounds[3] + lineHeight / 2);
   });
 });
