@@ -1511,7 +1511,7 @@ describe("textWysiwyg", () => {
     });
   });
 
-  it.only("should update labeled arrow version", async () => {
+  it("should update labeled arrow version", async () => {
     await render(<ExcalidrawApp />);
     const arrow = UI.createElement("arrow", {
       width: 300,
