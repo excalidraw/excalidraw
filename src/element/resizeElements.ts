@@ -55,16 +55,6 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import {
-  SNAP_PRECISION,
-  Snap,
-  Snaps,
-  getElementsCorners,
-  getNearestSnaps,
-  getSnapThreshold,
-} from "../snapping";
-import * as GAPoints from "../gapoints";
-import * as GALines from "../galines";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -90,8 +80,6 @@ export const transformElements = (
   centerX: number,
   centerY: number,
   appState: AppState,
-  snaps: Snaps | null,
-  snapsCallback: (snaps: Snaps | null) => void,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -128,9 +116,6 @@ export const transformElements = (
         shouldResizeFromCenter,
         pointerX,
         pointerY,
-        appState,
-        snaps,
-        snapsCallback,
       );
     }
 
@@ -160,9 +145,6 @@ export const transformElements = (
         shouldResizeFromCenter,
         pointerX,
         pointerY,
-        appState,
-        snaps,
-        snapsCallback,
       );
       return true;
     }
@@ -366,9 +348,6 @@ export const resizeSingleElement = (
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
-  appState: AppState,
-  snaps: Snaps | null,
-  snapsCallback: (snaps: Snaps | null) => void,
 ) => {
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
@@ -536,7 +515,7 @@ export const resizeSingleElement = (
   const flipY = eleNewHeight < 0;
 
   // Flip horizontally
-  if (eleNewWidth < 0) {
+  if (flipX) {
     if (transformHandleDirection.includes("e")) {
       newTopLeft[0] -= Math.abs(newBoundsWidth);
     }
@@ -578,204 +557,8 @@ export const resizeSingleElement = (
   newOrigin[0] += linearElementXOffset;
   newOrigin[1] += linearElementYOffset;
 
-  let nextX = newOrigin[0];
-  let nextY = newOrigin[1];
-
-  if (snaps) {
-    let cornerX: number;
-    let cornerY: number;
-
-    switch (transformHandleDirection) {
-      case "w":
-      case "nw":
-      case "n": {
-        cornerX = newOrigin[0] - linearElementXOffset;
-        cornerY = newOrigin[1] - linearElementYOffset;
-
-        break;
-      }
-      case "ne":
-      case "e": {
-        cornerX = newOrigin[0] + eleNewWidth - linearElementXOffset;
-        cornerY = newOrigin[1] - linearElementYOffset;
-
-        break;
-      }
-      case "s":
-      case "sw": {
-        cornerX = newOrigin[0] - linearElementXOffset;
-        cornerY = newOrigin[1] - linearElementYOffset + eleNewHeight;
-
-        break;
-      }
-      case "se": {
-        cornerX = newOrigin[0] - linearElementXOffset + eleNewWidth;
-        cornerY = newOrigin[1] - linearElementYOffset + eleNewHeight;
-        break;
-      }
-    }
-
-    if (flipX) {
-      cornerX = cornerX + Math.abs(newBoundsWidth);
-    }
-
-    if (flipY) {
-      cornerY = cornerY + Math.abs(newBoundsHeight);
-    }
-
-    const corner: Point = [cornerX, cornerY];
-
-    const { horizontalSnap, verticalSnap } = getNearestSnaps(
-      corner,
-      snaps,
-      appState,
-    );
-
-    if (verticalSnap) {
-      if (
-        (transformHandleDirection.includes("e") && !flipX) ||
-        (transformHandleDirection.includes("w") && flipX)
-      ) {
-        eleNewWidth =
-          Math.sign(eleNewWidth) *
-          (GAPoints.toTuple(verticalSnap.snapLine.point)[0] -
-            newOrigin[0] +
-            linearElementXOffset);
-      }
-
-      if (
-        (transformHandleDirection.includes("w") && !flipX) ||
-        (transformHandleDirection.includes("e") && flipX)
-      ) {
-        nextX = GAPoints.toTuple(verticalSnap.snapLine.point)[0];
-        nextX += linearElementXOffset;
-
-        eleNewWidth = flipX
-          ? nextX - startTopLeft[0] - linearElementXOffset
-          : eleNewWidth + (newOrigin[0] - nextX);
-      }
-    }
-
-    if (horizontalSnap) {
-      if (
-        (transformHandleDirection.includes("n") && !flipY) ||
-        (transformHandleDirection.includes("s") && flipY)
-      ) {
-        nextY = GAPoints.toTuple(horizontalSnap.snapLine.point)[1];
-        nextY += linearElementYOffset;
-        eleNewHeight = flipY
-          ? nextY - startTopLeft[1] - linearElementYOffset
-          : eleNewHeight + (newOrigin[1] - nextY);
-      }
-
-      if (
-        (transformHandleDirection.includes("s") && !flipY) ||
-        (transformHandleDirection.includes("n") && flipY)
-      ) {
-        eleNewHeight =
-          Math.sign(eleNewHeight) *
-          (GAPoints.toTuple(horizontalSnap.snapLine.point)[1] -
-            newOrigin[1] +
-            linearElementYOffset);
-      }
-    }
-
-    if (shouldMaintainAspectRatio) {
-      const fixWidthFromHeight = () => {
-        const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
-        eleNewWidth = eleInitialWidth * heightRatio;
-      };
-
-      const fixHeightFromWidth = () => {
-        const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
-        eleNewHeight = eleInitialHeight * widthRatio;
-      };
-
-      if (verticalSnap) {
-        fixHeightFromWidth();
-        if (
-          transformHandleDirection === "w" ||
-          transformHandleDirection === "e"
-        ) {
-          nextY = stateAtResizeStart.y - (eleNewHeight - eleInitialHeight) / 2;
-        } else if (transformHandleDirection === "ne") {
-          nextY = stateAtResizeStart.y - (eleNewHeight - eleInitialHeight);
-        } else if (transformHandleDirection === "se" && flipX) {
-          nextY = stateAtResizeStart.y - eleNewHeight;
-        }
-      }
-
-      if (horizontalSnap) {
-        fixWidthFromHeight();
-        if (
-          transformHandleDirection === "n" ||
-          transformHandleDirection === "s"
-        ) {
-          nextX = stateAtResizeStart.x - (eleNewWidth - eleInitialWidth) / 2;
-        } else if (
-          transformHandleDirection === "sw" ||
-          transformHandleDirection === "nw"
-        ) {
-          nextX = flipY
-            ? stateAtResizeStart.x + eleInitialWidth
-            : stateAtResizeStart.x - (eleNewWidth - eleInitialWidth);
-        } else if (
-          (transformHandleDirection === "se" ||
-            transformHandleDirection === "ne") &&
-          flipY
-        ) {
-          nextX = stateAtResizeStart.x - eleNewWidth;
-        }
-      }
-    }
-
-    const nextSnaps = snaps
-      .map((snap) => {
-        let nextSnap: Snap = snap;
-
-        if (snap === verticalSnap || snap === horizontalSnap) {
-          nextSnap = {
-            ...snap,
-            isSnapped: true,
-          };
-        } else if (verticalSnap) {
-          if (
-            GALines.areParallel(
-              snap.snapLine.line,
-              verticalSnap.snapLine.line,
-            ) &&
-            GALines.distance(snap.snapLine.line, verticalSnap.snapLine.line) <=
-              SNAP_PRECISION
-          ) {
-            nextSnap = {
-              ...snap,
-              isSnapped: true,
-            };
-          }
-        } else if (horizontalSnap) {
-          if (
-            GALines.areParallel(
-              snap.snapLine.line,
-              horizontalSnap.snapLine.line,
-            ) &&
-            GALines.distance(
-              snap.snapLine.line,
-              horizontalSnap.snapLine.line,
-            ) <= SNAP_PRECISION
-          ) {
-            nextSnap = {
-              ...snap,
-              isSnapped: true,
-            };
-          }
-        }
-
-        return nextSnap;
-      })
-      .filter((snap) => snap?.isSnapped);
-
-    snapsCallback(nextSnaps);
-  }
+  const nextX = newOrigin[0];
+  const nextY = newOrigin[1];
 
   // Readjust points for linear elements
   let rescaledElementPointsY;
@@ -844,9 +627,6 @@ export const resizeMultipleElements = (
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
-  appState: AppState,
-  snaps: Snaps | null,
-  snapsCallback?: (snaps: Snaps | null) => void,
 ) => {
   // map selected elements to the original elements. While it never should
   // happen that pointerDownState.originalElements won't contain the selected
@@ -895,8 +675,8 @@ export const resizeMultipleElements = (
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
 
-  const originalHeight = maxY - minY;
-  const originalWidth = maxX - minX;
+  // const originalHeight = maxY - minY;
+  // const originalWidth = maxX - minX;
 
   const direction = transformHandleType;
 
@@ -913,7 +693,7 @@ export const resizeMultipleElements = (
     ? [midX, midY]
     : mapDirectionsToAnchors[direction];
 
-  let scale =
+  const scale =
     Math.max(
       Math.abs(pointerX - anchorX) / (maxX - minX) || 0,
       Math.abs(pointerY - anchorY) / (maxY - minY) || 0,
@@ -946,129 +726,6 @@ export const resizeMultipleElements = (
   ].map((condition) => (condition ? 1 : -1));
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
-
-  if (snaps) {
-    const [topLeft, , , bottomRight] = getElementsCorners(
-      targetElements.map(({ latest }) => latest).concat(boundTextElements),
-    );
-    const minX = topLeft[0];
-    const maxX = bottomRight[0];
-    const minY = topLeft[1];
-    const maxY = bottomRight[1];
-
-    let cornerX = minX;
-    let cornerY = minY;
-
-    if (direction.includes("e")) {
-      cornerX = maxX;
-
-      if (isFlippedByX) {
-        cornerX = minX;
-      }
-    }
-
-    if (direction.includes("w")) {
-      cornerX = minX;
-      if (isFlippedByX) {
-        cornerX = minX;
-      }
-    }
-
-    if (direction.includes("s")) {
-      cornerY = maxY;
-
-      if (isFlippedByY) {
-        cornerY = minY;
-      }
-    }
-
-    if (direction.includes("n")) {
-      cornerY = minY;
-
-      if (isFlippedByY) {
-        cornerY = maxY;
-      }
-    }
-
-    const corner: Point = [cornerX, cornerY];
-
-    let { horizontalSnap, verticalSnap } = getNearestSnaps(
-      corner,
-      snaps,
-      appState,
-      true,
-    );
-
-    const snapPoint = horizontalSnap
-      ? GAPoints.toTuple(horizontalSnap.snapLine.point)
-      : verticalSnap
-      ? GAPoints.toTuple(verticalSnap.snapLine.point)
-      : null;
-
-    if (snapPoint) {
-      const snapThreshold = getSnapThreshold(appState.zoom.value);
-      if (
-        Math.abs(corner[1] - pointerY) > snapThreshold &&
-        Math.abs(corner[0] - pointerX) > snapThreshold
-      ) {
-        horizontalSnap = null;
-        verticalSnap = null;
-      }
-
-      if (horizontalSnap) {
-        scale = Math.abs(snapPoint[1] - anchorY) / originalHeight;
-      } else if (verticalSnap) {
-        scale = Math.abs(snapPoint[0] - anchorX) / originalWidth;
-      }
-    }
-
-    const nextSnaps = snaps
-      .map((snap) => {
-        let nextSnap: Snap = snap;
-
-        if (snap === verticalSnap || snap === horizontalSnap) {
-          nextSnap = {
-            ...snap,
-            isSnapped: true,
-          };
-        } else if (verticalSnap) {
-          if (
-            GALines.areParallel(
-              snap.snapLine.line,
-              verticalSnap.snapLine.line,
-            ) &&
-            GALines.distance(snap.snapLine.line, verticalSnap.snapLine.line) <=
-              SNAP_PRECISION
-          ) {
-            nextSnap = {
-              ...snap,
-              isSnapped: true,
-            };
-          }
-        } else if (horizontalSnap) {
-          if (
-            GALines.areParallel(
-              snap.snapLine.line,
-              horizontalSnap.snapLine.line,
-            ) &&
-            GALines.distance(
-              snap.snapLine.line,
-              horizontalSnap.snapLine.line,
-            ) <= SNAP_PRECISION
-          ) {
-            nextSnap = {
-              ...snap,
-              isSnapped: true,
-            };
-          }
-        }
-
-        return nextSnap;
-      })
-      .filter((snap) => snap?.isSnapped);
-
-    snapsCallback?.(nextSnaps);
-  }
 
   const elementsAndUpdates: {
     element: NonDeletedExcalidrawElement;

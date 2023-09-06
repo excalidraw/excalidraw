@@ -4,65 +4,58 @@ import {
   getElementAbsoluteCoords,
   getElementBounds,
 } from "./element/bounds";
+import { MaybeTransformHandleType } from "./element/transformHandles";
 import { isBoundToContainer, isFrameElement } from "./element/typeChecks";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import * as GA from "./ga";
-import * as GALines from "./galines";
-import * as GAPoints from "./gapoints";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
-import {
-  distance2d,
-  rangeIntersection,
-  rangesOverlap,
-  rotatePoint,
-} from "./math";
+import { rangeIntersection, rangesOverlap, rotatePoint } from "./math";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
-import { AppState, Point, Zoom } from "./types";
-
-const SNAP_DISTANCE = 8;
-
-export const getSnapThreshold = (zoomValue: number) => {
-  return SNAP_DISTANCE / zoomValue;
-};
+import { AppState, Point } from "./types";
 
 // handle floating point errors
 export const SNAP_PRECISION = 0.001;
 
-export type SnapLine = {
-  id: string;
-  line: GA.Line;
-  point: GA.Point;
-  direction: "vertical" | "horizontal";
+const SNAP_DISTANCE = 8;
+
+// snap distance with zoom value taken into consideration
+export const getSnapDistance = (zoomValue: number) => {
+  return SNAP_DISTANCE / zoomValue;
 };
 
-export type Snap = {
-  distance: number;
-  point: GA.Point;
-  snapLine: SnapLine;
-  isSnapped: boolean;
+type Vector2D = {
+  x: number;
+  y: number;
+};
+
+type PointPair = [Point, Point];
+
+export type PointSnap = {
+  type: "point";
+  points: PointPair;
+  offset: number;
 };
 
 export type Gap = {
-  //  start edge ↓     length
+  //  start side ↓     length
   // ┌───────────┐◄───────────────►
   // │           │-----------------┌───────────┐
   // │  start    │       ↑         │           │
-  // │  element  │  intersection   │  end      │
+  // │  element  │    overlap      │  end      │
   // │           │       ↓         │  element  │
   // └───────────┘-----------------│           │
   //                               └───────────┘
-  //                               ↑ end edge
+  //                               ↑ end side
 
   startElement: ExcalidrawElement;
   endElement: ExcalidrawElement;
-  startEdge: [Point, Point];
-  endEdge: [Point, Point];
+  startSide: [Point, Point];
+  endSide: [Point, Point];
+  overlap: [number, number];
   length: number;
-  intersection: [number, number];
 };
 
 export type GapSnap = {
@@ -80,10 +73,21 @@ export type GapSnap = {
 
 export type GapSnaps = GapSnap[];
 
+export type Snap = GapSnap | PointSnap;
 export type Snaps = Snap[];
 
-const shouldSnap = (snap: Snap, zoom: Zoom) =>
-  snap.distance < SNAP_DISTANCE / zoom.value / 2;
+export type PointSnapLine = {
+  type: "points";
+  points: PointPair;
+};
+
+export type GapSnapLine = {
+  type: "gap";
+  direction: "horizontal" | "vertical";
+  points: [PointPair, PointPair];
+};
+
+export type SnapLine = PointSnapLine | GapSnapLine;
 
 export const isSnappingEnabled = ({
   event,
@@ -108,70 +112,6 @@ export const isSnappingEnabled = ({
   return appState.objectsSnapModeEnabled;
 };
 
-export const round = (x: number) => {
-  // round numbers to avoid glitches for floating point rounding errors
-  const decimalPlacesTolerance = 8;
-  return (
-    Math.round(x * 10 ** decimalPlacesTolerance) / 10 ** decimalPlacesTolerance
-  );
-};
-
-interface ProjectionOptions {
-  zoom: Zoom;
-  origin: { x: number; y: number };
-  offset?: { x: number; y: number };
-  snaps: Snaps;
-}
-
-export const snapProject = ({
-  origin,
-  offset = {
-    x: 0,
-    y: 0,
-  },
-  snaps,
-  zoom,
-}: ProjectionOptions) => {
-  let totalOffset = GA.offset(0, 0);
-
-  for (const snap of snaps) {
-    if (!shouldSnap(snap, zoom)) {
-      continue;
-    }
-
-    const snapReferencePoint = GA.add(snap.point, totalOffset);
-    const snapProjection = GALines.orthogonalProjection(
-      snapReferencePoint,
-      snap.snapLine.line,
-    );
-
-    if (GA.isNaN(snapProjection)) {
-      continue;
-    }
-
-    const snapOffset = GA.sub(snapReferencePoint, snapProjection);
-
-    totalOffset = GA.sub(totalOffset, snapOffset);
-  }
-
-  return GAPoints.toTuple(
-    GA.add(
-      GA.point(origin.x, origin.y),
-      GA.add(totalOffset, GA.offset(offset.x, offset.y)),
-    ),
-  );
-};
-
-// find out which point the given snap should be snapped to
-export const snapToPoint = (snap: Snap): Point => {
-  const from = GAPoints.toTuple(snap.snapLine.point);
-  const to = GAPoints.toTuple(snap.point);
-
-  return snap.snapLine.direction === "horizontal"
-    ? [to[0], from[1]]
-    : [from[0], to[1]];
-};
-
 export const areRoughlyEqual = (
   a: number,
   b: number,
@@ -185,9 +125,11 @@ export const getElementsCorners = (
   {
     omitCenter,
     boundingBoxCorners,
+    dragOffset,
   }: {
     omitCenter?: boolean;
     boundingBoxCorners?: boolean;
+    dragOffset?: Vector2D;
   } = {
     omitCenter: false,
     boundingBoxCorners: false,
@@ -196,7 +138,17 @@ export const getElementsCorners = (
   if (elements.length === 1) {
     const element = elements[0];
 
-    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+    let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+
+    if (dragOffset) {
+      x1 += dragOffset.x;
+      x2 += dragOffset.x;
+      cx += dragOffset.x;
+
+      y1 += dragOffset.y;
+      y2 += dragOffset.y;
+      cy += dragOffset.y;
+    }
 
     const halfWidth = (x2 - x1) / 2;
     const halfHeight = (y2 - y1) / 2;
@@ -228,22 +180,11 @@ export const getElementsCorners = (
         : [leftMid, topMid, rightMid, bottomMid, center];
     }
 
-    const topLeft = rotatePoint([x1, y1], [cx, cy], element.angle).map(
-      (point) => round(point),
-    ) as [number, number];
-    const topRight = rotatePoint([x2, y1], [cx, cy], element.angle).map(
-      (point) => round(point),
-    ) as [number, number];
-    const bottomLeft = rotatePoint([x1, y2], [cx, cy], element.angle).map(
-      (point) => round(point),
-    ) as [number, number];
-    const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle).map(
-      (point) => round(point),
-    ) as [number, number];
-    const center: Point = [cx, cy].map((point) => round(point)) as [
-      number,
-      number,
-    ];
+    const topLeft = rotatePoint([x1, y1], [cx, cy], element.angle);
+    const topRight = rotatePoint([x2, y1], [cx, cy], element.angle);
+    const bottomLeft = rotatePoint([x1, y2], [cx, cy], element.angle);
+    const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle);
+    const center: Point = [cx, cy];
 
     return omitCenter
       ? [topLeft, topRight, bottomLeft, bottomRight]
@@ -251,50 +192,25 @@ export const getElementsCorners = (
   }
 
   if (elements.length > 1) {
-    const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+    const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
+      elements,
+      dragOffset ?? { x: 0, y: 0 },
+    );
     const width = maxX - minX;
     const height = maxY - minY;
 
-    return [
-      [minX, minY],
-      [maxX, minY],
-      [minX, maxY],
-      [maxX, maxY],
-      [minX + width / 2, minY + height / 2],
-    ];
+    const topLeft: Point = [minX, minY];
+    const topRight: Point = [maxX, minY];
+    const bottomLeft: Point = [minX, maxY];
+    const bottomRight: Point = [maxX, maxY];
+    const center: Point = [minX + width / 2, minY + height / 2];
+
+    return omitCenter
+      ? [topLeft, topRight, bottomLeft, bottomRight]
+      : [topLeft, topRight, bottomLeft, bottomRight, center];
   }
 
   return [];
-};
-
-const createSnapLine = (
-  [x, y]: Point,
-  direction: "vertical" | "horizontal",
-  id: string,
-): SnapLine => {
-  const gaFrom = GAPoints.from([x, y]);
-  const gaTo = GAPoints.from(
-    direction === "vertical" ? [x, y + SNAP_DISTANCE] : [x + SNAP_DISTANCE, y],
-  );
-
-  return {
-    id: `${id}_${direction}`,
-    line: GALines.through(gaFrom, gaTo),
-    point: gaFrom,
-    direction,
-  };
-};
-
-const getElementsSnapLines = (elements: ExcalidrawElement[]) => {
-  const corners = getElementsCorners(elements);
-  const id = elements[0].id;
-
-  return Object.values(corners)
-    .map((point) => [
-      createSnapLine(point, "horizontal", id),
-      createSnapLine(point, "vertical", id),
-    ])
-    .flat();
 };
 
 const getReferenceElements = (
@@ -315,171 +231,8 @@ const getReferenceElements = (
   );
 };
 
-export const getSnaps = ({
-  elements,
-  selectedElements,
-  corners,
-  appState,
-  event = null,
-  dragOffset = {
-    x: 0,
-    y: 0,
-  },
-}: {
-  elements: readonly NonDeletedExcalidrawElement[];
-  selectedElements: NonDeletedExcalidrawElement[];
-  corners: Point[];
-  appState: AppState;
-  event?: PointerEvent | MouseEvent | KeyboardEvent | null;
-  dragOffset?: { x: number; y: number };
-}) => {
-  if (!isSnappingEnabled({ appState, event, selectedElements })) {
-    return null;
-  }
-
-  if (selectedElements.length === 0) {
-    return null;
-  }
-
-  let referenceElements: ExcalidrawElement[] = getReferenceElements(
-    elements,
-    selectedElements,
-    appState,
-  );
-
-  if (appState.frameToHighlight) {
-    referenceElements = referenceElements.filter(
-      (element) => element.frameId === appState.frameToHighlight?.id,
-    );
-  } else if (
-    appState.isResizing &&
-    new Set(selectedElements.map((element) => element.frameId)).size === 1
-  ) {
-    const frameId = selectedElements[0].frameId;
-    referenceElements = referenceElements.filter(
-      (element) => element.frameId === frameId,
-    );
-  } else {
-    referenceElements = referenceElements.filter((element) => !element.frameId);
-  }
-
-  const offset = GA.offset(dragOffset.x, dragOffset.y);
-
-  const snaps = getMaximumGroups(referenceElements)
-    .filter(
-      (elementsGroup) => !elementsGroup.every((element) => element.locked),
-    )
-    .filter(
-      (elementsGroup) =>
-        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
-    )
-    .flatMap(getElementsSnapLines)
-    .flatMap((snapLine) =>
-      corners
-        .map((originPoint) => {
-          const point = GA.add(GAPoints.from(originPoint), offset);
-          const distance = round(
-            Math.abs(GAPoints.distanceToLine(point, snapLine.line)),
-          );
-
-          return {
-            distance,
-            point,
-            snapLine,
-            isSnapped: false,
-          };
-        })
-        .filter(
-          (snap): snap is Snap =>
-            snap !== null && shouldSnap(snap, appState.zoom),
-        ),
-    );
-
-  if (snaps.length > 0) {
-    if (!appState.isResizing) {
-      const verticalSnaps: Snaps = [];
-      const horizontalSnaps: Snaps = [];
-
-      let leastVerticalDistance = SNAP_DISTANCE / appState.zoom.value;
-      let leastHorizontalDistance = SNAP_DISTANCE / appState.zoom.value;
-
-      for (const snap of snaps) {
-        if (snap.snapLine.direction === "horizontal") {
-          horizontalSnaps.push(snap);
-          if (snap.distance < leastHorizontalDistance) {
-            leastHorizontalDistance = snap.distance;
-          }
-        } else {
-          verticalSnaps.push(snap);
-          if (snap.distance < leastVerticalDistance) {
-            leastVerticalDistance = snap.distance;
-          }
-        }
-      }
-
-      return [
-        ...verticalSnaps.filter((snap) =>
-          areRoughlyEqual(snap.distance, leastVerticalDistance),
-        ),
-        ...horizontalSnaps.filter((snap) =>
-          areRoughlyEqual(snap.distance, leastHorizontalDistance),
-        ),
-      ];
-    }
-
-    return snaps;
-  }
-
-  return null;
-};
-
-// TODO: rename to something more appropriate
-export const getNearestSnaps = (
-  corner: Point,
-  snaps: Snaps,
-  appState: AppState,
-  onlyKeepOne = false,
-) => {
-  let verticalSnap: Snap | null = null;
-  let horizontalSnap: Snap | null = null;
-
-  const snapThreshold = getSnapThreshold(appState.zoom.value);
-
-  let leastDistanceX = snapThreshold;
-  let leastDistanceY = snapThreshold;
-
-  for (const snap of snaps) {
-    const distance = round(distance2d(...snapToPoint(snap), ...corner));
-
-    if (snap.snapLine.direction === "vertical") {
-      if (distance <= leastDistanceX) {
-        leastDistanceX = distance;
-        verticalSnap = snap;
-      }
-    } else if (distance <= leastDistanceY) {
-      leastDistanceY = distance;
-      horizontalSnap = snap;
-    }
-  }
-
-  if (onlyKeepOne) {
-    if (leastDistanceX < leastDistanceY) {
-      horizontalSnap = null;
-    }
-
-    if (leastDistanceY < leastDistanceX) {
-      verticalSnap = null;
-    }
-  }
-
-  return {
-    verticalSnap,
-    horizontalSnap,
-  };
-};
-
 export const getVisibleGaps = (
-  elements: ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   appState: AppState,
 ) => {
@@ -513,16 +266,16 @@ export const getVisibleGaps = (
         horizontalGaps.push({
           startElement,
           endElement,
-          startEdge: [
+          startSide: [
             [startMaxX, startMinY],
             [startMaxX, startMaxY],
           ],
-          endEdge: [
+          endSide: [
             [endMinX, endMinY],
             [endMinX, endMaxY],
           ],
           length: endMinX - startMaxX,
-          intersection: rangeIntersection(
+          overlap: rangeIntersection(
             [startMinY, startMaxY],
             [endMinY, endMaxY],
           )!,
@@ -554,16 +307,16 @@ export const getVisibleGaps = (
         verticalGaps.push({
           startElement,
           endElement,
-          startEdge: [
+          startSide: [
             [startMinX, startMaxY],
             [startMaxX, startMaxY],
           ],
-          endEdge: [
+          endSide: [
             [endMinX, endMinY],
             [endMaxX, endMinY],
           ],
           length: endMinY - startMaxY,
-          intersection: rangeIntersection(
+          overlap: rangeIntersection(
             [startMinX, startMaxX],
             [endMinX, endMaxX],
           )!,
@@ -579,11 +332,23 @@ export const getVisibleGaps = (
 };
 
 export const getGapSnaps = (
-  elements: ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
-  dragOffset: { x: number; y: number },
+  dragOffset: Vector2D,
   appState: AppState,
-): GapSnaps => {
+  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  neartestSnapsX: Snaps,
+  neartestSnapsY: Snaps,
+  minOffset: Vector2D,
+) => {
+  if (!isSnappingEnabled({ appState, event, selectedElements })) {
+    return [];
+  }
+
+  if (selectedElements.length === 0) {
+    return [];
+  }
+
   const { horizontalGaps, verticalGaps } = getVisibleGaps(
     elements,
     selectedElements,
@@ -597,27 +362,21 @@ export const getGapSnaps = (
   const centerX = (minX + maxX) / 2;
   const centerY = (minY + maxY) / 2;
 
-  let minOffsetX = SNAP_DISTANCE;
-  const neartestSnapsX: GapSnaps = [];
-
   for (const gap of horizontalGaps) {
-    if (!rangesOverlap([minY, maxY], gap.intersection)) {
+    if (!rangesOverlap([minY, maxY], gap.overlap)) {
       continue;
     }
 
     // center gap
-    const gapMidX = gap.startEdge[0][0] + gap.length / 2;
+    const gapMidX = gap.startSide[0][0] + gap.length / 2;
     const centerOffset = gapMidX - centerX;
     const gapIsLargerThanSelection = gap.length > maxX - minX;
 
-    if (
-      gapIsLargerThanSelection &&
-      round(Math.abs(centerOffset)) <= minOffsetX
-    ) {
-      if (round(Math.abs(centerOffset)) < minOffsetX) {
+    if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
+      if (Math.abs(centerOffset) < minOffset.x) {
         neartestSnapsX.length = 0;
       }
-      minOffsetX = Math.abs(centerOffset);
+      minOffset.x = Math.abs(centerOffset);
 
       const snap: GapSnap = {
         type: "gap",
@@ -633,12 +392,13 @@ export const getGapSnaps = (
     // side gap, from the right
     const [, , endMaxX] = getElementBounds(gap.endElement);
     const distanceToEndElementX = minX - endMaxX;
-    const sideOffsetRight = distanceToEndElementX - gap.length;
+    const sideOffsetRight = gap.length - distanceToEndElementX;
 
-    if (round(Math.abs(sideOffsetRight)) <= minOffsetX) {
-      if (round(Math.abs(sideOffsetRight)) < minOffsetX) {
+    if (Math.abs(sideOffsetRight) <= minOffset.x) {
+      if (Math.abs(sideOffsetRight) < minOffset.x) {
         neartestSnapsX.length = 0;
       }
+      minOffset.x = Math.abs(centerOffset);
 
       const snap: GapSnap = {
         type: "gap",
@@ -655,10 +415,11 @@ export const getGapSnaps = (
     const distanceToStartElementX = startMinX - maxX;
     const sideOffsetLeft = distanceToStartElementX - gap.length;
 
-    if (round(Math.abs(sideOffsetLeft)) <= minOffsetX) {
-      if (round(Math.abs(sideOffsetLeft)) < minOffsetX) {
+    if (Math.abs(sideOffsetLeft) <= minOffset.x) {
+      if (Math.abs(sideOffsetLeft) < minOffset.x) {
         neartestSnapsX.length = 0;
       }
+      minOffset.x = Math.abs(centerOffset);
 
       const snap: GapSnap = {
         type: "gap",
@@ -671,26 +432,21 @@ export const getGapSnaps = (
     }
   }
 
-  const neartestSnapsY: GapSnaps = [];
-  let minOffsetY = SNAP_DISTANCE;
   for (const gap of verticalGaps) {
-    if (!rangesOverlap([minX, maxX], gap.intersection)) {
+    if (!rangesOverlap([minX, maxX], gap.overlap)) {
       continue;
     }
 
     // center gap
-    const gapMidY = gap.startEdge[0][1] + gap.length / 2;
+    const gapMidY = gap.startSide[0][1] + gap.length / 2;
     const centerOffset = gapMidY - centerY;
     const gapIsLargerThanSelection = gap.length > maxY - minY;
 
-    if (
-      gapIsLargerThanSelection &&
-      round(Math.abs(centerOffset)) <= minOffsetY
-    ) {
-      if (round(Math.abs(centerOffset)) < minOffsetX) {
+    if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
+      if (Math.abs(centerOffset) < minOffset.y) {
         neartestSnapsY.length = 0;
       }
-      minOffsetY = Math.abs(centerOffset);
+      minOffset.y = Math.abs(centerOffset);
 
       const snap: GapSnap = {
         type: "gap",
@@ -708,10 +464,11 @@ export const getGapSnaps = (
     const distanceToStartElementY = startMinY - maxY;
     const sideOffsetTop = distanceToStartElementY - gap.length;
 
-    if (round(Math.abs(sideOffsetTop)) <= minOffsetX) {
-      if (round(Math.abs(sideOffsetTop)) < minOffsetX) {
+    if (Math.abs(sideOffsetTop) <= minOffset.y) {
+      if (Math.abs(sideOffsetTop) < minOffset.y) {
         neartestSnapsY.length = 0;
       }
+      minOffset.y = Math.abs(centerOffset);
 
       const snap: GapSnap = {
         type: "gap",
@@ -726,12 +483,13 @@ export const getGapSnaps = (
     // side gap, from the bottom
     const [, , , endMaxY] = getElementBounds(gap.endElement);
     const distanceToEndElementY = minY - endMaxY;
-    const sideOffsetBottom = distanceToEndElementY - gap.length;
+    const sideOffsetBottom = gap.length - distanceToEndElementY;
 
-    if (round(Math.abs(sideOffsetBottom)) <= minOffsetX) {
-      if (round(Math.abs(sideOffsetBottom)) < minOffsetX) {
+    if (Math.abs(sideOffsetBottom) <= minOffset.y) {
+      if (Math.abs(sideOffsetBottom) < minOffset.y) {
         neartestSnapsY.length = 0;
       }
+      minOffset.y = Math.abs(centerOffset);
 
       const snap: GapSnap = {
         type: "gap",
@@ -743,6 +501,577 @@ export const getGapSnaps = (
       continue;
     }
   }
+};
 
-  return [...neartestSnapsX, ...neartestSnapsY];
+export const getPointSnaps = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
+  selectionSnapPoints: Point[],
+  appState: AppState,
+  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  neartestSnapsX: Snaps,
+  neartestSnapsY: Snaps,
+  minOffset: Vector2D,
+) => {
+  if (
+    !isSnappingEnabled({ appState, event, selectedElements }) ||
+    selectedElements.length === 0
+  ) {
+    return [];
+  }
+
+  const referenceElements = getReferenceElements(
+    elements,
+    selectedElements,
+    appState,
+  );
+
+  const referenceSnapPoints = getMaximumGroups(referenceElements)
+    .filter(
+      (elementsGroup) => !elementsGroup.every((element) => element.locked),
+    )
+    .filter(
+      (elementsGroup) =>
+        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
+    )
+    .flatMap((elementGroup) => getElementsCorners(elementGroup));
+
+  for (const thisSnapPoint of selectionSnapPoints) {
+    for (const otherSnapPoint of referenceSnapPoints) {
+      const offsetX = otherSnapPoint[0] - thisSnapPoint[0];
+      const offsetY = otherSnapPoint[1] - thisSnapPoint[1];
+
+      if (Math.abs(offsetX) <= minOffset.x) {
+        if (Math.abs(offsetX) < minOffset.x) {
+          neartestSnapsX.length = 0;
+        }
+
+        neartestSnapsX.push({
+          type: "point",
+          points: [thisSnapPoint, otherSnapPoint],
+          offset: offsetX,
+        });
+
+        minOffset.x = Math.abs(offsetX);
+      }
+
+      if (Math.abs(offsetY) <= minOffset.y) {
+        if (Math.abs(offsetY) < minOffset.y) {
+          neartestSnapsY.length = 0;
+        }
+
+        neartestSnapsY.push({
+          type: "point",
+          points: [thisSnapPoint, otherSnapPoint],
+          offset: offsetY,
+        });
+
+        minOffset.y = Math.abs(offsetY);
+      }
+    }
+  }
+};
+
+export const getSnapsOffsetAndSnapLines = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
+  dragOffset: Vector2D,
+  appState: AppState,
+  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+) => {
+  const neartestSnapsX: Snaps = [];
+  const neartestSnapsY: Snaps = [];
+  const snapDistance = getSnapDistance(appState.zoom.value);
+  const minOffset = {
+    x: snapDistance,
+    y: snapDistance,
+  };
+
+  const selectionPoints = getElementsCorners(selectedElements, {
+    dragOffset,
+  });
+
+  // get the nearest snaps
+  getPointSnaps(
+    elements,
+    selectedElements,
+    selectionPoints,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  getGapSnaps(
+    elements,
+    selectedElements,
+    dragOffset,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  // using the neartest snaps to figure out how
+  // much the elements need to be offset to be snapped
+  const snapOffset = {
+    x: neartestSnapsX[0]?.offset ?? 0,
+    y: neartestSnapsY[0]?.offset ?? 0,
+  };
+
+  // once the elements are snapped
+  // and moved to the snapped position
+  // we want to use the element's snapped position
+  // to update nearest snaps so that we can create
+  // point and gap snap lines correctly without any shifting
+  minOffset.x = SNAP_PRECISION / appState.zoom.value;
+  minOffset.y = SNAP_PRECISION / appState.zoom.value;
+  neartestSnapsX.length = 0;
+  neartestSnapsY.length = 0;
+  const newDragOffset = {
+    x: dragOffset.x + snapOffset.x,
+    y: dragOffset.y + snapOffset.y,
+  };
+
+  getPointSnaps(
+    elements,
+    selectedElements,
+    getElementsCorners(selectedElements, {
+      dragOffset: newDragOffset,
+    }),
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  minOffset.x = snapDistance / appState.zoom.value;
+  minOffset.y = snapDistance / appState.zoom.value;
+
+  getGapSnaps(
+    elements,
+    selectedElements,
+    dragOffset,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  const snaps = [...neartestSnapsX, ...neartestSnapsY];
+
+  const pointSnapLines = createPointSnapLines(
+    snaps.filter((snap) => snap.type === "point") as PointSnap[],
+  );
+  const gapSnapLines = createGapSnapLines(
+    selectedElements,
+    newDragOffset,
+    snaps.filter((snap) => snap.type === "gap") as GapSnap[],
+  );
+
+  return {
+    snapOffset,
+    snapLines: [...pointSnapLines, ...gapSnapLines],
+  };
+};
+
+const createPointSnapLines = (pointSnaps: PointSnap[]): PointSnapLine[] => {
+  return pointSnaps.map((pointSnap) => ({
+    type: "points",
+    points: pointSnap.points,
+  }));
+};
+
+const createGapSnapLines = (
+  selectedElements: ExcalidrawElement[],
+  dragOffset: Vector2D,
+  gapSnaps: GapSnap[],
+): GapSnapLine[] => {
+  const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
+    selectedElements,
+    dragOffset,
+  );
+
+  const gapSnapLines: GapSnapLine[] = [];
+
+  for (const gapSnap of gapSnaps) {
+    const [startMinX, startMinY, startMaxX, startMaxY] = getElementBounds(
+      gapSnap.gap.startElement,
+    );
+    const [endMinX, endMinY, endMaxX, endMaxY] = getElementBounds(
+      gapSnap.gap.endElement,
+    );
+
+    const verticalIntersection = rangeIntersection(
+      [minY, maxY],
+      gapSnap.gap.overlap,
+    );
+
+    const horizontalGapIntersection = rangeIntersection(
+      [minX, maxX],
+      gapSnap.gap.overlap,
+    );
+
+    switch (gapSnap.direction) {
+      case "center_horizontal": {
+        if (verticalIntersection) {
+          const gapLineY =
+            (verticalIntersection[0] + verticalIntersection[1]) / 2;
+
+          gapSnapLines.push({
+            type: "gap",
+            direction: "horizontal",
+            points: [
+              [
+                [gapSnap.gap.startSide[0][0], gapLineY],
+                [minX, gapLineY],
+              ],
+              [
+                [maxX, gapLineY],
+                [gapSnap.gap.endSide[0][0], gapLineY],
+              ],
+            ],
+          });
+        }
+        break;
+      }
+      case "center_vertical": {
+        if (horizontalGapIntersection) {
+          const gapLineX =
+            (horizontalGapIntersection[0] + horizontalGapIntersection[1]) / 2;
+
+          gapSnapLines.push({
+            type: "gap",
+            direction: "vertical",
+            points: [
+              [
+                [gapLineX, gapSnap.gap.startSide[0][1]],
+                [gapLineX, minY],
+              ],
+              [
+                [gapLineX, maxY],
+                [gapLineX, gapSnap.gap.endSide[0][1]],
+              ],
+            ],
+          });
+        }
+        break;
+      }
+      case "side_right": {
+        if (verticalIntersection) {
+          const gapLineY =
+            (verticalIntersection[0] + verticalIntersection[1]) / 2;
+
+          gapSnapLines.push({
+            type: "gap",
+            direction: "horizontal",
+            points: [
+              [
+                [startMaxX, gapLineY],
+                [endMinX, gapLineY],
+              ],
+              [
+                [endMaxX, gapLineY],
+                [minX, gapLineY],
+              ],
+            ],
+          });
+        }
+        break;
+      }
+      case "side_left": {
+        if (verticalIntersection) {
+          const gapLineY =
+            (verticalIntersection[0] + verticalIntersection[1]) / 2;
+
+          gapSnapLines.push({
+            type: "gap",
+            direction: "horizontal",
+            points: [
+              [
+                [maxX, gapLineY],
+                [startMinX, gapLineY],
+              ],
+              [
+                [startMaxX, gapLineY],
+                [endMinX, gapLineY],
+              ],
+            ],
+          });
+        }
+        break;
+      }
+      case "side_top": {
+        if (horizontalGapIntersection) {
+          const gapLineX =
+            (horizontalGapIntersection[0] + horizontalGapIntersection[1]) / 2;
+
+          gapSnapLines.push({
+            type: "gap",
+            direction: "vertical",
+            points: [
+              [
+                [gapLineX, maxY],
+                [gapLineX, startMinY],
+              ],
+              [
+                [gapLineX, startMaxY],
+                [gapLineX, endMinY],
+              ],
+            ],
+          });
+        }
+        break;
+      }
+      case "side_bottom": {
+        if (horizontalGapIntersection) {
+          const gapLineX =
+            (horizontalGapIntersection[0] + horizontalGapIntersection[1]) / 2;
+
+          gapSnapLines.push({
+            type: "gap",
+            direction: "vertical",
+            points: [
+              [
+                [gapLineX, startMaxY],
+                [gapLineX, endMinY],
+              ],
+              [
+                [gapLineX, endMaxY],
+                [gapLineX, minY],
+              ],
+            ],
+          });
+        }
+        break;
+      }
+    }
+  }
+
+  return gapSnapLines;
+};
+
+export const snapResizingElements = (
+  elements: ExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
+  selectedOriginalElements: ExcalidrawElement[],
+  appState: AppState,
+  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  dragOffset: Vector2D,
+  transformHandle: MaybeTransformHandleType,
+) => {
+  if (
+    !isSnappingEnabled({ event, selectedElements, appState }) ||
+    selectedElements.length === 0 ||
+    (selectedElements.length === 1 &&
+      !areRoughlyEqual(selectedElements[0].angle, 0))
+  ) {
+    return {
+      snapOffset: { x: 0, y: 0 },
+      snapLines: [],
+    };
+  }
+
+  let [minX, minY, maxX, maxY] = getCommonBounds(selectedOriginalElements);
+
+  if (transformHandle) {
+    if (transformHandle.includes("e")) {
+      maxX += dragOffset.x;
+    } else if (transformHandle.includes("w")) {
+      minX += dragOffset.x;
+    }
+
+    if (transformHandle.includes("n")) {
+      minY += dragOffset.y;
+    } else if (transformHandle.includes("s")) {
+      maxY += dragOffset.y;
+    }
+  }
+
+  const selectionSnapPoints: Point[] = [];
+
+  if (transformHandle) {
+    switch (transformHandle) {
+      case "e": {
+        selectionSnapPoints.push([maxX, minY], [maxX, maxY]);
+        break;
+      }
+      case "w": {
+        selectionSnapPoints.push([minX, minY], [minX, maxY]);
+        break;
+      }
+      case "n": {
+        selectionSnapPoints.push([minX, minY], [maxX, minY]);
+        break;
+      }
+      case "s": {
+        selectionSnapPoints.push([minX, maxY], [maxX, maxY]);
+        break;
+      }
+      case "ne": {
+        selectionSnapPoints.push([maxX, minY]);
+        break;
+      }
+      case "nw": {
+        selectionSnapPoints.push([minX, minY]);
+        break;
+      }
+      case "se": {
+        selectionSnapPoints.push([maxX, maxY]);
+        break;
+      }
+      case "sw": {
+        selectionSnapPoints.push([minX, maxY]);
+        break;
+      }
+    }
+  }
+
+  const snapDistance = getSnapDistance(appState.zoom.value);
+
+  const minOffset = {
+    x: snapDistance,
+    y: snapDistance,
+  };
+
+  const neartestSnapsX: Snaps = [];
+  const neartestSnapsY: Snaps = [];
+
+  getPointSnaps(
+    elements,
+    selectedOriginalElements,
+    selectionSnapPoints,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  const snapOffset = {
+    x: neartestSnapsX[0]?.offset ?? 0,
+    y: neartestSnapsY[0]?.offset ?? 0,
+  };
+
+  // minOffset.x = SNAP_PRECISION / appState.zoom.value;
+  // minOffset.y = SNAP_PRECISION / appState.zoom.value;
+  minOffset.x = 0;
+  minOffset.y = 0;
+  neartestSnapsX.length = 0;
+  neartestSnapsY.length = 0;
+
+  const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+
+  const corners: Point[] = [
+    [x1, y1],
+    [x1, y2],
+    [x2, y1],
+    [x2, y2],
+  ];
+
+  getPointSnaps(
+    elements,
+    selectedElements,
+    corners,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  const pointSnapLines = createPointSnapLines(
+    [...neartestSnapsX, ...neartestSnapsY].filter(
+      (snap) => snap.type === "point",
+    ) as PointSnap[],
+  );
+
+  return {
+    snapOffset,
+    snapLines: pointSnapLines,
+  };
+};
+
+export const snapNewElement = (
+  elements: readonly ExcalidrawElement[],
+  draggingElement: ExcalidrawElement,
+  appState: AppState,
+  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  origin: Vector2D,
+  dragOffset: Vector2D,
+) => {
+  if (
+    !isSnappingEnabled({ event, selectedElements: [draggingElement], appState })
+  ) {
+    return {
+      snapOffset: { x: 0, y: 0 },
+      snapLines: [],
+    };
+  }
+
+  const selectionSnapPoints: Point[] = [
+    [origin.x + dragOffset.x, origin.y + dragOffset.y],
+  ];
+
+  const snapDistance = getSnapDistance(appState.zoom.value);
+
+  const minOffset = {
+    x: snapDistance,
+    y: snapDistance,
+  };
+
+  const neartestSnapsX: Snaps = [];
+  const neartestSnapsY: Snaps = [];
+
+  getPointSnaps(
+    elements,
+    [draggingElement],
+    selectionSnapPoints,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  const snapOffset = {
+    x: neartestSnapsX[0]?.offset ?? 0,
+    y: neartestSnapsY[0]?.offset ?? 0,
+  };
+
+  minOffset.x = SNAP_PRECISION / appState.zoom.value;
+  minOffset.y = SNAP_PRECISION / appState.zoom.value;
+  neartestSnapsX.length = 0;
+  neartestSnapsY.length = 0;
+
+  const corners = getElementsCorners([draggingElement], {
+    boundingBoxCorners: true,
+    omitCenter: true,
+  });
+
+  getPointSnaps(
+    elements,
+    [draggingElement],
+    corners,
+    appState,
+    event,
+    neartestSnapsX,
+    neartestSnapsY,
+    minOffset,
+  );
+
+  const pointSnapLines = createPointSnapLines(
+    [...neartestSnapsX, ...neartestSnapsY].filter(
+      (snap) => snap.type === "point",
+    ) as PointSnap[],
+  );
+
+  return {
+    snapOffset,
+    snapLines: pointSnapLines,
+  };
 };

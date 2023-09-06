@@ -328,7 +328,11 @@ import {
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
-import { getGapSnaps, getElementsCorners, getSnaps } from "../snapping";
+import {
+  getSnapsOffsetAndSnapLines,
+  snapNewElement,
+  snapResizingElements,
+} from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -5322,28 +5326,15 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          const snaps = getSnaps({
-            elements: originalElements,
-            selectedElements: getSelectedElements(originalElements, this.state),
-            appState: this.state,
-            event,
-            dragOffset,
-            corners: getElementsCorners(
-              getSelectedElements(originalElements, this.state),
-              {
-                boundingBoxCorners: true,
-              },
-            ),
-          });
-          this.setState({ snaps });
-
-          const gapSnaps = getGapSnaps(
+          const { snapOffset, snapLines } = getSnapsOffsetAndSnapLines(
             originalElements,
             getSelectedElements(originalElements, this.state),
             dragOffset,
             this.state,
+            event,
           );
-          this.setState({ gapSnaps });
+
+          this.setState({ snapLines });
 
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
@@ -5354,8 +5345,7 @@ class App extends React.Component<AppProps, AppState> {
               dragOffset,
               this.state,
               this.scene,
-              snaps,
-              gapSnaps,
+              snapOffset,
             );
 
           this.maybeSuggestBindingForAll(selectedElements);
@@ -5653,8 +5643,7 @@ class App extends React.Component<AppProps, AppState> {
           multiElement || isTextElement(this.state.editingElement)
             ? this.state.editingElement
             : null,
-        snaps: null,
-        gapSnaps: [],
+        snapLines: [],
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
@@ -7085,10 +7074,9 @@ class App extends React.Component<AppProps, AppState> {
         distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
-        this.state,
       );
     } else {
-      const [gridX, gridY] = getGridPoint(
+      let [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
         this.state.gridSize,
@@ -7102,16 +7090,27 @@ class App extends React.Component<AppProps, AppState> {
           ? image.width / image.height
           : null;
 
-      const snaps = getSnaps({
-        elements: this.scene.getNonDeletedElements(),
-        selectedElements: [draggingElement],
-        corners: getElementsCorners([draggingElement], {
-          boundingBoxCorners: true,
-          omitCenter: true,
-        }),
-        appState: this.state,
+      const { snapOffset, snapLines } = snapNewElement(
+        this.scene.getNonDeletedElements(),
+        draggingElement,
+        this.state,
+        event,
+        {
+          x: pointerDownState.originInGrid.x,
+          y: pointerDownState.originInGrid.y,
+        },
+        {
+          x: gridX - pointerDownState.originInGrid.x,
+          y: gridY - pointerDownState.originInGrid.y,
+        },
+      );
+
+      gridX += snapOffset.x;
+      gridY += snapOffset.y;
+
+      this.setState({
+        snapLines,
       });
-      this.setState({ snaps });
 
       dragNewElement(
         draggingElement,
@@ -7126,9 +7125,7 @@ class App extends React.Component<AppProps, AppState> {
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
-        this.state,
         aspectRatio,
-        snaps,
       );
 
       this.maybeSuggestBindingForAll([draggingElement]);
@@ -7172,7 +7169,7 @@ class App extends React.Component<AppProps, AppState> {
       isRotating: transformHandleType === "rotation",
     });
     const pointerCoords = pointerDownState.lastCoords;
-    const [resizeX, resizeY] = getGridPoint(
+    let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
       this.state.gridSize,
@@ -7200,29 +7197,35 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
-    const shouldGetResizedSnaps = !(
-      selectedElements.length === 1 &&
-      (selectedElements[0].type === "arrow" || selectedElements[0].angle !== 0)
+    const [gridX, gridY] = getGridPoint(
+      pointerCoords.x,
+      pointerCoords.y,
+      this.state.gridSize,
     );
 
-    const snaps = shouldGetResizedSnaps
-      ? getSnaps({
-          elements: this.scene.getNonDeletedElements(),
-          selectedElements: getSelectedElements(
-            this.scene.getNonDeletedElements(),
-            this.state,
-          ),
-          corners: getElementsCorners(
-            getSelectedElements(this.scene.getNonDeletedElements(), this.state),
-            {
-              omitCenter: true,
-              boundingBoxCorners: true,
-            },
-          ),
-          appState: this.state,
-          event,
-        })
-      : null;
+    const dragOffset = {
+      x: gridX - pointerDownState.originInGrid.x,
+      y: gridY - pointerDownState.originInGrid.y,
+    };
+
+    const originalElements = [...pointerDownState.originalElements.values()];
+
+    const { snapOffset, snapLines } = snapResizingElements(
+      originalElements,
+      selectedElements,
+      getSelectedElements(originalElements, this.state),
+      this.state,
+      event,
+      dragOffset,
+      transformHandleType,
+    );
+
+    resizeX += snapOffset.x;
+    resizeY += snapOffset.y;
+
+    this.setState({
+      snapLines,
+    });
 
     if (
       transformElements(
@@ -7240,8 +7243,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
         this.state,
-        snaps,
-        (snaps) => this.setState({ snaps }),
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);

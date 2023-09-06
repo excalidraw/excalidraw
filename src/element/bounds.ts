@@ -24,7 +24,6 @@ import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
-import { TransformHandleDirection } from "./transformHandles";
 
 export type RectangleBox = {
   x: number;
@@ -159,29 +158,6 @@ export const getElementAbsoluteCoords = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   ];
-};
-
-/**
- * Returns the coordinates of the bounding box of the given elements
- * at the 8 transform handle directions
- */
-export const getElementsBoundingBoxHandles = (
-  elements: ExcalidrawElement[],
-): Record<TransformHandleDirection, Point> => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = maxX - minX;
-  const height = maxY - minY;
-
-  return {
-    nw: [minX, minY],
-    ne: [maxX, minY],
-    sw: [minX, maxY],
-    se: [maxX, maxY],
-    n: [minX + width / 2, minY],
-    s: [minX + width / 2, maxY],
-    w: [minX, minY + height / 2],
-    e: [maxX, minY + height / 2],
-  };
 };
 
 /*

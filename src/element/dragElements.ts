@@ -3,14 +3,12 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
-import { AppState, Point, PointerDownState } from "../types";
+import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
-import { GapSnaps, Snaps, getNearestSnaps, snapProject } from "../snapping";
 import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
 import { isFrameElement } from "./typeChecks";
-import * as GAPoints from "../gapoints";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -18,8 +16,10 @@ export const dragSelectedElements = (
   offset: { x: number; y: number },
   appState: AppState,
   scene: Scene,
-  snaps: Snaps | null = null,
-  gapSnaps: GapSnaps = [],
+  snapOffset: {
+    x: number;
+    y: number;
+  },
 ) => {
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
@@ -46,8 +46,7 @@ export const dragSelectedElements = (
       element,
       offset,
       appState,
-      snaps,
-      gapSnaps,
+      snapOffset,
     );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
@@ -71,8 +70,7 @@ export const dragSelectedElements = (
           textElement,
           offset,
           appState,
-          snaps,
-          gapSnaps,
+          snapOffset,
         );
       }
     }
@@ -85,69 +83,30 @@ export const dragSelectedElements = (
 const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
-  offset: { x: number; y: number },
+  dragOffset: { x: number; y: number },
   appState: AppState,
-  snaps: Snaps | null = null,
-  gapSnaps: GapSnaps = [],
+  snapOffset: { x: number; y: number },
 ) => {
   const originalElement =
     pointerDownState.originalElements.get(element.id) ?? element;
 
-  const origin = {
-    x: originalElement.x,
-    y: originalElement.y,
-  };
+  let nextX = originalElement.x + dragOffset.x + snapOffset.x;
+  let nextY = originalElement.y + dragOffset.y + snapOffset.y;
 
-  const nextDragX = origin.x + offset.x;
-  const nextDragY = origin.y + offset.y;
-
-  let nextX = nextDragX;
-  let nextY = nextDragY;
-
-  if (snaps && snaps.length > 0) {
-    [nextX, nextY] = snapProject({
-      origin,
-      offset,
-      snaps,
-      zoom: appState.zoom,
-    });
-  }
-
-  for (const gapSnap of gapSnaps) {
-    switch (gapSnap.direction) {
-      case "center_horizontal": {
-        nextX = nextDragX + gapSnap.offset;
-        break;
-      }
-      case "center_vertical": {
-        nextY = nextDragY + gapSnap.offset;
-        break;
-      }
-      case "side_right": {
-        nextX = nextDragX - gapSnap.offset;
-        break;
-      }
-      case "side_left": {
-        nextX = nextDragX + gapSnap.offset;
-        break;
-      }
-      case "side_bottom": {
-        nextY = nextDragY - gapSnap.offset;
-        break;
-      }
-      case "side_top": {
-        nextY = nextDragY + gapSnap.offset;
-        break;
-      }
-    }
-  }
-
-  if ((!snaps || snaps.length === 0) && gapSnaps.length === 0) {
-    [nextX, nextY] = getGridPoint(
-      origin.x + offset.x,
-      origin.y + offset.y,
+  if (snapOffset.x === 0 || snapOffset.y === 0) {
+    const [nextGridX, nextGridY] = getGridPoint(
+      originalElement.x + dragOffset.x,
+      originalElement.y + dragOffset.y,
       appState.gridSize,
     );
+
+    if (snapOffset.x === 0) {
+      nextX = nextGridX;
+    }
+
+    if (snapOffset.y === 0) {
+      nextY = nextGridY;
+    }
   }
 
   mutateElement(element, {
@@ -176,11 +135,9 @@ export const dragNewElement = (
   height: number,
   shouldMaintainAspectRatio: boolean,
   shouldResizeFromCenter: boolean,
-  appState: AppState,
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null,
-  snaps: Snaps | null = null,
 ) => {
   if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
     if (widthAspectRatio) {
@@ -217,77 +174,6 @@ export const dragNewElement = (
     height += height;
     newX = originX - width / 2;
     newY = originY - height / 2;
-  }
-
-  if (snaps) {
-    let cornerX: number = newX + width;
-    let cornerY: number = newY + height;
-    if (x < originX) {
-      cornerX = newX;
-    }
-    if (y < originY) {
-      cornerY = newY;
-    }
-
-    const corner: Point = [cornerX, cornerY];
-
-    const { horizontalSnap, verticalSnap } = getNearestSnaps(
-      corner,
-      snaps,
-      appState,
-    );
-
-    if (horizontalSnap) {
-      const snapPoint = GAPoints.toTuple(horizontalSnap.snapLine.point);
-      height = snapPoint[1] - newY;
-
-      if (y < originY) {
-        newY = snapPoint[1];
-        height = originY - newY;
-      }
-
-      if (shouldMaintainAspectRatio) {
-        if (widthAspectRatio) {
-          width = height * widthAspectRatio;
-        } else {
-          width = height;
-        }
-      }
-
-      if (y < originY) {
-        newY = snapPoint[1];
-      }
-
-      if (x < originX) {
-        newX = originX - width;
-      }
-    }
-
-    if (verticalSnap) {
-      const snapPoint = GAPoints.toTuple(verticalSnap.snapLine.point);
-      width = GAPoints.toTuple(verticalSnap.snapLine.point)[0] - newX;
-
-      if (x < originX) {
-        newX = snapPoint[0];
-        width = originX - newX;
-      }
-
-      if (shouldMaintainAspectRatio) {
-        if (widthAspectRatio) {
-          height = width / widthAspectRatio;
-        } else {
-          height = width;
-        }
-      }
-
-      if (x < originX) {
-        newX = snapPoint[0];
-      }
-
-      if (y < originY) {
-        newY = originY - height;
-      }
-    }
   }
 
   if (width !== 0 && height !== 0) {

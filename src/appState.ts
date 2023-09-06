@@ -98,8 +98,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
-    snaps: null,
-    gapSnaps: [],
+    snapLines: [],
     objectsSnapModeEnabled: false,
   };
 };
@@ -207,8 +206,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
-  snaps: { browser: true, export: false, server: false },
-  gapSnaps: { browser: false, export: false, server: false },
+  snapLines: { browser: false, export: false, server: false },
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
 });
 

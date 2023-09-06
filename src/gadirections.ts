@@ -24,16 +24,3 @@ export const orthogonal = (direction: Direction): Direction =>
   GA.inormalized([0, 0, 0, 0, -direction[5], direction[4], 0, 0]);
 
 export const orthogonalToLine = (line: Line): Direction => GA.mul(line, GA.I);
-
-/** Check that 2 direction are not opposite */
-export const hasSameSign = (
-  a: Direction,
-  b: Direction,
-  strict = false,
-): boolean => {
-  // With strict deactivated, we consider 0 has same sign
-  const isSameSign = (na: number, nb: number) =>
-    strict ? na * nb > 0 : na * nb >= 0;
-
-  return isSameSign(a[4], b[4]) && isSameSign(a[5], b[5]);
-};

@@ -745,7 +745,6 @@ export const _renderScene = ({
           context,
         },
         appState,
-        elements,
       );
       context.restore();
     }

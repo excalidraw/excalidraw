@@ -75,7 +75,7 @@ Object {
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": false,
-  "snaps": null,
+  "snapLines": Array [],
   "startBoundElement": null,
   "suggestedBindings": Array [],
   "theme": "light",

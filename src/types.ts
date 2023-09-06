@@ -33,7 +33,7 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
-import { GapSnaps, Snaps } from "./snapping";
+import { SnapLine } from "./snapping";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
@@ -220,8 +220,7 @@ export type AppState = {
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
 
-  snaps: Snaps | null;
-  gapSnaps: GapSnaps;
+  snapLines: SnapLine[];
   objectsSnapModeEnabled: boolean;
 };
 
