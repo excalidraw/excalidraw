@@ -163,7 +163,7 @@ const MermaidToExcalidraw = ({
       }
     };
     renderExcalidrawPreview();
-  }, [deferredText, appState]);
+  }, [deferredText]);
 
   const setAppState = useExcalidrawSetAppState();
 
