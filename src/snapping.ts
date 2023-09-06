@@ -17,7 +17,7 @@ import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, Point } from "./types";
 
 // handle floating point errors
-export const SNAP_PRECISION = 0.001;
+export const SNAP_PRECISION = 0.01;
 
 const SNAP_DISTANCE = 8;
 
@@ -957,10 +957,8 @@ export const snapResizingElements = (
     y: neartestSnapsY[0]?.offset ?? 0,
   };
 
-  // minOffset.x = SNAP_PRECISION / appState.zoom.value;
-  // minOffset.y = SNAP_PRECISION / appState.zoom.value;
-  minOffset.x = 0;
-  minOffset.y = 0;
+  minOffset.x = SNAP_PRECISION / appState.zoom.value;
+  minOffset.y = SNAP_PRECISION / appState.zoom.value;
   neartestSnapsX.length = 0;
   neartestSnapsY.length = 0;
 
