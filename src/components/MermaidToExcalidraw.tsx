@@ -116,29 +116,19 @@ const MermaidToExcalidraw = ({
 
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
-      let mermaidGraphData;
       const canvasNode = canvasRef.current;
       if (!canvasNode) {
         return;
       }
       try {
-        mermaidGraphData = await mermaidToExcalidrawLib.current.parseMermaid(
-          deferredText,
-          {
-            fontSize: DEFAULT_FONT_SIZE,
-          },
-        );
-        setError(null);
-      } catch (e: any) {
-        console.error(e.message);
-        resetPreview();
-        if (deferredText) {
-          setError(e.message);
-        }
-      }
-      if (mermaidGraphData) {
         const { elements, files } =
-          mermaidToExcalidrawLib.current.graphToExcalidraw(mermaidGraphData);
+          await mermaidToExcalidrawLib.current.parseMermaidToExcalidraw(
+            deferredText,
+            {
+              fontSize: DEFAULT_FONT_SIZE,
+            },
+          );
+        setError(null);
 
         data.current = {
           elements: convertToExcalidrawElements(elements, {
@@ -164,6 +154,12 @@ const MermaidToExcalidraw = ({
         await canvasToBlob(canvas);
         parent.style.background = "#fff";
         canvasNode.replaceChildren(canvas);
+      } catch (e: any) {
+        console.error(e.message);
+        resetPreview();
+        if (deferredText) {
+          setError(e.message);
+        }
       }
     };
     renderExcalidrawPreview();
