@@ -483,12 +483,12 @@ export const addElementsToFrame = (
     (e) => e.frameId === frame.id,
   );
 
-  const existingFrameElements = allElements.filter(
+  const existingFrameChildren = allElements.filter(
     (element) => element.frameId === frame.id,
   );
 
-  const newLeftFrameElements: ExcalidrawElement[] = [];
-  const newRightFrameElements: ExcalidrawElement[] = [];
+  const addedFrameChildren_left: ExcalidrawElement[] = [];
+  const addedFrameChildren_right: ExcalidrawElement[] = [];
 
   for (const element of omitGroupsContainingFrames(
     allElements,
@@ -496,9 +496,9 @@ export const addElementsToFrame = (
   )) {
     if (element.frameId !== frame.id && !isFrameElement(element)) {
       if (allElementsIndex[element.id] > frameIndex) {
-        newRightFrameElements.push(element);
+        addedFrameChildren_right.push(element);
       } else {
-        newLeftFrameElements.push(element);
+        addedFrameChildren_left.push(element);
       }
 
       mutateElement(
@@ -512,11 +512,11 @@ export const addElementsToFrame = (
   }
 
   const frameElement = allElements[frameIndex];
-  const frameElements = newLeftFrameElements
-    .concat(existingFrameElements)
-    .concat(newRightFrameElements);
+  const nextFrameChildren = addedFrameChildren_left
+    .concat(existingFrameChildren)
+    .concat(addedFrameChildren_right);
 
-  const frameElementsIndex = frameElements.reduce(
+  const nextFrameChildrenMap = nextFrameChildren.reduce(
     (acc: Record<string, boolean>, element) => {
       acc[element.id] = true;
       return acc;
@@ -524,18 +524,18 @@ export const addElementsToFrame = (
     {},
   );
 
-  const nextLeftNonFrameElements = allElements
+  const nextOtherElements_left = allElements
     .slice(0, leftFrameBoundaryIndex >= 0 ? leftFrameBoundaryIndex : frameIndex)
-    .filter((element) => !frameElementsIndex[element.id]);
+    .filter((element) => !nextFrameChildrenMap[element.id]);
 
-  const nextRightNonFrameElements = allElements
+  const nextOtherElement_right = allElements
     .slice(frameIndex + 1)
-    .filter((element) => !frameElementsIndex[element.id]);
+    .filter((element) => !nextFrameChildrenMap[element.id]);
 
-  const nextElements = nextLeftNonFrameElements
-    .concat(frameElements)
+  const nextElements = nextOtherElements_left
+    .concat(nextFrameChildren)
     .concat([frameElement])
-    .concat(nextRightNonFrameElements);
+    .concat(nextOtherElement_right);
 
   return nextElements;
 };
