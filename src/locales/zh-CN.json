@@ -111,7 +111,8 @@
     "link": {
       "edit": "编辑链接",
       "create": "新建链接",
-      "label": "链接"
+      "label": "链接",
+      "copied": "已复制"
     },
     "lineEditor": {
       "edit": "编辑线条",

@@ -78,7 +78,7 @@ export const ShareableLinkDialog = ({
               align="end"
               sideOffset={5.5}
             >
-              {tablerCheckIcon} copied
+              {tablerCheckIcon} {t("labels.link.copied")}
             </Popover.Content>
           </Popover.Root>
         </div>
