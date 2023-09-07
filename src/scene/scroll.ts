@@ -11,11 +11,7 @@ import {
   viewportCoordsToSceneCoords,
 } from "../utils";
 
-const isOutsideViewPort = (
-  appState: AppState,
-  canvas: HTMLCanvasElement | null,
-  cords: Array<number>,
-) => {
+const isOutsideViewPort = (appState: AppState, cords: Array<number>) => {
   const [x1, y1, x2, y2] = cords;
   const { x: viewportX1, y: viewportY1 } = sceneCoordsToViewportCoords(
     { sceneX: x1, sceneY: y1 },
@@ -49,7 +45,6 @@ export const centerScrollOn = ({
 export const calculateScrollCenter = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-  canvas: HTMLCanvasElement | null,
 ): { scrollX: number; scrollY: number } => {
   elements = getVisibleElements(elements);
 
@@ -61,7 +56,7 @@ export const calculateScrollCenter = (
   }
   let [x1, y1, x2, y2] = getCommonBounds(elements);
 
-  if (isOutsideViewPort(appState, canvas, [x1, y1, x2, y2])) {
+  if (isOutsideViewPort(appState, [x1, y1, x2, y2])) {
     [x1, y1, x2, y2] = getClosestElementBounds(
       elements,
       viewportCoordsToSceneCoords(

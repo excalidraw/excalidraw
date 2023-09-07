@@ -40,6 +40,9 @@ const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
 const RE_TWITTER_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https:\/\/twitter.com\/[^"']*)/i;
 
+const RE_VALTOWN =
+  /^https:\/\/(?:www\.)?val.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
+
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
@@ -52,7 +55,9 @@ const ALLOWED_DOMAINS = new Set([
   "link.excalidraw.com",
   "gist.github.com",
   "twitter.com",
+  "*.simplepdf.eu",
   "stackblitz.com",
+  "val.town",
 ]);
 
 const createSrcDoc = (body: string) => {
@@ -118,6 +123,14 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
       link,
     )}`;
     aspectRatio = { w: 550, h: 550 };
+    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
+    return { link, aspectRatio, type };
+  }
+
+  const valLink = link.match(RE_VALTOWN);
+  if (valLink) {
+    link =
+      valLink[1] === "embed" ? valLink[0] : valLink[0].replace("/v", "/embed");
     embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
     return { link, aspectRatio, type };
   }
@@ -262,9 +275,16 @@ const validateHostname = (
     const { hostname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
+    const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
+      /^([^.]+)/,
+      "*",
+    );
 
     if (allowedHostnames instanceof Set) {
-      return ALLOWED_DOMAINS.has(bareDomain);
+      return (
+        ALLOWED_DOMAINS.has(bareDomain) ||
+        ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)
+      );
     }
 
     if (bareDomain === allowedHostnames.replace(/^www\./, "")) {

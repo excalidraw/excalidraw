@@ -39,7 +39,6 @@ import {
 import { FrameNameBoundsCache, Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
 import {
   hasBoundTextElement,
   isEmbeddableElement,
@@ -50,6 +49,7 @@ import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -489,7 +489,7 @@ const hitTestFreeDrawElement = (
     B = element.points[i + 1];
   }
 
-  const shape = getShapeForElement(element);
+  const shape = ShapeCache.get(element);
 
   // for filled freedraw shapes, support
   // selecting from inside
@@ -502,7 +502,7 @@ const hitTestFreeDrawElement = (
 
 const hitTestLinear = (args: HitTestArgs): boolean => {
   const { element, threshold } = args;
-  if (!getShapeForElement(element)) {
+  if (!ShapeCache.get(element)) {
     return false;
   }
 
@@ -520,7 +520,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   }
   const [relX, relY] = GAPoint.toTuple(point);
 
-  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+  const shape = ShapeCache.get(element as ExcalidrawLinearElement);
 
   if (!shape) {
     return false;
@@ -655,18 +655,23 @@ export const determineFocusDistance = (
   const c = line[1];
   const mabs = Math.abs(m);
   const nabs = Math.abs(n);
+  let ret;
   switch (element.type) {
     case "rectangle":
     case "image":
     case "text":
     case "embeddable":
     case "frame":
-      return c / (hwidth * (nabs + q * mabs));
+      ret = c / (hwidth * (nabs + q * mabs));
+      break;
     case "diamond":
-      return mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+      ret = mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+      break;
     case "ellipse":
-      return c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+      ret = c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+      break;
   }
+  return ret || 0;
 };
 
 export const determineFocusPoint = (
