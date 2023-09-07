@@ -329,7 +329,9 @@ import {
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import {
+  getSnapLinesAtPointer,
   getSnapsOffsetAndSnapLines,
+  isActiveToolNonLinearSnappable,
   snapNewElement,
   snapResizingElements,
 } from "../snapping";
@@ -2447,6 +2449,9 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      // clear snaplines on key down (when switching between tools)
+      this.setState({ snapLines: [] });
+
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
         IS_PLAIN_PASTE = event.shiftKey;
         clearTimeout(IS_PLAIN_PASTE_TIMER);
@@ -2756,12 +2761,12 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageAction();
     }
     if (nextActiveTool.type !== "selection") {
-      this.setState({
+      this.setState((prevState) => ({
         activeTool: nextActiveTool,
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
-      });
+      }));
     } else {
       this.setState({ activeTool: nextActiveTool });
     }
@@ -3479,6 +3484,25 @@ class App extends React.Component<AppProps, AppState> {
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
     if (
+      !this.state.draggingElement &&
+      isActiveToolNonLinearSnappable(this.state.activeTool.type)
+    ) {
+      const { originOffset, snapLines } = getSnapLinesAtPointer(
+        this.scene.getNonDeletedElements(),
+        this.state,
+        {
+          x: scenePointerX,
+          y: scenePointerY,
+        },
+      );
+
+      this.setState({
+        snapLines,
+        originSnapOffset: originOffset,
+      });
+    }
+
+    if (
       this.state.editingLinearElement &&
       !this.state.editingLinearElement.isDragging
     ) {
@@ -3927,6 +3951,10 @@ class App extends React.Component<AppProps, AppState> {
     // (e.g. resetting selection)
     if (this.state.contextMenu) {
       this.setState({ contextMenu: null });
+    }
+
+    if (this.state.snapLines) {
+      this.setAppState({ snapLines: [] });
     }
 
     this.updateGestureOnPointerDown(event);
@@ -5644,6 +5672,7 @@ class App extends React.Component<AppProps, AppState> {
             ? this.state.editingElement
             : null,
         snapLines: [],
+        originSnapOffset: null,
       });
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
@@ -7096,8 +7125,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
         event,
         {
-          x: pointerDownState.originInGrid.x,
-          y: pointerDownState.originInGrid.y,
+          x:
+            pointerDownState.originInGrid.x +
+            (this.state.originSnapOffset?.x ?? 0),
+          y:
+            pointerDownState.originInGrid.y +
+            (this.state.originSnapOffset?.y ?? 0),
         },
         {
           x: gridX - pointerDownState.originInGrid.x,
@@ -7126,6 +7159,7 @@ class App extends React.Component<AppProps, AppState> {
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
         aspectRatio,
+        this.state.originSnapOffset,
       );
 
       this.maybeSuggestBindingForAll([draggingElement]);

@@ -138,6 +138,10 @@ export const dragNewElement = (
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null,
+  originOffset: {
+    x: number;
+    y: number;
+  } | null = null,
 ) => {
   if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
     if (widthAspectRatio) {
@@ -178,8 +182,8 @@ export const dragNewElement = (
 
   if (width !== 0 && height !== 0) {
     mutateElement(draggingElement, {
-      x: newX,
-      y: newY,
+      x: newX + (originOffset?.x ?? 0),
+      y: newY + (originOffset?.y ?? 0),
       width,
       height,
     });

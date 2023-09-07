@@ -1,5 +1,5 @@
 import { RenderConfig } from "../scene/types";
-import { PointSnapLine, getSnapDistance } from "../snapping";
+import { PointSnapLine, PointerSnapLine, getSnapDistance } from "../snapping";
 import { AppState, Point } from "../types";
 
 const SNAP_COLOR = "#fa5252";
@@ -20,7 +20,7 @@ export const renderSnaps = (
   context.strokeStyle = SNAP_COLOR;
 
   for (const snapLine of appState.snapLines) {
-    if (snapLine.type === "points") {
+    if (snapLine.type === "points" || snapLine.type === "pointer") {
       drawPointSnap({ renderConfig, context }, snapLine);
     } else {
       drawGapLine(
@@ -46,7 +46,7 @@ export const renderSnaps = (
 
 const drawPointSnap = (
   { renderConfig, context }: RenderSnapOptions,
-  pointSnapLine: PointSnapLine,
+  pointSnapLine: PointSnapLine | PointerSnapLine,
 ) => {
   drawCross(pointSnapLine.points[0], renderConfig.zoom, context);
   drawLine(pointSnapLine.points[0], pointSnapLine.points[1], context);

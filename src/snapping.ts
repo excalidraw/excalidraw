@@ -81,13 +81,19 @@ export type PointSnapLine = {
   points: PointPair;
 };
 
+export type PointerSnapLine = {
+  type: "pointer";
+  points: PointPair;
+  direction: "horizontal" | "vertical";
+};
+
 export type GapSnapLine = {
   type: "gap";
   direction: "horizontal" | "vertical";
   points: [PointPair, PointPair];
 };
 
-export type SnapLine = PointSnapLine | GapSnapLine;
+export type SnapLine = PointSnapLine | GapSnapLine | PointerSnapLine;
 
 export const isSnappingEnabled = ({
   event,
@@ -95,7 +101,7 @@ export const isSnappingEnabled = ({
   selectedElements,
 }: {
   appState: AppState;
-  event: PointerEvent | MouseEvent | KeyboardEvent | null;
+  event: PointerEvent | MouseEvent | KeyboardEvent | Event | null;
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   // do not suggest snaps for an arrow to give way to binding
@@ -103,7 +109,7 @@ export const isSnappingEnabled = ({
     return false;
   }
 
-  if (event) {
+  if (event && "metaKey" in event) {
     return (
       (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
       (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD])
@@ -508,14 +514,14 @@ export const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: Point[],
   appState: AppState,
-  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  event: PointerEvent | MouseEvent | KeyboardEvent | Event | null,
   neartestSnapsX: Snaps,
   neartestSnapsY: Snaps,
   minOffset: Vector2D,
 ) => {
   if (
     !isSnappingEnabled({ appState, event, selectedElements }) ||
-    selectedElements.length === 0
+    (selectedElements.length === 0 && selectionSnapPoints.length === 0)
   ) {
     return [];
   }
@@ -1072,4 +1078,90 @@ export const snapNewElement = (
     snapOffset,
     snapLines: pointSnapLines,
   };
+};
+
+export const getSnapLinesAtPointer = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  pointer: Vector2D,
+) => {
+  const referenceElements = getVisibleAndNonSelectedElements(
+    elements,
+    [],
+    appState,
+  );
+
+  const snapDistance = getSnapDistance(appState.zoom.value);
+
+  const minOffset = {
+    x: snapDistance,
+    y: snapDistance,
+  };
+
+  const horizontalSnapLines: PointerSnapLine[] = [];
+  const verticalSnapLines: PointerSnapLine[] = [];
+
+  for (const referenceElement of referenceElements) {
+    const corners = getElementsCorners([referenceElement]);
+
+    for (const corner of corners) {
+      const offsetX = corner[0] - pointer.x;
+
+      if (Math.abs(offsetX) <= Math.abs(minOffset.x)) {
+        if (Math.abs(offsetX) < Math.abs(minOffset.x)) {
+          verticalSnapLines.length = 0;
+        }
+
+        verticalSnapLines.push({
+          type: "pointer",
+          points: [corner, [corner[0], pointer.y]],
+          direction: "vertical",
+        });
+
+        minOffset.x = offsetX;
+      }
+
+      const offsetY = corner[1] - pointer.y;
+
+      if (Math.abs(offsetY) <= Math.abs(minOffset.y)) {
+        if (Math.abs(offsetY) < Math.abs(minOffset.y)) {
+          horizontalSnapLines.length = 0;
+        }
+
+        horizontalSnapLines.push({
+          type: "pointer",
+          points: [corner, [pointer.x, corner[1]]],
+          direction: "horizontal",
+        });
+
+        minOffset.y = offsetY;
+      }
+    }
+  }
+
+  return {
+    originOffset: {
+      x:
+        verticalSnapLines.length > 0
+          ? verticalSnapLines[0].points[0][0] - pointer.x
+          : 0,
+      y:
+        horizontalSnapLines.length > 0
+          ? horizontalSnapLines[0].points[0][1] - pointer.y
+          : 0,
+    },
+    snapLines: [...verticalSnapLines, ...horizontalSnapLines],
+  };
+};
+
+export const isActiveToolNonLinearSnappable = (
+  activeToolType: AppState["activeTool"]["type"],
+) => {
+  return (
+    activeToolType === "rectangle" ||
+    activeToolType === "ellipse" ||
+    activeToolType === "diamond" ||
+    activeToolType === "frame" ||
+    activeToolType === "image"
+  );
 };

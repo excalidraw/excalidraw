@@ -221,6 +221,10 @@ export type AppState = {
   selectedLinearElement: LinearElementEditor | null;
 
   snapLines: SnapLine[];
+  originSnapOffset: {
+    x: number;
+    y: number;
+  } | null;
   objectsSnapModeEnabled: boolean;
 };
 
