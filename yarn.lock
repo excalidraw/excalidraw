@@ -1532,10 +1532,10 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/mermaid-to-excalidraw@0.1.0-api":
-  version "0.1.0-api"
-  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.0-api.tgz#456b03587bdb071f517cc80685470a744475fb46"
-  integrity sha512-taCgev1frQ/eR4Eenq2HboFCncGbhPgyReV9+JTzazDkzNg4P6YOoFCcQHEHw+nee9NsK1TrKYGorRbEEJOROA==
+"@excalidraw/mermaid-to-excalidraw@0.1.0-firefox":
+  version "0.1.0-firefox"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.0-firefox.tgz#6b0581fa7b9e3121ff59499782c76f812e9626f5"
+  integrity sha512-9PVUK2yg9gUavAVFHV4M3ZUBlki4ZcV1Ah/UMd2sdIk4/JPDxXLFKgOeHCuYaxB3cDoilq8sqJGJBLTgk/qIsA==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
     mermaid "10.2.3"
