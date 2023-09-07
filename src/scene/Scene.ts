@@ -14,6 +14,7 @@ import { isFrameElement } from "../element/typeChecks";
 import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
+import { randomInteger } from "../random";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -105,6 +106,7 @@ class Scene {
     elements: null,
     cache: new Map(),
   };
+  private versionNonce: number | undefined;
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -172,6 +174,10 @@ class Scene {
     return (this.elementsMap.get(id) as T | undefined) || null;
   }
 
+  getVersionNonce() {
+    return this.versionNonce;
+  }
+
   getNonDeletedElement(
     id: ExcalidrawElement["id"],
   ): NonDeleted<ExcalidrawElement> | null {
@@ -230,6 +236,8 @@ class Scene {
   }
 
   informMutation() {
+    this.versionNonce = randomInteger();
+
     for (const callback of Array.from(this.callbacks)) {
       callback();
     }

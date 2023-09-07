@@ -26,26 +26,28 @@ import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 
-const renderScene = vi.spyOn(Renderer, "renderScene");
+const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
 
 const { h } = window;
 const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
 
 describe("Test Linear Elements", () => {
   let container: HTMLElement;
-  let canvas: HTMLCanvasElement;
+  let interactiveCanvas: HTMLCanvasElement;
 
   beforeEach(async () => {
     // Unmount ReactDOM from root
     ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
     localStorage.clear();
-    renderScene.mockClear();
+    renderInteractiveScene.mockClear();
+    renderStaticScene.mockClear();
     reseed(7);
     const comp = await render(<ExcalidrawApp />);
+    h.state.width = 1000;
+    h.state.height = 1000;
     container = comp.container;
-    canvas = container.querySelector("canvas")!;
-    canvas.width = 1000;
-    canvas.height = 1000;
+    interactiveCanvas = container.querySelector("canvas.interactive")!;
   });
 
   const p1: Point = [20, 20];
@@ -120,26 +122,26 @@ describe("Test Linear Elements", () => {
   };
 
   const drag = (startPoint: Point, endPoint: Point) => {
-    fireEvent.pointerDown(canvas, {
+    fireEvent.pointerDown(interactiveCanvas, {
       clientX: startPoint[0],
       clientY: startPoint[1],
     });
-    fireEvent.pointerMove(canvas, {
+    fireEvent.pointerMove(interactiveCanvas, {
       clientX: endPoint[0],
       clientY: endPoint[1],
     });
-    fireEvent.pointerUp(canvas, {
+    fireEvent.pointerUp(interactiveCanvas, {
       clientX: endPoint[0],
       clientY: endPoint[1],
     });
   };
 
   const deletePoint = (point: Point) => {
-    fireEvent.pointerDown(canvas, {
+    fireEvent.pointerDown(interactiveCanvas, {
       clientX: point[0],
       clientY: point[1],
     });
-    fireEvent.pointerUp(canvas, {
+    fireEvent.pointerUp(interactiveCanvas, {
       clientX: point[0],
       clientY: point[1],
     });
@@ -172,12 +174,14 @@ describe("Test Linear Elements", () => {
     createTwoPointerLinearElement("line");
     const line = h.elements[0] as ExcalidrawLinearElement;
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
 
     // drag line from midpoint
     drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-    expect(renderScene).toHaveBeenCalledTimes(11);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       [
@@ -199,14 +203,14 @@ describe("Test Linear Elements", () => {
 
   it("should allow entering and exiting line editor via context menu", () => {
     createTwoPointerLinearElement("line");
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
       clientY: midpoint[1],
     });
     // Enter line editor
     let contextMenu = document.querySelector(".context-menu");
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
       clientY: midpoint[1],
@@ -216,13 +220,13 @@ describe("Test Linear Elements", () => {
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
 
     // Exiting line editor
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
       clientY: midpoint[1],
     });
     contextMenu = document.querySelector(".context-menu");
-    fireEvent.contextMenu(GlobalTestState.canvas, {
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
       clientY: midpoint[1],
@@ -270,7 +274,8 @@ describe("Test Linear Elements", () => {
 
       // drag line from midpoint
       drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
-      expect(renderScene).toHaveBeenCalledTimes(15);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
 
       expect(line.points.length).toEqual(3);
       expect(line.points).toMatchInlineSnapshot(`
@@ -307,7 +312,9 @@ describe("Test Linear Elements", () => {
       // update roundness
       fireEvent.click(screen.getByTitle("Round"));
 
-      expect(renderScene).toHaveBeenCalledTimes(12);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(10);
+      expect(renderStaticScene).toHaveBeenCalledTimes(8);
+
       const midPointsWithRoundEdge = LinearElementEditor.getEditorMidPoints(
         h.elements[0] as ExcalidrawLinearElement,
         h.state,
@@ -351,7 +358,9 @@ describe("Test Linear Elements", () => {
       // Move the element
       drag(startPoint, endPoint);
 
-      expect(renderScene).toHaveBeenCalledTimes(16);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
+      expect(renderStaticScene).toHaveBeenCalledTimes(9);
+
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
         points[0][1] + deltaY,
@@ -408,7 +417,9 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[1] + delta,
         ]);
 
-        expect(renderScene).toHaveBeenCalledTimes(21);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
+
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -447,7 +458,8 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(16);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
+        expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -473,7 +485,8 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(16);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
+        expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -507,7 +520,8 @@ describe("Test Linear Elements", () => {
         // delete 3rd point
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
-        expect(renderScene).toHaveBeenCalledTimes(22);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -553,8 +567,8 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[0] + delta,
           lastSegmentMidpoint[1] + delta,
         ]);
-        expect(renderScene).toHaveBeenCalledTimes(21);
-
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -629,7 +643,8 @@ describe("Test Linear Elements", () => {
         // Drag from first point
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
-        expect(renderScene).toHaveBeenCalledTimes(16);
+        expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
+        expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -870,10 +885,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
+          "Online whiteboard 
+          collaboration made 
+          easy"
+        `);
     });
 
     it("should bind text to arrow when clicked on arrow and enter pressed", async () => {
@@ -904,10 +919,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
+          "Online whiteboard 
+          collaboration made 
+          easy"
+        `);
     });
 
     it("should not bind text to line when double clicked", async () => {
@@ -1046,9 +1061,9 @@ describe("Test Linear Elements", () => {
         `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made easy"
-      `);
+          "Online whiteboard 
+          collaboration made easy"
+        `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
         .toMatchInlineSnapshot(`
           [
@@ -1128,7 +1143,7 @@ describe("Test Linear Elements", () => {
         height: 500,
       });
       const arrow = UI.createElement("arrow", {
-        x: 210,
+        x: -10,
         y: 250,
         width: 400,
         height: 1,
@@ -1152,8 +1167,8 @@ describe("Test Linear Elements", () => {
       expect(
         wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard collaboration
-        made easy"
+        "Online whiteboard 
+        collaboration made easy"
       `);
       const handleBindTextResizeSpy = vi.spyOn(
         textElementUtils,
@@ -1165,7 +1180,7 @@ describe("Test Linear Elements", () => {
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
 
-      expect(arrow.width).toBe(170);
+      expect(arrow.width).toBe(200);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
@@ -1206,7 +1221,7 @@ describe("Test Linear Elements", () => {
 
       const container = h.elements[0];
       API.setSelectedElements([container, text]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1231,7 +1246,7 @@ describe("Test Linear Elements", () => {
       mouse.up();
       API.setSelectedElements([h.elements[0], h.elements[1]]);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,

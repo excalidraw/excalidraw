@@ -598,7 +598,7 @@ const ExcalidrawWrapper = () => {
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: Partial<AppState>,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => {
     if (exportedElements.length === 0) {
       return window.alert(t("alerts.cannotExportEmptyCanvas"));
