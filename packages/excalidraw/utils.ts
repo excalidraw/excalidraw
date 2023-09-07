@@ -2,6 +2,7 @@ import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
   EVENT,
+  FALLBACK_FONT,
   FONT_FAMILY,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
@@ -84,6 +85,10 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
+      const fallback = FALLBACK_FONT[fontFamily];
+      if (fallback) {
+        return `${fontFamilyString}, ${fallback}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+      }
       return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
     }
   }
