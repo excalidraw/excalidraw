@@ -122,9 +122,14 @@
       }
 
       &__filename {
+        width: 100%;
+        text-align: center;
+
         & > input {
           width: 100%;
           box-sizing: border-box;
+          max-width: 30em;
+          margin-bottom: 1em;
         }
       }
 
@@ -162,6 +167,13 @@
           display: flex;
           height: 100%;
           align-items: center;
+          gap: 1em;
+
+          &--multipleInputs {
+            @include isMobile {
+              flex-direction: row-reverse;
+            }
+          }
         }
       }
 

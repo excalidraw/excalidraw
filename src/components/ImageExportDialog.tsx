@@ -268,6 +268,7 @@ const ImageExportModal = ({
         <ExportSetting
           label={t("imageExportDialog.label.withBackground")}
           name="exportBackgroundSwitch"
+          multipleInputs
         >
           {exportWithBackground && (
             <Select
@@ -399,6 +400,7 @@ type ExportSettingProps = {
   children: React.ReactNode;
   tooltip?: string;
   name?: string;
+  multipleInputs?: boolean;
 };
 
 const ExportSetting = ({
@@ -406,6 +408,7 @@ const ExportSetting = ({
   children,
   tooltip,
   name,
+  multipleInputs,
 }: ExportSettingProps) => {
   return (
     <div className="ImageExportModal__settings__setting" title={label}>
@@ -420,7 +423,12 @@ const ExportSetting = ({
           </Tooltip>
         )}
       </label>
-      <div className="ImageExportModal__settings__setting__content">
+      <div
+        className={clsx("ImageExportModal__settings__setting__content", {
+          "ImageExportModal__settings__setting__content--multipleInputs":
+            multipleInputs,
+        })}
+      >
         {children}
       </div>
     </div>
