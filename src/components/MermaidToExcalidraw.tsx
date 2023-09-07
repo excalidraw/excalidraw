@@ -4,8 +4,6 @@ import { updateActiveTool } from "../utils";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
-
-import "./MermaidToExcalidraw.scss";
 import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../constants";
 import {
   convertToExcalidrawElements,
@@ -15,6 +13,10 @@ import { NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
+import "./MermaidToExcalidraw.scss";
+
+import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
+import { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
@@ -68,7 +70,12 @@ const MermaidToExcalidraw = ({
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
 }) => {
-  const mermaidToExcalidrawLib = useRef<any>(null);
+  const mermaidToExcalidrawLib = useRef<{
+    parseMermaidToExcalidraw: (
+      defination: string,
+      options: MermaidOptions,
+    ) => Promise<MermaidToExcalidrawResult>;
+  } | null>(null);
   const [text, setText] = useState("");
   const deferredText = useDeferredValue(text);
   const [loading, setLoading] = useState(true);
@@ -117,7 +124,7 @@ const MermaidToExcalidraw = ({
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
-      if (!canvasNode) {
+      if (!canvasNode || !mermaidToExcalidrawLib.current) {
         return;
       }
       try {
