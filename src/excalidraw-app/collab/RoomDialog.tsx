@@ -119,7 +119,7 @@ export const RoomModal = ({
             <FilledButton
               size="large"
               variant="icon"
-              label="Share"
+              label={t("labels.share")}
               startIcon={getShareIcon()}
               className="RoomDialog__active__share"
               onClick={shareRoomLink}
