@@ -23,7 +23,6 @@ const sidebars = {
       },
       items: ["introduction/development", "introduction/contributing"],
     },
-
     {
       type: "category",
       label: "@excalidraw/excalidraw",
@@ -91,6 +90,11 @@ const sidebars = {
         "@excalidraw/excalidraw/faq",
         "@excalidraw/excalidraw/development",
       ],
+    },
+    {
+      type: "category",
+      label: "Codebase",
+      items: ["codebase/json-schema"],
     },
   ],
 };
