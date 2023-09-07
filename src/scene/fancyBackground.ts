@@ -291,8 +291,31 @@ const addImageBackgroundToSvg = async ({
     fancyBackgroundImage.setAttribute("filter", IMAGE_INVERT_FILTER);
   }
 
-  svgRoot.appendChild(fancyBackgroundImage);
+  const clipRect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
+  clipRect.setAttribute("x", "0");
+  clipRect.setAttribute("y", "0");
+  clipRect.setAttribute("width", `${dimensions.width}`);
+  clipRect.setAttribute("height", `${dimensions.height}`);
+  clipRect.setAttribute("rx", FANCY_BG_BORDER_RADIUS.toString());
+  clipRect.setAttribute("ry", FANCY_BG_BORDER_RADIUS.toString());
+
+  const clipPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "clipPath");
+  clipPath.setAttribute("id", "fancyBackgroundImageClipPath");
+  clipPath.appendChild(clipRect);
+  clipRect.setAttribute("preserveAspectRatio", "xMidYMid slice");
+
+  const fancyBgGroup = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+  fancyBgGroup.setAttributeNS(
+    SVG_NS,
+    "clip-path",
+    `url(#fancyBackgroundImageClipPath)`,
+  );
+  fancyBgGroup.appendChild(fancyBackgroundImage);
+
+  svgRoot.appendChild(clipPath);
+  svgRoot.appendChild(fancyBgGroup);
 };
+
 const addContentBackgroundToSvg = ({
   svgRoot,
   contentSize,
