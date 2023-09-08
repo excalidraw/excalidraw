@@ -1,0 +1,47 @@
+# Installation
+
+`@excalidraw/mermaid-to-excalidraw` is published to npm. This library is used in [excalidraw](excalidraw.com) to transform mermaid syntax to Excalidraw diagrams.
+
+Using `npm`
+
+```bash
+npm install @excalidraw/mermaid-to-excalidraw
+```
+
+Using `yarn`
+
+```bash
+yarn add @excalidraw/mermaid-to-excalidraw
+```
+
+## Usage
+
+Once the library is installed, its ready to use.
+
+```js
+import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+import { convertToExcalidrawElements}  from "@excalidraw/excalidraw"
+
+try {
+  const { elements, files } = await parseMermaid(diagramDefinition, {
+    fontSize: DEFAULT_FONT_SIZE,
+  });
+  const excalidrawElements = convertToExcalidrawElements(elements);
+
+  // Render elements and files on Excalidraw
+} catch (e) {
+  // Error handling
+}
+```
+
+## Playground
+
+ You can try it out at https://mermaid-to-excalidraw.vercel.app/
+
+:::info
+
+ If you're clicking the "Render to Excalidraw" button on the same diagram multiple times, you may notice a slight change of elements stroke on the Excalidraw diagram. 
+ This occurs as a result of the `randomness` featured in the libraries used by Excalidraw, specifically Rough.js.
+
+ :::
+

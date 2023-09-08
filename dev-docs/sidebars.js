@@ -92,6 +92,15 @@ const sidebars = {
         "@excalidraw/excalidraw/development",
       ],
     },
+    {
+      type: "category",
+      label: "@excalidraw/mermaid-to-excalidraw",
+      collapsed: true,
+      items: [
+        "@excalidraw/mermaid-to-excalidraw/installation",
+        "@excalidraw/mermaid-to-excalidraw/api",
+      ],
+    },
   ],
 };
 
