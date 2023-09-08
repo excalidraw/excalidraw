@@ -91,16 +91,16 @@ const sidebars = {
         "@excalidraw/excalidraw/development",
       ],
     },
-    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
     {
       type: "category",
       label: "@excalidraw/mermaid-to-excalidraw",
-      collapsed: true,
       items: [
         "@excalidraw/mermaid-to-excalidraw/installation",
         "@excalidraw/mermaid-to-excalidraw/api",
+        "@excalidraw/mermaid-to-excalidraw/development",
       ],
     },
+    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
   ],
 };
 
