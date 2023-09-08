@@ -350,7 +350,6 @@ import {
 } from "../data/transform";
 import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import FollowMode from "./FollowMode/FollowMode";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -1249,6 +1248,10 @@ class App extends React.Component<AppProps, AppState> {
                           onTouchMove={this.handleTouchMove}
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
+                          userToFollow={this.state.userToFollow}
+                          resetUserToFollow={() => {
+                            this.setState({ userToFollow: null });
+                          }}
                         />
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
