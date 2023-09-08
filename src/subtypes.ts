@@ -51,13 +51,13 @@ export type SubtypeRecord = Readonly<{
 }>;
 
 // Subtype Names
-export type Subtype = string;
+export type Subtype = Required<ExcalidrawElement>["subtype"];
 export const getSubtypeNames = (): readonly Subtype[] => {
   return subtypeNames;
 };
 export const isValidSubtype = (s: any, t: any): s is Subtype =>
   parentTypeMap.find(
-    (val) => val.subtype === (s as string) && val.parentType === (t as string),
+    (val) => (val.subtype as any) === s && (val.parentType as any) === t,
   ) !== undefined;
 const isSubtypeName = (s: any): s is Subtype => subtypeNames.includes(s);
 
