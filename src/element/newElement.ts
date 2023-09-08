@@ -65,7 +65,7 @@ export const maybeGetSubtypeProps = (
   return data as typeof obj;
 };
 
-type ElementConstructorOpts = MarkOptional<
+export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
@@ -160,7 +160,7 @@ export const newElement = (
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
-    validated: boolean | undefined;
+    validated: ExcalidrawEmbeddableElement["validated"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawEmbeddableElement> => {
   return {
@@ -213,7 +213,7 @@ export const newTextElement = (
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
-    containerId?: ExcalidrawTextContainer["id"];
+    containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
   } & ElementConstructorOpts,
@@ -387,8 +387,8 @@ export const newFreeDrawElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startArrowhead: Arrowhead | null;
-    endArrowhead: Arrowhead | null;
+    startArrowhead?: Arrowhead | null;
+    endArrowhead?: Arrowhead | null;
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
@@ -400,8 +400,8 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
-    startArrowhead: opts.startArrowhead,
-    endArrowhead: opts.endArrowhead,
+    startArrowhead: opts.startArrowhead || null,
+    endArrowhead: opts.endArrowhead || null,
   };
 };
 
@@ -507,7 +507,7 @@ export const deepCopyElement = <T extends ExcalidrawElement>(
  * utility wrapper to generate new id. In test env it reuses the old + postfix
  * for test assertions.
  */
-const regenerateId = (
+export const regenerateId = (
   /** supply null if no previous id exists */
   previousId: string | null,
 ) => {

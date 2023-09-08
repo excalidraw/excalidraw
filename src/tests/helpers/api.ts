@@ -26,6 +26,8 @@ import {
 } from "../../subtypes";
 import {
   maybeGetSubtypeProps,
+  newEmbeddableElement,
+  newFrameElement,
   newFreeDrawElement,
   newImageElement,
 } from "../../element/newElement";
@@ -33,6 +35,7 @@ import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import { Mutable } from "../../utility-types";
+import { assertNever } from "../../utils";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -222,12 +225,18 @@ export class API {
       case "rectangle":
       case "diamond":
       case "ellipse":
-      case "embeddable":
         element = newElement({
-          type: type as "rectangle" | "diamond" | "ellipse" | "embeddable",
+          type: type as "rectangle" | "diamond" | "ellipse",
           width,
           height,
           ...base,
+        });
+        break;
+      case "embeddable":
+        element = newEmbeddableElement({
+          type: "embeddable",
+          ...base,
+          validated: null,
         });
         break;
       case "text":
@@ -278,6 +287,15 @@ export class API {
           scale: rest.scale || [1, 1],
         });
         break;
+      case "frame":
+        element = newFrameElement({ ...base, width, height });
+        break;
+      default:
+        assertNever(
+          type,
+          `API.createElement: unimplemented element type ${type}}`,
+        );
+        break;
     }
     if (element.type === "arrow") {
       element.startBinding = rest.startBinding ?? null;
@@ -313,7 +331,7 @@ export class API {
   };
 
   static drop = async (blob: Blob) => {
-    const fileDropEvent = createEvent.drop(GlobalTestState.canvas);
+    const fileDropEvent = createEvent.drop(GlobalTestState.interactiveCanvas);
     const text = await new Promise<string>((resolve, reject) => {
       try {
         const reader = new FileReader();
@@ -340,6 +358,6 @@ export class API {
         },
       },
     });
-    fireEvent(GlobalTestState.canvas, fileDropEvent);
+    fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
   };
 }

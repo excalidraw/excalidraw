@@ -253,3 +253,4 @@ export { LiveCollaborationTrigger };
 export { DefaultSidebar } from "../../components/DefaultSidebar";
 
 export { normalizeLink } from "../../data/url";
+export { convertToExcalidrawElements } from "../../data/transform";

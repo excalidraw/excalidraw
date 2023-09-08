@@ -8,9 +8,9 @@ import { mutateElement } from "../element/mutateElement";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { KEYS } from "../keys";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import { getSelectedElements } from "../scene";
 import Scene from "../scene/Scene";
+import { ShapeCache } from "../scene/ShapeCache";
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
 
 import "./EyeDropper.scss";
@@ -98,7 +98,7 @@ export const EyeDropper: React.FC<{
             },
             false,
           );
-          invalidateShapeForElement(element);
+          ShapeCache.delete(element);
         }
         Scene.getScene(
           metaStuffRef.current.selectedElements[0],

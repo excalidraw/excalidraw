@@ -1,11 +1,11 @@
 import { ExcalidrawElement } from "./types";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 import { maybeGetSubtypeProps } from "./newElement";
 import { getSubtypeMethods } from "../subtypes";
 
@@ -104,7 +104,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     typeof fileId != "undefined" ||
     typeof points !== "undefined"
   ) {
-    invalidateShapeForElement(element);
+    ShapeCache.delete(element);
   }
 
   if (increment) {

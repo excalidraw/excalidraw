@@ -20,7 +20,7 @@ import {
   ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
-import { mutateElement } from "./mutateElement";
+import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
   getContainerElement,
@@ -127,7 +127,7 @@ export const textWysiwyg = ({
   }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   excalidrawContainer: HTMLDivElement | null;
   app: App;
 }) => {
@@ -585,6 +585,9 @@ export const textWysiwyg = ({
               id: element.id,
             }),
           });
+        } else if (isArrowElement(container)) {
+          // updating an arrow label may change bounds, prevent stale cache:
+          bumpVersion(container);
         }
       } else {
         mutateElement(container, {

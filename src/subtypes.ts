@@ -20,7 +20,7 @@ import {
   getContainerElement,
   redrawTextBoundingBox,
 } from "./element/textElement";
-import { invalidateShapeForElement } from "./renderer/renderElement";
+import { ShapeCache } from "./scene/ShapeCache";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
 let subtypeNames: readonly Subtype[] = [];
@@ -458,7 +458,7 @@ export const checkRefreshOnSubtypeLoad = (
     // registered, update the element's dimensions, mark the
     // element for a re-render, and indicate the scene needs a refresh.
     if (hasSubtype(element)) {
-      invalidateShapeForElement(element);
+      ShapeCache.delete(element);
       if (isTextElement(element)) {
         redrawTextBoundingBox(element, getContainerElement(element));
       }
