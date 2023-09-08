@@ -44,6 +44,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onScrollAndZoomChange,
     onUserFollowed,
     children,
+    validateEmbeddable,
+    renderEmbeddable,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -119,6 +121,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onScrollChange={onScrollChange}
           onScrollAndZoomChange={onScrollAndZoomChange}
           onUserFollowed={onUserFollowed}
+          validateEmbeddable={validateEmbeddable}
+          renderEmbeddable={renderEmbeddable}
         >
           {children}
         </App>
@@ -255,3 +259,4 @@ export { DefaultSidebar } from "../../components/DefaultSidebar";
 export { normalizeLink } from "../../data/url";
 
 export { zoomToFitBounds } from "../../actions/actionCanvas";
+export { convertToExcalidrawElements } from "../../data/transform";

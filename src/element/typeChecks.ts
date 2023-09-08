@@ -4,6 +4,7 @@ import { MarkNonNullable } from "../utility-types";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
+  ExcalidrawEmbeddableElement,
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawGenericElement,
@@ -24,7 +25,8 @@ export const isGenericElement = (
     (element.type === "selection" ||
       element.type === "rectangle" ||
       element.type === "diamond" ||
-      element.type === "ellipse")
+      element.type === "ellipse" ||
+      element.type === "embeddable")
   );
 };
 
@@ -38,6 +40,12 @@ export const isImageElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawImageElement => {
   return !!element && element.type === "image";
+};
+
+export const isEmbeddableElement = (
+  element: ExcalidrawElement | null | undefined,
+): element is ExcalidrawEmbeddableElement => {
+  return !!element && element.type === "embeddable";
 };
 
 export const isTextElement = (
@@ -112,6 +120,7 @@ export const isBindableElement = (
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
+      element.type === "embeddable" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -135,6 +144,7 @@ export const isExcalidrawElement = (element: any): boolean => {
     element?.type === "text" ||
     element?.type === "diamond" ||
     element?.type === "rectangle" ||
+    element?.type === "embeddable" ||
     element?.type === "ellipse" ||
     element?.type === "arrow" ||
     element?.type === "freedraw" ||
@@ -162,7 +172,8 @@ export const isBoundToContainer = (
   );
 };
 
-export const isUsingAdaptiveRadius = (type: string) => type === "rectangle";
+export const isUsingAdaptiveRadius = (type: string) =>
+  type === "rectangle" || type === "embeddable";
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";
@@ -193,17 +204,13 @@ export const canApplyRoundnessTypeToElement = (
 export const getDefaultRoundnessTypeForElement = (
   element: ExcalidrawElement,
 ) => {
-  if (
-    element.type === "arrow" ||
-    element.type === "line" ||
-    element.type === "diamond"
-  ) {
+  if (isUsingProportionalRadius(element.type)) {
     return {
       type: ROUNDNESS.PROPORTIONAL_RADIUS,
     };
   }
 
-  if (element.type === "rectangle") {
+  if (isUsingAdaptiveRadius(element.type)) {
     return {
       type: ROUNDNESS.ADAPTIVE_RADIUS,
     };

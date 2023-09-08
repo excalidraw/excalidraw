@@ -36,7 +36,7 @@ import {
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { extraToolsIcon, frameToolIcon } from "./icons";
+import { EmbedIcon, extraToolsIcon, frameToolIcon } from "./icons";
 import { KEYS } from "../keys";
 
 export const SelectedShapeActions = ({
@@ -213,13 +213,13 @@ export const SelectedShapeActions = ({
 };
 
 export const ShapesSwitcher = ({
-  canvas,
+  interactiveCanvas,
   activeTool,
   setAppState,
   onImageAction,
   appState,
 }: {
-  canvas: HTMLCanvasElement | null;
+  interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, UIAppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
@@ -266,10 +266,11 @@ export const ShapesSwitcher = ({
               });
               setAppState({
                 activeTool: nextActiveTool,
+                activeEmbeddable: null,
                 multiElement: null,
                 selectedElementIds: {},
               });
-              setCursorForShape(canvas, {
+              setCursorForShape(interactiveCanvas, {
                 ...appState,
                 activeTool: nextActiveTool,
               });
@@ -283,39 +284,72 @@ export const ShapesSwitcher = ({
       <div className="App-toolbar__divider" />
       {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
       {device.isMobile ? (
-        <ToolButton
-          className={clsx("Shape", { fillable: false })}
-          type="radio"
-          icon={frameToolIcon}
-          checked={activeTool.type === "frame"}
-          name="editor-current-shape"
-          title={`${capitalizeString(
-            t("toolBar.frame"),
-          )} — ${KEYS.F.toLocaleUpperCase()}`}
-          keyBindingLabel={KEYS.F.toLocaleUpperCase()}
-          aria-label={capitalizeString(t("toolBar.frame"))}
-          aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
-          data-testid={`toolbar-frame`}
-          onPointerDown={({ pointerType }) => {
-            if (!appState.penDetected && pointerType === "pen") {
-              setAppState({
-                penDetected: true,
-                penMode: true,
+        <>
+          <ToolButton
+            className={clsx("Shape", { fillable: false })}
+            type="radio"
+            icon={frameToolIcon}
+            checked={activeTool.type === "frame"}
+            name="editor-current-shape"
+            title={`${capitalizeString(
+              t("toolBar.frame"),
+            )} — ${KEYS.F.toLocaleUpperCase()}`}
+            keyBindingLabel={KEYS.F.toLocaleUpperCase()}
+            aria-label={capitalizeString(t("toolBar.frame"))}
+            aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
+            data-testid={`toolbar-frame`}
+            onPointerDown={({ pointerType }) => {
+              if (!appState.penDetected && pointerType === "pen") {
+                setAppState({
+                  penDetected: true,
+                  penMode: true,
+                });
+              }
+            }}
+            onChange={({ pointerType }) => {
+              trackEvent("toolbar", "frame", "ui");
+              const nextActiveTool = updateActiveTool(appState, {
+                type: "frame",
               });
-            }
-          }}
-          onChange={({ pointerType }) => {
-            trackEvent("toolbar", "frame", "ui");
-            const nextActiveTool = updateActiveTool(appState, {
-              type: "frame",
-            });
-            setAppState({
-              activeTool: nextActiveTool,
-              multiElement: null,
-              selectedElementIds: {},
-            });
-          }}
-        />
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+                activeEmbeddable: null,
+              });
+            }}
+          />
+          <ToolButton
+            className={clsx("Shape", { fillable: false })}
+            type="radio"
+            icon={EmbedIcon}
+            checked={activeTool.type === "embeddable"}
+            name="editor-current-shape"
+            title={capitalizeString(t("toolBar.embeddable"))}
+            aria-label={capitalizeString(t("toolBar.embeddable"))}
+            data-testid={`toolbar-embeddable`}
+            onPointerDown={({ pointerType }) => {
+              if (!appState.penDetected && pointerType === "pen") {
+                setAppState({
+                  penDetected: true,
+                  penMode: true,
+                });
+              }
+            }}
+            onChange={({ pointerType }) => {
+              trackEvent("toolbar", "embeddable", "ui");
+              const nextActiveTool = updateActiveTool(appState, {
+                type: "embeddable",
+              });
+              setAppState({
+                activeTool: nextActiveTool,
+                multiElement: null,
+                selectedElementIds: {},
+                activeEmbeddable: null,
+              });
+            }}
+          />
+        </>
       ) : (
         <DropdownMenu open={isExtraToolsMenuOpen}>
           <DropdownMenu.Trigger
@@ -346,6 +380,22 @@ export const ShapesSwitcher = ({
               data-testid="toolbar-frame"
             >
               {t("toolBar.frame")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                const nextActiveTool = updateActiveTool(appState, {
+                  type: "embeddable",
+                });
+                setAppState({
+                  activeTool: nextActiveTool,
+                  multiElement: null,
+                  selectedElementIds: {},
+                });
+              }}
+              icon={EmbedIcon}
+              data-testid="toolbar-embeddable"
+            >
+              {t("toolBar.embeddable")}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>
