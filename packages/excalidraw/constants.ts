@@ -110,7 +110,7 @@ export const FONT_FAMILY = {
 };
 
 export const FALLBACK_FONT = {
-  [FONT_FAMILY.Virgil]: "SanamDeklen",
+  [FONT_FAMILY.Virgil]: "Itim",
 };
 
 export const THEME = {

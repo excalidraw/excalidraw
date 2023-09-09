@@ -407,8 +407,8 @@ export const exportToSvg = async (
         src: url("${assetPath}Cascadia.woff2");
       }
       @font-face {
-        font-family: "SanamDeklen";
-        src: url("SanamDeklen.woff2");
+        font-family: "Itim";
+        src: url("Itim-Regular.woff2");
         font-display: swap;
         unicode-range: U+0E00–U+0E7F;
       }
