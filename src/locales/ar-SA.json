@@ -259,7 +259,7 @@
     "lineEditor_info": "اضغط على مفتاح (Ctrl أو Cmd) و انقر بشكل مزدوج، أو اضغط على مفتاحي (Ctrl أو Cmd) و (Enter) لتعديل النقاط",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
-    "placeImage": "",
+    "placeImage": "انقر لوضع الصورة، أو انقر واسحب لتعيين حجمها يدوياً",
     "publishLibrary": "نشر مكتبتك",
     "bindTextToElement": "",
     "deepBoxSelect": "",
