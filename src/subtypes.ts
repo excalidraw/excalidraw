@@ -21,6 +21,7 @@ import {
   redrawTextBoundingBox,
 } from "./element/textElement";
 import { ShapeCache } from "./scene/ShapeCache";
+import Scene from "./scene/Scene";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
 let subtypeNames: readonly Subtype[] = [];
@@ -453,6 +454,7 @@ export const checkRefreshOnSubtypeLoad = (
   elements: readonly ExcalidrawElement[],
 ) => {
   let refreshNeeded = false;
+  const scenes: Scene[] = [];
   getNonDeletedElements(elements).forEach((element) => {
     // If the element is of the subtype that was just
     // registered, update the element's dimensions, mark the
@@ -463,7 +465,14 @@ export const checkRefreshOnSubtypeLoad = (
         redrawTextBoundingBox(element, getContainerElement(element));
       }
       refreshNeeded = true;
+      const scene = Scene.getScene(element);
+      if (scene && !scenes.includes(scene)) {
+        // Store in case we have multiple scenes
+        scenes.push(scene);
+      }
     }
   });
+  // Only inform each scene once
+  scenes.forEach((scene) => scene.informMutation());
   return refreshNeeded;
 };
