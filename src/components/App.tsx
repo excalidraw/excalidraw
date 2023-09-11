@@ -3500,6 +3500,10 @@ class App extends React.Component<AppProps, AppState> {
         snapLines,
         originSnapOffset: originOffset,
       });
+    } else if (!this.state.draggingElement) {
+      this.setState({
+        snapLines: [],
+      });
     }
 
     if (

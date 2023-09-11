@@ -404,7 +404,7 @@ export const getGapSnaps = (
       if (Math.abs(sideOffsetRight) < minOffset.x) {
         neartestSnapsX.length = 0;
       }
-      minOffset.x = Math.abs(centerOffset);
+      minOffset.x = Math.abs(sideOffsetRight);
 
       const snap: GapSnap = {
         type: "gap",
@@ -425,7 +425,7 @@ export const getGapSnaps = (
       if (Math.abs(sideOffsetLeft) < minOffset.x) {
         neartestSnapsX.length = 0;
       }
-      minOffset.x = Math.abs(centerOffset);
+      minOffset.x = Math.abs(sideOffsetLeft);
 
       const snap: GapSnap = {
         type: "gap",
@@ -474,7 +474,7 @@ export const getGapSnaps = (
       if (Math.abs(sideOffsetTop) < minOffset.y) {
         neartestSnapsY.length = 0;
       }
-      minOffset.y = Math.abs(centerOffset);
+      minOffset.y = Math.abs(sideOffsetTop);
 
       const snap: GapSnap = {
         type: "gap",
@@ -495,7 +495,7 @@ export const getGapSnaps = (
       if (Math.abs(sideOffsetBottom) < minOffset.y) {
         neartestSnapsY.length = 0;
       }
-      minOffset.y = Math.abs(centerOffset);
+      minOffset.y = Math.abs(sideOffsetBottom);
 
       const snap: GapSnap = {
         type: "gap",
@@ -632,8 +632,8 @@ export const getSnapsOffsetAndSnapLines = (
   // we want to use the element's snapped position
   // to update nearest snaps so that we can create
   // point and gap snap lines correctly without any shifting
-  minOffset.x = SNAP_PRECISION / appState.zoom.value;
-  minOffset.y = SNAP_PRECISION / appState.zoom.value;
+  minOffset.x = SNAP_PRECISION;
+  minOffset.y = SNAP_PRECISION;
   neartestSnapsX.length = 0;
   neartestSnapsY.length = 0;
   const newDragOffset = {
@@ -654,8 +654,8 @@ export const getSnapsOffsetAndSnapLines = (
     minOffset,
   );
 
-  minOffset.x = snapDistance / appState.zoom.value;
-  minOffset.y = snapDistance / appState.zoom.value;
+  minOffset.x = snapDistance;
+  minOffset.y = snapDistance;
 
   getGapSnaps(
     elements,
@@ -1047,8 +1047,8 @@ export const snapNewElement = (
     y: neartestSnapsY[0]?.offset ?? 0,
   };
 
-  minOffset.x = SNAP_PRECISION / appState.zoom.value;
-  minOffset.y = SNAP_PRECISION / appState.zoom.value;
+  minOffset.x = SNAP_PRECISION;
+  minOffset.y = SNAP_PRECISION;
   neartestSnapsX.length = 0;
   neartestSnapsY.length = 0;
 
