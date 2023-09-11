@@ -597,7 +597,7 @@ export const getSnapsOffsetAndSnapLines = (
     dragOffset,
   });
 
-  // get the nearest snaps
+  // get the nearest horizontal and vertical point and gap snaps
   getPointSnaps(
     elements,
     selectedElements,
@@ -622,6 +622,7 @@ export const getSnapsOffsetAndSnapLines = (
 
   // using the neartest snaps to figure out how
   // much the elements need to be offset to be snapped
+  // to some reference elements
   const snapOffset = {
     x: neartestSnapsX[0]?.offset ?? 0,
     y: neartestSnapsY[0]?.offset ?? 0,
@@ -863,7 +864,9 @@ const createGapSnapLines = (
 
 export const snapResizingElements = (
   elements: ExcalidrawElement[],
+  // use the latest elements to create snap lines
   selectedElements: ExcalidrawElement[],
+  // while using the original elements to appy dragOffset to calculate snaps
   selectedOriginalElements: ExcalidrawElement[],
   appState: AppState,
   event: PointerEvent | MouseEvent | KeyboardEvent | null,
@@ -963,8 +966,10 @@ export const snapResizingElements = (
     y: neartestSnapsY[0]?.offset ?? 0,
   };
 
-  minOffset.x = SNAP_PRECISION / appState.zoom.value;
-  minOffset.y = SNAP_PRECISION / appState.zoom.value;
+  // again, once snap offset is calculated
+  // reset to recompute for creating snap lines to be rendered
+  minOffset.x = SNAP_PRECISION;
+  minOffset.y = SNAP_PRECISION;
   neartestSnapsX.length = 0;
   neartestSnapsY.length = 0;
 
