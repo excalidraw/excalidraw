@@ -13,7 +13,9 @@ Lets look at the high level overview at how the parse works :point_down:
 
 Lets dive deeper into individual section now to understand better.
 
-### Rendering Mermaid to svg 
+## Parsing Mermaid diagram
+
+### Rendering Mermaid to svg
 
 One of the dependencies of the library is [`mermaid`](https://www.npmjs.com/package/mermaid) package.
 We need the mermaid diagram in some extractable format so we can parse it to Excalidraw Elements.
@@ -241,3 +243,14 @@ For position and dimensions we use the svg to compute. The [`parseSubgraph`](htt
 	}
 ]
 ```
+
+## Transforming the parsed mermaid data to ExcalidrawSkeleton
+
+Now we have all the data which we need to create ExcalidrawSkeleton, we just need to transform it to ExcalidrawSkeletonAPI so it can be rendered on Excalidraw.
+
+For this we have `convertors` which takes the parsed mermaid data and gives back the Excalidraw Skeleton.
+For Unsupported types, we have already mentioned above that we convert it to `dataURL` and return the ExcalidrawImageSkeleton.
+
+For supported types, we parse the data and transform to Excalidraw Skeleton.
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/39487ebc-4368-46c3-a3c4-c196c8d811f1)
