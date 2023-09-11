@@ -2449,9 +2449,6 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      // clear snaplines on key down (when switching between tools)
-      this.setState({ snapLines: [] });
-
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
         IS_PLAIN_PASTE = event.shiftKey;
         clearTimeout(IS_PLAIN_PASTE_TIMER);
@@ -2766,9 +2763,15 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
+        snapLines: [],
+        originSnapOffset: null,
       }));
     } else {
-      this.setState({ activeTool: nextActiveTool });
+      this.setState({
+        activeTool: nextActiveTool,
+        snapLines: [],
+        originSnapOffset: null,
+      });
     }
   };
 
@@ -7235,35 +7238,39 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
-    const [gridX, gridY] = getGridPoint(
-      pointerCoords.x,
-      pointerCoords.y,
-      this.state.gridSize,
-    );
+    // check needed for avoiding flickering when a key gets pressed
+    // during dragging
+    if (!this.state.selectedElementsAreBeingDragged) {
+      const [gridX, gridY] = getGridPoint(
+        pointerCoords.x,
+        pointerCoords.y,
+        this.state.gridSize,
+      );
 
-    const dragOffset = {
-      x: gridX - pointerDownState.originInGrid.x,
-      y: gridY - pointerDownState.originInGrid.y,
-    };
+      const dragOffset = {
+        x: gridX - pointerDownState.originInGrid.x,
+        y: gridY - pointerDownState.originInGrid.y,
+      };
 
-    const originalElements = [...pointerDownState.originalElements.values()];
+      const originalElements = [...pointerDownState.originalElements.values()];
 
-    const { snapOffset, snapLines } = snapResizingElements(
-      originalElements,
-      selectedElements,
-      getSelectedElements(originalElements, this.state),
-      this.state,
-      event,
-      dragOffset,
-      transformHandleType,
-    );
+      const { snapOffset, snapLines } = snapResizingElements(
+        originalElements,
+        selectedElements,
+        getSelectedElements(originalElements, this.state),
+        this.state,
+        event,
+        dragOffset,
+        transformHandleType,
+      );
 
-    resizeX += snapOffset.x;
-    resizeY += snapOffset.y;
+      resizeX += snapOffset.x;
+      resizeY += snapOffset.y;
 
-    this.setState({
-      snapLines,
-    });
+      this.setState({
+        snapLines,
+      });
+    }
 
     if (
       transformElements(
