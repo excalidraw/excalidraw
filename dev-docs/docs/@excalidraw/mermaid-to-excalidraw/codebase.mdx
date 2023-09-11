@@ -1,0 +1,158 @@
+# Codebase
+
+## How the Parser works under the hood ?
+
+[This](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/index.ts) is the entry point of the library.
+
+`parseMermaidToExcalidraw` function is the only function exposed which recieves mermaid syntax as the input, parses the mermaid syntax and resolves to Excalidraw Skeleton.
+
+Lets look at the high level overview at how the parse works :point_down:
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/a85091d1-be65-4071-b989-fde169e4d71f"/>
+
+
+Lets dive deeper into individual section now to understand better.
+
+### Rendering Mermaid to svg 
+
+One of the dependencies of the library is [`mermaid`](https://www.npmjs.com/package/mermaid) package.
+We need the mermaid diagram in some extractable format so we can parse it to Excalidraw Elements.
+
+[`renderMermaid`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L275) takes care of it and returns the svg.
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/ce4ae2bb-a37a-4018-9122-fe1afcb9f1cb)
+
+[`mermaid.render`](https://www.npmjs.com/package/mermaid) API gives the output of the diagram in `svg`.
+
+
+If the diagram isn't supported, this svg is converted to `dataURL` and can be rendered as an image in Excalidraw.
+
+
+### Parsing the mermaid syntax
+
+If the diagram is supported, the next step is to parse the mermaid syntax.
+
+For this we first need the full mermaid defination along with mermaid [directives ](https://mermaid.js.org/config/directives.html).
+Along with some default options we combine the user provided options and transform it to mermaid directive.
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/51085127-6eea-4b08-9e8c-6e6adeaa559b)
+
+```js
+ const diagramInitOptions = {
+    flowchart: {
+      curve: options?.curve || "basis",
+    },
+    // Increase the Mermaid's font size by multiplying with 1.25 
+    // to match the Excalidraw Virgil font
+    themeVariables: {
+      fontSize: `${(options?.fontSize || DEFAULT_FONT_SIZE) * 1.25}px`,
+    },
+  };
+  const fullDefinition = `%%{init: ${JSON.stringify(
+    diagramInitOptions
+  )}}%%\n${definition}`;
+
+```
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/6a4b3012-2efa-49a6-8691-a5dea1da08b0" width="500"/>
+
+As you can see above we are combining `options.curve` and `options.fontSize` and generative the `init` directive for flowchart.
+
+Next we use mermaid api [getDiagramFromText](https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/Diagram.ts#L80) to parse the full defination and get the diagram json from it.
+
+```js
+const diagram = await mermaid.mermaidAPI.getDiagramFromText(fullDefinition);
+```
+This resolves to [Diagram](https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/Diagram.ts#L15).
+
+Next we write our own parser to parse `diagram.parse.yy`.
+
+### diagram.parse.yy 
+
+If you want to know more about how the `yy` attribute looks like, you can check it [here](https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/diagrams/flowchart/flowDb.js#L768), however for scope of flowchart we are using 3 apis from this parser to compute `vertices`, `edges` and `clusters` as we need these data to transform to ExcalidrawSkeleton.
+
+We have a [parseRoot](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L116) function which takes the `diagram.parse.yy`(https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/diagrams/flowchart/flowDb.js#L768) as input along with the svg rendered and computes the `vertices`, `edges` and `clusters`.
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/507daebb-cbe7-4bf6-a660-6b2cc411f5c8)
+
+#### Computing the vertices
+
+We use `getVertices` API from `diagram.parse.yy` to get the vertices for a given flowchart.
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/999c9c74-2dcd-429f-9cd3-29b25abc79b5)
+
+Considering the same example this is the response from the API
+
+```js
+{
+	"start": {
+		"id": "start",
+		"labelType": "text",
+		"domId": "flowchart-start-1414",
+		"styles": [],
+		"classes": [],
+		"text": "start",
+		"props": {}
+	},
+	"stop": {
+		"id": "stop",
+		"labelType": "text",
+		"domId": "flowchart-stop-1415",
+		"styles": [],
+		"classes": [],
+		"text": "stop",
+		"props": {}
+	}
+}
+```
+The dimensions and position is missing in this response and we need that to transform to ExcalidrawSkeleton, for this we have our own parser [`parseVertex`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L178) which takes the above response and uses the `svg` together to compute position, dimensions and cleanup the response.
+
+ The final output from `parseVertex` looks like :point_down:
+
+```js
+{
+	"start": {
+		"id": "start",
+		"labelType": "text",
+		"text": "start",
+		"x": 0,
+		"y": 0,
+		"width": 67.796875,
+		"height": 44,
+		"containerStyle": {},
+		"labelStyle": {}
+	},
+	"stop": {
+		"id": "stop",
+		"labelType": "text",
+		"text": "stop",
+		"x": 117.796875,
+		"y": 0,
+		"width": 62.3828125,
+		"height": 44,
+		"containerStyle": {},
+		"labelStyle": {}
+	}
+}
+```
+
+
+#### Computing the edges
+
+We use `getEdges` API from `diagram.parse.yy` to get the edges for a given flowchart.
+Considering the same example this is the response from the API
+
+```js
+[
+	{
+		"start": "start",
+		"end": "stop",
+		"type": "arrow_point",
+		"text": "",
+		"labelType": "text",
+		"stroke": "normal",
+		"length": 1
+	}
+]
+```
+

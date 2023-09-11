@@ -98,6 +98,7 @@ const sidebars = {
         "@excalidraw/mermaid-to-excalidraw/installation",
         "@excalidraw/mermaid-to-excalidraw/api",
         "@excalidraw/mermaid-to-excalidraw/development",
+        "@excalidraw/mermaid-to-excalidraw/codebase",
       ],
     },
     { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
