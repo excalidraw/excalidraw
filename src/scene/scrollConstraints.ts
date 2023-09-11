@@ -1,5 +1,4 @@
 import { AppState, ScrollConstraints } from "../types";
-import { easeToValuesRAF, isShallowEqual } from "../utils";
 import { getNormalizedZoom } from "./zoom";
 
 /**
@@ -274,162 +273,41 @@ const constrainScrollValues = ({
     maxScrollY,
     Math.max(scrollY, minScrollY),
   );
-  return { constrainedScrollX, constrainedScrollY, constrainedZoom };
+  return {
+    scrollX: constrainedScrollX,
+    scrollY: constrainedScrollY,
+    zoom: constrainedZoom,
+  };
 };
 
 /**
- * Animate the scroll values to the constrained area
+ * Determines whether the current viewport is outside the constrained area defined in the AppState.
+ *
+ * @param state - The application state containing scroll, zoom, and constraint information.
+ * @returns True if the viewport is outside the constrained area; otherwise undefined.
  */
-const animateConstrainedScroll = ({
-  state,
-  constrainedScrollX,
-  constrainedScrollY,
-  opts,
-}: {
-  state: AppState;
-  constrainedScrollX: number;
-  constrainedScrollY: number;
-  opts?: {
-    onStartCallback?: () => void;
-    onEndCallback?: () => void;
-  };
-}) => {
-  const { scrollX, scrollY, scrollConstraints } = state;
-
-  const { onStartCallback, onEndCallback } = opts || {};
-
-  if (!scrollConstraints) {
-    return null;
+export const isViewportOutsideOfConstrainedArea = (state: AppState) => {
+  if (!state.scrollConstraints) {
+    return;
   }
 
-  easeToValuesRAF({
-    fromValues: { scrollX, scrollY },
-    toValues: {
-      scrollX: constrainedScrollX,
-      scrollY: constrainedScrollY,
-    },
-    onStep: ({ scrollX, scrollY }) => {
-      // TODO: this.setState({ scrollX, scrollY });
-    },
-    onStart: () => {
-      // TODO: this.setState({
-      //   scrollConstraints: { ...scrollConstraints, isAnimating: true },
-      // });
-      onStartCallback && onStartCallback();
-    },
-    onEnd: () => {
-      // TODO: this.setState({
-      //   scrollConstraints: { ...scrollConstraints, isAnimating: false },
-      // });
-      onEndCallback && onEndCallback();
-    },
-  });
-};
-
-const isViewportOutsideOfConstrainedArea = ({
-  scrollX,
-  scrollY,
-  width,
-  height,
-  scrollConstraints,
-}: {
-  scrollX: AppState["scrollX"];
-  scrollY: AppState["scrollY"];
-  width: AppState["width"];
-  height: AppState["height"];
-  scrollConstraints: AppState["scrollConstraints"];
-}) => {
-  if (!scrollConstraints) {
-    return false;
-  }
+  const { scrollX, scrollY, width, height, scrollConstraints } = state;
 
   return (
-    scrollX < scrollConstraints.x ||
-    scrollX + width > scrollConstraints.x + scrollConstraints.width ||
+    scrollX > scrollConstraints.x ||
+    scrollX - width < scrollConstraints.x - scrollConstraints.width ||
     scrollY < scrollConstraints.y ||
     scrollY + height > scrollConstraints.y + scrollConstraints.height
   );
 };
 
 /**
- * Handles the state change based on the constrained scroll values.
- * Also handles the animation to the constrained area when the viewport is outside of constrained area.
- * @param constrainedScrollX - The constrained scroll value for the X axis.
- * @param constrainedScrollY - The constrained scroll value for the Y axis.
- * @returns The constrained state if the state has changed, when needs to be passed into render function, otherwise null.
+ * Constrains the AppState scroll values within the defined scroll constraints.
+ *
+ * @param state - The original AppState with the current scroll position, dimensions, and constraints.
+ * @returns A new AppState object with scroll values constrained as per the defined constraints.
  */
-const handleConstrainedScrollStateChange = ({
-  state,
-  constrainedScrollX,
-  constrainedScrollY,
-  constrainedZoom,
-  shouldAnimate,
-}: {
-  constrainedScrollX: number;
-  constrainedScrollY: number;
-  constrainedZoom: AppState["zoom"];
-  shouldAnimate?: boolean;
-  state: AppState;
-}) => {
-  const { scrollX, scrollY } = state;
-  const isStateChanged =
-    constrainedScrollX !== scrollX || constrainedScrollY !== scrollY;
-
-  if (isStateChanged) {
-    if (shouldAnimate) {
-      animateConstrainedScroll({
-        state,
-        constrainedScrollX,
-        constrainedScrollY,
-      });
-
-      return null;
-    }
-    const constrainedState = {
-      scrollX: constrainedScrollX,
-      scrollY: constrainedScrollY,
-      zoom: constrainedZoom,
-    };
-
-    // TODO: this.setState(constrainedState);
-    return constrainedState;
-  }
-
-  return null;
-};
-
-export const setScrollConstraints = (
-  scrollConstraints: ScrollConstraints,
-  state: AppState,
-  onAnimteEndCallback?: () => void,
-) => {
-  const { scrollX, scrollY, width, height, zoom, cursorButton } = state;
-  const constrainedScrollValues = constrainScrollValues({
-    ...calculateConstraints({
-      scrollConstraints,
-      zoom,
-      cursorButton,
-      width,
-      height,
-    }),
-    scrollX,
-    scrollY,
-  });
-  animateConstrainedScroll({
-    state,
-    ...constrainedScrollValues,
-    opts: {
-      onEndCallback: () => {
-        onAnimteEndCallback && onAnimteEndCallback();
-      },
-    },
-  });
-};
-
-let memoizedScrollConstraints: ReturnType<typeof calculateConstraints> | null =
-  null;
-
-export const constrainScrollState = (state: AppState, prevState: AppState) => {
+export const constrainScrollState = (state: AppState): AppState => {
   if (!state.scrollConstraints || state.scrollConstraints.isAnimating) {
     return state;
   }
@@ -443,55 +321,28 @@ export const constrainScrollState = (state: AppState, prevState: AppState) => {
     cursorButton,
   } = state;
 
-  const canUseMemoizedConstraints =
-    isShallowEqual(scrollConstraints, prevState.scrollConstraints ?? {}) &&
-    isShallowEqual(
-      { width, height, zoom: zoom.value, cursorButton },
-      {
-        width: prevState.width,
-        height: prevState.height,
-        zoom: prevState.zoom.value,
-        cursorButton: prevState.cursorButton,
-      } ?? {},
-    );
-
-  const calculatedConstraints =
-    canUseMemoizedConstraints && !!memoizedScrollConstraints
-      ? memoizedScrollConstraints
-      : calculateConstraints({
-          scrollConstraints,
-          width,
-          height,
-          zoom,
-          cursorButton,
-        });
-
-  memoizedScrollConstraints = calculatedConstraints;
-
-  const constrainedScrollValues = constrainScrollValues({
-    ...calculatedConstraints,
+  const constrainedValues = constrainScrollValues({
+    ...calculateConstraints({
+      scrollConstraints,
+      width,
+      height,
+      zoom,
+      cursorButton,
+    }),
     scrollX,
     scrollY,
   });
 
-  const viewportOutsideOfConstrainedArea = isViewportOutsideOfConstrainedArea({
-    scrollX,
-    scrollY,
-    width,
-    height,
-    scrollConstraints,
-  });
+  const isStateChanged =
+    constrainedValues.scrollX !== scrollX ||
+    constrainedValues.scrollY !== scrollY;
 
-  const shouldAnimate =
-    viewportOutsideOfConstrainedArea &&
-    state.cursorButton !== "down" &&
-    prevState.cursorButton === "down" &&
-    prevState.zoom.value === state.zoom.value &&
-    !state.isLoading; // Do not animate when app is initialized but scene is empty - it would cause flickering
+  if (isStateChanged) {
+    return {
+      ...state,
+      ...constrainedValues,
+    };
+  }
 
-  return handleConstrainedScrollStateChange({
-    state,
-    ...constrainedScrollValues,
-    shouldAnimate,
-  });
+  return state;
 };

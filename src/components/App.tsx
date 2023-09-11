@@ -355,8 +355,9 @@ import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
 import {
-  setScrollConstraints,
   calculateConstrainedScrollCenter,
+  constrainScrollState,
+  isViewportOutsideOfConstrainedArea,
 } from "../scene/scrollConstraints";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -2004,6 +2005,58 @@ class App extends React.Component<AppProps, AppState> {
         this.files,
       );
     }
+
+    if (
+      this.state.scrollConstraints &&
+      isViewportOutsideOfConstrainedArea(this.state) &&
+      prevState.cursorButton === "down" &&
+      this.state.cursorButton !== "down" &&
+      !this.state.isLoading
+    ) {
+      const state = constrainScrollState(this.state);
+      const cancel = easeToValuesRAF({
+        fromValues: {
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          zoom: this.state.zoom.value,
+        },
+        toValues: {
+          scrollX: state.scrollX,
+          scrollY: state.scrollY,
+          zoom: state.zoom.value,
+        },
+        interpolateValue: (from, to, progress, key) => {
+          // for zoom, use different easing
+          if (key === "zoom") {
+            return from * Math.pow(to / from, easeOut(progress));
+          }
+          // handle using default
+          return undefined;
+        },
+        onStep: ({ scrollX, scrollY, zoom }) => {
+          this.setState({
+            scrollX,
+            scrollY,
+            zoom: { value: getNormalizedZoom(zoom) },
+          });
+        },
+        onStart: () => {
+          this.setState({ shouldCacheIgnoreZoom: true });
+        },
+        onEnd: () => {
+          this.setState({ shouldCacheIgnoreZoom: false });
+        },
+        onCancel: () => {
+          this.setState({ shouldCacheIgnoreZoom: false });
+        },
+        duration: 500,
+      });
+
+      this.cancelInProgresAnimation = () => {
+        cancel();
+        this.cancelInProgresAnimation = null;
+      };
+    }
   }
 
   private renderInteractiveSceneCallback = ({
@@ -2669,9 +2722,27 @@ class App extends React.Component<AppProps, AppState> {
 
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
-    state,
+    stateUpdate,
   ) => {
     this.cancelInProgresAnimation?.();
+
+    const partialNewState =
+      typeof stateUpdate === "function"
+        ? (
+            stateUpdate as (
+              prevState: Readonly<AppState>,
+              props: Readonly<AppProps>,
+            ) => AppState
+          )(this.state, this.props)
+        : stateUpdate;
+
+    const newState: AppState = {
+      ...this.state,
+      ...partialNewState,
+    };
+
+    const state = constrainScrollState(newState);
+
     this.setState(state);
   };
 
@@ -8136,12 +8207,10 @@ class App extends React.Component<AppProps, AppState> {
     scrollConstraints: ScrollConstraints | null,
   ) => {
     if (scrollConstraints) {
-      setScrollConstraints(scrollConstraints, this.state, () =>
-        this.setState({
-          scrollConstraints,
-          viewModeEnabled: true,
-        }),
-      );
+      this.setState({
+        scrollConstraints,
+        viewModeEnabled: true,
+      });
     } else {
       this.setState({
         scrollConstraints: null,
