@@ -123,7 +123,7 @@ const config = {
       prism: {
         theme: require("prism-react-renderer/themes/dracula"),
       },
-      image: "img/og-image.png",
+      image: "img/og-image-2.png",
       docs: {
         sidebar: {
           hideable: true,
