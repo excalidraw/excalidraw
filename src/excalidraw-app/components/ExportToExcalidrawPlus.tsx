@@ -7,7 +7,6 @@ import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
 import { AppState, BinaryFileData, BinaryFiles } from "../../types";
 import { nanoid } from "nanoid";
 import { useI18n } from "../../i18n";
-import { excalidrawPlusIcon } from "./icons";
 import { encryptData, generateEncryptionKey } from "../../data/encryption";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
@@ -15,6 +14,7 @@ import { encodeFilesForUpload } from "../data/FileManager";
 import { MIME_TYPES } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
+import { ExcalidrawLogo } from "../../components/ExcalidrawLogo";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -82,7 +82,15 @@ export const ExportToExcalidrawPlus: React.FC<{
   const { t } = useI18n();
   return (
     <Card color="primary">
-      <div className="Card-icon">{excalidrawPlusIcon}</div>
+      <div className="Card-icon">
+        <ExcalidrawLogo
+          style={{
+            [`--color-logo-icon` as any]: "#fff",
+            width: "2.8rem",
+            height: "2.8rem",
+          }}
+        />
+      </div>
       <h2>Excalidraw+</h2>
       <div className="Card-details">
         {t("exportDialog.excalidrawplus_description")}

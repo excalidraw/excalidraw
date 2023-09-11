@@ -10,6 +10,13 @@
     pointer-events: none;
 
     color: var(--color-gray-40);
+
+    a {
+      --color: var(--color-primary);
+      color: var(--color);
+      text-decoration: none;
+      margin-bottom: -6px;
+    }
   }
 
   &.theme--dark {
@@ -136,11 +143,6 @@
     align-items: center;
     column-gap: 0.75rem;
     font-size: 2.25rem;
-
-    svg {
-      width: 1.625rem;
-      height: auto;
-    }
   }
 
   .welcome-screen-center__heading {

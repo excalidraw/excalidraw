@@ -10,7 +10,7 @@ const config = {
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/favicon.png",
   organizationName: "Excalidraw", // Usually your GitHub org/user name.
   projectName: "excalidraw", // Usually your repo name.
 
@@ -123,7 +123,7 @@ const config = {
       prism: {
         theme: require("prism-react-renderer/themes/dracula"),
       },
-      image: "img/og-image.png",
+      image: "img/og-image-2.png",
       docs: {
         sidebar: {
           hideable: true,
