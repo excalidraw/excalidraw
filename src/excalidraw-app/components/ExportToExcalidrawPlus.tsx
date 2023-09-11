@@ -69,7 +69,9 @@ export const exportToExcalidrawPlus = async (
   }
 
   window.open(
-    `https://plus.excalidraw.com/import?excalidraw=${id},${encryptionKey}`,
+    `${
+      import.meta.env.VITE_APP_PLUS_APP
+    }/import?excalidraw=${id},${encryptionKey}`,
   );
 };
 
