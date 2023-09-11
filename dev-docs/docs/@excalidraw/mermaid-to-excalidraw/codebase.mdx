@@ -142,6 +142,7 @@ The dimensions and position is missing in this response and we need that to tran
 
 #### Computing the edges
 
+The lines and arrows are considered as `edges` in mermaid as shown in the above diagram.
 We use `getEdges` API from `diagram.parse.yy` to get the edges for a given flowchart.
 Considering the same example this is the response from the API
 
@@ -186,6 +187,57 @@ Similarly here the dimensions and position is missing and we compute that from t
 				"y": 22
 			}
 		]
+	}
+]
+```
+#### Computing the Subgraphs
+
+`Subgraphs` is collection of elements grouped together. The Subgraphs map to `grouping` elements in Excalidraw.
+
+Lets consider the below example :point_down:
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/5243ce4c-beaa-43d2-812a-0577b0a574d7)
+
+We use `getSubgraphs` API to get the subgraph data for a given flowchart.
+Considering the same example this is the response from the API
+
+```js
+[
+	{
+		"id": "one",
+		"nodes": [
+				"flowchart-a2-1399",
+				"flowchart-a1-1400"
+		],
+		"title": "one",
+		"classes": [],
+		"labelType": "text"
+	}
+]
+```
+
+For position and dimensions we use the svg to compute. The [`parseSubgraph`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L139) takes the above response along with `svg` and computes the position, dimensions and cleans up the response.
+
+
+```js
+[
+	{
+		"id": "one",
+		"nodes": [
+				"flowchart-a2-1399",
+				"flowchart-a1-1400"
+		],
+		"title": "one",
+		"labelType": "text",
+		"nodeIds": [
+				"a2",
+				"a1"
+		],
+		"x": 75.4921875,
+		"y": 0,
+		"width": 121.25,
+		"height": 188,
+		"text": "one"
 	}
 ]
 ```
