@@ -98,7 +98,18 @@ const sidebars = {
         "@excalidraw/mermaid-to-excalidraw/installation",
         "@excalidraw/mermaid-to-excalidraw/api",
         "@excalidraw/mermaid-to-excalidraw/development",
-        "@excalidraw/mermaid-to-excalidraw/codebase",
+        {
+          type: "category",
+          label: "Codebase",
+          link: {
+            type: "doc",
+            id: "@excalidraw/mermaid-to-excalidraw/codebase/codebase",
+          },
+          items: [
+            "@excalidraw/mermaid-to-excalidraw/codebase/parser",
+            "@excalidraw/mermaid-to-excalidraw/codebase/new-chart",
+          ],
+        },
       ],
     },
     { type: "category", label: "Codebase", items: ["codebase/json-schema"] },

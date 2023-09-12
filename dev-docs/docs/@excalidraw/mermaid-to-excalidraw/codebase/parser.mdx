@@ -1,14 +1,13 @@
-# Codebase
-
-## How the Parser works under the hood ?
+# How the Parser works under the hood ?
 
 [This](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/index.ts) is the entry point of the library.
+
 
 `parseMermaidToExcalidraw` function is the only function exposed which recieves mermaid syntax as the input, parses the mermaid syntax and resolves to Excalidraw Skeleton.
 
 Lets look at the high level overview at how the parse works :point_down:
 
-<img src="https://github.com/excalidraw/excalidraw/assets/11256141/1719c629-99a7-4774-8c67-a96120ba0a56"/>
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/18b34873-af75-4ac5-8102-4c43e3626515)
 
 
 Lets dive deeper into individual section now to understand better.
@@ -59,7 +58,7 @@ Along with some default options we combine the user provided options and transfo
 
 <img src="https://github.com/excalidraw/excalidraw/assets/11256141/6a4b3012-2efa-49a6-8691-a5dea1da08b0" width="500"/>
 
-As you can see above we are combining `options.curve` and `options.fontSize` and generative the `init` directive for flowchart.
+As you can see above we are combining `options.curve` and `options.fontSize` and generating the `init` directive for flowchart.
 
 Next we use mermaid api [getDiagramFromText](https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/Diagram.ts#L80) to parse the full defination and get the diagram json from it.
 
