@@ -16,6 +16,7 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "./element/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -87,7 +88,12 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type LastActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
+      type:
+        | typeof SHAPES[number]["value"]
+        | "eraser"
+        | "hand"
+        | "frame"
+        | "embeddable";
       customType: null;
     }
   | {
@@ -99,6 +105,57 @@ export type LastActiveTool =
 export type SidebarName = string;
 export type SidebarTabName = string;
 
+type _CommonCanvasAppState = {
+  zoom: AppState["zoom"];
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  width: AppState["width"];
+  height: AppState["height"];
+  viewModeEnabled: AppState["viewModeEnabled"];
+  editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
+  selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
+  frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
+  offsetLeft: AppState["offsetLeft"];
+  offsetTop: AppState["offsetTop"];
+  theme: AppState["theme"];
+  pendingImageElementId: AppState["pendingImageElementId"];
+};
+
+export type StaticCanvasAppState = Readonly<
+  _CommonCanvasAppState & {
+    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+    /** null indicates transparent bg */
+    viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+    exportScale: AppState["exportScale"];
+    selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
+    gridSize: AppState["gridSize"];
+    frameRendering: AppState["frameRendering"];
+  }
+>;
+
+export type InteractiveCanvasAppState = Readonly<
+  _CommonCanvasAppState & {
+    // renderInteractiveScene
+    activeEmbeddable: AppState["activeEmbeddable"];
+    editingLinearElement: AppState["editingLinearElement"];
+    selectionElement: AppState["selectionElement"];
+    selectedGroupIds: AppState["selectedGroupIds"];
+    selectedLinearElement: AppState["selectedLinearElement"];
+    multiElement: AppState["multiElement"];
+    isBindingEnabled: AppState["isBindingEnabled"];
+    suggestedBindings: AppState["suggestedBindings"];
+    isRotating: AppState["isRotating"];
+    elementsToHighlight: AppState["elementsToHighlight"];
+    // App
+    openSidebar: AppState["openSidebar"];
+    showHyperlinkPopup: AppState["showHyperlinkPopup"];
+    // Collaborators
+    collaborators: AppState["collaborators"];
+    // SnapLines
+    snapLines: AppState["snapLines"];
+  }
+>;
+
 export type AppState = {
   contextMenu: {
     items: ContextMenuItems;
@@ -108,6 +165,10 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
+  activeEmbeddable: {
+    element: NonDeletedExcalidrawElement;
+    state: "hover" | "active";
+  } | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -116,7 +177,12 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
-  shouldRenderFrames: boolean;
+  frameRendering: {
+    enabled: boolean;
+    name: boolean;
+    outline: boolean;
+    clip: boolean;
+  };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
@@ -132,7 +198,12 @@ export type AppState = {
     locked: boolean;
   } & (
     | {
-        type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
+        type:
+          | typeof SHAPES[number]["value"]
+          | "eraser"
+          | "hand"
+          | "frame"
+          | "embeddable";
         customType: null;
       }
     | {
@@ -182,8 +253,8 @@ export type AppState = {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
-  selectedElementIds: { [id: string]: boolean };
-  previousSelectedElementIds: { [id: string]: boolean };
+  selectedElementIds: Readonly<{ [id: string]: true }>;
+  previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
@@ -365,6 +436,16 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
+  validateEmbeddable?:
+    | boolean
+    | string[]
+    | RegExp
+    | RegExp[]
+    | ((link: string) => boolean | undefined);
+  renderEmbeddable?: (
+    element: NonDeleted<ExcalidrawEmbeddableElement>,
+    appState: AppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {
@@ -386,13 +467,13 @@ export type ExportOpts = {
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => JSX.Element;
 };
 
@@ -437,7 +518,8 @@ export type AppProps = Merge<
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
   props: AppProps;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
+  interactiveCanvas: HTMLCanvasElement | null;
   focusContainer(): void;
   library: Library;
   imageCache: Map<
@@ -552,7 +634,7 @@ export type ExcalidrawImperativeAPI = {
    * the frames are still interactive in edit mode. As such, this API should be
    * used in conjunction with view mode (props.viewModeEnabled).
    */
-  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
+  updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
 };
 
 export type Device = Readonly<{

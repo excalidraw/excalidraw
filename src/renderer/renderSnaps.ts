@@ -1,33 +1,27 @@
-import { RenderConfig } from "../scene/types";
 import { PointSnapLine, PointerSnapLine, getSnapDistance } from "../snapping";
-import { AppState, Point } from "../types";
+import { InteractiveCanvasAppState, Point } from "../types";
 
 const SNAP_COLOR = "#fa5252";
 const SNAP_WIDTH = 2;
 const SNAP_CROSS_SIZE = 3;
 
-interface RenderSnapOptions {
-  renderConfig: RenderConfig;
-  context: CanvasRenderingContext2D;
-}
-
 export const renderSnaps = (
-  { renderConfig, context }: RenderSnapOptions,
-  appState: AppState,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
 ) => {
   context.save();
-  context.lineWidth = SNAP_WIDTH / renderConfig.zoom.value;
+  context.lineWidth = SNAP_WIDTH / appState.zoom.value;
   context.strokeStyle = SNAP_COLOR;
 
   for (const snapLine of appState.snapLines) {
     if (snapLine.type === "points" || snapLine.type === "pointer") {
-      drawPointSnap({ renderConfig, context }, snapLine);
+      drawPointSnap(snapLine, context, appState);
     } else {
       drawGapLine(
         snapLine.points[0][0],
         snapLine.points[0][1],
         snapLine.direction,
-        renderConfig.zoom,
+        appState.zoom,
         context,
       );
 
@@ -35,7 +29,7 @@ export const renderSnaps = (
         snapLine.points[1][0],
         snapLine.points[1][1],
         snapLine.direction,
-        renderConfig.zoom,
+        appState.zoom,
         context,
       );
     }
@@ -45,17 +39,18 @@ export const renderSnaps = (
 };
 
 const drawPointSnap = (
-  { renderConfig, context }: RenderSnapOptions,
   pointSnapLine: PointSnapLine | PointerSnapLine,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
 ) => {
-  drawCross(pointSnapLine.points[0], renderConfig.zoom, context);
+  drawCross(pointSnapLine.points[0], appState.zoom, context);
   drawLine(pointSnapLine.points[0], pointSnapLine.points[1], context);
-  drawCross(pointSnapLine.points[1], renderConfig.zoom, context);
+  drawCross(pointSnapLine.points[1], appState.zoom, context);
 };
 
 const drawCross = (
   [x, y]: Point,
-  zoom: RenderConfig["zoom"],
+  zoom: InteractiveCanvasAppState["zoom"],
   context: CanvasRenderingContext2D,
 ) => {
   context.save();
@@ -87,7 +82,7 @@ const drawGapLine = (
   from: Point,
   to: Point,
   direction: "horizontal" | "vertical",
-  zoom: RenderConfig["zoom"],
+  zoom: InteractiveCanvasAppState["zoom"],
   context: CanvasRenderingContext2D,
 ) => {
   // a horizontal gap snap line

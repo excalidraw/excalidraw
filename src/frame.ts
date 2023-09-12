@@ -16,7 +16,7 @@ import {
 } from "./element/textElement";
 import { arrayToMap, findIndex } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppState } from "./types";
+import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
@@ -304,7 +304,7 @@ export const groupsAreCompletelyOutOfFrame = (
 /**
  * Returns a map of frameId to frame elements. Includes empty frames.
  */
-export const groupByFrames = (elements: ExcalidrawElementsIncludingDeleted) => {
+export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
   const frameElementsMap = new Map<
     ExcalidrawElement["id"],
     ExcalidrawElement[]
@@ -468,15 +468,39 @@ export const addElementsToFrame = (
     }
   }
 
-  let nextElements = allElements.slice();
+  const allElementsIndex = allElements.reduce(
+    (acc: Record<string, number>, element, index) => {
+      acc[element.id] = index;
+      return acc;
+    },
+    {},
+  );
 
-  const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
+  const frameIndex = allElementsIndex[frame.id];
+  // need to be calculated before the mutation below occurs
+  const leftFrameBoundaryIndex = findIndex(
+    allElements,
+    (e) => e.frameId === frame.id,
+  );
+
+  const existingFrameChildren = allElements.filter(
+    (element) => element.frameId === frame.id,
+  );
+
+  const addedFrameChildren_left: ExcalidrawElement[] = [];
+  const addedFrameChildren_right: ExcalidrawElement[] = [];
 
   for (const element of omitGroupsContainingFrames(
     allElements,
     _elementsToAdd,
   )) {
     if (element.frameId !== frame.id && !isFrameElement(element)) {
+      if (allElementsIndex[element.id] > frameIndex) {
+        addedFrameChildren_right.push(element);
+      } else {
+        addedFrameChildren_left.push(element);
+      }
+
       mutateElement(
         element,
         {
@@ -484,27 +508,34 @@ export const addElementsToFrame = (
         },
         false,
       );
-
-      const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
-      const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
-
-      if (elementIndex < frameBoundary) {
-        nextElements = [
-          ...nextElements.slice(0, elementIndex),
-          ...nextElements.slice(elementIndex + 1, frameBoundary),
-          element,
-          ...nextElements.slice(frameBoundary),
-        ];
-      } else if (elementIndex > frameIndex) {
-        nextElements = [
-          ...nextElements.slice(0, frameIndex),
-          element,
-          ...nextElements.slice(frameIndex, elementIndex),
-          ...nextElements.slice(elementIndex + 1),
-        ];
-      }
     }
   }
+
+  const frameElement = allElements[frameIndex];
+  const nextFrameChildren = addedFrameChildren_left
+    .concat(existingFrameChildren)
+    .concat(addedFrameChildren_right);
+
+  const nextFrameChildrenMap = nextFrameChildren.reduce(
+    (acc: Record<string, boolean>, element) => {
+      acc[element.id] = true;
+      return acc;
+    },
+    {},
+  );
+
+  const nextOtherElements_left = allElements
+    .slice(0, leftFrameBoundaryIndex >= 0 ? leftFrameBoundaryIndex : frameIndex)
+    .filter((element) => !nextFrameChildrenMap[element.id]);
+
+  const nextOtherElement_right = allElements
+    .slice(frameIndex + 1)
+    .filter((element) => !nextFrameChildrenMap[element.id]);
+
+  const nextElements = nextOtherElements_left
+    .concat(nextFrameChildren)
+    .concat([frameElement])
+    .concat(nextOtherElement_right);
 
   return nextElements;
 };
@@ -519,6 +550,7 @@ export const removeElementsFromFrame = (
   for (const element of elementsToRemove) {
     if (element.frameId) {
       _elementsToRemove.push(element);
+
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
         _elementsToRemove.push(boundTextElement);
@@ -567,12 +599,17 @@ export const replaceAllElementsInFrame = (
   );
 };
 
-/** does not mutate elements, but return new ones */
+/** does not mutate elements, but returns new ones */
 export const updateFrameMembershipOfSelectedElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
   appState: AppState,
+  app: AppClassProperties,
 ) => {
-  const selectedElements = getSelectedElements(allElements, appState);
+  const selectedElements = app.scene.getSelectedElements({
+    selectedElementIds: appState.selectedElementIds,
+    // supplying elements explicitly in case we're passed non-state elements
+    elements: allElements,
+  });
   const elementsToFilter = new Set<ExcalidrawElement>(selectedElements);
 
   if (appState.editingGroupId) {
@@ -591,6 +628,7 @@ export const updateFrameMembershipOfSelectedElements = (
 
   elementsToFilter.forEach((element) => {
     if (
+      element.frameId &&
       !isFrameElement(element) &&
       !isElementInFrame(element, allElements, appState)
     ) {
@@ -598,7 +636,9 @@ export const updateFrameMembershipOfSelectedElements = (
     }
   });
 
-  return removeElementsFromFrame(allElements, [...elementsToRemove], appState);
+  return elementsToRemove.size > 0
+    ? removeElementsFromFrame(allElements, [...elementsToRemove], appState)
+    : allElements;
 };
 
 /**
@@ -640,7 +680,7 @@ export const omitGroupsContainingFrames = (
  */
 export const getTargetFrame = (
   element: ExcalidrawElement,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element) || element
@@ -652,11 +692,12 @@ export const getTargetFrame = (
     : getContainingFrame(_element);
 };
 
+// TODO: this a huge bottleneck for large scenes, optimise
 // given an element, return if the element is in some frame
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElements: ExcalidrawElementsIncludingDeleted,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const frame = getTargetFrame(element, appState);
   const _element = isTextElement(element)

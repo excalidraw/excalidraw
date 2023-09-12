@@ -10,9 +10,9 @@ import {
   ExcalidrawLinearElement,
   NonDeleted,
 } from "./element/types";
-import { getShapeForElement } from "./renderer/renderElement";
 import { getCurvePathOps } from "./element/bounds";
 import { Mutable } from "./utility-types";
+import { ShapeCache } from "./scene/ShapeCache";
 
 export const rotate = (
   x1: number,
@@ -303,7 +303,7 @@ export const getControlPointsForBezierCurve = (
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: Point,
 ) => {
-  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+  const shape = ShapeCache.generateElementShape(element);
   if (!shape) {
     return null;
   }
