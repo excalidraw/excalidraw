@@ -266,8 +266,9 @@ export const getGridPoint = (
   x: number,
   y: number,
   gridSize: number | null,
+  snapToGrid: boolean = false,
 ): [number, number] => {
-  if (gridSize) {
+  if (gridSize && snapToGrid) {
     return [
       Math.round(x / gridSize) * gridSize,
       Math.round(y / gridSize) * gridSize,

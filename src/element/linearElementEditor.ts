@@ -42,7 +42,7 @@ import {
 } from "./binding";
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
-import { shouldRotateWithDiscreteAngle } from "../keys";
+import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
@@ -222,6 +222,7 @@ export class LinearElementEditor {
           referencePoint,
           [scenePointerX, scenePointerY],
           appState.gridSize,
+          !event[KEYS.CTRL_OR_CMD],
         );
 
         LinearElementEditor.movePoints(element, [
@@ -239,6 +240,7 @@ export class LinearElementEditor {
           scenePointerX - linearElementEditor.pointerOffset.x,
           scenePointerY - linearElementEditor.pointerOffset.y,
           appState.gridSize,
+          !event[KEYS.CTRL_OR_CMD],
         );
 
         const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
@@ -255,6 +257,7 @@ export class LinearElementEditor {
                     scenePointerX - linearElementEditor.pointerOffset.x,
                     scenePointerY - linearElementEditor.pointerOffset.y,
                     appState.gridSize,
+                    !event[KEYS.CTRL_OR_CMD],
                   )
                 : ([
                     element.points[pointIndex][0] + deltaX,
@@ -648,6 +651,7 @@ export class LinearElementEditor {
               scenePointer.x,
               scenePointer.y,
               appState.gridSize,
+              !event[KEYS.CTRL_OR_CMD],
             ),
           ],
         });
@@ -799,6 +803,7 @@ export class LinearElementEditor {
         lastCommittedPoint,
         [scenePointerX, scenePointerY],
         appState.gridSize,
+        !event[KEYS.CTRL_OR_CMD],
       );
 
       newPoint = [
@@ -811,6 +816,7 @@ export class LinearElementEditor {
         scenePointerX - appState.editingLinearElement.pointerOffset.x,
         scenePointerY - appState.editingLinearElement.pointerOffset.y,
         appState.gridSize,
+        !event[KEYS.CTRL_OR_CMD],
       );
     }
 
@@ -924,8 +930,14 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     gridSize: number | null,
+    snapToGrid: boolean,
   ): Point {
-    const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
+    const pointerOnGrid = getGridPoint(
+      scenePointerX,
+      scenePointerY,
+      gridSize,
+      snapToGrid,
+    );
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -1176,6 +1188,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
     appState: AppState,
+    snapToGrid: boolean,
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
@@ -1197,6 +1210,7 @@ export class LinearElementEditor {
       pointerCoords.x,
       pointerCoords.y,
       appState.gridSize,
+      snapToGrid,
     );
     const points = [
       ...element.points.slice(0, segmentMidpoint.index!),
@@ -1249,6 +1263,7 @@ export class LinearElementEditor {
     referencePoint: Point,
     scenePointer: Point,
     gridSize: number | null,
+    snapToGrid: boolean,
   ) {
     const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
       element,
@@ -1259,6 +1274,7 @@ export class LinearElementEditor {
       scenePointer[0],
       scenePointer[1],
       gridSize,
+      snapToGrid,
     );
 
     const { width, height } = getLockedLinearCursorAlignSize(
