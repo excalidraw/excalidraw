@@ -24,8 +24,6 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
       <MainMenu.DefaultItems.Socials />
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme />
