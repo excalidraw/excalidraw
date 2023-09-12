@@ -95,13 +95,20 @@ export type GapSnapLine = {
 
 export type SnapLine = PointSnapLine | GapSnapLine | PointerSnapLine;
 
+export type MaybeSnapEvent =
+  | PointerEvent
+  | MouseEvent
+  | KeyboardEvent
+  | React.PointerEvent<HTMLCanvasElement>
+  | false;
+
 export const isSnappingEnabled = ({
   event,
   appState,
   selectedElements,
 }: {
   appState: AppState;
-  event: PointerEvent | MouseEvent | KeyboardEvent | Event | null;
+  event: MaybeSnapEvent;
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   // do not suggest snaps for an arrow to give way to binding
@@ -342,7 +349,7 @@ export const getGapSnaps = (
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
-  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  event: MaybeSnapEvent,
   neartestSnapsX: Snaps,
   neartestSnapsY: Snaps,
   minOffset: Vector2D,
@@ -514,7 +521,7 @@ export const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: Point[],
   appState: AppState,
-  event: PointerEvent | MouseEvent | KeyboardEvent | Event | null,
+  event: MaybeSnapEvent,
   neartestSnapsX: Snaps,
   neartestSnapsY: Snaps,
   minOffset: Vector2D,
@@ -583,7 +590,7 @@ export const getSnapsOffsetAndSnapLines = (
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
-  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  event: MaybeSnapEvent,
 ) => {
   const neartestSnapsX: Snaps = [];
   const neartestSnapsY: Snaps = [];
@@ -869,7 +876,7 @@ export const snapResizingElements = (
   // while using the original elements to appy dragOffset to calculate snaps
   selectedOriginalElements: ExcalidrawElement[],
   appState: AppState,
-  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  event: MaybeSnapEvent,
   dragOffset: Vector2D,
   transformHandle: MaybeTransformHandleType,
 ) => {
@@ -1009,7 +1016,7 @@ export const snapNewElement = (
   elements: readonly ExcalidrawElement[],
   draggingElement: ExcalidrawElement,
   appState: AppState,
-  event: PointerEvent | MouseEvent | KeyboardEvent | null,
+  event: MaybeSnapEvent,
   origin: Vector2D,
   dragOffset: Vector2D,
 ) => {
@@ -1089,7 +1096,15 @@ export const getSnapLinesAtPointer = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   pointer: Vector2D,
+  event: MaybeSnapEvent,
 ) => {
+  if (!isSnappingEnabled({ event, selectedElements: [], appState })) {
+    return {
+      originOffset: { x: 0, y: 0 },
+      snapLines: [],
+    };
+  }
+
   const referenceElements = getVisibleAndNonSelectedElements(
     elements,
     [],

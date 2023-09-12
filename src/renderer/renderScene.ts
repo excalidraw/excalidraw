@@ -732,18 +732,16 @@ export const _renderScene = ({
     }
 
     // Paint snaps
-    if (appState.objectsSnapModeEnabled) {
-      context.save();
-      context.translate(renderConfig.scrollX, renderConfig.scrollY);
-      renderSnaps(
-        {
-          renderConfig,
-          context,
-        },
-        appState,
-      );
-      context.restore();
-    }
+    context.save();
+    context.translate(renderConfig.scrollX, renderConfig.scrollY);
+    renderSnaps(
+      {
+        renderConfig,
+        context,
+      },
+      appState,
+    );
+    context.restore();
 
     // Reset zoom
     context.restore();

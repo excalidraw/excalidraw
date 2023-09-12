@@ -3497,6 +3497,7 @@ class App extends React.Component<AppProps, AppState> {
           x: scenePointerX,
           y: scenePointerY,
         },
+        event,
       );
 
       this.setState({
