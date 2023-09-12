@@ -78,7 +78,7 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "showGrid": "Show grid",
+    "showGrid": "Show grid (Cmd/Ctrl: No Snap)",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
