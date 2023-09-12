@@ -60,6 +60,10 @@ exports[`exportToSvg > with default arguments 1`] = `
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -81,7 +85,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": false,
-  "snapLines": Array [],
+  "snapLines": [],
   "startBoundElement": null,
   "suggestedBindings": [],
   "theme": "light",
