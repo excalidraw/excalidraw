@@ -3944,8 +3944,7 @@ class App extends React.Component<AppProps, AppState> {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          this.state.gridSize,
-          !event[KEYS.CTRL_OR_CMD],
+          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
         );
 
         const [lastCommittedX, lastCommittedY] =
@@ -4765,8 +4764,7 @@ class App extends React.Component<AppProps, AppState> {
         getGridPoint(
           origin.x,
           origin.y,
-          this.state.gridSize,
-          !event[KEYS.CTRL_OR_CMD],
+          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
         ),
       ),
       scrollbars: isOverScrollBars(
@@ -5294,8 +5292,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       sceneX,
       sceneY,
-      this.state.gridSize,
-      !this.lastPointerDown?.[KEYS.CTRL_OR_CMD],
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const embedLink = getEmbedLink(link);
@@ -5345,8 +5342,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       sceneX,
       sceneY,
-      this.state.gridSize,
-      !this.lastPointerDown?.[KEYS.CTRL_OR_CMD],
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5430,8 +5426,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
-        this.state.gridSize,
-        !event[KEYS.CTRL_OR_CMD],
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5524,8 +5519,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.state.gridSize,
-      !this.lastPointerDown?.[KEYS.CTRL_OR_CMD],
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5583,8 +5577,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.state.gridSize,
-      !this.lastPointerDown?.[KEYS.CTRL_OR_CMD],
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const frame = newFrameElement({
@@ -5667,8 +5660,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
-        !event[KEYS.CTRL_OR_CMD],
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       // for arrows/lines, don't start dragging until a given threshold
@@ -5840,8 +5832,7 @@ class App extends React.Component<AppProps, AppState> {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
-            this.state.gridSize,
-            !event[KEYS.CTRL_OR_CMD],
+            event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
           );
 
           const [dragDistanceX, dragDistanceY] = [
@@ -5908,8 +5899,7 @@ class App extends React.Component<AppProps, AppState> {
                 const [originDragX, originDragY] = getGridPoint(
                   pointerDownState.origin.x - pointerDownState.drag.offset.x,
                   pointerDownState.origin.y - pointerDownState.drag.offset.y,
-                  this.state.gridSize,
-                  !event[KEYS.CTRL_OR_CMD],
+                  event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
                   x: duplicatedElement.x + (originDragX - dragX),
@@ -7702,8 +7692,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
-        event[KEYS.CTRL_OR_CMD],
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const image =
@@ -7772,8 +7761,7 @@ class App extends React.Component<AppProps, AppState> {
     const [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      this.state.gridSize,
-      !event[KEYS.CTRL_OR_CMD],
+      event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const frameElementsOffsetsMap = new Map<

@@ -221,8 +221,7 @@ export class LinearElementEditor {
           element,
           referencePoint,
           [scenePointerX, scenePointerY],
-          appState.gridSize,
-          !event[KEYS.CTRL_OR_CMD],
+          event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
         );
 
         LinearElementEditor.movePoints(element, [
@@ -239,8 +238,7 @@ export class LinearElementEditor {
           element,
           scenePointerX - linearElementEditor.pointerOffset.x,
           scenePointerY - linearElementEditor.pointerOffset.y,
-          appState.gridSize,
-          !event[KEYS.CTRL_OR_CMD],
+          event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
         );
 
         const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
@@ -256,8 +254,7 @@ export class LinearElementEditor {
                     element,
                     scenePointerX - linearElementEditor.pointerOffset.x,
                     scenePointerY - linearElementEditor.pointerOffset.y,
-                    appState.gridSize,
-                    !event[KEYS.CTRL_OR_CMD],
+                    event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
                   )
                 : ([
                     element.points[pointIndex][0] + deltaX,
@@ -650,8 +647,7 @@ export class LinearElementEditor {
               element,
               scenePointer.x,
               scenePointer.y,
-              appState.gridSize,
-              !event[KEYS.CTRL_OR_CMD],
+              event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
             ),
           ],
         });
@@ -802,8 +798,7 @@ export class LinearElementEditor {
         element,
         lastCommittedPoint,
         [scenePointerX, scenePointerY],
-        appState.gridSize,
-        !event[KEYS.CTRL_OR_CMD],
+        event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
       );
 
       newPoint = [
@@ -815,8 +810,7 @@ export class LinearElementEditor {
         element,
         scenePointerX - appState.editingLinearElement.pointerOffset.x,
         scenePointerY - appState.editingLinearElement.pointerOffset.y,
-        appState.gridSize,
-        !event[KEYS.CTRL_OR_CMD],
+        event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
       );
     }
 
@@ -930,14 +924,8 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     gridSize: number | null,
-    snapToGrid: boolean,
   ): Point {
-    const pointerOnGrid = getGridPoint(
-      scenePointerX,
-      scenePointerY,
-      gridSize,
-      snapToGrid,
-    );
+    const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -1209,8 +1197,7 @@ export class LinearElementEditor {
       element,
       pointerCoords.x,
       pointerCoords.y,
-      appState.gridSize,
-      snapToGrid,
+      snapToGrid ? appState.gridSize : null,
     );
     const points = [
       ...element.points.slice(0, segmentMidpoint.index!),
@@ -1263,7 +1250,6 @@ export class LinearElementEditor {
     referencePoint: Point,
     scenePointer: Point,
     gridSize: number | null,
-    snapToGrid: boolean,
   ) {
     const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
       element,
@@ -1274,7 +1260,6 @@ export class LinearElementEditor {
       scenePointer[0],
       scenePointer[1],
       gridSize,
-      snapToGrid,
     );
 
     const { width, height } = getLockedLinearCursorAlignSize(
