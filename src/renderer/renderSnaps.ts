@@ -1,7 +1,8 @@
 import { PointSnapLine, PointerSnapLine, getSnapDistance } from "../snapping";
 import { InteractiveCanvasAppState, Point } from "../types";
 
-const SNAP_COLOR = "#fa5252";
+const SNAP_COLOR_PRIMARY = "#fa5252";
+const SNAP_COLOR_SECONDARY = "#ff8787";
 const SNAP_WIDTH = 2;
 const SNAP_CROSS_SIZE = 3;
 
@@ -10,13 +11,22 @@ export const renderSnaps = (
   appState: InteractiveCanvasAppState,
 ) => {
   context.save();
-  context.lineWidth = SNAP_WIDTH / appState.zoom.value;
-  context.strokeStyle = SNAP_COLOR;
 
   for (const snapLine of appState.snapLines) {
-    if (snapLine.type === "points" || snapLine.type === "pointer") {
-      drawPointSnap(snapLine, context, appState);
+    if (snapLine.type === "points") {
+      context.lineWidth = SNAP_WIDTH / appState.zoom.value;
+      context.strokeStyle = SNAP_COLOR_PRIMARY;
+
+      drawPointsSnapLine(snapLine, context, appState);
+    } else if (snapLine.type === "pointer") {
+      context.lineWidth = SNAP_WIDTH / appState.zoom.value;
+      context.strokeStyle = SNAP_COLOR_SECONDARY;
+
+      drawPointerSnapLine(snapLine, context, appState);
     } else {
+      context.lineWidth = SNAP_WIDTH / appState.zoom.value;
+      context.strokeStyle = SNAP_COLOR_PRIMARY;
+
       drawGapLine(
         snapLine.points[0][0],
         snapLine.points[0][1],
@@ -38,14 +48,25 @@ export const renderSnaps = (
   context.restore();
 };
 
-const drawPointSnap = (
+const drawPointsSnapLine = (
   pointSnapLine: PointSnapLine | PointerSnapLine,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
   drawCross(pointSnapLine.points[0], appState.zoom, context);
   drawLine(pointSnapLine.points[0], pointSnapLine.points[1], context);
-  drawCross(pointSnapLine.points[1], appState.zoom, context);
+  if (pointSnapLine.type === "points") {
+    drawCross(pointSnapLine.points[1], appState.zoom, context);
+  }
+};
+
+const drawPointerSnapLine = (
+  pointerSnapLine: PointerSnapLine,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+) => {
+  drawCross(pointerSnapLine.points[0], appState.zoom, context);
+  drawLine(pointerSnapLine.points[0], pointerSnapLine.points[1], context);
 };
 
 const drawCross = (
