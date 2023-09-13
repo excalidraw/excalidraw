@@ -23,6 +23,7 @@ const sidebars = {
       },
       items: ["introduction/development", "introduction/contributing"],
     },
+    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
     {
       type: "category",
       label: "@excalidraw/excalidraw",
@@ -93,8 +94,37 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Codebase",
-      items: ["codebase/json-schema"],
+      label: "@excalidraw/mermaid-to-excalidraw",
+      link: {
+        type: "doc",
+        id: "@excalidraw/mermaid-to-excalidraw/installation",
+      },
+      items: [
+        "@excalidraw/mermaid-to-excalidraw/api",
+        "@excalidraw/mermaid-to-excalidraw/development",
+        {
+          type: "category",
+          label: "Codebase",
+          link: {
+            type: "doc",
+            id: "@excalidraw/mermaid-to-excalidraw/codebase/codebase",
+          },
+          items: [
+            {
+              type: "category",
+              label: "How Parser works under the hood?",
+              link: {
+                type: "doc",
+                id: "@excalidraw/mermaid-to-excalidraw/codebase/parser/parser",
+              },
+              items: [
+                "@excalidraw/mermaid-to-excalidraw/codebase/parser/flowchart",
+              ],
+            },
+            "@excalidraw/mermaid-to-excalidraw/codebase/new-diagram-type",
+          ],
+        },
+      ],
     },
   ],
 };
