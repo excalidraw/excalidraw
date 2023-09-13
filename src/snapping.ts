@@ -541,9 +541,6 @@ export const getPointSnaps = (
 
   const referenceSnapPoints = getMaximumGroups(referenceElements)
     .filter(
-      (elementsGroup) => !elementsGroup.every((element) => element.locked),
-    )
-    .filter(
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
