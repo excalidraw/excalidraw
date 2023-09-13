@@ -94,6 +94,10 @@ const sidebars = {
     {
       type: "category",
       label: "@excalidraw/mermaid-to-excalidraw",
+      link: {
+        type: "doc",
+        id: "@excalidraw/mermaid-to-excalidraw/installation",
+      },
       items: [
         "@excalidraw/mermaid-to-excalidraw/installation",
         "@excalidraw/mermaid-to-excalidraw/api",
