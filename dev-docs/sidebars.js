@@ -99,7 +99,6 @@ const sidebars = {
         id: "@excalidraw/mermaid-to-excalidraw/installation",
       },
       items: [
-        "@excalidraw/mermaid-to-excalidraw/installation",
         "@excalidraw/mermaid-to-excalidraw/api",
         "@excalidraw/mermaid-to-excalidraw/development",
         {
