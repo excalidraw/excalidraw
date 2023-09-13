@@ -80,7 +80,7 @@ The `<Sidebar>` component takes these props (all are optional except `children`)
 | --- | --- | --- |
 | `children` | `React.ReactNode` | Content you want to render inside the `sidebar`. |
 | `onClose` | `function` | Invoked when the component is closed (by user, or the editor). No need to act on this event, as the editor manages the sidebar open state on its own. |
-| `onDock` | `function` | Invoked when the user toggles the `dock` button. The callback recieves a `boolean` parameter `isDocked` which indicates whether the sidebar is `docked` |
+| `onDock` | `function` | Invoked when the user toggles the `dock` button. The callback receives a `boolean` parameter `isDocked` which indicates whether the sidebar is `docked` |
 | `docked` | `boolean` | Indicates whether the sidebar is`docked`. By default, the sidebar is `undocked`. If passed, the docking becomes controlled, and you are responsible for updating the `docked` state by listening on `onDock` callback. To decide the breakpoint for docking you can use [UIOptions.dockedSidebarBreakpoint](/docs/@excalidraw/excalidraw/api/props/ui-options#dockedsidebarbreakpoint) for more info on docking. |
 | `dockable` | `boolean` | Indicates whether to show the `dock` button so that user can `dock` the sidebar. If `false`, you can still dock programmatically by passing `docked` as `true`. |
 

@@ -1,27 +1,14 @@
 # API
 
-Once the library is installed, its ready to use.
+At the moment the mermaid-to-excalidraw works in two steps. First, you call `parseMermaidToExcalidraw(mermaidSyntax)` on the mermaid diagram definition string, which resolves with elements in a skeleton format — a simplified excalidraw JSON format (docs coming soon). You then pass them to `convertToExcalidrawElements(elements)` to get the fully qualified excalidraw elements you can render in the editor.
 
-```js
-import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
-
-try {
-  const { elements, files } = await parseMermaid(diagramDefinition, {
-    fontSize: DEFAULT_FONT_SIZE,
-  });
-  
-  // Render elements and files on Excalidraw
-} catch (e) {
-  // Error handling
-}
-```
+The need for these two steps is due to the [@excalidraw/excalidraw](/docs/@excalidraw/excalidraw/installation) being a **UMD** build so we currently cannot import the `convertToExcalidrawElements()` util alone, until we support a tree-shakeable **ESM** build.
 
 ## parseMermaidToExcalidraw
 
-This API recieves the mermaid syntax as the input, parses the mermaid syntax and resolves to Excalidraw Skeleton.
-You will need to call `convertToExcalidraw` API to convert the element skeleton to excalidraw elements.
+This API receives the mermaid syntax as the input, and resolves to skeleton Excalidraw elements. You will need to call `convertToExcalidraw` API to convert them to fully qualified elements that you can render in Excalidraw.
 
-** Signature **
+** Example **
 
 ```ts
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
@@ -37,20 +24,9 @@ try {
 }
 ```
 
-** How to use **
-
-```js
-import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
-```
-
-Since the elements returned from the parser are not fully Excalidraw Elements hence you will need to the call the API `convertToExcalidrawElements` before rendering it to Excalidraw.
-
-This limitation is due to the[@excalidraw/excalidraw](/docs/@excalidraw/excalidraw/installation) being a **UMD** build so we cannot export just the util yet, hence the host will need to keep using this function unless we support **ESM** build.
-
 ## Supported Diagram Types
 
-Currently only [flowcharts](https://mermaid.js.org/syntax/flowchart.html) are supported. The other diagram types will be rendered as an image in Excalidraw.
-
+Currently only [flowcharts](https://mermaid.js.org/syntax/flowchart.html) are supported. Oother diagram types will be rendered as an image in Excalidraw.
 
 ### Flowchart
 

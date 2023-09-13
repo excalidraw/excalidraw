@@ -26,6 +26,8 @@ try {
   const { elements, files } = await parseMermaid(diagramDefinition, {
     fontSize: DEFAULT_FONT_SIZE,
   });
+  // currently the elements returned from the parser are in a "skeleton" format
+  // which we need to convert to fully qualified excalidraw elements first
   const excalidrawElements = convertToExcalidrawElements(elements);
 
   // Render elements and files on Excalidraw

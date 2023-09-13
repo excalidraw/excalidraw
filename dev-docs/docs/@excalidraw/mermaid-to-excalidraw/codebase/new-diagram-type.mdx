@@ -38,9 +38,9 @@ Add the diagram type in switch case in [`parseMermaid`](https://github.com/excal
 
 ## Writing the Excalidraw Skeleton Convertor
 
-With the completion of previous step, we have all the data, now we need to transform it so to ExcalidrawElementSkeleton API.
+With the completion of previous step, we have all the data, now we need to transform it so to ExcalidrawElementSkeleton format.
 
-Similar to [`FlowChartToExcalidrawSkeletonConverter`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24), you have to write the `{{diagramType}}ToExcalidrawSkeletonConverter` which parses the data recieved in previous step and returns the ExcalidrawElementSkeleton.
+Similar to [`FlowChartToExcalidrawSkeletonConverter`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24), you have to write the `{{diagramType}}ToExcalidrawSkeletonConverter` which parses the data received in previous step and returns the ExcalidrawElementSkeleton.
 
 Thats it, you have added the new diagram type 🥳, now lets test it out!
 
