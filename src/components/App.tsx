@@ -357,8 +357,8 @@ import { ShapeCache } from "../scene/ShapeCache";
 import {
   calculateConstrainedScrollCenter,
   constrainScrollState,
-  isViewportOutsideOfConstrainedArea,
 } from "../scene/scrollConstraints";
+import { cancelRender } from "../renderer/renderScene";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -428,6 +428,8 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+let scrollConstraintsAnimationTimeout: ReturnType<typeof setTimeout> | null =
+  null;
 
 /**
  * Map of youtube embed video states
@@ -2005,58 +2007,6 @@ class App extends React.Component<AppProps, AppState> {
         this.files,
       );
     }
-
-    if (
-      this.state.scrollConstraints &&
-      isViewportOutsideOfConstrainedArea(this.state) &&
-      prevState.cursorButton === "down" &&
-      this.state.cursorButton !== "down" &&
-      !this.state.isLoading
-    ) {
-      const state = constrainScrollState(this.state);
-      const cancel = easeToValuesRAF({
-        fromValues: {
-          scrollX: this.state.scrollX,
-          scrollY: this.state.scrollY,
-          zoom: this.state.zoom.value,
-        },
-        toValues: {
-          scrollX: state.scrollX,
-          scrollY: state.scrollY,
-          zoom: state.zoom.value,
-        },
-        interpolateValue: (from, to, progress, key) => {
-          // for zoom, use different easing
-          if (key === "zoom") {
-            return from * Math.pow(to / from, easeOut(progress));
-          }
-          // handle using default
-          return undefined;
-        },
-        onStep: ({ scrollX, scrollY, zoom }) => {
-          this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: getNormalizedZoom(zoom) },
-          });
-        },
-        onStart: () => {
-          this.setState({ shouldCacheIgnoreZoom: true });
-        },
-        onEnd: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
-        },
-        onCancel: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
-        },
-        duration: 500,
-      });
-
-      this.cancelInProgresAnimation = () => {
-        cancel();
-        this.cancelInProgresAnimation = null;
-      };
-    }
   }
 
   private renderInteractiveSceneCallback = ({
@@ -2725,6 +2675,9 @@ class App extends React.Component<AppProps, AppState> {
     stateUpdate,
   ) => {
     this.cancelInProgresAnimation?.();
+    if (scrollConstraintsAnimationTimeout) {
+      clearTimeout(scrollConstraintsAnimationTimeout);
+    }
 
     const partialNewState =
       typeof stateUpdate === "function"
@@ -2739,11 +2692,87 @@ class App extends React.Component<AppProps, AppState> {
     const newState: AppState = {
       ...this.state,
       ...partialNewState,
+      ...(this.state.scrollConstraints && {
+        // manually reset if setState in onCancel wasn't committed yet
+        shouldCacheIgnoreZoom: false,
+        scrollConstraints: {
+          ...this.state.scrollConstraints,
+          isAnimating: false,
+        },
+      }),
     };
 
-    const state = constrainScrollState(newState);
+    const { state, shouldAnimate, animateTo } = constrainScrollState(newState);
 
-    this.setState(state);
+    this.setState(state, () => {
+      if (shouldAnimate && animateTo) {
+        scrollConstraintsAnimationTimeout = setTimeout(() => {
+          const cancel = easeToValuesRAF({
+            fromValues: {
+              scrollX: newState.scrollX,
+              scrollY: newState.scrollY,
+              zoom: newState.zoom.value,
+            },
+            toValues: {
+              scrollX: animateTo.scrollX,
+              scrollY: animateTo.scrollY,
+              zoom: animateTo.zoom.value,
+            },
+            interpolateValue: (from, to, progress, key) => {
+              // for zoom, use different easing
+              if (key === "zoom") {
+                return from * Math.pow(to / from, easeOut(progress));
+              }
+              // handle using default
+              return undefined;
+            },
+            onStep: ({ scrollX, scrollY, zoom }) => {
+              this.setState({
+                scrollX,
+                scrollY,
+                zoom: { value: getNormalizedZoom(zoom) },
+              });
+            },
+            onStart: () => {
+              this.setState((inAnimationState) => ({
+                shouldCacheIgnoreZoom: true,
+                scrollConstraints: {
+                  ...inAnimationState.scrollConstraints!, // existance scrollConstraints is checked in test for shouldAnimate
+                  isAnimating: true,
+                },
+              }));
+              cancelRender();
+            },
+            onEnd: () => {
+              this.setState((inAnimationState) => ({
+                shouldCacheIgnoreZoom: false,
+                scrollConstraints: {
+                  ...inAnimationState.scrollConstraints!,
+                  isAnimating: false,
+                },
+              }));
+            },
+            onCancel: () => {
+              this.setState((inAnimationState) => {
+                return {
+                  shouldCacheIgnoreZoom: false,
+                  scrollConstraints: {
+                    ...inAnimationState.scrollConstraints!,
+                    isAnimating: false,
+                  },
+                };
+              });
+            },
+            duration: 200,
+          });
+
+          this.cancelInProgresAnimation = () => {
+            cancel();
+            this.cancelInProgresAnimation = null;
+          };
+        }, 200);
+      }
+    });
   };
 
   setToast = (

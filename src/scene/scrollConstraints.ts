@@ -286,9 +286,9 @@ const constrainScrollValues = ({
  * @param state - The application state containing scroll, zoom, and constraint information.
  * @returns True if the viewport is outside the constrained area; otherwise undefined.
  */
-export const isViewportOutsideOfConstrainedArea = (state: AppState) => {
+const isViewportOutsideOfConstrainedArea = (state: AppState) => {
   if (!state.scrollConstraints) {
-    return;
+    return false;
   }
 
   const { scrollX, scrollY, width, height, scrollConstraints } = state;
@@ -307,19 +307,21 @@ export const isViewportOutsideOfConstrainedArea = (state: AppState) => {
  * @param state - The original AppState with the current scroll position, dimensions, and constraints.
  * @returns A new AppState object with scroll values constrained as per the defined constraints.
  */
-export const constrainScrollState = (state: AppState): AppState => {
+export const constrainScrollState = (
+  state: AppState,
+): {
+  state: AppState;
+  shouldAnimate: boolean;
+  animateTo: {
+    scrollX: AppState["scrollX"];
+    scrollY: AppState["scrollY"];
+    zoom: AppState["zoom"];
+  } | null;
+} => {
   if (!state.scrollConstraints || state.scrollConstraints.isAnimating) {
-    return state;
+    return { state, shouldAnimate: false, animateTo: null };
   }
-  const {
-    scrollX,
-    scrollY,
-    width,
-    height,
-    scrollConstraints,
-    zoom,
-    cursorButton,
-  } = state;
+  const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;
 
   const constrainedValues = constrainScrollValues({
     ...calculateConstraints({
@@ -327,22 +329,41 @@ export const constrainScrollState = (state: AppState): AppState => {
       width,
       height,
       zoom,
-      cursorButton,
+      cursorButton: "down",
     }),
     scrollX,
     scrollY,
   });
 
-  const isStateChanged =
-    constrainedValues.scrollX !== scrollX ||
-    constrainedValues.scrollY !== scrollY;
+  const shouldAnimate = isViewportOutsideOfConstrainedArea(state);
 
-  if (isStateChanged) {
+  const animateTo = shouldAnimate
+    ? constrainScrollValues({
+        ...calculateConstraints({
+          scrollConstraints,
+          width,
+          height,
+          zoom,
+          cursorButton: "up",
+        }),
+        scrollX,
+        scrollY,
+      })
+    : null;
+
+  if (
+    constrainedValues.scrollX !== scrollX ||
+    constrainedValues.scrollY !== scrollY
+  ) {
     return {
-      ...state,
-      ...constrainedValues,
+      state: {
+        ...state,
+        ...constrainedValues,
+      },
+      shouldAnimate,
+      animateTo,
     };
   }
 
-  return state;
+  return { state, shouldAnimate, animateTo };
 };
