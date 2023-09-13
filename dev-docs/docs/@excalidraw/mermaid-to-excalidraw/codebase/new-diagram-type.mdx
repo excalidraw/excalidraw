@@ -22,7 +22,7 @@ Once this is done the new diagram type won't be rendered as an image but start t
 
 Once the diagram type is added in previous step. Next step is to write the parser to parse the mermaid diagram.
 
-For this create a file named `{{diagramType}}.ts` in [`src/converter/types`](https://github.com/excalidraw/mermaid-to-excalidraw/tree/master/src/converter/types) and write a function `parseMermaid{{diagramType}}Diagram` similar to how we [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L438) for parsing flowchart diagram.
+For this create a file named `{{diagramType}}.ts` in [`src/parser`](https://github.com/excalidraw/mermaid-to-excalidraw/tree/master/src/parser) and write a function `parseMermaid{{diagramType}}Diagram` similar to how we [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parser/flowchart.ts#L256) for parsing flowchart diagram.
 
 The main aim of the parser is :point_down:
 
