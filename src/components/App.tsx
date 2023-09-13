@@ -228,6 +228,7 @@ import {
   SidebarName,
   SidebarTabName,
   ScrollConstraints,
+  AnimateTranslateCanvasValues,
 } from "../types";
 import {
   debounce,
@@ -2627,28 +2628,18 @@ class App extends React.Component<AppProps, AppState> {
       const origScrollY = this.state.scrollY;
       const origZoom = this.state.zoom.value;
 
-      const cancel = easeToValuesRAF({
-        fromValues: {
-          scrollX: origScrollX,
-          scrollY: origScrollY,
-          zoom: origZoom,
-        },
-        toValues: { scrollX, scrollY, zoom: zoom.value },
-        interpolateValue: (from, to, progress, key) => {
-          // for zoom, use different easing
-          if (key === "zoom") {
-            return from * Math.pow(to / from, easeOut(progress));
-          }
-          // handle using default
-          return undefined;
-        },
-        onStep: ({ scrollX, scrollY, zoom }) => {
-          this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: zoom },
-          });
-        },
+      const fromValues = {
+        scrollX: this.state.scrollX,
+        scrollY: this.state.scrollY,
+        zoom: this.state.zoom.value,
+      };
+
+      const toValues = { scrollX, scrollY, zoom: zoom.value };
+
+      this.animateTranslateCanvas({
+        fromValues,
+        toValues,
+        duration: opts?.duration ?? 500,
         onStart: () => {
           this.setState({ shouldCacheIgnoreZoom: true });
         },
@@ -2658,13 +2649,7 @@ class App extends React.Component<AppProps, AppState> {
         onCancel: () => {
           this.setState({ shouldCacheIgnoreZoom: false });
         },
-        duration: opts?.duration ?? 500,
       });
-
-      this.cancelInProgresAnimation = () => {
-        cancel();
-        this.cancelInProgresAnimation = null;
-      };
     } else {
       this.setState({ scrollX, scrollY, zoom });
     }
@@ -2707,72 +2692,90 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state, () => {
       if (shouldAnimate && animateTo) {
         scrollConstraintsAnimationTimeout = setTimeout(() => {
-          const cancel = easeToValuesRAF({
-            fromValues: {
-              scrollX: newState.scrollX,
-              scrollY: newState.scrollY,
-              zoom: newState.zoom.value,
-            },
-            toValues: {
-              scrollX: animateTo.scrollX,
-              scrollY: animateTo.scrollY,
-              zoom: animateTo.zoom.value,
-            },
-            interpolateValue: (from, to, progress, key) => {
-              // for zoom, use different easing
-              if (key === "zoom") {
-                return from * Math.pow(to / from, easeOut(progress));
-              }
-              // handle using default
-              return undefined;
-            },
-            onStep: ({ scrollX, scrollY, zoom }) => {
-              this.setState({
-                scrollX,
-                scrollY,
-                zoom: { value: getNormalizedZoom(zoom) },
-              });
-            },
+          const fromValues = {
+            scrollX: newState.scrollX,
+            scrollY: newState.scrollY,
+            zoom: newState.zoom.value,
+          };
+          const toValues = {
+            scrollX: animateTo.scrollX,
+            scrollY: animateTo.scrollY,
+            zoom: animateTo.zoom.value,
+          };
+          const cleanUp = () => {
+            this.setState((inAnimationState) => ({
+              shouldCacheIgnoreZoom: false,
+              scrollConstraints: {
+                ...inAnimationState.scrollConstraints!,
+                isAnimating: false,
+              },
+            }));
+          };
+
+          this.animateTranslateCanvas({
+            fromValues,
+            toValues,
+            duration: 200,
             onStart: () => {
               this.setState((inAnimationState) => ({
                 shouldCacheIgnoreZoom: true,
                 scrollConstraints: {
-                  ...inAnimationState.scrollConstraints!, // existance scrollConstraints is checked in test for shouldAnimate
+                  ...inAnimationState.scrollConstraints!,
                   isAnimating: true,
                 },
               }));
-              cancelRender();
             },
-            onEnd: () => {
-              this.setState((inAnimationState) => ({
-                shouldCacheIgnoreZoom: false,
-                scrollConstraints: {
-                  ...inAnimationState.scrollConstraints!,
-                  isAnimating: false,
-                },
-              }));
-            },
-            onCancel: () => {
-              this.setState((inAnimationState) => {
-                return {
-                  shouldCacheIgnoreZoom: false,
-                  scrollConstraints: {
-                    ...inAnimationState.scrollConstraints!,
-                    isAnimating: false,
-                  },
-                };
-              });
-            },
-            duration: 200,
+            onEnd: cleanUp,
+            onCancel: cleanUp,
           });
-
-          this.cancelInProgresAnimation = () => {
-            cancel();
-            this.cancelInProgresAnimation = null;
-          };
         }, 200);
       }
     });
+  };
+
+  animateTranslateCanvas = ({
+    fromValues,
+    toValues,
+    duration,
+    onStart,
+    onEnd,
+    onCancel,
+  }: {
+    fromValues: AnimateTranslateCanvasValues;
+    toValues: AnimateTranslateCanvasValues;
+    duration: number;
+    onStart: () => void;
+    onEnd: () => void;
+    onCancel: () => void;
+  }) => {
+    const cancel = easeToValuesRAF({
+      fromValues,
+      toValues,
+      interpolateValue: (from, to, progress, key) => {
+        // for zoom, use different easing
+        if (key === "zoom") {
+          return from * Math.pow(to / from, easeOut(progress));
+        }
+        // handle using default
+        return undefined;
+      },
+      onStep: ({ scrollX, scrollY, zoom }) => {
+        this.setState({
+          scrollX,
+          scrollY,
+          zoom: { value: zoom },
+        });
+      },
+      onStart,
+      onEnd,
+      onCancel,
+      duration,
+    });
+
+    this.cancelInProgresAnimation = () => {
+      cancel();
+      this.cancelInProgresAnimation = null;
+    };
   };
 
   setToast = (

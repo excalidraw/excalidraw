@@ -665,3 +665,9 @@ export type ScrollConstraints = {
   viewportZoomFactor?: number;
   lockZoom?: boolean;
 };
+
+export type AnimateTranslateCanvasValues = {
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  zoom: AppState["zoom"]["value"];
+};
