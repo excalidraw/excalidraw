@@ -1,4 +1,5 @@
 import { AppState, ScrollConstraints } from "../types";
+import { isShallowEqual } from "../utils";
 import { getNormalizedZoom } from "./zoom";
 
 /**
@@ -301,6 +302,15 @@ const isViewportOutsideOfConstrainedArea = (state: AppState) => {
   );
 };
 
+let memoizedValues: {
+  previousState: Pick<
+    AppState,
+    "zoom" | "width" | "height" | "scrollConstraints"
+  >;
+  constraints: ReturnType<typeof calculateConstraints>;
+  constraintsWithoutOverscroll: ReturnType<typeof calculateConstraints>;
+} | null = null;
+
 /**
  * Constrains the AppState scroll values within the defined scroll constraints.
  *
@@ -323,47 +333,75 @@ export const constrainScrollState = (
   }
   const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;
 
+  const canUseMemoizedValues =
+    memoizedValues?.previousState.scrollConstraints && // can't use memoized values if there were no scrollConstraints in memoizedValues
+    memoizedValues && // there are memoized values
+    isShallowEqual(
+      // current scrollConstraints are the same as in memoizedValues
+      state.scrollConstraints,
+      memoizedValues.previousState.scrollConstraints!,
+    ) &&
+    isShallowEqual(
+      // current zoom and window dimensions are equal to those in memoizedValues
+      { zoom: zoom.value, width, height },
+      {
+        zoom: memoizedValues.previousState.zoom.value,
+        width: memoizedValues.previousState.width,
+        height: memoizedValues.previousState.height,
+      },
+    );
+
+  const constraints = canUseMemoizedValues
+    ? memoizedValues!.constraints
+    : calculateConstraints({
+        scrollConstraints,
+        width,
+        height,
+        zoom,
+        cursorButton: "down",
+      });
+
+  const constraintsWithoutOverscroll = canUseMemoizedValues
+    ? memoizedValues!.constraintsWithoutOverscroll
+    : calculateConstraints({
+        scrollConstraints,
+        width,
+        height,
+        zoom,
+        cursorButton: "up",
+      });
+
   const constrainedValues = constrainScrollValues({
-    ...calculateConstraints({
-      scrollConstraints,
-      width,
-      height,
-      zoom,
-      cursorButton: "down",
-    }),
+    ...constraints,
     scrollX,
     scrollY,
   });
 
-  const shouldAnimate = isViewportOutsideOfConstrainedArea(state);
+  const animateTo = constrainScrollValues({
+    ...constraintsWithoutOverscroll,
+    scrollX,
+    scrollY,
+  });
 
-  const animateTo = shouldAnimate
-    ? constrainScrollValues({
-        ...calculateConstraints({
-          scrollConstraints,
-          width,
-          height,
-          zoom,
-          cursorButton: "up",
-        }),
-        scrollX,
-        scrollY,
-      })
-    : null;
-
-  if (
-    constrainedValues.scrollX !== scrollX ||
-    constrainedValues.scrollY !== scrollY
-  ) {
-    return {
-      state: {
-        ...state,
-        ...constrainedValues,
+  if (!canUseMemoizedValues) {
+    memoizedValues = {
+      previousState: {
+        zoom: state.zoom,
+        width: state.width,
+        height: state.height,
+        scrollConstraints: state.scrollConstraints,
       },
-      shouldAnimate,
-      animateTo,
+      constraints,
+      constraintsWithoutOverscroll,
     };
   }
 
-  return { state, shouldAnimate, animateTo };
+  return {
+    state: {
+      ...state,
+      ...constrainedValues,
+    },
+    shouldAnimate: isViewportOutsideOfConstrainedArea(state),
+    animateTo,
+  };
 };
