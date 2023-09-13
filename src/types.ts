@@ -88,7 +88,7 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 export type LastActiveTool =
   | {
       type:
-        | typeof SHAPES[number]["value"]
+        | (typeof SHAPES)[number]["value"]
         | "eraser"
         | "hand"
         | "frame"
@@ -196,7 +196,7 @@ export type AppState = {
   } & (
     | {
         type:
-          | typeof SHAPES[number]["value"]
+          | (typeof SHAPES)[number]["value"]
           | "eraser"
           | "hand"
           | "frame"

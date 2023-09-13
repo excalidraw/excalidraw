@@ -372,7 +372,7 @@ export const updateActiveTool = (
   data: (
     | {
         type:
-          | typeof SHAPES[number]["value"]
+          | (typeof SHAPES)[number]["value"]
           | "eraser"
           | "hand"
           | "frame"

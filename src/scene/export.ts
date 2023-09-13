@@ -167,8 +167,8 @@ export const exportToSvg = async (
 
     exportingFrameClipPath = `<clipPath id=${exportingFrame.id}>
             <rect transform="translate(${exportingFrame.x + offsetX} ${
-      exportingFrame.y + offsetY
-    }) rotate(${exportingFrame.angle} ${cx} ${cy})"
+              exportingFrame.y + offsetY
+            }) rotate(${exportingFrame.angle} ${cx} ${cy})"
           width="${exportingFrame.width}"
           height="${exportingFrame.height}"
           >
@@ -235,10 +235,13 @@ const getCanvasSize = (
   if (!isExportingWholeCanvas || onlyExportingSingleFrame) {
     const frames = elements.filter((element) => element.type === "frame");
 
-    const exportedFrameIds = frames.reduce((acc, frame) => {
-      acc[frame.id] = true;
-      return acc;
-    }, {} as Record<string, true>);
+    const exportedFrameIds = frames.reduce(
+      (acc, frame) => {
+        acc[frame.id] = true;
+        return acc;
+      },
+      {} as Record<string, true>,
+    );
 
     // elements in a frame do not affect the canvas size if we're not exporting
     // the whole canvas

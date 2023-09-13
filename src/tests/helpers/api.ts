@@ -34,10 +34,13 @@ const { h } = window;
 export class API {
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
     h.setState({
-      selectedElementIds: elements.reduce((acc, element) => {
-        acc[element.id] = true;
-        return acc;
-      }, {} as Record<ExcalidrawElement["id"], true>),
+      selectedElementIds: elements.reduce(
+        (acc, element) => {
+          acc[element.id] = true;
+          return acc;
+        },
+        {} as Record<ExcalidrawElement["id"], true>,
+      ),
     });
   };
 

@@ -29,10 +29,13 @@ export const actionSelectAllElementsInFrame = register({
         elements,
         appState: {
           ...appState,
-          selectedElementIds: elementsInFrame.reduce((acc, element) => {
-            acc[element.id] = true;
-            return acc;
-          }, {} as Record<ExcalidrawElement["id"], true>),
+          selectedElementIds: elementsInFrame.reduce(
+            (acc, element) => {
+              acc[element.id] = true;
+              return acc;
+            },
+            {} as Record<ExcalidrawElement["id"], true>,
+          ),
         },
         commitToHistory: false,
       };
