@@ -6518,7 +6518,7 @@ class App extends React.Component<AppProps, AppState> {
             }
 
             nextElements = updateFrameMembershipOfSelectedElements(
-              this.scene.getElementsIncludingDeleted(),
+              nextElements,
               this.state,
               this,
             );
