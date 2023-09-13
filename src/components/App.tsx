@@ -2624,10 +2624,6 @@ class App extends React.Component<AppProps, AppState> {
     // when animating, we use RequestAnimationFrame to prevent the animation
     // from slowing down other processes
     if (opts?.animate) {
-      const origScrollX = this.state.scrollX;
-      const origScrollY = this.state.scrollY;
-      const origZoom = this.state.zoom.value;
-
       const fromValues = {
         scrollX: this.state.scrollX,
         scrollY: this.state.scrollY,
@@ -2702,38 +2698,46 @@ class App extends React.Component<AppProps, AppState> {
             scrollY: animateTo.scrollY,
             zoom: animateTo.zoom.value,
           };
-          const cleanUp = () => {
-            this.setState((inAnimationState) => ({
-              shouldCacheIgnoreZoom: false,
-              scrollConstraints: {
-                ...inAnimationState.scrollConstraints!,
-                isAnimating: false,
-              },
-            }));
-          };
 
-          this.animateTranslateCanvas({
-            fromValues,
-            toValues,
-            duration: 200,
-            onStart: () => {
-              this.setState((inAnimationState) => ({
-                shouldCacheIgnoreZoom: true,
-                scrollConstraints: {
-                  ...inAnimationState.scrollConstraints!,
-                  isAnimating: true,
-                },
-              }));
-            },
-            onEnd: cleanUp,
-            onCancel: cleanUp,
-          });
+          this.animateToConstrainedArea(fromValues, toValues);
         }, 200);
       }
     });
   };
 
-  animateTranslateCanvas = ({
+  private animateToConstrainedArea = (
+    fromValues: AnimateTranslateCanvasValues,
+    toValues: AnimateTranslateCanvasValues,
+  ) => {
+    const cleanUp = () => {
+      this.setState((state) => ({
+        shouldCacheIgnoreZoom: false,
+        scrollConstraints: {
+          ...state.scrollConstraints!,
+          isAnimating: false,
+        },
+      }));
+    };
+
+    this.animateTranslateCanvas({
+      fromValues,
+      toValues,
+      duration: 200,
+      onStart: () => {
+        this.setState((state) => ({
+          shouldCacheIgnoreZoom: true,
+          scrollConstraints: {
+            ...state.scrollConstraints!,
+            isAnimating: true,
+          },
+        }));
+      },
+      onEnd: cleanUp,
+      onCancel: cleanUp,
+    });
+  };
+
+  private animateTranslateCanvas = ({
     fromValues,
     toValues,
     duration,
@@ -8239,10 +8243,31 @@ class App extends React.Component<AppProps, AppState> {
     scrollConstraints: ScrollConstraints | null,
   ) => {
     if (scrollConstraints) {
-      this.setState({
-        scrollConstraints,
-        viewModeEnabled: true,
-      });
+      this.setState(
+        {
+          scrollConstraints,
+          viewModeEnabled: true,
+        },
+        () => {
+          const { animateTo } = constrainScrollState({
+            ...this.state,
+            scrollConstraints,
+          });
+
+          this.animateToConstrainedArea(
+            {
+              scrollX: this.state.scrollX,
+              scrollY: this.state.scrollY,
+              zoom: this.state.zoom.value,
+            },
+            {
+              scrollX: animateTo!.scrollX,
+              scrollY: animateTo!.scrollY,
+              zoom: animateTo!.zoom.value,
+            },
+          );
+        },
+      );
     } else {
       this.setState({
         scrollConstraints: null,
