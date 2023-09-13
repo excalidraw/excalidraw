@@ -106,7 +106,17 @@ const sidebars = {
             id: "@excalidraw/mermaid-to-excalidraw/codebase/codebase",
           },
           items: [
-            "@excalidraw/mermaid-to-excalidraw/codebase/parser",
+            {
+              type: "category",
+              label: "How Parser works under the hood?",
+              link: {
+                type: "doc",
+                id: "@excalidraw/mermaid-to-excalidraw/codebase/parser/parser",
+              },
+              items: [
+                "@excalidraw/mermaid-to-excalidraw/codebase/parser/flowchart",
+              ],
+            },
             "@excalidraw/mermaid-to-excalidraw/codebase/new-diagram-type",
           ],
         },
