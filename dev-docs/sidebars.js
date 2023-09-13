@@ -107,7 +107,7 @@ const sidebars = {
           },
           items: [
             "@excalidraw/mermaid-to-excalidraw/codebase/parser",
-            "@excalidraw/mermaid-to-excalidraw/codebase/new-chart",
+            "@excalidraw/mermaid-to-excalidraw/codebase/new-diagram-type",
           ],
         },
       ],
