@@ -49,7 +49,7 @@ export const calculateConstrainedScrollCenter = (
     width,
     height,
     zoom: _zoom,
-    cursorButton: "up",
+    allowOverscroll: false,
   });
 
   return {
@@ -98,13 +98,13 @@ const calculateConstraints = ({
   width,
   height,
   zoom,
-  cursorButton,
+  allowOverscroll,
 }: {
   scrollConstraints: ScrollConstraints;
   width: AppState["width"];
   height: AppState["height"];
   zoom: AppState["zoom"];
-  cursorButton: AppState["cursorButton"];
+  allowOverscroll: boolean;
 }) => {
   // Set the overscroll allowance percentage
   const OVERSCROLL_ALLOWANCE_PERCENTAGE = 0.2;
@@ -158,7 +158,7 @@ const calculateConstraints = ({
     let minScrollY;
 
     // Handling the X-axis
-    if (cursorButton === "down") {
+    if (allowOverscroll) {
       if (shouldAdjustForCenteredViewX) {
         maxScrollX = constrainedScrollCenterX + overscrollAllowance;
         minScrollX = constrainedScrollCenterX - overscrollAllowance;
@@ -179,7 +179,7 @@ const calculateConstraints = ({
     }
 
     // Handling the Y-axis
-    if (cursorButton === "down") {
+    if (allowOverscroll) {
       if (shouldAdjustForCenteredViewY) {
         maxScrollY = constrainedScrollCenterY + overscrollAllowance;
         minScrollY = constrainedScrollCenterY - overscrollAllowance;
@@ -360,7 +360,7 @@ export const constrainScrollState = (
         width,
         height,
         zoom,
-        cursorButton: "down",
+        allowOverscroll: true,
       });
 
   const constraintsWithoutOverscroll = canUseMemoizedValues
@@ -370,7 +370,7 @@ export const constrainScrollState = (
         width,
         height,
         zoom,
-        cursorButton: "up",
+        allowOverscroll: false,
       });
 
   const constrainedValues = constrainScrollValues({
