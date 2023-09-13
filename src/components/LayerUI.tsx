@@ -32,9 +32,11 @@ import { UserList } from "./UserList";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { useDevice } from "../components/App";
+import { useDevice, useExcalidrawAppState } from "../components/App";
+import { ToolButton } from "../components/ToolButton";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
+import { actionSaveToActiveFile } from "../actions/actionExport";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
@@ -134,6 +136,7 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
+  const { fileHandle } = useExcalidrawAppState();
 
   const [eyeDropperState, setEyeDropperState] = useAtom(
     activeEyeDropperAtom,
@@ -218,10 +221,25 @@ const LayerUI = ({
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
-            {renderCanvasActions()}
-            {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
-          </Stack.Col>
+          <div className="App-menu_top_left_container">
+            <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
+              {renderCanvasActions()}
+              {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
+            </Stack.Col>
+            {fileHandle !== null && (
+              <ToolButton
+                type="button"
+                onClick={() =>
+                  actionManager.executeAction(actionSaveToActiveFile)
+                }
+                className="excalidraw-button save-button"
+                title={`${t("buttons.save")}`}
+                aria-label={`${t("buttons.save")}`}
+              >
+                {fileHandle.name}
+              </ToolButton>
+            )}
+          </div>
           {!appState.viewModeEnabled && (
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (

@@ -2,6 +2,14 @@
 @import "../css/variables.module";
 
 .excalidraw {
+  .save-button {
+    max-width: 180px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    --button-width: auto;
+    --button-height: auto;
+  }
   .layer-ui__wrapper.animate {
     transition: width 0.1s ease-in-out;
   }

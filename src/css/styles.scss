@@ -316,6 +316,13 @@
     }
   }
 
+  .App-menu_top_left_container {
+    cursor: pointer;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
   .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
     pointer-events: all;
   }
