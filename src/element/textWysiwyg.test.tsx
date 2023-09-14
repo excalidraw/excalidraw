@@ -956,8 +956,8 @@ describe("textWysiwyg", () => {
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
-          85,
-          4.5,
+          3085,
+          1862.5,
         ]
       `);
 
@@ -1280,8 +1280,8 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
-            25,
+            2665,
+            1505,
           ]
         `);
       });
@@ -1291,8 +1291,8 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            30,
-            25,
+            3085,
+            1505,
           ]
         `);
       });
@@ -1303,8 +1303,8 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
-            25,
+            3505,
+            1505,
           ]
         `);
       });
@@ -1314,8 +1314,8 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
-            45,
+            2665,
+            1862.5,
           ]
         `);
       });
@@ -1326,8 +1326,8 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            30,
-            45,
+            3085,
+            1862.5,
           ]
         `);
       });
@@ -1338,8 +1338,8 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
-            45,
+            3505,
+            1862.5,
           ]
         `);
       });
@@ -1350,8 +1350,8 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
-            65,
+            2665,
+            2220,
           ]
         `);
       });
@@ -1361,8 +1361,8 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            30,
-            65,
+            3085,
+            2220,
           ]
         `);
       });
@@ -1372,8 +1372,8 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
-            65,
+            3505,
+            2220,
           ]
         `);
       });

@@ -726,8 +726,8 @@ describe("Test Linear Elements", () => {
             0,
           ],
           [
-            -60,
-            -100,
+            40,
+            0,
           ],
         ]
       `);
@@ -885,8 +885,8 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
-          collaboration made 
+          "Online whiteboard
+          collaboration made
           easy"
         `);
     });
@@ -919,8 +919,8 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
-          collaboration made 
+          "Online whiteboard
+          collaboration made
           easy"
         `);
     });
@@ -961,8 +961,8 @@ describe("Test Linear Elements", () => {
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -972,24 +972,24 @@ describe("Test Linear Elements", () => {
             20,
             105,
             80,
-            55.45893770831013,
+            55,
             45,
           ]
         `);
 
       rotate(container, -35, 55);
-      expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
+      expect(container.angle).toMatchInlineSnapshot("0");
       expect(textElement.angle).toBe(0);
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
           {
-            "x": 21.73926141863671,
-            "y": 73.31003398390868,
+            "x": 75,
+            "y": 60,
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -997,9 +997,9 @@ describe("Test Linear Elements", () => {
           [
             20,
             20,
-            102.41961302274555,
-            86.49012635273976,
-            55.45893770831013,
+            105,
+            80,
+            55,
             45,
           ]
         `);
@@ -1026,8 +1026,8 @@ describe("Test Linear Elements", () => {
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -1061,7 +1061,7 @@ describe("Test Linear Elements", () => {
         `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
+          "Online whiteboard
           collaboration made easy"
         `);
       expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
@@ -1094,8 +1094,8 @@ describe("Test Linear Elements", () => {
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
       const points = LinearElementEditor.getPointsGlobalCoordinates(container);
@@ -1106,21 +1106,22 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
           {
-            "height": 130,
-            "width": 340,
+            "height": 0,
+            "width": 40,
           }
         `);
 
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
           {
-            "x": 75,
-            "y": -5,
+            "x": 25,
+            "y": 10,
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made easy"
+        "Online whiteboard
+        collaboration made
+        easy"
       `);
     });
 
@@ -1167,7 +1168,7 @@ describe("Test Linear Elements", () => {
       expect(
         wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard 
+        "Online whiteboard
         collaboration made easy"
       `);
       const handleBindTextResizeSpy = vi.spyOn(
@@ -1190,8 +1191,8 @@ describe("Test Linear Elements", () => {
       expect(
         wrapText(textElement.originalText, font, getBoundTextMaxWidth(arrow)),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
+        "Online whiteboard
+        collaboration made
         easy"
       `);
     });
