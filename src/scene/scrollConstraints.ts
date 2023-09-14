@@ -330,7 +330,7 @@ export const constrainScrollState = (
     zoom: AppState["zoom"];
   } | null;
 } => {
-  if (!state.scrollConstraints || state.scrollConstraints.isAnimating) {
+  if (!state.scrollConstraints) {
     return { state, shouldAnimate: false, animateTo: null };
   }
   const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;

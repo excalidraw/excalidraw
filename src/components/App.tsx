@@ -2008,6 +2008,31 @@ class App extends React.Component<AppProps, AppState> {
         this.files,
       );
     }
+
+    if (
+      this.state.scrollConstraints &&
+      this.state.scrollConstraints.isAnimating
+    ) {
+      const { shouldAnimate, animateTo } = constrainScrollState(this.state);
+
+      scrollConstraintsAnimationTimeout = setTimeout(() => {
+        this.cancelInProgresAnimation?.();
+        if (shouldAnimate && animateTo) {
+          const fromValues = {
+            scrollX: this.state.scrollX,
+            scrollY: this.state.scrollY,
+            zoom: this.state.zoom.value,
+          };
+          const toValues = {
+            scrollX: animateTo.scrollX,
+            scrollY: animateTo.scrollY,
+            zoom: animateTo.zoom.value,
+          };
+
+          this.animateToConstrainedArea(fromValues, toValues);
+        }
+      }, 200);
+    }
   }
 
   private renderInteractiveSceneCallback = ({
@@ -2683,25 +2708,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
     };
 
-    const { state, shouldAnimate, animateTo } = constrainScrollState(newState);
+    const { state, shouldAnimate } = constrainScrollState(newState);
 
-    this.setState(state, () => {
-      if (shouldAnimate && animateTo) {
-        scrollConstraintsAnimationTimeout = setTimeout(() => {
-          const fromValues = {
-            scrollX: newState.scrollX,
-            scrollY: newState.scrollY,
-            zoom: newState.zoom.value,
-          };
-          const toValues = {
-            scrollX: animateTo.scrollX,
-            scrollY: animateTo.scrollY,
-            zoom: animateTo.zoom.value,
-          };
-
-          this.animateToConstrainedArea(fromValues, toValues);
-        }, 200);
-      }
+    this.setState({
+      ...state,
+      scrollConstraints: {
+        ...state.scrollConstraints!,
+        isAnimating: shouldAnimate,
+      },
     });
   };
 
@@ -2724,13 +2738,16 @@ class App extends React.Component<AppProps, AppState> {
       toValues,
       duration: 200,
       onStart: () => {
-        this.setState((state) => ({
-          shouldCacheIgnoreZoom: true,
-          scrollConstraints: {
-            ...state.scrollConstraints!,
-            isAnimating: true,
-          },
-        }));
+        this.setState((state) => {
+          cancelRender();
+          return {
+            shouldCacheIgnoreZoom: true,
+            scrollConstraints: {
+              ...state.scrollConstraints!,
+              isAnimating: false,
+            },
+          };
+        });
       },
       onEnd: cleanUp,
       onCancel: cleanUp,
