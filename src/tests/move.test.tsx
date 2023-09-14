@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";

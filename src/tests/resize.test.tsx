@@ -6,7 +6,7 @@ import { reseed } from "../random";
 import { UI, Keyboard } from "./helpers/ui";
 import { resize } from "./utils";
 import { ExcalidrawTextElement } from "../element/types";
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { vi } from "vitest";

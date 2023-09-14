@@ -5,7 +5,7 @@ import {
   ExcalidrawTextElementWithContainer,
   FontString,
 } from "../element/types";
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";

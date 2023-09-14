@@ -3,7 +3,7 @@ import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { render, queryByTestId } from "../tests/test-utils";
 
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { vi } from "vitest";
 
 const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");

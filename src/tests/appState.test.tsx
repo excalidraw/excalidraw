@@ -1,6 +1,6 @@
 import { queryByTestId, render, waitFor } from "./test-utils";
 
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";

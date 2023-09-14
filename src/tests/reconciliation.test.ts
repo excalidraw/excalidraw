@@ -5,7 +5,7 @@ import {
   BroadcastedExcalidrawElement,
   ReconciledElements,
   reconcileElements,
-} from "../excalidraw-app/collab/reconciliation";
+} from "../../excalidraw-app/collab/reconciliation";
 import { randomInteger } from "../random";
 import { AppState } from "../types";
 

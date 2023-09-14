@@ -1,20 +1,20 @@
-import { ExcalidrawElement, FileId } from "../../element/types";
-import { getSceneVersion } from "../../element";
+import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { getSceneVersion } from "../../src/element";
 import Portal from "../collab/Portal";
-import { restoreElements } from "../../data/restore";
+import { restoreElements } from "../../src/data/restore";
 import {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
-} from "../../types";
+} from "../../src/types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
-import { decompressData } from "../../data/encode";
-import { encryptData, decryptData } from "../../data/encryption";
-import { MIME_TYPES } from "../../constants";
+import { decompressData } from "../../src/data/encode";
+import { encryptData, decryptData } from "../../src/data/encryption";
+import { MIME_TYPES } from "../../src/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { ResolutionType } from "../../utility-types";
+import { ResolutionType } from "../../src/utility-types";
 
 // private
 // -----------------------------------------------------------------------------

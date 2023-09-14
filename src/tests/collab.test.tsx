@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import { render, updateSceneData, waitFor } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { API } from "./helpers/api";
 import { createUndoAction } from "../actions/actionHistory";
 const { h } = window;

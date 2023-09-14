@@ -7,7 +7,7 @@ import {
   createPasteEvent,
 } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { KEYS } from "../keys";
 import {
   getDefaultLineHeight,

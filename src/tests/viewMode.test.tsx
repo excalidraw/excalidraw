@@ -1,5 +1,5 @@
 import { render, GlobalTestState } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import ExcalidrawApp from "../../excalidraw-app";
 import { KEYS } from "../keys";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { CURSOR_TYPE } from "../constants";
