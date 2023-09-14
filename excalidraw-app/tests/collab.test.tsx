@@ -1,8 +1,8 @@
 import { vi } from "vitest";
-import { render, updateSceneData, waitFor } from "./test-utils";
+import { render, updateSceneData, waitFor } from "../../src/tests/test-utils";
 import ExcalidrawApp from "../../excalidraw-app";
-import { API } from "./helpers/api";
-import { createUndoAction } from "../actions/actionHistory";
+import { API } from "../../src/tests/helpers/api";
+import { createUndoAction } from "../../src/actions/actionHistory";
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {

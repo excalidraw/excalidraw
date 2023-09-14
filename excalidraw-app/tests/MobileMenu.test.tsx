@@ -3,9 +3,9 @@ import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
-} from "./test-utils";
+} from "../../src/tests/test-utils";
 
-import { UI } from "./helpers/ui";
+import { UI } from "../../src/tests/helpers/ui";
 
 describe("Test MobileMenu", () => {
   const { h } = window;

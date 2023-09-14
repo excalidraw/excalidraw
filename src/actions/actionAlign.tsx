@@ -56,6 +56,7 @@ export const actionAlignTop = register({
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
+    console.log("HELLLIIIIIIIII");
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
