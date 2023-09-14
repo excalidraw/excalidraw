@@ -661,7 +661,7 @@ export type ScrollConstraints = {
   y: number;
   width: number;
   height: number;
-  isAnimating?: boolean;
+  animateOnNextUpdate?: boolean;
   viewportZoomFactor?: number;
   lockZoom?: boolean;
 };

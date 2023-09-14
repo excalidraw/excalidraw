@@ -2009,28 +2009,23 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (
-      this.state.scrollConstraints &&
-      this.state.scrollConstraints.isAnimating
-    ) {
-      const { shouldAnimate, animateTo } = constrainScrollState(this.state);
+    if (this.state.scrollConstraints?.animateOnNextUpdate) {
+      const newState = constrainScrollState(this.state, false);
 
       scrollConstraintsAnimationTimeout = setTimeout(() => {
         this.cancelInProgresAnimation?.();
-        if (shouldAnimate && animateTo) {
-          const fromValues = {
-            scrollX: this.state.scrollX,
-            scrollY: this.state.scrollY,
-            zoom: this.state.zoom.value,
-          };
-          const toValues = {
-            scrollX: animateTo.scrollX,
-            scrollY: animateTo.scrollY,
-            zoom: animateTo.zoom.value,
-          };
+        const fromValues = {
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          zoom: this.state.zoom.value,
+        };
+        const toValues = {
+          scrollX: newState.scrollX,
+          scrollY: newState.scrollY,
+          zoom: newState.zoom.value,
+        };
 
-          this.animateToConstrainedArea(fromValues, toValues);
-        }
+        this.animateToConstrainedArea(fromValues, toValues);
       }, 200);
     }
   }
@@ -2701,22 +2696,10 @@ class App extends React.Component<AppProps, AppState> {
       ...(this.state.scrollConstraints && {
         // manually reset if setState in onCancel wasn't committed yet
         shouldCacheIgnoreZoom: false,
-        scrollConstraints: {
-          ...this.state.scrollConstraints,
-          isAnimating: false,
-        },
       }),
     };
 
-    const { state, shouldAnimate } = constrainScrollState(newState);
-
-    this.setState({
-      ...state,
-      scrollConstraints: {
-        ...state.scrollConstraints!,
-        isAnimating: shouldAnimate,
-      },
-    });
+    this.setState(constrainScrollState(newState));
   };
 
   private animateToConstrainedArea = (
@@ -2728,7 +2711,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldCacheIgnoreZoom: false,
         scrollConstraints: {
           ...state.scrollConstraints!,
-          isAnimating: false,
+          animateOnNextUpdate: false,
         },
       }));
     };
@@ -2744,7 +2727,7 @@ class App extends React.Component<AppProps, AppState> {
             shouldCacheIgnoreZoom: true,
             scrollConstraints: {
               ...state.scrollConstraints!,
-              isAnimating: false,
+              animateOnNextUpdate: false,
             },
           };
         });
@@ -8266,10 +8249,13 @@ class App extends React.Component<AppProps, AppState> {
           viewModeEnabled: true,
         },
         () => {
-          const { animateTo } = constrainScrollState({
-            ...this.state,
-            scrollConstraints,
-          });
+          const newState = constrainScrollState(
+            {
+              ...this.state,
+              scrollConstraints,
+            },
+            false,
+          );
 
           this.animateToConstrainedArea(
             {
@@ -8278,9 +8264,9 @@ class App extends React.Component<AppProps, AppState> {
               zoom: this.state.zoom.value,
             },
             {
-              scrollX: animateTo!.scrollX,
-              scrollY: animateTo!.scrollY,
-              zoom: animateTo!.zoom.value,
+              scrollX: newState.scrollX,
+              scrollY: newState.scrollY,
+              zoom: newState.zoom.value,
             },
           );
         },

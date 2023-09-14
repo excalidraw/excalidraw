@@ -310,7 +310,7 @@ let memoizedValues: {
     "zoom" | "width" | "height" | "scrollConstraints"
   >;
   constraints: ReturnType<typeof calculateConstraints>;
-  constraintsWithoutOverscroll: ReturnType<typeof calculateConstraints>;
+  allowOverscroll: boolean;
 } | null = null;
 
 /**
@@ -321,30 +321,24 @@ let memoizedValues: {
  */
 export const constrainScrollState = (
   state: AppState,
-): {
-  state: AppState;
-  shouldAnimate: boolean;
-  animateTo: {
-    scrollX: AppState["scrollX"];
-    scrollY: AppState["scrollY"];
-    zoom: AppState["zoom"];
-  } | null;
-} => {
+  allowOverscroll = true,
+): AppState => {
   if (!state.scrollConstraints) {
-    return { state, shouldAnimate: false, animateTo: null };
+    return state;
   }
   const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;
 
   const canUseMemoizedValues =
-    memoizedValues?.previousState.scrollConstraints && // can't use memoized values if there were no scrollConstraints in memoizedValues
     memoizedValues && // there are memoized values
+    memoizedValues.previousState.scrollConstraints && // can't use memoized values if there were no scrollConstraints in memoizedValues
+    memoizedValues.allowOverscroll === allowOverscroll && // allowOverscroll is the same as in memoizedValues
+    // current scrollConstraints are the same as in memoizedValues
     isShallowEqual(
-      // current scrollConstraints are the same as in memoizedValues
       state.scrollConstraints,
       memoizedValues.previousState.scrollConstraints!,
     ) &&
+    // current zoom and window dimensions are equal to those in memoizedValues
     isShallowEqual(
-      // current zoom and window dimensions are equal to those in memoizedValues
       { zoom: zoom.value, width, height },
       {
         zoom: memoizedValues.previousState.zoom.value,
@@ -360,27 +354,11 @@ export const constrainScrollState = (
         width,
         height,
         zoom,
-        allowOverscroll: true,
-      });
-
-  const constraintsWithoutOverscroll = canUseMemoizedValues
-    ? memoizedValues!.constraintsWithoutOverscroll
-    : calculateConstraints({
-        scrollConstraints,
-        width,
-        height,
-        zoom,
-        allowOverscroll: false,
+        allowOverscroll,
       });
 
   const constrainedValues = constrainScrollValues({
     ...constraints,
-    scrollX,
-    scrollY,
-  });
-
-  const animateTo = constrainScrollValues({
-    ...constraintsWithoutOverscroll,
     scrollX,
     scrollY,
   });
@@ -394,16 +372,16 @@ export const constrainScrollState = (
         scrollConstraints: state.scrollConstraints,
       },
       constraints,
-      constraintsWithoutOverscroll,
+      allowOverscroll,
     };
   }
 
   return {
-    state: {
-      ...state,
-      ...constrainedValues,
+    ...state,
+    scrollConstraints: {
+      ...state.scrollConstraints,
+      animateOnNextUpdate: isViewportOutsideOfConstrainedArea(state),
     },
-    shouldAnimate: isViewportOutsideOfConstrainedArea(state),
-    animateTo,
+    ...constrainedValues,
   };
 };
