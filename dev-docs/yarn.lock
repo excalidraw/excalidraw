@@ -1631,10 +1631,10 @@
     url-loader "^4.1.1"
     webpack "^5.73.0"
 
-"@excalidraw/excalidraw@0.15.3":
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.15.3.tgz#5dea570f76451adf68bc24d4bfdd67a375cfeab1"
-  integrity sha512-/gpY7fgMO/AEaFLWnPqzbY8H7ly+/zocFf7D0Is5sWNMD2mhult5tana12lXKLSJ6EAz7ubo1A7LajXzvJXJDA==
+"@excalidraw/excalidraw@0.15.2-6546-3398d86":
+  version "0.15.2-6546-3398d86"
+  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.15.2-6546-3398d86.tgz#e74d5ad944b8b414924d27ee91469a32b4f08dbf"
+  integrity sha512-Tzq6qighJUytXRA8iMzQ8onoGclo9CuvPSw7DMvPxME8nxAxn5CeK/gsxIs3zwooj9CC6XF42BSrx0+n+fPxaQ==
 
 "@hapi/hoek@^9.0.0":
   version "9.3.0"

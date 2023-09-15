@@ -64,6 +64,7 @@ const sidebars = {
               items: [
                 "@excalidraw/excalidraw/api/children-components/main-menu",
                 "@excalidraw/excalidraw/api/children-components/welcome-screen",
+                "@excalidraw/excalidraw/api/children-components/sidebar",
                 "@excalidraw/excalidraw/api/children-components/footer",
                 "@excalidraw/excalidraw/api/children-components/live-collaboration-trigger",
               ],

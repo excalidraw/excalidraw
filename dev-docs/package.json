@@ -18,7 +18,7 @@
     "@docusaurus/core": "2.2.0",
     "@docusaurus/preset-classic": "2.2.0",
     "@docusaurus/theme-live-codeblock": "2.2.0",
-    "@excalidraw/excalidraw": "0.15.3",
+    "@excalidraw/excalidraw": "0.15.2-6546-3398d86",
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.2.1",
     "docusaurus-plugin-sass": "0.2.3",

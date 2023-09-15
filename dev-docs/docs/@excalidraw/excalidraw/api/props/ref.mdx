@@ -404,15 +404,15 @@ This API can be used to customise the mouse cursor on the canvas and has the bel
 (cursor: string) => void
 ```
 
-## toggleMenu
+## toggleSidebar
 
 ```tsx
-(type: "library" | "customSidebar", force?: boolean) => boolean;
+(opts: { name: string; tab?: string; force?: boolean }) => boolean;
 ```
 
-This API can be used to toggle a specific menu (currently only the sidebars), and returns whether the menu was toggled on or off. If the `force` flag passed, it will force the menu to be toggled either on/off based on the `boolean` passed.
+This API can be used to toggle sidebar, optionally opening a specific sidebar tab. It returns whether the sidebar was toggled on or off. If the `force` flag passed, it will force the sidebar to be toggled either on/off.
 
-This API is especially useful when you render a custom sidebar using [`renderSidebar`](#rendersidebar) prop, and you want to toggle it from your app based on a user action.
+This API is especially useful when you render a custom [`<Sidebar/>`](/docs/@excalidraw/excalidraw/api/children-components/sidebar), and you want to toggle it from your app based on a user action.
 
 ## resetCursor
 
