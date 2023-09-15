@@ -30,7 +30,7 @@ This function converts the Excalidraw Element Skeleton to excalidraw elements wh
 
 ### Rectangle, Ellipse, and Diamond
 
-To create these shapes you need to pass its `type` and `x` and `y` coordinates for position. Rest all attributes are _optional_.
+To create these shapes you need to pass its `type` and `x` and `y` coordinates for position. The rest of the attributes are optional_.
 
 For the Skeleton API to work, `convertToExcalidrawElements` needs to be called before passing it to Excalidraw Component via initialData, updateScene or any such API.
 
@@ -116,7 +116,7 @@ convertToExcalidrawElements([
 
 ### Text Element
 
-The `type`, `x`, `y` and `text` properties are required to create a text element, rest all attributes are optional
+The `type`, `x`, `y` and `text` properties are required to create a text element, rest of the attributes are optional
 
 ```js
 convertToExcalidrawElements([
@@ -141,7 +141,7 @@ convertToExcalidrawElements([
 
 ### Lines and Arrows
 
-The `type`, `x`, and `y` properties are required, rest all attributes are optional
+The `type`, `x`, and `y` properties are required, rest of the attributes are optional
 
 ```js
 convertToExcalidrawElements([
@@ -188,7 +188,7 @@ convertToExcalidrawElements([
 
 ### Text Containers
 
-In addition to `type`, `x` and `y` properties, [`label`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L124C7-L130C59) property is required for text containers. The `text` property in `label` is required, rest all are optional.
+In addition to `type`, `x` and `y` properties, [`label`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L124C7-L130C59) property is required for text containers. The `text` property in `label` is required, rest of the attributes are optional.
 
 If you don't provide the dimensions of container, we calculate it based of the label dimensions.
 
@@ -322,7 +322,7 @@ convertToExcalidrawElements([
 
 ### Arrow bindings
 
-To bind arrow to a shape you need to specify its [`start`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L86) and [`end`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L54) properties. You need to pass either `type` or `id` property in `start` and `end` properties, rest all are optional.
+To bind arrow to a shape you need to specify its [`start`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L86) and [`end`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L54) properties. You need to pass either `type` or `id` property in `start` and `end` properties, rest of the attributes are optional
 
 ```js
 convertToExcalidrawElements([
