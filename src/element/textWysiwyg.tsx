@@ -65,7 +65,8 @@ const getTransform = (
   if (height > maxHeight && zoom.value !== 1) {
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
-  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg) translate(${offsetX}px, 0px)`;
+  const offset = offsetX !== 0 ? ` translate(${offsetX}px, 0px)` : "";
+  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)${offset}`;
 };
 
 const originalContainerCache: {
@@ -278,6 +279,7 @@ export const textWysiwyg = ({
         textElementWidth += 0.5;
         transformWidth += 0.5;
       }
+
       // Horizontal offset in case updatedTextElement has a non-WYSIWYG subtype
       const offWidth = container
         ? Math.min(
@@ -293,7 +295,11 @@ export const textWysiwyg = ({
           ? offWidth / 2
           : 0;
       const { width: w, height: h } = updatedTextElement;
-
+      const transformOrigin =
+        updatedTextElement.width !== eMetrics.width ||
+        updatedTextElement.height !== eMetrics.height
+          ? { transformOrigin: `${w / 2}px ${h / 2}px` }
+          : {};
       let lineHeight = updatedTextElement.lineHeight;
 
       // In Safari the font size gets rounded off when rendering hence calculating the line height by rounding off font size
@@ -315,7 +321,7 @@ export const textWysiwyg = ({
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transformOrigin: `${w / 2}px ${h / 2}px`,
+        ...transformOrigin,
         transform: getTransform(
           offsetX,
           transformWidth,
