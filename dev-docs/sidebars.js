@@ -80,21 +80,8 @@ const sidebars = {
                 "@excalidraw/excalidraw/api/utils/restore",
               ],
             },
-            {
-              type: "category",
-              label: "Constants",
-              link: { type: "doc", id: "@excalidraw/excalidraw/api/constants" },
-              items: [],
-            },
-            {
-              type: "category",
-              label: "Excalidraw Element Skeleton",
-              link: {
-                type: "doc",
-                id: "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
-              },
-              items: [],
-            },
+            "@excalidraw/excalidraw/api/constants",
+            "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
           ],
         },
         "@excalidraw/excalidraw/faq",
