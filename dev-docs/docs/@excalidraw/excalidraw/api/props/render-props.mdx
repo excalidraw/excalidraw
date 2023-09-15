@@ -6,8 +6,7 @@
   (isMobile: boolean, appState:
   <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">
     AppState
-  </a>
-  ) => JSX | null
+  </a>) => JSX | null
 </pre>
 
 A function returning `JSX` to render `custom` UI in the top right corner of the app.
@@ -66,7 +65,11 @@ function App() {
 ## renderEmbeddable
 
 <pre>
-  (element: NonDeleted&lt;ExcalidrawEmbeddableElement&gt;, appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>) => JSX.Element | null
+  (element: NonDeleted&lt;ExcalidrawEmbeddableElement&gt;, appState:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">
+    AppState
+  </a>
+  ) => JSX.Element | null
 </pre>
 
 Allows you to replace the renderer for embeddable elements (which renders `<iframe>` elements).
