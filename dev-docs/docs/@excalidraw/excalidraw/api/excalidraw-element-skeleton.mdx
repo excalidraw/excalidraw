@@ -2,7 +2,7 @@
 
 We support a simplified API to make it easier to generate Excalidraw elements programmatically. This API is in beta and subject to change before stable. You can check the [PR](https://github.com/excalidraw/excalidraw/pull/6546) for more details.
 
-For this purpose we introduced a format [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133). This format is nothing but a simplified version of [`ExcalidrawElement`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L134) with minimum possible attributes so users can create the individual elements programmatically, bind arrows and create text containers easily by supplying the minimum required attributes and rest all is taken care by Excalidraw Library.
+For this purpose we introduced a new type [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133). This is the simplified version of [`ExcalidrawElement`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L134) type with the minimum possible attributes so that creating elements programmatically is much easier (especially for cases like binding arrows or creating text containers).
 
 The [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133) can be converted to fully qualified Excalidraw elements by using [`convertToExcalidrawElements`](/docs/@excalidraw/excalidraw/api/excalidraw-element-skeleton#converttoexcalidrawelements).
 
