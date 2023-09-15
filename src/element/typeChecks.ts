@@ -121,6 +121,7 @@ export const isBindableElement = (
       element.type === "ellipse" ||
       element.type === "image" ||
       element.type === "embeddable" ||
+      element.type === "frame" ||
       (element.type === "text" && !element.containerId))
   );
 };
