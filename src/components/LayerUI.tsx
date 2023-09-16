@@ -33,7 +33,7 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
 import { useDevice, useExcalidrawAppState } from "../components/App";
-import { ToolButton } from "../components/ToolButton";
+import { getLanguage } from "../i18n";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import { actionSaveToActiveFile } from "../actions/actionExport";
@@ -178,14 +178,35 @@ const LayerUI = ({
     );
   };
 
-  const renderCanvasActions = () => (
-    <div style={{ position: "relative" }}>
-      {/* wrapping to Fragment stops React from occasionally complaining
+  const renderCanvasActions = () => {
+    const renderFilename = fileHandle !== null;
+    return (
+      <div
+        className={clsx("render-canvas-actions", {
+          "render-canvas-actions-show-filename": renderFilename,
+        })}
+      >
+        {/* wrapping to Fragment stops React from occasionally complaining
                 about identical Keys */}
-      <tunnels.MainMenuTunnel.Out />
-      {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
-    </div>
-  );
+        <tunnels.MainMenuTunnel.Out />
+        {renderFilename && (
+          <button
+            onClick={() => {
+              actionManager.executeAction(actionSaveToActiveFile);
+            }}
+            title={`${t("buttons.save")}`}
+            className={clsx("filename-save-button", {
+              "rtl-filename-save-button-text": getLanguage().rtl,
+            })}
+            aria-label={`${t("buttons.save")}`}
+          >
+            {fileHandle.name}
+          </button>
+        )}
+        {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
+      </div>
+    );
+  };
 
   const renderSelectedShapeActions = () => (
     <Section
@@ -226,19 +247,6 @@ const LayerUI = ({
               {renderCanvasActions()}
               {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
             </Stack.Col>
-            {fileHandle !== null && (
-              <ToolButton
-                type="button"
-                onClick={() =>
-                  actionManager.executeAction(actionSaveToActiveFile)
-                }
-                className="excalidraw-button save-button"
-                title={`${t("buttons.save")}`}
-                aria-label={`${t("buttons.save")}`}
-              >
-                {fileHandle.name}
-              </ToolButton>
-            )}
           </div>
           {!appState.viewModeEnabled && (
             <Section heading="shapes" className="shapes-section">

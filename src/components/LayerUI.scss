@@ -2,13 +2,28 @@
 @import "../css/variables.module";
 
 .excalidraw {
-  .save-button {
+  .filename-save-button {
     max-width: 180px;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    text-overflow: ellipsis;
     overflow: hidden;
-    --button-width: auto;
-    --button-height: auto;
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+  }
+  .rtl-filename-save-button-text {
+    direction: rtl;
+  }
+  .render-canvas-actions {
+    position: relative;
+  }
+  .render-canvas-actions-show-filename {
+    display: flex;
+    gap: 1rem;
   }
   .layer-ui__wrapper.animate {
     transition: width 0.1s ease-in-out;
