@@ -94,7 +94,8 @@ export type LastActiveTool =
         | "eraser"
         | "hand"
         | "frame"
-        | "embeddable";
+        | "embeddable"
+        | "mermaid";
       customType: null;
     }
   | {
@@ -204,7 +205,8 @@ export type AppState = {
           | "eraser"
           | "hand"
           | "frame"
-          | "embeddable";
+          | "embeddable"
+          | "mermaid";
         customType: null;
       }
     | {
@@ -574,6 +576,10 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
+  scrollToContent: App["scrollToContent"];
+  addFiles: App["addFiles"];
+  setSelection: App["setSelection"];
+  addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
 };
 
 export type PointerDownState = Readonly<{
