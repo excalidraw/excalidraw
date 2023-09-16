@@ -360,6 +360,7 @@ export let showFourthFont: boolean = false;
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
+import MermaidToExcalidraw from "./MermaidToExcalidraw";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1222,7 +1223,14 @@ class App extends React.Component<AppProps, AppState> {
                           app={this}
                         >
                           {this.props.children}
+                          {this.state.activeTool.type === "mermaid" && (
+                            <MermaidToExcalidraw
+                              appState={this.state}
+                              elements={this.scene.getNonDeletedElements()}
+                            />
+                          )}
                         </LayerUI>
+
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
@@ -2289,11 +2297,12 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private addElementsFromPasteOrLibrary = (opts: {
+  addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
+    fitToContent?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -2398,6 +2407,12 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
     this.setActiveTool({ type: "selection" });
+
+    if (opts.fitToContent) {
+      this.scrollToContent(newElements, {
+        fitToContent: true,
+      });
+    }
   };
 
   private addTextFromPaste(text: string, isPlainPaste = false) {
@@ -4287,6 +4302,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
+
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
       hitElement,
@@ -4743,7 +4759,8 @@ class App extends React.Component<AppProps, AppState> {
       this.createFrameElementOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand"
+      this.state.activeTool.type !== "hand" &&
+      this.state.activeTool.type !== "mermaid"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -7660,6 +7677,30 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   }
 
+  public setSelection(elements: readonly NonDeletedExcalidrawElement[]) {
+    const selectedElementIds: { [id: string]: true } = {};
+    const selectedGroupIds: { [id: string]: true } = {};
+
+    elements.forEach((ele) => {
+      if (ele.groupIds.length) {
+        selectedElementIds[ele.id] = true;
+        ele.groupIds.forEach((id) => {
+          selectedGroupIds[id] = true;
+        });
+      }
+      // exclude bound text elements as we don't mark them as selected when
+      // container is selected unless in group
+      else if (!isBoundToContainer(ele)) {
+        selectedElementIds[ele.id] = true;
+      }
+    });
+
+    this.setState({
+      previousSelectedElementIds: this.state.selectedElementIds,
+      selectedElementIds,
+      selectedGroupIds,
+    });
+  }
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),

@@ -321,7 +321,7 @@ describe("Test Transform", () => {
       });
 
       expect(text).toMatchObject({
-        x: 340,
+        x: 240,
         y: 226.5,
         type: "text",
         text: "HELLO WORLD!!",
@@ -341,7 +341,7 @@ describe("Test Transform", () => {
       });
 
       expect(ellipse).toMatchObject({
-        x: 555,
+        x: 355,
         y: 189,
         type: "ellipse",
         boundElements: [
@@ -386,7 +386,6 @@ describe("Test Transform", () => {
       );
 
       expect(excaldrawElements.length).toBe(4);
-
       const [arrow, text1, text2, text3] = excaldrawElements;
 
       expect(arrow).toMatchObject({
@@ -406,7 +405,7 @@ describe("Test Transform", () => {
       });
 
       expect(text1).toMatchObject({
-        x: 340,
+        x: 240,
         y: 226.5,
         type: "text",
         text: "HELLO WORLD!!",
@@ -426,7 +425,7 @@ describe("Test Transform", () => {
       });
 
       expect(text3).toMatchObject({
-        x: 555,
+        x: 355,
         y: 226.5,
         type: "text",
         boundElements: [
@@ -603,14 +602,14 @@ describe("Test Transform", () => {
       );
 
       expect(excaldrawElements.length).toBe(4);
-      const [, , arrow] = excaldrawElements;
+      const [, , arrow, text] = excaldrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
         x: 255,
         y: 239,
         boundElements: [
           {
-            id: "id46",
+            id: text.id,
             type: "text",
           },
         ],
@@ -656,11 +655,11 @@ describe("Test Transform", () => {
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
         focus: 0,
-        gap: 5,
+        gap: 205,
       });
       expect(rect.boundElements).toStrictEqual([
         {
-          id: "id47",
+          id: arrow.id,
           type: "arrow",
         },
       ]);

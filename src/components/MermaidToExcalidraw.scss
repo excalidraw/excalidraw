@@ -1,0 +1,82 @@
+@import "../css/variables.module";
+.excalidraw {
+  .mermaid-to-excalidraw-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+
+    label {
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 600;
+      margin-bottom: 4px;
+      margin-left: 4px;
+
+      @media screen and (max-width: 860px) {
+        margin-top: 4px;
+      }
+    }
+
+    &-text {
+      display: flex;
+      flex-direction: column;
+
+      textarea {
+        width: 20rem;
+        height: 19rem;
+        resize: none;
+        border-radius: 8px;
+        padding: 1rem;
+
+        @media screen and (max-width: 860px) {
+          width: auto;
+          height: 10rem;
+        }
+      }
+    }
+
+    &-preview-canvas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem;
+
+      width: 20rem;
+      height: 19rem;
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+        left center;
+      border-radius: 8px;
+      border: 1px solid #e4e4eb;
+
+      @media screen and (max-width: 860px) {
+        width: auto;
+      }
+    }
+
+    &-preview-insert.excalidraw-button {
+      font-family: "Assistant";
+      font-weight: 600;
+      height: 2.5rem;
+      margin-top: 1em;
+      margin-bottom: 0.3em;
+      width: 7.5rem;
+      font-size: 12px;
+      background-color: var(--color-primary);
+      &:hover {
+        background-color: var(--color-primary-darker);
+      }
+      &:active {
+        background-color: var(--color-primary-darkest);
+      }
+
+      color: $oc-white;
+
+      @media screen and (max-width: 860px) {
+        width: 100%;
+      }
+    }
+    @media screen and (max-width: 860px) {
+      flex-direction: column;
+    }
+  }
+}
