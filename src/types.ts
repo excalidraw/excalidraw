@@ -17,6 +17,7 @@ import {
   StrokeRoundness,
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
+  ExcalidrawSelectionElement,
 } from "./element/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
@@ -182,10 +183,25 @@ export type AppState = {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
-  draggingElement: NonDeletedExcalidrawElement | null;
+  /** element that's being dragged or created */
+  draggingElement: Exclude<
+    NonDeletedExcalidrawElement,
+    ExcalidrawSelectionElement
+  > | null;
+  /**
+   * Element that's being resized.
+   * NOTE not set when resizing a group or linear element
+   */
   resizingElement: NonDeletedExcalidrawElement | null;
+  /** multi-point linear element when it's being created */
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
-  selectionElement: NonDeletedExcalidrawElement | null;
+  /**
+   * The selection box (we currently use an excalidraw element).
+   *
+   * Checking for this attribute is a good way to determine whether the user is
+   * selecting.
+   */
+  selectionElement: ExcalidrawSelectionElement | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
@@ -198,9 +214,14 @@ export type AppState = {
   };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
-  // element being edited, but not necessarily added to elements array yet
-  // (e.g. text element when typing into the input)
+  /**
+   * Text that's being element, or new element being created.
+   */
   editingElement: NonDeletedExcalidrawElement | null;
+  /**
+   * Linear element that's being edited (when in the linear element editor).
+   * Not set when creating multi-point linear element.
+   */
   editingLinearElement: LinearElementEditor | null;
   activeTool: {
     /**
