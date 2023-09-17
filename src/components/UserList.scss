@@ -26,7 +26,7 @@
   }
 
   .UserList > * {
-    pointer-events: all;
+    pointer-events: var(--ui-pointerEvents);
   }
 
   .UserList_mobile {
