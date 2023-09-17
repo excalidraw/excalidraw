@@ -15,9 +15,15 @@ interface ColorInputProps {
   color: string;
   onChange: (color: string) => void;
   label: string;
+  eyeDropperType: "strokeColor" | "backgroundColor";
 }
 
-export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
+export const ColorInput = ({
+  color,
+  onChange,
+  label,
+  eyeDropperType,
+}: ColorInputProps) => {
   const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
   const [activeSection, setActiveColorPickerSection] = useAtom(
@@ -110,6 +116,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
                   : {
                       keepOpenOnAlt: false,
                       onSelect: (color) => onChange(color),
+                      previewType: eyeDropperType,
                     },
               )
             }
