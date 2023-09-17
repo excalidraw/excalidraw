@@ -101,12 +101,7 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(
-        queryByText(
-          contextMenu as HTMLElement,
-          "Show grid (Cmd/Ctrl: No Snap)",
-        )!,
-      );
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Show grid")!);
       expect(h.state.gridSize).toBe(GRID_SIZE);
     });
 
@@ -125,12 +120,7 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      expect(
-        queryByText(
-          contextMenu as HTMLElement,
-          "Show grid (Cmd/Ctrl: No Snap)",
-        ),
-      ).toBe(null);
+      expect(queryByText(contextMenu as HTMLElement, "Show grid")).toBe(null);
       expect(h.state.gridSize).toBe(null);
     });
   });
