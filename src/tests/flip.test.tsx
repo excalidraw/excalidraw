@@ -1,11 +1,13 @@
 import ReactDOM from "react-dom";
 import {
   createPasteEvent,
+  fireEvent,
   GlobalTestState,
   render,
+  screen,
   waitFor,
 } from "./test-utils";
-import { UI, Pointer } from "./helpers/ui";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { getElementAbsoluteCoords } from "../element";
@@ -13,6 +15,7 @@ import {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
   FileId,
 } from "../element/types";
 import { newLinearElement } from "../element";
@@ -22,6 +25,8 @@ import { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
 import { vi } from "vitest";
 import * as blob from "../data/blob";
+import { KEYS } from "../keys";
+import { getBoundTextElementPosition } from "../element/textElement";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -810,5 +815,71 @@ describe("image", () => {
     await checkVerticalHorizontalFlip();
     expect((h.elements[0] as ExcalidrawImageElement).scale).toEqual([-1, -1]);
     expect(h.elements[0].angle).toBeCloseTo(0);
+  });
+});
+
+describe("mutliple elements", () => {
+  it("with bound text flip correctly", async () => {
+    UI.clickTool("arrow");
+    fireEvent.click(screen.getByTitle("Architect"));
+    const arrow = UI.createElement("arrow", {
+      x: 0,
+      y: 0,
+      width: 180,
+      height: 80,
+    });
+
+    Keyboard.keyPress(KEYS.ENTER);
+    let editor = document.querySelector<HTMLTextAreaElement>(
+      ".excalidraw-textEditorContainer > textarea",
+    )!;
+    fireEvent.input(editor, { target: { value: "arrow" } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    const rectangle = UI.createElement("rectangle", {
+      x: 0,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+
+    Keyboard.keyPress(KEYS.ENTER);
+    editor = document.querySelector<HTMLTextAreaElement>(
+      ".excalidraw-textEditorContainer > textarea",
+    )!;
+    fireEvent.input(editor, { target: { value: "rect\ntext" } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    mouse.select([arrow, rectangle]);
+    h.app.actionManager.executeAction(actionFlipHorizontal);
+    h.app.actionManager.executeAction(actionFlipVertical);
+
+    const arrowText = h.elements[1] as ExcalidrawTextElementWithContainer;
+    const arrowTextPos = getBoundTextElementPosition(arrow.get(), arrowText)!;
+    const rectText = h.elements[3] as ExcalidrawTextElementWithContainer;
+
+    expect(arrow.x).toBeCloseTo(180);
+    expect(arrow.y).toBeCloseTo(200);
+    expect(arrow.points[1][0]).toBeCloseTo(-180);
+    expect(arrow.points[1][1]).toBeCloseTo(-80);
+
+    expect(arrowTextPos.x - (arrow.x - arrow.width)).toBeCloseTo(
+      arrow.x - (arrowTextPos.x + arrowText.width),
+    );
+    expect(arrowTextPos.y - (arrow.y - arrow.height)).toBeCloseTo(
+      arrow.y - (arrowTextPos.y + arrowText.height),
+    );
+
+    expect(rectangle.x).toBeCloseTo(80);
+    expect(rectangle.y).toBeCloseTo(0);
+
+    expect(rectText.x - rectangle.x).toBeCloseTo(
+      rectangle.x + rectangle.width - (rectText.x + rectText.width),
+    );
+    expect(rectText.y - rectangle.y).toBeCloseTo(
+      rectangle.y + rectangle.height - (rectText.y + rectText.height),
+    );
   });
 });
