@@ -194,7 +194,7 @@ const LayerUI = ({
             onClick={() => {
               actionManager.executeAction(actionSaveToActiveFile);
             }}
-            title={`${t("buttons.save")}`}
+            title={`${fileHandle.name}`}
             className={clsx("filename-save-button", {
               "rtl-filename-save-button-text": getLanguage().rtl,
             })}
