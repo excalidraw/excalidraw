@@ -140,7 +140,7 @@ const ColorPickerPopupContent = ({
         alignOffset={-16}
         sideOffset={20}
         style={{
-          zIndex: 9999,
+          zIndex: "var(--zIndex-layerUI)",
           backgroundColor: "var(--popup-bg-color)",
           maxWidth: "208px",
           maxHeight: window.innerHeight,
