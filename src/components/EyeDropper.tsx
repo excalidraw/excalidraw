@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { COLOR_PALETTE, rgbToHex } from "../colors";
+import { rgbToHex } from "../colors";
 import { EVENT } from "../constants";
 import { useUIAppState } from "../context/ui-appState";
 import { mutateElement } from "../element/mutateElement";
