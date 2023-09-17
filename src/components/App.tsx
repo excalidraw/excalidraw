@@ -1130,6 +1130,7 @@ class App extends React.Component<AppProps, AppState> {
         })}
         style={{
           ["--ui-pointerEvents" as any]:
+            this.state.selectionElement ||
             this.state.draggingElement ||
             this.state.resizingElement ||
             (this.state.editingElement &&
