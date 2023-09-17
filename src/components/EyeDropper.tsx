@@ -18,8 +18,8 @@ import "./EyeDropper.scss";
 type EyeDropperProperties = {
   keepOpenOnAlt: boolean;
   swapPreviewOnAlt?: boolean;
-  onSelect?: (color: string, event: PointerEvent) => void;
-  previewType?: "strokeColor" | "backgroundColor";
+  onSelect: (color: string, event: PointerEvent) => void;
+  previewType: "strokeColor" | "backgroundColor";
 };
 
 export const activeEyeDropperAtom = atom<null | EyeDropperProperties>(null);
@@ -28,13 +28,8 @@ export const EyeDropper: React.FC<{
   onCancel: () => void;
   onSelect: Required<EyeDropperProperties>["onSelect"];
   swapPreviewOnAlt?: EyeDropperProperties["swapPreviewOnAlt"];
-  previewType?: EyeDropperProperties["previewType"];
-}> = ({
-  onCancel,
-  onSelect,
-  swapPreviewOnAlt,
-  previewType = "backgroundColor",
-}) => {
+  previewType: EyeDropperProperties["previewType"];
+}> = ({ onCancel, onSelect, swapPreviewOnAlt, previewType }) => {
   const eyeDropperContainer = useCreatePortalContainer({
     className: "excalidraw-eye-dropper-backdrop",
     parentSelector: ".excalidraw-eye-dropper-container",
