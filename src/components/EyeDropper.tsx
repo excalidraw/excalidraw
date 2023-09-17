@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { COLOR_PALETTE, rgbToHex } from "../colors";
+import { rgbToHex } from "../colors";
 import { EVENT } from "../constants";
 import { useUIAppState } from "../context/ui-appState";
 import { mutateElement } from "../element/mutateElement";
@@ -18,8 +18,8 @@ import "./EyeDropper.scss";
 type EyeDropperProperties = {
   keepOpenOnAlt: boolean;
   swapPreviewOnAlt?: boolean;
-  onSelect?: (color: string, event: PointerEvent) => void;
-  previewType?: "strokeColor" | "backgroundColor";
+  onSelect: (color: string, event: PointerEvent) => void;
+  previewType: "strokeColor" | "backgroundColor";
 };
 
 export const activeEyeDropperAtom = atom<null | EyeDropperProperties>(null);
@@ -28,13 +28,8 @@ export const EyeDropper: React.FC<{
   onCancel: () => void;
   onSelect: Required<EyeDropperProperties>["onSelect"];
   swapPreviewOnAlt?: EyeDropperProperties["swapPreviewOnAlt"];
-  previewType?: EyeDropperProperties["previewType"];
-}> = ({
-  onCancel,
-  onSelect,
-  swapPreviewOnAlt,
-  previewType = "backgroundColor",
-}) => {
+  previewType: EyeDropperProperties["previewType"];
+}> = ({ onCancel, onSelect, swapPreviewOnAlt, previewType }) => {
   const eyeDropperContainer = useCreatePortalContainer({
     className: "excalidraw-eye-dropper-backdrop",
     parentSelector: ".excalidraw-eye-dropper-container",
@@ -58,10 +53,26 @@ export const EyeDropper: React.FC<{
       return;
     }
 
-    let currentColor: string = COLOR_PALETTE.black;
     let isHoldingPointerDown = false;
 
     const ctx = app.canvas.getContext("2d")!;
+
+    const getCurrentColor = ({
+      clientX,
+      clientY,
+    }: {
+      clientX: number;
+      clientY: number;
+    }) => {
+      const pixel = ctx.getImageData(
+        (clientX - appState.offsetLeft) * window.devicePixelRatio,
+        (clientY - appState.offsetTop) * window.devicePixelRatio,
+        1,
+        1,
+      ).data;
+
+      return rgbToHex(pixel[0], pixel[1], pixel[2]);
+    };
 
     const mouseMoveListener = ({
       clientX,
@@ -76,14 +87,7 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.top = `${clientY + 20}px`;
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
-      const pixel = ctx.getImageData(
-        (clientX - appState.offsetLeft) * window.devicePixelRatio,
-        (clientY - appState.offsetTop) * window.devicePixelRatio,
-        1,
-        1,
-      ).data;
-
-      currentColor = rgbToHex(pixel[0], pixel[1], pixel[2]);
+      const currentColor = getCurrentColor({ clientX, clientY });
 
       if (isHoldingPointerDown) {
         for (const element of metaStuffRef.current.selectedElements) {
@@ -125,7 +129,7 @@ export const EyeDropper: React.FC<{
       event.stopImmediatePropagation();
       event.preventDefault();
 
-      onSelect(currentColor, event);
+      onSelect(getCurrentColor(event), event);
     };
 
     const keyDownListener = (event: KeyboardEvent) => {

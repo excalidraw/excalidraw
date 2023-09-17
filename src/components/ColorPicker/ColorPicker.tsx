@@ -82,7 +82,14 @@ const ColorPickerPopupContent = ({
   const { container } = useExcalidrawContainer();
   const { isMobile, isLandscape } = useDevice();
 
-  const colorInputJSX = (
+  const eyeDropperType =
+    type === "canvasBackground"
+      ? undefined
+      : type === "elementBackground"
+      ? "backgroundColor"
+      : "strokeColor";
+
+  const colorInputJSX = eyeDropperType && (
     <div>
       <PickerHeading>{t("colorPicker.hexCode")}</PickerHeading>
       <ColorInput
@@ -91,6 +98,7 @@ const ColorPickerPopupContent = ({
         onChange={(color) => {
           onChange(color);
         }}
+        eyeDropperType={eyeDropperType}
       />
     </div>
   );
@@ -140,7 +148,7 @@ const ColorPickerPopupContent = ({
         alignOffset={-16}
         sideOffset={20}
         style={{
-          zIndex: 9999,
+          zIndex: "var(--zIndex-layerUI)",
           backgroundColor: "var(--popup-bg-color)",
           maxWidth: "208px",
           maxHeight: window.innerHeight,
@@ -152,7 +160,7 @@ const ColorPickerPopupContent = ({
             "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",
         }}
       >
-        {palette ? (
+        {palette && eyeDropperType ? (
           <Picker
             palette={palette}
             color={color}
@@ -165,6 +173,7 @@ const ColorPickerPopupContent = ({
                   state = state || {
                     keepOpenOnAlt: true,
                     onSelect: onChange,
+                    previewType: eyeDropperType,
                   };
                   state.keepOpenOnAlt = true;
                   return state;
@@ -175,6 +184,7 @@ const ColorPickerPopupContent = ({
                   : {
                       keepOpenOnAlt: false,
                       onSelect: onChange,
+                      previewType: eyeDropperType,
                     };
               });
             }}

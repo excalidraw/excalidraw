@@ -507,8 +507,9 @@ export type AppProps = Merge<
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
   props: AppProps;
-  canvas: HTMLCanvasElement;
   interactiveCanvas: HTMLCanvasElement | null;
+  /** static canvas */
+  canvas: HTMLCanvasElement;
   focusContainer(): void;
   library: Library;
   imageCache: Map<
