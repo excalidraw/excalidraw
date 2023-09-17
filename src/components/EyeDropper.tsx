@@ -58,10 +58,26 @@ export const EyeDropper: React.FC<{
       return;
     }
 
-    let currentColor: string = COLOR_PALETTE.black;
     let isHoldingPointerDown = false;
 
     const ctx = app.canvas.getContext("2d")!;
+
+    const getCurrentColor = ({
+      clientX,
+      clientY,
+    }: {
+      clientX: number;
+      clientY: number;
+    }) => {
+      const pixel = ctx.getImageData(
+        (clientX - appState.offsetLeft) * window.devicePixelRatio,
+        (clientY - appState.offsetTop) * window.devicePixelRatio,
+        1,
+        1,
+      ).data;
+
+      return rgbToHex(pixel[0], pixel[1], pixel[2]);
+    };
 
     const mouseMoveListener = ({
       clientX,
@@ -76,14 +92,7 @@ export const EyeDropper: React.FC<{
       colorPreviewDiv.style.top = `${clientY + 20}px`;
       colorPreviewDiv.style.left = `${clientX + 20}px`;
 
-      const pixel = ctx.getImageData(
-        (clientX - appState.offsetLeft) * window.devicePixelRatio,
-        (clientY - appState.offsetTop) * window.devicePixelRatio,
-        1,
-        1,
-      ).data;
-
-      currentColor = rgbToHex(pixel[0], pixel[1], pixel[2]);
+      const currentColor = getCurrentColor({ clientX, clientY });
 
       if (isHoldingPointerDown) {
         for (const element of metaStuffRef.current.selectedElements) {
@@ -125,7 +134,7 @@ export const EyeDropper: React.FC<{
       event.stopImmediatePropagation();
       event.preventDefault();
 
-      onSelect(currentColor, event);
+      onSelect(getCurrentColor(event), event);
     };
 
     const keyDownListener = (event: KeyboardEvent) => {
