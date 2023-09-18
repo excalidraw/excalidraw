@@ -264,7 +264,8 @@
     "bindTextToElement": "Ssed ɣef kcem akken ad ternuḍ aḍris",
     "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer",
     "eraserRevert": "Ssed Alt akken ad tsefsxeḍ iferdisen yettwacerḍen i tukksa",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
