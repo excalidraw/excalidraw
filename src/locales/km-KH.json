@@ -264,7 +264,8 @@
     "bindTextToElement": "ចុច Enter ដើម្បីបន្ថែមអត្ថបទ",
     "deepBoxSelect": "សង្កត់ CtrlOrCmd ដើម្បីជ្រើសរើសយ៉ាងជ្រៅ និងជៀសវាងការអូស",
     "eraserRevert": "សង្កត់ Alt ដើម្បីដកការជ្រើសរើសធាតុដែលត្រូវបានសម្គាល់សម្រាប់ការលុប",
-    "firefox_clipboard_write": "បើកមុខងារនេះដោយកំណត់ទង់ \"dom.events.asyncClipboard.clipboardItem\" ទៅ \"true\" \nដើម្បីផ្លាស់ប្តូរទង់កម្មវិធីរុករកនៅក្នុង Firefox សូមចូលទៅកាន់ទំព័រ \"about:config\"។"
+    "firefox_clipboard_write": "បើកមុខងារនេះដោយកំណត់ទង់ \"dom.events.asyncClipboard.clipboardItem\" ទៅ \"true\" \nដើម្បីផ្លាស់ប្តូរទង់កម្មវិធីរុករកនៅក្នុង Firefox សូមចូលទៅកាន់ទំព័រ \"about:config\"។",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "មិនអាចបង្ហាញការមើលជាមុនបាន",
