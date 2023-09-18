@@ -264,7 +264,8 @@
     "bindTextToElement": "உரையைச் சேர்க்க enterஐ அழுத்து",
     "deepBoxSelect": "ஆழ்ந்துத் தேரவும் பிடித்திழுத்தலைத் தவிர்க்கவும் CtrlOrCmdஐ அழுத்திப்பிடி",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
