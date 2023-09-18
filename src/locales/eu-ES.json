@@ -264,7 +264,8 @@
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
     "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
-    "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera."
+    "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera.",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
