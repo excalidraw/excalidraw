@@ -6,7 +6,7 @@
   "ca-ES": 81,
   "cs-CZ": 92,
   "da-DK": 32,
-  "de-DE": 99,
+  "de-DE": 100,
   "el-GR": 85,
   "en": 100,
   "es-ES": 96,
@@ -39,7 +39,7 @@
   "pl-PL": 92,
   "pt-BR": 96,
   "pt-PT": 88,
-  "ro-RO": 98,
+  "ro-RO": 99,
   "ru-RU": 94,
   "si-LK": 8,
   "sk-SK": 99,
@@ -50,7 +50,7 @@
   "tr-TR": 80,
   "uk-UA": 99,
   "vi-VN": 52,
-  "zh-CN": 99,
+  "zh-CN": 100,
   "zh-HK": 24,
   "zh-TW": 99
 }
