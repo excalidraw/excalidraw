@@ -264,7 +264,8 @@
     "bindTextToElement": "Premeu enter per a afegir-hi text",
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
     "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
-    "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\"."
+    "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
