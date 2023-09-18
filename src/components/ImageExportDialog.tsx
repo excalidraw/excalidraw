@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import clsx from "clsx";
 
 import type { ActionManager } from "../actions/manager";
@@ -106,12 +112,16 @@ const ImageExportModal = ({
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
 
-  const exportedElements = exportSelected
-    ? getSelectedElements(elements, appState, {
-        includeBoundTextElement: true,
-        includeElementsInFrames: true,
-      })
-    : elements;
+  const exportedElements = useMemo(
+    () =>
+      exportSelected
+        ? getSelectedElements(elements, appState, {
+            includeBoundTextElement: true,
+            includeElementsInFrames: true,
+          })
+        : elements,
+    [exportSelected, elements],
+  );
 
   const updateAllScales = useCallback(
     (scale: number) => {
@@ -168,9 +178,10 @@ const ImageExportModal = ({
   }, [
     exportBackgroundImage,
     exportWithBackground,
-    exportedElements,
     exportBaseScale,
     updateAllScales,
+    exportedElements,
+    exportSelected,
   ]);
 
   useEffect(() => {
