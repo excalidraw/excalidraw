@@ -12,10 +12,9 @@ import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
 import {
-  DEFAULT_FANCY_BACKGROUND_IMAGE,
   DEFAULT_EXPORT_PADDING,
-  FANCY_BACKGROUND_IMAGES,
   EXPORT_SCALES,
+  FANCY_BACKGROUND_IMAGES,
   THEME,
 } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
@@ -25,7 +24,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
-import Select, { convertToSelectItems } from "../components/Select";
+import { Select } from "../components/Select";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -124,19 +123,18 @@ export const actionChangeFancyBackgroundImageUrl = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData }) => {
-    const items = convertToSelectItems(
-      FANCY_BACKGROUND_IMAGES,
-      (item) => item.label,
-    );
+  PanelComponent: ({ updateData, appState }) => {
     return (
       <Select
-        items={items}
-        ariaLabel={t("imageExportDialog.label.backgroundImage")}
-        placeholder={t("imageExportDialog.label.backgroundImage")}
-        value={DEFAULT_FANCY_BACKGROUND_IMAGE}
-        onChange={(value) => {
-          updateData(value);
+        value={appState.fancyBackgroundImageKey}
+        options={Object.entries(FANCY_BACKGROUND_IMAGES).map(
+          ([value, { label }]) => ({
+            value,
+            label,
+          }),
+        )}
+        onSelect={(key) => {
+          updateData(key);
         }}
       />
     );

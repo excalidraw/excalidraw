@@ -5,6 +5,7 @@ import {
   DEFAULT_VERSION,
   EVENT,
   EXPORT_SCALES,
+  FANCY_BACKGROUND_IMAGES,
   FONT_FAMILY,
   isDarwin,
   MIME_TYPES,
@@ -1081,3 +1082,9 @@ export const convertToExportPadding = (
 
   throw new Error("Invalid padding value");
 };
+
+export function isBackgroundImageKey(
+  key: string,
+): key is keyof typeof FANCY_BACKGROUND_IMAGES {
+  return key in FANCY_BACKGROUND_IMAGES;
+}

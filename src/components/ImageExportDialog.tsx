@@ -43,13 +43,25 @@ import { Tooltip } from "./Tooltip";
 import "./ImageExportDialog.scss";
 import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
-import Select, { convertToSelectItems } from "./Select";
 import { getCommonBounds } from "../element";
-import { convertToExportPadding, defaultExportScale, distance } from "../utils";
+import {
+  convertToExportPadding,
+  defaultExportScale,
+  distance,
+  isBackgroundImageKey,
+} from "../utils";
 import { getFancyBackgroundPadding } from "../scene/fancyBackground";
+import { Select } from "./Select";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
+
+const fancyBackgroundImageOptions = Object.entries(FANCY_BACKGROUND_IMAGES).map(
+  ([value, { label }]) => ({
+    value,
+    label,
+  }),
+);
 
 export const ErrorCanvasPreview = () => {
   return (
@@ -70,17 +82,6 @@ type ImageExportModalProps = {
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
 };
-
-function isBackgroundImageKey(
-  key: string,
-): key is keyof typeof FANCY_BACKGROUND_IMAGES {
-  return key in FANCY_BACKGROUND_IMAGES;
-}
-
-const backgroundSelectItems = convertToSelectItems(
-  FANCY_BACKGROUND_IMAGES,
-  (item) => item.label,
-);
 
 const ImageExportModal = ({
   appState,
@@ -283,17 +284,15 @@ const ImageExportModal = ({
         >
           {exportWithBackground && (
             <Select
-              items={backgroundSelectItems}
-              ariaLabel={t("imageExportDialog.label.backgroundImage")}
-              placeholder={t("imageExportDialog.label.backgroundImage")}
               value={exportBackgroundImage}
-              onChange={(value) => {
-                if (isBackgroundImageKey(value)) {
-                  setExportBackgroundImage(value);
+              options={fancyBackgroundImageOptions}
+              onSelect={(key) => {
+                if (isBackgroundImageKey(key)) {
+                  setExportBackgroundImage(key);
                   actionManager.executeAction(
                     actionChangeFancyBackgroundImageUrl,
                     "ui",
-                    value,
+                    key,
                   );
                 }
               }}
