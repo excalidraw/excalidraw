@@ -264,7 +264,8 @@
     "bindTextToElement": "Quichatz Entrada per apondre de tèxte",
     "deepBoxSelect": "Gardar CtrlOCmd per una seleccion gropada e empachar lo desplaçament",
     "eraserRevert": "Tenètz quichat Alt per anullar los elements marcats per supression",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Afichatge impossible de l’apercebut",
