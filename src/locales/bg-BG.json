@@ -264,7 +264,8 @@
     "bindTextToElement": "Натиснете Enter, за да добавите",
     "deepBoxSelect": "",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Невъзможност за показване на preview",
