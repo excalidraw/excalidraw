@@ -264,7 +264,8 @@
     "bindTextToElement": "Nyomd meg az Entert szöveg hozzáadáshoz",
     "deepBoxSelect": "Tartsd lenyomva a Ctrl/Cmd billentyűt a mély kijelöléshez és a húzás megakadályozásához",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Előnézet nem jeleníthető meg",
