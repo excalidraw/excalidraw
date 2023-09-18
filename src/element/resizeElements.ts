@@ -467,8 +467,8 @@ export const resizeSingleElement = (
         boundTextElement.fontSize,
         boundTextElement.lineHeight,
       );
-      eleNewWidth = Math.ceil(Math.max(eleNewWidth, minWidth));
-      eleNewHeight = Math.ceil(Math.max(eleNewHeight, minHeight));
+      eleNewWidth = Math.max(eleNewWidth, minWidth);
+      eleNewHeight = Math.max(eleNewHeight, minHeight);
     }
   }
 

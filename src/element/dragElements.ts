@@ -20,6 +20,7 @@ export const dragSelectedElements = (
     x: number;
     y: number;
   },
+  gridSize: AppState["gridSize"],
 ) => {
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
@@ -45,8 +46,8 @@ export const dragSelectedElements = (
       pointerDownState,
       element,
       offset,
-      appState,
       snapOffset,
+      gridSize,
     );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
@@ -69,8 +70,8 @@ export const dragSelectedElements = (
           pointerDownState,
           textElement,
           offset,
-          appState,
           snapOffset,
+          gridSize,
         );
       }
     }
@@ -84,8 +85,8 @@ const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
   dragOffset: { x: number; y: number },
-  appState: AppState,
   snapOffset: { x: number; y: number },
+  gridSize: AppState["gridSize"],
 ) => {
   const originalElement =
     pointerDownState.originalElements.get(element.id) ?? element;
@@ -97,7 +98,7 @@ const updateElementCoords = (
     const [nextGridX, nextGridY] = getGridPoint(
       originalElement.x + dragOffset.x,
       originalElement.y + dragOffset.y,
-      appState.gridSize,
+      gridSize,
     );
 
     if (snapOffset.x === 0) {

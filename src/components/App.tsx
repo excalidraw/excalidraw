@@ -344,10 +344,12 @@ import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import {
   getSnapLinesAtPointer,
-  getSnapsOffsetAndSnapLines,
+  snapDraggedElements,
   isActiveToolNonLinearSnappable,
   snapNewElement,
   snapResizingElements,
+  isSnappingEnabled,
+  getVisibleGaps,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -4548,6 +4550,21 @@ class App extends React.Component<AppProps, AppState> {
 
     this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
 
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    );
+
+    if (isSnappingEnabled({ event, appState: this.state, selectedElements })) {
+      this.setState({
+        visibleGaps: getVisibleGaps(
+          this.scene.getNonDeletedElements(),
+          selectedElements,
+          this.state,
+        ),
+      });
+    }
+
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
 
@@ -5863,7 +5880,7 @@ class App extends React.Component<AppProps, AppState> {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
-            this.state.gridSize,
+            event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
           );
 
           const dragOffset = {
@@ -5894,7 +5911,7 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          const { snapOffset, snapLines } = getSnapsOffsetAndSnapLines(
+          const { snapOffset, snapLines } = snapDraggedElements(
             originalElements,
             getSelectedElements(originalElements, this.state),
             dragOffset,
@@ -5914,6 +5931,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               this.scene,
               snapOffset,
+              event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
           this.maybeSuggestBindingForAll(selectedElements);
@@ -5959,7 +5977,7 @@ class App extends React.Component<AppProps, AppState> {
                 const [originDragX, originDragY] = getGridPoint(
                   pointerDownState.origin.x - pointerDownState.drag.offset.x,
                   pointerDownState.origin.y - pointerDownState.drag.offset.y,
-                  this.state.gridSize,
+                  event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
                   x: duplicatedElement.x + (originDragX - dragX),
@@ -6229,6 +6247,7 @@ class App extends React.Component<AppProps, AppState> {
             ? this.state.editingElement
             : null,
         snapLines: [],
+        visibleGaps: null,
         originSnapOffset: null,
       });
 
@@ -7762,7 +7781,7 @@ class App extends React.Component<AppProps, AppState> {
       let [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const image =
@@ -7858,7 +7877,7 @@ class App extends React.Component<AppProps, AppState> {
     let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      this.state.gridSize,
+      event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const frameElementsOffsetsMap = new Map<
@@ -7889,7 +7908,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const dragOffset = {
@@ -8020,9 +8039,9 @@ class App extends React.Component<AppProps, AppState> {
         actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
+        actionToggleObjectsSnapMode,
         actionToggleZenMode,
         actionToggleViewMode,
-        actionToggleObjectsSnapMode,
         actionToggleStats,
       ];
     }

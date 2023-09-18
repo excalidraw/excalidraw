@@ -1,8 +1,8 @@
 import {
+  Bounds,
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
-  getElementBounds,
 } from "./element/bounds";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import { isBoundToContainer, isFrameElement } from "./element/typeChecks";
@@ -50,8 +50,10 @@ export type Gap = {
   //                               └───────────┘
   //                               ↑ end side
 
-  startElement: ExcalidrawElement;
-  endElement: ExcalidrawElement;
+  // startElement: ExcalidrawElement;
+  // endElement: ExcalidrawElement;
+  startBounds: Bounds;
+  endBounds: Bounds;
   startSide: [Point, Point];
   endSide: [Point, Point];
   overlap: [number, number];
@@ -100,6 +102,7 @@ export type MaybeSnapEvent =
   | MouseEvent
   | KeyboardEvent
   | React.PointerEvent<HTMLCanvasElement>
+  | React.PointerEvent<HTMLElement>
   | false;
 
 export const isSnappingEnabled = ({
@@ -111,16 +114,16 @@ export const isSnappingEnabled = ({
   event: MaybeSnapEvent;
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
-  // do not suggest snaps for an arrow to give way to binding
-  if (selectedElements.length === 1 && selectedElements[0].type === "arrow") {
-    return false;
-  }
-
-  if (event && "metaKey" in event) {
+  if (event) {
     return (
       (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
       (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD])
     );
+  }
+
+  // do not suggest snaps for an arrow to give way to binding
+  if (selectedElements.length === 1 && selectedElements[0].type === "arrow") {
+    return false;
   }
   return appState.objectsSnapModeEnabled;
 };
@@ -255,30 +258,33 @@ export const getVisibleGaps = (
     appState,
   );
 
-  // TODO: we could cache horizontally and vertically sorted elements
-  const horizontallySorted = referenceElements.sort(
-    (a, b) => getElementBounds(a)[0] - getElementBounds(b)[0],
-  );
+  const referenceBounds = getMaximumGroups(referenceElements)
+    .filter(
+      (elementsGroup) =>
+        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
+    )
+    .map((group) => getCommonBounds(group));
+
+  const horizontallySorted = referenceBounds.sort((a, b) => a[0] - b[0]);
 
   const horizontalGaps: Gap[] = [];
 
   for (let i = 0; i < horizontallySorted.length; i++) {
-    const startElement = horizontallySorted[i];
+    const startBounds = horizontallySorted[i];
 
     for (let j = i + 1; j < horizontallySorted.length; j++) {
-      const endElement = horizontallySorted[j];
+      const endBounds = horizontallySorted[j];
 
-      const [, startMinY, startMaxX, startMaxY] =
-        getElementBounds(startElement);
-      const [endMinX, endMinY, , endMaxY] = getElementBounds(endElement);
+      const [, startMinY, startMaxX, startMaxY] = startBounds;
+      const [endMinX, endMinY, , endMaxY] = endBounds;
 
       if (
         startMaxX < endMinX &&
         rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY])
       ) {
         horizontalGaps.push({
-          startElement,
-          endElement,
+          startBounds,
+          endBounds,
           startSide: [
             [startMaxX, startMinY],
             [startMaxX, startMaxY],
@@ -297,29 +303,26 @@ export const getVisibleGaps = (
     }
   }
 
-  const verticallySorted = referenceElements.sort(
-    (a, b) => getElementBounds(a)[1] - getElementBounds(b)[1],
-  );
+  const verticallySorted = referenceBounds.sort((a, b) => a[1] - b[1]);
 
   const verticalGaps: Gap[] = [];
 
   for (let i = 0; i < verticallySorted.length; i++) {
-    const startElement = verticallySorted[i];
+    const startBounds = verticallySorted[i];
 
     for (let j = i + 1; j < verticallySorted.length; j++) {
-      const endElement = verticallySorted[j];
+      const endBounds = verticallySorted[j];
 
-      const [startMinX, , startMaxX, startMaxY] =
-        getElementBounds(startElement);
-      const [endMinX, endMinY, endMaxX] = getElementBounds(endElement);
+      const [startMinX, , startMaxX, startMaxY] = startBounds;
+      const [endMinX, endMinY, endMaxX] = endBounds;
 
       if (
         startMaxY < endMinY &&
         rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX])
       ) {
         verticalGaps.push({
-          startElement,
-          endElement,
+          startBounds,
+          endBounds,
           startSide: [
             [startMinX, startMaxY],
             [startMaxX, startMaxY],
@@ -345,7 +348,6 @@ export const getVisibleGaps = (
 };
 
 export const getGapSnaps = (
-  elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
@@ -362,156 +364,154 @@ export const getGapSnaps = (
     return [];
   }
 
-  const { horizontalGaps, verticalGaps } = getVisibleGaps(
-    elements,
-    selectedElements,
-    appState,
-  );
+  if (appState.visibleGaps) {
+    const { horizontalGaps, verticalGaps } = appState.visibleGaps;
 
-  const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
-    selectedElements,
-    dragOffset,
-  );
-  const centerX = (minX + maxX) / 2;
-  const centerY = (minY + maxY) / 2;
+    const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
+      selectedElements,
+      dragOffset,
+    );
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
 
-  for (const gap of horizontalGaps) {
-    if (!rangesOverlap([minY, maxY], gap.overlap)) {
-      continue;
-    }
-
-    // center gap
-    const gapMidX = gap.startSide[0][0] + gap.length / 2;
-    const centerOffset = gapMidX - centerX;
-    const gapIsLargerThanSelection = gap.length > maxX - minX;
-
-    if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
-      if (Math.abs(centerOffset) < minOffset.x) {
-        neartestSnapsX.length = 0;
+    for (const gap of horizontalGaps) {
+      if (!rangesOverlap([minY, maxY], gap.overlap)) {
+        continue;
       }
-      minOffset.x = Math.abs(centerOffset);
 
-      const snap: GapSnap = {
-        type: "gap",
-        direction: "center_horizontal",
-        gap,
-        offset: centerOffset,
-      };
+      // center gap
+      const gapMidX = gap.startSide[0][0] + gap.length / 2;
+      const centerOffset = gapMidX - centerX;
+      const gapIsLargerThanSelection = gap.length > maxX - minX;
 
-      neartestSnapsX.push(snap);
-      continue;
-    }
+      if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
+        if (Math.abs(centerOffset) < minOffset.x) {
+          neartestSnapsX.length = 0;
+        }
+        minOffset.x = Math.abs(centerOffset);
 
-    // side gap, from the right
-    const [, , endMaxX] = getElementBounds(gap.endElement);
-    const distanceToEndElementX = minX - endMaxX;
-    const sideOffsetRight = gap.length - distanceToEndElementX;
+        const snap: GapSnap = {
+          type: "gap",
+          direction: "center_horizontal",
+          gap,
+          offset: centerOffset,
+        };
 
-    if (Math.abs(sideOffsetRight) <= minOffset.x) {
-      if (Math.abs(sideOffsetRight) < minOffset.x) {
-        neartestSnapsX.length = 0;
+        neartestSnapsX.push(snap);
+        continue;
       }
-      minOffset.x = Math.abs(sideOffsetRight);
 
-      const snap: GapSnap = {
-        type: "gap",
-        direction: "side_right",
-        gap,
-        offset: sideOffsetRight,
-      };
-      neartestSnapsX.push(snap);
-      continue;
-    }
+      // side gap, from the right
+      const [, , endMaxX] = gap.endBounds;
+      const distanceToEndElementX = minX - endMaxX;
+      const sideOffsetRight = gap.length - distanceToEndElementX;
 
-    // side gap, from the left
-    const [startMinX, , ,] = getElementBounds(gap.startElement);
-    const distanceToStartElementX = startMinX - maxX;
-    const sideOffsetLeft = distanceToStartElementX - gap.length;
+      if (Math.abs(sideOffsetRight) <= minOffset.x) {
+        if (Math.abs(sideOffsetRight) < minOffset.x) {
+          neartestSnapsX.length = 0;
+        }
+        minOffset.x = Math.abs(sideOffsetRight);
 
-    if (Math.abs(sideOffsetLeft) <= minOffset.x) {
-      if (Math.abs(sideOffsetLeft) < minOffset.x) {
-        neartestSnapsX.length = 0;
+        const snap: GapSnap = {
+          type: "gap",
+          direction: "side_right",
+          gap,
+          offset: sideOffsetRight,
+        };
+        neartestSnapsX.push(snap);
+        continue;
       }
-      minOffset.x = Math.abs(sideOffsetLeft);
 
-      const snap: GapSnap = {
-        type: "gap",
-        direction: "side_left",
-        gap,
-        offset: sideOffsetLeft,
-      };
-      neartestSnapsX.push(snap);
-      continue;
-    }
-  }
+      // side gap, from the left
+      const [startMinX, , ,] = gap.startBounds;
+      const distanceToStartElementX = startMinX - maxX;
+      const sideOffsetLeft = distanceToStartElementX - gap.length;
 
-  for (const gap of verticalGaps) {
-    if (!rangesOverlap([minX, maxX], gap.overlap)) {
-      continue;
-    }
+      if (Math.abs(sideOffsetLeft) <= minOffset.x) {
+        if (Math.abs(sideOffsetLeft) < minOffset.x) {
+          neartestSnapsX.length = 0;
+        }
+        minOffset.x = Math.abs(sideOffsetLeft);
 
-    // center gap
-    const gapMidY = gap.startSide[0][1] + gap.length / 2;
-    const centerOffset = gapMidY - centerY;
-    const gapIsLargerThanSelection = gap.length > maxY - minY;
-
-    if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
-      if (Math.abs(centerOffset) < minOffset.y) {
-        neartestSnapsY.length = 0;
+        const snap: GapSnap = {
+          type: "gap",
+          direction: "side_left",
+          gap,
+          offset: sideOffsetLeft,
+        };
+        neartestSnapsX.push(snap);
+        continue;
       }
-      minOffset.y = Math.abs(centerOffset);
-
-      const snap: GapSnap = {
-        type: "gap",
-        direction: "center_vertical",
-        gap,
-        offset: centerOffset,
-      };
-
-      neartestSnapsY.push(snap);
-      continue;
     }
 
-    // side gap, from the top
-    const [, startMinY, ,] = getElementBounds(gap.startElement);
-    const distanceToStartElementY = startMinY - maxY;
-    const sideOffsetTop = distanceToStartElementY - gap.length;
-
-    if (Math.abs(sideOffsetTop) <= minOffset.y) {
-      if (Math.abs(sideOffsetTop) < minOffset.y) {
-        neartestSnapsY.length = 0;
+    for (const gap of verticalGaps) {
+      if (!rangesOverlap([minX, maxX], gap.overlap)) {
+        continue;
       }
-      minOffset.y = Math.abs(sideOffsetTop);
 
-      const snap: GapSnap = {
-        type: "gap",
-        direction: "side_top",
-        gap,
-        offset: sideOffsetTop,
-      };
-      neartestSnapsY.push(snap);
-      continue;
-    }
+      // center gap
+      const gapMidY = gap.startSide[0][1] + gap.length / 2;
+      const centerOffset = gapMidY - centerY;
+      const gapIsLargerThanSelection = gap.length > maxY - minY;
 
-    // side gap, from the bottom
-    const [, , , endMaxY] = getElementBounds(gap.endElement);
-    const distanceToEndElementY = minY - endMaxY;
-    const sideOffsetBottom = gap.length - distanceToEndElementY;
+      if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
+        if (Math.abs(centerOffset) < minOffset.y) {
+          neartestSnapsY.length = 0;
+        }
+        minOffset.y = Math.abs(centerOffset);
 
-    if (Math.abs(sideOffsetBottom) <= minOffset.y) {
-      if (Math.abs(sideOffsetBottom) < minOffset.y) {
-        neartestSnapsY.length = 0;
+        const snap: GapSnap = {
+          type: "gap",
+          direction: "center_vertical",
+          gap,
+          offset: centerOffset,
+        };
+
+        neartestSnapsY.push(snap);
+        continue;
       }
-      minOffset.y = Math.abs(sideOffsetBottom);
 
-      const snap: GapSnap = {
-        type: "gap",
-        direction: "side_bottom",
-        gap,
-        offset: sideOffsetBottom,
-      };
-      neartestSnapsY.push(snap);
-      continue;
+      // side gap, from the top
+      const [, startMinY, ,] = gap.startBounds;
+      const distanceToStartElementY = startMinY - maxY;
+      const sideOffsetTop = distanceToStartElementY - gap.length;
+
+      if (Math.abs(sideOffsetTop) <= minOffset.y) {
+        if (Math.abs(sideOffsetTop) < minOffset.y) {
+          neartestSnapsY.length = 0;
+        }
+        minOffset.y = Math.abs(sideOffsetTop);
+
+        const snap: GapSnap = {
+          type: "gap",
+          direction: "side_top",
+          gap,
+          offset: sideOffsetTop,
+        };
+        neartestSnapsY.push(snap);
+        continue;
+      }
+
+      // side gap, from the bottom
+      const [, , , endMaxY] = gap.endBounds;
+      const distanceToEndElementY = minY - endMaxY;
+      const sideOffsetBottom = gap.length - distanceToEndElementY;
+
+      if (Math.abs(sideOffsetBottom) <= minOffset.y) {
+        if (Math.abs(sideOffsetBottom) < minOffset.y) {
+          neartestSnapsY.length = 0;
+        }
+        minOffset.y = Math.abs(sideOffsetBottom);
+
+        const snap: GapSnap = {
+          type: "gap",
+          direction: "side_bottom",
+          gap,
+          offset: sideOffsetBottom,
+        };
+        neartestSnapsY.push(snap);
+        continue;
+      }
     }
   }
 };
@@ -582,7 +582,7 @@ export const getPointSnaps = (
   }
 };
 
-export const getSnapsOffsetAndSnapLines = (
+export const snapDraggedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
@@ -614,7 +614,6 @@ export const getSnapsOffsetAndSnapLines = (
   );
 
   getGapSnaps(
-    elements,
     selectedElements,
     dragOffset,
     appState,
@@ -659,13 +658,9 @@ export const getSnapsOffsetAndSnapLines = (
     minOffset,
   );
 
-  minOffset.x = snapDistance;
-  minOffset.y = snapDistance;
-
   getGapSnaps(
-    elements,
     selectedElements,
-    dragOffset,
+    newDragOffset,
     appState,
     event,
     neartestSnapsX,
@@ -710,12 +705,9 @@ const createGapSnapLines = (
   const gapSnapLines: GapSnapLine[] = [];
 
   for (const gapSnap of gapSnaps) {
-    const [startMinX, startMinY, startMaxX, startMaxY] = getElementBounds(
-      gapSnap.gap.startElement,
-    );
-    const [endMinX, endMinY, endMaxX, endMaxY] = getElementBounds(
-      gapSnap.gap.endElement,
-    );
+    const [startMinX, startMinY, startMaxX, startMaxY] =
+      gapSnap.gap.startBounds;
+    const [endMinX, endMinY, endMaxX, endMaxY] = gapSnap.gap.endBounds;
 
     const verticalIntersection = rangeIntersection(
       [minY, maxY],
