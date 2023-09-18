@@ -264,7 +264,8 @@
     "bindTextToElement": "برای افزودن اینتر را بزنید",
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
-    "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید."
+    "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
