@@ -264,7 +264,8 @@
     "bindTextToElement": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
-    "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\"."
+    "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Không thể xem trước",
