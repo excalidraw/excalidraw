@@ -264,7 +264,8 @@
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
-    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page."
+    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
