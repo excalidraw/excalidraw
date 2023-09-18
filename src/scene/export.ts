@@ -1,9 +1,13 @@
 import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
+import {
+  Bounds,
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
 import {
-  convertToExportPadding,
+  convertToExportPadding as convertExportPadding,
   distance,
   expandToAspectRatio,
   isOnlyExportingSingleFrame,
@@ -61,19 +65,29 @@ export const exportToCanvas = async (
   );
 
   const padding = !exportingWithFancyBackground
-    ? convertToExportPadding(exportPadding)
+    ? convertExportPadding(exportPadding)
     : getFancyBackgroundPadding(
-        convertToExportPadding(exportPadding),
+        convertExportPadding(exportPadding),
         FANCY_BG_INCLUDE_LOGO,
       );
 
-  const onlyExportingSingleFrame =
-    isOnlyExportingSingleFrame(elements) && !exportingWithFancyBackground;
+  const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
   const [minX, minY, width, height] = !exportingWithFancyBackground
-    ? getCanvasSize(elements, padding, onlyExportingSingleFrame)
-    : getCanvasSize(elements, padding, onlyExportingSingleFrame, {
-        aspectRatio: { width: 16, height: 9 },
+    ? getCanvasSize({
+        elements,
+        padding,
+        onlyExportingSingleFrame,
+        exportingWithFancyBackground,
+      })
+    : getCanvasSize({
+        elements,
+        padding,
+        onlyExportingSingleFrame,
+        exportingWithFancyBackground,
+        opts: {
+          aspectRatio: { width: 16, height: 9 },
+        },
       });
 
   const { canvas, scale = 1 } = createCanvas(width, height);
@@ -95,7 +109,10 @@ export const exportToCanvas = async (
     exportingWithFancyBackground &&
     appState.fancyBackgroundImageKey !== "solid"
   ) {
-    const commonBounds = getCommonBounds(elements);
+    const commonBounds = getElementsSize({
+      elements,
+      onlyExportingSingleFrame,
+    });
     const contentSize: Dimensions = {
       width: distance(commonBounds[0], commonBounds[2]),
       height: distance(commonBounds[1], commonBounds[3]),
@@ -131,9 +148,15 @@ export const exportToCanvas = async (
           ? viewBackgroundColor
           : null,
       scrollX:
-        -minX + (onlyExportingSingleFrame ? 0 : padding[3] + scrollXAdjustment),
+        -minX +
+        (onlyExportingSingleFrame && !exportingWithFancyBackground
+          ? 0
+          : padding[3] + scrollXAdjustment),
       scrollY:
-        -minY + (onlyExportingSingleFrame ? 0 : padding[0] + scrollYAdjustment),
+        -minY +
+        (onlyExportingSingleFrame && !exportingWithFancyBackground
+          ? 0
+          : padding[0] + scrollYAdjustment),
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
@@ -183,9 +206,9 @@ export const exportToSvg = async (
   );
 
   const padding = !exportingWithFancyBackground
-    ? convertToExportPadding(exportPadding)
+    ? convertExportPadding(exportPadding)
     : getFancyBackgroundPadding(
-        convertToExportPadding(exportPadding),
+        convertExportPadding(exportPadding),
         FANCY_BG_INCLUDE_LOGO,
       );
 
@@ -204,13 +227,23 @@ export const exportToSvg = async (
     }
   }
 
-  const onlyExportingSingleFrame =
-    isOnlyExportingSingleFrame(elements) && !exportingWithFancyBackground;
+  const onlyExportingSingleFrame = isOnlyExportingSingleFrame(elements);
 
   const [minX, minY, width, height] = !exportingWithFancyBackground
-    ? getCanvasSize(elements, padding, onlyExportingSingleFrame)
-    : getCanvasSize(elements, padding, onlyExportingSingleFrame, {
-        aspectRatio: { width: 16, height: 9 },
+    ? getCanvasSize({
+        elements,
+        padding,
+        onlyExportingSingleFrame,
+        exportingWithFancyBackground,
+      })
+    : getCanvasSize({
+        elements,
+        padding,
+        onlyExportingSingleFrame,
+        exportingWithFancyBackground,
+        opts: {
+          aspectRatio: { width: 16, height: 9 },
+        },
       });
 
   // initialize SVG root
@@ -244,8 +277,16 @@ export const exportToSvg = async (
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
 
-  const offsetX = -minX + (onlyExportingSingleFrame ? 0 : padding[3]);
-  const offsetY = -minY + (onlyExportingSingleFrame ? 0 : padding[0]);
+  const offsetX =
+    -minX +
+    (onlyExportingSingleFrame && !exportingWithFancyBackground
+      ? 0
+      : padding[3]);
+  const offsetY =
+    -minY +
+    (onlyExportingSingleFrame && !exportingWithFancyBackground
+      ? 0
+      : padding[0]);
 
   const exportingFrame =
     isExportingWholeCanvas || !onlyExportingSingleFrame
@@ -297,7 +338,10 @@ export const exportToSvg = async (
       appState.fancyBackgroundImageKey &&
       appState.fancyBackgroundImageKey !== "solid"
     ) {
-      const commonBounds = getCommonBounds(elements);
+      const commonBounds = getElementsSize({
+        elements,
+        onlyExportingSingleFrame,
+      });
       const contentSize: Dimensions = {
         width: distance(commonBounds[0], commonBounds[2]),
         height: distance(commonBounds[1], commonBounds[3]),
@@ -342,17 +386,16 @@ export const exportToSvg = async (
   return svgRoot;
 };
 
-// calculate smallest area to fit the contents in
-const getCanvasSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  exportPadding: ExportPadding,
-  onlyExportingSingleFrame: boolean,
-  opts?: { aspectRatio: Dimensions },
-): [number, number, number, number] => {
+const getElementsSize = ({
+  elements,
+  onlyExportingSingleFrame,
+}: {
+  elements: readonly NonDeletedExcalidrawElement[];
+  onlyExportingSingleFrame: boolean;
+}): Bounds => {
   // we should decide if we are exporting the whole canvas
   // if so, we are not clipping elements in the frame
   // and therefore, we should not do anything special
-
   const isExportingWholeCanvas =
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
@@ -372,17 +415,37 @@ const getCanvasSize = (
     );
   }
 
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  return getCommonBounds(elements);
+};
+
+// calculate smallest area to fit the contents in
+const getCanvasSize = ({
+  elements,
+  padding,
+  onlyExportingSingleFrame,
+  exportingWithFancyBackground,
+  opts,
+}: {
+  elements: readonly NonDeletedExcalidrawElement[];
+  padding: ExportPadding;
+  onlyExportingSingleFrame: boolean;
+  exportingWithFancyBackground: boolean;
+  opts?: { aspectRatio: Dimensions };
+}): [number, number, number, number] => {
+  const [minX, minY, maxX, maxY] = getElementsSize({
+    elements,
+    onlyExportingSingleFrame,
+  });
 
   let width = 0;
   let height = 0;
 
-  if (onlyExportingSingleFrame) {
+  if (onlyExportingSingleFrame && !exportingWithFancyBackground) {
     width = distance(minX, maxX);
     height = distance(minY, maxY);
   } else {
-    width = distance(minX, maxX) + exportPadding[1] + exportPadding[3];
-    height = distance(minY, maxY) + exportPadding[0] + exportPadding[2];
+    width = distance(minX, maxX) + padding[1] + padding[3];
+    height = distance(minY, maxY) + padding[0] + padding[2];
   }
 
   if (opts?.aspectRatio) {
@@ -403,11 +466,15 @@ export const getExportSize = (
   scale: number,
   appState: AppState,
 ): [number, number] => {
-  const [, , width, height] = getCanvasSize(
+  const [, , width, height] = getCanvasSize({
     elements,
-    convertToExportPadding(exportPadding),
-    isExportingWithFacnyBackground(appState, elements),
-  ).map((dimension) => Math.trunc(dimension * scale));
+    padding: convertExportPadding(exportPadding),
+    onlyExportingSingleFrame: isOnlyExportingSingleFrame(elements),
+    exportingWithFancyBackground: isExportingWithFacnyBackground(
+      appState,
+      elements,
+    ),
+  }).map((dimension) => Math.trunc(dimension * scale));
 
   return [width, height];
 };
