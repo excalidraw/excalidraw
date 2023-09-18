@@ -264,7 +264,8 @@
     "bindTextToElement": "Druk op enter om tekst toe te voegen",
     "deepBoxSelect": "",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
