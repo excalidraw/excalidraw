@@ -366,6 +366,10 @@ const frameClip = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  if (!appState.frameRendering.clip) {
+    return;
+  }
+
   context.translate(frame.x + appState.scrollX, frame.y + appState.scrollY);
   context.beginPath();
   if (context.roundRect && !renderConfig.isExporting) {

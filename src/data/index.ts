@@ -48,6 +48,7 @@ export const exportCanvas = async (
         exportScale: appState.exportScale,
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
         fancyBackgroundImageKey: appState.fancyBackgroundImageKey,
+        clipFrame: appState.frameRendering.clip,
       },
       files,
     );

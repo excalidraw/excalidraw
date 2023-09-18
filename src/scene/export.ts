@@ -79,6 +79,9 @@ export const exportToCanvas = async (
         padding,
         onlyExportingSingleFrame,
         exportingWithFancyBackground,
+        opts: {
+          clipFrame: appState.frameRendering.clip,
+        },
       })
     : getCanvasSize({
         elements,
@@ -87,6 +90,7 @@ export const exportToCanvas = async (
         exportingWithFancyBackground,
         opts: {
           aspectRatio: { width: 16, height: 9 },
+          clipFrame: appState.frameRendering.clip,
         },
       });
 
@@ -112,6 +116,7 @@ export const exportToCanvas = async (
     const commonBounds = getElementsSize({
       elements,
       onlyExportingSingleFrame,
+      clipFrame: appState.frameRendering.clip,
     });
     const contentSize: Dimensions = {
       width: distance(commonBounds[0], commonBounds[2]),
@@ -183,6 +188,7 @@ export const exportToSvg = async (
     exportEmbedScene?: boolean;
     renderFrame?: boolean;
     fancyBackgroundImageKey?: keyof typeof FANCY_BACKGROUND_IMAGES;
+    clipFrame?: boolean;
   },
   files: BinaryFiles | null,
   opts?: {
@@ -235,6 +241,9 @@ export const exportToSvg = async (
         padding,
         onlyExportingSingleFrame,
         exportingWithFancyBackground,
+        opts: {
+          clipFrame: appState.clipFrame ?? false,
+        },
       })
     : getCanvasSize({
         elements,
@@ -243,6 +252,7 @@ export const exportToSvg = async (
         exportingWithFancyBackground,
         opts: {
           aspectRatio: { width: 16, height: 9 },
+          clipFrame: appState.clipFrame ?? false,
         },
       });
 
@@ -294,7 +304,7 @@ export const exportToSvg = async (
       : elements.find((element) => element.type === "frame");
 
   let exportingFrameClipPath = "";
-  if (exportingFrame) {
+  if (exportingFrame && appState.clipFrame) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(exportingFrame);
     const cx = (x2 - x1) / 2 - (exportingFrame.x - x1);
     const cy = (y2 - y1) / 2 - (exportingFrame.y - y1);
@@ -341,6 +351,7 @@ export const exportToSvg = async (
       const commonBounds = getElementsSize({
         elements,
         onlyExportingSingleFrame,
+        clipFrame: appState.clipFrame ?? false,
       });
       const contentSize: Dimensions = {
         width: distance(commonBounds[0], commonBounds[2]),
@@ -389,9 +400,11 @@ export const exportToSvg = async (
 const getElementsSize = ({
   elements,
   onlyExportingSingleFrame,
+  clipFrame,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   onlyExportingSingleFrame: boolean;
+  clipFrame: boolean;
 }): Bounds => {
   // we should decide if we are exporting the whole canvas
   // if so, we are not clipping elements in the frame
@@ -400,7 +413,7 @@ const getElementsSize = ({
     Scene.getScene(elements[0])?.getNonDeletedElements()?.length ===
     elements.length;
 
-  if (!isExportingWholeCanvas || onlyExportingSingleFrame) {
+  if ((!isExportingWholeCanvas || onlyExportingSingleFrame) && clipFrame) {
     const frames = elements.filter((element) => element.type === "frame");
 
     const exportedFrameIds = frames.reduce((acc, frame) => {
@@ -430,11 +443,12 @@ const getCanvasSize = ({
   padding: ExportPadding;
   onlyExportingSingleFrame: boolean;
   exportingWithFancyBackground: boolean;
-  opts?: { aspectRatio: Dimensions };
+  opts?: { aspectRatio?: Dimensions; clipFrame?: boolean };
 }): [number, number, number, number] => {
   const [minX, minY, maxX, maxY] = getElementsSize({
     elements,
     onlyExportingSingleFrame,
+    clipFrame: opts?.clipFrame ?? false,
   });
 
   let width = 0;
@@ -474,6 +488,9 @@ export const getExportSize = (
       appState,
       elements,
     ),
+    opts: {
+      clipFrame: appState.frameRendering.clip,
+    },
   }).map((dimension) => Math.trunc(dimension * scale));
 
   return [width, height];
