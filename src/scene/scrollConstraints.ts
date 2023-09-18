@@ -294,13 +294,19 @@ const isViewportOutsideOfConstrainedArea = (state: AppState) => {
 
   const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;
 
+  // Adjust scroll and dimensions according to the zoom level
+  const adjustedScrollX = scrollX * zoom.value;
+  const adjustedScrollY = scrollY * zoom.value;
+  const adjustedWidth = width / zoom.value;
+  const adjustedHeight = height / zoom.value;
+
   return (
-    scrollX > scrollConstraints.x ||
-    scrollX - width <
-      scrollConstraints.x - scrollConstraints.width * zoom.value ||
-    scrollY > scrollConstraints.y ||
-    scrollY - height <
-      scrollConstraints.y - scrollConstraints.height * zoom.value
+    adjustedScrollX > scrollConstraints.x ||
+    adjustedScrollX - adjustedWidth <
+      scrollConstraints.x - scrollConstraints.width ||
+    adjustedScrollY > scrollConstraints.y ||
+    adjustedScrollY - adjustedHeight <
+      scrollConstraints.y - scrollConstraints.height
   );
 };
 
