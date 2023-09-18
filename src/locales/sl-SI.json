@@ -265,7 +265,7 @@
     "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
     "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
     "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "Držite CtrlOrCmd, da onemogočite pripenjanje"
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
