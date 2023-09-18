@@ -264,7 +264,8 @@
     "bindTextToElement": "Нажмите Enter для добавления текста",
     "deepBoxSelect": "Удерживайте Ctrl или Cmd для глубокого выделения, чтобы предотвратить перетаскивание",
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
-    "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\"."
+    "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
