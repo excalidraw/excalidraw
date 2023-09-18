@@ -3986,7 +3986,7 @@ class App extends React.Component<AppProps, AppState> {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          this.state.gridSize,
+          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
         );
 
         const [lastCommittedX, lastCommittedY] =
@@ -4822,7 +4822,11 @@ class App extends React.Component<AppProps, AppState> {
       origin,
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
       originInGrid: tupleToCoors(
-        getGridPoint(origin.x, origin.y, this.state.gridSize),
+        getGridPoint(
+          origin.x,
+          origin.y,
+          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+        ),
       ),
       scrollbars: isOverScrollBars(
         currentScrollBars,
@@ -5346,7 +5350,11 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number;
     link: string;
   }) => {
-    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+    const [gridX, gridY] = getGridPoint(
+      sceneX,
+      sceneY,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+    );
 
     const embedLink = getEmbedLink(link);
 
@@ -5392,7 +5400,11 @@ class App extends React.Component<AppProps, AppState> {
     sceneX: number;
     sceneY: number;
   }) => {
-    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+    const [gridX, gridY] = getGridPoint(
+      sceneX,
+      sceneY,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+    );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
       x: gridX,
@@ -5475,7 +5487,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5568,7 +5580,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.state.gridSize,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5626,7 +5638,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.state.gridSize,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const frame = newFrameElement({
@@ -5709,7 +5721,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       // for arrows/lines, don't start dragging until a given threshold
@@ -5755,6 +5767,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement,
             pointerCoords,
             this.state,
+            !event[KEYS.CTRL_OR_CMD],
           );
           if (!ret) {
             return;
