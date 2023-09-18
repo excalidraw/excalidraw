@@ -264,7 +264,8 @@
     "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
     "deepBoxSelect": "",
     "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
