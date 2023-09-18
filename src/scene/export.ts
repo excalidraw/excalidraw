@@ -90,7 +90,7 @@ export const exportToCanvas = async (
         exportingWithFancyBackground,
         opts: {
           aspectRatio: { width: 16, height: 9 },
-          clipFrame: appState.frameRendering.clip,
+          clipFrame: false,
         },
       });
 
@@ -116,7 +116,7 @@ export const exportToCanvas = async (
     const commonBounds = getElementsSize({
       elements,
       onlyExportingSingleFrame,
-      clipFrame: appState.frameRendering.clip,
+      clipFrame: false,
     });
     const contentSize: Dimensions = {
       width: distance(commonBounds[0], commonBounds[2]),
@@ -165,6 +165,10 @@ export const exportToCanvas = async (
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+      frameRendering: {
+        ...appState.frameRendering,
+        clip: appState.frameRendering.clip && !exportingWithFancyBackground,
+      },
     },
     renderConfig: {
       imageCache,
@@ -252,7 +256,7 @@ export const exportToSvg = async (
         exportingWithFancyBackground,
         opts: {
           aspectRatio: { width: 16, height: 9 },
-          clipFrame: appState.clipFrame ?? false,
+          clipFrame: false,
         },
       });
 
@@ -304,7 +308,7 @@ export const exportToSvg = async (
       : elements.find((element) => element.type === "frame");
 
   let exportingFrameClipPath = "";
-  if (exportingFrame && appState.clipFrame) {
+  if (exportingFrame && appState.clipFrame && !exportingWithFancyBackground) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(exportingFrame);
     const cx = (x2 - x1) / 2 - (exportingFrame.x - x1);
     const cy = (y2 - y1) / 2 - (exportingFrame.y - y1);
@@ -351,7 +355,7 @@ export const exportToSvg = async (
       const commonBounds = getElementsSize({
         elements,
         onlyExportingSingleFrame,
-        clipFrame: appState.clipFrame ?? false,
+        clipFrame: false,
       });
       const contentSize: Dimensions = {
         width: distance(commonBounds[0], commonBounds[2]),
@@ -480,16 +484,18 @@ export const getExportSize = (
   scale: number,
   appState: AppState,
 ): [number, number] => {
+  const exportingWithFancyBackground = isExportingWithFacnyBackground(
+    appState,
+    elements,
+  );
+
   const [, , width, height] = getCanvasSize({
     elements,
     padding: convertExportPadding(exportPadding),
     onlyExportingSingleFrame: isOnlyExportingSingleFrame(elements),
-    exportingWithFancyBackground: isExportingWithFacnyBackground(
-      appState,
-      elements,
-    ),
+    exportingWithFancyBackground,
     opts: {
-      clipFrame: appState.frameRendering.clip,
+      clipFrame: appState.frameRendering.clip && !exportingWithFancyBackground,
     },
   }).map((dimension) => Math.trunc(dimension * scale));
 
