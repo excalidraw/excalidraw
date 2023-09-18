@@ -375,6 +375,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -570,6 +571,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -770,6 +772,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -1146,6 +1149,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -1524,6 +1528,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -1722,6 +1727,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -1963,6 +1969,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -2272,6 +2279,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -2661,6 +2669,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   },
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -3541,6 +3550,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -3917,6 +3927,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -4296,6 +4307,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -5031,6 +5043,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -5616,6 +5629,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -5997,6 +6011,19 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
+        "contextItemLabel": "buttons.objectsSnapMode",
+        "keyTest": [Function],
+        "name": "objectsSnapMode",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      {
+        "checked": [Function],
         "contextItemLabel": "buttons.zenMode",
         "keyTest": [Function],
         "name": "zenMode",
@@ -6013,19 +6040,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "contextItemLabel": "labels.viewMode",
         "keyTest": [Function],
         "name": "viewMode",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "canvas",
-          "predicate": [Function],
-        },
-        "viewMode": true,
-      },
-      {
-        "checked": [Function],
-        "contextItemLabel": "buttons.objectsSnapMode",
-        "keyTest": [Function],
-        "name": "objectsSnapMode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6132,6 +6146,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -6533,6 +6548,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
@@ -6913,6 +6929,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "visibleGaps": null,
   "width": 200,
   "zenModeEnabled": false,
   "zoom": {
