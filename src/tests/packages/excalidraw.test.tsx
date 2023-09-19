@@ -64,9 +64,7 @@ describe("<Excalidraw/>", () => {
         <div>This is a custom footer</div>
       </Excalidraw>,
     );
-    expect(container.querySelector(".layer-ui__wrapper__footer-center")).toBe(
-      null,
-    );
+    expect(container.querySelector(".footer-center")).toBe(null);
 
     // Footer passed hence it will render the footer
     ({ container } = await render(
@@ -76,12 +74,10 @@ describe("<Excalidraw/>", () => {
         </Footer>
       </Excalidraw>,
     ));
-    expect(
-      container.querySelector(".layer-ui__wrapper__footer-center"),
-    ).toMatchInlineSnapshot(
+    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(
       `
       <div
-        class="layer-ui__wrapper__footer-center zen-mode-transition"
+        class="footer-center zen-mode-transition"
       >
         <div>
           This is a custom footer
