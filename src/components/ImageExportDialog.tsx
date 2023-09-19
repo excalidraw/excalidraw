@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import clsx from "clsx";
 
 import type { ActionManager } from "../actions/manager";
@@ -29,7 +23,10 @@ import {
 
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, getScaleToFit } from "../packages/utils";
@@ -52,6 +49,7 @@ import {
 } from "../utils";
 import { getFancyBackgroundPadding } from "../scene/fancyBackground";
 import { Select } from "./Select";
+import { Bounds } from "../element/bounds";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -83,6 +81,113 @@ type ImageExportModalProps = {
   onExportImage: AppClassProperties["onExportImage"];
 };
 
+type State = {
+  projectName: string;
+  someElementIsSelected: boolean;
+  exportSelected: boolean;
+  exportedElements:
+    | readonly NonDeletedExcalidrawElement[]
+    | ExcalidrawElement[];
+  elementsBounds: Bounds;
+  exportWithBackground: boolean;
+  exportBackgroundImage: keyof typeof FANCY_BACKGROUND_IMAGES;
+  exportDarkMode: boolean;
+  embedScene: boolean;
+  exportScale: number;
+  exportBaseScale: number;
+  renderError: Error | null;
+};
+
+type Action =
+  | { type: "SET_PROJECT_NAME"; projectName: string }
+  | {
+      type: "SET_EXPORT_SELECTED";
+      exportSelected: boolean;
+      exportedElements: readonly NonDeletedExcalidrawElement[];
+    }
+  | {
+      type: "SET_EXPORTED_ELEMENTS";
+      exportedElements: readonly NonDeletedExcalidrawElement[];
+    }
+  | { type: "SET_EXPORT_WITH_BACKGROUND"; exportWithBackground: boolean }
+  | {
+      type: "SET_EXPORT_BACKGROUND_IMAGE";
+      exportBackgroundImage: keyof typeof FANCY_BACKGROUND_IMAGES;
+    }
+  | { type: "SET_EXPORT_DARK_MODE"; exportDarkMode: boolean }
+  | { type: "SET_EMBED_SCENE"; embedScene: boolean }
+  | { type: "SET_EXPORT_SCALE"; exportScale: number }
+  | { type: "SET_ALL_SCALES"; exportScale: number }
+  | { type: "SET_RENDER_ERROR"; renderError: Error | null };
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "SET_PROJECT_NAME":
+      return {
+        ...state,
+        projectName: action.projectName,
+      };
+    case "SET_EXPORT_SELECTED":
+      return {
+        ...state,
+        exportSelected: action.exportSelected,
+        exportedElements: action.exportedElements,
+      };
+    case "SET_EXPORTED_ELEMENTS":
+      return {
+        ...state,
+        exportedElements: action.exportedElements,
+        elementsBounds: getCommonBounds(action.exportedElements),
+      };
+    case "SET_EXPORT_WITH_BACKGROUND":
+      return {
+        ...state,
+        exportWithBackground: action.exportWithBackground,
+      };
+    case "SET_EXPORT_BACKGROUND_IMAGE":
+      return {
+        ...state,
+        exportBackgroundImage: action.exportBackgroundImage,
+      };
+    case "SET_EXPORT_DARK_MODE":
+      return { ...state, exportDarkMode: action.exportDarkMode };
+    case "SET_EMBED_SCENE":
+      return { ...state, embedScene: action.embedScene };
+    case "SET_EXPORT_SCALE":
+      return { ...state, exportScale: action.exportScale };
+    case "SET_ALL_SCALES":
+      return {
+        ...state,
+        exportScale: action.exportScale,
+        exportBaseScale: action.exportScale,
+      };
+    default:
+      return state;
+  }
+};
+
+const createInitialState = ({
+  appState,
+  elements,
+}: Pick<ImageExportModalProps, "appState" | "elements">): State => {
+  const someElementIsSelected = isSomeElementSelected(elements, appState);
+
+  return {
+    projectName: appState.name,
+    someElementIsSelected: isSomeElementSelected(elements, appState),
+    exportedElements: elements,
+    elementsBounds: getCommonBounds(elements),
+    exportSelected: someElementIsSelected,
+    exportWithBackground: appState.exportBackground,
+    exportBackgroundImage: appState.fancyBackgroundImageKey,
+    exportDarkMode: appState.exportWithDarkMode,
+    embedScene: appState.exportEmbedScene,
+    exportScale: appState.exportScale,
+    exportBaseScale: appState.exportScale,
+    renderError: null,
+  };
+};
+
 const ImageExportModal = ({
   appState,
   elements,
@@ -90,61 +195,38 @@ const ImageExportModal = ({
   actionManager,
   onExportImage,
 }: ImageExportModalProps) => {
-  const appProps = useAppProps();
-  const [projectName, setProjectName] = useState(appState.name);
-
-  const someElementIsSelected = isSomeElementSelected(elements, appState);
-
-  const [exportSelected, setExportSelected] = useState(someElementIsSelected);
-  const [exportWithBackground, setExportWithBackground] = useState(
-    appState.exportBackground,
+  const [state, dispatch] = useReducer(
+    reducer,
+    { appState, elements },
+    createInitialState,
   );
-  const [exportBackgroundImage, setExportBackgroundImage] = useState<
-    keyof typeof FANCY_BACKGROUND_IMAGES
-  >(appState.fancyBackgroundImageKey);
 
-  const [exportDarkMode, setExportDarkMode] = useState(
-    appState.exportWithDarkMode,
-  );
-  const [embedScene, setEmbedScene] = useState(appState.exportEmbedScene);
-  const [exportScale, setExportScale] = useState(appState.exportScale);
-  const [exportBaseScale, setExportBaseScale] = useState(appState.exportScale);
-
-  const previewRef = useRef<HTMLDivElement>(null);
-  const [renderError, setRenderError] = useState<Error | null>(null);
-
-  const exportedElements = useMemo(
-    () =>
-      exportSelected
+  useEffect(() => {
+    dispatch({
+      type: "SET_EXPORTED_ELEMENTS",
+      exportedElements: state.exportSelected
         ? getSelectedElements(elements, appState, {
             includeBoundTextElement: true,
             includeElementsInFrames: true,
           })
         : elements,
-    [exportSelected, elements],
-  );
+    });
+  }, [elements, appState, state.exportSelected]);
 
-  const updateAllScales = useCallback(
-    (scale: number) => {
-      actionManager.executeAction(actionChangeExportScale, "ui", scale);
-      setExportScale(scale);
-      setExportBaseScale(scale);
-    },
-    [actionManager, setExportScale, setExportBaseScale],
-  );
+  const appProps = useAppProps();
+
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [renderError, setRenderError] = useState<Error | null>(null);
 
   // Upscale exported image when is smaller than preview
   useEffect(() => {
-    if (
-      exportedElements.length > 0 &&
-      exportWithBackground &&
-      exportBackgroundImage !== "solid"
-    ) {
+    let scale = defaultExportScale;
+    if (state.exportWithBackground && state.exportBackgroundImage !== "solid") {
       const previewNode = previewRef.current;
       if (!previewNode) {
         return;
       }
-      const [minX, minY, maxX, maxY] = getCommonBounds(exportedElements);
+      const [minX, minY, maxX, maxY] = state.elementsBounds;
       const maxWidth = previewNode.offsetWidth;
       const maxHeight = previewNode.offsetHeight;
 
@@ -153,7 +235,7 @@ const ImageExportModal = ({
         true,
       );
 
-      const scale =
+      const upscaledScale =
         Math.floor(
           (getScaleToFit(
             {
@@ -166,23 +248,25 @@ const ImageExportModal = ({
             100,
         ) / 100;
 
-      if (scale > 1) {
-        if (scale !== exportBaseScale) {
-          updateAllScales(scale);
-        }
-      } else {
-        updateAllScales(defaultExportScale);
+      if (upscaledScale > 1) {
+        scale = upscaledScale;
       }
-    } else if (exportBaseScale !== defaultExportScale) {
-      updateAllScales(defaultExportScale);
+    }
+
+    if (scale !== state.exportBaseScale) {
+      dispatch({
+        type: "SET_ALL_SCALES",
+        exportScale: scale > 1 ? scale : defaultExportScale,
+      });
+      actionManager.executeAction(actionChangeExportScale, "ui", scale);
     }
   }, [
-    exportBackgroundImage,
-    exportWithBackground,
-    exportBaseScale,
-    updateAllScales,
-    exportedElements,
-    exportSelected,
+    state.elementsBounds,
+    state.exportSelected,
+    state.exportWithBackground,
+    state.exportBackgroundImage,
+    state.exportBaseScale,
+    actionManager,
   ]);
 
   useEffect(() => {
@@ -199,7 +283,7 @@ const ImageExportModal = ({
       return;
     }
     exportToCanvas({
-      elements: exportedElements,
+      elements: state.exportedElements,
       appState,
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
@@ -222,7 +306,7 @@ const ImageExportModal = ({
     appState.exportBackground,
     appState.fancyBackgroundImageKey,
     files,
-    exportedElements,
+    state.exportedElements,
   ]);
 
   return (
@@ -248,12 +332,15 @@ const ImageExportModal = ({
             <input
               type="text"
               className="TextInput"
-              value={projectName}
+              value={state.projectName}
               disabled={
                 typeof appProps.name !== "undefined" || appState.viewModeEnabled
               }
               onChange={(event) => {
-                setProjectName(event.target.value);
+                dispatch({
+                  type: "SET_PROJECT_NAME",
+                  projectName: event.target.value,
+                });
                 actionManager.executeAction(
                   actionChangeProjectName,
                   "ui",
@@ -263,16 +350,25 @@ const ImageExportModal = ({
             />
           </div>
         )}
-        {someElementIsSelected && (
+        {state.someElementIsSelected && (
           <ExportSetting
             label={t("imageExportDialog.label.onlySelected")}
             name="exportOnlySelected"
           >
             <Switch
               name="exportOnlySelected"
-              checked={exportSelected}
+              checked={state.exportSelected}
               onChange={(checked) => {
-                setExportSelected(checked);
+                dispatch({
+                  type: "SET_EXPORT_SELECTED",
+                  exportSelected: checked,
+                  exportedElements: checked
+                    ? getSelectedElements(elements, appState, {
+                        includeBoundTextElement: true,
+                        includeElementsInFrames: true,
+                      })
+                    : elements,
+                });
               }}
             />
           </ExportSetting>
@@ -282,13 +378,16 @@ const ImageExportModal = ({
           name="exportBackgroundSwitch"
           multipleInputs
         >
-          {exportWithBackground && (
+          {state.exportWithBackground && (
             <Select
-              value={exportBackgroundImage}
+              value={state.exportBackgroundImage}
               options={fancyBackgroundImageOptions}
               onSelect={(key) => {
                 if (isBackgroundImageKey(key)) {
-                  setExportBackgroundImage(key);
+                  dispatch({
+                    type: "SET_EXPORT_BACKGROUND_IMAGE",
+                    exportBackgroundImage: key,
+                  });
                   actionManager.executeAction(
                     actionChangeFancyBackgroundImageUrl,
                     "ui",
@@ -300,9 +399,12 @@ const ImageExportModal = ({
           )}
           <Switch
             name="exportBackgroundSwitch"
-            checked={exportWithBackground}
+            checked={state.exportWithBackground}
             onChange={(checked) => {
-              setExportWithBackground(checked);
+              dispatch({
+                type: "SET_EXPORT_WITH_BACKGROUND",
+                exportWithBackground: checked,
+              });
               actionManager.executeAction(
                 actionChangeExportBackground,
                 "ui",
@@ -318,9 +420,12 @@ const ImageExportModal = ({
           >
             <Switch
               name="exportDarkModeSwitch"
-              checked={exportDarkMode}
+              checked={state.exportDarkMode}
               onChange={(checked) => {
-                setExportDarkMode(checked);
+                dispatch({
+                  type: "SET_EXPORT_DARK_MODE",
+                  exportDarkMode: checked,
+                });
                 actionManager.executeAction(
                   actionExportWithDarkMode,
                   "ui",
@@ -337,9 +442,9 @@ const ImageExportModal = ({
         >
           <Switch
             name="exportEmbedSwitch"
-            checked={embedScene}
+            checked={state.embedScene}
             onChange={(checked) => {
-              setEmbedScene(checked);
+              dispatch({ type: "SET_EMBED_SCENE", embedScene: checked });
               actionManager.executeAction(
                 actionChangeExportEmbedScene,
                 "ui",
@@ -354,13 +459,13 @@ const ImageExportModal = ({
         >
           <RadioGroup
             name="exportScale"
-            value={exportScale}
+            value={state.exportScale}
             onChange={(scale) => {
-              setExportScale(scale);
+              dispatch({ type: "SET_EXPORT_SCALE", exportScale: scale });
               actionManager.executeAction(actionChangeExportScale, "ui", scale);
             }}
             choices={EXPORT_SCALES.map((scale) => ({
-              value: scale * exportBaseScale,
+              value: scale * state.exportBaseScale,
               label: `${scale}\u00d7`,
             }))}
           />
@@ -371,7 +476,7 @@ const ImageExportModal = ({
             className="ImageExportModal__settings__buttons__button"
             label={t("imageExportDialog.title.exportToPng")}
             onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements)
+              onExportImage(EXPORT_IMAGE_TYPES.png, state.exportedElements)
             }
             startIcon={downloadIcon}
           >
@@ -381,7 +486,7 @@ const ImageExportModal = ({
             className="ImageExportModal__settings__buttons__button"
             label={t("imageExportDialog.title.exportToSvg")}
             onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements)
+              onExportImage(EXPORT_IMAGE_TYPES.svg, state.exportedElements)
             }
             startIcon={downloadIcon}
           >
@@ -392,7 +497,10 @@ const ImageExportModal = ({
               className="ImageExportModal__settings__buttons__button"
               label={t("imageExportDialog.title.copyPngToClipboard")}
               onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements)
+                onExportImage(
+                  EXPORT_IMAGE_TYPES.clipboard,
+                  state.exportedElements,
+                )
               }
               startIcon={copyIcon}
             >
