@@ -23,7 +23,6 @@ export const Select = <T,>({ onSelect, options, value }: SelectProps<T>) => {
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => {
-            console.log("click outside");
             setIsOpen(false);
           }}
           onSelect={() => setIsOpen(false)}
