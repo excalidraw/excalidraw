@@ -375,11 +375,11 @@
   "imageExportDialog": {
     "header": "",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
+      "withBackground": "Fond",
+      "onlySelected": "Uniquement la sélection",
+      "darkMode": "Mode sombre",
       "embedScene": "",
-      "scale": "",
+      "scale": "Échelle",
       "padding": ""
     },
     "tooltip": {
@@ -391,8 +391,8 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
@@ -430,20 +430,20 @@
   },
   "colors": {
     "transparent": "Transparent",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Noir",
+    "white": "Blanc",
+    "red": "Rouge",
+    "pink": "Rose",
+    "grape": "Mauve",
+    "violet": "Violet",
+    "gray": "Gris",
+    "blue": "Bleu",
+    "cyan": "Cyan",
+    "teal": "Turquoise",
+    "green": "Vert",
+    "yellow": "Jaune",
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -460,7 +460,7 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
+    "colors": "Couleurs",
     "shades": "",
     "hexCode": "",
     "noShades": ""
