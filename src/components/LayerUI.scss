@@ -91,13 +91,17 @@
         visibility: visible;
         transition: visibility 0s linear 300ms, opacity 0.5s;
         transition-delay: 0.8s;
+
+        pointer-events: var(--ui-pointerEvents);
       }
     }
 
     .layer-ui__wrapper__footer-left,
-    .layer-ui__wrapper__footer-right,
-    .disable-zen-mode--visible {
-      pointer-events: all;
+    .footer-center,
+    .layer-ui__wrapper__footer-right {
+      & > * {
+        pointer-events: var(--ui-pointerEvents);
+      }
     }
 
     .layer-ui__wrapper__footer-right {

@@ -85,6 +85,7 @@ import {
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
   ZOOM_STEP,
+  POINTER_EVENTS,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -857,7 +858,9 @@ class App extends React.Component<AppProps, AppState> {
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
-                  pointerEvents: isActive ? "auto" : "none",
+                  pointerEvents: isActive
+                    ? POINTER_EVENTS.enabled
+                    : POINTER_EVENTS.disabled,
                 }}
               >
                 {isHovered && (
@@ -1081,9 +1084,9 @@ class App extends React.Component<AppProps, AppState> {
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             cursor: CURSOR_TYPE.MOVE,
-            // disable all interaction (e.g. cursor change) when in view
-            // mode
-            pointerEvents: this.state.viewModeEnabled ? "none" : "all",
+            pointerEvents: this.state.viewModeEnabled
+              ? POINTER_EVENTS.disabled
+              : POINTER_EVENTS.inheritFromUI,
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
           onWheel={(event) => this.handleWheel(event)}
@@ -1125,6 +1128,16 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--view-mode": this.state.viewModeEnabled,
           "excalidraw--mobile": this.device.isMobile,
         })}
+        style={{
+          ["--ui-pointerEvents" as any]:
+            this.state.selectionElement ||
+            this.state.draggingElement ||
+            this.state.resizingElement ||
+            (this.state.editingElement &&
+              !isTextElement(this.state.editingElement))
+              ? POINTER_EVENTS.disabled
+              : POINTER_EVENTS.enabled,
+        }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}

@@ -3,6 +3,7 @@ import { PlusPromoIcon } from "../../components/icons";
 import { useI18n } from "../../i18n";
 import { WelcomeScreen } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
+import { POINTER_EVENTS } from "../../constants";
 
 export const AppWelcomeScreen: React.FC<{
   setCollabDialogShown: (toggle: boolean) => any;
@@ -18,7 +19,7 @@ export const AppWelcomeScreen: React.FC<{
         if (bit === "Excalidraw+") {
           return (
             <a
-              style={{ pointerEvents: "all" }}
+              style={{ pointerEvents: POINTER_EVENTS.inheritFromUI }}
               href={`${
                 import.meta.env.VITE_APP_PLUS_APP
               }?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenSignedInUser`}
