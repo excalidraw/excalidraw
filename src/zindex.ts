@@ -96,7 +96,6 @@ const getTargetIndexAccountingForBinding = (
       if (direction === "left") {
         return elements.indexOf(nextElement);
       }
-      console.log(Scene.getScene(nextElement), "SCENE");
 
       const boundTextElement =
         Scene.getScene(nextElement)!.getElement(boundElementId);

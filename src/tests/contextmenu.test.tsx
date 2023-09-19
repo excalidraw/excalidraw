@@ -11,7 +11,7 @@ import {
   waitFor,
   togglePopover,
 } from "./test-utils";
-import ExcalidrawApp from "../../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -56,7 +56,7 @@ describe("contextMenu element", () => {
     reseed(7);
     setDateTimeForTests("201933152653");
 
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
   beforeAll(() => {
@@ -394,11 +394,9 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Add to library")!);
 
-    await waitFor(() => {
-      const library = localStorage.getItem("excalidraw-library");
-      expect(library).not.toBeNull();
-      const addedElement = JSON.parse(library!)[0] as LibraryItem;
-      expect(addedElement.elements[0]).toEqual(h.elements[0]);
+    await waitFor(async () => {
+      const libraryItems = await h.app.library.getLatestLibrary();
+      expect(libraryItems[0].elements[0]).toEqual(h.elements[0]);
     });
   });
 

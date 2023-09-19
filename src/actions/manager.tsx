@@ -77,7 +77,6 @@ export class ActionManager {
   }
 
   handleKeyDown(event: React.KeyboardEvent | KeyboardEvent) {
-    console.log("HANDLE KEYDOWN");
     const canvasActions = this.app.props.UIOptions.canvasActions;
     const data = Object.values(this.actions)
       .sort((a, b) => (b.keyPriority || 0) - (a.keyPriority || 0))

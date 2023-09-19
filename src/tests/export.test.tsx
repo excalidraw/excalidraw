@@ -1,5 +1,5 @@
 import { render, waitFor } from "./test-utils";
-import { Excalidraw } from "../packages/excalidraw";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import {
   encodePngMetadata,
