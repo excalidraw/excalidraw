@@ -8,6 +8,7 @@
     "moveCanvas": "캔버스 이동",
     "cut": "잘라내기",
     "copy": "복사",
+    "copyLink": "",
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
     "copyText": "클립보드로 텍스트 복사",

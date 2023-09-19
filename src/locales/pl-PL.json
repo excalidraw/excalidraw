@@ -8,6 +8,7 @@
     "moveCanvas": "Przesuń obszar roboczy",
     "cut": "Wytnij",
     "copy": "Kopiuj",
+    "copyLink": "",
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
     "copyText": "Skopiuj do schowka jako tekst",

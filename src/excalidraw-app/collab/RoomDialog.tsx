@@ -103,14 +103,14 @@ export const RoomModal = ({
         <TextField
           value={username}
           placeholder="Your name"
-          label="Your name"
+          label={t("labels.yourName")}
           onChange={onUsernameChange}
           onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
         />
         <div className="RoomDialog__active__linkRow">
           <TextField
             ref={ref}
-            label="Link"
+            label={t("labels.link.label")}
             readonly
             fullWidth
             value={activeRoomLink}
@@ -119,7 +119,7 @@ export const RoomModal = ({
             <FilledButton
               size="large"
               variant="icon"
-              label="Share"
+              label={t("labels.share")}
               startIcon={getShareIcon()}
               className="RoomDialog__active__share"
               onClick={shareRoomLink}
@@ -129,7 +129,7 @@ export const RoomModal = ({
             <Popover.Trigger asChild>
               <FilledButton
                 size="large"
-                label="Copy link"
+                label={t("labels.copyLink")}
                 startIcon={copyIcon}
                 onClick={copyRoomLink}
               />
@@ -142,7 +142,7 @@ export const RoomModal = ({
               align="end"
               sideOffset={5.5}
             >
-              {tablerCheckIcon} copied
+              {tablerCheckIcon} {t("labels.link.copied")}
             </Popover.Content>
           </Popover.Root>
         </div>

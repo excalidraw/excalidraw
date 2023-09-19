@@ -8,6 +8,7 @@
     "moveCanvas": "Pārvietot tāfeli",
     "cut": "Izgriezt",
     "copy": "Kopēt",
+    "copyLink": "",
     "copyAsPng": "Kopēt starpliktuvē kā PNG",
     "copyAsSvg": "Kopēt starpliktuvē kā SVG",
     "copyText": "Kopēt starpliktuvē kā tekstu",

@@ -51,11 +51,11 @@ export const ShareableLinkDialog = ({
   return (
     <Dialog onCloseRequest={onCloseRequest} title={false} size="small">
       <div className="ShareableLinkDialog">
-        <h3>Shareable link</h3>
+        <h3>{t("exportDialog.link_title")}</h3>
         <div className="ShareableLinkDialog__linkRow">
           <TextField
             ref={ref}
-            label="Link"
+            label={t("labels.link.label")}
             readonly
             fullWidth
             value={link}
@@ -65,7 +65,7 @@ export const ShareableLinkDialog = ({
             <Popover.Trigger asChild>
               <FilledButton
                 size="large"
-                label="Copy link"
+                label={t("labels.copyLink")}
                 startIcon={copyIcon}
                 onClick={copyRoomLink}
               />
@@ -78,7 +78,7 @@ export const ShareableLinkDialog = ({
               align="end"
               sideOffset={5.5}
             >
-              {tablerCheckIcon} copied
+              {tablerCheckIcon} {t("labels.link.copied")}
             </Popover.Content>
           </Popover.Root>
         </div>

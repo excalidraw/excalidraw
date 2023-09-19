@@ -8,6 +8,7 @@
     "moveCanvas": "نقل لوح الرسم",
     "cut": "قص",
     "copy": "نسخ",
+    "copyLink": "",
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
     "copyText": "نسخ إلى الحافظة كنص",

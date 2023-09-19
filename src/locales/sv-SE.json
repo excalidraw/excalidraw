@@ -8,6 +8,7 @@
     "moveCanvas": "Flytta canvas",
     "cut": "Klipp ut",
     "copy": "Kopiera",
+    "copyLink": "",
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
     "copyText": "Kopiera till urklipp som text",

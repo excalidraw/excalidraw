@@ -8,6 +8,7 @@
     "moveCanvas": "移動畫布",
     "cut": "剪下",
     "copy": "複製",
+    "copyLink": "",
     "copyAsPng": "以PNG格式儲存到剪貼板",
     "copyAsSvg": "以SVG格式複製到剪貼板",
     "copyText": "以文字格式複製至剪貼簿",

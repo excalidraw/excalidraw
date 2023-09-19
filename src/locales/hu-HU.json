@@ -8,6 +8,7 @@
     "moveCanvas": "Vászon mozgatása",
     "cut": "Kivágás",
     "copy": "Másolás",
+    "copyLink": "",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
     "copyText": "",

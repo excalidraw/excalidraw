@@ -8,6 +8,7 @@
     "moveCanvas": "הזז את הקנבס",
     "cut": "גזור",
     "copy": "העתק",
+    "copyLink": "",
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
     "copyText": "העתק ללוח כטקסט",
