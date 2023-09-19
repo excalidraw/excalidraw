@@ -44,7 +44,7 @@ export const POINTER_BUTTON = {
 export const POINTER_EVENTS = {
   enabled: "all",
   disabled: "none",
-  // asserted as any so it canbe freely assigned to React Element
+  // asserted as any so it can be freely assigned to React Element
   // "pointerEnvets" CSS prop
   inheritFromUI: "var(--ui-pointerEvents)" as any,
 } as const;
