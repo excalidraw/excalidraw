@@ -41,6 +41,14 @@ export const POINTER_BUTTON = {
   TOUCH: -1,
 } as const;
 
+export const POINTER_EVENTS = {
+  enabled: "all",
+  disabled: "none",
+  // asserted as any so it can be freely assigned to React Element
+  // "pointerEnvets" CSS prop
+  inheritFromUI: "var(--ui-pointerEvents)" as any,
+} as const;
+
 export enum EVENT {
   COPY = "copy",
   PASTE = "paste",

@@ -7,7 +7,7 @@
     right: 12px;
     font-size: 12px;
     z-index: 10;
-    pointer-events: all;
+    pointer-events: var(--ui-pointerEvents);
 
     h3 {
       margin: 0 24px 8px 0;
