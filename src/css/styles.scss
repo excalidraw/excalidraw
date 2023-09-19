@@ -425,17 +425,6 @@
     }
   }
 
-  .disable-zen-mode {
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-gray-20);
-    border: 1px solid var(--color-gray-30);
-    padding: 10px 20px;
-
-    &:hover {
-      background-color: var(--color-gray-30);
-    }
-  }
-
   .scroll-back-to-content {
     border-radius: var(--border-radius-lg);
     background-color: var(--island-bg-color);
