@@ -265,7 +265,7 @@
     "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
     "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning",
     "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan.",
-    "disableSnapping": ""
+    "disableSnapping": "Håll Ctrl eller Cmd för att inaktivera fästning"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
