@@ -52,7 +52,7 @@ beforeEach(async () => {
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
   });
-  await render(<Excalidraw autoFocus={true} />);
+  await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
   h.setState({
     zoom: {
       value: 1 as NormalizedZoomValue,
