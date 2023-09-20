@@ -18,6 +18,7 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+  exportWithFancyBackground?: boolean;
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -28,6 +29,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUserStates: { [id: string]: string };
   remotePointerUsernames: { [id: string]: string };
   remotePointerButton?: { [id: string]: string | undefined };
+  exportBackgroundImage?: string;
   selectionColor?: string;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------

@@ -4,6 +4,8 @@ import {
   CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
+  EXPORT_SCALES,
+  FANCY_BACKGROUND_IMAGES,
   FONT_FAMILY,
   isDarwin,
   MIME_TYPES,
@@ -15,7 +17,14 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
+import {
+  AppState,
+  DataURL,
+  Dimensions,
+  ExportPadding,
+  LastActiveTool,
+  Zoom,
+} from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
@@ -1002,3 +1011,80 @@ export const isRenderThrottlingEnabled = (() => {
     return false;
   };
 })();
+
+export const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
+  ? devicePixelRatio
+  : 1;
+
+/**
+ * Expands dimensions to fit into a specified aspect ratio without cropping.
+ * The resulting dimensions are rounded up to the nearest integer.
+ *
+ * @param dimensions - The original dimensions.
+ * @param aspectRatio - The aspect ratio to fit the dimensions into.
+ *
+ * @return The expanded dimensions.
+ *
+ * @example
+ * ```typescript
+ * const originalDimensions = { width: 800, height: 600 };
+ * const targetAspectRatio = { width: 16, height: 9 };
+ * const expandedDimensions = expandToAspectRatio(originalDimensions, targetAspectRatio);
+ * // Output will be { width: 1067, height: 600 }
+ * ```
+ */
+export const expandToAspectRatio = (
+  dimensions: Dimensions,
+  aspectRatio: Dimensions,
+): Dimensions => {
+  const originalWidth = dimensions.width;
+  const originalHeight = dimensions.height;
+
+  const originalAspectRatio = originalWidth / originalHeight;
+  const targetAspectRatio = aspectRatio.width / aspectRatio.height;
+
+  let newWidth = Math.round(originalWidth);
+  let newHeight = Math.round(originalHeight);
+
+  // Original is landscape, expand width
+  if (originalAspectRatio < targetAspectRatio) {
+    newWidth = Math.round(originalHeight * targetAspectRatio);
+  }
+  // Original is portrait or square, expand height
+  else {
+    newHeight = Math.round(originalWidth / targetAspectRatio);
+  }
+
+  return {
+    width: newWidth,
+    height: newHeight,
+  };
+};
+
+const isExportPadding = (value: any): value is ExportPadding => {
+  return (
+    Array.isArray(value) &&
+    value.length === 4 &&
+    value.every((item) => typeof item === "number")
+  );
+};
+
+export const convertToExportPadding = (
+  padding: number | ExportPadding,
+): ExportPadding => {
+  if (typeof padding === "number") {
+    return [padding, padding, padding, padding];
+  }
+
+  if (isExportPadding(padding)) {
+    return padding;
+  }
+
+  throw new Error("Invalid padding value");
+};
+
+export function isBackgroundImageKey(
+  key: string,
+): key is keyof typeof FANCY_BACKGROUND_IMAGES {
+  return key in FANCY_BACKGROUND_IMAGES;
+}

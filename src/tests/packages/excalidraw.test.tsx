@@ -309,7 +309,7 @@ describe("<Excalidraw/>", () => {
       toggleMenu(container);
       fireEvent.click(queryByTestId(container, "image-export-button")!);
       const textInput: HTMLInputElement | null = document.querySelector(
-        ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
+        ".ImageExportModal .ImageExportModal__settings__filename .TextInput",
       );
       expect(textInput?.value).toContain(`${t("labels.untitled")}`);
       expect(textInput?.nodeName).toBe("INPUT");
@@ -322,7 +322,7 @@ describe("<Excalidraw/>", () => {
       toggleMenu(container);
       await fireEvent.click(queryByTestId(container, "image-export-button")!);
       const textInput = document.querySelector(
-        ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
+        ".ImageExportModal .ImageExportModal__settings__filename .TextInput",
       ) as HTMLInputElement;
       expect(textInput?.value).toEqual(name);
       expect(textInput?.nodeName).toBe("INPUT");

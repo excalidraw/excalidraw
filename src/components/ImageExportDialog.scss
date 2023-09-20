@@ -58,12 +58,6 @@
         flex-grow: 1;
       }
 
-      &__filename {
-        & > input {
-          margin-top: 1rem;
-        }
-      }
-
       &__canvas {
         box-sizing: border-box;
         width: 100%;
@@ -93,6 +87,18 @@
           }
         }
 
+        &--img-bcg {
+          padding: 0;
+          background: none;
+          border: none;
+          border-radius: 0;
+
+          & > canvas {
+            max-width: calc(100%);
+            max-height: calc(100%);
+          }
+        }
+
         @include isMobile {
           margin-top: 24px;
           max-width: unset;
@@ -113,6 +119,18 @@
         gap: 6px 34px;
 
         align-content: flex-start;
+      }
+
+      &__filename {
+        width: 100%;
+        text-align: center;
+
+        & > input {
+          width: 100%;
+          box-sizing: border-box;
+          max-width: 30em;
+          margin-bottom: 1em;
+        }
       }
 
       &__setting {
@@ -149,6 +167,13 @@
           display: flex;
           height: 100%;
           align-items: center;
+          gap: 1em;
+
+          &--multipleInputs {
+            @include isMobile {
+              flex-direction: row-reverse;
+            }
+          }
         }
       }
 

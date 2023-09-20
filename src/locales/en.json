@@ -376,6 +376,7 @@
     "header": "Export image",
     "label": {
       "withBackground": "Background",
+      "backgroundImage": "Background image",
       "onlySelected": "Only selected",
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",

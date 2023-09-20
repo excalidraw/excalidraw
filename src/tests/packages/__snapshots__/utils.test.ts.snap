@@ -39,6 +39,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportPadding": undefined,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "fancyBackgroundImageKey": "solid",
   "fileHandle": null,
   "frameRendering": {
     "clip": true,

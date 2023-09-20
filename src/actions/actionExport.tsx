@@ -11,7 +11,12 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_SCALES,
+  FANCY_BACKGROUND_IMAGES,
+  THEME,
+} from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
@@ -19,6 +24,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
+import { Select } from "../components/Select";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -62,6 +68,7 @@ export const actionChangeExportScale = register({
             exportedElements,
             DEFAULT_EXPORT_PADDING,
             s,
+            appState,
           );
 
           const scaleButtonTitle = `${t(
@@ -105,6 +112,33 @@ export const actionChangeExportBackground = register({
       {t("imageExportDialog.label.withBackground")}
     </CheckboxItem>
   ),
+});
+
+export const actionChangeFancyBackgroundImageUrl = register({
+  name: "changeFancyBackgroundImageUrl",
+  trackEvent: { category: "export", action: "toggleBackgroundImage" },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, fancyBackgroundImageKey: value },
+      commitToHistory: false,
+    };
+  },
+  PanelComponent: ({ updateData, appState }) => {
+    return (
+      <Select
+        value={appState.fancyBackgroundImageKey}
+        options={Object.entries(FANCY_BACKGROUND_IMAGES).map(
+          ([value, { label }]) => ({
+            value,
+            label,
+          }),
+        )}
+        onSelect={(key) => {
+          updateData(key);
+        }}
+      />
+    );
+  },
 });
 
 export const actionChangeExportEmbedScene = register({

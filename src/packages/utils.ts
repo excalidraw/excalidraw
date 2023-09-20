@@ -3,7 +3,7 @@ import {
   exportToSvg as _exportToSvg,
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
-import { AppState, BinaryFiles } from "../types";
+import { AppState, BinaryFiles, Dimensions } from "../types";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
@@ -69,6 +69,20 @@ export const exportToCanvas = ({
     { exportBackground, exportPadding, viewBackgroundColor },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
+
+      if (
+        appState?.exportBackground &&
+        appState?.fancyBackgroundImageKey !== "solid"
+      ) {
+        const scale = appState?.exportScale ?? 1;
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+
+        return {
+          canvas,
+          scale,
+        };
+      }
 
       if (maxWidthOrHeight) {
         if (typeof getDimensions === "function") {
@@ -237,3 +251,27 @@ export {
 } from "../data/blob";
 export { getFreeDrawSvgPath } from "../renderer/renderElement";
 export { mergeLibraryItems } from "../data/library";
+
+export const getScaleToFill = (
+  contentSize: Dimensions,
+  containerSize: Dimensions,
+) => {
+  const scale = Math.max(
+    containerSize.width / contentSize.width,
+    containerSize.height / contentSize.height,
+  );
+
+  return scale;
+};
+
+export const getScaleToFit = (
+  contentSize: Dimensions,
+  containerSize: Dimensions,
+) => {
+  const scale = Math.min(
+    containerSize.width / contentSize.width,
+    containerSize.height / contentSize.height,
+  );
+
+  return scale;
+};

@@ -32,7 +32,11 @@ import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
-import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import type {
+  FANCY_BACKGROUND_IMAGES,
+  IMAGE_MIME_TYPES,
+  MIME_TYPES,
+} from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
@@ -287,6 +291,7 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+  fancyBackgroundImageKey: keyof typeof FANCY_BACKGROUND_IMAGES;
 };
 
 export type UIAppState = Omit<
@@ -653,3 +658,6 @@ export type FrameNameBoundsCache = {
     }
   >;
 };
+
+export type Dimensions = { width: number; height: number };
+export type ExportPadding = [number, number, number, number];

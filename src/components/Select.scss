@@ -1,0 +1,11 @@
+.Select {
+  position: relative;
+
+  &__content {
+    right: 0;
+  }
+}
+
+.excalidraw .Modal .Select .Island {
+  padding: 1rem !important;
+}

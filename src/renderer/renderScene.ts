@@ -366,6 +366,10 @@ const frameClip = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  if (!appState.frameRendering.clip) {
+    return;
+  }
+
   context.translate(frame.x + appState.scrollX, frame.y + appState.scrollY);
   context.beginPath();
   if (context.roundRect && !renderConfig.isExporting) {
@@ -402,6 +406,7 @@ const bootstrapCanvas = ({
   theme,
   isExporting,
   viewBackgroundColor,
+  exportWithFancyBackground,
 }: {
   canvas: HTMLCanvasElement;
   scale: number;
@@ -410,6 +415,7 @@ const bootstrapCanvas = ({
   theme?: AppState["theme"];
   isExporting?: StaticCanvasRenderConfig["isExporting"];
   viewBackgroundColor?: StaticCanvasAppState["viewBackgroundColor"];
+  exportWithFancyBackground?: boolean;
 }): CanvasRenderingContext2D => {
   const context = canvas.getContext("2d")!;
 
@@ -419,7 +425,6 @@ const bootstrapCanvas = ({
   if (isExporting && theme === "dark") {
     context.filter = THEME_FILTER;
   }
-
   // Paint background
   if (typeof viewBackgroundColor === "string") {
     const hasTransparence =
@@ -434,7 +439,7 @@ const bootstrapCanvas = ({
     context.fillStyle = viewBackgroundColor;
     context.fillRect(0, 0, normalizedWidth, normalizedHeight);
     context.restore();
-  } else {
+  } else if (!exportWithFancyBackground) {
     context.clearRect(0, 0, normalizedWidth, normalizedHeight);
   }
 
@@ -924,6 +929,7 @@ const _renderStaticScene = ({
     theme: appState.theme,
     isExporting,
     viewBackgroundColor: appState.viewBackgroundColor,
+    exportWithFancyBackground: renderConfig.exportWithFancyBackground,
   });
 
   // Apply zoom

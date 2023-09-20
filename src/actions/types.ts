@@ -123,7 +123,8 @@ export type ActionName =
   | "setFrameAsActiveTool"
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
-  | "wrapTextInContainer";
+  | "wrapTextInContainer"
+  | "changeFancyBackgroundImageUrl";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

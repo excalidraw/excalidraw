@@ -1,19 +1,15 @@
 import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_ELEMENT_PROPS,
+  DEFAULT_FANCY_BACKGROUND_IMAGE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
-  EXPORT_SCALES,
   THEME,
 } from "./constants";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
-
-const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
-  ? devicePixelRatio
-  : 1;
+import { getDateTime, defaultExportScale } from "./utils";
 
 export const getDefaultAppState = (): Omit<
   AppState,
@@ -99,6 +95,7 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
+    fancyBackgroundImageKey: DEFAULT_FANCY_BACKGROUND_IMAGE,
   };
 };
 
@@ -206,6 +203,7 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
+  fancyBackgroundImageKey: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
