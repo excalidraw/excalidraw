@@ -77,13 +77,14 @@
   align-items: center;
   border: 1px solid var(--color-primary);
   padding: 0.5rem 0.75rem;
-  border-radius: var(--space-factor);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--island-bg-color);
   color: var(--color-primary) !important;
   text-decoration: none !important;
 
   font-size: 0.75rem;
   box-sizing: border-box;
-  height: var(--default-button-size);
+  height: var(--lg-button-size);
 
   &:hover {
     background-color: var(--color-primary);

@@ -25,10 +25,10 @@
   }
 
   .default-sidebar-trigger .sidebar-trigger__label {
-    display: none;
+    display: block;
+  }
 
-    @media screen and (min-width: 1024px) {
-      display: block;
-    }
+  &.excalidraw--mobile .default-sidebar-trigger .sidebar-trigger__label {
+    display: none;
   }
 }
