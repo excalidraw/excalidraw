@@ -64,6 +64,7 @@ const sidebars = {
               items: [
                 "@excalidraw/excalidraw/api/children-components/main-menu",
                 "@excalidraw/excalidraw/api/children-components/welcome-screen",
+                "@excalidraw/excalidraw/api/children-components/sidebar",
                 "@excalidraw/excalidraw/api/children-components/footer",
                 "@excalidraw/excalidraw/api/children-components/live-collaboration-trigger",
               ],
@@ -80,12 +81,8 @@ const sidebars = {
                 "@excalidraw/excalidraw/api/utils/restore",
               ],
             },
-            {
-              type: "category",
-              label: "Constants",
-              link: { type: "doc", id: "@excalidraw/excalidraw/api/constants" },
-              items: [],
-            },
+            "@excalidraw/excalidraw/api/constants",
+            "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
           ],
         },
         "@excalidraw/excalidraw/faq",
