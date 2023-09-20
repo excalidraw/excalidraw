@@ -1859,6 +1859,7 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     this.updateEmbeddables();
+    console.log("HEYYY AFTER VITE AUTOMATIC RELOAD!!");
     if (
       !this.state.showWelcomeScreen &&
       !this.scene.getElementsIncludingDeleted().length
