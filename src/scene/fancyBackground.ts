@@ -7,6 +7,7 @@ import {
   FANCY_BG_LOGO_BOTTOM_PADDING,
   FANCY_BG_LOGO_PADDING,
   FANCY_BG_PADDING,
+  FANCY_BG_STRETCH_CONTENT_BACKGROUND,
   IMAGE_INVERT_FILTER,
   SVG_NS,
   THEME,
@@ -26,13 +27,21 @@ export const getFancyBackgroundPadding = (
   ],
   includeLogo = false,
 ): ExportPadding =>
-  exportPadding.map(
-    (padding, index) =>
-      FANCY_BG_PADDING +
-      FANCY_BG_BORDER_RADIUS +
-      padding +
-      (index === 2 && includeLogo ? FANCY_BG_LOGO_PADDING : 0),
-  ) as [number, number, number, number];
+  FANCY_BG_STRETCH_CONTENT_BACKGROUND
+    ? (exportPadding.map(
+        (padding) =>
+          FANCY_BG_PADDING +
+          FANCY_BG_LOGO_PADDING +
+          FANCY_BG_BORDER_RADIUS +
+          padding,
+      ) as [number, number, number, number])
+    : (exportPadding.map(
+        (padding, index) =>
+          FANCY_BG_PADDING +
+          FANCY_BG_BORDER_RADIUS +
+          padding +
+          (index === 2 && includeLogo ? FANCY_BG_LOGO_PADDING : 0),
+      ) as [number, number, number, number]);
 
 const addImageBackground = (
   context: CanvasRenderingContext2D,
@@ -90,6 +99,17 @@ const getContentBackgound = (
   exportScale: number,
   includeLogo: boolean,
 ): { x: number; y: number; width: number; height: number } => {
+  if (FANCY_BG_STRETCH_CONTENT_BACKGROUND) {
+    const padding = FANCY_BG_PADDING + FANCY_BG_LOGO_PADDING;
+
+    return {
+      x: padding,
+      y: padding,
+      width: normalizedCanvasDimensions.width - padding * 2,
+      height: normalizedCanvasDimensions.height - padding * 2,
+    };
+  }
+
   const totalPaddingAndRadius = DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS;
 
   const width =
