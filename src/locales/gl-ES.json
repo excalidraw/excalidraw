@@ -236,7 +236,7 @@
     "frame": "",
     "embeddable": "",
     "hand": "Man (ferramenta de desprazamento)",
-    "extraTools": ""
+    "extraTools": "Máis ferramentas"
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -373,11 +373,11 @@
     "removeItemsFromLib": "Eliminar os elementos seleccionados da biblioteca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imaxe",
     "label": {
-      "withBackground": "",
+      "withBackground": "Fondo",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "Modo escuro",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -386,14 +386,14 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar a PNG",
+      "exportToSvg": "Exportar a SVG",
+      "copyPngToClipboard": "Copiar PNG ao portapapeis"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar ao portapapeis"
     }
   },
   "encrypted": {
@@ -430,20 +430,20 @@
   },
   "colors": {
     "transparent": "Transparente",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
+    "black": "Negro",
+    "white": "Branco",
+    "red": "Vermello",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
+    "gray": "Gris",
+    "blue": "Azul",
     "cyan": "",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "Verde",
+    "yellow": "Marelo",
+    "orange": "Laranxa",
+    "bronze": "Bronce"
   },
   "welcomeScreen": {
     "app": {
@@ -460,7 +460,7 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
+    "colors": "Cores",
     "shades": "",
     "hexCode": "",
     "noShades": ""
@@ -468,18 +468,18 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Exportar como imaxe",
+        "button": "Exportar como imaxe",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Gardar no disco",
+        "button": "Gardar no disco",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+",
+        "button": "Exportar a Excalidraw+",
         "description": ""
       }
     },
@@ -491,7 +491,7 @@
       },
       "shareableLink": {
         "title": "",
-        "button": "",
+        "button": "Substituír o meu contido",
         "description": ""
       }
     }
