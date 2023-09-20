@@ -27,6 +27,7 @@ export const getFancyBackgroundPadding = (
   ],
   includeLogo = false,
 ): ExportPadding =>
+  // for stretched background we need to add same padding to all sides
   FANCY_BG_STRETCH_CONTENT_BACKGROUND
     ? (exportPadding.map(
         (padding) =>
@@ -35,7 +36,8 @@ export const getFancyBackgroundPadding = (
           FANCY_BG_BORDER_RADIUS +
           padding,
       ) as [number, number, number, number])
-    : (exportPadding.map(
+    : // otherwise we need to add padding to all sides except bottom where we need to add extra space when is presented logo
+      (exportPadding.map(
         (padding, index) =>
           FANCY_BG_PADDING +
           FANCY_BG_BORDER_RADIUS +
@@ -99,6 +101,7 @@ const getContentBackgound = (
   exportScale: number,
   includeLogo: boolean,
 ): { x: number; y: number; width: number; height: number } => {
+  // When the content backgrond should be stretched it is taken as canvas size - padding
   if (FANCY_BG_STRETCH_CONTENT_BACKGROUND) {
     const padding = FANCY_BG_PADDING + FANCY_BG_LOGO_PADDING;
 
@@ -110,6 +113,7 @@ const getContentBackgound = (
     };
   }
 
+  // Otherwise the content background is taken as content size + padding and centered and adjust for logo
   const totalPaddingAndRadius = DEFAULT_EXPORT_PADDING + FANCY_BG_BORDER_RADIUS;
 
   const width =
