@@ -1,5 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
-import { AppProps, DataURL } from "./types";
+import { AppProps, DataURL, Dimensions } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 
@@ -246,6 +246,10 @@ export const FANCY_BG_BORDER_RADIUS = 12; // px
 export const FANCY_BG_LOGO_PADDING = 20; // px
 export const FANCY_BG_LOGO_BOTTOM_PADDING = 12; // px
 export const FANCY_BG_INCLUDE_LOGO = true;
+export const DEFAULT_FANCY_BACKGROUND_RATIO: Dimensions = {
+  width: 16,
+  height: 9,
+};
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 

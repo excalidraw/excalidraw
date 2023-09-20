@@ -15,6 +15,7 @@ import {
 import { AppState, BinaryFiles, Dimensions, ExportPadding } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
+  DEFAULT_FANCY_BACKGROUND_RATIO,
   FANCY_BACKGROUND_IMAGES,
   FANCY_BG_INCLUDE_LOGO,
   SVG_NS,
@@ -89,7 +90,7 @@ export const exportToCanvas = async (
         onlyExportingSingleFrame,
         exportingWithFancyBackground,
         opts: {
-          aspectRatio: { width: 16, height: 9 },
+          aspectRatio: DEFAULT_FANCY_BACKGROUND_RATIO,
           clipFrame: false,
         },
       });
@@ -255,7 +256,7 @@ export const exportToSvg = async (
         onlyExportingSingleFrame,
         exportingWithFancyBackground,
         opts: {
-          aspectRatio: { width: 16, height: 9 },
+          aspectRatio: DEFAULT_FANCY_BACKGROUND_RATIO,
           clipFrame: false,
         },
       });
