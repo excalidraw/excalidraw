@@ -40,13 +40,15 @@ describe("remove shape in non linear elements", () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
     const tool = getByToolName("rectangle");
+    fireEvent.click(tool);
+
     const canvas = container.querySelector("canvas.interactive")!;
 
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(4);
-    expect(renderStaticScene).toHaveBeenCalledTimes(3);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.elements.length).toEqual(0);
   });
 
