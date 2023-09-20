@@ -31,7 +31,7 @@ export const getFancyBackgroundPadding = (
       FANCY_BG_PADDING +
       FANCY_BG_BORDER_RADIUS +
       padding +
-      (index === 2 && includeLogo ? 20 : 0),
+      (index === 2 && includeLogo ? FANCY_BG_LOGO_PADDING : 0),
   ) as [number, number, number, number];
 
 const addImageBackground = (
