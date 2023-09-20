@@ -1,4 +1,4 @@
-import ExcalidrawApp from "../../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { CODES } from "../keys";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
@@ -17,7 +17,7 @@ const mouse = new Pointer("mouse");
 
 describe("actionStyles", () => {
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
   afterEach(async () => {
