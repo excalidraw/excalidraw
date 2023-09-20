@@ -9,7 +9,7 @@ import {
   screen,
   togglePopover,
 } from "../tests/test-utils";
-import { copiedStyles } from "./actionStyles";
+import { copiedStyles } from "../actions/actionStyles";
 
 const { h } = window;
 
