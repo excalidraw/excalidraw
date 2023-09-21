@@ -1,8 +1,8 @@
 import { vi } from "vitest";
-import { render, updateSceneData, waitFor } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
-import { API } from "./helpers/api";
-import { createUndoAction } from "../actions/actionHistory";
+import { render, updateSceneData, waitFor } from "../../src/tests/test-utils";
+import ExcalidrawApp from "../../excalidraw-app";
+import { API } from "../../src/tests/helpers/api";
+import { createUndoAction } from "../../src/actions/actionHistory";
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {
@@ -16,7 +16,7 @@ Object.defineProperty(window, "crypto", {
   },
 });
 
-vi.mock("../excalidraw-app/data/index.ts", async (importActual) => {
+vi.mock("../../excalidraw-app/data/index.ts", async (importActual) => {
   const module = (await importActual()) as any;
   return {
     __esmodule: true,
@@ -27,7 +27,7 @@ vi.mock("../excalidraw-app/data/index.ts", async (importActual) => {
   };
 });
 
-vi.mock("../excalidraw-app/data/firebase.ts", () => {
+vi.mock("../../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
   const isSavedToFirebase = () => true;

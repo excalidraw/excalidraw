@@ -1,6 +1,6 @@
-import { shield } from "../../components/icons";
-import { Tooltip } from "../../components/Tooltip";
-import { useI18n } from "../../i18n";
+import { shield } from "../../src/components/icons";
+import { Tooltip } from "../../src/components/Tooltip";
+import { useI18n } from "../../src/i18n";
 
 export const EncryptedIcon = () => {
   const { t } = useI18n();

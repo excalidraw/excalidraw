@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { reseed } from "../random";
 import {
   actionSendBackward,
@@ -121,7 +121,6 @@ const assertZindex = ({
   operations: [Actions, string[]][];
 }) => {
   const selectedElementIds = populateElements(elements, appState);
-
   operations.forEach(([action, expected]) => {
     h.app.actionManager.executeAction(action);
     expect(h.elements.map((element) => element.id)).toEqual(expected);
@@ -131,7 +130,7 @@ const assertZindex = ({
 
 describe("z-index manipulation", () => {
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
   });
 
   it("send back", () => {
