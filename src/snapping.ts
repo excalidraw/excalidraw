@@ -49,9 +49,6 @@ export type Gap = {
   // └───────────┘-----------------│           │
   //                               └───────────┘
   //                               ↑ end side
-
-  // startElement: ExcalidrawElement;
-  // endElement: ExcalidrawElement;
   startBounds: Bounds;
   endBounds: Bounds;
   startSide: [Point, Point];
@@ -265,6 +262,8 @@ export const getVisibleGaps = (
     )
     .map((group) => getCommonBounds(group));
 
+  const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
+
   const horizontallySorted = referenceBounds.sort((a, b) => a[0] - b[0]);
 
   const horizontalGaps: Gap[] = [];
@@ -278,9 +277,12 @@ export const getVisibleGaps = (
       const [, startMinY, startMaxX, startMaxY] = startBounds;
       const [endMinX, endMinY, , endMaxY] = endBounds;
 
+      const gapIsLargerThanSelection = endMinX - startMaxX > maxX - minX;
+
       if (
         startMaxX < endMinX &&
-        rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY])
+        rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY]) &&
+        gapIsLargerThanSelection
       ) {
         horizontalGaps.push({
           startBounds,
@@ -316,9 +318,12 @@ export const getVisibleGaps = (
       const [startMinX, , startMaxX, startMaxY] = startBounds;
       const [endMinX, endMinY, endMaxX] = endBounds;
 
+      const gapIsLargerThanSelection = endMinY - startMaxY > maxY - minY;
+
       if (
         startMaxY < endMinY &&
-        rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX])
+        rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX]) &&
+        gapIsLargerThanSelection
       ) {
         verticalGaps.push({
           startBounds,
@@ -382,9 +387,8 @@ export const getGapSnaps = (
       // center gap
       const gapMidX = gap.startSide[0][0] + gap.length / 2;
       const centerOffset = gapMidX - centerX;
-      const gapIsLargerThanSelection = gap.length > maxX - minX;
 
-      if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
+      if (Math.abs(centerOffset) <= minOffset.x) {
         if (Math.abs(centerOffset) < minOffset.x) {
           neartestSnapsX.length = 0;
         }
@@ -443,7 +447,6 @@ export const getGapSnaps = (
         continue;
       }
     }
-
     for (const gap of verticalGaps) {
       if (!rangesOverlap([minX, maxX], gap.overlap)) {
         continue;
@@ -452,9 +455,8 @@ export const getGapSnaps = (
       // center gap
       const gapMidY = gap.startSide[0][1] + gap.length / 2;
       const centerOffset = gapMidY - centerY;
-      const gapIsLargerThanSelection = gap.length > maxY - minY;
 
-      if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
+      if (Math.abs(centerOffset) <= minOffset.y) {
         if (Math.abs(centerOffset) < minOffset.y) {
           neartestSnapsY.length = 0;
         }
@@ -516,8 +518,26 @@ export const getGapSnaps = (
   }
 };
 
-export const getPointSnaps = (
+export const getReferenceSnapPoints = (
   elements: readonly NonDeletedExcalidrawElement[],
+  selectedElements: ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const referenceElements = getReferenceElements(
+    elements,
+    selectedElements,
+    appState,
+  );
+
+  return getMaximumGroups(referenceElements)
+    .filter(
+      (elementsGroup) =>
+        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
+    )
+    .flatMap((elementGroup) => getElementsCorners(elementGroup));
+};
+
+export const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: Point[],
   appState: AppState,
@@ -533,57 +553,45 @@ export const getPointSnaps = (
     return [];
   }
 
-  const referenceElements = getReferenceElements(
-    elements,
-    selectedElements,
-    appState,
-  );
+  if (appState.referenceSnapPoints) {
+    for (const thisSnapPoint of selectionSnapPoints) {
+      for (const otherSnapPoint of appState.referenceSnapPoints) {
+        const offsetX = otherSnapPoint[0] - thisSnapPoint[0];
+        const offsetY = otherSnapPoint[1] - thisSnapPoint[1];
 
-  const referenceSnapPoints = getMaximumGroups(referenceElements)
-    .filter(
-      (elementsGroup) =>
-        !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
-    )
-    .flatMap((elementGroup) => getElementsCorners(elementGroup));
+        if (Math.abs(offsetX) <= minOffset.x) {
+          if (Math.abs(offsetX) < minOffset.x) {
+            neartestSnapsX.length = 0;
+          }
 
-  for (const thisSnapPoint of selectionSnapPoints) {
-    for (const otherSnapPoint of referenceSnapPoints) {
-      const offsetX = otherSnapPoint[0] - thisSnapPoint[0];
-      const offsetY = otherSnapPoint[1] - thisSnapPoint[1];
+          neartestSnapsX.push({
+            type: "point",
+            points: [thisSnapPoint, otherSnapPoint],
+            offset: offsetX,
+          });
 
-      if (Math.abs(offsetX) <= minOffset.x) {
-        if (Math.abs(offsetX) < minOffset.x) {
-          neartestSnapsX.length = 0;
+          minOffset.x = Math.abs(offsetX);
         }
 
-        neartestSnapsX.push({
-          type: "point",
-          points: [thisSnapPoint, otherSnapPoint],
-          offset: offsetX,
-        });
+        if (Math.abs(offsetY) <= minOffset.y) {
+          if (Math.abs(offsetY) < minOffset.y) {
+            neartestSnapsY.length = 0;
+          }
 
-        minOffset.x = Math.abs(offsetX);
-      }
+          neartestSnapsY.push({
+            type: "point",
+            points: [thisSnapPoint, otherSnapPoint],
+            offset: offsetY,
+          });
 
-      if (Math.abs(offsetY) <= minOffset.y) {
-        if (Math.abs(offsetY) < minOffset.y) {
-          neartestSnapsY.length = 0;
+          minOffset.y = Math.abs(offsetY);
         }
-
-        neartestSnapsY.push({
-          type: "point",
-          points: [thisSnapPoint, otherSnapPoint],
-          offset: offsetY,
-        });
-
-        minOffset.y = Math.abs(offsetY);
       }
     }
   }
 };
 
 export const snapDraggedElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
@@ -603,7 +611,6 @@ export const snapDraggedElements = (
 
   // get the nearest horizontal and vertical point and gap snaps
   getPointSnaps(
-    elements,
     selectedElements,
     selectionPoints,
     appState,
@@ -646,7 +653,6 @@ export const snapDraggedElements = (
   };
 
   getPointSnaps(
-    elements,
     selectedElements,
     getElementsCorners(selectedElements, {
       dragOffset: newDragOffset,
@@ -943,31 +949,30 @@ export const snapResizingElements = (
     y: snapDistance,
   };
 
-  const neartestSnapsX: Snaps = [];
-  const neartestSnapsY: Snaps = [];
+  const nearestSnapsX: Snaps = [];
+  const nearestSnapsY: Snaps = [];
 
   getPointSnaps(
-    elements,
     selectedOriginalElements,
     selectionSnapPoints,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
   const snapOffset = {
-    x: neartestSnapsX[0]?.offset ?? 0,
-    y: neartestSnapsY[0]?.offset ?? 0,
+    x: nearestSnapsX[0]?.offset ?? 0,
+    y: nearestSnapsY[0]?.offset ?? 0,
   };
 
   // again, once snap offset is calculated
   // reset to recompute for creating snap lines to be rendered
   minOffset.x = SNAP_PRECISION;
   minOffset.y = SNAP_PRECISION;
-  neartestSnapsX.length = 0;
-  neartestSnapsY.length = 0;
+  nearestSnapsX.length = 0;
+  nearestSnapsY.length = 0;
 
   const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
 
@@ -979,18 +984,17 @@ export const snapResizingElements = (
   ];
 
   getPointSnaps(
-    elements,
     selectedElements,
     corners,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
   const pointSnapLines = createPointSnapLines(
-    [...neartestSnapsX, ...neartestSnapsY].filter(
+    [...nearestSnapsX, ...nearestSnapsY].filter(
       (snap) => snap.type === "point",
     ) as PointSnap[],
   );
@@ -1033,7 +1037,6 @@ export const snapNewElement = (
   const neartestSnapsY: Snaps = [];
 
   getPointSnaps(
-    elements,
     [draggingElement],
     selectionSnapPoints,
     appState,
@@ -1059,7 +1062,6 @@ export const snapNewElement = (
   });
 
   getPointSnaps(
-    elements,
     [draggingElement],
     corners,
     appState,

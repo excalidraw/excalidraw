@@ -296,6 +296,7 @@ export type AppState = {
     verticalGaps: Gap[];
     horizontalGaps: Gap[];
   } | null;
+  referenceSnapPoints: Point[] | null;
   originSnapOffset: {
     x: number;
     y: number;

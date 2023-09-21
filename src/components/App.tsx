@@ -350,6 +350,7 @@ import {
   snapResizingElements,
   isSnappingEnabled,
   getVisibleGaps,
+  getReferenceSnapPoints,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -5646,6 +5647,50 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private maybeCacheReferenceSnapPoints(
+    event: PointerEvent | MouseEvent | KeyboardEvent,
+    selectedElements: ExcalidrawElement[],
+  ) {
+    if (
+      isSnappingEnabled({
+        event,
+        appState: this.state,
+        selectedElements,
+      }) &&
+      !this.state.referenceSnapPoints
+    ) {
+      this.setState({
+        referenceSnapPoints: getReferenceSnapPoints(
+          this.scene.getNonDeletedElements(),
+          selectedElements,
+          this.state,
+        ),
+      });
+    }
+  }
+
+  private maybeCacheVisibleGaps(
+    event: PointerEvent,
+    selectedElements: ExcalidrawElement[],
+  ) {
+    if (
+      isSnappingEnabled({
+        event,
+        appState: this.state,
+        selectedElements,
+      }) &&
+      !this.state.visibleGaps
+    ) {
+      this.setState({
+        visibleGaps: getVisibleGaps(
+          this.scene.getNonDeletedElements(),
+          selectedElements,
+          this.state,
+        ),
+      });
+    }
+  }
+
   private onKeyDownFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
@@ -5909,25 +5954,10 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          if (
-            isSnappingEnabled({
-              event,
-              appState: this.state,
-              selectedElements,
-            }) &&
-            !this.state.visibleGaps
-          ) {
-            this.setState({
-              visibleGaps: getVisibleGaps(
-                this.scene.getNonDeletedElements(),
-                selectedElements,
-                this.state,
-              ),
-            });
-          }
+          this.maybeCacheVisibleGaps(event, selectedElements);
+          this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
           const { snapOffset, snapLines } = snapDraggedElements(
-            originalElements,
             getSelectedElements(originalElements, this.state),
             dragOffset,
             this.state,
@@ -6263,6 +6293,7 @@ class App extends React.Component<AppProps, AppState> {
             : null,
         snapLines: [],
         visibleGaps: null,
+        referenceSnapPoints: null,
         originSnapOffset: null,
       });
 
@@ -7807,6 +7838,8 @@ class App extends React.Component<AppProps, AppState> {
           ? image.width / image.height
           : null;
 
+      this.maybeCacheReferenceSnapPoints(event, [draggingElement]);
+
       const { snapOffset, snapLines } = snapNewElement(
         this.scene.getNonDeletedElements(),
         draggingElement,
@@ -7932,6 +7965,8 @@ class App extends React.Component<AppProps, AppState> {
       };
 
       const originalElements = [...pointerDownState.originalElements.values()];
+
+      this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
       const { snapOffset, snapLines } = snapResizingElements(
         originalElements,
