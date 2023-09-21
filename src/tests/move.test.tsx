@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";
@@ -31,7 +31,7 @@ const { h } = window;
 
 describe("move element", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     const canvas = container.querySelector("canvas.interactive")!;
 
     {
@@ -67,7 +67,7 @@ describe("move element", () => {
   });
 
   it("rectangles with binding arrow", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
 
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
@@ -119,7 +119,7 @@ describe("move element", () => {
 
 describe("duplicate element on move when ALT is clicked", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     const canvas = container.querySelector("canvas.interactive")!;
 
     {

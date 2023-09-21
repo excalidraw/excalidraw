@@ -11,11 +11,11 @@
  */
 
 import { createStore, entries, del, getMany, set, setMany } from "idb-keyval";
-import { clearAppStateForLocalStorage } from "../../appState";
-import { clearElementsForLocalStorage } from "../../element";
-import { ExcalidrawElement, FileId } from "../../element/types";
-import { AppState, BinaryFileData, BinaryFiles } from "../../types";
-import { debounce } from "../../utils";
+import { clearAppStateForLocalStorage } from "../../src/appState";
+import { clearElementsForLocalStorage } from "../../src/element";
+import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { AppState, BinaryFileData, BinaryFiles } from "../../src/types";
+import { debounce } from "../../src/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";

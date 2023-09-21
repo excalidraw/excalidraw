@@ -1,23 +1,23 @@
-import { compressData, decompressData } from "../../data/encode";
+import { compressData, decompressData } from "../../src/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../data/encryption";
-import { serializeAsJSON } from "../../data/json";
-import { restore } from "../../data/restore";
-import { ImportedDataState } from "../../data/types";
-import { isInvisiblySmallElement } from "../../element/sizeHelpers";
-import { isInitializedImageElement } from "../../element/typeChecks";
-import { ExcalidrawElement, FileId } from "../../element/types";
-import { t } from "../../i18n";
+} from "../../src/data/encryption";
+import { serializeAsJSON } from "../../src/data/json";
+import { restore } from "../../src/data/restore";
+import { ImportedDataState } from "../../src/data/types";
+import { isInvisiblySmallElement } from "../../src/element/sizeHelpers";
+import { isInitializedImageElement } from "../../src/element/typeChecks";
+import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { t } from "../../src/i18n";
 import {
   AppState,
   BinaryFileData,
   BinaryFiles,
   UserIdleState,
-} from "../../types";
-import { bytesToHexString } from "../../utils";
+} from "../../src/types";
+import { bytesToHexString } from "../../src/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
