@@ -6025,8 +6025,12 @@ class App extends React.Component<AppProps, AppState> {
                   event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
-                  x: duplicatedElement.x + (originDragX - dragX),
-                  y: duplicatedElement.y + (originDragY - dragY),
+                  x:
+                    duplicatedElement.x +
+                    (originDragX - (dragX + snapOffset.x)),
+                  y:
+                    duplicatedElement.y +
+                    (originDragY - (dragY + snapOffset.y)),
                 });
 
                 // put duplicated element to pointerDownState.originalElements
