@@ -11,6 +11,22 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## 0.16.1 (2023-09-21)
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Fixes
+
+- More eye-droper fixes [#7019](https://github.com/excalidraw/excalidraw/pull/7019)
+
+### Refactor
+
+- Move excalidraw-app outside src [#6987](https://github.com/excalidraw/excalidraw/pull/6987)
+
+---
+
 ## 0.16.0 (2023-09-19)
 
 - Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
