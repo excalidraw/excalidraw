@@ -4550,21 +4550,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
 
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
-
-    if (isSnappingEnabled({ event, appState: this.state, selectedElements })) {
-      this.setState({
-        visibleGaps: getVisibleGaps(
-          this.scene.getNonDeletedElements(),
-          selectedElements,
-          this.state,
-        ),
-      });
-    }
-
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
 
@@ -5922,6 +5907,23 @@ class App extends React.Component<AppProps, AppState> {
             if (lockY) {
               dragOffset.y = 0;
             }
+          }
+
+          if (
+            isSnappingEnabled({
+              event,
+              appState: this.state,
+              selectedElements,
+            }) &&
+            !this.state.visibleGaps
+          ) {
+            this.setState({
+              visibleGaps: getVisibleGaps(
+                this.scene.getNonDeletedElements(),
+                selectedElements,
+                this.state,
+              ),
+            });
           }
 
           const { snapOffset, snapLines } = snapDraggedElements(
