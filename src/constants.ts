@@ -246,6 +246,7 @@ export const FANCY_BG_BORDER_RADIUS = 12; // px
 export const FANCY_BG_LOGO_PADDING = 20; // px
 export const FANCY_BG_LOGO_BOTTOM_PADDING = 12; // px
 export const FANCY_BG_INCLUDE_LOGO = true;
+export const FANCY_BG_STRETCH_CONTENT_BACKGROUND = true;
 export const DEFAULT_FANCY_BACKGROUND_RATIO: Dimensions = {
   width: 16,
   height: 9,
