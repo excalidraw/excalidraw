@@ -52,6 +52,9 @@ import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
+import { mutateElement } from "../element/mutateElement";
+import { ShapeCache } from "../scene/ShapeCache";
+import Scene from "../scene/Scene";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -368,10 +371,43 @@ const LayerUI = ({
       )}
       {eyeDropperState && !device.isMobile && (
         <EyeDropper
-          swapPreviewOnAlt={eyeDropperState.swapPreviewOnAlt}
-          previewType={eyeDropperState.previewType}
+          colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
             setEyeDropperState(null);
+          }}
+          onChange={(colorPickerType, color, selectedElements, { altKey }) => {
+            if (
+              colorPickerType !== "elementBackground" &&
+              colorPickerType !== "elementStroke"
+            ) {
+              return;
+            }
+
+            if (selectedElements.length) {
+              for (const element of selectedElements) {
+                mutateElement(
+                  element,
+                  {
+                    [altKey && eyeDropperState.swapPreviewOnAlt
+                      ? colorPickerType === "elementBackground"
+                        ? "strokeColor"
+                        : "backgroundColor"
+                      : colorPickerType === "elementBackground"
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
+                  },
+                  false,
+                );
+                ShapeCache.delete(element);
+              }
+              Scene.getScene(selectedElements[0])?.informMutation();
+            } else if (colorPickerType === "elementBackground") {
+              setAppState({
+                currentItemBackgroundColor: color,
+              });
+            } else {
+              setAppState({ currentItemStrokeColor: color });
+            }
           }}
           onSelect={(color, event) => {
             setEyeDropperState((state) => {
