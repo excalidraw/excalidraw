@@ -1,31 +1,31 @@
-import polyfill from "../polyfill";
+import polyfill from "../src/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { useEffect, useRef, useState } from "react";
-import { trackEvent } from "../analytics";
-import { getDefaultAppState } from "../appState";
-import { ErrorDialog } from "../components/ErrorDialog";
-import { TopErrorBoundary } from "../components/TopErrorBoundary";
+import { trackEvent } from "../src/analytics";
+import { getDefaultAppState } from "../src/appState";
+import { ErrorDialog } from "../src/components/ErrorDialog";
+import { TopErrorBoundary } from "../src/components/TopErrorBoundary";
 import {
   APP_NAME,
   EVENT,
   THEME,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
-} from "../constants";
-import { loadFromBlob } from "../data/blob";
+} from "../src/constants";
+import { loadFromBlob } from "../src/data/blob";
 import {
   ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
   Theme,
-} from "../element/types";
-import { useCallbackRefState } from "../hooks/useCallbackRefState";
-import { t } from "../i18n";
+} from "../src/element/types";
+import { useCallbackRefState } from "../src/hooks/useCallbackRefState";
+import { t } from "../src/i18n";
 import {
   Excalidraw,
   defaultLang,
   LiveCollaborationTrigger,
-} from "../packages/excalidraw/index";
+} from "../src/packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -33,7 +33,7 @@ import {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
-} from "../types";
+} from "../src/types";
 import {
   debounce,
   getVersion,
@@ -43,7 +43,7 @@ import {
   ResolvablePromise,
   resolvablePromise,
   isRunningInIframe,
-} from "../utils";
+} from "../src/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
   STORAGE_KEYS,
@@ -68,33 +68,40 @@ import {
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import { restore, restoreAppState, RestoredDataState } from "../data/restore";
+import {
+  restore,
+  restoreAppState,
+  RestoredDataState,
+} from "../src/data/restore";
 import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
-import { newElementWith } from "../element/mutateElement";
-import { isInitializedImageElement } from "../element/typeChecks";
+import { newElementWith } from "../src/element/mutateElement";
+import { isInitializedImageElement } from "../src/element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { reconcileElements } from "./collab/reconciliation";
-import { parseLibraryTokensFromUrl, useHandleLibrary } from "../data/library";
+import {
+  parseLibraryTokensFromUrl,
+  useHandleLibrary,
+} from "../src/data/library";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
 import { atom, Provider, useAtom, useAtomValue } from "jotai";
-import { useAtomWithInitialValue } from "../jotai";
+import { useAtomWithInitialValue } from "../src/jotai";
 import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
-import { ResolutionType } from "../utility-types";
-import { ShareableLinkDialog } from "../components/ShareableLinkDialog";
-import { openConfirmModal } from "../components/OverwriteConfirm/OverwriteConfirmState";
-import { OverwriteConfirmDialog } from "../components/OverwriteConfirm/OverwriteConfirm";
-import Trans from "../components/Trans";
+import { ResolutionType } from "../src/utility-types";
+import { ShareableLinkDialog } from "../src/components/ShareableLinkDialog";
+import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteConfirmState";
+import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
+import Trans from "../src/components/Trans";
 
 polyfill();
 

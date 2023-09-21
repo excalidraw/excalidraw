@@ -6,19 +6,19 @@ import {
 
 import { TCollabClass } from "./Collab";
 
-import { ExcalidrawElement } from "../../element/types";
+import { ExcalidrawElement } from "../../src/element/types";
 import {
   WS_EVENTS,
   FILE_UPLOAD_TIMEOUT,
   WS_SCENE_EVENT_TYPES,
 } from "../app_constants";
-import { UserIdleState } from "../../types";
-import { trackEvent } from "../../analytics";
+import { UserIdleState } from "../../src/types";
+import { trackEvent } from "../../src/analytics";
 import throttle from "lodash.throttle";
-import { newElementWith } from "../../element/mutateElement";
+import { newElementWith } from "../../src/element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
-import { encryptData } from "../../data/encryption";
-import { PRECEDING_ELEMENT_KEY } from "../../constants";
+import { encryptData } from "../../src/data/encryption";
+import { PRECEDING_ELEMENT_KEY } from "../../src/constants";
 
 class Portal {
   collab: TCollabClass;

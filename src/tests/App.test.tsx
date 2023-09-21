@@ -3,7 +3,7 @@ import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { render, queryByTestId } from "../tests/test-utils";
 
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { vi } from "vitest";
 
 const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
@@ -35,7 +35,7 @@ describe("Test <App/>", () => {
       };
     };
 
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
     expect(
       queryByTestId(
         document.querySelector(".excalidraw-modal-container")!,

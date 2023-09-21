@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../../src/packages/excalidraw/index";
 import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
@@ -60,7 +60,7 @@ describe("aligning", () => {
     mouse.reset();
 
     await setLanguage(defaultLang);
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
   it("aligns two objects correctly to the top", () => {

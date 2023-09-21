@@ -1,20 +1,20 @@
 import React from "react";
-import { Card } from "../../components/Card";
-import { ToolButton } from "../../components/ToolButton";
-import { serializeAsJSON } from "../../data/json";
+import { Card } from "../../src/components/Card";
+import { ToolButton } from "../../src/components/ToolButton";
+import { serializeAsJSON } from "../../src/data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
-import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
-import { AppState, BinaryFileData, BinaryFiles } from "../../types";
+import { FileId, NonDeletedExcalidrawElement } from "../../src/element/types";
+import { AppState, BinaryFileData, BinaryFiles } from "../../src/types";
 import { nanoid } from "nanoid";
-import { useI18n } from "../../i18n";
-import { encryptData, generateEncryptionKey } from "../../data/encryption";
-import { isInitializedImageElement } from "../../element/typeChecks";
+import { useI18n } from "../../src/i18n";
+import { encryptData, generateEncryptionKey } from "../../src/data/encryption";
+import { isInitializedImageElement } from "../../src/element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
-import { MIME_TYPES } from "../../constants";
-import { trackEvent } from "../../analytics";
-import { getFrame } from "../../utils";
-import { ExcalidrawLogo } from "../../components/ExcalidrawLogo";
+import { MIME_TYPES } from "../../src/constants";
+import { trackEvent } from "../../src/analytics";
+import { getFrame } from "../../src/utils";
+import { ExcalidrawLogo } from "../../src/components/ExcalidrawLogo";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],

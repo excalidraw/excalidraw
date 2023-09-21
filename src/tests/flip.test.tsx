@@ -19,7 +19,7 @@ import {
   FileId,
 } from "../element/types";
 import { newLinearElement } from "../element";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { mutateElement } from "../element/mutateElement";
 import { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
@@ -52,7 +52,7 @@ beforeEach(async () => {
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
   });
-  await render(<ExcalidrawApp />);
+  await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
   h.setState({
     zoom: {
       value: 1 as NormalizedZoomValue,

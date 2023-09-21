@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { GlobalTestState, render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
@@ -41,7 +41,7 @@ describe("textWysiwyg", () => {
   describe("start text editing", () => {
     const { h } = window;
     beforeEach(async () => {
-      await render(<ExcalidrawApp />);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
       h.elements = [];
     });
 
@@ -243,7 +243,7 @@ describe("textWysiwyg", () => {
     });
 
     beforeEach(async () => {
-      await render(<ExcalidrawApp />);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
       //@ts-ignore
       h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
 
@@ -477,7 +477,7 @@ describe("textWysiwyg", () => {
     const { h } = window;
 
     beforeEach(async () => {
-      await render(<ExcalidrawApp />);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
       h.elements = [];
 
       rectangle = UI.createElement("rectangle", {
@@ -1511,7 +1511,7 @@ describe("textWysiwyg", () => {
   });
 
   it("should bump the version of labelled arrow when label updated", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
     const arrow = UI.createElement("arrow", {
       width: 300,
       height: 0,

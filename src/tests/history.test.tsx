@@ -1,5 +1,5 @@
 import { assertSelectedElements, render } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
@@ -13,14 +13,16 @@ const mouse = new Pointer("mouse");
 
 describe("history", () => {
   it("initializing scene should end up with single history entry", async () => {
-    await render(<ExcalidrawApp />, {
-      localStorageData: {
-        elements: [API.createElement({ type: "rectangle", id: "A" })],
-        appState: {
-          zenModeEnabled: true,
-        },
-      },
-    });
+    await render(
+      <Excalidraw
+        initialData={{
+          elements: [API.createElement({ type: "rectangle", id: "A" })],
+          appState: {
+            zenModeEnabled: true,
+          },
+        }}
+      />,
+    );
 
     await waitFor(() => expect(h.state.zenModeEnabled).toBe(true));
     await waitFor(() =>
@@ -60,14 +62,16 @@ describe("history", () => {
   });
 
   it("scene import via drag&drop should create new history entry", async () => {
-    await render(<ExcalidrawApp />, {
-      localStorageData: {
-        elements: [API.createElement({ type: "rectangle", id: "A" })],
-        appState: {
-          viewBackgroundColor: "#FFF",
-        },
-      },
-    });
+    await render(
+      <Excalidraw
+        initialData={{
+          elements: [API.createElement({ type: "rectangle", id: "A" })],
+          appState: {
+            viewBackgroundColor: "#FFF",
+          },
+        }}
+      />,
+    );
 
     await waitFor(() => expect(h.state.viewBackgroundColor).toBe("#FFF"));
     await waitFor(() =>
@@ -113,7 +117,7 @@ describe("history", () => {
   });
 
   it("undo/redo works properly with groups", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
     const rect1 = API.createElement({ type: "rectangle", groupIds: ["A"] });
     const rect2 = API.createElement({ type: "rectangle", groupIds: ["A"] });
 

@@ -203,7 +203,6 @@ describe("duplicating multiple elements", () => {
     );
 
     clonedArrows.forEach((arrow) => {
-      // console.log(arrow);
       expect(
         clonedRectangle.boundElements!.find((e) => e.id === arrow.id),
       ).toEqual(

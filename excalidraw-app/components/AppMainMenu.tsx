@@ -1,6 +1,6 @@
 import React from "react";
-import { PlusPromoIcon } from "../../components/icons";
-import { MainMenu } from "../../packages/excalidraw/index";
+import { PlusPromoIcon } from "../../src/components/icons";
+import { MainMenu } from "../../src/packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
 
 export const AppMainMenu: React.FC<{

@@ -1,14 +1,14 @@
 import { render } from "./test-utils";
 import { API } from "./helpers/api";
 
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { vi } from "vitest";
 
 const { h } = window;
 
 describe("fitToContent", () => {
   it("should zoom to fit the selected element", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
 
     h.state.width = 10;
     h.state.height = 10;
@@ -30,7 +30,7 @@ describe("fitToContent", () => {
   });
 
   it("should zoom to fit multiple elements", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
 
     const topLeft = API.createElement({
       width: 20,
@@ -61,7 +61,7 @@ describe("fitToContent", () => {
   });
 
   it("should scroll the viewport to the selected element", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
 
     h.state.width = 10;
     h.state.height = 10;
@@ -106,7 +106,7 @@ describe("fitToContent animated", () => {
   });
 
   it("should ease scroll the viewport to the selected element", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
 
     h.state.width = 10;
     h.state.height = 10;
@@ -142,7 +142,7 @@ describe("fitToContent animated", () => {
   });
 
   it("should animate the scroll but not the zoom", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
 
     h.state.width = 50;
     h.state.height = 50;

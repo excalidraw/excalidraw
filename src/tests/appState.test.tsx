@@ -1,6 +1,6 @@
 import { queryByTestId, render, waitFor } from "./test-utils";
 
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
@@ -14,14 +14,17 @@ describe("appState", () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;
 
-    await render(<ExcalidrawApp />, {
-      localStorageData: {
-        appState: {
-          exportBackground,
-          viewBackgroundColor: "#F00",
-        },
-      },
-    });
+    await render(
+      <Excalidraw
+        initialData={{
+          appState: {
+            exportBackground,
+            viewBackgroundColor: "#F00",
+          },
+        }}
+      />,
+      {},
+    );
 
     await waitFor(() => {
       expect(h.state.exportBackground).toBe(exportBackground);
@@ -53,13 +56,15 @@ describe("appState", () => {
   });
 
   it("changing fontSize with text tool selected (no element created yet)", async () => {
-    const { container } = await render(<ExcalidrawApp />, {
-      localStorageData: {
-        appState: {
-          currentItemFontSize: 30,
-        },
-      },
-    });
+    const { container } = await render(
+      <Excalidraw
+        initialData={{
+          appState: {
+            currentItemFontSize: 30,
+          },
+        }}
+      />,
+    );
 
     UI.clickTool("text");
 
