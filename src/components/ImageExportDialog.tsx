@@ -95,6 +95,7 @@ type State = {
   embedScene: boolean;
   exportScale: number;
   exportBaseScale: number;
+  isExportWithFancyBackground: boolean;
   renderError: Error | null;
 };
 
@@ -118,6 +119,10 @@ type Action =
   | { type: "SET_EMBED_SCENE"; embedScene: boolean }
   | { type: "SET_EXPORT_SCALE"; exportScale: number }
   | { type: "SET_ALL_SCALES"; exportScale: number }
+  | {
+      type: "SET_IS_EXPORT_WITH_FANCY_BACKGROUND";
+      isExportWithFancyBackground: boolean;
+    }
   | { type: "SET_RENDER_ERROR"; renderError: Error | null };
 
 const reducer = (state: State, action: Action): State => {
@@ -155,6 +160,11 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, embedScene: action.embedScene };
     case "SET_EXPORT_SCALE":
       return { ...state, exportScale: action.exportScale };
+    case "SET_IS_EXPORT_WITH_FANCY_BACKGROUND":
+      return {
+        ...state,
+        isExportWithFancyBackground: action.isExportWithFancyBackground,
+      };
     case "SET_ALL_SCALES":
       return {
         ...state,
@@ -184,6 +194,8 @@ const createInitialState = ({
     embedScene: appState.exportEmbedScene,
     exportScale: appState.exportScale,
     exportBaseScale: appState.exportScale,
+    isExportWithFancyBackground:
+      appState.exportBackground && appState.fancyBackgroundImageKey !== "solid",
     renderError: null,
   };
 };
@@ -282,6 +294,24 @@ const ImageExportModal = ({
     if (!maxWidth) {
       return;
     }
+
+    // when switching between solid/no background and image background, we clear the canvas to prevent flickering
+    const isExportWithFancyBackground =
+      appState.exportBackground && appState.fancyBackgroundImageKey !== "solid";
+
+    if (state.isExportWithFancyBackground !== isExportWithFancyBackground) {
+      const existingCanvas = previewNode.querySelector("canvas");
+      if (existingCanvas) {
+        const context = existingCanvas.getContext("2d");
+
+        context!.clearRect(0, 0, existingCanvas.width, existingCanvas.height);
+      }
+      dispatch({
+        type: "SET_IS_EXPORT_WITH_FANCY_BACKGROUND",
+        isExportWithFancyBackground,
+      });
+    }
+
     exportToCanvas({
       elements: state.exportedElements,
       appState,
@@ -294,8 +324,20 @@ const ImageExportModal = ({
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
         return canvasToBlob(canvas).then(() => {
-          previewNode.replaceChildren(canvas);
+          const existingCanvas = previewNode.querySelector("canvas");
+          if (!existingCanvas) {
+            previewNode.appendChild(canvas);
+            return;
+          }
+
+          existingCanvas.width = canvas.width;
+          existingCanvas.height = canvas.height;
+
+          const context = existingCanvas.getContext("2d");
+          context!.drawImage(canvas, 0, 0);
         });
+
+        // Get the 2D rendering context of the existing canvas
       })
       .catch((error) => {
         console.error(error);
@@ -307,6 +349,7 @@ const ImageExportModal = ({
     appState.fancyBackgroundImageKey,
     files,
     state.exportedElements,
+    state.isExportWithFancyBackground,
   ]);
 
   return (
@@ -317,7 +360,6 @@ const ImageExportModal = ({
           className={clsx("ImageExportModal__preview__canvas", {
             "ImageExportModal__preview__canvas--img-bcg":
               appState.exportBackground &&
-              appState.fancyBackgroundImageKey &&
               appState.fancyBackgroundImageKey !== "solid",
           })}
           ref={previewRef}
