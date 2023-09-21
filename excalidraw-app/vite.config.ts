@@ -6,7 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 
 // To load .env.local variables
-const envVars = loadEnv("", process.cwd());
+const envVars = loadEnv("", `../`);
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -25,7 +25,7 @@ export default defineConfig({
         // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
         manualChunks(id) {
           if (
-            id.includes("src/locales") &&
+            id.includes("../src/locales") &&
             id.match(/en.json|percentages.json/) === null
           ) {
             const index = id.indexOf("locales/");
@@ -44,7 +44,7 @@ export default defineConfig({
       eslint:
         envVars.VITE_APP_ENABLE_ESLINT === "false"
           ? undefined
-          : { lintCommand: 'eslint "./src/**/*.{js,ts,tsx}"' },
+          : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
       overlay: {
         initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
         badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",

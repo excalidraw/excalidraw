@@ -1,7 +1,7 @@
 import React from "react";
 import * as Sentry from "@sentry/browser";
-import { t } from "../i18n";
-import Trans from "./Trans";
+import { t } from "../../src/i18n";
+import Trans from "../../src/components/Trans";
 
 interface TopErrorBoundaryState {
   hasError: boolean;
@@ -57,7 +57,7 @@ export class TopErrorBoundary extends React.Component<
     try {
       const templateStrFn = (
         await import(
-          /* webpackChunkName: "bug-issue-template" */ "../bug-issue-template"
+          /* webpackChunkName: "bug-issue-template" */ "../../src/bug-issue-template"
         )
       ).default;
       body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
