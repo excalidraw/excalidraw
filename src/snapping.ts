@@ -262,8 +262,6 @@ export const getVisibleGaps = (
     )
     .map((group) => getCommonBounds(group));
 
-  const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
-
   const horizontallySorted = referenceBounds.sort((a, b) => a[0] - b[0]);
 
   const horizontalGaps: Gap[] = [];
@@ -277,12 +275,9 @@ export const getVisibleGaps = (
       const [, startMinY, startMaxX, startMaxY] = startBounds;
       const [endMinX, endMinY, , endMaxY] = endBounds;
 
-      const gapIsLargerThanSelection = endMinX - startMaxX > maxX - minX;
-
       if (
         startMaxX < endMinX &&
-        rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY]) &&
-        gapIsLargerThanSelection
+        rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY])
       ) {
         horizontalGaps.push({
           startBounds,
@@ -318,12 +313,9 @@ export const getVisibleGaps = (
       const [startMinX, , startMaxX, startMaxY] = startBounds;
       const [endMinX, endMinY, endMaxX] = endBounds;
 
-      const gapIsLargerThanSelection = endMinY - startMaxY > maxY - minY;
-
       if (
         startMaxY < endMinY &&
-        rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX]) &&
-        gapIsLargerThanSelection
+        rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX])
       ) {
         verticalGaps.push({
           startBounds,
@@ -387,8 +379,9 @@ export const getGapSnaps = (
       // center gap
       const gapMidX = gap.startSide[0][0] + gap.length / 2;
       const centerOffset = gapMidX - centerX;
+      const gapIsLargerThanSelection = gap.length > maxX - minX;
 
-      if (Math.abs(centerOffset) <= minOffset.x) {
+      if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
         if (Math.abs(centerOffset) < minOffset.x) {
           neartestSnapsX.length = 0;
         }
@@ -455,8 +448,9 @@ export const getGapSnaps = (
       // center gap
       const gapMidY = gap.startSide[0][1] + gap.length / 2;
       const centerOffset = gapMidY - centerY;
+      const gapIsLargerThanSelection = gap.length > maxY - minY;
 
-      if (Math.abs(centerOffset) <= minOffset.y) {
+      if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
         if (Math.abs(centerOffset) < minOffset.y) {
           neartestSnapsY.length = 0;
         }
