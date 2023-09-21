@@ -5920,12 +5920,6 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.editingElement &&
           this.state.activeEmbeddable?.state !== "active"
         ) {
-          const [dragX, dragY] = getGridPoint(
-            pointerCoords.x - pointerDownState.drag.offset.x,
-            pointerCoords.y - pointerDownState.drag.offset.y,
-            event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
-          );
-
           const dragOffset = {
             x: pointerCoords.x - pointerDownState.origin.x,
             y: pointerCoords.y - pointerDownState.origin.y,
@@ -6019,18 +6013,12 @@ class App extends React.Component<AppProps, AppState> {
                   groupIdMap,
                   element,
                 );
-                const [originDragX, originDragY] = getGridPoint(
-                  pointerDownState.origin.x - pointerDownState.drag.offset.x,
-                  pointerDownState.origin.y - pointerDownState.drag.offset.y,
-                  event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
-                );
+                const origElement = pointerDownState.originalElements.get(
+                  element.id,
+                )!;
                 mutateElement(duplicatedElement, {
-                  x:
-                    duplicatedElement.x +
-                    (originDragX - (dragX + snapOffset.x)),
-                  y:
-                    duplicatedElement.y +
-                    (originDragY - (dragY + snapOffset.y)),
+                  x: origElement.x,
+                  y: origElement.y,
                 });
 
                 // put duplicated element to pointerDownState.originalElements
