@@ -1,4 +1,5 @@
 import { getStroke } from "perfect-freehand";
+import { getClientColor } from "../../clients";
 
 import { sceneCoordsToViewportCoords } from "../../utils";
 import App from "../App";
@@ -41,6 +42,7 @@ function getSvgPathFromStroke(points: number[][], closed = true) {
 
 export type LaserPath = {
   original: [number, number, number][];
+  element: SVGPathElement | undefined;
 };
 
 declare global {
@@ -50,7 +52,7 @@ declare global {
 }
 
 export class LaserPathManager {
-  private currentPath: LaserPath | undefined;
+  private currentPaths = new Map<string, LaserPath>();
 
   private rafId: number | undefined;
   private container: SVGSVGElement | undefined;
@@ -59,21 +61,17 @@ export class LaserPathManager {
     window.LPM = this;
   }
 
-  startPath(point: Point) {
-    this.currentPath = {
-      original: [[...point, performance.now()]],
-    };
-  }
-
-  addPointToPath(point: Point) {
-    if (this.currentPath) {
-      this.currentPath.original.push([...point, performance.now()]);
+  addPointToPath(client: string, point: Point) {
+    let currentPath = this.currentPaths.get(client);
+    if (typeof currentPath === "undefined") {
+      currentPath = {
+        original: [[...point, performance.now()]],
+        element: undefined,
+      };
+      this.currentPaths.set(client, currentPath);
     }
-  }
 
-  endPath() {
-    if (this.currentPath) {
-    }
+    currentPath.original.push([...point, performance.now()]);
   }
 
   private translatePoint(point: number[]): Point {
@@ -91,16 +89,8 @@ export class LaserPathManager {
     this.tick(time);
   }
 
-  ownPath: SVGPathElement | undefined;
-
   start(svg: SVGSVGElement) {
     this.container = svg;
-    this.ownPath = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "path",
-    );
-
-    this.container.appendChild(this.ownPath);
 
     this.stop();
     this.loop();
@@ -117,9 +107,19 @@ export class LaserPathManager {
       return;
     }
 
-    if (this.currentPath) {
-      this.ownPath?.setAttribute("d", this.draw(this.currentPath, time));
-      this.ownPath?.setAttribute("fill", "red");
+    for (const [client, path] of this.currentPaths) {
+      let pathElem = path.element;
+      if (typeof pathElem === "undefined") {
+        pathElem = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path",
+        );
+        pathElem.setAttribute("fill", getClientColor(client));
+        this.container.appendChild(pathElem);
+        path.element = pathElem;
+      }
+
+      pathElem.setAttribute("d", this.draw(path, time));
     }
   }
 

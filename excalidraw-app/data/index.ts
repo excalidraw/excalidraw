@@ -109,6 +109,7 @@ export type SocketUpdateDataSource = {
       socketId: string;
       pointer: { x: number; y: number };
       button: "down" | "up";
+      usingLaserTool: boolean;
       selectedElementIds: AppState["selectedElementIds"];
       username: string;
     };

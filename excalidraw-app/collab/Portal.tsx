@@ -208,6 +208,8 @@ class Portal {
           socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
+          usingLaserTool:
+            this.collab.excalidrawAPI.getAppState().activeTool.type === "laser",
           selectedElementIds:
             this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
