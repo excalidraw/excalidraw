@@ -1,35 +1,47 @@
 import { atom } from "jotai";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { rgbToHex } from "../colors";
 import { EVENT } from "../constants";
 import { useUIAppState } from "../context/ui-appState";
-import { mutateElement } from "../element/mutateElement";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
-import Scene from "../scene/Scene";
-import { ShapeCache } from "../scene/ShapeCache";
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+import { useStable } from "../hooks/useStable";
 
 import "./EyeDropper.scss";
+import { ColorPickerType } from "./ColorPicker/colorPickerUtils";
+import { ExcalidrawElement } from "../element/types";
 
-type EyeDropperProperties = {
+export type EyeDropperProperties = {
   keepOpenOnAlt: boolean;
   swapPreviewOnAlt?: boolean;
+  /** called when user picks color (on pointerup) */
   onSelect: (color: string, event: PointerEvent) => void;
-  previewType: "strokeColor" | "backgroundColor";
+  /**
+   * property of selected elements to update live when alt-dragging.
+   * Supply `null` if not applicable (e.g. updating the canvas bg instead of
+   * elements)
+   **/
+  colorPickerType: ColorPickerType;
 };
 
 export const activeEyeDropperAtom = atom<null | EyeDropperProperties>(null);
 
 export const EyeDropper: React.FC<{
   onCancel: () => void;
-  onSelect: Required<EyeDropperProperties>["onSelect"];
-  swapPreviewOnAlt?: EyeDropperProperties["swapPreviewOnAlt"];
-  previewType: EyeDropperProperties["previewType"];
-}> = ({ onCancel, onSelect, swapPreviewOnAlt, previewType }) => {
+  onSelect: EyeDropperProperties["onSelect"];
+  /** called when color changes, on pointerdown for preview */
+  onChange: (
+    type: ColorPickerType,
+    color: string,
+    selectedElements: ExcalidrawElement[],
+    event: { altKey: boolean },
+  ) => void;
+  colorPickerType: EyeDropperProperties["colorPickerType"];
+}> = ({ onCancel, onChange, onSelect, colorPickerType }) => {
   const eyeDropperContainer = useCreatePortalContainer({
     className: "excalidraw-eye-dropper-backdrop",
     parentSelector: ".excalidraw-eye-dropper-container",
@@ -40,9 +52,13 @@ export const EyeDropper: React.FC<{
 
   const selectedElements = getSelectedElements(elements, appState);
 
-  const metaStuffRef = useRef({ selectedElements, app });
-  metaStuffRef.current.selectedElements = selectedElements;
-  metaStuffRef.current.app = app;
+  const stableProps = useStable({
+    app,
+    onCancel,
+    onChange,
+    onSelect,
+    selectedElements,
+  });
 
   const { container: excalidrawContainer } = useExcalidrawContainer();
 
@@ -90,26 +106,26 @@ export const EyeDropper: React.FC<{
       const currentColor = getCurrentColor({ clientX, clientY });
 
       if (isHoldingPointerDown) {
-        for (const element of metaStuffRef.current.selectedElements) {
-          mutateElement(
-            element,
-            {
-              [altKey && swapPreviewOnAlt
-                ? previewType === "strokeColor"
-                  ? "backgroundColor"
-                  : "strokeColor"
-                : previewType]: currentColor,
-            },
-            false,
-          );
-          ShapeCache.delete(element);
-        }
-        Scene.getScene(
-          metaStuffRef.current.selectedElements[0],
-        )?.informMutation();
+        stableProps.onChange(
+          colorPickerType,
+          currentColor,
+          stableProps.selectedElements,
+          { altKey },
+        );
       }
 
       colorPreviewDiv.style.background = currentColor;
+    };
+
+    const onCancel = () => {
+      stableProps.onCancel();
+    };
+
+    const onSelect: Required<EyeDropperProperties>["onSelect"] = (
+      color,
+      event,
+    ) => {
+      stableProps.onSelect(color, event);
     };
 
     const pointerDownListener = (event: PointerEvent) => {
@@ -148,8 +164,8 @@ export const EyeDropper: React.FC<{
 
     // init color preview else it would show only after the first mouse move
     mouseMoveListener({
-      clientX: metaStuffRef.current.app.lastViewportPosition.x,
-      clientY: metaStuffRef.current.app.lastViewportPosition.y,
+      clientX: stableProps.app.lastViewportPosition.x,
+      clientY: stableProps.app.lastViewportPosition.y,
       altKey: false,
     });
 
@@ -179,12 +195,10 @@ export const EyeDropper: React.FC<{
       window.removeEventListener(EVENT.BLUR, onCancel);
     };
   }, [
+    stableProps,
     app.canvas,
     eyeDropperContainer,
-    onCancel,
-    onSelect,
-    swapPreviewOnAlt,
-    previewType,
+    colorPickerType,
     excalidrawContainer,
     appState.offsetLeft,
     appState.offsetTop,
