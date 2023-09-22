@@ -15,7 +15,7 @@ import Spinner from "./Spinner";
 import "./MermaidToExcalidraw.scss";
 
 import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-import { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
+import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
 import { t } from "../i18n";
 import Trans from "./Trans";
 
@@ -49,6 +49,7 @@ const importMermaidDataFromStorage = () => {
 const ErrorComp = ({ error }: { error: string }) => {
   return (
     <div
+      data-testid="mermaid-error"
       style={{
         color: "red",
         fontWeight: 800,
@@ -185,6 +186,7 @@ const MermaidToExcalidraw = () => {
 
   return (
     <Dialog
+      className="dialog-mermaid"
       onCloseRequest={onClose}
       title={
         <>
