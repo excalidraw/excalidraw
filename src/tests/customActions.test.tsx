@@ -2,7 +2,7 @@ import { ExcalidrawElement } from "../element/types";
 import { getShortcutKey } from "../utils";
 import { API } from "./helpers/api";
 import { render } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import {
   CustomShortcutName,
   getShortcutFromShortcutName,
@@ -27,7 +27,7 @@ describe("regression tests", () => {
   });
 
   it("should apply universal action predicates", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
     // Create the test elements
     const el1 = API.createElement({ type: "rectangle", id: "A", y: 0 });
     const el2 = API.createElement({ type: "rectangle", id: "B", y: 30 });

@@ -16,7 +16,7 @@ import {
 
 import { render } from "./test-utils";
 import { API } from "./helpers/api";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 
 import {
   ExcalidrawElement,
@@ -252,7 +252,7 @@ const { h } = window;
 
 describe("subtype registration", () => {
   it("should check for invalid subtype or parents", async () => {
-    await render(<ExcalidrawApp />, {});
+    await render(<Excalidraw />, {});
     // Define invalid subtype records
     const null1 = {} as SubtypeRecord;
     const null2 = { subtype: "" } as SubtypeRecord;
@@ -368,7 +368,7 @@ describe("subtypes", () => {
       API.createElement({ type: "diamond", id: "D", subtype: test1.subtype }),
       API.createElement({ type: "ellipse", id: "E", subtype: test1.subtype }),
     ];
-    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    await render(<Excalidraw />, { localStorageData: { elements } });
     elements.forEach((el) => expect(el.subtype).toBe(test1.subtype));
   });
   it("should enforce prop value restrictions", async () => {
@@ -381,7 +381,7 @@ describe("subtypes", () => {
       }),
       API.createElement({ type: "line", id: "B", roughness: 1 }),
     ];
-    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    await render(<Excalidraw />, { localStorageData: { elements } });
     elements.forEach((el) => {
       if (el.subtype === test1.subtype) {
         expect(el.roughness).toBe(0);
@@ -440,7 +440,7 @@ describe("subtypes", () => {
         fontSize: FONTSIZE,
       }),
     ];
-    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    await render(<Excalidraw />, { localStorageData: { elements } });
     const mockMeasureText = (text: string, font: FontString) => {
       if (text === testString) {
         let multiplier = 1;
@@ -608,7 +608,7 @@ describe("subtype actions", () => {
       API.createElement({ type: "line", id: "C", subtype: test3.subtype }),
       API.createElement({ type: "text", id: "D", subtype: test3.subtype }),
     ];
-    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    await render(<Excalidraw />, { localStorageData: { elements } });
   });
   it("should apply to elements with their subtype", async () => {
     h.setState({ selectedElementIds: { A: true } });
@@ -672,7 +672,8 @@ describe("subtype loading", () => {
         text: testString,
       }),
     ];
-    await render(<ExcalidrawApp />, { localStorageData: { elements } });
+    await render(<Excalidraw />, { localStorageData: { elements } });
+    h.elements = elements;
   });
   it("should redraw text bounding boxes", async () => {
     h.setState({ selectedElementIds: { A: true } });

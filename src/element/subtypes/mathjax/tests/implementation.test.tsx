@@ -1,13 +1,13 @@
 import { render } from "../../../../tests/test-utils";
 import { API } from "../../../../tests/helpers/api";
-import ExcalidrawApp from "../../../../excalidraw-app";
+import { Excalidraw } from "../../../../packages/excalidraw/index";
 
 import { measureTextElement } from "../../../textElement";
 import { ensureSubtypesLoaded } from "../../";
 
 describe("mathjax", () => {
   it("text-only measurements match", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
     await ensureSubtypesLoaded(["math"]);
     const text = "A quick brown fox jumps over the lazy dog.";
     const elements = [
@@ -19,7 +19,7 @@ describe("mathjax", () => {
     expect(metrics1).toStrictEqual(metrics2);
   });
   it("minimum height remains", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
     await ensureSubtypesLoaded(["math"]);
     const elements = [
       API.createElement({ type: "text", id: "A", text: "a" }),
