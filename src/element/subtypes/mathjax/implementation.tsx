@@ -668,7 +668,7 @@ const measureMarkup = (
   }
   document.body.removeChild(container);
   let width = 0;
-  let height = 0;
+  let height = measureText(" ", font, lineHeight).height;
   childMetrics.forEach((metrics) => (width += metrics.width));
   childMetrics.forEach(
     (metrics) => (height = Math.max(height, metrics.height)),
