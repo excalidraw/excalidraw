@@ -228,6 +228,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  CollaboratorPointer,
 } from "../types";
 import {
   debounce,
@@ -4514,10 +4515,10 @@ class App extends React.Component<AppProps, AppState> {
     } else if (this.state.activeTool.type === "frame") {
       this.createFrameElementOnPointerDown(pointerDownState);
     } else if (this.state.activeTool.type === "laser") {
-      this.laserPathManager.startPath([
+      this.laserPathManager.startPath(
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
-      ]);
+      );
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand"
@@ -5684,10 +5685,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.activeTool.type === "laser") {
-        this.laserPathManager.addPointToPath([
-          pointerCoords.x,
-          pointerCoords.y,
-        ]);
+        this.laserPathManager.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
       const [gridX, gridY] = getGridPoint(
@@ -8072,14 +8070,20 @@ class App extends React.Component<AppProps, AppState> {
     if (!x || !y) {
       return;
     }
-    const pointer = viewportCoordsToSceneCoords(
+    const { x: vx, y: vy } = viewportCoordsToSceneCoords(
       { clientX: x, clientY: y },
       this.state,
     );
 
-    if (isNaN(pointer.x) || isNaN(pointer.y)) {
+    if (isNaN(vx) || isNaN(vy)) {
       // sometimes the pointer goes off screen
     }
+
+    const pointer: CollaboratorPointer = {
+      x: vx,
+      y: vy,
+      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+    };
 
     this.props.onPointerUpdate?.({
       pointer,
