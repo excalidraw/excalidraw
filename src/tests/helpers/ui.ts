@@ -14,6 +14,7 @@ import {
   getTransformHandlesFromCoords,
   OMIT_SIDES_FOR_FRAME,
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  TransformHandleType,
   type TransformHandle,
   type TransformHandleDirection,
 } from "../../element/transformHandles";
@@ -271,6 +272,48 @@ export class Pointer {
 
 const mouse = new Pointer("mouse");
 
+const transform = (
+  element: ExcalidrawElement | ExcalidrawElement[],
+  handle: TransformHandleType,
+  mouseMove: [deltaX: number, deltaY: number],
+  keyboardModifiers: KeyboardModifiers = {},
+) => {
+  const elements = Array.isArray(element) ? element : [element];
+  mouse.select(elements);
+  let handleCoords: TransformHandle | undefined;
+
+  if (elements.length === 1) {
+    handleCoords = getTransformHandles(elements[0], h.state.zoom, "mouse")[
+      handle
+    ];
+  } else {
+    const [x1, y1, x2, y2] = getCommonBounds(elements);
+    const isFrameSelected = elements.some(isFrameElement);
+    const transformHandles = getTransformHandlesFromCoords(
+      [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
+      0,
+      h.state.zoom,
+      "mouse",
+      isFrameSelected ? OMIT_SIDES_FOR_FRAME : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+    );
+    handleCoords = transformHandles[handle];
+  }
+
+  if (!handleCoords) {
+    throw new Error(`There is no "${handle}" handle for this selection`);
+  }
+
+  const clientX = handleCoords[0] + handleCoords[2] / 2;
+  const clientY = handleCoords[1] + handleCoords[3] / 2;
+
+  Keyboard.withModifierKeys(keyboardModifiers, () => {
+    mouse.reset();
+    mouse.down(clientX, clientY);
+    mouse.move(mouseMove[0], mouseMove[1]);
+    mouse.up();
+  });
+};
+
 /** Tools that can be used to draw shapes */
 type DrawingToolName = Exclude<ToolName, "lock" | "selection" | "eraser">;
 
@@ -451,66 +494,19 @@ export class UI {
 
   static resize(
     element: ExcalidrawElement | ExcalidrawElement[],
-    handleDir: TransformHandleDirection,
-    mouseMove: [number, number],
+    handle: TransformHandleDirection,
+    mouseMove: [deltaX: number, deltaY: number],
     keyboardModifiers: KeyboardModifiers = {},
   ) {
-    const elements = Array.isArray(element) ? element : [element];
-    mouse.select(elements);
-    let handle: TransformHandle | undefined;
-
-    if (elements.length === 1) {
-      handle = getTransformHandles(elements[0], h.state.zoom, "mouse")[
-        handleDir
-      ];
-    } else {
-      const [x1, y1, x2, y2] = getCommonBounds(elements);
-      const isFrameSelected = elements.some(isFrameElement);
-      const transformHandles = getTransformHandlesFromCoords(
-        [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
-        0,
-        h.state.zoom,
-        "mouse",
-        isFrameSelected
-          ? OMIT_SIDES_FOR_FRAME
-          : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-      );
-      handle = transformHandles[handleDir];
-    }
-
-    if (!handle) {
-      throw new Error(`There is no "${handleDir}" handle for this selection`);
-    }
-
-    const clientX = handle[0] + handle[2] / 2;
-    const clientY = handle[1] + handle[3] / 2;
-
-    Keyboard.withModifierKeys(keyboardModifiers, () => {
-      mouse.reset();
-      mouse.down(clientX, clientY);
-      mouse.move(mouseMove[0], mouseMove[1]);
-      mouse.up();
-    });
+    return transform(element, handle, mouseMove, keyboardModifiers);
   }
 
   static rotate(
-    element: ExcalidrawElement,
-    deltaX: number,
-    deltaY: number,
+    element: ExcalidrawElement | ExcalidrawElement[],
+    mouseMove: [deltaX: number, deltaY: number],
     keyboardModifiers: KeyboardModifiers = {},
   ) {
-    mouse.select(element);
-    const handle = getTransformHandles(element, h.state.zoom, "mouse")
-      .rotation!;
-    const clientX = handle[0] + handle[2] / 2;
-    const clientY = handle[1] + handle[3] / 2;
-
-    Keyboard.withModifierKeys(keyboardModifiers, () => {
-      mouse.reset();
-      mouse.down(clientX, clientY);
-      mouse.move(clientX + deltaX, clientY + deltaY);
-      mouse.up();
-    });
+    return transform(element, "rotation", mouseMove, keyboardModifiers);
   }
 
   static group(elements: ExcalidrawElement[]) {
