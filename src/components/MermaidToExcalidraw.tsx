@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import { AppState, BinaryFiles } from "../types";
-import { updateActiveTool } from "../utils";
-import { useApp, useExcalidrawSetAppState } from "./App";
+import { BinaryFiles } from "../types";
+import { useApp } from "./App";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../constants";
@@ -65,13 +64,7 @@ const ErrorComp = ({ error }: { error: string }) => {
   );
 };
 
-const MermaidToExcalidraw = ({
-  appState,
-  elements,
-}: {
-  appState: AppState;
-  elements: readonly NonDeletedExcalidrawElement[];
-}) => {
+const MermaidToExcalidraw = () => {
   const mermaidToExcalidrawLib = useRef<{
     parseMermaidToExcalidraw: (
       defination: string,
@@ -174,11 +167,8 @@ const MermaidToExcalidraw = ({
     renderExcalidrawPreview();
   }, [deferredText]);
 
-  const setAppState = useExcalidrawSetAppState();
-
   const onClose = () => {
-    const activeTool = updateActiveTool(appState, { type: "selection" });
-    setAppState({ activeTool });
+    app.setActiveTool({ type: "selection" });
     saveMermaidDataToStorage(text);
   };
 

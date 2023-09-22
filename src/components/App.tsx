@@ -1192,10 +1192,7 @@ class App extends React.Component<AppProps, AppState> {
                         >
                           {this.props.children}
                           {this.state.activeTool.type === "mermaid" && (
-                            <MermaidToExcalidraw
-                              appState={this.state}
-                              elements={this.scene.getNonDeletedElements()}
-                            />
+                            <MermaidToExcalidraw />
                           )}
                         </LayerUI>
 
@@ -3107,7 +3104,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool = (
+  public setActiveTool = (
     tool:
       | {
           type:

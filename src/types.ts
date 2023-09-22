@@ -533,6 +533,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   setSelection: App["setSelection"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
+  setActiveTool: App["setActiveTool"];
 };
 
 export type PointerDownState = Readonly<{
