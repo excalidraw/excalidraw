@@ -502,4 +502,488 @@ describe("image element", () => {
   });
 });
 
-test.todo("multiple elements");
+describe("multiple selection", () => {
+  it("resizes with generic elements", async () => {
+    const rectangle = UI.createElement("rectangle", {
+      position: 0,
+      width: 100,
+      height: 80,
+    });
+    await UI.editText(rectangle, "hello\nworld");
+    const diamond = UI.createElement("diamond", {
+      x: 140,
+      y: 40,
+      size: 80,
+    });
+    const ellipse = UI.createElement("ellipse", {
+      x: 40,
+      y: 100,
+      width: 80,
+      height: 60,
+    });
+
+    const selectionWidth = 220;
+    const selectionHeight = 160;
+    const move = [50, 30] as [number, number];
+    const scale = Math.max(
+      1 + move[0] / selectionWidth,
+      1 + move[1] / selectionHeight,
+    );
+
+    UI.resize([rectangle, diamond, ellipse], "se", move);
+
+    expect(rectangle.x).toBeCloseTo(0);
+    expect(rectangle.y).toBeCloseTo(0);
+    expect(rectangle.width).toBeCloseTo(100 * scale);
+    expect(rectangle.height).toBeCloseTo(80 * scale);
+    expect(rectangle.angle).toEqual(0);
+
+    const rectLabel = h.elements[1] as ExcalidrawTextElement;
+
+    expect(rectLabel.type).toEqual("text");
+    expect(rectLabel.containerId).toEqual(rectangle.id);
+    expect(rectLabel.x + rectLabel.width / 2).toBeCloseTo(
+      rectangle.x + rectangle.width / 2,
+    );
+    expect(rectLabel.y + rectLabel.height / 2).toBeCloseTo(
+      rectangle.y + rectangle.height / 2,
+    );
+    expect(rectLabel.angle).toEqual(0);
+    expect(rectLabel.fontSize).toBeCloseTo(20 * scale, -1);
+
+    expect(diamond.x).toBeCloseTo(140 * scale);
+    expect(diamond.y).toBeCloseTo(40 * scale);
+    expect(diamond.width).toBeCloseTo(80 * scale);
+    expect(diamond.height).toBeCloseTo(80 * scale);
+    expect(diamond.angle).toEqual(0);
+
+    expect(ellipse.x).toBeCloseTo(40 * scale);
+    expect(ellipse.y).toBeCloseTo(100 * scale);
+    expect(ellipse.width).toBeCloseTo(80 * scale);
+    expect(ellipse.height).toBeCloseTo(60 * scale);
+    expect(ellipse.angle).toEqual(0);
+  });
+
+  it("resizes with linear elements > 2 points", async () => {
+    UI.clickTool("line");
+    UI.clickByTitle("Sharp");
+
+    const line = UI.createElement("line", {
+      x: 60,
+      y: 40,
+      points: [
+        [0, 0],
+        [-40, 40],
+        [-60, 0],
+        [0, -40],
+        [40, 20],
+        [0, 40],
+      ],
+    });
+    const freedraw = UI.createElement("freedraw", {
+      x: 63.56072661326618,
+      y: 100,
+      points: [
+        [0, 0],
+        [-43.56072661326618, 18.15048126846341],
+        [-43.56072661326618, 29.041198460587566],
+        [-38.115368017204105, 42.652452795512204],
+        [-19.964886748740696, 66.24829266003775],
+        [19.056612930986716, 77.1390098521619],
+      ],
+    });
+
+    const selectionWidth = 100;
+    const selectionHeight = 177.1390098521619;
+    const move = [-25, -25] as [number, number];
+    const scale = Math.max(
+      1 + move[0] / selectionWidth,
+      1 + move[1] / selectionHeight,
+    );
+
+    UI.resize([line, freedraw], "se", move);
+
+    expect(line.x).toBeCloseTo(60 * scale);
+    expect(line.y).toBeCloseTo(40 * scale);
+    expect(line.width).toBeCloseTo(100 * scale);
+    expect(line.height).toBeCloseTo(80 * scale);
+    expect(line.angle).toEqual(0);
+
+    expect(freedraw.x).toBeCloseTo(63.56072661326618 * scale);
+    expect(freedraw.y).toBeCloseTo(100 * scale);
+    expect(freedraw.width).toBeCloseTo(62.6173395442529 * scale);
+    expect(freedraw.height).toBeCloseTo(77.1390098521619 * scale);
+    expect(freedraw.angle).toEqual(0);
+  });
+
+  it("resizes with 2-point lines", async () => {
+    const horizLine = UI.createElement("line", {
+      position: 0,
+      width: 120,
+      height: 0,
+    });
+    const vertLine = UI.createElement("line", {
+      x: 0,
+      y: 20,
+      width: 0,
+      height: 80,
+    });
+    const diagLine = UI.createElement("line", {
+      position: 40,
+      size: 60,
+    });
+
+    const selectionWidth = 120;
+    const selectionHeight = 100;
+    const move = [40, 40] as [number, number];
+    const scale = Math.max(
+      1 - move[0] / selectionWidth,
+      1 - move[1] / selectionHeight,
+    );
+
+    UI.resize([horizLine, vertLine, diagLine], "nw", move);
+
+    expect(horizLine.x).toBeCloseTo(selectionWidth * (1 - scale));
+    expect(horizLine.y).toBeCloseTo(selectionHeight * (1 - scale));
+    expect(horizLine.width).toBeCloseTo(120 * scale);
+    expect(horizLine.height).toBeCloseTo(0);
+    expect(horizLine.angle).toEqual(0);
+
+    expect(vertLine.x).toBeCloseTo(selectionWidth * (1 - scale));
+    expect(vertLine.y).toBeCloseTo((selectionHeight - 20) * (1 - scale) + 20);
+    expect(vertLine.width).toBeCloseTo(0);
+    expect(vertLine.height).toBeCloseTo(80 * scale);
+    expect(vertLine.angle).toEqual(0);
+
+    expect(diagLine.x).toBeCloseTo((selectionWidth - 40) * (1 - scale) + 40);
+    expect(diagLine.y).toBeCloseTo((selectionHeight - 40) * (1 - scale) + 40);
+    expect(diagLine.width).toBeCloseTo(60 * scale);
+    expect(diagLine.height).toBeCloseTo(60 * scale);
+    expect(diagLine.angle).toEqual(0);
+  });
+
+  it("resizes with bound arrows", async () => {
+    const rectangle = UI.createElement("rectangle", {
+      position: 0,
+      size: 100,
+    });
+    const leftBoundArrow = UI.createElement("arrow", {
+      x: -110,
+      y: 50,
+      width: 100,
+      height: 0,
+    });
+    const rightBoundArrow = UI.createElement("arrow", {
+      x: 210,
+      y: 50,
+      width: -100,
+      height: 0,
+    });
+
+    const selectionWidth = 210;
+    const selectionHeight = 100;
+    const move = [40, 40] as [number, number];
+    const scale = Math.max(
+      1 - move[0] / selectionWidth,
+      1 - move[1] / selectionHeight,
+    );
+    const leftArrowBinding = { ...leftBoundArrow.endBinding };
+    const rightArrowBinding = { ...rightBoundArrow.endBinding };
+    delete rightArrowBinding.gap;
+
+    UI.resize([rectangle, rightBoundArrow], "nw", move);
+
+    expect(leftBoundArrow.x).toBeCloseTo(-110);
+    expect(leftBoundArrow.y).toBeCloseTo(50);
+    expect(leftBoundArrow.width).toBeCloseTo(140, 0);
+    expect(leftBoundArrow.height).toBeCloseTo(7, 0);
+    expect(leftBoundArrow.angle).toEqual(0);
+    expect(leftBoundArrow.startBinding).toBeNull();
+    expect(leftBoundArrow.endBinding).toMatchObject(leftArrowBinding);
+
+    expect(rightBoundArrow.x).toBeCloseTo(210);
+    expect(rightBoundArrow.y).toBeCloseTo(
+      (selectionHeight - 50) * (1 - scale) + 50,
+    );
+    expect(rightBoundArrow.width).toBeCloseTo(100 * scale);
+    expect(rightBoundArrow.height).toBeCloseTo(0);
+    expect(rightBoundArrow.angle).toEqual(0);
+    expect(rightBoundArrow.startBinding).toBeNull();
+    expect(rightBoundArrow.endBinding).toMatchObject(rightArrowBinding);
+  });
+
+  it("resizes with labeled arrows", async () => {
+    const topArrow = UI.createElement("arrow", {
+      x: 0,
+      y: 20,
+      width: 220,
+      height: 0,
+    });
+    await UI.editText(topArrow.get(), "lorem ipsum");
+    const topArrowLabel = h.elements[1] as ExcalidrawTextElement;
+
+    UI.clickTool("text");
+    UI.clickByTitle("Large");
+    const bottomArrow = UI.createElement("arrow", {
+      x: 0,
+      y: 80,
+      width: 220,
+      height: 0,
+    });
+    await UI.editText(bottomArrow.get(), "dolor\nsit amet");
+    const bottomArrowLabel = h.elements[3] as ExcalidrawTextElement;
+
+    const selectionWidth = 220;
+    const selectionTop = 20 - topArrowLabel.height / 2;
+    const move = [80, 0] as [number, number];
+    const scale = move[0] / selectionWidth + 1;
+
+    UI.resize([topArrow.get(), bottomArrow.get()], "se", move);
+
+    expect(topArrow.x).toBeCloseTo(0);
+    expect(topArrow.y).toBeCloseTo(selectionTop + (20 - selectionTop) * scale);
+    expect(topArrow.width).toBeCloseTo(300);
+    expect(topArrow.points).toEqual([
+      [0, 0],
+      [300, 0],
+    ]);
+
+    expect(topArrowLabel.x + topArrowLabel.width / 2).toBeCloseTo(
+      topArrow.width / 2,
+    );
+    expect(topArrowLabel.y + topArrowLabel.height / 2).toBeCloseTo(topArrow.y);
+    expect(topArrowLabel.fontSize).toBeCloseTo(20 * scale);
+
+    expect(bottomArrow.x).toBeCloseTo(0);
+    expect(bottomArrow.y).toBeCloseTo(
+      selectionTop + (80 - selectionTop) * scale,
+    );
+    expect(bottomArrow.width).toBeCloseTo(300);
+    expect(topArrow.points).toEqual([
+      [0, 0],
+      [300, 0],
+    ]);
+
+    expect(bottomArrowLabel.x + bottomArrowLabel.width / 2).toBeCloseTo(
+      bottomArrow.width / 2,
+    );
+    expect(bottomArrowLabel.y + bottomArrowLabel.height / 2).toBeCloseTo(
+      bottomArrow.y,
+    );
+    expect(bottomArrowLabel.fontSize).toBeCloseTo(28 * scale);
+  });
+
+  it("resizes with text elements", async () => {
+    const topText = UI.createElement("text", { position: 0 });
+    await UI.editText(topText, "lorem ipsum");
+
+    UI.clickTool("text");
+    UI.clickByTitle("Large");
+    const bottomText = UI.createElement("text", { position: 40 });
+    await UI.editText(bottomText, "dolor\nsit amet");
+
+    const selectionWidth = 40 + bottomText.width;
+    const selectionHeight = 40 + bottomText.height;
+    const move = [30, -40] as [number, number];
+    const scale = Math.max(
+      1 + move[0] / selectionWidth,
+      1 - move[1] / selectionHeight,
+    );
+
+    UI.resize([topText, bottomText], "ne", move);
+
+    expect(topText.x).toBeCloseTo(0);
+    expect(topText.y).toBeCloseTo(-selectionHeight * (scale - 1));
+    expect(topText.fontSize).toBeCloseTo(20 * scale);
+    expect(topText.angle).toEqual(0);
+
+    expect(bottomText.x).toBeCloseTo(40 * scale);
+    expect(bottomText.y).toBeCloseTo(40 - (selectionHeight - 40) * (scale - 1));
+    expect(bottomText.fontSize).toBeCloseTo(28 * scale);
+    expect(bottomText.angle).toEqual(0);
+  });
+
+  it("resizes with images", () => {
+    const topImage = API.createElement({
+      type: "image",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 100,
+    });
+    const bottomImage = API.createElement({
+      type: "image",
+      x: 30,
+      y: 150,
+      width: 120,
+      height: 80,
+    });
+    h.elements = [topImage, bottomImage];
+
+    const selectionWidth = 200;
+    const selectionHeight = 230;
+    const move = [-50, -50] as [number, number];
+    const scale = Math.max(
+      1 + move[0] / selectionWidth,
+      1 + move[1] / selectionHeight,
+    );
+
+    UI.resize([topImage, bottomImage], "se", move);
+
+    expect(topImage.x).toBeCloseTo(0);
+    expect(topImage.y).toBeCloseTo(0);
+    expect(topImage.width).toBeCloseTo(200 * scale);
+    expect(topImage.height).toBeCloseTo(100 * scale);
+    expect(topImage.angle).toEqual(0);
+    expect(topImage.scale).toEqual([1, 1]);
+
+    expect(bottomImage.x).toBeCloseTo(30 * scale);
+    expect(bottomImage.y).toBeCloseTo(150 * scale);
+    expect(bottomImage.width).toBeCloseTo(120 * scale);
+    expect(bottomImage.height).toBeCloseTo(80 * scale);
+    expect(bottomImage.angle).toEqual(0);
+    expect(bottomImage.scale).toEqual([1, 1]);
+  });
+
+  it("resizes from center", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -200,
+      y: -140,
+      width: 120,
+      height: 100,
+    });
+    const ellipse = UI.createElement("ellipse", {
+      position: 60,
+      width: 140,
+      height: 80,
+    });
+
+    const selectionWidth = 400;
+    const selectionHeight = 280;
+    const move = [-80, -80] as [number, number];
+    const scale = Math.max(
+      1 + (2 * move[0]) / selectionWidth,
+      1 + (2 * move[1]) / selectionHeight,
+    );
+
+    UI.resize([rectangle, ellipse], "se", move, { alt: true });
+
+    expect(rectangle.x).toBeCloseTo(-200 * scale);
+    expect(rectangle.y).toBeCloseTo(-140 * scale);
+    expect(rectangle.width).toBeCloseTo(120 * scale);
+    expect(rectangle.height).toBeCloseTo(100 * scale);
+    expect(rectangle.angle).toEqual(0);
+
+    expect(ellipse.x).toBeCloseTo(60 * scale);
+    expect(ellipse.y).toBeCloseTo(60 * scale);
+    expect(ellipse.width).toBeCloseTo(140 * scale);
+    expect(ellipse.height).toBeCloseTo(80 * scale);
+    expect(ellipse.angle).toEqual(0);
+  });
+
+  it("flips while resizing", async () => {
+    const image = API.createElement({
+      type: "image",
+      x: 60,
+      y: 100,
+      width: 100,
+      height: 100,
+      angle: (Math.PI * 7) / 6,
+    });
+    h.elements = [image];
+
+    const line = UI.createElement("line", {
+      x: 60,
+      y: 0,
+      points: [
+        [0, 0],
+        [-40, 40],
+        [-20, 60],
+        [20, 20],
+        [40, 40],
+        [-20, 100],
+        [-60, 60],
+      ],
+    });
+
+    const rectangle = UI.createElement("rectangle", {
+      x: 180,
+      y: 60,
+      width: 160,
+      height: 80,
+      angle: Math.PI / 6,
+    });
+    await UI.editText(rectangle, "hello\nworld");
+    const rectLabel = h.elements[
+      h.elements.length - 1
+    ] as ExcalidrawTextElement;
+
+    const boundArrow = UI.createElement("arrow", {
+      x: 380,
+      y: 240,
+      width: -60,
+      height: -80,
+    });
+    await UI.editText(boundArrow, "test");
+    const arrowLabel = h.elements[
+      h.elements.length - 1
+    ] as ExcalidrawTextElement;
+
+    const selectionWidth = 380;
+    const move = [-800, 0] as [number, number];
+    const scaleX = move[0] / selectionWidth + 1;
+    const scaleY = -scaleX;
+    const lineOrigBounds = getBoundsFromPoints(line);
+
+    UI.resize([line, image, rectangle, boundArrow], "se", move);
+    const lineNewBounds = getBoundsFromPoints(line);
+
+    expect(line.x).toBeCloseTo(60 * scaleX);
+    expect(line.y).toBeCloseTo(0);
+    expect(lineNewBounds[0]).toBeCloseTo(
+      (lineOrigBounds[2] - lineOrigBounds[0]) * scaleX,
+    );
+    expect(lineNewBounds[1]).toBeCloseTo(0);
+    expect(lineNewBounds[3]).toBeCloseTo(
+      (lineOrigBounds[3] - lineOrigBounds[1]) * scaleY,
+    );
+    expect(lineNewBounds[2]).toBeCloseTo(0);
+    expect(line.angle).toEqual(0);
+
+    expect(image.x).toBeCloseTo((60 + 100) * scaleX);
+    expect(image.y).toBeCloseTo(100 * scaleY);
+    expect(image.width).toBeCloseTo(100 * -scaleX);
+    expect(image.height).toBeCloseTo(100 * scaleY);
+    expect(image.angle).toBeCloseTo((Math.PI * 5) / 6);
+    expect(image.scale).toEqual([1, 1]);
+
+    expect(rectangle.x).toBeCloseTo((180 + 160) * scaleX);
+    expect(rectangle.y).toBeCloseTo(60 * scaleY);
+    expect(rectangle.width).toBeCloseTo(160 * -scaleX);
+    expect(rectangle.height).toBeCloseTo(80 * scaleY);
+    expect(rectangle.angle).toEqual((Math.PI * 11) / 6);
+
+    expect(rectLabel.x + rectLabel.width / 2).toBeCloseTo(
+      rectangle.x + rectangle.width / 2,
+    );
+    expect(rectLabel.y + rectLabel.height / 2).toBeCloseTo(
+      rectangle.y + rectangle.height / 2,
+    );
+    expect(rectLabel.angle).toBeCloseTo(rectangle.angle);
+    expect(rectLabel.fontSize).toBeCloseTo(20 * scaleY);
+
+    expect(boundArrow.x).toBeCloseTo(380 * scaleX);
+    expect(boundArrow.y).toBeCloseTo(240 * scaleY);
+    expect(boundArrow.points[1][0]).toBeCloseTo(-60 * scaleX);
+    expect(boundArrow.points[1][1]).toBeCloseTo(-80 * scaleY);
+
+    expect(arrowLabel.x + arrowLabel.width / 2).toBeCloseTo(
+      boundArrow.x + boundArrow.points[1][0] / 2,
+    );
+    expect(arrowLabel.y + arrowLabel.height / 2).toBeCloseTo(
+      boundArrow.y + boundArrow.points[1][1] / 2,
+    );
+    expect(arrowLabel.angle).toEqual(0);
+    expect(arrowLabel.fontSize).toBeCloseTo(20 * scaleY);
+  });
+});
