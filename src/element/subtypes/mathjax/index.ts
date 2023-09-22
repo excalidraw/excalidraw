@@ -4,6 +4,12 @@ import { addSubtypeMethods } from "../";
 import { getMathSubtypeRecord } from "./types";
 import { prepareMathSubtype } from "./implementation";
 
+declare global {
+  module SREfeature {
+    function custom(locale: string): Promise<string>;
+  }
+}
+
 export const MathJaxSubtype = "mathjax";
 
 // The main hook to use the MathJax subtype

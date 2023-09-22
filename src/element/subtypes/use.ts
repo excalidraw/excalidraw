@@ -1,3 +1,4 @@
+import { Subtype } from ".";
 import { ExcalidrawImperativeAPI } from "../../types";
 import {
   MathJaxSubtype,
@@ -5,13 +6,13 @@ import {
   useMathJaxSubtype,
 } from "./mathjax";
 
-const validSubtypes: readonly string[] = [MathJaxSubtype];
-const subtypesUsed: string[] = [];
+const validSubtypes: readonly Subtype[] = [MathJaxSubtype];
+const subtypesUsed: Subtype[] = [];
 
 // The main invocation hook for use in the UI
 export const useSubtypes = (
   api: ExcalidrawImperativeAPI | null,
-  subtypes?: string[],
+  subtypes?: Subtype[],
 ) => {
   selectSubtypesToEnable(subtypes);
   useMathJaxSubtype(api);
@@ -19,8 +20,8 @@ export const useSubtypes = (
 };
 
 // This MUST be called before the `useSubtype` calls.
-const selectSubtypesToEnable = (subtypes?: string[]) => {
-  const subtypeList: string[] = [];
+const selectSubtypesToEnable = (subtypes?: Subtype[]) => {
+  const subtypeList: Subtype[] = [];
   if (subtypes === undefined) {
     subtypeList.push(...validSubtypes);
   } else {

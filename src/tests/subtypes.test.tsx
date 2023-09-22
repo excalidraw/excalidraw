@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import fallbackLangData from "./helpers/locales/en.json";
 import {
   SubtypeLoadedCb,
@@ -458,9 +459,9 @@ describe("subtypes", () => {
       return { width: 1, height: 0, baseline: 0 };
     };
 
-    jest
-      .spyOn(textElementUtils, "measureText")
-      .mockImplementation(mockMeasureText);
+    vi.spyOn(textElementUtils, "measureText").mockImplementation(
+      mockMeasureText,
+    );
 
     elements.forEach((el) => {
       if (isTextElement(el)) {
