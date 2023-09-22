@@ -1509,28 +1509,16 @@ describe("textWysiwyg", () => {
     });
   });
 
-  it("should bump the version of labelled arrow when label updated", async () => {
+  it("should bump the version of a labeled arrow when the label is updated", async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     const arrow = UI.createElement("arrow", {
       width: 300,
       height: 0,
     });
-
-    mouse.select(arrow);
-    Keyboard.keyPress(KEYS.ENTER);
-    let editor = getTextEditor();
-    await new Promise((r) => setTimeout(r, 0));
-    updateTextEditor(editor, "Hello");
-    editor.blur();
-
+    await UI.editText(arrow, "Hello");
     const { version } = arrow;
 
-    mouse.select(arrow);
-    Keyboard.keyPress(KEYS.ENTER);
-    editor = getTextEditor();
-    await new Promise((r) => setTimeout(r, 0));
-    updateTextEditor(editor, "Hello\nworld!");
-    editor.blur();
+    await UI.editText(arrow, "Hello\nworld!");
 
     expect(arrow.version).toEqual(version + 1);
   });
