@@ -236,7 +236,7 @@
     "frame": "",
     "embeddable": "ฝังเว็บ",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "เครื่องมืออื่นๆ"
   },
   "headings": {
     "canvasActions": "",
@@ -316,7 +316,7 @@
     "drag": "ลาก",
     "editor": "",
     "editLineArrowPoints": "",
-    "editText": "",
+    "editText": "แก้ไขข้อความ / เพิ่มข้อความ",
     "github": "",
     "howto": "",
     "or": "",
