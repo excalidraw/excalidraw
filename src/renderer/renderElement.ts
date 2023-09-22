@@ -31,7 +31,7 @@ import {
   InteractiveCanvasAppState,
 } from "../types";
 import { getDefaultAppState } from "../appState";
-import { getSubtypeMethods } from "../subtypes";
+import { getSubtypeMethods } from "../element/subtypes";
 import {
   BOUND_TEXT_PADDING,
   FRAME_STYLE,

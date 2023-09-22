@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { ExcalidrawImperativeAPI } from "../../../types";
-import { addSubtypeMethods } from "../../../subtypes";
+import { addSubtypeMethods } from "../";
 import { getMathSubtypeRecord } from "./types";
 import { prepareMathSubtype } from "./implementation";
 

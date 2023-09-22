@@ -1,4 +1,4 @@
-import { getSubtypeMethods, SubtypeMethods } from "../subtypes";
+import { getSubtypeMethods, SubtypeMethods } from "./subtypes";
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,

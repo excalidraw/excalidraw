@@ -5,7 +5,7 @@ import { trackEvent } from "../analytics";
 import { getDefaultAppState } from "../appState";
 import { ErrorDialog } from "../components/ErrorDialog";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
-import { useSubtypes } from "./subtypes";
+import { useSubtypes } from "../element/subtypes/use";
 import {
   APP_NAME,
   EVENT,

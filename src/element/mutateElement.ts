@@ -7,7 +7,7 @@ import { getUpdatedTimestamp } from "../utils";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import { maybeGetSubtypeProps } from "./newElement";
-import { getSubtypeMethods } from "../subtypes";
+import { getSubtypeMethods } from "./subtypes";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,

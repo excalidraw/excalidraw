@@ -1,9 +1,9 @@
 import { render } from "../../../../tests/test-utils";
 import { API } from "../../../../tests/helpers/api";
-import ExcalidrawApp from "../../../";
+import ExcalidrawApp from "../../../../excalidraw-app";
 
-import { measureTextElement } from "../../../../element/textElement";
-import { ensureSubtypesLoaded } from "../../../../subtypes";
+import { measureTextElement } from "../../../textElement";
+import { ensureSubtypesLoaded } from "../../";
 
 describe("mathjax", () => {
   it("text-only measurements match", async () => {

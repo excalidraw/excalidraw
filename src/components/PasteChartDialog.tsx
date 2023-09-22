@@ -10,7 +10,7 @@ import { useApp } from "./App";
 import { Dialog } from "./Dialog";
 
 import "./PasteChartDialog.scss";
-import { ensureSubtypesLoaded } from "../subtypes";
+import { ensureSubtypesLoaded } from "../element/subtypes";
 import { isTextElement } from "../element";
 import {
   getContainerElement,

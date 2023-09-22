@@ -37,7 +37,7 @@ import {
   Subtype,
   SubtypePrepFn,
   SubtypeRecord,
-} from "./subtypes";
+} from "./element/subtypes";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";

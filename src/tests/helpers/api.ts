@@ -23,7 +23,7 @@ import {
   prepareSubtype,
   selectSubtype,
   subtypeActionPredicate,
-} from "../../subtypes";
+} from "../../element/subtypes";
 import {
   maybeGetSubtypeProps,
   newEmbeddableElement,

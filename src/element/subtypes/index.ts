@@ -1,27 +1,23 @@
-import {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-} from "./element/types";
-import { getNonDeletedElements } from "./element";
-import { getSelectedElements } from "./scene";
-import { AppState } from "./types";
-import { registerAuxLangData } from "./i18n";
+import { ExcalidrawElement, ExcalidrawTextElement, NonDeleted } from "../types";
+import { getNonDeletedElements } from "../";
+import { getSelectedElements } from "../../scene";
+import { AppState } from "../../types";
+import { registerAuxLangData } from "../../i18n";
 
-import { Action, ActionName, ActionPredicateFn } from "./actions/types";
+import { Action, ActionName, ActionPredicateFn } from "../../actions/types";
 import {
   CustomShortcutName,
   registerCustomShortcuts,
-} from "./actions/shortcuts";
-import { register } from "./actions/register";
-import { hasBoundTextElement, isTextElement } from "./element/typeChecks";
+} from "../../actions/shortcuts";
+import { register } from "../../actions/register";
+import { hasBoundTextElement, isTextElement } from "../typeChecks";
 import {
   getBoundTextElement,
   getContainerElement,
   redrawTextBoundingBox,
-} from "./element/textElement";
-import { ShapeCache } from "./scene/ShapeCache";
-import Scene from "./scene/Scene";
+} from "../textElement";
+import { ShapeCache } from "../../scene/ShapeCache";
+import Scene from "../../scene/Scene";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
 let subtypeNames: readonly Subtype[] = [];

@@ -40,7 +40,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
-import { getSubtypeMethods, isValidSubtype } from "../subtypes";
+import { getSubtypeMethods, isValidSubtype } from "./subtypes";
 
 export const maybeGetSubtypeProps = (
   obj: {

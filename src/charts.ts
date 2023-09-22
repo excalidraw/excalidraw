@@ -12,7 +12,7 @@ import { newElement, newLinearElement, newTextElement } from "./element";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
 import { AppState } from "./types";
-import { selectSubtype } from "./subtypes";
+import { selectSubtype } from "./element/subtypes";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 

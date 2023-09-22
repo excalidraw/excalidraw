@@ -12,7 +12,7 @@ import {
   isValidSubtype,
   selectSubtype,
   subtypeCollides,
-} from "../subtypes";
+} from "../element/subtypes";
 
 import { render } from "./test-utils";
 import { API } from "./helpers/api";

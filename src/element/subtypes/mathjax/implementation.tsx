@@ -37,11 +37,7 @@ import { getNonDeletedElements, redrawTextBoundingBox } from "../../../element";
 import { ButtonIconSelect } from "../../../components/ButtonIconSelect";
 
 // Subtype imports
-import {
-  SubtypeLoadedCb,
-  SubtypeMethods,
-  SubtypePrepFn,
-} from "../../../subtypes";
+import { SubtypeLoadedCb, SubtypeMethods, SubtypePrepFn } from "../";
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
 import { SubtypeButton } from "../../../components/Subtypes";

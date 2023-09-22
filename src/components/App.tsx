@@ -278,7 +278,7 @@ import {
   prepareSubtype,
   selectSubtype,
   subtypeActionPredicate,
-} from "../subtypes";
+} from "../element/subtypes";
 import {
   dataURLToFile,
   generateIdFromFile,
@@ -583,7 +583,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
-    // Call `this.addSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
     this.actionManager.registerActionPredicate(subtypeActionPredicate);
   }
 

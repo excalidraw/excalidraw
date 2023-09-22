@@ -44,7 +44,7 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
-import { SubtypeMethods, getSubtypeMethods } from "../subtypes";
+import { SubtypeMethods, getSubtypeMethods } from "./subtypes";
 
 const getTransform = (
   offsetX: number,

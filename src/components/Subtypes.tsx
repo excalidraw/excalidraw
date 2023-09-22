@@ -9,7 +9,7 @@ import {
   isSubtypeAction,
   isValidSubtype,
   subtypeCollides,
-} from "../subtypes";
+} from "../element/subtypes";
 import { ExcalidrawElement, Theme } from "../element/types";
 import {
   useExcalidrawActionManager,
