@@ -621,8 +621,6 @@ const measureMarkup = (
   container.appendChild(span);
   // Baseline is important for positioning text on canvas
   const baseline = span.offsetTop + span.offsetHeight;
-  const width = container.offsetWidth + 1;
-  const height = container.offsetHeight;
 
   const containerRect = container.getBoundingClientRect();
   // Compute for each SVG or Text child node of line (the last
@@ -673,6 +671,12 @@ const measureMarkup = (
     childMetrics.push({ x: 0, y: 0, width: 0, height: 0 });
   }
   document.body.removeChild(container);
+  let width = 0;
+  let height = 0;
+  childMetrics.forEach((metrics) => (width += metrics.width));
+  childMetrics.forEach(
+    (metrics) => (height = Math.max(height, metrics.height)),
+  );
   return { width, height, baseline, childMetrics };
 };
 
@@ -735,10 +739,14 @@ const getMetrics = (
     imageHeight += height;
   }
   const lastLineMetrics = lineMetrics[lineMetrics.length - 1];
+  const imageBaseline = Math.max(
+    0,
+    imageHeight - lastLineMetrics.height + lastLineMetrics.baseline - 1,
+  );
   const imageMetrics = {
     width: imageWidth,
     height: imageHeight,
-    baseline: imageHeight - lastLineMetrics.height + lastLineMetrics.baseline,
+    baseline: imageBaseline,
   };
   const metrics = { markupMetrics, lineMetrics, imageMetrics };
   if (isMathJaxLoaded) {
@@ -778,17 +786,17 @@ const renderMath = (
   );
   const width = parentWidth ?? metrics.imageMetrics.width;
 
-  let y = 0;
+  let y = -1;
   for (let index = 0; index < markup.length; index++) {
     const lineMetrics = metrics.lineMetrics[index];
     const lineMarkupMetrics = metrics.markupMetrics[index];
     const rtl = isRTL(mathLines[index]);
     const x =
       textAlign === "right"
-        ? width - lineMetrics.width
+        ? width - lineMetrics.width + 1
         : textAlign === "left"
         ? 0
-        : (width - lineMetrics.width) / 2;
+        : (width - lineMetrics.width + 1) / 2;
     // Drop any empty strings from this line to match childMetrics
     const content = markup[index].filter((value) => value !== "");
     for (let i = 0; i < content.length; i += 1) {
