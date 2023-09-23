@@ -5,7 +5,7 @@ import { trackEvent } from "../src/analytics";
 import { getDefaultAppState } from "../src/appState";
 import { ErrorDialog } from "../src/components/ErrorDialog";
 import { TopErrorBoundary } from "../src/components/TopErrorBoundary";
-import { useSubtypes } from "../src/element/subtypes/use";
+import { useMathSubtype } from "../src/element/subtypes/mathjax";
 import {
   APP_NAME,
   EVENT,
@@ -304,7 +304,7 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
-  useSubtypes(excalidrawAPI);
+  useMathSubtype(excalidrawAPI);
 
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);

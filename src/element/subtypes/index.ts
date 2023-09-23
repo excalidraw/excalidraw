@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { ExcalidrawElement, ExcalidrawTextElement, NonDeleted } from "../types";
 import { getNonDeletedElements } from "../";
 import { getSelectedElements } from "../../scene";
-import { AppState } from "../../types";
+import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { registerAuxLangData } from "../../i18n";
 
 import { Action, ActionName, ActionPredicateFn } from "../../actions/types";
@@ -471,4 +472,19 @@ export const checkRefreshOnSubtypeLoad = (
   // Only inform each scene once
   scenes.forEach((scene) => scene.informMutation());
   return refreshNeeded;
+};
+
+export const useSubtype = (
+  api: ExcalidrawImperativeAPI | null,
+  record: SubtypeRecord,
+  subtypePrepFn: SubtypePrepFn,
+) => {
+  useEffect(() => {
+    if (api) {
+      const prep = api.addSubtype(record, subtypePrepFn);
+      if (prep) {
+        addSubtypeMethods(record.subtype, prep.methods);
+      }
+    }
+  }, [api, record, subtypePrepFn]);
 };
