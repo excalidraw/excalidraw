@@ -28,8 +28,8 @@ export const generateRoughOptions = (
       element.strokeStyle === "dashed"
         ? getDashArrayDashed(element.strokeWidth)
         : element.strokeStyle === "dotted"
-          ? getDashArrayDotted(element.strokeWidth)
-          : undefined,
+        ? getDashArrayDotted(element.strokeWidth)
+        : undefined,
     // for non-solid strokes, disable multiStroke because it tends to make
     // dashes/dots overlay each other
     disableMultiStroke: element.strokeStyle !== "solid",
@@ -126,8 +126,10 @@ export const _generateElementShape = (
         const h = element.height;
         const r = getCornerRadius(Math.min(w, h), element);
         shape = generator.path(
-          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${h - r
-          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${h - r
+          `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${
+            h - r
+          } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+            h - r
           } L 0 ${r} Q 0 0, ${r} 0`,
           generateRoughOptions(
             modifyEmbeddableForRoughOptions(element, isExporting),
@@ -162,18 +164,23 @@ export const _generateElementShape = (
         );
 
         shape = generator.path(
-          `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${rightX - verticalRadius
+          `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
+            rightX - verticalRadius
           } ${rightY - horizontalRadius}
-            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${rightX - verticalRadius
+            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
+            rightX - verticalRadius
           } ${rightY + horizontalRadius}
             L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
-            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${bottomX - verticalRadius
+            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
+            bottomX - verticalRadius
           } ${bottomY - horizontalRadius}
             L ${leftX + verticalRadius} ${leftY + horizontalRadius}
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${leftY - horizontalRadius
+            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
+            leftY - horizontalRadius
           }
             L ${topX - verticalRadius} ${topY + horizontalRadius}
-            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${topY + horizontalRadius
+            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
+            topY + horizontalRadius
           }`,
           generateRoughOptions(element, true),
         );
