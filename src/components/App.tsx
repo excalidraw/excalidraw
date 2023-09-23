@@ -357,7 +357,6 @@ import {
 } from "../data/transform";
 import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-export let showFourthFont: boolean = false;
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -365,6 +364,7 @@ import MermaidToExcalidraw from "./MermaidToExcalidraw";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
+export let showFourthFont: boolean = false; //zsviczian
 
 const deviceContextInitialValue = {
   isSmScreen: false,
