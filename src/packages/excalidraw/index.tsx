@@ -248,6 +248,7 @@ export {
   getBoundTextMaxWidth, //zsviczian
   exportToClipboard,
   mergeLibraryItems,
+  mermaidToExcalidraw, //zsviczian
 } from "../../packages/utils";
 export { isLinearElement } from "../../element/typeChecks";
 

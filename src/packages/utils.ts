@@ -248,3 +248,4 @@ export {
 export { getFontString } from "../utils"; //zsviczian
 export { getBoundTextMaxWidth } from "../element/textElement"; //zsviczian
 export { mergeLibraryItems } from "../data/library";
+export { mermaidToExcalidraw } from "../components/MermaidToExcalidraw"; //zsviczian

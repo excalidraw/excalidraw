@@ -9,7 +9,7 @@ import {
   convertToExcalidrawElements,
   exportToCanvas,
 } from "../packages/excalidraw/index";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
@@ -17,6 +17,7 @@ import "./MermaidToExcalidraw.scss";
 
 import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 import { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
+import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw"; //zsviczian
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
@@ -255,3 +256,29 @@ const MermaidToExcalidraw = ({
   );
 };
 export default MermaidToExcalidraw;
+
+//zsviczian
+export const mermaidToExcalidraw = async (
+    mermaidDefinition: string,
+    opts: MermaidOptions = {fontSize: DEFAULT_FONT_SIZE},
+  ):Promise<{
+    elements: ExcalidrawElement[],
+    files:any
+  } | undefined> => {
+  try {
+    const { elements, files } =
+      await parseMermaidToExcalidraw(
+        mermaidDefinition,
+        opts
+      );
+
+    return {
+      elements: convertToExcalidrawElements(elements, {
+        regenerateIds: true,
+      }),
+      files,
+    };
+  } catch (e: any) {
+    console.error(e.message);
+  }
+}
