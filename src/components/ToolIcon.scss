@@ -165,9 +165,13 @@
       width: var(--lg-button-size);
       height: var(--lg-button-size);
 
-      @include isMobile {
-        width: 1.75rem;
-        height: 1.75rem;
+      @media screen and (max-width: 450px) {
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+      @media screen and (max-width: 379px) {
+        width: 1.5rem;
+        height: 1.5rem;
       }
 
       svg {

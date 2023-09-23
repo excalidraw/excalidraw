@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import { AppState, BinaryFiles } from "../types";
-import { updateActiveTool } from "../utils";
-import { useApp, useExcalidrawSetAppState } from "./App";
+import { BinaryFiles } from "../types";
+import { useApp } from "./App";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../constants";
@@ -16,8 +15,10 @@ import Spinner from "./Spinner";
 import "./MermaidToExcalidraw.scss";
 
 import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-import { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw"; //zsviczian
+import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
+import { t } from "../i18n";
+import Trans from "./Trans";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
@@ -49,6 +50,7 @@ const importMermaidDataFromStorage = () => {
 const ErrorComp = ({ error }: { error: string }) => {
   return (
     <div
+      data-testid="mermaid-error"
       style={{
         color: "red",
         fontWeight: 800,
@@ -64,13 +66,7 @@ const ErrorComp = ({ error }: { error: string }) => {
   );
 };
 
-const MermaidToExcalidraw = ({
-  appState,
-  elements,
-}: {
-  appState: AppState;
-  elements: readonly NonDeletedExcalidrawElement[];
-}) => {
+const MermaidToExcalidraw = () => {
   const mermaidToExcalidrawLib = useRef<{
     parseMermaidToExcalidraw: (
       defination: string,
@@ -173,11 +169,8 @@ const MermaidToExcalidraw = ({
     renderExcalidrawPreview();
   }, [deferredText]);
 
-  const setAppState = useExcalidrawSetAppState();
-
   const onClose = () => {
-    const activeTool = updateActiveTool(appState, { type: "selection" });
-    setAppState({ activeTool });
+    app.setActiveTool({ type: "selection" });
     saveMermaidDataToStorage(text);
   };
 
@@ -194,21 +187,23 @@ const MermaidToExcalidraw = ({
 
   return (
     <Dialog
+      className="dialog-mermaid"
       onCloseRequest={onClose}
       title={
         <>
           <p style={{ marginBottom: "5px", marginTop: "2px" }}>
-            Mermaid to Excalidraw
+            {t("mermaid.title")}
           </p>
           <span
             style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
           >
-            Currently only{" "}
-            <a href="https://mermaid.js.org/syntax/flowchart.html">
-              flowcharts
-            </a>{" "}
-            are supported. The other types will be rendered as image in
-            Excalidraw. <br />
+            <Trans
+              i18nKey="mermaid.description"
+              flowchartLink={(el) => (
+                <a href="https://mermaid.js.org/syntax/flowchart.html">{el}</a>
+              )}
+            />
+            <br />
           </span>
         </>
       }
@@ -218,7 +213,7 @@ const MermaidToExcalidraw = ({
           className="mermaid-to-excalidraw-wrapper-text"
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <label>Mermaid Syntax</label>
+          <label>{t("mermaid.syntax")}</label>
 
           <textarea
             style={{
@@ -235,7 +230,7 @@ const MermaidToExcalidraw = ({
           className="mermaid-to-excalidraw-wrapper-preview"
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <label>Preview</label>
+          <label>{t("mermaid.preview")}</label>
           <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
             {error && <ErrorComp error={error} />}
             {loading && <Spinner size="2rem" />}
@@ -245,7 +240,7 @@ const MermaidToExcalidraw = ({
             className="mermaid-to-excalidraw-wrapper-preview-insert"
             onSelect={onSelect}
           >
-            Insert{" "}
+            {t("mermaid.button")}
             <span style={{ paddingLeft: "8px", display: "flex" }}>
               {ArrowRightIcon}
             </span>
