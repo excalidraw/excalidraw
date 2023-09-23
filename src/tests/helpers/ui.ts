@@ -8,6 +8,7 @@ import type {
   ExcalidrawEllipseElement,
   ExcalidrawDiamondElement,
   ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
 } from "../../element/types";
 import {
   getTransformHandles,
@@ -314,6 +315,34 @@ const transform = (
   });
 };
 
+const proxy = <T extends ExcalidrawElement>(
+  element: T,
+): typeof element & {
+  /** Returns the actual, current element from the elements array, instead of
+      the proxy */
+  get(): typeof element;
+} => {
+  return new Proxy(
+    {},
+    {
+      get(target, prop) {
+        const currentElement = h.elements.find(
+          ({ id }) => id === element.id,
+        ) as any;
+        if (prop === "get") {
+          if (currentElement.hasOwnProperty("get")) {
+            throw new Error(
+              "trying to get `get` test property, but ExcalidrawElement seems to define its own",
+            );
+          }
+          return () => currentElement;
+        }
+        return currentElement[prop];
+      },
+    },
+  ) as any;
+};
+
 /** Tools that can be used to draw shapes */
 type DrawingToolName = Exclude<ToolName, "lock" | "selection" | "eraser">;
 
@@ -432,39 +461,13 @@ export class UI {
       mutateElement(origElement, { angle });
     }
 
-    return new Proxy(
-      {},
-      {
-        get(target, prop) {
-          const currentElement = h.elements.find(
-            (element) => element.id === origElement.id,
-          ) as any;
-          if (prop === "get") {
-            if (currentElement.hasOwnProperty("get")) {
-              throw new Error(
-                "trying to get `get` test property, but ExcalidrawElement seems to define its own",
-              );
-            }
-            return () => currentElement;
-          }
-          return currentElement[prop];
-        },
-      },
-    ) as any;
+    return proxy(origElement);
   }
 
   static async editText(
     element: ExcalidrawTextElement | ExcalidrawTextContainer,
-    newText: string,
-  ): Promise<void>;
-  static async editText(
-    element: ExcalidrawTextElement | ExcalidrawTextContainer,
-    updateText: (prevText: string) => string,
-  ): Promise<void>;
-  static async editText(
-    element: ExcalidrawTextElement | ExcalidrawTextContainer,
-    textOrUpdateFn: string | ((prevText: string) => string),
-  ): Promise<void> {
+    text: string,
+  ) {
     const openedEditor = document.querySelector<HTMLTextAreaElement>(
       ".excalidraw-textEditorContainer > textarea",
     );
@@ -483,13 +486,17 @@ export class UI {
       throw new Error("Can't find wysiwyg text editor in the dom");
     }
 
-    const newText =
-      typeof textOrUpdateFn === "string"
-        ? textOrUpdateFn
-        : textOrUpdateFn(editor.value);
-    fireEvent.input(editor, { target: { value: newText } });
+    fireEvent.input(editor, { target: { value: text } });
     await new Promise((resolve) => setTimeout(resolve, 0));
     editor.blur();
+
+    return isTextElement(element)
+      ? element
+      : proxy(
+          h.elements[
+            h.elements.length - 1
+          ] as ExcalidrawTextElementWithContainer,
+        );
   }
 
   static resize(

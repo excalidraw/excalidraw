@@ -3,7 +3,6 @@ import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
-  ExcalidrawTextElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
@@ -188,8 +187,7 @@ describe("generic element", () => {
       width: 200,
       height: 100,
     });
-    await UI.editText(rectangle, "Hello world");
-    const label = h.elements[1] as ExcalidrawTextElement;
+    const label = await UI.editText(rectangle, "Hello world");
     UI.resize(rectangle, "se", [50, 50]);
 
     expect(label.x + label.width / 2).toBeCloseTo(
@@ -301,8 +299,7 @@ describe("arrow element", () => {
         [200, 120],
       ],
     });
-    await UI.editText(arrow, "Hello");
-    const label = h.elements[1] as ExcalidrawTextElement;
+    const label = await UI.editText(arrow, "Hello");
     UI.resize(arrow, "se", [50, 30]);
 
     expect(label.x + label.width / 2).toBeCloseTo(arrow.x + arrow.points[2][0]);
@@ -509,7 +506,7 @@ describe("multiple selection", () => {
       width: 100,
       height: 80,
     });
-    await UI.editText(rectangle, "hello\nworld");
+    const rectLabel = await UI.editText(rectangle, "hello\nworld");
     const diamond = UI.createElement("diamond", {
       x: 140,
       y: 40,
@@ -537,8 +534,6 @@ describe("multiple selection", () => {
     expect(rectangle.width).toBeCloseTo(100 * scale);
     expect(rectangle.height).toBeCloseTo(80 * scale);
     expect(rectangle.angle).toEqual(0);
-
-    const rectLabel = h.elements[1] as ExcalidrawTextElement;
 
     expect(rectLabel.type).toEqual("text");
     expect(rectLabel.containerId).toEqual(rectangle.id);
@@ -719,8 +714,7 @@ describe("multiple selection", () => {
       width: 220,
       height: 0,
     });
-    await UI.editText(topArrow.get(), "lorem ipsum");
-    const topArrowLabel = h.elements[1] as ExcalidrawTextElement;
+    const topArrowLabel = await UI.editText(topArrow.get(), "lorem ipsum");
 
     UI.clickTool("text");
     UI.clickByTitle("Large");
@@ -730,8 +724,10 @@ describe("multiple selection", () => {
       width: 220,
       height: 0,
     });
-    await UI.editText(bottomArrow.get(), "dolor\nsit amet");
-    const bottomArrowLabel = h.elements[3] as ExcalidrawTextElement;
+    const bottomArrowLabel = await UI.editText(
+      bottomArrow.get(),
+      "dolor\nsit amet",
+    );
 
     const selectionWidth = 220;
     const selectionTop = 20 - topArrowLabel.height / 2;
@@ -913,10 +909,7 @@ describe("multiple selection", () => {
       height: 80,
       angle: Math.PI / 6,
     });
-    await UI.editText(rectangle, "hello\nworld");
-    const rectLabel = h.elements[
-      h.elements.length - 1
-    ] as ExcalidrawTextElement;
+    const rectLabel = await UI.editText(rectangle, "hello\nworld");
 
     const boundArrow = UI.createElement("arrow", {
       x: 380,
@@ -924,10 +917,7 @@ describe("multiple selection", () => {
       width: -60,
       height: -80,
     });
-    await UI.editText(boundArrow, "test");
-    const arrowLabel = h.elements[
-      h.elements.length - 1
-    ] as ExcalidrawTextElement;
+    const arrowLabel = await UI.editText(boundArrow, "test");
 
     const selectionWidth = 380;
     const move = [-800, 0] as [number, number];
