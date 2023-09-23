@@ -162,7 +162,7 @@
   .welcome-screen-menu-item {
     box-sizing: border-box;
 
-    pointer-events: all;
+    pointer-events: var(--ui-pointerEvents);
 
     color: var(--color-gray-50);
     font-size: 0.875rem;
@@ -203,7 +203,7 @@
     }
   }
 
-  &:not(:active) .welcome-screen-menu-item:hover {
+  .welcome-screen-menu-item:hover {
     text-decoration: none;
     background: var(--color-gray-10);
 
@@ -247,7 +247,7 @@
       }
     }
 
-    &:not(:active) .welcome-screen-menu-item:hover {
+    .welcome-screen-menu-item:hover {
       background: var(--color-gray-85);
 
       .welcome-screen-menu-item__shortcut {

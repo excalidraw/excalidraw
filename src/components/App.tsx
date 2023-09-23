@@ -85,6 +85,7 @@ import {
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
   ZOOM_STEP,
+  POINTER_EVENTS,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -882,7 +883,9 @@ class App extends React.Component<AppProps, AppState> {
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
-                  pointerEvents: isActive ? "auto" : "none",
+                  pointerEvents: isActive
+                    ? POINTER_EVENTS.enabled
+                    : POINTER_EVENTS.disabled,
                 }}
               >
                 {isHovered && (
@@ -1123,9 +1126,9 @@ class App extends React.Component<AppProps, AppState> {
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             cursor: CURSOR_TYPE.MOVE,
-            // disable all interaction (e.g. cursor change) when in view
-            // mode
-            pointerEvents: this.state.viewModeEnabled ? "none" : "all",
+            pointerEvents: this.state.viewModeEnabled
+              ? POINTER_EVENTS.disabled
+              : POINTER_EVENTS.inheritFromUI,
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
           onWheel={(event) => this.handleWheel(event)}
@@ -1170,6 +1173,16 @@ class App extends React.Component<AppProps, AppState> {
             (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
               this.state.trayModeEnabled), //zsviczian
         })}
+        style={{
+          ["--ui-pointerEvents" as any]:
+            this.state.selectionElement ||
+            this.state.draggingElement ||
+            this.state.resizingElement ||
+            (this.state.editingElement &&
+              !isTextElement(this.state.editingElement))
+              ? POINTER_EVENTS.disabled
+              : POINTER_EVENTS.enabled,
+        }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}
@@ -1364,7 +1377,8 @@ class App extends React.Component<AppProps, AppState> {
   private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
     jotaiStore.set(activeEyeDropperAtom, {
       swapPreviewOnAlt: true,
-      previewType: type === "stroke" ? "strokeColor" : "backgroundColor",
+      colorPickerType:
+        type === "stroke" ? "elementStroke" : "elementBackground",
       onSelect: (color, event) => {
         const shouldUpdateStrokeColor =
           (type === "background" && event.altKey) ||
@@ -1375,12 +1389,14 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeTool.type !== "selection"
         ) {
           if (shouldUpdateStrokeColor) {
-            this.setState({
-              currentItemStrokeColor: color,
+            this.syncActionResult({
+              appState: { ...this.state, currentItemStrokeColor: color },
+              commitToHistory: true,
             });
           } else {
-            this.setState({
-              currentItemBackgroundColor: color,
+            this.syncActionResult({
+              appState: { ...this.state, currentItemBackgroundColor: color },
+              commitToHistory: true,
             });
           }
         } else {
@@ -4189,7 +4205,7 @@ class App extends React.Component<AppProps, AppState> {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          this.state.gridSize,
+          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
         );
 
         const [lastCommittedX, lastCommittedY] =
@@ -5010,7 +5026,11 @@ class App extends React.Component<AppProps, AppState> {
       origin,
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
       originInGrid: tupleToCoors(
-        getGridPoint(origin.x, origin.y, this.state.gridSize),
+        getGridPoint(
+          origin.x,
+          origin.y,
+          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+        ),
       ),
       scrollbars: isOverScrollBars(
         currentScrollBars,
@@ -5553,7 +5573,11 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number;
     link: string;
   }) => {
-    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+    const [gridX, gridY] = getGridPoint(
+      sceneX,
+      sceneY,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+    );
 
     const embedLink = getEmbedLink(link);
 
@@ -5599,7 +5623,11 @@ class App extends React.Component<AppProps, AppState> {
     sceneX: number;
     sceneY: number;
   }) => {
-    const [gridX, gridY] = getGridPoint(sceneX, sceneY, this.state.gridSize);
+    const [gridX, gridY] = getGridPoint(
+      sceneX,
+      sceneY,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+    );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
       x: gridX,
@@ -5682,7 +5710,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5775,7 +5803,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.state.gridSize,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5833,7 +5861,7 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.state.gridSize,
+      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const frame = newFrameElement({
@@ -5916,7 +5944,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       // for arrows/lines, don't start dragging until a given threshold
@@ -5962,6 +5990,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement,
             pointerCoords,
             this.state,
+            !event[KEYS.CTRL_OR_CMD],
           );
           if (!ret) {
             return;
@@ -6087,7 +6116,7 @@ class App extends React.Component<AppProps, AppState> {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
             pointerCoords.y - pointerDownState.drag.offset.y,
-            this.state.gridSize,
+            event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
           );
 
           const [dragDistanceX, dragDistanceY] = [
@@ -6154,7 +6183,7 @@ class App extends React.Component<AppProps, AppState> {
                 const [originDragX, originDragY] = getGridPoint(
                   pointerDownState.origin.x - pointerDownState.drag.offset.x,
                   pointerDownState.origin.y - pointerDownState.drag.offset.y,
-                  this.state.gridSize,
+                  event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
                 );
                 mutateElement(duplicatedElement, {
                   x: duplicatedElement.x + (originDragX - dragX),
@@ -7962,7 +7991,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
       );
 
       const image =
@@ -8031,7 +8060,7 @@ class App extends React.Component<AppProps, AppState> {
     const [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      this.state.gridSize,
+      event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
     const frameElementsOffsetsMap = new Map<
