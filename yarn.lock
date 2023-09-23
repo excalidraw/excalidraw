@@ -5582,10 +5582,20 @@
   dependencies:
     "crc-32" "^0.3.0"
 
-"points-on-curve@^0.2.0", "points-on-curve@0.2.0":
+"points-on-curve@^0.2.0":
   "integrity" "sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A=="
   "resolved" "https://registry.npmjs.org/points-on-curve/-/points-on-curve-0.2.0.tgz"
   "version" "0.2.0"
+
+"points-on-curve@0.2.0":
+  "integrity" "sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A=="
+  "resolved" "https://registry.npmjs.org/points-on-curve/-/points-on-curve-0.2.0.tgz"
+  "version" "0.2.0"
+
+"points-on-curve@1.0.1":
+  "integrity" "sha512-3nmX4/LIiyuwGLwuUrfhTlDeQFlAhi7lyK/zcRNGhalwapDWgAGR82bUpmn2mA03vII3fvNCG8jAONzKXwpxAg=="
+  "resolved" "https://registry.npmjs.org/points-on-curve/-/points-on-curve-1.0.1.tgz"
+  "version" "1.0.1"
 
 "points-on-path@^0.2.1":
   "integrity" "sha512-25ClnWWuw7JbWZcgqY/gJ4FQWadKxGWk+3kR/7kD0tCaDtPPMj7oHu2ToLaVhfpnHrZzYby2w6tUA0eOIuUg8g=="
