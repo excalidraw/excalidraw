@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import { AppState, BinaryFiles } from "../types";
+import { BinaryFiles } from "../types";
 import { useApp } from "./App";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
@@ -8,10 +8,7 @@ import {
   convertToExcalidrawElements,
   exportToCanvas,
 } from "../packages/excalidraw/index";
-import {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
+import { NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
@@ -127,7 +124,7 @@ const MermaidToExcalidraw = ({
 
       setText(data);
     }
-  }, [loading]);
+  }, [loading, selectedElements]);
 
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
@@ -186,7 +183,7 @@ const MermaidToExcalidraw = ({
       }
     };
     renderExcalidrawPreview();
-  }, [deferredText]);
+  }, [deferredText, text]);
 
   const onClose = () => {
     app.setActiveTool({ type: "selection" });
