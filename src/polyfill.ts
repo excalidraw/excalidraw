@@ -22,5 +22,12 @@ const polyfill = () => {
       configurable: true,
     });
   }
+
+  if (!Element.prototype.replaceChildren) {
+    Element.prototype.replaceChildren = function (...nodes) {
+      this.innerHTML = "";
+      this.append(...nodes);
+    };
+  }
 };
 export default polyfill;
