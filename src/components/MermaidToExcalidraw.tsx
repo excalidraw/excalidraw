@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import { BinaryFiles } from "../types";
+import { AppState, BinaryFiles } from "../types";
 import { useApp } from "./App";
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
@@ -8,7 +8,10 @@ import {
   convertToExcalidrawElements,
   exportToCanvas,
 } from "../packages/excalidraw/index";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
@@ -65,7 +68,11 @@ const ErrorComp = ({ error }: { error: string }) => {
   );
 };
 
-const MermaidToExcalidraw = () => {
+const MermaidToExcalidraw = ({
+  selectedElements,
+}: {
+  selectedElements: readonly NonDeletedExcalidrawElement[];
+}) => {
   const mermaidToExcalidrawLib = useRef<{
     parseMermaidToExcalidraw: (
       defination: string,
@@ -111,7 +118,12 @@ const MermaidToExcalidraw = () => {
 
   useEffect(() => {
     if (!loading) {
-      const data = importMermaidDataFromStorage() || MERMAID_EXAMPLE;
+      const selectedMermaidImage = selectedElements.filter(
+        (el) => el.type === "image" && el.customData?.mermaidText,
+      )[0];
+      const data = selectedMermaidImage
+        ? selectedMermaidImage.customData?.mermaidText
+        : importMermaidDataFromStorage() || MERMAID_EXAMPLE;
 
       setText(data);
     }
@@ -134,9 +146,17 @@ const MermaidToExcalidraw = () => {
         setError(null);
 
         data.current = {
-          elements: convertToExcalidrawElements(elements, {
-            regenerateIds: true,
-          }),
+          elements: convertToExcalidrawElements(
+            elements.map((el) => {
+              if (el.type === "image") {
+                el.customData = { mermaidText: text };
+              }
+              return el;
+            }),
+            {
+              regenerateIds: true,
+            },
+          ),
           files,
         };
         const parent = canvasNode.parentElement!;

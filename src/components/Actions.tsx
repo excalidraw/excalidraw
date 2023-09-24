@@ -341,7 +341,6 @@ export const ShapesSwitcher = ({
               setAppState({
                 activeTool: nextActiveTool,
                 multiElement: null,
-                selectedElementIds: {},
               });
             }}
             icon={mermaidLogoIcon}

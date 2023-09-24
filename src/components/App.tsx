@@ -1192,7 +1192,11 @@ class App extends React.Component<AppProps, AppState> {
                         >
                           {this.props.children}
                           {this.state.activeTool.type === "mermaid" && (
-                            <MermaidToExcalidraw />
+                            <MermaidToExcalidraw
+                              selectedElements={this.scene.getSelectedElements(
+                                this.state,
+                              )}
+                            />
                           )}
                         </LayerUI>
 
