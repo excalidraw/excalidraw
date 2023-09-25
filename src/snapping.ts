@@ -21,6 +21,10 @@ export const SNAP_PRECISION = 0.01;
 
 const SNAP_DISTANCE = 8;
 
+// do not comput more gaps per axis than this limit
+// TODO increase or remove once we optimize
+const VISIBLE_GAPS_LIMIT_PER_AXIS = 99999;
+
 // snap distance with zoom value taken into consideration
 export const getSnapDistance = (zoomValue: number) => {
   return SNAP_DISTANCE / zoomValue;
@@ -297,10 +301,16 @@ export const getVisibleGaps = (
 
   const horizontalGaps: Gap[] = [];
 
-  for (let i = 0; i < horizontallySorted.length; i++) {
+  let c = 0;
+
+  horizontal: for (let i = 0; i < horizontallySorted.length; i++) {
     const startBounds = horizontallySorted[i];
 
     for (let j = i + 1; j < horizontallySorted.length; j++) {
+      if (++c > VISIBLE_GAPS_LIMIT_PER_AXIS) {
+        break horizontal;
+      }
+
       const endBounds = horizontallySorted[j];
 
       const [, startMinY, startMaxX, startMaxY] = startBounds;
@@ -335,10 +345,15 @@ export const getVisibleGaps = (
 
   const verticalGaps: Gap[] = [];
 
-  for (let i = 0; i < verticallySorted.length; i++) {
+  c = 0;
+
+  vertical: for (let i = 0; i < verticallySorted.length; i++) {
     const startBounds = verticallySorted[i];
 
     for (let j = i + 1; j < verticallySorted.length; j++) {
+      if (++c > VISIBLE_GAPS_LIMIT_PER_AXIS) {
+        break vertical;
+      }
       const endBounds = verticallySorted[j];
 
       const [startMinX, , startMaxX, startMaxY] = startBounds;
