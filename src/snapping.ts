@@ -344,7 +344,7 @@ export const getVisibleGaps = (
   };
 };
 
-export const getGapSnaps = (
+const getGapSnaps = (
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
@@ -531,7 +531,7 @@ export const getReferenceSnapPoints = (
     .flatMap((elementGroup) => getElementsCorners(elementGroup));
 };
 
-export const getPointSnaps = (
+const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: Point[],
   appState: AppState,
@@ -591,6 +591,19 @@ export const snapDraggedElements = (
   appState: AppState,
   event: MaybeSnapEvent,
 ) => {
+  if (
+    !isSnappingEnabled({ appState, event, selectedElements }) ||
+    selectedElements.length === 0
+  ) {
+    return {
+      snapOffset: {
+        x: 0,
+        y: 0,
+      },
+      snapLines: [],
+    };
+  }
+
   const nearestSnapsX: Snaps = [];
   const nearestSnapsY: Snaps = [];
   const snapDistance = getSnapDistance(appState.zoom.value);
