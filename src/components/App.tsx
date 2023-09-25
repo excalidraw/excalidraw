@@ -5672,6 +5672,7 @@ class App extends React.Component<AppProps, AppState> {
   private maybeCacheVisibleGaps(
     event: PointerEvent,
     selectedElements: ExcalidrawElement[],
+    recomputeAnyways: boolean = false,
   ) {
     if (
       isSnappingEnabled({
@@ -5679,7 +5680,7 @@ class App extends React.Component<AppProps, AppState> {
         appState: this.state,
         selectedElements,
       }) &&
-      !this.state.visibleGaps
+      (recomputeAnyways || !this.state.visibleGaps)
     ) {
       this.setState({
         visibleGaps: getVisibleGaps(
@@ -6053,6 +6054,7 @@ class App extends React.Component<AppProps, AppState> {
               oldIdToDuplicatedId,
             );
             this.scene.replaceAllElements(nextSceneElements);
+            this.maybeCacheVisibleGaps(event, selectedElements, true);
           }
           return;
         }
