@@ -670,9 +670,7 @@ export const snapDraggedElements = (
 
   const snaps = [...nearestSnapsX, ...nearestSnapsY];
 
-  const pointSnapLines = createPointSnapLines(
-    snaps.filter((snap) => snap.type === "point") as PointSnap[],
-  );
+  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
 
   const gapSnapLines = createGapSnapLines(
     selectedElements,
@@ -686,11 +684,110 @@ export const snapDraggedElements = (
   };
 };
 
-const createPointSnapLines = (pointSnaps: PointSnap[]): PointSnapLine[] => {
-  return pointSnaps.map((pointSnap) => ({
-    type: "points",
-    points: pointSnap.points,
-  }));
+const round = (x: number) => {
+  const decimalPlaces = 6;
+  return Math.round(x * 10 ** decimalPlaces) / 10 ** decimalPlaces;
+};
+
+const dedupePoints = (points: Point[]): Point[] => {
+  const map = new Map<string, Point>();
+
+  for (const point of points) {
+    const key = point.join(",");
+
+    if (!map.has(key)) {
+      map.set(key, point);
+    }
+  }
+
+  return Array.from(map.values());
+};
+
+const createPointSnapLines = (
+  nearestSnapsX: Snaps,
+  nearestSnapsY: Snaps,
+): PointSnapLine[] => {
+  const snapsX = {} as { [key: string]: Point[] };
+  const snapsY = {} as { [key: string]: Point[] };
+
+  if (nearestSnapsX.length > 0) {
+    for (const snap of nearestSnapsX) {
+      if (snap.type === "point") {
+        // key = thisPoint.x
+        const key = round(snap.points[0][0]);
+        if (!snapsX[key]) {
+          snapsX[key] = [];
+        }
+        snapsX[key].push(
+          ...snap.points.map(
+            (point) => [round(point[0]), round(point[1])] as Point,
+          ),
+        );
+      }
+    }
+  }
+
+  if (nearestSnapsY.length > 0) {
+    for (const snap of nearestSnapsY) {
+      if (snap.type === "point") {
+        // key = thisPoint.y
+        const key = round(snap.points[0][1]);
+        if (!snapsY[key]) {
+          snapsY[key] = [];
+        }
+        snapsY[key].push(
+          ...snap.points.map(
+            (point) => [round(point[0]), round(point[1])] as Point,
+          ),
+        );
+      }
+    }
+  }
+
+  return Object.entries(snapsX)
+    .map(([key, points]) => {
+      return {
+        type: "points",
+        points: dedupePoints(
+          points
+            .map((point) => {
+              return [Number(key), point[1]] as Point;
+            })
+            .sort((a, b) => a[1] - b[1]),
+        ),
+      } as PointSnapLine;
+    })
+    .concat(
+      Object.entries(snapsY).map(([key, points]) => {
+        return {
+          type: "points",
+          points: dedupePoints(
+            points
+              .map((point) => {
+                return [point[0], Number(key)] as Point;
+              })
+              .sort((a, b) => a[0] - b[0]),
+          ),
+        } as PointSnapLine;
+      }),
+    );
+};
+
+const dedupeGapSnapLines = (gapSnapLines: GapSnapLine[]) => {
+  const map = new Map<string, GapSnapLine>();
+
+  for (const gapSnapLine of gapSnapLines) {
+    const key = gapSnapLine.points
+      .flat()
+      .map((point) => [round(point)])
+      .join(",");
+
+    if (!map.has(key)) {
+      map.set(key, gapSnapLine);
+    }
+  }
+
+  return Array.from(map.values());
 };
 
 const createGapSnapLines = (
@@ -880,7 +977,16 @@ const createGapSnapLines = (
     }
   }
 
-  return gapSnapLines;
+  return dedupeGapSnapLines(
+    gapSnapLines.map((gapSnapLine) => {
+      return {
+        ...gapSnapLine,
+        points: gapSnapLine.points.map(
+          (point) => [round(point[0]), round(point[1])] as Point,
+        ) as PointPair,
+      };
+    }),
+  );
 };
 
 export const snapResizingElements = (
@@ -1012,11 +1118,7 @@ export const snapResizingElements = (
     minOffset,
   );
 
-  const pointSnapLines = createPointSnapLines(
-    [...nearestSnapsX, ...nearestSnapsY].filter(
-      (snap) => snap.type === "point",
-    ) as PointSnap[],
-  );
+  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
 
   return {
     snapOffset,
@@ -1090,11 +1192,7 @@ export const snapNewElement = (
     minOffset,
   );
 
-  const pointSnapLines = createPointSnapLines(
-    [...nearestSnapsX, ...nearestSnapsY].filter(
-      (snap) => snap.type === "point",
-    ) as PointSnap[],
-  );
+  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
 
   return {
     snapOffset,

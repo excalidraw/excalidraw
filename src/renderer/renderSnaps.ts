@@ -1,4 +1,4 @@
-import { PointSnapLine, PointerSnapLine, SnapLine } from "../snapping";
+import { PointSnapLine, PointerSnapLine } from "../snapping";
 import { InteractiveCanvasAppState, Point } from "../types";
 
 const SNAP_COLOR_PRIMARY = "#fa5252";
@@ -6,123 +6,13 @@ const SNAP_COLOR_SECONDARY = "#ff8787";
 const SNAP_WIDTH = 1;
 const SNAP_CROSS_SIZE = 2;
 
-function mergeLines(snapLines: SnapLine[]): SnapLine[] {
-  if (!snapLines.length) {
-    return snapLines;
-  }
-
-  const result: SnapLine[] = [];
-  const lines: PointSnapLine[] = snapLines.filter(
-    (l) => l.type === "points",
-  ) as PointSnapLine[];
-
-  if (!lines.length) {
-    return snapLines;
-  }
-
-  while (lines.length > 0) {
-    const currentLine = lines.pop()!;
-    let merged = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (isOverlapping(currentLine, lines[i])) {
-        const newLine: SnapLine = {
-          type: "points",
-          points: [
-            [
-              Math.min(
-                currentLine.points[0][0],
-                currentLine.points[1][0],
-                lines[i].points[0][0],
-                lines[i].points[1][0],
-              ),
-              Math.min(
-                currentLine.points[0][1],
-                currentLine.points[1][1],
-                lines[i].points[0][1],
-                lines[i].points[1][1],
-              ),
-            ],
-            [
-              Math.max(
-                currentLine.points[0][0],
-                currentLine.points[1][0],
-                lines[i].points[0][0],
-                lines[i].points[1][0],
-              ),
-              Math.max(
-                currentLine.points[0][1],
-                currentLine.points[1][1],
-                lines[i].points[0][1],
-                lines[i].points[1][1],
-              ),
-            ],
-          ],
-        };
-        lines[i] = newLine;
-        merged = true;
-        break;
-      }
-    }
-
-    if (!merged) {
-      result.push(currentLine);
-    }
-  }
-
-  // ddd back other types
-  result.push(...snapLines.filter((l) => l.type !== "points"));
-
-  return result;
-}
-
-function isOverlapping(line1: PointSnapLine, line2: PointSnapLine): boolean {
-  const [l1StartX, l1EndX] =
-    line1.points[0][0] <= line1.points[1][0]
-      ? [line1.points[0][0], line1.points[1][0]]
-      : [line1.points[1][0], line1.points[0][0]];
-  const [l1StartY, l1EndY] =
-    line1.points[0][1] <= line1.points[1][1]
-      ? [line1.points[0][1], line1.points[1][1]]
-      : [line1.points[1][1], line1.points[0][1]];
-
-  const [l2StartX, l2EndX] =
-    line2.points[0][0] <= line2.points[1][0]
-      ? [line2.points[0][0], line2.points[1][0]]
-      : [line2.points[1][0], line2.points[0][0]];
-  const [l2StartY, l2EndY] =
-    line2.points[0][1] <= line2.points[1][1]
-      ? [line2.points[0][1], line2.points[1][1]]
-      : [line2.points[1][1], line2.points[0][1]];
-
-  // Vertical overlap
-  if (l1StartX === l1EndX && l2StartX === l2EndX && l1StartX === l2StartX) {
-    return (
-      (l1StartY <= l2EndY && l1EndY >= l2StartY) ||
-      (l2StartY <= l1EndY && l2EndY >= l1StartY)
-    );
-  }
-
-  // Horizontal overlap
-  if (l1StartY === l1EndY && l2StartY === l2EndY && l1StartY === l2StartY) {
-    return (
-      (l1StartX <= l2EndX && l1EndX >= l2StartX) ||
-      (l2StartX <= l1EndX && l2EndX >= l1StartX)
-    );
-  }
-
-  return false;
-}
-
 export const renderSnaps = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
   context.save();
 
-  const snapLines = mergeLines(appState.snapLines);
-
-  for (const snapLine of snapLines) {
+  for (const snapLine of appState.snapLines) {
     if (snapLine.type === "pointer") {
       context.lineWidth = SNAP_WIDTH / appState.zoom.value;
       context.strokeStyle = SNAP_COLOR_SECONDARY;
