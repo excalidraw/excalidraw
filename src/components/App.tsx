@@ -5650,6 +5650,7 @@ class App extends React.Component<AppProps, AppState> {
   private maybeCacheReferenceSnapPoints(
     event: PointerEvent | MouseEvent | KeyboardEvent,
     selectedElements: ExcalidrawElement[],
+    recomputeAnyways: boolean = false,
   ) {
     if (
       isSnappingEnabled({
@@ -5657,7 +5658,7 @@ class App extends React.Component<AppProps, AppState> {
         appState: this.state,
         selectedElements,
       }) &&
-      !this.state.referenceSnapPoints
+      (recomputeAnyways || !this.state.referenceSnapPoints)
     ) {
       this.setState({
         referenceSnapPoints: getReferenceSnapPoints(
@@ -6055,6 +6056,7 @@ class App extends React.Component<AppProps, AppState> {
             );
             this.scene.replaceAllElements(nextSceneElements);
             this.maybeCacheVisibleGaps(event, selectedElements, true);
+            this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
           return;
         }
