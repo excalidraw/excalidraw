@@ -34,7 +34,7 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
-import { Gap, SnapLine } from "./snapping";
+import { SnapLine } from "./snapping";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
@@ -292,11 +292,6 @@ export type AppState = {
   selectedLinearElement: LinearElementEditor | null;
 
   snapLines: SnapLine[];
-  visibleGaps: {
-    verticalGaps: Gap[];
-    horizontalGaps: Gap[];
-  } | null;
-  referenceSnapPoints: Point[] | null;
   originSnapOffset: {
     x: number;
     y: number;

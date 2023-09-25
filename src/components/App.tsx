@@ -351,6 +351,7 @@ import {
   isSnappingEnabled,
   getVisibleGaps,
   getReferenceSnapPoints,
+  SnapCache,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -1719,6 +1720,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     this.library.destroy();
     ShapeCache.destroy();
+    SnapCache.destroy();
     clearTimeout(touchTimeout);
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
@@ -5658,15 +5660,15 @@ class App extends React.Component<AppProps, AppState> {
         appState: this.state,
         selectedElements,
       }) &&
-      (recomputeAnyways || !this.state.referenceSnapPoints)
+      (recomputeAnyways || !SnapCache.getReferenceSnapPoints())
     ) {
-      this.setState({
-        referenceSnapPoints: getReferenceSnapPoints(
+      SnapCache.setReferenceSnapPoints(
+        getReferenceSnapPoints(
           this.scene.getNonDeletedElements(),
           selectedElements,
           this.state,
         ),
-      });
+      );
     }
   }
 
@@ -5681,15 +5683,15 @@ class App extends React.Component<AppProps, AppState> {
         appState: this.state,
         selectedElements,
       }) &&
-      (recomputeAnyways || !this.state.visibleGaps)
+      (recomputeAnyways || !SnapCache.getVisibleGaps())
     ) {
-      this.setState({
-        visibleGaps: getVisibleGaps(
+      SnapCache.setVisibleGaps(
+        getVisibleGaps(
           this.scene.getNonDeletedElements(),
           selectedElements,
           this.state,
         ),
-      });
+      );
     }
   }
 
@@ -5950,6 +5952,9 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
+          // Snap cache *must* be synchronously popuplated before initial drag,
+          // otherwise the first drag even will not snap, causing a jump before
+          // it snaps to its position if previously snapped already.
           this.maybeCacheVisibleGaps(event, selectedElements);
           this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
@@ -6273,6 +6278,7 @@ class App extends React.Component<AppProps, AppState> {
         isResizing,
         isRotating,
       } = this.state;
+
       this.setState({
         isResizing: false,
         isRotating: false,
@@ -6288,10 +6294,12 @@ class App extends React.Component<AppProps, AppState> {
             ? this.state.editingElement
             : null,
         snapLines: [],
-        visibleGaps: null,
-        referenceSnapPoints: null,
+
         originSnapOffset: null,
       });
+
+      SnapCache.setReferenceSnapPoints(null);
+      SnapCache.setVisibleGaps(null);
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 

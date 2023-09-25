@@ -94,13 +94,44 @@ export type GapSnapLine = {
 
 export type SnapLine = PointSnapLine | GapSnapLine | PointerSnapLine;
 
-export type MaybeSnapEvent =
-  | PointerEvent
-  | MouseEvent
-  | KeyboardEvent
-  | React.PointerEvent<HTMLCanvasElement>
-  | React.PointerEvent<HTMLElement>
-  | false;
+// -----------------------------------------------------------------------------
+
+export class SnapCache {
+  private static referenceSnapPoints: Point[] | null = null;
+
+  private static visibleGaps: {
+    verticalGaps: Gap[];
+    horizontalGaps: Gap[];
+  } | null = null;
+
+  public static setReferenceSnapPoints = (snapPoints: Point[] | null) => {
+    SnapCache.referenceSnapPoints = snapPoints;
+  };
+
+  public static getReferenceSnapPoints = () => {
+    return SnapCache.referenceSnapPoints;
+  };
+
+  public static setVisibleGaps = (
+    gaps: {
+      verticalGaps: Gap[];
+      horizontalGaps: Gap[];
+    } | null,
+  ) => {
+    SnapCache.visibleGaps = gaps;
+  };
+
+  public static getVisibleGaps = () => {
+    return SnapCache.visibleGaps;
+  };
+
+  public static destroy = () => {
+    SnapCache.referenceSnapPoints = null;
+    SnapCache.visibleGaps = null;
+  };
+}
+
+// -----------------------------------------------------------------------------
 
 export const isSnappingEnabled = ({
   event,
@@ -361,8 +392,10 @@ const getGapSnaps = (
     return [];
   }
 
-  if (appState.visibleGaps) {
-    const { horizontalGaps, verticalGaps } = appState.visibleGaps;
+  const visibleGaps = SnapCache.getVisibleGaps();
+
+  if (visibleGaps) {
+    const { horizontalGaps, verticalGaps } = visibleGaps;
 
     const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
       selectedElements,
@@ -547,9 +580,11 @@ const getPointSnaps = (
     return [];
   }
 
-  if (appState.referenceSnapPoints) {
+  const referenceSnapPoints = SnapCache.getReferenceSnapPoints();
+
+  if (referenceSnapPoints) {
     for (const thisSnapPoint of selectionSnapPoints) {
-      for (const otherSnapPoint of appState.referenceSnapPoints) {
+      for (const otherSnapPoint of referenceSnapPoints) {
         const offsetX = otherSnapPoint[0] - thisSnapPoint[0];
         const offsetY = otherSnapPoint[1] - thisSnapPoint[1];
 

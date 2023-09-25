@@ -100,8 +100,6 @@ export const getDefaultAppState = (): Omit<
     showHyperlinkPopup: false,
     selectedLinearElement: null,
     snapLines: [],
-    visibleGaps: null,
-    referenceSnapPoints: null,
     originSnapOffset: {
       x: 0,
       y: 0,
@@ -215,8 +213,6 @@ const APP_STATE_STORAGE_CONF = (<
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
   snapLines: { browser: false, export: false, server: false },
-  visibleGaps: { browser: false, export: false, server: false },
-  referenceSnapPoints: { browser: false, export: false, server: false },
   originSnapOffset: { browser: false, export: false, server: false },
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
 });
