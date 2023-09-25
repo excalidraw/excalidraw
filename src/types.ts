@@ -664,3 +664,10 @@ export type FrameNameBoundsCache = {
     }
   >;
 };
+
+export type KeyboardModifiersObject = {
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
+};

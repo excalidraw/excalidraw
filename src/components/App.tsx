@@ -228,6 +228,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  KeyboardModifiersObject,
 } from "../types";
 import {
   debounce,
@@ -5650,7 +5651,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private maybeCacheReferenceSnapPoints(
-    event: PointerEvent | MouseEvent | KeyboardEvent,
+    event: KeyboardModifiersObject,
     selectedElements: ExcalidrawElement[],
     recomputeAnyways: boolean = false,
   ) {
@@ -5673,7 +5674,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private maybeCacheVisibleGaps(
-    event: PointerEvent,
+    event: KeyboardModifiersObject,
     selectedElements: ExcalidrawElement[],
     recomputeAnyways: boolean = false,
   ) {

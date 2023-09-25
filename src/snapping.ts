@@ -14,7 +14,7 @@ import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
 import { rangeIntersection, rangesOverlap, rotatePoint } from "./math";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
-import { AppState, Point } from "./types";
+import { AppState, KeyboardModifiersObject, Point } from "./types";
 
 // handle floating point errors
 export const SNAP_PRECISION = 0.01;
@@ -139,7 +139,7 @@ export const isSnappingEnabled = ({
   selectedElements,
 }: {
   appState: AppState;
-  event: MaybeSnapEvent;
+  event: KeyboardModifiersObject;
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   if (event) {
@@ -379,7 +379,7 @@ const getGapSnaps = (
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
-  event: MaybeSnapEvent,
+  event: KeyboardModifiersObject,
   nearestSnapsX: Snaps,
   nearestSnapsY: Snaps,
   minOffset: Vector2D,
@@ -568,7 +568,7 @@ const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: Point[],
   appState: AppState,
-  event: MaybeSnapEvent,
+  event: KeyboardModifiersObject,
   nearestSnapsX: Snaps,
   nearestSnapsY: Snaps,
   minOffset: Vector2D,
@@ -624,7 +624,7 @@ export const snapDraggedElements = (
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
-  event: MaybeSnapEvent,
+  event: KeyboardModifiersObject,
 ) => {
   if (
     !isSnappingEnabled({ appState, event, selectedElements }) ||
@@ -1044,7 +1044,7 @@ export const snapResizingElements = (
   // while using the original elements to appy dragOffset to calculate snaps
   selectedOriginalElements: ExcalidrawElement[],
   appState: AppState,
-  event: MaybeSnapEvent,
+  event: KeyboardModifiersObject,
   dragOffset: Vector2D,
   transformHandle: MaybeTransformHandleType,
 ) => {
@@ -1178,7 +1178,7 @@ export const snapNewElement = (
   elements: readonly ExcalidrawElement[],
   draggingElement: ExcalidrawElement,
   appState: AppState,
-  event: MaybeSnapEvent,
+  event: KeyboardModifiersObject,
   origin: Vector2D,
   dragOffset: Vector2D,
 ) => {
@@ -1252,7 +1252,7 @@ export const getSnapLinesAtPointer = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   pointer: Vector2D,
-  event: MaybeSnapEvent,
+  event: KeyboardModifiersObject,
 ) => {
   if (!isSnappingEnabled({ event, selectedElements: [], appState })) {
     return {
