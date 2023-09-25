@@ -8,7 +8,10 @@ import {
   convertToExcalidrawElements,
   exportToCanvas,
 } from "../packages/excalidraw/index";
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement, //zsviczian
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
@@ -66,7 +69,11 @@ const ErrorComp = ({ error }: { error: string }) => {
   );
 };
 
-const MermaidToExcalidraw = () => {
+const MermaidToExcalidraw = ({
+  selectedElements, //zsviczian
+}: {
+  selectedElements: readonly NonDeletedExcalidrawElement[];
+}) => {
   const mermaidToExcalidrawLib = useRef<{
     parseMermaidToExcalidraw: (
       defination: string,
@@ -112,7 +119,12 @@ const MermaidToExcalidraw = () => {
 
   useEffect(() => {
     if (!loading) {
-      const data = importMermaidDataFromStorage() || MERMAID_EXAMPLE;
+      const selectedMermaidImage = selectedElements.filter(
+        (el) => el.type === "image" && el.customData?.mermaidText,
+      )[0]; //zsviczian
+      const data = selectedMermaidImage
+        ? selectedMermaidImage.customData?.mermaidText
+        : importMermaidDataFromStorage() || MERMAID_EXAMPLE;
 
       setText(data);
     }
@@ -133,11 +145,18 @@ const MermaidToExcalidraw = () => {
             },
           );
         setError(null);
-
         data.current = {
-          elements: convertToExcalidrawElements(elements, {
-            regenerateIds: true,
-          }),
+          elements: convertToExcalidrawElements(
+            elements.map((el) => { //zsviczian
+              if (el.type === "image") {
+                el.customData = { mermaidText: text };
+              }
+              return el;
+            }),
+            {
+              regenerateIds: true,
+            },
+          ),
           files,
         };
         const parent = canvasNode.parentElement!;
@@ -254,26 +273,36 @@ export default MermaidToExcalidraw;
 
 //zsviczian
 export const mermaidToExcalidraw = async (
-    mermaidDefinition: string,
-    opts: MermaidOptions = {fontSize: DEFAULT_FONT_SIZE},
-  ):Promise<{
-    elements: ExcalidrawElement[],
-    files:any
-  } | undefined> => {
+  mermaidDefinition: string,
+  opts: MermaidOptions = { fontSize: DEFAULT_FONT_SIZE },
+): Promise<
+  | {
+      elements: ExcalidrawElement[];
+      files: any;
+    }
+  | undefined
+> => {
   try {
-    const { elements, files } =
-      await parseMermaidToExcalidraw(
-        mermaidDefinition,
-        opts
-      );
+    const { elements, files } = await parseMermaidToExcalidraw(
+      mermaidDefinition,
+      opts,
+    );
 
     return {
-      elements: convertToExcalidrawElements(elements, {
-        regenerateIds: true,
-      }),
+      elements: convertToExcalidrawElements(
+        elements.map((el) => {
+          if (el.type === "image") {
+            el.customData = { mermaidText: mermaidDefinition };
+          }
+          return el;
+        }),
+        {
+          regenerateIds: true,
+        },
+      ),
       files,
     };
   } catch (e: any) {
     console.error(e.message);
   }
-}
+};

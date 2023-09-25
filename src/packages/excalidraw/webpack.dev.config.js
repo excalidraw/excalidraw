@@ -66,7 +66,7 @@ module.exports = {
               transpileOnly: true,
               configFile: path.resolve(__dirname, "../tsconfig.dev.json"),
             },
-          },        
+          },
         ],
       },
       {

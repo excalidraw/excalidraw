@@ -348,9 +348,8 @@ export const ShapesSwitcher = ({
                 setAppState({
                   activeTool: nextActiveTool,
                   multiElement: null,
-                  selectedElementIds: {},
-                })
-              ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
+                }),
+              ); //zsviczian added setTimeout wrapper and removed selectedElementIds
             }}
             icon={mermaidLogoIcon}
             data-testid="toolbar-embeddable"

@@ -311,7 +311,7 @@ export type AppState = {
   customPens?: any[]; //zsviczian
   currentStrokeOptions?: any; //zsviczian
   resetCustomPen?: any; //zsviczian
-  gridColor: {Bold: string, Regular: string, MajorGridFrequency?: number}; //zsviczian
+  gridColor: { Bold: string; Regular: string; MajorGridFrequency?: number }; //zsviczian
   dynamicStyle: string; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;

@@ -1237,7 +1237,11 @@ class App extends React.Component<AppProps, AppState> {
                         >
                           {this.props.children}
                           {this.state.activeTool.type === "mermaid" && (
-                            <MermaidToExcalidraw />
+                            <MermaidToExcalidraw
+                              selectedElements={this.scene.getSelectedElements(
+                                this.state, //zsviczian
+                              )}
+                            />
                           )}
                         </LayerUI>
 
@@ -2068,7 +2072,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!document.querySelector(".excalidraw")) {
       return;
     } //zsviczian - address issue when moving excalidraw to a new window/document
-    
+
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
