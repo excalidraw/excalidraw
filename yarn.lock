@@ -6403,10 +6403,10 @@ rollup@^3.25.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-roughjs@4.6.2:
-  version "4.6.2"
-  resolved "https://registry.npmjs.org/roughjs/-/roughjs-4.6.2.tgz"
-  integrity sha512-FKQYHxDlymPhw45vz/I7Wvn8Ru3UMopoeOOkf/VgzP4aNGKtgdX0uW+5k/YFb7HBfQg+go44ek34DG+HFJbVJg==
+roughjs@4.6.3:
+  version "4.6.3"
+  resolved "https://registry.npmjs.org/roughjs/-/roughjs-4.6.3.tgz"
+  integrity "sha512-gKMI0rHr09711GCDPhm6Qvra40lG7frUG7h1LzYC5i1voCo43oSRtB+dR+n/52Tsn8WjsJC/P7S4BmK3M8SbjA=="
   dependencies:
     hachure-fill "^0.4.0"
     path-data-parser "^0.1.0"
