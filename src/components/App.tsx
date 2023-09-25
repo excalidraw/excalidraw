@@ -1086,7 +1086,7 @@ class App extends React.Component<AppProps, AppState> {
             cursor: CURSOR_TYPE.MOVE,
             pointerEvents: this.state.viewModeEnabled
               ? POINTER_EVENTS.disabled
-              : POINTER_EVENTS.inheritFromUI,
+              : POINTER_EVENTS.enabled,
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
           onWheel={(event) => this.handleWheel(event)}
