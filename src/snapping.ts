@@ -77,7 +77,7 @@ export type Snaps = Snap[];
 
 export type PointSnapLine = {
   type: "points";
-  points: PointPair;
+  points: Point[];
 };
 
 export type PointerSnapLine = {
@@ -89,7 +89,7 @@ export type PointerSnapLine = {
 export type GapSnapLine = {
   type: "gap";
   direction: "horizontal" | "vertical";
-  points: [PointPair, PointPair];
+  points: PointPair;
 };
 
 export type SnapLine = PointSnapLine | GapSnapLine | PointerSnapLine;
@@ -349,8 +349,8 @@ export const getGapSnaps = (
   dragOffset: Vector2D,
   appState: AppState,
   event: MaybeSnapEvent,
-  neartestSnapsX: Snaps,
-  neartestSnapsY: Snaps,
+  nearestSnapsX: Snaps,
+  nearestSnapsY: Snaps,
   minOffset: Vector2D,
 ) => {
   if (!isSnappingEnabled({ appState, event, selectedElements })) {
@@ -383,7 +383,7 @@ export const getGapSnaps = (
 
       if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
         if (Math.abs(centerOffset) < minOffset.x) {
-          neartestSnapsX.length = 0;
+          nearestSnapsX.length = 0;
         }
         minOffset.x = Math.abs(centerOffset);
 
@@ -394,7 +394,7 @@ export const getGapSnaps = (
           offset: centerOffset,
         };
 
-        neartestSnapsX.push(snap);
+        nearestSnapsX.push(snap);
         continue;
       }
 
@@ -405,7 +405,7 @@ export const getGapSnaps = (
 
       if (Math.abs(sideOffsetRight) <= minOffset.x) {
         if (Math.abs(sideOffsetRight) < minOffset.x) {
-          neartestSnapsX.length = 0;
+          nearestSnapsX.length = 0;
         }
         minOffset.x = Math.abs(sideOffsetRight);
 
@@ -415,7 +415,7 @@ export const getGapSnaps = (
           gap,
           offset: sideOffsetRight,
         };
-        neartestSnapsX.push(snap);
+        nearestSnapsX.push(snap);
         continue;
       }
 
@@ -426,7 +426,7 @@ export const getGapSnaps = (
 
       if (Math.abs(sideOffsetLeft) <= minOffset.x) {
         if (Math.abs(sideOffsetLeft) < minOffset.x) {
-          neartestSnapsX.length = 0;
+          nearestSnapsX.length = 0;
         }
         minOffset.x = Math.abs(sideOffsetLeft);
 
@@ -436,7 +436,7 @@ export const getGapSnaps = (
           gap,
           offset: sideOffsetLeft,
         };
-        neartestSnapsX.push(snap);
+        nearestSnapsX.push(snap);
         continue;
       }
     }
@@ -452,7 +452,7 @@ export const getGapSnaps = (
 
       if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
         if (Math.abs(centerOffset) < minOffset.y) {
-          neartestSnapsY.length = 0;
+          nearestSnapsY.length = 0;
         }
         minOffset.y = Math.abs(centerOffset);
 
@@ -463,7 +463,7 @@ export const getGapSnaps = (
           offset: centerOffset,
         };
 
-        neartestSnapsY.push(snap);
+        nearestSnapsY.push(snap);
         continue;
       }
 
@@ -474,7 +474,7 @@ export const getGapSnaps = (
 
       if (Math.abs(sideOffsetTop) <= minOffset.y) {
         if (Math.abs(sideOffsetTop) < minOffset.y) {
-          neartestSnapsY.length = 0;
+          nearestSnapsY.length = 0;
         }
         minOffset.y = Math.abs(sideOffsetTop);
 
@@ -484,7 +484,7 @@ export const getGapSnaps = (
           gap,
           offset: sideOffsetTop,
         };
-        neartestSnapsY.push(snap);
+        nearestSnapsY.push(snap);
         continue;
       }
 
@@ -495,7 +495,7 @@ export const getGapSnaps = (
 
       if (Math.abs(sideOffsetBottom) <= minOffset.y) {
         if (Math.abs(sideOffsetBottom) < minOffset.y) {
-          neartestSnapsY.length = 0;
+          nearestSnapsY.length = 0;
         }
         minOffset.y = Math.abs(sideOffsetBottom);
 
@@ -505,7 +505,7 @@ export const getGapSnaps = (
           gap,
           offset: sideOffsetBottom,
         };
-        neartestSnapsY.push(snap);
+        nearestSnapsY.push(snap);
         continue;
       }
     }
@@ -536,8 +536,8 @@ export const getPointSnaps = (
   selectionSnapPoints: Point[],
   appState: AppState,
   event: MaybeSnapEvent,
-  neartestSnapsX: Snaps,
-  neartestSnapsY: Snaps,
+  nearestSnapsX: Snaps,
+  nearestSnapsY: Snaps,
   minOffset: Vector2D,
 ) => {
   if (
@@ -555,10 +555,10 @@ export const getPointSnaps = (
 
         if (Math.abs(offsetX) <= minOffset.x) {
           if (Math.abs(offsetX) < minOffset.x) {
-            neartestSnapsX.length = 0;
+            nearestSnapsX.length = 0;
           }
 
-          neartestSnapsX.push({
+          nearestSnapsX.push({
             type: "point",
             points: [thisSnapPoint, otherSnapPoint],
             offset: offsetX,
@@ -569,10 +569,10 @@ export const getPointSnaps = (
 
         if (Math.abs(offsetY) <= minOffset.y) {
           if (Math.abs(offsetY) < minOffset.y) {
-            neartestSnapsY.length = 0;
+            nearestSnapsY.length = 0;
           }
 
-          neartestSnapsY.push({
+          nearestSnapsY.push({
             type: "point",
             points: [thisSnapPoint, otherSnapPoint],
             offset: offsetY,
@@ -591,8 +591,8 @@ export const snapDraggedElements = (
   appState: AppState,
   event: MaybeSnapEvent,
 ) => {
-  const neartestSnapsX: Snaps = [];
-  const neartestSnapsY: Snaps = [];
+  const nearestSnapsX: Snaps = [];
+  const nearestSnapsY: Snaps = [];
   const snapDistance = getSnapDistance(appState.zoom.value);
   const minOffset = {
     x: snapDistance,
@@ -609,8 +609,8 @@ export const snapDraggedElements = (
     selectionPoints,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
@@ -619,17 +619,17 @@ export const snapDraggedElements = (
     dragOffset,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
-  // using the neartest snaps to figure out how
+  // using the nearest snaps to figure out how
   // much the elements need to be offset to be snapped
   // to some reference elements
   const snapOffset = {
-    x: neartestSnapsX[0]?.offset ?? 0,
-    y: neartestSnapsY[0]?.offset ?? 0,
+    x: nearestSnapsX[0]?.offset ?? 0,
+    y: nearestSnapsY[0]?.offset ?? 0,
   };
 
   // once the elements are snapped
@@ -639,8 +639,8 @@ export const snapDraggedElements = (
   // point and gap snap lines correctly without any shifting
   minOffset.x = SNAP_PRECISION;
   minOffset.y = SNAP_PRECISION;
-  neartestSnapsX.length = 0;
-  neartestSnapsY.length = 0;
+  nearestSnapsX.length = 0;
+  nearestSnapsY.length = 0;
   const newDragOffset = {
     x: dragOffset.x + snapOffset.x,
     y: dragOffset.y + snapOffset.y,
@@ -653,8 +653,8 @@ export const snapDraggedElements = (
     }),
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
@@ -663,16 +663,17 @@ export const snapDraggedElements = (
     newDragOffset,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
-  const snaps = [...neartestSnapsX, ...neartestSnapsY];
+  const snaps = [...nearestSnapsX, ...nearestSnapsY];
 
   const pointSnapLines = createPointSnapLines(
     snaps.filter((snap) => snap.type === "point") as PointSnap[],
   );
+
   const gapSnapLines = createGapSnapLines(
     selectedElements,
     newDragOffset,
@@ -725,20 +726,24 @@ const createGapSnapLines = (
           const gapLineY =
             (verticalIntersection[0] + verticalIntersection[1]) / 2;
 
-          gapSnapLines.push({
-            type: "gap",
-            direction: "horizontal",
-            points: [
-              [
+          gapSnapLines.push(
+            {
+              type: "gap",
+              direction: "horizontal",
+              points: [
                 [gapSnap.gap.startSide[0][0], gapLineY],
                 [minX, gapLineY],
               ],
-              [
+            },
+            {
+              type: "gap",
+              direction: "horizontal",
+              points: [
                 [maxX, gapLineY],
                 [gapSnap.gap.endSide[0][0], gapLineY],
               ],
-            ],
-          });
+            },
+          );
         }
         break;
       }
@@ -747,20 +752,24 @@ const createGapSnapLines = (
           const gapLineX =
             (horizontalGapIntersection[0] + horizontalGapIntersection[1]) / 2;
 
-          gapSnapLines.push({
-            type: "gap",
-            direction: "vertical",
-            points: [
-              [
+          gapSnapLines.push(
+            {
+              type: "gap",
+              direction: "vertical",
+              points: [
                 [gapLineX, gapSnap.gap.startSide[0][1]],
                 [gapLineX, minY],
               ],
-              [
+            },
+            {
+              type: "gap",
+              direction: "vertical",
+              points: [
                 [gapLineX, maxY],
                 [gapLineX, gapSnap.gap.endSide[0][1]],
               ],
-            ],
-          });
+            },
+          );
         }
         break;
       }
@@ -769,20 +778,24 @@ const createGapSnapLines = (
           const gapLineY =
             (verticalIntersection[0] + verticalIntersection[1]) / 2;
 
-          gapSnapLines.push({
-            type: "gap",
-            direction: "horizontal",
-            points: [
-              [
+          gapSnapLines.push(
+            {
+              type: "gap",
+              direction: "horizontal",
+              points: [
                 [startMaxX, gapLineY],
                 [endMinX, gapLineY],
               ],
-              [
+            },
+            {
+              type: "gap",
+              direction: "horizontal",
+              points: [
                 [endMaxX, gapLineY],
                 [minX, gapLineY],
               ],
-            ],
-          });
+            },
+          );
         }
         break;
       }
@@ -791,20 +804,24 @@ const createGapSnapLines = (
           const gapLineY =
             (verticalIntersection[0] + verticalIntersection[1]) / 2;
 
-          gapSnapLines.push({
-            type: "gap",
-            direction: "horizontal",
-            points: [
-              [
+          gapSnapLines.push(
+            {
+              type: "gap",
+              direction: "horizontal",
+              points: [
                 [maxX, gapLineY],
                 [startMinX, gapLineY],
               ],
-              [
+            },
+            {
+              type: "gap",
+              direction: "horizontal",
+              points: [
                 [startMaxX, gapLineY],
                 [endMinX, gapLineY],
               ],
-            ],
-          });
+            },
+          );
         }
         break;
       }
@@ -813,20 +830,24 @@ const createGapSnapLines = (
           const gapLineX =
             (horizontalGapIntersection[0] + horizontalGapIntersection[1]) / 2;
 
-          gapSnapLines.push({
-            type: "gap",
-            direction: "vertical",
-            points: [
-              [
+          gapSnapLines.push(
+            {
+              type: "gap",
+              direction: "vertical",
+              points: [
                 [gapLineX, maxY],
                 [gapLineX, startMinY],
               ],
-              [
+            },
+            {
+              type: "gap",
+              direction: "vertical",
+              points: [
                 [gapLineX, startMaxY],
                 [gapLineX, endMinY],
               ],
-            ],
-          });
+            },
+          );
         }
         break;
       }
@@ -835,20 +856,24 @@ const createGapSnapLines = (
           const gapLineX =
             (horizontalGapIntersection[0] + horizontalGapIntersection[1]) / 2;
 
-          gapSnapLines.push({
-            type: "gap",
-            direction: "vertical",
-            points: [
-              [
+          gapSnapLines.push(
+            {
+              type: "gap",
+              direction: "vertical",
+              points: [
                 [gapLineX, startMaxY],
                 [gapLineX, endMinY],
               ],
-              [
+            },
+            {
+              type: "gap",
+              direction: "vertical",
+              points: [
                 [gapLineX, endMaxY],
                 [gapLineX, minY],
               ],
-            ],
-          });
+            },
+          );
         }
         break;
       }
@@ -1027,28 +1052,28 @@ export const snapNewElement = (
     y: snapDistance,
   };
 
-  const neartestSnapsX: Snaps = [];
-  const neartestSnapsY: Snaps = [];
+  const nearestSnapsX: Snaps = [];
+  const nearestSnapsY: Snaps = [];
 
   getPointSnaps(
     [draggingElement],
     selectionSnapPoints,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
   const snapOffset = {
-    x: neartestSnapsX[0]?.offset ?? 0,
-    y: neartestSnapsY[0]?.offset ?? 0,
+    x: nearestSnapsX[0]?.offset ?? 0,
+    y: nearestSnapsY[0]?.offset ?? 0,
   };
 
   minOffset.x = SNAP_PRECISION;
   minOffset.y = SNAP_PRECISION;
-  neartestSnapsX.length = 0;
-  neartestSnapsY.length = 0;
+  nearestSnapsX.length = 0;
+  nearestSnapsY.length = 0;
 
   const corners = getElementsCorners([draggingElement], {
     boundingBoxCorners: true,
@@ -1060,13 +1085,13 @@ export const snapNewElement = (
     corners,
     appState,
     event,
-    neartestSnapsX,
-    neartestSnapsY,
+    nearestSnapsX,
+    nearestSnapsY,
     minOffset,
   );
 
   const pointSnapLines = createPointSnapLines(
-    [...neartestSnapsX, ...neartestSnapsY].filter(
+    [...nearestSnapsX, ...nearestSnapsY].filter(
       (snap) => snap.type === "point",
     ) as PointSnap[],
   );
