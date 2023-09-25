@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import clsx from "clsx";
 
 import type { ActionManager } from "../actions/manager";
@@ -21,6 +21,7 @@ import {
   FANCY_BACKGROUND_IMAGES,
 } from "../constants";
 
+import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import {
   ExcalidrawElement,
@@ -28,7 +29,7 @@ import {
 } from "../element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getScaleToFit } from "../packages/utils";
+import { exportToCanvas, getScaleToFit } from "../packages/utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -49,7 +50,6 @@ import {
 import { getFancyBackgroundPadding } from "../scene/fancyBackground";
 import { Select } from "./Select";
 import { Bounds } from "../element/bounds";
-import { CanvasPreview } from "./ImageExportPreview";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -60,6 +60,18 @@ const fancyBackgroundImageOptions = Object.entries(FANCY_BACKGROUND_IMAGES).map(
     label,
   }),
 );
+
+export const ErrorCanvasPreview = () => {
+  return (
+    <div>
+      <h3>{t("canvasError.cannotShowPreview")}</h3>
+      <p>
+        <span>{t("canvasError.canvasTooBig")}</span>
+      </p>
+      <em>({t("canvasError.canvasTooBigTip")})</em>
+    </div>
+  );
+};
 
 type ImageExportModalProps = {
   appState: UIAppState;
@@ -216,6 +228,7 @@ const ImageExportModal = ({
   const appProps = useAppProps();
 
   const previewRef = useRef<HTMLDivElement>(null);
+  const [renderError, setRenderError] = useState<Error | null>(null);
 
   // Upscale exported image when is smaller than preview
   useEffect(() => {
@@ -268,17 +281,91 @@ const ImageExportModal = ({
     actionManager,
   ]);
 
+  useEffect(() => {
+    const previewNode = previewRef.current;
+    if (!previewNode) {
+      return;
+    }
+    const maxWidth = previewNode.offsetWidth;
+    const maxHeight = previewNode.offsetHeight;
+
+    const maxWidthOrHeight = Math.min(maxWidth, maxHeight);
+
+    if (!maxWidth) {
+      return;
+    }
+
+    // when switching between solid/no background and image background, we clear the canvas to prevent flickering
+    const isExportWithFancyBackground =
+      appState.exportBackground && appState.fancyBackgroundImageKey !== "solid";
+
+    if (state.isExportWithFancyBackground !== isExportWithFancyBackground) {
+      const existingCanvas = previewNode.querySelector("canvas");
+      if (existingCanvas) {
+        const context = existingCanvas.getContext("2d");
+
+        context!.clearRect(0, 0, existingCanvas.width, existingCanvas.height);
+      }
+      dispatch({
+        type: "SET_IS_EXPORT_WITH_FANCY_BACKGROUND",
+        isExportWithFancyBackground,
+      });
+    }
+
+    exportToCanvas({
+      elements: state.exportedElements,
+      appState,
+      files,
+      exportPadding: DEFAULT_EXPORT_PADDING,
+      maxWidthOrHeight,
+    })
+      .then((canvas) => {
+        setRenderError(null);
+        // if converting to blob fails, there's some problem that will
+        // likely prevent preview and export (e.g. canvas too big)
+        return canvasToBlob(canvas).then(() => {
+          const existingCanvas = previewNode.querySelector("canvas");
+          if (!existingCanvas) {
+            previewNode.appendChild(canvas);
+            return;
+          }
+
+          existingCanvas.width = canvas.width;
+          existingCanvas.height = canvas.height;
+
+          const context = existingCanvas.getContext("2d");
+          context!.drawImage(canvas, 0, 0);
+        });
+
+        // Get the 2D rendering context of the existing canvas
+      })
+      .catch((error) => {
+        console.error(error);
+        setRenderError(error);
+      });
+  }, [
+    appState,
+    appState.exportBackground,
+    appState.fancyBackgroundImageKey,
+    files,
+    state.exportedElements,
+    state.isExportWithFancyBackground,
+  ]);
+
   return (
     <div className="ImageExportModal">
       <h3>{t("imageExportDialog.header")}</h3>
       <div className="ImageExportModal__preview">
-        <React.Suspense fallback={<div>Loading...</div>}>
-          <CanvasPreview
-            appState={appState}
-            files={files}
-            elements={state.exportedElements}
-          />
-        </React.Suspense>
+        <div
+          className={clsx("ImageExportModal__preview__canvas", {
+            "ImageExportModal__preview__canvas--img-bcg":
+              appState.exportBackground &&
+              appState.fancyBackgroundImageKey !== "solid",
+          })}
+          ref={previewRef}
+        >
+          {renderError && <ErrorCanvasPreview />}
+        </div>
       </div>
       <div className="ImageExportModal__settings">
         <h3>{t("imageExportDialog.header")}</h3>
