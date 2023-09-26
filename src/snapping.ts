@@ -16,9 +16,6 @@ import { rangeIntersection, rangesOverlap, rotatePoint } from "./math";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, KeyboardModifiersObject, Point } from "./types";
 
-// handle floating point errors
-export const SNAP_PRECISION = 0.01;
-
 const SNAP_DISTANCE = 8;
 
 // do not comput more gaps per axis than this limit
@@ -160,11 +157,7 @@ export const isSnappingEnabled = ({
   return appState.objectsSnapModeEnabled;
 };
 
-export const areRoughlyEqual = (
-  a: number,
-  b: number,
-  precision = SNAP_PRECISION,
-) => {
+export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
   return Math.abs(a - b) <= precision;
 };
 
@@ -708,10 +701,8 @@ export const snapDraggedElements = (
   // to update nearest snaps so that we can create
   // point and gap snap lines correctly without any shifting
 
-  const zoomFactor = appState.zoom.value < 1 ? 1 : appState.zoom.value;
-
-  minOffset.x = SNAP_PRECISION * zoomFactor;
-  minOffset.y = SNAP_PRECISION * zoomFactor;
+  minOffset.x = 0;
+  minOffset.y = 0;
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
   const newDragOffset = {
@@ -1167,8 +1158,8 @@ export const snapResizingElements = (
 
   // again, once snap offset is calculated
   // reset to recompute for creating snap lines to be rendered
-  minOffset.x = SNAP_PRECISION;
-  minOffset.y = SNAP_PRECISION;
+  minOffset.x = 0;
+  minOffset.y = 0;
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
 
@@ -1245,8 +1236,8 @@ export const snapNewElement = (
     y: nearestSnapsY[0]?.offset ?? 0,
   };
 
-  minOffset.x = SNAP_PRECISION;
-  minOffset.y = SNAP_PRECISION;
+  minOffset.x = 0;
+  minOffset.y = 0;
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
 
