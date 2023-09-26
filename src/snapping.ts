@@ -700,8 +700,11 @@ export const snapDraggedElements = (
   // we want to use the element's snapped position
   // to update nearest snaps so that we can create
   // point and gap snap lines correctly without any shifting
-  minOffset.x = SNAP_PRECISION;
-  minOffset.y = SNAP_PRECISION;
+
+  const zoomFactor = appState.zoom.value < 1 ? 1 : appState.zoom.value;
+
+  minOffset.x = SNAP_PRECISION * zoomFactor;
+  minOffset.y = SNAP_PRECISION * zoomFactor;
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
   const newDragOffset = {
@@ -721,8 +724,6 @@ export const snapDraggedElements = (
     minOffset,
   );
 
-  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
-
   getGapSnaps(
     selectedElements,
     newDragOffset,
@@ -732,6 +733,8 @@ export const snapDraggedElements = (
     nearestSnapsY,
     minOffset,
   );
+
+  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
 
   const gapSnapLines = createGapSnapLines(
     selectedElements,
