@@ -3321,7 +3321,8 @@ class App extends React.Component<AppProps, AppState> {
             | "eraser"
             | "hand"
             | "frame"
-            | "embeddable";
+            | "embeddable"
+            | "mermaid"; //zsviczian
         }
       | { type: "custom"; customType: string },
   ) => {
@@ -3343,7 +3344,12 @@ class App extends React.Component<AppProps, AppState> {
     if (nextActiveTool.type !== "selection") {
       this.setState({
         activeTool: nextActiveTool,
-        selectedElementIds: makeNextSelectedElementIds({}, this.state),
+        selectedElementIds: makeNextSelectedElementIds(
+          nextActiveTool.type === "mermaid" //zsviczian
+            ? this.state.selectedElementIds
+            : {},
+          this.state,
+        ),
         selectedGroupIds: {},
         editingGroupId: null,
         activeEmbeddable: null,
