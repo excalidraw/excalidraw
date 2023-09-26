@@ -7846,7 +7846,6 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeCacheReferenceSnapPoints(event, [draggingElement]);
 
       const { snapOffset, snapLines } = snapNewElement(
-        this.scene.getNonDeletedElements(),
         draggingElement,
         this.state,
         event,
@@ -7974,7 +7973,6 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
       const { snapOffset, snapLines } = snapResizingElements(
-        originalElements,
         selectedElements,
         getSelectedElements(originalElements, this.state),
         this.state,

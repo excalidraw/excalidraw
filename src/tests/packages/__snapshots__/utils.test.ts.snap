@@ -72,7 +72,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {},
-  "referenceSnapPoints": null,
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -93,7 +92,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
-  "visibleGaps": null,
   "zenModeEnabled": false,
   "zoom": {
     "value": 1,
