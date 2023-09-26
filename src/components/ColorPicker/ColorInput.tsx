@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getColor } from "./ColorPicker";
 import { useAtom } from "jotai";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import {
+  ColorPickerType,
+  activeColorPickerSectionAtom,
+} from "./colorPickerUtils";
 import { eyeDropperIcon } from "../icons";
 import { jotaiScope } from "../../jotai";
 import { KEYS } from "../../keys";
@@ -15,14 +18,14 @@ interface ColorInputProps {
   color: string;
   onChange: (color: string) => void;
   label: string;
-  eyeDropperType: "strokeColor" | "backgroundColor";
+  colorPickerType: ColorPickerType;
 }
 
 export const ColorInput = ({
   color,
   onChange,
   label,
-  eyeDropperType,
+  colorPickerType,
 }: ColorInputProps) => {
   const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
@@ -116,7 +119,7 @@ export const ColorInput = ({
                   : {
                       keepOpenOnAlt: false,
                       onSelect: (color) => onChange(color),
-                      previewType: eyeDropperType,
+                      colorPickerType,
                     },
               )
             }

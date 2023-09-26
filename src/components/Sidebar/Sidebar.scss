@@ -17,6 +17,8 @@
     background-color: var(--sidebar-bg-color);
     box-shadow: var(--sidebar-shadow);
 
+    pointer-events: var(--ui-pointerEvents);
+
     :root[dir="rtl"] & {
       left: 0;
       right: auto;
