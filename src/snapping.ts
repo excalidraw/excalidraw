@@ -176,6 +176,8 @@ export const getElementsCorners = (
     boundingBoxCorners: false,
   },
 ): Point[] => {
+  let result: Point[] = [];
+
   if (elements.length === 1) {
     const element = elements[0];
 
@@ -227,12 +229,10 @@ export const getElementsCorners = (
     const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle);
     const center: Point = [cx, cy];
 
-    return omitCenter
+    result = omitCenter
       ? [topLeft, topRight, bottomLeft, bottomRight]
       : [topLeft, topRight, bottomLeft, bottomRight, center];
-  }
-
-  if (elements.length > 1) {
+  } else if (elements.length > 1) {
     const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
       elements,
       dragOffset ?? { x: 0, y: 0 },
@@ -246,12 +246,12 @@ export const getElementsCorners = (
     const bottomRight: Point = [maxX, maxY];
     const center: Point = [minX + width / 2, minY + height / 2];
 
-    return omitCenter
+    result = omitCenter
       ? [topLeft, topRight, bottomLeft, bottomRight]
       : [topLeft, topRight, bottomLeft, bottomRight, center];
   }
 
-  return [];
+  return result.map((point) => [round(point[0]), round(point[1])] as Point);
 };
 
 const getReferenceElements = (
@@ -290,7 +290,9 @@ export const getVisibleGaps = (
     )
     .map(
       (group) =>
-        getCommonBounds(group).map((num) => round(num)) as unknown as Bounds,
+        getCommonBounds(group).map((bound) =>
+          round(bound),
+        ) as unknown as Bounds,
     );
 
   const horizontallySorted = referenceBounds.sort((a, b) => a[0] - b[0]);
@@ -572,11 +574,7 @@ export const getReferenceSnapPoints = (
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
-    .flatMap((elementGroup) =>
-      getElementsCorners(elementGroup).map(
-        (corner) => [round(corner[0]), round(corner[1])] as Point,
-      ),
-    );
+    .flatMap((elementGroup) => getElementsCorners(elementGroup));
 };
 
 const getPointSnaps = (
@@ -1163,7 +1161,9 @@ export const snapResizingElements = (
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
 
-  const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+  const [x1, y1, x2, y2] = getCommonBounds(selectedElements).map((bound) =>
+    round(bound),
+  );
 
   const corners: Point[] = [
     [x1, y1],
