@@ -721,6 +721,8 @@ export const snapDraggedElements = (
     minOffset,
   );
 
+  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
+
   getGapSnaps(
     selectedElements,
     newDragOffset,
@@ -731,14 +733,12 @@ export const snapDraggedElements = (
     minOffset,
   );
 
-  const snaps = [...nearestSnapsX, ...nearestSnapsY];
-
-  const pointSnapLines = createPointSnapLines(nearestSnapsX, nearestSnapsY);
-
   const gapSnapLines = createGapSnapLines(
     selectedElements,
     newDragOffset,
-    snaps.filter((snap) => snap.type === "gap") as GapSnap[],
+    [...nearestSnapsX, ...nearestSnapsY].filter(
+      (snap) => snap.type === "gap",
+    ) as GapSnap[],
   );
 
   return {
