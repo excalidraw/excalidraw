@@ -295,7 +295,10 @@ export const getVisibleGaps = (
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
-    .map((group) => getCommonBounds(group));
+    .map(
+      (group) =>
+        getCommonBounds(group).map((num) => round(num)) as unknown as Bounds,
+    );
 
   const horizontallySorted = referenceBounds.sort((a, b) => a[0] - b[0]);
 
@@ -576,7 +579,11 @@ export const getReferenceSnapPoints = (
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
-    .flatMap((elementGroup) => getElementsCorners(elementGroup));
+    .flatMap((elementGroup) =>
+      getElementsCorners(elementGroup).map(
+        (corner) => [round(corner[0]), round(corner[1])] as Point,
+      ),
+    );
 };
 
 const getPointSnaps = (
