@@ -4,7 +4,7 @@ const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
+//const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
 
 module.exports = {
   mode: "development",

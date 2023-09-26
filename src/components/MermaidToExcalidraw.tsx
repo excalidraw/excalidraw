@@ -128,7 +128,7 @@ const MermaidToExcalidraw = ({
 
       setText(data);
     }
-  }, [loading]);
+  }, [loading, selectedElements]);
 
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
@@ -147,7 +147,8 @@ const MermaidToExcalidraw = ({
         setError(null);
         data.current = {
           elements: convertToExcalidrawElements(
-            elements.map((el) => { //zsviczian
+            elements.map((el) => {
+              //zsviczian
               if (el.type === "image") {
                 el.customData = { mermaidText: text };
               }
@@ -186,7 +187,7 @@ const MermaidToExcalidraw = ({
       }
     };
     renderExcalidrawPreview();
-  }, [deferredText]);
+  }, [deferredText, text]);
 
   const onClose = () => {
     app.setActiveTool({ type: "selection" });
