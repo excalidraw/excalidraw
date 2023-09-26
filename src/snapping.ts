@@ -218,20 +218,20 @@ export const getElementsCorners = (
       );
       const center: Point = [cx, cy];
 
-      return omitCenter
+      result = omitCenter
         ? [leftMid, topMid, rightMid, bottomMid]
         : [leftMid, topMid, rightMid, bottomMid, center];
+    } else {
+      const topLeft = rotatePoint([x1, y1], [cx, cy], element.angle);
+      const topRight = rotatePoint([x2, y1], [cx, cy], element.angle);
+      const bottomLeft = rotatePoint([x1, y2], [cx, cy], element.angle);
+      const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle);
+      const center: Point = [cx, cy];
+
+      result = omitCenter
+        ? [topLeft, topRight, bottomLeft, bottomRight]
+        : [topLeft, topRight, bottomLeft, bottomRight, center];
     }
-
-    const topLeft = rotatePoint([x1, y1], [cx, cy], element.angle);
-    const topRight = rotatePoint([x2, y1], [cx, cy], element.angle);
-    const bottomLeft = rotatePoint([x1, y2], [cx, cy], element.angle);
-    const bottomRight = rotatePoint([x2, y2], [cx, cy], element.angle);
-    const center: Point = [cx, cy];
-
-    result = omitCenter
-      ? [topLeft, topRight, bottomLeft, bottomRight]
-      : [topLeft, topRight, bottomLeft, bottomRight, center];
   } else if (elements.length > 1) {
     const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
       elements,
@@ -413,7 +413,7 @@ const getGapSnaps = (
     const [minX, minY, maxX, maxY] = getDraggedElementsBounds(
       selectedElements,
       dragOffset,
-    );
+    ).map((bound) => round(bound));
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
@@ -424,7 +424,7 @@ const getGapSnaps = (
 
       // center gap
       const gapMidX = gap.startSide[0][0] + gap.length / 2;
-      const centerOffset = gapMidX - centerX;
+      const centerOffset = round(gapMidX - centerX);
       const gapIsLargerThanSelection = gap.length > maxX - minX;
 
       if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.x) {
@@ -447,7 +447,7 @@ const getGapSnaps = (
       // side gap, from the right
       const [, , endMaxX] = gap.endBounds;
       const distanceToEndElementX = minX - endMaxX;
-      const sideOffsetRight = gap.length - distanceToEndElementX;
+      const sideOffsetRight = round(gap.length - distanceToEndElementX);
 
       if (Math.abs(sideOffsetRight) <= minOffset.x) {
         if (Math.abs(sideOffsetRight) < minOffset.x) {
@@ -468,7 +468,7 @@ const getGapSnaps = (
       // side gap, from the left
       const [startMinX, , ,] = gap.startBounds;
       const distanceToStartElementX = startMinX - maxX;
-      const sideOffsetLeft = distanceToStartElementX - gap.length;
+      const sideOffsetLeft = round(distanceToStartElementX - gap.length);
 
       if (Math.abs(sideOffsetLeft) <= minOffset.x) {
         if (Math.abs(sideOffsetLeft) < minOffset.x) {
@@ -493,7 +493,7 @@ const getGapSnaps = (
 
       // center gap
       const gapMidY = gap.startSide[0][1] + gap.length / 2;
-      const centerOffset = gapMidY - centerY;
+      const centerOffset = round(gapMidY - centerY);
       const gapIsLargerThanSelection = gap.length > maxY - minY;
 
       if (gapIsLargerThanSelection && Math.abs(centerOffset) <= minOffset.y) {
@@ -516,7 +516,7 @@ const getGapSnaps = (
       // side gap, from the top
       const [, startMinY, ,] = gap.startBounds;
       const distanceToStartElementY = startMinY - maxY;
-      const sideOffsetTop = distanceToStartElementY - gap.length;
+      const sideOffsetTop = round(distanceToStartElementY - gap.length);
 
       if (Math.abs(sideOffsetTop) <= minOffset.y) {
         if (Math.abs(sideOffsetTop) < minOffset.y) {
@@ -536,7 +536,7 @@ const getGapSnaps = (
 
       // side gap, from the bottom
       const [, , , endMaxY] = gap.endBounds;
-      const distanceToEndElementY = minY - endMaxY;
+      const distanceToEndElementY = round(minY - endMaxY);
       const sideOffsetBottom = gap.length - distanceToEndElementY;
 
       if (Math.abs(sideOffsetBottom) <= minOffset.y) {
@@ -652,6 +652,8 @@ export const snapDraggedElements = (
     };
   }
 
+  dragOffset.x = round(dragOffset.x);
+  dragOffset.y = round(dragOffset.y);
   const nearestSnapsX: Snaps = [];
   const nearestSnapsY: Snaps = [];
   const snapDistance = getSnapDistance(appState.zoom.value);
@@ -704,8 +706,8 @@ export const snapDraggedElements = (
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
   const newDragOffset = {
-    x: dragOffset.x + snapOffset.x,
-    y: dragOffset.y + snapOffset.y,
+    x: round(dragOffset.x + snapOffset.x),
+    y: round(dragOffset.y + snapOffset.y),
   };
 
   getPointSnaps(
