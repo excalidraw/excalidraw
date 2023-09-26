@@ -1,4 +1,4 @@
-import { ExcalidrawFreehand, Point } from "@are/laser-pointer";
+import { ExcalidrawFreehand } from "@are/laser-pointer";
 
 import { sceneCoordsToViewportCoords } from "../../utils";
 import App from "../App";
@@ -96,16 +96,12 @@ export class LaserPathManager {
 
   startPath(x: number, y: number) {
     this.ownState.currentPath = instantiatePath();
-    this.ownState.currentPath.addPoint(
-      this.translatePoint([x, y, performance.now()]),
-    );
+    this.ownState.currentPath.addPoint([x, y, performance.now()]);
   }
 
   addPointToPath(x: number, y: number) {
     if (this.ownState.currentPath) {
-      this.ownState.currentPath?.addPoint(
-        this.translatePoint([x, y, performance.now()]),
-      );
+      this.ownState.currentPath?.addPoint([x, y, performance.now()]);
     }
   }
 
@@ -114,15 +110,6 @@ export class LaserPathManager {
       this.ownState.currentPath.close();
       this.ownState.finishedPaths.push(this.ownState.currentPath);
     }
-  }
-
-  private translatePoint([x, y, ...rest]: Point): Point {
-    const result = sceneCoordsToViewportCoords(
-      { sceneX: x, sceneY: y },
-      this.app.state,
-    );
-
-    return [result.x, result.y, ...rest];
   }
 
   start(svg: SVGSVGElement) {
@@ -147,7 +134,14 @@ export class LaserPathManager {
   }
 
   draw(path: ExcalidrawFreehand) {
-    const stroke = path.getStrokeOutline();
+    const stroke = path.getStrokeOutline().map(([x, y]) => {
+      const result = sceneCoordsToViewportCoords(
+        { sceneX: x, sceneY: y },
+        this.app.state,
+      );
+
+      return [result.x, result.y];
+    });
 
     return getSvgPathFromStroke(stroke, true);
   }
@@ -170,13 +164,11 @@ export class LaserPathManager {
         if (collabolator.button === "down" && state.currentPath === undefined) {
           state.lastPoint = [collabolator.pointer.x, collabolator.pointer.y];
           state.currentPath = instantiatePath();
-          state.currentPath.addPoint(
-            this.translatePoint([
-              collabolator.pointer.x,
-              collabolator.pointer.y,
-              performance.now(),
-            ]),
-          );
+          state.currentPath.addPoint([
+            collabolator.pointer.x,
+            collabolator.pointer.y,
+            performance.now(),
+          ]);
         }
 
         if (collabolator.button === "down" && state.currentPath !== undefined) {
@@ -185,25 +177,21 @@ export class LaserPathManager {
             collabolator.pointer.y !== state.lastPoint[1]
           ) {
             state.lastPoint = [collabolator.pointer.x, collabolator.pointer.y];
-            state.currentPath.addPoint(
-              this.translatePoint([
-                collabolator.pointer.x,
-                collabolator.pointer.y,
-                performance.now(),
-              ]),
-            );
+            state.currentPath.addPoint([
+              collabolator.pointer.x,
+              collabolator.pointer.y,
+              performance.now(),
+            ]);
           }
         }
 
         if (collabolator.button === "up" && state.currentPath !== undefined) {
           state.lastPoint = [collabolator.pointer.x, collabolator.pointer.y];
-          state.currentPath.addPoint(
-            this.translatePoint([
-              collabolator.pointer.x,
-              collabolator.pointer.y,
-              performance.now(),
-            ]),
-          );
+          state.currentPath.addPoint([
+            collabolator.pointer.x,
+            collabolator.pointer.y,
+            performance.now(),
+          ]);
           state.currentPath.close();
 
           state.finishedPaths.push(state.currentPath);

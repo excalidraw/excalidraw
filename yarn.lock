@@ -19,10 +19,10 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@are/laser-pointer@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@are/laser-pointer/-/laser-pointer-1.0.0.tgz#581b9a9138aba97550b87f9f09988d4dab874cdd"
-  integrity sha512-iPieecuBJ2f2/0WKzPkBvfNAZ7qbP+JLkMeslCPI6M+hQ/R0wFa5BXCFIgxmDshZnRq/RFKZu0IsIdLssqcugQ==
+"@are/laser-pointer@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@are/laser-pointer/-/laser-pointer-1.0.1.tgz#00cc8329f3b96686de68e4195f110bbfae56a80e"
+  integrity sha512-zIpaZTOhKFdfAZliGxpmmaGGRzGh9cGen7XT/NaxRHIpSAeyztKaGVx8hQVGOzv8wfy8iAypbGMroPGkZuDRfw==
 
 "@babel/code-frame@7.12.11":
   version "7.12.11"

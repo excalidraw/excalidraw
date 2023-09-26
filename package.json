@@ -19,7 +19,7 @@
     ]
   },
   "dependencies": {
-    "@are/laser-pointer": "1.0.0",
+    "@are/laser-pointer": "1.0.1",
     "@braintree/sanitize-url": "6.0.2",
     "@excalidraw/random-username": "1.0.0",
     "@radix-ui/react-popover": "1.0.3",

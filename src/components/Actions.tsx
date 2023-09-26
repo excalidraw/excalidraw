@@ -414,7 +414,6 @@ export const ShapesSwitcher = ({
                 });
               }}
               icon={laserPointerToolIcon}
-              shortcut={KEYS.F.toLocaleUpperCase()}
               data-testid="toolbar-laser"
             >
               {t("toolBar.laser")}
