@@ -1,8 +1,7 @@
 import { PointSnapLine, PointerSnapLine } from "../snapping";
 import { InteractiveCanvasAppState, Point } from "../types";
 
-const SNAP_COLOR_PRIMARY = "#fa5252";
-const SNAP_COLOR_SECONDARY = "#ff8787";
+const SNAP_COLOR_PRIMARY = "#ff6b6b";
 const SNAP_WIDTH = 1;
 const SNAP_CROSS_SIZE = 2;
 
@@ -15,7 +14,7 @@ export const renderSnaps = (
   for (const snapLine of appState.snapLines) {
     if (snapLine.type === "pointer") {
       context.lineWidth = SNAP_WIDTH / appState.zoom.value;
-      context.strokeStyle = SNAP_COLOR_SECONDARY;
+      context.strokeStyle = SNAP_COLOR_PRIMARY;
 
       drawPointerSnapLine(snapLine, context, appState);
     } else if (snapLine.type === "gap") {
