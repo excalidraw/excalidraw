@@ -129,7 +129,11 @@ const MermaidToExcalidraw = ({
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
-      if (!canvasNode || !mermaidToExcalidrawLib.current) {
+      if (
+        !canvasNode ||
+        !mermaidToExcalidrawLib.current ||
+        deferredText === ""
+      ) {
         return;
       }
       try {
