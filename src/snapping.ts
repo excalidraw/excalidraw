@@ -146,7 +146,9 @@ export const isSnappingEnabled = ({
   if (event) {
     return (
       (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!appState.objectsSnapModeEnabled && event[KEYS.CTRL_OR_CMD])
+      (!appState.objectsSnapModeEnabled &&
+        event[KEYS.CTRL_OR_CMD] &&
+        appState.gridSize === null)
     );
   }
 
