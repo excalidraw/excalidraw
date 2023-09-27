@@ -4628,10 +4628,10 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-hachure-fill@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/hachure-fill/-/hachure-fill-0.4.0.tgz#5684c5268261cb7ea71f11e49696fb7b12a8a5aa"
-  integrity sha512-adAAzV4vgE5BBkeimtSPMkTARn6XFoV8vhel4C4S/B+cC7XNZGXyU3Fb2zNBz0PgYHkLLWWSL0CRSSnC+Xcw5g==
+hachure-fill@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/hachure-fill/-/hachure-fill-0.5.2.tgz#d19bc4cc8750a5962b47fb1300557a85fcf934cc"
+  integrity sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==
 
 has-bigints@^1.0.1, has-bigints@^1.0.2:
   version "1.0.2"
@@ -6403,12 +6403,12 @@ rollup@^3.25.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-roughjs@4.6.3:
-  version "4.6.3"
-  resolved "https://registry.npmjs.org/roughjs/-/roughjs-4.6.3.tgz"
-  integrity "sha512-gKMI0rHr09711GCDPhm6Qvra40lG7frUG7h1LzYC5i1voCo43oSRtB+dR+n/52Tsn8WjsJC/P7S4BmK3M8SbjA=="
+roughjs@4.6.4:
+  version "4.6.4"
+  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.6.4.tgz#b6f39b44645854a6e0a4a28b078368701eb7f939"
+  integrity sha512-s6EZ0BntezkFYMf/9mGn7M8XGIoaav9QQBCnJROWB3brUWQ683Q2LbRD/hq0Z3bAJ/9NVpU/5LpiTWvQMyLDhw==
   dependencies:
-    hachure-fill "^0.4.0"
+    hachure-fill "^0.5.2"
     path-data-parser "^0.1.0"
     points-on-curve "^0.2.0"
     points-on-path "^0.2.1"
