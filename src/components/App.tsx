@@ -1175,6 +1175,7 @@ class App extends React.Component<AppProps, AppState> {
                           onLockToggle={this.toggleLock}
                           onPenModeToggle={this.togglePenMode}
                           onHandToolToggle={this.onHandToolToggle}
+                          onLaserToolToggle={this.onLaserToolToggle}
                           langCode={getLanguage().code}
                           renderTopRightUI={renderTopRightUI}
                           renderCustomStats={renderCustomStats}
@@ -1193,6 +1194,7 @@ class App extends React.Component<AppProps, AppState> {
                             !this.scene.getElementsIncludingDeleted().length
                           }
                           app={this}
+                          isCollaborating={this.props.isCollaborating}
                         >
                           {this.props.children}
                         </LayerUI>
@@ -2552,6 +2554,16 @@ class App extends React.Component<AppProps, AppState> {
 
   onHandToolToggle = () => {
     this.actionManager.executeAction(actionToggleHandTool);
+  };
+
+  onLaserToolToggle = () => {
+    this.setState((prevState) => ({
+      activeTool: updateActiveTool(prevState, {
+        type: "laser",
+      }),
+      multiElement: null,
+      selectedElementIds: {},
+    }));
   };
 
   /**

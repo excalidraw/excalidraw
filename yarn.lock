@@ -19,11 +19,6 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@are/laser-pointer@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@are/laser-pointer/-/laser-pointer-1.0.1.tgz#00cc8329f3b96686de68e4195f110bbfae56a80e"
-  integrity sha512-zIpaZTOhKFdfAZliGxpmmaGGRzGh9cGen7XT/NaxRHIpSAeyztKaGVx8hQVGOzv8wfy8iAypbGMroPGkZuDRfw==
-
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
@@ -1526,6 +1521,11 @@
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
   integrity sha512-GemHNF5Z6ga0BWBSX7GJaNBUchLu6RwTcAB84eX1MeckRNhNasAsPCdelDlFalz27iS4RuYEQh0bPE8SRxJgbQ==
+
+"@excalidraw/laser-pointer@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@excalidraw/laser-pointer/-/laser-pointer-1.0.1.tgz#181f3b6dfd626c7055553d007dea2225d9a0aaac"
+  integrity sha512-qqnexhFOtsOXStwIiHh2K8ZaWWszxhUJe4lmqpCexUfr0WR6R7mJlkjzbJobE8yvA5e3tr9P11SNOYe9Z5K7+w==
 
 "@excalidraw/prettier-config@1.0.2":
   version "1.0.2"

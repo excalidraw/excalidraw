@@ -43,7 +43,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { HandButton } from "./HandButton";
-import { isHandToolActive } from "../appState";
+import { isHandToolActive, isLaserToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
@@ -55,6 +55,7 @@ import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
+import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -66,6 +67,7 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
+  onLaserToolToggle: () => void;
   onPenModeToggle: () => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
@@ -77,6 +79,7 @@ interface LayerUIProps {
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
   app: AppClassProperties;
+  isCollaborating: boolean;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -125,6 +128,7 @@ const LayerUI = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
+  onLaserToolToggle,
   showExitZenModeBtn,
   renderTopRightUI,
   renderCustomStats,
@@ -134,6 +138,7 @@ const LayerUI = ({
   renderWelcomeScreen,
   children,
   app,
+  isCollaborating,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -288,6 +293,16 @@ const LayerUI = ({
                           />
                         </Stack.Row>
                       </Island>
+                      {isCollaborating && (
+                        <Island padding={1} style={{ marginLeft: 16 }}>
+                          <LaserPointerButton
+                            title={t("toolBar.laser")}
+                            checked={isLaserToolActive(appState)}
+                            onChange={() => onLaserToolToggle()}
+                            isMobile
+                          />
+                        </Island>
+                      )}
                     </Stack.Row>
                   </Stack.Col>
                 </div>

@@ -1,4 +1,4 @@
-import { ExcalidrawFreehand } from "@are/laser-pointer";
+import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import { sceneCoordsToViewportCoords } from "../../utils";
 import App from "../App";
@@ -58,9 +58,9 @@ function instantiateCollabolatorState(): CollabolatorState {
 }
 
 function instantiatePath() {
-  ExcalidrawFreehand.constants.cornerDetectionMaxAngle = 70;
+  LaserPointer.constants.cornerDetectionMaxAngle = 70;
 
-  return new ExcalidrawFreehand({
+  return new LaserPointer({
     simplify: 0,
     streamline: 0.4,
     sizeMapping: (c) => {
@@ -75,8 +75,8 @@ function instantiatePath() {
 }
 
 type CollabolatorState = {
-  currentPath: ExcalidrawFreehand | undefined;
-  finishedPaths: ExcalidrawFreehand[];
+  currentPath: LaserPointer | undefined;
+  finishedPaths: LaserPointer[];
   lastPoint: [number, number];
   svg: SVGPathElement;
 };
@@ -133,7 +133,7 @@ export class LaserPathManager {
     this.update();
   }
 
-  draw(path: ExcalidrawFreehand) {
+  draw(path: LaserPointer) {
     const stroke = path.getStrokeOutline().map(([x, y]) => {
       const result = sceneCoordsToViewportCoords(
         { sceneX: x, sceneY: y },
