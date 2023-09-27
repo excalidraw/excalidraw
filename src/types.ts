@@ -153,6 +153,7 @@ export type InteractiveCanvasAppState = Readonly<
     collaborators: AppState["collaborators"];
     // SnapLines
     snapLines: AppState["snapLines"];
+    zenModeEnabled: AppState["zenModeEnabled"];
   }
 >;
 

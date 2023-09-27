@@ -721,11 +721,7 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  // Paint snaps
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
   renderSnaps(context, appState);
-  context.restore();
 
   // Reset zoom
   context.restore();
