@@ -6,7 +6,7 @@ import { reseed } from "../random";
 import { UI, Keyboard } from "./helpers/ui";
 import { resize } from "./utils";
 import { ExcalidrawTextElement } from "../element/types";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
@@ -126,7 +126,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
 
 describe("Test text element", () => {
   it("should update font size via keyboard", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
 
     const textElement = API.createElement({
       type: "text",

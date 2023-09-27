@@ -23,7 +23,7 @@ const sidebars = {
       },
       items: ["introduction/development", "introduction/contributing"],
     },
-
+    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
     {
       type: "category",
       label: "@excalidraw/excalidraw",
@@ -64,6 +64,7 @@ const sidebars = {
               items: [
                 "@excalidraw/excalidraw/api/children-components/main-menu",
                 "@excalidraw/excalidraw/api/children-components/welcome-screen",
+                "@excalidraw/excalidraw/api/children-components/sidebar",
                 "@excalidraw/excalidraw/api/children-components/footer",
                 "@excalidraw/excalidraw/api/children-components/live-collaboration-trigger",
               ],
@@ -80,16 +81,46 @@ const sidebars = {
                 "@excalidraw/excalidraw/api/utils/restore",
               ],
             },
-            {
-              type: "category",
-              label: "Constants",
-              link: { type: "doc", id: "@excalidraw/excalidraw/api/constants" },
-              items: [],
-            },
+            "@excalidraw/excalidraw/api/constants",
+            "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
           ],
         },
         "@excalidraw/excalidraw/faq",
         "@excalidraw/excalidraw/development",
+      ],
+    },
+    {
+      type: "category",
+      label: "@excalidraw/mermaid-to-excalidraw",
+      link: {
+        type: "doc",
+        id: "@excalidraw/mermaid-to-excalidraw/installation",
+      },
+      items: [
+        "@excalidraw/mermaid-to-excalidraw/api",
+        "@excalidraw/mermaid-to-excalidraw/development",
+        {
+          type: "category",
+          label: "Codebase",
+          link: {
+            type: "doc",
+            id: "@excalidraw/mermaid-to-excalidraw/codebase/codebase",
+          },
+          items: [
+            {
+              type: "category",
+              label: "How Parser works under the hood?",
+              link: {
+                type: "doc",
+                id: "@excalidraw/mermaid-to-excalidraw/codebase/parser/parser",
+              },
+              items: [
+                "@excalidraw/mermaid-to-excalidraw/codebase/parser/flowchart",
+              ],
+            },
+            "@excalidraw/mermaid-to-excalidraw/codebase/new-diagram-type",
+          ],
+        },
       ],
     },
   ],
