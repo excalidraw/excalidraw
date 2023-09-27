@@ -12,7 +12,7 @@ type LaserPointerIconProps = {
   isMobile?: boolean;
 };
 
-const DEFAULT_SIZE: ToolButtonSize = "medium";
+const DEFAULT_SIZE: ToolButtonSize = "small";
 
 export const LaserPointerButton = (props: LaserPointerIconProps) => {
   return (

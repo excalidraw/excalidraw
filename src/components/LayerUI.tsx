@@ -294,7 +294,13 @@ const LayerUI = ({
                         </Stack.Row>
                       </Island>
                       {isCollaborating && (
-                        <Island padding={1} style={{ marginLeft: 16 }}>
+                        <Island
+                          style={{
+                            marginLeft: 8,
+                            alignSelf: "center",
+                            height: "fit-content",
+                          }}
+                        >
                           <LaserPointerButton
                             title={t("toolBar.laser")}
                             checked={isLaserToolActive(appState)}
