@@ -6400,9 +6400,11 @@ class App extends React.Component<AppProps, AppState> {
         isInvisiblySmallElement(draggingElement)
       ) {
         // remove invisible element which was added in onPointerDown
-        this.scene.replaceAllElements(
-          this.scene.getElementsIncludingDeleted().slice(0, -1),
-        );
+        if (draggingElement.type !== "selection") {
+          this.scene.replaceAllElements(
+            this.scene.getElementsIncludingDeleted().slice(0, -1),
+          );
+        }
         this.setState({
           draggingElement: null,
         });
