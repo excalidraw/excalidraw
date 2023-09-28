@@ -164,6 +164,7 @@
     "darkMode": "حالت تیره",
     "lightMode": "حالت روشن",
     "zenMode": "حالت ذن",
+    "objectsSnapMode": "",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
     "clear": "پاک کردن",
