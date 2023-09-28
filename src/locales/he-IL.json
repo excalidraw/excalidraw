@@ -164,6 +164,7 @@
     "darkMode": "מצב כהה",
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
+    "objectsSnapMode": "",
     "exitZenMode": "צא ממצב זן",
     "cancel": "ביטול",
     "clear": "ניקוי",
