@@ -164,6 +164,7 @@
     "darkMode": "Dunkles Design",
     "lightMode": "Helles Design",
     "zenMode": "Zen-Modus",
+    "objectsSnapMode": "",
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
     "clear": "Löschen",
