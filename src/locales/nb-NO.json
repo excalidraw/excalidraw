@@ -164,6 +164,7 @@
     "darkMode": "Mørk modus",
     "lightMode": "Lys modus",
     "zenMode": "Zen-modus",
+    "objectsSnapMode": "",
     "exitZenMode": "Avslutt zen-modus",
     "cancel": "Avbryt",
     "clear": "Tøm",
