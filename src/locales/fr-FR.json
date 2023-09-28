@@ -164,6 +164,7 @@
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
     "zenMode": "Mode zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Quitter le mode zen",
     "cancel": "Annuler",
     "clear": "Effacer",
