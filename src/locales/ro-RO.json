@@ -164,6 +164,7 @@
     "darkMode": "Mod întunecat",
     "lightMode": "Mod luminos",
     "zenMode": "Mod zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
     "clear": "Ștergere",
