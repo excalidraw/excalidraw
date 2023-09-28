@@ -164,6 +164,7 @@
     "darkMode": "Koyu tema",
     "lightMode": "Açık tema",
     "zenMode": "Zen modu",
+    "objectsSnapMode": "",
     "exitZenMode": "Zen modundan çık",
     "cancel": "İptal",
     "clear": "Temizle",
