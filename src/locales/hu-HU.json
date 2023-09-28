@@ -164,6 +164,7 @@
     "darkMode": "Sötét mód",
     "lightMode": "Világos mód",
     "zenMode": "Letisztult mód",
+    "objectsSnapMode": "",
     "exitZenMode": "Kilépés a letisztult módból",
     "cancel": "Mégsem",
     "clear": "Kiűrítés",
