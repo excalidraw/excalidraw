@@ -164,6 +164,7 @@
     "darkMode": "Tumma tila",
     "lightMode": "Vaalea tila",
     "zenMode": "Zen-tila",
+    "objectsSnapMode": "",
     "exitZenMode": "Poistu zen-tilasta",
     "cancel": "Peruuta",
     "clear": "Pyyhi",
