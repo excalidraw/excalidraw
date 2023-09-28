@@ -164,6 +164,7 @@
     "darkMode": "深色模式",
     "lightMode": "浅色模式",
     "zenMode": "禅模式",
+    "objectsSnapMode": "",
     "exitZenMode": "退出禅模式",
     "cancel": "取消",
     "clear": "清除",
