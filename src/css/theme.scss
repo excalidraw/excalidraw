@@ -12,14 +12,14 @@
   --dialog-border-color: var(--color-gray-20);
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
   --focus-highlight-color: #{$oc-blue-2};
-  --icon-fill-color: var(--color-gray-80);
+  --icon-fill-color: var(--color-on-surface);
   --icon-green-fill-color: #{$oc-green-9};
   --default-bg-color: #{$oc-white};
   --input-bg-color: #{$oc-white};
   --input-border-color: #{$oc-gray-4};
   --input-hover-bg-color: #{$oc-gray-1};
   --input-label-color: #{$oc-gray-7};
-  --island-bg-color: rgba(255, 255, 255, 0.96);
+  --island-bg-color: #ffffff;
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$oc-blue-7};
   --overlay-bg-color: #{transparentize($oc-white, 0.12)};
@@ -31,7 +31,7 @@
   --shadow-island: 0px 7px 14px rgba(0, 0, 0, 0.05),
     0px 0px 3.12708px rgba(0, 0, 0, 0.0798),
     0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
-  --button-hover-bg: var(--color-gray-10);
+  --button-hover-bg: var(--color-surface-high);
   --default-border-color: var(--color-gray-30);
 
   --default-button-size: 2rem;
@@ -132,6 +132,12 @@
   --border-radius-md: 0.375rem;
   --border-radius-lg: 0.5rem;
 
+  --color-surface-high: #f0efff;
+  --color-on-surface: #1b1b1f;
+  --color-brand-hover: #5753d0;
+  --color-on-primary-container: #030064;
+  --color-surface-primary-container: #e0dfff;
+
   &.theme--dark {
     &.theme--dark-background-none {
       background: none;
@@ -150,14 +156,13 @@
     --dialog-border-color: var(--color-gray-80);
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
     --focus-highlight-color: #{$oc-blue-6};
-    --icon-fill-color: var(--color-gray-40);
     --icon-green-fill-color: #{$oc-green-4};
     --default-bg-color: #121212;
     --input-bg-color: #121212;
     --input-border-color: #2e2e2e;
     --input-hover-bg-color: #181818;
     --input-label-color: #{$oc-gray-2};
-    --island-bg-color: #262627;
+    --island-bg-color: #232329;
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$oc-blue-4};
     --overlay-bg-color: #{transparentize($oc-gray-8, 0.88)};
@@ -167,7 +172,6 @@
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
     --text-primary-color: var(--color-gray-40);
-    --button-hover-bg: var(--color-gray-80);
     --default-border-color: var(--color-gray-80);
     --shadow-island: 0px 13px 33px rgba(0, 0, 0, 0.07),
       0px 4.13px 9.94853px rgba(0, 0, 0, 0.0456112),
@@ -224,5 +228,11 @@
     --color-promo: #d297ff;
 
     --color-logo-text: #e2dfff;
+
+    --color-surface-high: #31303b;
+    --color-on-surface: #e3e3e8;
+    --color-brand-hover: #bbb8ff;
+    --color-on-primary-container: #e0dfff;
+    --color-surface-primary-container: #403e6a;
   }
 }
