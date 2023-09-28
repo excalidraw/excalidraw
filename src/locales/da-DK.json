@@ -164,6 +164,7 @@
     "darkMode": "Mørk tilstand",
     "lightMode": "Lys baggrund",
     "zenMode": "Zentilstand",
+    "objectsSnapMode": "",
     "exitZenMode": "Stop zentilstand",
     "cancel": "Annuller",
     "clear": "Ryd",
