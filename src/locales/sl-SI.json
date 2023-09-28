@@ -164,6 +164,7 @@
     "darkMode": "Temni način",
     "lightMode": "Svetli način",
     "zenMode": "Način Zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Zapri način Zen",
     "cancel": "Prekliči",
     "clear": "Počisti",
