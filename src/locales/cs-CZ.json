@@ -164,6 +164,7 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
     "zenMode": "Zen mód",
+    "objectsSnapMode": "",
     "exitZenMode": "Opustit zen mód",
     "cancel": "Zrušit",
     "clear": "Vyčistit",
