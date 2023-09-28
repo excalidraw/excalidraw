@@ -17,9 +17,9 @@ import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
 import "./MermaidToExcalidraw.scss";
 
-import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw"; //zsviczian
-import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
+import { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
+import { parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw"; //zsviczian
+import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
 import { t } from "../i18n";
 import Trans from "./Trans";
 
@@ -110,7 +110,7 @@ const MermaidToExcalidraw = ({
   useEffect(() => {
     const loadMermaidToExcalidrawLib = async () => {
       mermaidToExcalidrawLib.current = await import(
-        /* webpackChunkName:"mermaid-to-excalidraw" */ "@excalidraw/mermaid-to-excalidraw"
+        /* webpackChunkName:"mermaid-to-excalidraw" */ "@zsviczian/mermaid-to-excalidraw"
       );
       setLoading(false);
     };
