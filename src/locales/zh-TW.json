@@ -164,6 +164,7 @@
     "darkMode": "深色模式",
     "lightMode": "淺色模式",
     "zenMode": "專注模式",
+    "objectsSnapMode": "吸附至物件",
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
     "clear": "清除",
