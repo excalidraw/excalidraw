@@ -164,6 +164,7 @@
     "darkMode": "Темна тема",
     "lightMode": "Світла тема",
     "zenMode": "Режим Дзен",
+    "objectsSnapMode": "",
     "exitZenMode": "Вийти з дзен-режиму",
     "cancel": "Скасувати",
     "clear": "Очистити",
