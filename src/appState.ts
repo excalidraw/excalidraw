@@ -113,6 +113,12 @@ export const getDefaultAppState = (): Omit<
     dynamicStyle: "", //zsviczian
     invertBindingBehaviour: false, //zsviczian
     selectedLinearElement: null,
+    snapLines: [],
+    originSnapOffset: {
+      x: 0,
+      y: 0,
+    },
+    objectsSnapModeEnabled: false,
   };
 };
 
@@ -233,6 +239,9 @@ const APP_STATE_STORAGE_CONF = (<
   dynamicStyle: { browser: false, export: false, server: false }, //zsviczian
   invertBindingBehaviour: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
+  snapLines: { browser: false, export: false, server: false },
+  originSnapOffset: { browser: false, export: false, server: false },
+  objectsSnapModeEnabled: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
