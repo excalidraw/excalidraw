@@ -164,7 +164,7 @@
     "darkMode": "Темная тема",
     "lightMode": "Светлая тема",
     "zenMode": "Режим Дзен",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Привязка к объектам",
     "exitZenMode": "Выключить режим концентрации внимания",
     "cancel": "Отменить",
     "clear": "Очистить",
