@@ -164,6 +164,7 @@
     "darkMode": "Tumšais režīms",
     "lightMode": "Gaišais režīms",
     "zenMode": "Zen režīms",
+    "objectsSnapMode": "",
     "exitZenMode": "Pamest Zen režīmu",
     "cancel": "Atcelt",
     "clear": "Notīrīt",
