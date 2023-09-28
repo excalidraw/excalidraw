@@ -164,6 +164,7 @@
     "darkMode": "ダークモード",
     "lightMode": "ライトモード",
     "zenMode": "Zenモード",
+    "objectsSnapMode": "",
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
     "clear": "消去",
