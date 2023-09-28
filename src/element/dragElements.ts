@@ -6,23 +6,22 @@ import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
+import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
 import { isFrameElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
-  pointerX: number,
-  pointerY: number,
-  lockDirection: boolean = false,
-  distanceX: number = 0,
-  distanceY: number = 0,
+  offset: { x: number; y: number },
   appState: AppState,
   scene: Scene,
+  snapOffset: {
+    x: number;
+    y: number;
+  },
+  gridSize: AppState["gridSize"],
 ) => {
-  const [x1, y1] = getCommonBounds(selectedElements);
-  const offset = { x: pointerX - x1, y: pointerY - y1 };
-
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
   // in the frame twice, hence the use of set
@@ -44,12 +43,11 @@ export const dragSelectedElements = (
 
   elementsToUpdate.forEach((element) => {
     updateElementCoords(
-      lockDirection,
-      distanceX,
-      distanceY,
       pointerDownState,
       element,
       offset,
+      snapOffset,
+      gridSize,
     );
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
@@ -69,12 +67,11 @@ export const dragSelectedElements = (
         (!textElement.frameId || !frames.includes(textElement.frameId))
       ) {
         updateElementCoords(
-          lockDirection,
-          distanceX,
-          distanceY,
           pointerDownState,
           textElement,
           offset,
+          snapOffset,
+          gridSize,
         );
       }
     }
@@ -85,31 +82,40 @@ export const dragSelectedElements = (
 };
 
 const updateElementCoords = (
-  lockDirection: boolean,
-  distanceX: number,
-  distanceY: number,
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
-  offset: { x: number; y: number },
+  dragOffset: { x: number; y: number },
+  snapOffset: { x: number; y: number },
+  gridSize: AppState["gridSize"],
 ) => {
-  let x: number;
-  let y: number;
-  if (lockDirection) {
-    const lockX = lockDirection && distanceX < distanceY;
-    const lockY = lockDirection && distanceX > distanceY;
-    const original = pointerDownState.originalElements.get(element.id);
-    x = lockX && original ? original.x : element.x + offset.x;
-    y = lockY && original ? original.y : element.y + offset.y;
-  } else {
-    x = element.x + offset.x;
-    y = element.y + offset.y;
+  const originalElement =
+    pointerDownState.originalElements.get(element.id) ?? element;
+
+  let nextX = originalElement.x + dragOffset.x + snapOffset.x;
+  let nextY = originalElement.y + dragOffset.y + snapOffset.y;
+
+  if (snapOffset.x === 0 || snapOffset.y === 0) {
+    const [nextGridX, nextGridY] = getGridPoint(
+      originalElement.x + dragOffset.x,
+      originalElement.y + dragOffset.y,
+      gridSize,
+    );
+
+    if (snapOffset.x === 0) {
+      nextX = nextGridX;
+    }
+
+    if (snapOffset.y === 0) {
+      nextY = nextGridY;
+    }
   }
 
   mutateElement(element, {
-    x,
-    y,
+    x: nextX,
+    y: nextY,
   });
 };
+
 export const getDragOffsetXY = (
   selectedElements: NonDeletedExcalidrawElement[],
   x: number,
@@ -133,6 +139,10 @@ export const dragNewElement = (
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null,
+  originOffset: {
+    x: number;
+    y: number;
+  } | null = null,
 ) => {
   if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
     if (widthAspectRatio) {
@@ -173,8 +183,8 @@ export const dragNewElement = (
 
   if (width !== 0 && height !== 0) {
     mutateElement(draggingElement, {
-      x: newX,
-      y: newY,
+      x: newX + (originOffset?.x ?? 0),
+      y: newY + (originOffset?.y ?? 0),
       width,
       height,
     });

@@ -55,10 +55,15 @@ exports[`exportToSvg > with default arguments 1`] = `
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "name",
+  "objectsSnapModeEnabled": false,
   "openDialog": null,
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -80,6 +85,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "showHyperlinkPopup": false,
   "showStats": false,
   "showWelcomeScreen": false,
+  "snapLines": [],
   "startBoundElement": null,
   "suggestedBindings": [],
   "theme": "light",

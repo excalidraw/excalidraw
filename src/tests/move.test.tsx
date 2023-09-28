@@ -84,7 +84,7 @@ describe("move element", () => {
     // select the second rectangles
     new Pointer("mouse").clickOn(rectB);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(24);
     expect(renderStaticScene).toHaveBeenCalledTimes(20);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);

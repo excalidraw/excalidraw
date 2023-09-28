@@ -110,7 +110,7 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(11);
     expect(renderStaticScene).toHaveBeenCalledTimes(10);
     expect(h.elements.length).toEqual(1);
 
@@ -153,8 +153,7 @@ describe("multi point mode in linear elements", () => {
     fireEvent.keyDown(document, {
       key: KEYS.ENTER,
     });
-
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(11);
     expect(renderStaticScene).toHaveBeenCalledTimes(10);
     expect(h.elements.length).toEqual(1);
 

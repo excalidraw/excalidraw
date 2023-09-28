@@ -67,6 +67,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
+import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
   isFrameElement,
@@ -719,6 +720,8 @@ const _renderInteractiveScene = ({
     }
     context.restore();
   }
+
+  renderSnaps(context, appState);
 
   // Reset zoom
   context.restore();
