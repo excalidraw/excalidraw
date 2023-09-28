@@ -164,6 +164,7 @@
     "darkMode": "Mörkt läge",
     "lightMode": "Ljust läge",
     "zenMode": "Zen-läge",
+    "objectsSnapMode": "Fäst mot objekt",
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
     "clear": "Rensa",
