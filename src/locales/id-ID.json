@@ -164,6 +164,7 @@
     "darkMode": "Mode gelap",
     "lightMode": "Mode terang",
     "zenMode": "Mode zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
     "clear": "Hapus",
