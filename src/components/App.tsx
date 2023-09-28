@@ -35,6 +35,7 @@ import {
   actionLink,
   actionToggleElementLock,
   actionToggleLinearEditor,
+  actionToggleObjectsSnapMode,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -228,6 +229,7 @@ import {
   FrameNameBoundsCache,
   SidebarName,
   SidebarTabName,
+  KeyboardModifiersObject,
   CollaboratorPointer,
 } from "../types";
 import {
@@ -343,6 +345,17 @@ import {
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import {
+  getSnapLinesAtPointer,
+  snapDraggedElements,
+  isActiveToolNonLinearSnappable,
+  snapNewElement,
+  snapResizingElements,
+  isSnappingEnabled,
+  getVisibleGaps,
+  getReferenceSnapPoints,
+  SnapCache,
+} from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -495,6 +508,7 @@ class App extends React.Component<AppProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
       name = defaultAppState.name,
     } = props;
@@ -505,6 +519,7 @@ class App extends React.Component<AppProps, AppState> {
       ...this.getCanvasOffsets(),
       viewModeEnabled,
       zenModeEnabled,
+      objectsSnapModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
       width: window.innerWidth,
@@ -1091,7 +1106,7 @@ class App extends React.Component<AppProps, AppState> {
             cursor: CURSOR_TYPE.MOVE,
             pointerEvents: this.state.viewModeEnabled
               ? POINTER_EVENTS.disabled
-              : POINTER_EVENTS.inheritFromUI,
+              : POINTER_EVENTS.enabled,
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
           onWheel={(event) => this.handleWheel(event)}
@@ -1730,6 +1745,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     this.library.destroy();
     ShapeCache.destroy();
+    SnapCache.destroy();
     clearTimeout(touchTimeout);
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
@@ -3138,15 +3154,21 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageAction();
     }
     if (nextActiveTool.type !== "selection") {
-      this.setState({
+      this.setState((prevState) => ({
         activeTool: nextActiveTool,
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
         editingGroupId: null,
+        snapLines: [],
+        originSnapOffset: null,
+      }));
+    } else {
+      this.setState({
+        activeTool: nextActiveTool,
+        snapLines: [],
+        originSnapOffset: null,
         activeEmbeddable: null,
       });
-    } else {
-      this.setState({ activeTool: nextActiveTool, activeEmbeddable: null });
     }
   };
 
@@ -3884,6 +3906,30 @@ class App extends React.Component<AppProps, AppState> {
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
     if (
+      !this.state.draggingElement &&
+      isActiveToolNonLinearSnappable(this.state.activeTool.type)
+    ) {
+      const { originOffset, snapLines } = getSnapLinesAtPointer(
+        this.scene.getNonDeletedElements(),
+        this.state,
+        {
+          x: scenePointerX,
+          y: scenePointerY,
+        },
+        event,
+      );
+
+      this.setState({
+        snapLines,
+        originSnapOffset: originOffset,
+      });
+    } else if (!this.state.draggingElement) {
+      this.setState({
+        snapLines: [],
+      });
+    }
+
+    if (
       this.state.editingLinearElement &&
       !this.state.editingLinearElement.isDragging
     ) {
@@ -4351,6 +4397,10 @@ class App extends React.Component<AppProps, AppState> {
     // (e.g. resetting selection)
     if (this.state.contextMenu) {
       this.setState({ contextMenu: null });
+    }
+
+    if (this.state.snapLines) {
+      this.setAppState({ snapLines: [] });
     }
 
     this.updateGestureOnPointerDown(event);
@@ -5639,6 +5689,52 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private maybeCacheReferenceSnapPoints(
+    event: KeyboardModifiersObject,
+    selectedElements: ExcalidrawElement[],
+    recomputeAnyways: boolean = false,
+  ) {
+    if (
+      isSnappingEnabled({
+        event,
+        appState: this.state,
+        selectedElements,
+      }) &&
+      (recomputeAnyways || !SnapCache.getReferenceSnapPoints())
+    ) {
+      SnapCache.setReferenceSnapPoints(
+        getReferenceSnapPoints(
+          this.scene.getNonDeletedElements(),
+          selectedElements,
+          this.state,
+        ),
+      );
+    }
+  }
+
+  private maybeCacheVisibleGaps(
+    event: KeyboardModifiersObject,
+    selectedElements: ExcalidrawElement[],
+    recomputeAnyways: boolean = false,
+  ) {
+    if (
+      isSnappingEnabled({
+        event,
+        appState: this.state,
+        selectedElements,
+      }) &&
+      (recomputeAnyways || !SnapCache.getVisibleGaps())
+    ) {
+      SnapCache.setVisibleGaps(
+        getVisibleGaps(
+          this.scene.getNonDeletedElements(),
+          selectedElements,
+          this.state,
+        ),
+      );
+    }
+  }
+
   private onKeyDownFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
@@ -5872,33 +5968,62 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.editingElement &&
           this.state.activeEmbeddable?.state !== "active"
         ) {
-          const [dragX, dragY] = getGridPoint(
-            pointerCoords.x - pointerDownState.drag.offset.x,
-            pointerCoords.y - pointerDownState.drag.offset.y,
-            event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
-          );
+          const dragOffset = {
+            x: pointerCoords.x - pointerDownState.origin.x,
+            y: pointerCoords.y - pointerDownState.origin.y,
+          };
 
-          const [dragDistanceX, dragDistanceY] = [
-            Math.abs(pointerCoords.x - pointerDownState.origin.x),
-            Math.abs(pointerCoords.y - pointerDownState.origin.y),
+          const originalElements = [
+            ...pointerDownState.originalElements.values(),
           ];
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
+
+          if (lockDirection) {
+            const distanceX = Math.abs(dragOffset.x);
+            const distanceY = Math.abs(dragOffset.y);
+
+            const lockX = lockDirection && distanceX < distanceY;
+            const lockY = lockDirection && distanceX > distanceY;
+
+            if (lockX) {
+              dragOffset.x = 0;
+            }
+
+            if (lockY) {
+              dragOffset.y = 0;
+            }
+          }
+
+          // Snap cache *must* be synchronously popuplated before initial drag,
+          // otherwise the first drag even will not snap, causing a jump before
+          // it snaps to its position if previously snapped already.
+          this.maybeCacheVisibleGaps(event, selectedElements);
+          this.maybeCacheReferenceSnapPoints(event, selectedElements);
+
+          const { snapOffset, snapLines } = snapDraggedElements(
+            getSelectedElements(originalElements, this.state),
+            dragOffset,
+            this.state,
+            event,
+          );
+
+          this.setState({ snapLines });
+
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
           !this.state.editingFrame &&
             dragSelectedElements(
               pointerDownState,
               selectedElements,
-              dragX,
-              dragY,
-              lockDirection,
-              dragDistanceX,
-              dragDistanceY,
+              dragOffset,
               this.state,
               this.scene,
+              snapOffset,
+              event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
+
           this.maybeSuggestBindingForAll(selectedElements);
 
           // We duplicate the selected element if alt is pressed on pointer move
@@ -5939,15 +6064,21 @@ class App extends React.Component<AppProps, AppState> {
                   groupIdMap,
                   element,
                 );
-                const [originDragX, originDragY] = getGridPoint(
-                  pointerDownState.origin.x - pointerDownState.drag.offset.x,
-                  pointerDownState.origin.y - pointerDownState.drag.offset.y,
-                  event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
-                );
+                const origElement = pointerDownState.originalElements.get(
+                  element.id,
+                )!;
                 mutateElement(duplicatedElement, {
-                  x: duplicatedElement.x + (originDragX - dragX),
-                  y: duplicatedElement.y + (originDragY - dragY),
+                  x: origElement.x,
+                  y: origElement.y,
                 });
+
+                // put duplicated element to pointerDownState.originalElements
+                // so that we can snap to the duplicated element without releasing
+                pointerDownState.originalElements.set(
+                  duplicatedElement.id,
+                  duplicatedElement,
+                );
+
                 nextElements.push(duplicatedElement);
                 elementsToAppend.push(element);
                 oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
@@ -5973,6 +6104,8 @@ class App extends React.Component<AppProps, AppState> {
               oldIdToDuplicatedId,
             );
             this.scene.replaceAllElements(nextSceneElements);
+            this.maybeCacheVisibleGaps(event, selectedElements, true);
+            this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
           return;
         }
@@ -6189,6 +6322,7 @@ class App extends React.Component<AppProps, AppState> {
         isResizing,
         isRotating,
       } = this.state;
+
       this.setState({
         isResizing: false,
         isRotating: false,
@@ -6203,7 +6337,13 @@ class App extends React.Component<AppProps, AppState> {
           multiElement || isTextElement(this.state.editingElement)
             ? this.state.editingElement
             : null,
+        snapLines: [],
+
+        originSnapOffset: null,
       });
+
+      SnapCache.setReferenceSnapPoints(null);
+      SnapCache.setVisibleGaps(null);
 
       this.savePointer(childEvent.clientX, childEvent.clientY, "up");
 
@@ -7737,7 +7877,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter(event),
       );
     } else {
-      const [gridX, gridY] = getGridPoint(
+      let [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
         event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
@@ -7750,6 +7890,33 @@ class App extends React.Component<AppProps, AppState> {
         image && !(image instanceof Promise)
           ? image.width / image.height
           : null;
+
+      this.maybeCacheReferenceSnapPoints(event, [draggingElement]);
+
+      const { snapOffset, snapLines } = snapNewElement(
+        draggingElement,
+        this.state,
+        event,
+        {
+          x:
+            pointerDownState.originInGrid.x +
+            (this.state.originSnapOffset?.x ?? 0),
+          y:
+            pointerDownState.originInGrid.y +
+            (this.state.originSnapOffset?.y ?? 0),
+        },
+        {
+          x: gridX - pointerDownState.originInGrid.x,
+          y: gridY - pointerDownState.originInGrid.y,
+        },
+      );
+
+      gridX += snapOffset.x;
+      gridY += snapOffset.y;
+
+      this.setState({
+        snapLines,
+      });
 
       dragNewElement(
         draggingElement,
@@ -7765,6 +7932,7 @@ class App extends React.Component<AppProps, AppState> {
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
         aspectRatio,
+        this.state.originSnapOffset,
       );
 
       this.maybeSuggestBindingForAll([draggingElement]);
@@ -7806,7 +7974,7 @@ class App extends React.Component<AppProps, AppState> {
       activeEmbeddable: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
-    const [resizeX, resizeY] = getGridPoint(
+    let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
       event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
@@ -7834,6 +8002,41 @@ class App extends React.Component<AppProps, AppState> {
       });
     });
 
+    // check needed for avoiding flickering when a key gets pressed
+    // during dragging
+    if (!this.state.selectedElementsAreBeingDragged) {
+      const [gridX, gridY] = getGridPoint(
+        pointerCoords.x,
+        pointerCoords.y,
+        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      );
+
+      const dragOffset = {
+        x: gridX - pointerDownState.originInGrid.x,
+        y: gridY - pointerDownState.originInGrid.y,
+      };
+
+      const originalElements = [...pointerDownState.originalElements.values()];
+
+      this.maybeCacheReferenceSnapPoints(event, selectedElements);
+
+      const { snapOffset, snapLines } = snapResizingElements(
+        selectedElements,
+        getSelectedElements(originalElements, this.state),
+        this.state,
+        event,
+        dragOffset,
+        transformHandleType,
+      );
+
+      resizeX += snapOffset.x;
+      resizeY += snapOffset.y;
+
+      this.setState({
+        snapLines,
+      });
+    }
+
     if (
       transformElements(
         pointerDownState,
@@ -7849,6 +8052,7 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
+        this.state,
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
@@ -7936,6 +8140,7 @@ class App extends React.Component<AppProps, AppState> {
         actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
+        actionToggleObjectsSnapMode,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,
