@@ -164,6 +164,7 @@
     "darkMode": "โหมดกลางคืน",
     "lightMode": "โหมดกลางวัน",
     "zenMode": "โหมด Zen",
+    "objectsSnapMode": "",
     "exitZenMode": "ออกจากโหมด Zen",
     "cancel": "ยกเลิก",
     "clear": "เคลียร์",
