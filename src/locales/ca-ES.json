@@ -164,6 +164,7 @@
     "darkMode": "Mode fosc",
     "lightMode": "Mode clar",
     "zenMode": "Mode zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Surt de mode zen",
     "cancel": "Cancel·la",
     "clear": "Neteja",
