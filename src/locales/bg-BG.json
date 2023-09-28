@@ -164,6 +164,7 @@
     "darkMode": "Тъмен режим",
     "lightMode": "Светъл режим",
     "zenMode": "Режим Zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Спиране на Zen режим",
     "cancel": "Отмени",
     "clear": "Изчисти",
