@@ -63,8 +63,8 @@
     0px 12.5216px 10.0172px rgba(0, 0, 0, 0.035),
     0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
     0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
-  --sidebar-border-color: var(--color-gray-20);
-  --sidebar-bg-color: #fff;
+  --sidebar-border-color: var(--color-surface-high);
+  --sidebar-bg-color: var(--island-bg-color);
   --library-dropdown-shadow: 0px 15px 6px rgba(0, 0, 0, 0.01),
     0px 8px 5px rgba(0, 0, 0, 0.05), 0px 4px 4px rgba(0, 0, 0, 0.09),
     0px 1px 2px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
@@ -184,8 +184,6 @@
       0px 6.6501px 5.32008px rgba(0, 0, 0, 0.0282725),
       0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
     --avatar-border-color: var(--color-gray-85);
-    --sidebar-border-color: var(--color-gray-85);
-    --sidebar-bg-color: #191919;
 
     --scrollbar-thumb: #{$oc-gray-8};
     --scrollbar-thumb-hover: #{$oc-gray-7};
