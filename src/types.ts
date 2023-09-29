@@ -35,6 +35,7 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { SnapLine } from "./snapping";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 import { ColorPaletteCustom } from "./colors";
 
@@ -155,6 +156,9 @@ export type InteractiveCanvasAppState = Readonly<
     showHyperlinkPopup: AppState["showHyperlinkPopup"];
     // Collaborators
     collaborators: AppState["collaborators"];
+    // SnapLines
+    snapLines: AppState["snapLines"];
+    zenModeEnabled: AppState["zenModeEnabled"];
   }
 >;
 
@@ -315,6 +319,13 @@ export type AppState = {
   dynamicStyle: string; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
+
+  snapLines: SnapLine[];
+  originSnapOffset: {
+    x: number;
+    y: number;
+  } | null;
+  objectsSnapModeEnabled: boolean;
 };
 
 export type UIAppState = Omit<
@@ -431,6 +442,7 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   initState?: AppState; //zsviczian
   theme?: Theme;
@@ -718,4 +730,11 @@ export type FrameNameBoundsCache = {
       versionNonce: ExcalidrawFrameElement["versionNonce"];
     }
   >;
+};
+
+export type KeyboardModifiersObject = {
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
 };

@@ -1048,14 +1048,14 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": 367,
+            "width": 366.11716195150507,
           }
         `);
 
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
           {
-            "x": 272,
+            "x": 271.11716195150507,
             "y": 45,
           }
         `);
@@ -1069,9 +1069,9 @@ describe("Test Linear Elements", () => {
           [
             20,
             35,
-            502,
+            501.11716195150507,
             95,
-            205.9061448421403,
+            205.4589377083102,
             52.5,
           ]
         `);
