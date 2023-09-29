@@ -28,9 +28,12 @@
   --popup-text-color: #{$oc-black};
   --popup-text-inverted-color: #{$oc-white};
   --select-highlight-color: #{$oc-blue-5};
-  --shadow-island: 0px 7px 14px rgba(0, 0, 0, 0.05),
-    0px 0px 3.12708px rgba(0, 0, 0, 0.0798),
-    0px 0px 0.931014px rgba(0, 0, 0, 0.1702);
+  --shadow-island: 0px 0.7698959708213806px 1.4945039749145508px 0px
+      rgba(0, 0, 0, 0.02),
+    0px 1.1299999952316284px 4.1321120262146px 0px rgba(0, 0, 0, 0.04),
+    0px 4.130000114440918px 9.94853401184082px 0px rgba(0, 0, 0, 0.05),
+    0px 13px 33px 0px rgba(0, 0, 0, 0.07);
+
   --button-hover-bg: var(--color-surface-high);
   --default-border-color: var(--color-surface-high);
 
@@ -175,10 +178,12 @@
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
     --text-primary-color: var(--color-gray-40);
-    --shadow-island: 0px 13px 33px rgba(0, 0, 0, 0.07),
-      0px 4.13px 9.94853px rgba(0, 0, 0, 0.0456112),
-      0px 1.13px 4.13211px rgba(0, 0, 0, 0.035),
-      0px 0.769896px 1.4945px rgba(0, 0, 0, 0.0243888);
+    --shadow-island: 0px 0.7698959708213806px 1.4945039749145508px 0px
+        rgba(0, 0, 0, 0.02),
+      0px 1.1299999952316284px 4.1321120262146px 0px rgba(0, 0, 0, 0.04),
+      0px 4.130000114440918px 9.94853401184082px 0px rgba(0, 0, 0, 0.05),
+      0px 13px 33px 0px rgba(0, 0, 0, 0.07);
+
     --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
       0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
       0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
