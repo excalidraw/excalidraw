@@ -23,7 +23,7 @@
   --keybinding-color: var(--color-gray-40);
   --link-color: #{$oc-blue-7};
   --overlay-bg-color: #{transparentize($oc-white, 0.12)};
-  --popup-bg-color: #{$oc-white};
+  --popup-bg-color: var(--island-bg-color);
   --popup-secondary-bg-color: #{$oc-gray-1};
   --popup-text-color: #{$oc-black};
   --popup-text-inverted-color: #{$oc-white};
@@ -35,6 +35,8 @@
     0px 13px 33px 0px rgba(0, 0, 0, 0.07);
 
   --button-hover-bg: var(--color-surface-high);
+  --button-active-bg: var(--color-surface-high);
+  --button-active-border: var(--color-brand-active);
   --default-border-color: var(--color-surface-high);
 
   --default-button-size: 2rem;
@@ -73,7 +75,7 @@
     0px 1px 2px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
 
   --space-factor: 0.25rem;
-  --text-primary-color: var(--color-gray-80);
+  --text-primary-color: var(--color-on-surface);
 
   --color-selection: #6965db;
 
@@ -172,12 +174,10 @@
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$oc-blue-4};
     --overlay-bg-color: #{transparentize($oc-gray-8, 0.88)};
-    --popup-bg-color: #2c2c2c;
     --popup-secondary-bg-color: #222;
     --popup-text-color: #{$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
     --select-highlight-color: #{$oc-blue-4};
-    --text-primary-color: var(--color-gray-40);
     --shadow-island: 0px 0.7698959708213806px 1.4945039749145508px 0px
         rgba(0, 0, 0, 0.02),
       0px 1.1299999952316284px 4.1321120262146px 0px rgba(0, 0, 0, 0.04),
