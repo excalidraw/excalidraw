@@ -12,32 +12,32 @@
 
     &--color-primary {
       &.ExcButton--variant-filled {
-        --text-color: var(--input-bg-color);
+        --text-color: var(--color-surface-lowest);
         --back-color: var(--color-primary);
 
         &:hover {
-          --back-color: var(--color-primary-darker);
+          --back-color: var(--color-brand-hover);
         }
 
         &:active {
-          --back-color: var(--color-primary-darkest);
+          --back-color: var(--color-brand-active);
         }
       }
 
       &.ExcButton--variant-outlined,
       &.ExcButton--variant-icon {
         --text-color: var(--color-primary);
-        --border-color: var(--color-primary);
-        --back-color: var(--input-bg-color);
+        --border-color: var(--color-border-outline);
+        --back-color: transparent;
 
         &:hover {
-          --text-color: var(--color-primary-darker);
-          --border-color: var(--color-primary-darker);
+          --text-color: var(--color-brand-hover);
+          --border-color: var(--color-brand-hover);
         }
 
         &:active {
-          --text-color: var(--color-primary-darkest);
-          --border-color: var(--color-primary-darkest);
+          --text-color: var(--color-brand-active);
+          --border-color: var(--color-brand-active);
         }
       }
     }
