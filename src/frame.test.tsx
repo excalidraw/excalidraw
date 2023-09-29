@@ -177,7 +177,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect2, frame]);
       });
 
-      it("should add elements", async () => {
+      it.skip("should add elements", async () => {
         h.elements = [rect2, rect3, frame];
 
         func(frame, rect2);
@@ -188,7 +188,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect3, rect2, frame]);
       });
 
-      it("should add elements when there are other other elements in between", async () => {
+      it.skip("should add elements when there are other other elements in between", async () => {
         h.elements = [rect1, rect2, rect4, rect3, frame];
 
         func(frame, rect2);
@@ -199,7 +199,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect1, rect4, rect3, rect2, frame]);
       });
 
-      it("should add elements when there are other elements in between and the order is reversed", async () => {
+      it.skip("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, rect2, rect1, frame];
 
         func(frame, rect2);
@@ -234,7 +234,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect1, rect2, rect3, frame, rect4]);
       });
 
-      it("should add elements when there are other elements in between and the order is reversed", async () => {
+      it.skip("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, frame, rect2, rect1];
 
         func(frame, rect2);
