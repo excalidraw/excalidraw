@@ -8,9 +8,9 @@ import {
 import { Excalidraw } from "../packages/excalidraw/index";
 import React from "react";
 import { expect, vi } from "vitest";
-import * as MermaidToExcalidraw from "@zsviczian/mermaid-to-excalidraw";
+import * as MermaidToExcalidraw from "@excalidraw/mermaid-to-excalidraw";
 
-vi.mock("@zsviczian/mermaid-to-excalidraw", async (importActual) => {
+vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
   const module = (await importActual()) as any;
 
   return {
