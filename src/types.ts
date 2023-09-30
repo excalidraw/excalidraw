@@ -497,6 +497,7 @@ export interface ExcalidrawProps {
     //zsivzian
     appState: AppState,
   ) => JSX.Element | null;
+  renderMermaid?: boolean; //zsviczian
 }
 
 export type SceneData = {

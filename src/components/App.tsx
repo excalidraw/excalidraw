@@ -1251,7 +1251,7 @@ class App extends React.Component<AppProps, AppState> {
                           app={this}
                         >
                           {this.props.children}
-                          {this.state.activeTool.type === "mermaid" && (
+                          {this.props.renderMermaid && this.state.activeTool.type === "mermaid" && (//zsviczian
                             <MermaidToExcalidraw
                               selectedElements={this.scene.getSelectedElements(
                                 this.state, //zsviczian

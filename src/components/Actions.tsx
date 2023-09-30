@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, PointerType } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "../components/App";
+import { useAppProps, useDevice } from "../components/App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -230,6 +230,7 @@ export const ShapesSwitcher = ({
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: UIAppState;
 }) => {
+  const {renderMermaid} = useAppProps(); //zsviczian
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   return (
     <>
@@ -339,6 +340,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
+          {renderMermaid && ( //zsviczian
           <DropdownMenu.Item
             onSelect={() => {
               const nextActiveTool = updateActiveTool(appState, {
@@ -356,6 +358,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
