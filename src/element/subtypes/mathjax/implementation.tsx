@@ -137,60 +137,60 @@ const loadMathJax = async () => {
     mathJaxLoading = true;
 
     // MathJax components we use
-    const AsciiMath = (await import("mathjax-full/js/input/asciimath"))
+    const AsciiMath = (await import("mathjax-full/mjs/input/asciimath"))
       .AsciiMath;
-    const TeX = (await import("mathjax-full/js/input/tex")).TeX;
-    const SVG = (await import("mathjax-full/js/output/svg")).SVG;
-    const liteAdaptor = (await import("mathjax-full/js/adaptors/liteAdaptor"))
+    const TeX = (await import("mathjax-full/mjs/input/tex")).TeX;
+    const SVG = (await import("mathjax-full/mjs/output/svg")).SVG;
+    const liteAdaptor = (await import("mathjax-full/mjs/adaptors/liteAdaptor"))
       .liteAdaptor;
-    const RegisterHTMLHandler = (await import("mathjax-full/js/handlers/html"))
+    const RegisterHTMLHandler = (await import("mathjax-full/mjs/handlers/html"))
       .RegisterHTMLHandler;
 
     // Components for MathJax accessibility
-    const MathML = (await import("mathjax-full/js/input/mathml")).MathML;
+    const MathML = (await import("mathjax-full/mjs/input/mathml")).MathML;
     const SerializedMmlVisitor = (
-      await import("mathjax-full/js/core/MmlTree/SerializedMmlVisitor")
+      await import("mathjax-full/mjs/core/MmlTree/SerializedMmlVisitor")
     ).SerializedMmlVisitor;
     const Sre = useSRE
-      ? (await import("mathjax-full/js/a11y/sre")).Sre
+      ? (await import("mathjax-full/mjs/a11y/sre")).Sre
       : undefined;
 
     // Import some TeX packages
-    await import("mathjax-full/js/input/tex/ams/AmsConfiguration");
+    await import("mathjax-full/mjs/input/tex/ams/AmsConfiguration");
     await import(
-      "mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration"
+      "mathjax-full/mjs/input/tex/boldsymbol/BoldsymbolConfiguration"
     );
 
     // Set the following to "true" to import the "mhchem" and "physics" packages.
     const includeMhchemPhysics = false;
     if (includeMhchemPhysics) {
-      await import("mathjax-full/js/input/tex/mhchem/MhchemConfiguration");
-      await import("mathjax-full/js/input/tex/physics/PhysicsConfiguration");
+      await import("mathjax-full/mjs/input/tex/mhchem/MhchemConfiguration");
+      await import("mathjax-full/mjs/input/tex/physics/PhysicsConfiguration");
     }
     const texPackages = includeMhchemPhysics
       ? ["base", "ams", "boldsymbol", "mhchem", "physics"]
       : ["base", "ams", "boldsymbol"];
 
     // Types needed to lazy-load MathJax
-    const LiteElement = (await import("mathjax-full/js/adaptors/lite/Element"))
+    const LiteElement = (await import("mathjax-full/mjs/adaptors/lite/Element"))
       .LiteElement;
-    const LiteText = (await import("mathjax-full/js/adaptors/lite/Text"))
+    const LiteText = (await import("mathjax-full/mjs/adaptors/lite/Text"))
       .LiteText;
     const LiteDocument = (
-      await import("mathjax-full/js/adaptors/lite/Document")
+      await import("mathjax-full/mjs/adaptors/lite/Document")
     ).LiteDocument;
 
     // Configure AsciiMath to use the "display" option.  See
     // https://github.com/mathjax/MathJax/issues/2520#issuecomment-1128831182.
     const MathJax = (
       await import(
-        /* @vite-ignore */ "mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax"
+        /* @vite-ignore */ "mathjax-full/mjs/input/asciimath/legacy/MathJax"
       )
     ).MathJax;
     mathJax.amFixes = MathJax.InputJax.AsciiMath.AM.Augment;
 
     // Load the document creator last
-    const mathjax = (await import("mathjax-full/js/mathjax")).mathjax;
+    const mathjax = (await import("mathjax-full/mjs/mathjax")).mathjax;
 
     type E = typeof LiteElement;
     type T = typeof LiteText;
@@ -252,7 +252,7 @@ const loadMathJax = async () => {
           try {
             const mathmap = JSON.stringify(
               import(
-                /* @vite-ignore */ `mathjax-full/es5/sre/mathmaps/${locale}.json`
+                /* @vite-ignore */ `mathjax-full/mjs/sre/mathmaps/${locale}.json`
               ),
             );
             resolve(mathmap);
