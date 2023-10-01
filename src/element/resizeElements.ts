@@ -34,7 +34,6 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
-import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
   TransformHandleType,
@@ -53,6 +52,7 @@ import {
   getApproxMinLineHeight,
   measureText,
   getBoundTextMaxHeight,
+  getFontString,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 

@@ -10,8 +10,8 @@ import { MarkNonNullable, ValueOf } from "../utility-types";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
-export type FontFamilyKeys = keyof typeof FONT_FAMILY;
-export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
+export type FontFamilyId =
+  typeof FONT_FAMILY[keyof typeof FONT_FAMILY]["fontFamilyId"];
 export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
@@ -150,7 +150,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
     fontSize: number;
-    fontFamily: FontFamilyValues;
+    fontFamily: FontFamilyId;
     text: string;
     baseline: number;
     textAlign: TextAlign;

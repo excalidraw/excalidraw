@@ -74,7 +74,7 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamilyValues,
+  FontFamilyId,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
@@ -689,22 +689,22 @@ export const actionChangeFontFamily = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const options: {
-      value: FontFamilyValues;
+      value: FontFamilyId;
       text: string;
       icon: JSX.Element;
     }[] = [
       {
-        value: FONT_FAMILY.Virgil,
+        value: FONT_FAMILY.HAND_DRAWN.fontFamilyId,
         text: t("labels.handDrawn"),
         icon: FreedrawIcon,
       },
       {
-        value: FONT_FAMILY.Helvetica,
+        value: FONT_FAMILY.NORMAL.fontFamilyId,
         text: t("labels.normal"),
         icon: FontFamilyNormalIcon,
       },
       {
-        value: FONT_FAMILY.Cascadia,
+        value: FONT_FAMILY.CODE.fontFamilyId,
         text: t("labels.code"),
         icon: FontFamilyCodeIcon,
       },
@@ -713,7 +713,7 @@ export const actionChangeFontFamily = register({
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamilyValues | false>
+        <ButtonIconSelect<FontFamilyId | false>
           group="font-family"
           options={options}
           value={getFormValue(

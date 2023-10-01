@@ -10,17 +10,12 @@ import {
   VerticalAlign,
   Arrowhead,
   ExcalidrawFreeDrawElement,
-  FontFamilyValues,
+  FontFamilyId,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
 } from "../element/types";
-import {
-  arrayToMap,
-  getFontString,
-  getUpdatedTimestamp,
-  isTestEnv,
-} from "../utils";
+import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -35,6 +30,7 @@ import {
   wrapText,
   getBoundTextMaxWidth,
   getDefaultLineHeight,
+  getFontString,
 } from "./textElement";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -184,7 +180,7 @@ export const newTextElement = (
   opts: {
     text: string;
     fontSize?: number;
-    fontFamily?: FontFamilyValues;
+    fontFamily?: FontFamilyId;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"] | null;

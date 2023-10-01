@@ -1,6 +1,6 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import { ExcalidrawElement, FontFamilyId } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
@@ -102,10 +102,19 @@ export const CLASSES = {
 
 // 1-based in case we ever do `if(element.fontFamily)`
 export const FONT_FAMILY = {
-  Virgil: 1,
-  Helvetica: 2,
-  Cascadia: 3,
-};
+  HAND_DRAWN: {
+    fontFamilyId: 1,
+    fontFamily: "Virgil",
+  },
+  NORMAL: {
+    fontFamilyId: 2,
+    fontFamily: "Helvetica",
+  },
+  CODE: {
+    fontFamilyId: 3,
+    fontFamily: "Cascadia",
+  },
+} as const;
 
 export const THEME = {
   LIGHT: "light",
@@ -127,7 +136,8 @@ export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
+export const DEFAULT_FONT_FAMILY: FontFamilyId =
+  FONT_FAMILY.HAND_DRAWN.fontFamilyId;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";

@@ -1,10 +1,10 @@
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
+import { arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
-  FontFamilyValues,
+  FontFamilyId,
   FontString,
   NonDeletedExcalidrawElement,
 } from "./types";
@@ -19,6 +19,7 @@ import {
   isSafari,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
+  WINDOWS_EMOJI_FALLBACK_FONT,
 } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
 import Scene from "../scene/Scene";
@@ -967,17 +968,57 @@ export const isMeasureTextSupported = () => {
 const DEFAULT_LINE_HEIGHT = {
   // ~1.25 is the average for Virgil in WebKit and Blink.
   // Gecko (FF) uses ~1.28.
-  [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.HAND_DRAWN.fontFamilyId]:
+    1.25 as ExcalidrawTextElement["lineHeight"],
   // ~1.15 is the average for Virgil in WebKit and Blink.
   // Gecko if all over the place.
-  [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.NORMAL.fontFamilyId]:
+    1.15 as ExcalidrawTextElement["lineHeight"],
   // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
-  [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.CODE.fontFamilyId]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
 
-export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
-  if (fontFamily in DEFAULT_LINE_HEIGHT) {
-    return DEFAULT_LINE_HEIGHT[fontFamily];
+export const getDefaultLineHeight = (fontId: number) => {
+  if (fontId in DEFAULT_LINE_HEIGHT) {
+    return (
+      DEFAULT_LINE_HEIGHT as Record<number, ExcalidrawTextElement["lineHeight"]>
+    )[fontId];
   }
   return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
+};
+
+export const getFontFamilyIdByName = (fontFamilyName: string): FontFamilyId => {
+  for (const key in FONT_FAMILY) {
+    const font = FONT_FAMILY[key as keyof typeof FONT_FAMILY];
+    if (font.fontFamily === fontFamilyName) {
+      return font.fontFamilyId;
+    }
+  }
+  return DEFAULT_FONT_FAMILY;
+};
+
+export const getFontFamilyString = ({
+  fontFamily,
+}: {
+  fontFamily: FontFamilyId;
+}) => {
+  for (const key in FONT_FAMILY) {
+    const font = FONT_FAMILY[key as keyof typeof FONT_FAMILY];
+    if (font.fontFamilyId === fontFamily) {
+      return `${font.fontFamily}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+    }
+  }
+
+  return WINDOWS_EMOJI_FALLBACK_FONT;
+};
+
+/** returns fontSize+fontFamily string for assignment to DOM elements */
+export const getFontString = ({
+  fontSize,
+  fontFamily,
+}: {
+  fontSize: number;
+  fontFamily: FontFamilyId;
+}) => {
+  return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };
