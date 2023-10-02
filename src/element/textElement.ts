@@ -970,6 +970,8 @@ const DEFAULT_LINE_HEIGHT = {
   // Gecko (FF) uses ~1.28.
   [FONT_FAMILY.HAND_DRAWN.fontFamilyId]:
     1.25 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.HAND_DRAWN2.fontFamilyId]:
+    1.25 as ExcalidrawTextElement["lineHeight"],
   // ~1.15 is the average for Virgil in WebKit and Blink.
   // Gecko if all over the place.
   [FONT_FAMILY.NORMAL.fontFamilyId]:

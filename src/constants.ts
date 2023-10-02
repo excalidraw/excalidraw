@@ -98,6 +98,10 @@ export const FONT_FAMILY = {
     fontFamilyId: 1,
     fontFamily: "Virgil",
   },
+  HAND_DRAWN2: {
+    fontFamilyId: 4,
+    fontFamily: "Virgil2",
+  },
   NORMAL: {
     fontFamilyId: 2,
     fontFamily: "Helvetica",

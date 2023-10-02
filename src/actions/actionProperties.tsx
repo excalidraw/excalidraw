@@ -699,6 +699,11 @@ export const actionChangeFontFamily = register({
         icon: FreedrawIcon,
       },
       {
+        value: FONT_FAMILY.HAND_DRAWN2.fontFamilyId,
+        text: t("labels.handDrawn"),
+        icon: FreedrawIcon,
+      },
+      {
         value: FONT_FAMILY.NORMAL.fontFamilyId,
         text: t("labels.normal"),
         icon: FontFamilyNormalIcon,
