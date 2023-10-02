@@ -50,7 +50,7 @@
     "veryLarge": "Très grande",
     "solid": "Solide",
     "hachure": "Hachures",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Hachures croisées",
     "thin": "Fine",
     "bold": "Épaisse",
@@ -114,7 +114,7 @@
       "createEmbed": "",
       "label": "Lien",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "Aucun lien défini"
     },
     "lineEditor": {
       "edit": "Modifier la ligne",
@@ -173,7 +173,7 @@
     "publishLibrary": "Publier",
     "submit": "Envoyer",
     "confirm": "Confirmer",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Cliquez pour interagir"
   },
   "alerts": {
     "clearReset": "L'intégralité du canevas va être effacée. Êtes-vous sûr ?",
@@ -237,7 +237,7 @@
     "frame": "",
     "embeddable": "",
     "hand": "Mains (outil de déplacement de la vue)",
-    "extraTools": ""
+    "extraTools": "Plus d'outils"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -374,12 +374,12 @@
     "removeItemsFromLib": "Enlever les éléments sélectionnés de la bibliothèque"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exporter l'image",
     "label": {
       "withBackground": "Fond",
       "onlySelected": "Uniquement la sélection",
       "darkMode": "Mode sombre",
-      "embedScene": "",
+      "embedScene": "Intégrer la scène",
       "scale": "Échelle",
       "padding": ""
     },
@@ -387,14 +387,14 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exporter en PNG",
+      "exportToSvg": "Exporter en SVG",
+      "copyPngToClipboard": "Copier le PNG dans le presse-papier"
     },
     "button": {
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
-      "copyPngToClipboard": ""
+      "copyPngToClipboard": "Copier dans le presse-papier"
     }
   },
   "encrypted": {
@@ -462,15 +462,15 @@
   "colorPicker": {
     "mostUsedCustomColors": "",
     "colors": "Couleurs",
-    "shades": "",
+    "shades": "Nuances",
     "hexCode": "",
     "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Exporter en image",
+        "button": "Exporter en image",
         "description": ""
       },
       "saveToDisk": {
@@ -479,8 +479,8 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+",
+        "button": "Exporter vers Excalidraw+",
         "description": ""
       }
     },
@@ -492,7 +492,7 @@
       },
       "shareableLink": {
         "title": "",
-        "button": "",
+        "button": "Remplacer mon contenu",
         "description": ""
       }
     }
