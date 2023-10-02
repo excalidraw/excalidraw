@@ -464,7 +464,7 @@
     "colors": "Couleurs",
     "shades": "Nuances",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "Aucune nuance disponible pour cette couleur"
   },
   "overwriteConfirm": {
     "action": {
@@ -481,17 +481,17 @@
       "excalidrawPlus": {
         "title": "Excalidraw+",
         "button": "Exporter vers Excalidraw+",
-        "description": ""
+        "description": "Enregistrer la scène dans votre espace de travail Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Charger depuis un fichier",
+        "button": "Charger depuis un fichier",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "Charger depuis un lien",
         "button": "Remplacer mon contenu",
         "description": ""
       }
