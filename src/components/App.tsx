@@ -2552,10 +2552,11 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePenMode = () => {
+  togglePenMode = (force?: boolean) => {
     this.setState((prevState) => {
       return {
-        penMode: !prevState.penMode,
+        penMode: force ?? !prevState.penMode,
+        penDetected: true,
       };
     });
   };
@@ -3108,7 +3109,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool = (
+  setActiveTool = (
     tool:
       | {
           type:
@@ -3135,23 +3136,30 @@ class App extends React.Component<AppProps, AppState> {
     if (nextActiveTool.type === "image") {
       this.onImageAction();
     }
-    if (nextActiveTool.type !== "selection") {
-      this.setState((prevState) => ({
-        activeTool: nextActiveTool,
-        selectedElementIds: makeNextSelectedElementIds({}, this.state),
-        selectedGroupIds: {},
-        editingGroupId: null,
-        snapLines: [],
-        originSnapOffset: null,
-      }));
-    } else {
-      this.setState({
-        activeTool: nextActiveTool,
-        snapLines: [],
+
+    this.setState((prevState) => {
+      const commonResets = {
+        snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
         originSnapOffset: null,
         activeEmbeddable: null,
-      });
-    }
+      } as const;
+      if (nextActiveTool.type !== "selection") {
+        return {
+          ...prevState,
+          activeTool: nextActiveTool,
+          selectedElementIds: makeNextSelectedElementIds({}, prevState),
+          selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+          editingGroupId: null,
+          multiElement: null,
+          ...commonResets,
+        };
+      }
+      return {
+        ...prevState,
+        activeTool: nextActiveTool,
+        ...commonResets,
+      };
+    });
   };
 
   private setCursor = (cursor: string) => {

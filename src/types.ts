@@ -292,7 +292,7 @@ export type AppState = {
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
 
-  snapLines: SnapLine[];
+  snapLines: readonly SnapLine[];
   originSnapOffset: {
     x: number;
     y: number;
@@ -539,6 +539,8 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
+  togglePenMode: App["togglePenMode"];
+  setActiveTool: App["setActiveTool"];
 };
 
 export type PointerDownState = Readonly<{
