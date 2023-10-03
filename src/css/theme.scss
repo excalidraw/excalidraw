@@ -138,6 +138,7 @@
   --border-radius-lg: 0.5rem;
 
   --color-surface-high: #f0efff;
+  --color-surface-low: #f5f5f9;
   --color-on-surface: #1b1b1f;
   --color-brand-hover: #5753d0;
   --color-on-primary-container: #030064;
@@ -145,6 +146,7 @@
   --color-surface-lowest: #ffffff;
   --color-brand-active: #4440bf;
   --color-border-outline: #767680;
+  --color-border-outline-variant: #c5c5d0;
 
   &.theme--dark {
     &.theme--dark-background-none {
@@ -235,6 +237,7 @@
     --color-logo-text: #e2dfff;
 
     --color-surface-high: #31303b;
+    --color-surface-low: #232329;
     --color-on-surface: #e3e3e8;
     --color-brand-hover: #bbb8ff;
     --color-on-primary-container: #e0dfff;
@@ -242,5 +245,6 @@
     --color-surface-lowest: #121212;
     --color-brand-active: #d0ccff;
     --color-border-outline: #8e8d9c;
+    --color-border-outline-variant: #46464f;
   }
 }
