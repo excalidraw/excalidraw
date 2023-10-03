@@ -284,7 +284,7 @@ const LayerUI = ({
                             appState={appState}
                             interactiveCanvas={interactiveCanvas}
                             activeTool={appState.activeTool}
-                            setAppState={setAppState}
+                            app={app}
                             onImageAction={({ pointerType }) => {
                               onImageAction({
                                 insertOnCanvasDirectly: pointerType !== "mouse",
