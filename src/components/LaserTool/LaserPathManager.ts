@@ -134,14 +134,16 @@ export class LaserPathManager {
   }
 
   draw(path: LaserPointer) {
-    const stroke = path.getStrokeOutline().map(([x, y]) => {
-      const result = sceneCoordsToViewportCoords(
-        { sceneX: x, sceneY: y },
-        this.app.state,
-      );
+    const stroke = path
+      .getStrokeOutline(path.options.size / this.app.state.zoom.value)
+      .map(([x, y]) => {
+        const result = sceneCoordsToViewportCoords(
+          { sceneX: x, sceneY: y },
+          this.app.state,
+        );
 
-      return [result.x, result.y];
-    });
+        return [result.x, result.y];
+      });
 
     return getSvgPathFromStroke(stroke, true);
   }
