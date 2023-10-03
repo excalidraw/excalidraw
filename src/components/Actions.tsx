@@ -352,17 +352,11 @@ export const ShapesSwitcher = ({
             </DropdownMenu.Item>
             <DropdownMenu.Item
               onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "laser",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
+                app.setActiveTool({ type: "laser" });
               }}
               icon={laserPointerToolIcon}
               data-testid="toolbar-laser"
+              selected={activeTool.type === "laser"}
             >
               {t("toolBar.laser")}
             </DropdownMenu.Item>

@@ -1190,7 +1190,6 @@ class App extends React.Component<AppProps, AppState> {
                           onLockToggle={this.toggleLock}
                           onPenModeToggle={this.togglePenMode}
                           onHandToolToggle={this.onHandToolToggle}
-                          onLaserToolToggle={this.onLaserToolToggle}
                           langCode={getLanguage().code}
                           renderTopRightUI={renderTopRightUI}
                           renderCustomStats={renderCustomStats}
@@ -2573,16 +2572,6 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.executeAction(actionToggleHandTool);
   };
 
-  onLaserToolToggle = () => {
-    this.setState((prevState) => ({
-      activeTool: updateActiveTool(prevState, {
-        type: "laser",
-      }),
-      multiElement: null,
-      selectedElementIds: {},
-    }));
-  };
-
   /**
    * Zooms on canvas viewport center
    */
@@ -3135,7 +3124,8 @@ class App extends React.Component<AppProps, AppState> {
             | "eraser"
             | "hand"
             | "frame"
-            | "embeddable";
+            | "embeddable"
+            | "laser";
         }
       | { type: "custom"; customType: string },
   ) => {

@@ -266,11 +266,3 @@ export const isHandToolActive = ({
 }) => {
   return activeTool.type === "hand";
 };
-
-export const isLaserToolActive = ({
-  activeTool,
-}: {
-  activeTool: AppState["activeTool"];
-}) => {
-  return activeTool.type === "laser";
-};

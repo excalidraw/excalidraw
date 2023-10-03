@@ -43,7 +43,7 @@ import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { HandButton } from "./HandButton";
-import { isHandToolActive, isLaserToolActive } from "../appState";
+import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
@@ -67,7 +67,6 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
-  onLaserToolToggle: () => void;
   onPenModeToggle: () => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
@@ -128,7 +127,6 @@ const LayerUI = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  onLaserToolToggle,
   showExitZenModeBtn,
   renderTopRightUI,
   renderCustomStats,
@@ -303,8 +301,10 @@ const LayerUI = ({
                         >
                           <LaserPointerButton
                             title={t("toolBar.laser")}
-                            checked={isLaserToolActive(appState)}
-                            onChange={() => onLaserToolToggle()}
+                            checked={appState.activeTool.type === "laser"}
+                            onChange={() =>
+                              app.setActiveTool({ type: "laser" })
+                            }
                             isMobile
                           />
                         </Island>
