@@ -2552,10 +2552,11 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePenMode = () => {
+  togglePenMode = (force?: boolean) => {
     this.setState((prevState) => {
       return {
-        penMode: !prevState.penMode,
+        penMode: force ?? !prevState.penMode,
+        penDetected: true,
       };
     });
   };
@@ -3108,7 +3109,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  private setActiveTool = (
+  setActiveTool = (
     tool:
       | {
           type:
@@ -3135,21 +3136,26 @@ class App extends React.Component<AppProps, AppState> {
     if (nextActiveTool.type === "image") {
       this.onImageAction();
     }
+
+    const commonResets = {
+      snapLines: [],
+      originSnapOffset: null,
+      activeEmbeddable: null,
+    } as const;
+
     if (nextActiveTool.type !== "selection") {
       this.setState((prevState) => ({
         activeTool: nextActiveTool,
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
         editingGroupId: null,
-        snapLines: [],
-        originSnapOffset: null,
+        multiElement: null,
+        ...commonResets,
       }));
     } else {
       this.setState({
         activeTool: nextActiveTool,
-        snapLines: [],
-        originSnapOffset: null,
-        activeEmbeddable: null,
+        ...commonResets,
       });
     }
   };
