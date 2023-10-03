@@ -3137,27 +3137,29 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageAction();
     }
 
-    const commonResets = {
-      snapLines: [],
-      originSnapOffset: null,
-      activeEmbeddable: null,
-    } as const;
-
-    if (nextActiveTool.type !== "selection") {
-      this.setState((prevState) => ({
+    this.setState((prevState) => {
+      const commonResets = {
+        snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
+        originSnapOffset: null,
+        activeEmbeddable: null,
+      } as const;
+      if (nextActiveTool.type !== "selection") {
+        return {
+          ...prevState,
+          activeTool: nextActiveTool,
+          selectedElementIds: makeNextSelectedElementIds({}, prevState),
+          selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+          editingGroupId: null,
+          multiElement: null,
+          ...commonResets,
+        };
+      }
+      return {
+        ...prevState,
         activeTool: nextActiveTool,
-        selectedElementIds: makeNextSelectedElementIds({}, this.state),
-        selectedGroupIds: {},
-        editingGroupId: null,
-        multiElement: null,
         ...commonResets,
-      }));
-    } else {
-      this.setState({
-        activeTool: nextActiveTool,
-        ...commonResets,
-      });
-    }
+      };
+    });
   };
 
   private setCursor = (cursor: string) => {
