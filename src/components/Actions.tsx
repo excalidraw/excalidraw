@@ -318,6 +318,7 @@ export const ShapesSwitcher = ({
                 activeEmbeddable: null,
               });
             }}
+            selected={activeTool.type === "frame"}
           />
           <ToolButton
             className={clsx("Shape", { fillable: false })}
@@ -348,6 +349,7 @@ export const ShapesSwitcher = ({
                 activeEmbeddable: null,
               });
             }}
+            selected={activeTool.type === "embeddable"}
           />
         </>
       ) : (
@@ -378,6 +380,7 @@ export const ShapesSwitcher = ({
               icon={frameToolIcon}
               shortcut={KEYS.F.toLocaleUpperCase()}
               data-testid="toolbar-frame"
+              selected={activeTool.type === "frame"}
             >
               {t("toolBar.frame")}
             </DropdownMenu.Item>
@@ -394,6 +397,7 @@ export const ShapesSwitcher = ({
               }}
               icon={EmbedIcon}
               data-testid="toolbar-embeddable"
+              selected={activeTool.type === "embeddable"}
             >
               {t("toolBar.embeddable")}
             </DropdownMenu.Item>

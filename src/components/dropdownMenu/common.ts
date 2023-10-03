@@ -6,8 +6,13 @@ export const DropdownMenuContentPropsContext = React.createContext<{
   onSelect?: (event: Event) => void;
 }>({});
 
-export const getDropdownMenuItemClassName = (className = "") => {
-  return `dropdown-menu-item dropdown-menu-item-base ${className}`.trim();
+export const getDropdownMenuItemClassName = (
+  className = "",
+  selected = false,
+) => {
+  return `dropdown-menu-item dropdown-menu-item-base ${className} ${
+    selected ? "dropdown-menu-item--selected" : ""
+  }`.trim();
 };
 
 export const useHandleDropdownMenuItemClick = (

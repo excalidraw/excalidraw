@@ -59,6 +59,11 @@
         height: 2.25rem;
       }
 
+      &--selected {
+        background: var(--color-primary-light);
+        --icon-fill-color: var(--color-primary-darker);
+      }
+
       &__text {
         text-overflow: ellipsis;
         overflow: hidden;
