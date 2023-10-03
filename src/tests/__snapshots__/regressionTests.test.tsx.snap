@@ -454,7 +454,7 @@ exports[`given element A and group of elements B and given both are selected whe
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected > [end of test] number of elements 1`] = `0`;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected > [end of test] number of renders 1`] = `22`;
+exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected > [end of test] number of renders 1`] = `21`;
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] appState 1`] = `
 {
@@ -912,7 +912,7 @@ exports[`given element A and group of elements B and given both are selected whe
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] number of elements 1`] = `0`;
 
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] number of renders 1`] = `20`;
+exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] appState 1`] = `
 {
@@ -1743,7 +1743,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
 
 exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of renders 1`] = `30`;
+exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of renders 1`] = `29`;
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] appState 1`] = `
 {
@@ -1956,7 +1956,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `10`;
+exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > adjusts z order when grouping > [end of test] appState 1`] = `
 {
@@ -2410,7 +2410,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
 
 exports[`regression tests > adjusts z order when grouping > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > adjusts z order when grouping > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > adjusts z order when grouping > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] appState 1`] = `
 {
@@ -2652,7 +2652,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] histo
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `10`;
+exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > arrow keys > [end of test] appState 1`] = `
 {
@@ -2820,7 +2820,7 @@ exports[`regression tests > arrow keys > [end of test] history 1`] = `
 
 exports[`regression tests > arrow keys > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > arrow keys > [end of test] number of renders 1`] = `14`;
+exports[`regression tests > arrow keys > [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] appState 1`] = `
 {
@@ -3264,7 +3264,7 @@ exports[`regression tests > can drag element that covers another element, while 
 
 exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > change the properties of a shape > [end of test] appState 1`] = `
 {
@@ -3561,7 +3561,7 @@ exports[`regression tests > change the properties of a shape > [end of test] his
 
 exports[`regression tests > change the properties of a shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > change the properties of a shape > [end of test] number of renders 1`] = `11`;
+exports[`regression tests > change the properties of a shape > [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests > click on an element and drag it > [dragged] appState 1`] = `
 {
@@ -3806,7 +3806,7 @@ exports[`regression tests > click on an element and drag it > [dragged] history 
 
 exports[`regression tests > click on an element and drag it > [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `10`;
+exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `9`;
 
 exports[`regression tests > click on an element and drag it > [end of test] appState 1`] = `
 {
@@ -4062,7 +4062,7 @@ exports[`regression tests > click on an element and drag it > [end of test] hist
 
 exports[`regression tests > click on an element and drag it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `12`;
+exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests > click to select a shape > [end of test] appState 1`] = `
 {
@@ -4304,7 +4304,7 @@ exports[`regression tests > click to select a shape > [end of test] history 1`] 
 
 exports[`regression tests > click to select a shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click to select a shape > [end of test] number of renders 1`] = `13`;
+exports[`regression tests > click to select a shape > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > click-drag to select a group > [end of test] appState 1`] = `
 {
@@ -4648,7 +4648,7 @@ exports[`regression tests > click-drag to select a group > [end of test] history
 
 exports[`regression tests > click-drag to select a group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] appState 1`] = `
 {
@@ -5123,7 +5123,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
 
 exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] number of renders 1`] = `20`;
+exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] number of renders 1`] = `19`;
 
 exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] appState 1`] = `
 {
@@ -5420,7 +5420,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
 
 exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `14`;
+exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] appState 1`] = `
 {
@@ -5689,7 +5689,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
 
 exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] number of renders 1`] = `14`;
+exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] appState 1`] = `
 {
@@ -5913,7 +5913,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
 
 exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `9`;
+exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] appState 1`] = `
 {
@@ -6081,7 +6081,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
 
 exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] number of renders 1`] = `9`;
+exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests > double click to edit a group > [end of test] appState 1`] = `
 {
@@ -6533,7 +6533,7 @@ exports[`regression tests > double click to edit a group > [end of test] history
 
 exports[`regression tests > double click to edit a group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > double click to edit a group > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > double click to edit a group > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] appState 1`] = `
 {
@@ -6850,7 +6850,7 @@ exports[`regression tests > drags selected elements from point inside common bou
 
 exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of renders 1`] = `15`;
+exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > draw every type of shape > [end of test] appState 1`] = `
 {
@@ -8917,7 +8917,7 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `44`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `43`;
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] appState 1`] = `
 {
@@ -9261,7 +9261,7 @@ exports[`regression tests > given a group of selected elements with an element t
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] appState 1`] = `
 {
@@ -9504,7 +9504,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
 
 exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of renders 1`] = `15`;
+exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up > [end of test] appState 1`] = `
 {
@@ -12842,7 +12842,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
 
 exports[`regression tests > make a group and duplicate it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > make a group and duplicate it > [end of test] number of renders 1`] = `21`;
+exports[`regression tests > make a group and duplicate it > [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] appState 1`] = `
 {
@@ -13084,7 +13084,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
 
 exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of renders 1`] = `17`;
+exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
 {
@@ -13375,7 +13375,7 @@ exports[`regression tests > shift click on selected element should deselect it o
 
 exports[`regression tests > shift click on selected element should deselect it on pointer up > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > shift click on selected element should deselect it on pointer up > [end of test] number of renders 1`] = `9`;
+exports[`regression tests > shift click on selected element should deselect it on pointer up > [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests > shift-click to multiselect, then drag > [end of test] appState 1`] = `
 {
@@ -13692,7 +13692,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
 
 exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of renders 1`] = `16`;
+exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests > should group elements and ungroup them > [end of test] appState 1`] = `
 {
@@ -14253,7 +14253,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
 
 exports[`regression tests > should group elements and ungroup them > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > should group elements and ungroup them > [end of test] number of renders 1`] = `22`;
+exports[`regression tests > should group elements and ungroup them > [end of test] number of renders 1`] = `21`;
 
 exports[`regression tests > should show fill icons when element has non transparent background > [end of test] appState 1`] = `
 {
@@ -14464,7 +14464,7 @@ exports[`regression tests > should show fill icons when element has non transpar
 
 exports[`regression tests > should show fill icons when element has non transparent background > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > should show fill icons when element has non transparent background > [end of test] number of renders 1`] = `10`;
+exports[`regression tests > should show fill icons when element has non transparent background > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] appState 1`] = `
 {
@@ -15320,7 +15320,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
 
 exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of renders 1`] = `30`;
+exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of renders 1`] = `29`;
 
 exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] appState 1`] = `
 {
@@ -16233,7 +16233,7 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
 
 exports[`regression tests > supports nested groups > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > supports nested groups > [end of test] number of renders 1`] = `27`;
+exports[`regression tests > supports nested groups > [end of test] number of renders 1`] = `26`;
 
 exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] appState 1`] = `
 {
@@ -16633,7 +16633,7 @@ exports[`regression tests > switches from group of selected elements to another 
 
 exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests > switches selected element on pointer down > [end of test] appState 1`] = `
 {
@@ -16931,7 +16931,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
 
 exports[`regression tests > switches selected element on pointer down > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > switches selected element on pointer down > [end of test] number of renders 1`] = `13`;
+exports[`regression tests > switches selected element on pointer down > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > two-finger scroll works > [end of test] appState 1`] = `
 {
@@ -17537,7 +17537,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] history
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `24`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `23`;
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] appState 1`] = `
 {
@@ -17601,10 +17601,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "openMenu": null,
   "openPopup": null,
   "openSidebar": null,
-  "originSnapOffset": {
-    "x": 0,
-    "y": 0,
-  },
+  "originSnapOffset": null,
   "pasteDialog": {
     "data": null,
     "shown": false,
@@ -17663,7 +17660,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > updates fontSize & fontFamily appState > [end of test] number of renders 1`] = `6`;
+exports[`regression tests > updates fontSize & fontFamily appState > [end of test] number of renders 1`] = `5`;
 
 exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
 {
