@@ -43,7 +43,7 @@ describe("move element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(7);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -85,7 +85,7 @@ describe("move element", () => {
     new Pointer("mouse").clickOn(rectB);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(24);
-    expect(renderStaticScene).toHaveBeenCalledTimes(20);
+    expect(renderStaticScene).toHaveBeenCalledTimes(19);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
@@ -131,7 +131,7 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(7);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();

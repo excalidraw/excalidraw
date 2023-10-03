@@ -14,13 +14,8 @@ import {
   hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { UIAppState, Zoom } from "../types";
-import {
-  capitalizeString,
-  isTransparent,
-  updateActiveTool,
-  setCursorForShape,
-} from "../utils";
+import { AppClassProperties, UIAppState, Zoom } from "../types";
+import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
@@ -215,15 +210,15 @@ export const SelectedShapeActions = ({
 export const ShapesSwitcher = ({
   interactiveCanvas,
   activeTool,
-  setAppState,
   onImageAction,
   appState,
+  app,
 }: {
   interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
-  setAppState: React.Component<any, UIAppState>["setState"];
   onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: UIAppState;
+  app: AppClassProperties;
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const device = useDevice();
@@ -251,29 +246,14 @@ export const ShapesSwitcher = ({
             data-testid={`toolbar-${value}`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
+                app.togglePenMode(true);
               }
             }}
             onChange={({ pointerType }) => {
               if (appState.activeTool.type !== value) {
                 trackEvent("toolbar", value, "ui");
               }
-              const nextActiveTool = updateActiveTool(appState, {
-                type: value,
-              });
-              setAppState({
-                activeTool: nextActiveTool,
-                activeEmbeddable: null,
-                multiElement: null,
-                selectedElementIds: {},
-              });
-              setCursorForShape(interactiveCanvas, {
-                ...appState,
-                activeTool: nextActiveTool,
-              });
+              app.setActiveTool({ type: value });
               if (value === "image") {
                 onImageAction({ pointerType });
               }
@@ -300,23 +280,12 @@ export const ShapesSwitcher = ({
             data-testid={`toolbar-frame`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
+                app.togglePenMode(true);
               }
             }}
             onChange={({ pointerType }) => {
               trackEvent("toolbar", "frame", "ui");
-              const nextActiveTool = updateActiveTool(appState, {
-                type: "frame",
-              });
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-                activeEmbeddable: null,
-              });
+              app.setActiveTool({ type: "frame" });
             }}
             selected={activeTool.type === "frame"}
           />
@@ -331,23 +300,12 @@ export const ShapesSwitcher = ({
             data-testid={`toolbar-embeddable`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
+                app.togglePenMode(true);
               }
             }}
             onChange={({ pointerType }) => {
               trackEvent("toolbar", "embeddable", "ui");
-              const nextActiveTool = updateActiveTool(appState, {
-                type: "embeddable",
-              });
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-                activeEmbeddable: null,
-              });
+              app.setActiveTool({ type: "embeddable" });
             }}
             selected={activeTool.type === "embeddable"}
           />
@@ -368,14 +326,7 @@ export const ShapesSwitcher = ({
           >
             <DropdownMenu.Item
               onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "frame",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
+                app.setActiveTool({ type: "frame" });
               }}
               icon={frameToolIcon}
               shortcut={KEYS.F.toLocaleUpperCase()}
@@ -386,14 +337,7 @@ export const ShapesSwitcher = ({
             </DropdownMenu.Item>
             <DropdownMenu.Item
               onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "embeddable",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
+                app.setActiveTool({ type: "embeddable" });
               }}
               icon={EmbedIcon}
               data-testid="toolbar-embeddable"
