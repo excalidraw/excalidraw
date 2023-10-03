@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
   const envVars = loadEnv(mode, process.cwd());
 
   return {
+    ...(envVars.VITE_APP_BASE_PATH ? { base: envVars.VITE_APP_BASE_PATH } : {}),
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       // open the browser
