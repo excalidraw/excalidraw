@@ -18,6 +18,7 @@ import { AppClassProperties, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
+import { SubtypeShapeActions, SubtypeToggles } from "./Subtypes";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import { hasBoundTextElement } from "../element/typeChecks";
@@ -95,6 +96,7 @@ export const SelectedShapeActions = ({
       {showChangeBackgroundIcons && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
+      <SubtypeShapeActions elements={targetElements} />
       {showFillIcons && renderAction("changeFillStyle")}
 
       {(hasStrokeWidth(appState.activeTool.type) ||
@@ -348,6 +350,7 @@ export const ShapesSwitcher = ({
           </DropdownMenu.Content>
         </DropdownMenu>
       )}
+      <SubtypeToggles />
     </>
   );
 };

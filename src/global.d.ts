@@ -116,3 +116,5 @@ declare namespace jest {
     toBeNonNaNNumber(): void;
   }
 }
+
+declare module "mathjax-full/mjs/input/asciimath/legacy/MathJax";

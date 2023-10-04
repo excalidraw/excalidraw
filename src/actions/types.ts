@@ -32,6 +32,15 @@ type ActionFn = (
   app: AppClassProperties,
 ) => ActionResult | Promise<ActionResult>;
 
+// Return `true` *unless* `Action` should be disabled
+// given `elements`, `appState`, and optionally `data`.
+export type ActionPredicateFn = (
+  action: Action,
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  data?: Record<string, any>,
+) => boolean;
+
 export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
@@ -136,7 +145,7 @@ export type PanelComponentProps = {
 };
 
 export interface Action {
-  name: ActionName;
+  name: string;
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
@@ -158,6 +167,7 @@ export interface Action {
     appState: AppState,
     appProps: ExcalidrawProps,
     app: AppClassProperties,
+    data?: Record<string, any>,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
   trackEvent:

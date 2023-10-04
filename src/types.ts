@@ -18,6 +18,7 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
 } from "./element/types";
+import { Action } from "./actions/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
@@ -31,6 +32,12 @@ import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
+import {
+  SubtypeMethods,
+  Subtype,
+  SubtypePrepFn,
+  SubtypeRecord,
+} from "./element/subtypes";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
@@ -190,6 +197,10 @@ export type AppState = {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
+  activeSubtypes?: Subtype[];
+  customData?: {
+    [subtype: Subtype]: ExcalidrawElement["customData"];
+  };
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the
@@ -623,6 +634,11 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
+  actionManager: InstanceType<typeof App>["actionManager"];
+  addSubtype: (
+    record: SubtypeRecord,
+    subtypePrepFn: SubtypePrepFn,
+  ) => { actions: Action[] | null; methods: Partial<SubtypeMethods> };
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
