@@ -14,7 +14,7 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "./element/textElement";
-import { arrayToMap, findIndex } from "./utils";
+import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
@@ -457,85 +457,87 @@ export const addElementsToFrame = (
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  const _elementsToAdd: ExcalidrawElement[] = [];
-
-  for (const element of elementsToAdd) {
-    _elementsToAdd.push(element);
-
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      _elementsToAdd.push(boundTextElement);
-    }
-  }
-
-  const allElementsIndex = allElements.reduce(
-    (acc: Record<string, number>, element, index) => {
-      acc[element.id] = index;
-      return acc;
-    },
-    {},
+  const currTargetFrameChildrenMap = new Map(
+    allElements.reduce(
+      (acc: [ExcalidrawElement["id"], ExcalidrawElement][], element) => {
+        if (element.frameId === frame.id) {
+          acc.push([element.id, element]);
+        }
+        return acc;
+      },
+      [],
+    ),
   );
 
-  const frameIndex = allElementsIndex[frame.id];
-  // need to be calculated before the mutation below occurs
-  const leftFrameBoundaryIndex = findIndex(
-    allElements,
-    (e) => e.frameId === frame.id,
-  );
+  const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
 
-  const existingFrameChildren = allElements.filter(
-    (element) => element.frameId === frame.id,
-  );
+  const finalElementsToAdd: ExcalidrawElement[] = [];
 
-  const addedFrameChildren_left: ExcalidrawElement[] = [];
-  const addedFrameChildren_right: ExcalidrawElement[] = [];
-
+  // - add bound text elements if not already in the array
+  // - filter out elements that are already in the frame
   for (const element of omitGroupsContainingFrames(
     allElements,
-    _elementsToAdd,
+    elementsToAdd,
   )) {
-    if (element.frameId !== frame.id && !isFrameElement(element)) {
-      if (allElementsIndex[element.id] > frameIndex) {
-        addedFrameChildren_right.push(element);
-      } else {
-        addedFrameChildren_left.push(element);
-      }
+    if (!currTargetFrameChildrenMap.has(element.id)) {
+      finalElementsToAdd.push(element);
+    }
 
-      mutateElement(
-        element,
-        {
-          frameId: frame.id,
-        },
-        false,
-      );
+    const boundTextElement = getBoundTextElement(element);
+    if (
+      boundTextElement &&
+      !suppliedElementsToAddSet.has(boundTextElement.id) &&
+      !currTargetFrameChildrenMap.has(boundTextElement.id)
+    ) {
+      finalElementsToAdd.push(boundTextElement);
     }
   }
 
-  const frameElement = allElements[frameIndex];
-  const nextFrameChildren = addedFrameChildren_left
-    .concat(existingFrameChildren)
-    .concat(addedFrameChildren_right);
+  const finalElementsToAddSet = new Set(finalElementsToAdd.map((el) => el.id));
 
-  const nextFrameChildrenMap = nextFrameChildren.reduce(
-    (acc: Record<string, boolean>, element) => {
-      acc[element.id] = true;
-      return acc;
-    },
-    {},
-  );
+  const nextElements: ExcalidrawElement[] = [];
 
-  const nextOtherElements_left = allElements
-    .slice(0, leftFrameBoundaryIndex >= 0 ? leftFrameBoundaryIndex : frameIndex)
-    .filter((element) => !nextFrameChildrenMap[element.id]);
+  const processedElements = new Set<ExcalidrawElement["id"]>();
 
-  const nextOtherElement_right = allElements
-    .slice(frameIndex + 1)
-    .filter((element) => !nextFrameChildrenMap[element.id]);
+  for (const element of allElements) {
+    if (processedElements.has(element.id)) {
+      continue;
+    }
 
-  const nextElements = nextOtherElements_left
-    .concat(nextFrameChildren)
-    .concat([frameElement])
-    .concat(nextOtherElement_right);
+    processedElements.add(element.id);
+
+    if (
+      finalElementsToAddSet.has(element.id) ||
+      (element.frameId && element.frameId === frame.id)
+    ) {
+      // will be added in bulk once we process target frame
+      continue;
+    }
+
+    // target frame
+    if (element.id === frame.id) {
+      const currFrameChildren = getFrameElements(allElements, frame.id);
+      currFrameChildren.forEach((child) => {
+        processedElements.add(child.id);
+      });
+      // console.log(currFrameChildren, finalElementsToAdd, element);
+      nextElements.push(...currFrameChildren, ...finalElementsToAdd, element);
+      continue;
+    }
+
+    // console.log("(2)", element.frameId);
+    nextElements.push(element);
+  }
+
+  for (const element of finalElementsToAdd) {
+    mutateElement(
+      element,
+      {
+        frameId: frame.id,
+      },
+      false,
+    );
+  }
 
   return nextElements;
 };
