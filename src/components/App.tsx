@@ -6549,7 +6549,9 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         // remove invisible element which was added in onPointerDown
         this.scene.replaceAllElements(
-          this.scene.getElementsIncludingDeleted().slice(0, -1),
+          this.scene
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== draggingElement.id),
         );
         this.setState({
           draggingElement: null,

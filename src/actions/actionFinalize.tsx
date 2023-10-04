@@ -90,7 +90,9 @@ export const actionFinalize = register({
         }
       }
       if (isInvisiblySmallElement(multiPointElement)) {
-        newElements = newElements.slice(0, -1);
+        newElements = newElements.filter(
+          (el) => el.id !== multiPointElement.id,
+        );
       }
 
       // If the multi point line closes the loop,
