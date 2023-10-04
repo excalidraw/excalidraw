@@ -8,7 +8,7 @@ index 41f6a1f..25096c6 100644
  
  //
  //  Load component-based configuration, if any
-@@ -13,11 +13,12 @@ MathJax.Ajax.Preloading(
+@@ -13,11 +13,13 @@ MathJax.Ajax.Preloading(
    "[MathJax]/jax/element/mml/jax.js"
  );
  
@@ -16,12 +16,13 @@ index 41f6a1f..25096c6 100644
 -require("../legacy/jax/input/AsciiMath/config.js");
 -require("../legacy/jax/input/AsciiMath/jax.js");
 +exports.LegacyAsciiMath = void 0;
-+import("../legacy/jax/element/mml/jax.js").then(() => {
-+import("../legacy/jax/input/AsciiMath/config.js").then(() => {
-+import("../legacy/jax/input/AsciiMath/jax.js").then(() => {
++(async () => {
++  await import("../legacy/jax/element/mml/jax.js");
++  await import("../legacy/jax/input/AsciiMath/config.js");
++  await import("../legacy/jax/input/AsciiMath/jax.js");
  
 -require("../legacy/jax/element/MmlNode.js");
-+import("../legacy/jax/element/MmlNode.js").then(() => {
++  await import("../legacy/jax/element/MmlNode.js");
  
  var MmlFactory = require("../../../../core/MmlTree/MmlFactory.js").MmlFactory;
  var factory = new MmlFactory();
@@ -29,7 +30,7 @@ index 41f6a1f..25096c6 100644
      return this.Compile(am,display);
    }
  };
-+})})})})
++})();
 diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
 index 903ede2..504ae4f 100644
 --- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
@@ -39,7 +40,7 @@ index 903ede2..504ae4f 100644
    };
    var CONSTRUCTOR = function () {
 -    return function () {return arguments.callee.Init.call(this,arguments)};
-+    return function aaa() {return aaa.Init.call(this,Object.assign(arguments,{call:aaa}))};
++    return function fn() {return fn.Init.call(this,Object.assign(arguments,{call:fn}))};
    };
  
    BASE.Object = OBJECT({
@@ -57,7 +58,7 @@ index 903ede2..504ae4f 100644
      prototype: {
        Init: function () {},
 -      SUPER: function (fn) {return fn.callee.SUPER},
-+      SUPER: function (fncall) {return fncall.SUPER},
++      SUPER: function (fn) {return fn.SUPER},
        can: function (method) {return typeof(this[method]) === "function"},
        has: function (property) {return typeof(this[property]) !== "undefined"},
        isa: function (obj) {return (obj instanceof Object) && (this instanceof obj)}
@@ -66,7 +67,7 @@ index 903ede2..504ae4f 100644
    //
    var CALLBACK = function (data) {
 -    var cb = function () {return arguments.callee.execute.apply(arguments.callee,arguments)};
-+    var cb = function ccc() {return ccc.execute.apply(ccc,arguments)};
++    var cb = function fn() {return fn.execute.apply(fn,arguments)};
      for (var id in CALLBACK.prototype) {
        if (CALLBACK.prototype.hasOwnProperty(id)) {
          if (typeof(data[id]) !== 'undefined') {cb[id] = data[id]}
@@ -79,10 +80,10 @@ index 96fb918..473aca1 100644
        return this.data[this.core].CoreMO();
      },
 -    toString: function () {
-+    toString: function qqq() {
++    toString: function fn() {
        if (this.inferred) {return '[' + this.data.join(',') + ']'}
 -      return this.SUPER(arguments).toString.call(this);
-+      return this.SUPER(qqq).toString.call(this);
++      return this.SUPER(fn).toString.call(this);
      },
      setTeXclass: function (prev) {
        var i, m = this.data.length;
@@ -91,13 +92,13 @@ index 96fb918..473aca1 100644
      },
      linebreakContainer: true,
 -    Append: function () {
-+    Append: function www() {
++    Append: function fn() {
        for (var i = 0, m = arguments.length; i < m; i++) {
          if (!((arguments[i] instanceof MML.mtr) ||
                (arguments[i] instanceof MML.mlabeledtr))) {arguments[i] = MML.mtr(arguments[i])}
        }
 -      this.SUPER(arguments).Append.apply(this,arguments);
-+      this.SUPER(www).Append.apply(this,arguments);
++      this.SUPER(fn).Append.apply(this,arguments);
      },
      setTeXclass: MML.mbase.setSeparateTeXclasses
    });
@@ -106,12 +107,12 @@ index 96fb918..473aca1 100644
      },
      linebreakContainer: true,
 -    Append: function () {
-+    Append: function eee() {
++    Append: function fn() {
        for (var i = 0, m = arguments.length; i < m; i++) {
          if (!(arguments[i] instanceof MML.mtd)) {arguments[i] = MML.mtd(arguments[i])}
        }
 -      this.SUPER(arguments).Append.apply(this,arguments);
-+      this.SUPER(eee).Append.apply(this,arguments);
++      this.SUPER(fn).Append.apply(this,arguments);
      },
      setTeXclass: MML.mbase.setSeparateTeXclasses
    });
@@ -120,10 +121,10 @@ index 96fb918..473aca1 100644
    MML.xml = MML.mbase.Subclass({
      type: "xml",
 -    Init: function () {
-+    Init: function rrr() {
++    Init: function fn() {
        this.div = document.createElement("div");
 -      return this.SUPER(arguments).Init.apply(this,arguments);
-+      return this.SUPER(rrr).Init.apply(this,arguments);
++      return this.SUPER(fn).Init.apply(this,arguments);
      },
      Append: function () {
        for (var i = 0, m = arguments.length; i < m; i++) {
