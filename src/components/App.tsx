@@ -4602,7 +4602,7 @@ class App extends React.Component<AppProps, AppState> {
 
     lastPointerUp = onPointerUp;
 
-    if (!this.state.viewModeEnabled) {
+    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
