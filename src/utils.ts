@@ -15,9 +15,8 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
+import { ActiveTool, AppState, DataURL, ToolType, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { SHAPES } from "./shapes";
 import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
 import React from "react";
@@ -371,15 +370,10 @@ export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
     | {
-        type:
-          | typeof SHAPES[number]["value"]
-          | "eraser"
-          | "hand"
-          | "frame"
-          | "embeddable";
+        type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
+  ) & { lastActiveToolBeforeEraser?: ActiveTool | null },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {

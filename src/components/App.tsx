@@ -211,7 +211,7 @@ import {
 import Scene from "../scene/Scene";
 import { RenderInteractiveSceneCallback, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey, SHAPES } from "../shapes";
+import { findShapeByKey } from "../shapes";
 import {
   AppClassProperties,
   AppProps,
@@ -230,6 +230,7 @@ import {
   SidebarName,
   SidebarTabName,
   KeyboardModifiersObject,
+  ToolType,
 } from "../types";
 import {
   debounce,
@@ -3113,12 +3114,7 @@ class App extends React.Component<AppProps, AppState> {
   setActiveTool = (
     tool:
       | {
-          type:
-            | typeof SHAPES[number]["value"]
-            | "eraser"
-            | "hand"
-            | "frame"
-            | "embeddable";
+          type: ToolType;
         }
       | { type: "custom"; customType: string },
   ) => {

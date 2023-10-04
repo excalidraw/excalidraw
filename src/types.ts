@@ -18,7 +18,6 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
 } from "./element/types";
-import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
@@ -86,21 +85,30 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type LastActiveTool =
+export type ToolType =
+  | "selection"
+  | "rectangle"
+  | "diamond"
+  | "ellipse"
+  | "arrow"
+  | "line"
+  | "freedraw"
+  | "text"
+  | "image"
+  | "eraser"
+  | "hand"
+  | "frame"
+  | "embeddable";
+
+export type ActiveTool =
   | {
-      type:
-        | typeof SHAPES[number]["value"]
-        | "eraser"
-        | "hand"
-        | "frame"
-        | "embeddable";
+      type: ToolType;
       customType: null;
     }
   | {
       type: "custom";
       customType: string;
-    }
-  | null;
+    };
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -195,23 +203,9 @@ export type AppState = {
      * indicates a previous tool we should revert back to if we deselect the
      * currently active tool. At the moment applies to `eraser` and `hand` tool.
      */
-    lastActiveTool: LastActiveTool;
+    lastActiveTool: ActiveTool | null;
     locked: boolean;
-  } & (
-    | {
-        type:
-          | typeof SHAPES[number]["value"]
-          | "eraser"
-          | "hand"
-          | "frame"
-          | "embeddable";
-        customType: null;
-      }
-    | {
-        type: "custom";
-        customType: string;
-      }
-  );
+  } & ActiveTool;
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
