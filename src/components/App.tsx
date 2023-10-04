@@ -491,8 +491,9 @@ class App extends React.Component<AppProps, AppState> {
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
-  lastPointerDown: React.PointerEvent<HTMLElement> | null = null;
-  lastPointerUp: React.PointerEvent<HTMLElement> | PointerEvent | null = null;
+  lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
+  lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
+    null;
   lastViewportPosition = { x: 0, y: 0 };
 
   constructor(props: AppProps) {
@@ -3736,10 +3737,10 @@ class App extends React.Component<AppProps, AppState> {
     isTouchScreen: boolean,
   ) => {
     const draggedDistance = distance2d(
-      this.lastPointerDown!.clientX,
-      this.lastPointerDown!.clientY,
-      this.lastPointerUp!.clientX,
-      this.lastPointerUp!.clientY,
+      this.lastPointerDownEvent!.clientX,
+      this.lastPointerDownEvent!.clientY,
+      this.lastPointerUpEvent!.clientX,
+      this.lastPointerUpEvent!.clientY,
     );
     if (
       !this.hitLinkElement ||
@@ -3750,7 +3751,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
-      this.lastPointerDown!,
+      this.lastPointerDownEvent!,
       this.state,
     );
     const lastPointerDownHittingLinkIcon = isPointHittingLink(
@@ -3760,7 +3761,7 @@ class App extends React.Component<AppProps, AppState> {
       this.device.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
-      this.lastPointerUp!,
+      this.lastPointerUpEvent!,
       this.state,
     );
     const lastPointerUpHittingLinkIcon = isPointHittingLink(
@@ -4465,7 +4466,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.lastPointerDown = event;
+    this.lastPointerDownEvent = event;
+
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
@@ -4605,14 +4607,14 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.removePointer(event);
-    this.lastPointerUp = event;
+    this.lastPointerUpEvent = event;
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
       this.state,
     );
     const clicklength =
-      event.timeStamp - (this.lastPointerDown?.timeStamp ?? 0);
+      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
     if (this.device.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
@@ -5366,7 +5368,9 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       sceneX,
       sceneY,
-      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.state.gridSize,
     );
 
     const embedLink = getEmbedLink(link);
@@ -5416,7 +5420,9 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       sceneX,
       sceneY,
-      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.state.gridSize,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5593,7 +5599,9 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.state.gridSize,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5651,7 +5659,9 @@ class App extends React.Component<AppProps, AppState> {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.lastPointerDown?.[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.state.gridSize,
     );
 
     const frame = newFrameElement({
@@ -6773,17 +6783,17 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (isEraserActive(this.state)) {
         const draggedDistance = distance2d(
-          this.lastPointerDown!.clientX,
-          this.lastPointerDown!.clientY,
-          this.lastPointerUp!.clientX,
-          this.lastPointerUp!.clientY,
+          this.lastPointerDownEvent!.clientX,
+          this.lastPointerDownEvent!.clientY,
+          this.lastPointerUpEvent!.clientX,
+          this.lastPointerUpEvent!.clientY,
         );
 
         if (draggedDistance === 0) {
           const scenePointer = viewportCoordsToSceneCoords(
             {
-              clientX: this.lastPointerUp!.clientX,
-              clientY: this.lastPointerUp!.clientY,
+              clientX: this.lastPointerUpEvent!.clientX,
+              clientY: this.lastPointerUpEvent!.clientY,
             },
             this.state,
           );
@@ -7039,14 +7049,16 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         hitElement &&
-        this.lastPointerUp &&
-        this.lastPointerDown &&
-        this.lastPointerUp.timeStamp - this.lastPointerDown.timeStamp < 300 &&
+        this.lastPointerUpEvent &&
+        this.lastPointerDownEvent &&
+        this.lastPointerUpEvent.timeStamp -
+          this.lastPointerDownEvent.timeStamp <
+          300 &&
         gesture.pointers.size <= 1 &&
         isEmbeddableElement(hitElement) &&
         this.isEmbeddableCenter(
           hitElement,
-          this.lastPointerUp,
+          this.lastPointerUpEvent,
           pointerDownState.origin.x,
           pointerDownState.origin.y,
         )
