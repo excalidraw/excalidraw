@@ -95,8 +95,6 @@ export class LaserPathManager {
   private container: SVGSVGElement | undefined;
 
   constructor(private app: App) {
-    window.LPM = this;
-
     this.ownState = instantiateCollabolatorState();
   }
 
@@ -283,11 +281,5 @@ export class LaserPathManager {
 
     this.ownState.svg.setAttribute("d", paths);
     this.ownState.svg.setAttribute("fill", "red");
-  }
-}
-
-declare global {
-  interface Window {
-    __test: any;
   }
 }
