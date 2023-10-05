@@ -1904,6 +1904,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
+      this.props.activeTool &&
+      this.props.activeTool.type !== this.state.activeTool.type
+    ) {
+      this.setActiveTool(this.props.activeTool);
+    }
+
+    if (
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
     ) {
