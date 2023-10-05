@@ -143,9 +143,9 @@ export class LaserPathManager {
   }
 
   stop() {
+    this.isRunning = false;
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
-      this.isRunning = false;
     }
   }
 
