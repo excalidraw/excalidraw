@@ -4,6 +4,11 @@ import { sceneCoordsToViewportCoords } from "../../utils";
 import App from "../App";
 import { getClientColor } from "../../clients";
 
+// decay time in milliseconds
+const DECAY_TIME = 1000;
+// length of line in points before it starts decaying
+const DECAY_LENGTH = 50;
+
 const average = (a: number, b: number) => (a + b) / 2;
 function getSvgPathFromStroke(points: number[][], closed = true) {
   const len = points.length;
@@ -64,8 +69,8 @@ function instantiatePath() {
     simplify: 0,
     streamline: 0.4,
     sizeMapping: (c) => {
-      const pt = 1000;
-      const pl = 50;
+      const pt = DECAY_TIME;
+      const pl = DECAY_LENGTH;
       const t = Math.max(0, 1 - (performance.now() - c.pressure) / pt);
       const l = (pl - Math.min(pl, c.totalLength - c.currentIndex)) / pl;
 
@@ -249,7 +254,7 @@ export class LaserPathManager {
       state.finishedPaths = state.finishedPaths.filter((path) => {
         const lastPoint = path.originalPoints[path.originalPoints.length - 1];
 
-        return !(lastPoint && lastPoint[2] < performance.now() - 1000);
+        return !(lastPoint && lastPoint[2] < performance.now() - DECAY_TIME);
       });
 
       let paths = state.finishedPaths.map((path) => this.draw(path)).join(" ");
@@ -265,7 +270,7 @@ export class LaserPathManager {
     this.ownState.finishedPaths = this.ownState.finishedPaths.filter((path) => {
       const lastPoint = path.originalPoints[path.originalPoints.length - 1];
 
-      return !(lastPoint && lastPoint[2] < performance.now() - 1000);
+      return !(lastPoint && lastPoint[2] < performance.now() - DECAY_TIME);
     });
 
     let paths = this.ownState.finishedPaths
