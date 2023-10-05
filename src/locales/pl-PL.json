@@ -109,9 +109,9 @@
     "createContainerFromText": "Zawijaj tekst w kontenerze",
     "link": {
       "edit": "Edytuj łącze",
-      "editEmbed": "",
+      "editEmbed": "Edytuj i osadź link",
       "create": "Utwórz łącze",
-      "createEmbed": "",
+      "createEmbed": "Stwórz i osadź link",
       "label": "Łącze",
       "labelEmbed": "",
       "empty": ""
