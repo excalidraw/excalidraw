@@ -1,5 +1,5 @@
 import { updateBoundElements } from "./binding";
-import { getCommonBounds } from "./bounds";
+import { BoundingBox, getCommonBoundingBox, getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -41,14 +41,16 @@ export const dragSelectedElements = (
     elementsInFrames.forEach((element) => elementsToUpdate.add(element));
   }
 
+  const boundingBox = getCommonBoundingBox(Array.from(elementsToUpdate));
+  const adjustedOffset = calculateOffset(
+    boundingBox,
+    offset,
+    snapOffset,
+    gridSize,
+  );
+
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(
-      pointerDownState,
-      element,
-      offset,
-      snapOffset,
-      gridSize,
-    );
+    updateElementCoords(pointerDownState, element, adjustedOffset);
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
     if (
@@ -66,13 +68,7 @@ export const dragSelectedElements = (
         // updating its coords again
         (!textElement.frameId || !frames.includes(textElement.frameId))
       ) {
-        updateElementCoords(
-          pointerDownState,
-          textElement,
-          offset,
-          snapOffset,
-          gridSize,
-        );
+        updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
     updateBoundElements(element, {
@@ -81,23 +77,19 @@ export const dragSelectedElements = (
   });
 };
 
-const updateElementCoords = (
-  pointerDownState: PointerDownState,
-  element: NonDeletedExcalidrawElement,
+const calculateOffset = (
+  boundingBox: BoundingBox,
   dragOffset: { x: number; y: number },
   snapOffset: { x: number; y: number },
   gridSize: AppState["gridSize"],
-) => {
-  const originalElement =
-    pointerDownState.originalElements.get(element.id) ?? element;
-
-  let nextX = originalElement.x + dragOffset.x + snapOffset.x;
-  let nextY = originalElement.y + dragOffset.y + snapOffset.y;
+): { x: number; y: number } => {
+  let nextX = boundingBox.minX + dragOffset.x + snapOffset.x;
+  let nextY = boundingBox.minY + dragOffset.y + snapOffset.y;
 
   if (snapOffset.x === 0 || snapOffset.y === 0) {
     const [nextGridX, nextGridY] = getGridPoint(
-      originalElement.x + dragOffset.x,
-      originalElement.y + dragOffset.y,
+      boundingBox.minX + dragOffset.x,
+      boundingBox.minY + dragOffset.y,
       gridSize,
     );
 
@@ -109,6 +101,22 @@ const updateElementCoords = (
       nextY = nextGridY;
     }
   }
+  return {
+    x: nextX - boundingBox.minX,
+    y: nextY - boundingBox.minY,
+  };
+};
+
+const updateElementCoords = (
+  pointerDownState: PointerDownState,
+  element: NonDeletedExcalidrawElement,
+  dragOffset: { x: number; y: number },
+) => {
+  const originalElement =
+    pointerDownState.originalElements.get(element.id) ?? element;
+
+  const nextX = originalElement.x + dragOffset.x;
+  const nextY = originalElement.y + dragOffset.y;
 
   mutateElement(element, {
     x: nextX,
