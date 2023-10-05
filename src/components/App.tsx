@@ -230,6 +230,7 @@ import {
   SidebarName,
   SidebarTabName,
   KeyboardModifiersObject,
+  CollaboratorPointer,
   ToolType,
 } from "../types";
 import {
@@ -368,6 +369,8 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
+import { LaserToolOverlay } from "./LaserTool/LaserTool";
+import { LaserPathManager } from "./LaserTool/LaserPathManager";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -496,6 +499,8 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastViewportPosition = { x: 0, y: 0 };
+
+  laserPathManager: LaserPathManager = new LaserPathManager(this);
 
   constructor(props: AppProps) {
     super(props);
@@ -1205,12 +1210,14 @@ class App extends React.Component<AppProps, AppState> {
                             !this.scene.getElementsIncludingDeleted().length
                           }
                           app={this}
+                          isCollaborating={this.props.isCollaborating}
                         >
                           {this.props.children}
                         </LayerUI>
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
+                        <LaserToolOverlay manager={this.laserPathManager} />
                         {selectedElements.length === 1 &&
                           !this.state.contextMenu &&
                           this.state.showHyperlinkPopup && (
@@ -1738,6 +1745,7 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     this.library.destroy();
+    this.laserPathManager.destroy();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
@@ -3050,6 +3058,15 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
+      }
+
+      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (this.state.activeTool.type === "laser") {
+          this.setActiveTool({ type: "selection" });
+        } else {
+          this.setActiveTool({ type: "laser" });
+        }
+        return;
       }
 
       if (
@@ -4462,6 +4479,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
+
     this.lastPointerDownEvent = event;
 
     this.setState({
@@ -4469,10 +4490,6 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
-
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
-      return;
-    }
 
     // only handle left mouse button or touch
     if (
@@ -4564,6 +4581,11 @@ class App extends React.Component<AppProps, AppState> {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
     } else if (this.state.activeTool.type === "frame") {
       this.createFrameElementOnPointerDown(pointerDownState);
+    } else if (this.state.activeTool.type === "laser") {
+      this.laserPathManager.startPath(
+        pointerDownState.lastCoords.x,
+        pointerDownState.lastCoords.y,
+      );
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand"
@@ -4587,7 +4609,7 @@ class App extends React.Component<AppProps, AppState> {
 
     lastPointerUp = onPointerUp;
 
-    if (!this.state.viewModeEnabled) {
+    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -5781,6 +5803,10 @@ class App extends React.Component<AppProps, AppState> {
       if (isEraserActive(this.state)) {
         this.handleEraser(event, pointerDownState, pointerCoords);
         return;
+      }
+
+      if (this.state.activeTool.type === "laser") {
+        this.laserPathManager.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
       const [gridX, gridY] = getGridPoint(
@@ -7029,6 +7055,11 @@ class App extends React.Component<AppProps, AppState> {
           : unbindLinearElements)(this.scene.getSelectedElements(this.state));
       }
 
+      if (activeTool.type === "laser") {
+        this.laserPathManager.endPath();
+        return;
+      }
+
       if (!activeTool.locked && activeTool.type !== "freedraw") {
         resetCursor(this.interactiveCanvas);
         this.setState({
@@ -8273,14 +8304,20 @@ class App extends React.Component<AppProps, AppState> {
     if (!x || !y) {
       return;
     }
-    const pointer = viewportCoordsToSceneCoords(
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       { clientX: x, clientY: y },
       this.state,
     );
 
-    if (isNaN(pointer.x) || isNaN(pointer.y)) {
+    if (isNaN(sceneX) || isNaN(sceneY)) {
       // sometimes the pointer goes off screen
     }
+
+    const pointer: CollaboratorPointer = {
+      x: sceneX,
+      y: sceneY,
+      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+    };
 
     this.props.onPointerUpdate?.({
       pointer,
