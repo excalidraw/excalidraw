@@ -53,6 +53,7 @@ function instantiateCollabolatorState(): CollabolatorState {
     currentPath: undefined,
     finishedPaths: [],
     lastPoint: [-10000, -10000],
+    lastUpdate: 0,
     svg: document.createElementNS("http://www.w3.org/2000/svg", "path"),
   };
 }
@@ -78,6 +79,7 @@ type CollabolatorState = {
   currentPath: LaserPointer | undefined;
   finishedPaths: LaserPointer[];
   lastPoint: [number, number];
+  lastUpdate: number;
   svg: SVGPathElement;
 };
 
@@ -97,11 +99,13 @@ export class LaserPathManager {
   startPath(x: number, y: number) {
     this.ownState.currentPath = instantiatePath();
     this.ownState.currentPath.addPoint([x, y, performance.now()]);
+    this.updatePath(this.ownState);
   }
 
   addPointToPath(x: number, y: number) {
     if (this.ownState.currentPath) {
       this.ownState.currentPath?.addPoint([x, y, performance.now()]);
+      this.updatePath(this.ownState);
     }
   }
 
@@ -109,28 +113,57 @@ export class LaserPathManager {
     if (this.ownState.currentPath) {
       this.ownState.currentPath.close();
       this.ownState.finishedPaths.push(this.ownState.currentPath);
+      this.updatePath(this.ownState);
     }
   }
 
-  start(svg: SVGSVGElement) {
-    this.container = svg;
+  private updatePath(state: CollabolatorState) {
+    state.lastUpdate = performance.now();
 
-    this.container.appendChild(this.ownState.svg);
+    if (!this.isRunning) {
+      this.start();
+    }
+  }
+
+  private isPathActive(state: CollabolatorState) {
+    return performance.now() - state.lastUpdate < 1500;
+  }
+
+  private isRunning = false;
+
+  start(svg?: SVGSVGElement) {
+    if (svg) {
+      this.container = svg;
+      this.container.appendChild(this.ownState.svg);
+    }
 
     this.stop();
+    this.isRunning = true;
     this.loop();
   }
 
   stop() {
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
+      this.isRunning = false;
     }
   }
 
   loop() {
     this.rafId = requestAnimationFrame(this.loop.bind(this));
 
-    this.update();
+    this.updateCollabolatorsState();
+
+    if (
+      this.isPathActive(this.ownState) ||
+      Array.from(this.collaboratorsState.values()).some(
+        this.isPathActive.bind(this),
+      )
+    ) {
+      this.update();
+    } else {
+      this.isRunning = false;
+    }
   }
 
   draw(path: LaserPointer) {
@@ -148,7 +181,7 @@ export class LaserPathManager {
     return getSvgPathFromStroke(stroke, true);
   }
 
-  update() {
+  updateCollabolatorsState() {
     if (!this.container) {
       return;
     }
@@ -158,6 +191,8 @@ export class LaserPathManager {
         const state = instantiateCollabolatorState();
         this.container.appendChild(state.svg);
         this.collaboratorsState.set(key, state);
+
+        this.updatePath(state);
       }
 
       const state = this.collaboratorsState.get(key)!;
@@ -171,6 +206,8 @@ export class LaserPathManager {
             collabolator.pointer.y,
             performance.now(),
           ]);
+
+          this.updatePath(state);
         }
 
         if (collabolator.button === "down" && state.currentPath !== undefined) {
@@ -184,6 +221,8 @@ export class LaserPathManager {
               collabolator.pointer.y,
               performance.now(),
             ]);
+
+            this.updatePath(state);
           }
         }
 
@@ -198,8 +237,16 @@ export class LaserPathManager {
 
           state.finishedPaths.push(state.currentPath);
           state.currentPath = undefined;
+
+          this.updatePath(state);
         }
       }
+    }
+  }
+
+  update() {
+    if (!this.container) {
+      return;
     }
 
     for (const [key, state] of this.collaboratorsState.entries()) {
