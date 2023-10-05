@@ -248,7 +248,7 @@ export class LaserPathManager {
       if (!this.app.state.collaborators.has(key)) {
         state.svg.remove();
         this.collaboratorsState.delete(key);
-        return;
+        continue;
       }
 
       state.finishedPaths = state.finishedPaths.filter((path) => {
