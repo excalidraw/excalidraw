@@ -1,5 +1,5 @@
 import { updateBoundElements } from "./binding";
-import { BoundingBox, getCommonBoundingBox, getCommonBounds } from "./bounds";
+import { Bounds, getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -41,9 +41,9 @@ export const dragSelectedElements = (
     elementsInFrames.forEach((element) => elementsToUpdate.add(element));
   }
 
-  const boundingBox = getCommonBoundingBox(Array.from(elementsToUpdate));
+  const commonBounds = getCommonBounds(Array.from(elementsToUpdate));
   const adjustedOffset = calculateOffset(
-    boundingBox,
+    commonBounds,
     offset,
     snapOffset,
     gridSize,
@@ -78,18 +78,19 @@ export const dragSelectedElements = (
 };
 
 const calculateOffset = (
-  boundingBox: BoundingBox,
+  commonBounds: Bounds,
   dragOffset: { x: number; y: number },
   snapOffset: { x: number; y: number },
   gridSize: AppState["gridSize"],
 ): { x: number; y: number } => {
-  let nextX = boundingBox.minX + dragOffset.x + snapOffset.x;
-  let nextY = boundingBox.minY + dragOffset.y + snapOffset.y;
+  const [x, y] = commonBounds;
+  let nextX = x + dragOffset.x + snapOffset.x;
+  let nextY = y + dragOffset.y + snapOffset.y;
 
   if (snapOffset.x === 0 || snapOffset.y === 0) {
     const [nextGridX, nextGridY] = getGridPoint(
-      boundingBox.minX + dragOffset.x,
-      boundingBox.minY + dragOffset.y,
+      x + dragOffset.x,
+      y + dragOffset.y,
       gridSize,
     );
 
@@ -102,8 +103,8 @@ const calculateOffset = (
     }
   }
   return {
-    x: nextX - boundingBox.minX,
-    y: nextY - boundingBox.minY,
+    x: nextX - x,
+    y: nextY - y,
   };
 };
 
