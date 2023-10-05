@@ -170,5 +170,10 @@
         height: var(--lg-icon-size);
       }
     }
+
+    .ToolIcon__LaserPointer .ToolIcon__icon {
+      width: var(--default-button-size);
+      height: var(--default-button-size);
+    }
   }
 }

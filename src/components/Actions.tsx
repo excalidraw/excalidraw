@@ -31,7 +31,12 @@ import {
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { EmbedIcon, extraToolsIcon, frameToolIcon } from "./icons";
+import {
+  EmbedIcon,
+  extraToolsIcon,
+  frameToolIcon,
+  laserPointerToolIcon,
+} from "./icons";
 import { KEYS } from "../keys";
 
 export const SelectedShapeActions = ({
@@ -222,6 +227,11 @@ export const ShapesSwitcher = ({
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const device = useDevice();
+
+  const frameToolSelected = activeTool.type === "frame";
+  const laserToolSelected = activeTool.type === "laser";
+  const embeddableToolSelected = activeTool.type === "embeddable";
+
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -313,7 +323,15 @@ export const ShapesSwitcher = ({
       ) : (
         <DropdownMenu open={isExtraToolsMenuOpen}>
           <DropdownMenu.Trigger
-            className="App-toolbar__extra-tools-trigger"
+            className={clsx("App-toolbar__extra-tools-trigger", {
+              "App-toolbar__extra-tools-trigger--selected":
+                frameToolSelected ||
+                embeddableToolSelected ||
+                // in collab we're already highlighting the laser button
+                // outside toolbar, so let's not highlight extra-tools button
+                // on top of it
+                (laserToolSelected && !app.props.isCollaborating),
+            })}
             onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
             title={t("toolBar.extraTools")}
           >
@@ -331,7 +349,7 @@ export const ShapesSwitcher = ({
               icon={frameToolIcon}
               shortcut={KEYS.F.toLocaleUpperCase()}
               data-testid="toolbar-frame"
-              selected={activeTool.type === "frame"}
+              selected={frameToolSelected}
             >
               {t("toolBar.frame")}
             </DropdownMenu.Item>
@@ -341,9 +359,20 @@ export const ShapesSwitcher = ({
               }}
               icon={EmbedIcon}
               data-testid="toolbar-embeddable"
-              selected={activeTool.type === "embeddable"}
+              selected={embeddableToolSelected}
             >
               {t("toolBar.embeddable")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                app.setActiveTool({ type: "laser" });
+              }}
+              icon={laserPointerToolIcon}
+              data-testid="toolbar-laser"
+              selected={laserToolSelected}
+              shortcut={KEYS.K.toLocaleUpperCase()}
+            >
+              {t("toolBar.laser")}
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>

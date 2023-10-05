@@ -1522,6 +1522,11 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
   integrity sha512-GemHNF5Z6ga0BWBSX7GJaNBUchLu6RwTcAB84eX1MeckRNhNasAsPCdelDlFalz27iS4RuYEQh0bPE8SRxJgbQ==
 
+"@excalidraw/laser-pointer@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@excalidraw/laser-pointer/-/laser-pointer-1.2.0.tgz#cd34ea7d24b11743c726488cc1fcb28c161cacba"
+  integrity sha512-WjFFwLk9ahmKRKku7U0jqYpeM3fe9ZS1K43pfwPREHk4/FYU3iKDKVeS8m4tEAASnRlBt3hhLCBQLBF2uvgOnw==
+
 "@excalidraw/prettier-config@1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@excalidraw/prettier-config/-/prettier-config-1.0.2.tgz#b7c061c99cee2f78b9ca470ea1fbd602683bba65"

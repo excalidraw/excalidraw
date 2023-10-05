@@ -39,10 +39,7 @@ import { Merge, ForwardRef, ValueOf } from "./utility-types";
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
-  pointer?: {
-    x: number;
-    y: number;
-  };
+  pointer?: CollaboratorPointer;
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
@@ -56,6 +53,12 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+};
+
+export type CollaboratorPointer = {
+  x: number;
+  y: number;
+  tool: "pointer" | "laser";
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -98,7 +101,8 @@ export type ToolType =
   | "eraser"
   | "hand"
   | "frame"
-  | "embeddable";
+  | "embeddable"
+  | "laser";
 
 export type ActiveTool =
   | {
@@ -389,7 +393,7 @@ export interface ExcalidrawProps {
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number };
+    pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
