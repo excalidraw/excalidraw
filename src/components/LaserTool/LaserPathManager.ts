@@ -100,6 +100,7 @@ export class LaserPathManager {
 
   destroy() {
     this.stop();
+    this.lastUpdate = 0;
     this.ownState = instantiateCollabolatorState();
     this.collaboratorsState = new Map();
   }
@@ -148,7 +149,6 @@ export class LaserPathManager {
 
   stop() {
     this.isRunning = false;
-    this.lastUpdate = 0;
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
     }
