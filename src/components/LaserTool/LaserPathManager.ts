@@ -98,6 +98,12 @@ export class LaserPathManager {
     this.ownState = instantiateCollabolatorState();
   }
 
+  destroy() {
+    this.stop();
+    this.ownState = instantiateCollabolatorState();
+    this.collaboratorsState = new Map();
+  }
+
   startPath(x: number, y: number) {
     this.ownState.currentPath = instantiatePath();
     this.ownState.currentPath.addPoint([x, y, performance.now()]);
@@ -142,9 +148,11 @@ export class LaserPathManager {
 
   stop() {
     this.isRunning = false;
+    this.lastUpdate = 0;
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
     }
+    this.rafId = undefined;
   }
 
   loop() {
