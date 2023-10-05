@@ -370,6 +370,7 @@ export const ShapesSwitcher = ({
               icon={laserPointerToolIcon}
               data-testid="toolbar-laser"
               selected={laserToolSelected}
+              shortcut={KEYS.K.toLocaleUpperCase()}
             >
               {t("toolBar.laser")}
             </DropdownMenu.Item>
