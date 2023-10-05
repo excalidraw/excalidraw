@@ -20,8 +20,12 @@
 }
 
 .excalidraw {
+  @font-face{
+    font-family: 'VirgilRegular';
+    src: url(src/assets/Virgil GS Regular.ttf) format('truetype');
+  }
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+    Roboto, Helvetica, Arial, VirgilRegular, sans-serif;
   font-family: var(--ui-font);
 
   position: relative;
