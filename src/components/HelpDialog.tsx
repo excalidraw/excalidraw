@@ -238,6 +238,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+0")]}
             />
             <Shortcut
+              label={t("buttons.smoothZoom")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Space+drag")]}
+            />
+            <Shortcut
               label={t("helpDialog.zoomToFit")}
               shortcuts={["Shift+1"]}
             />

@@ -4474,6 +4474,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (this.handleCanvasZoomUsingCtrlAndSpace(event)) {
+      return;
+    }
+
     // only handle left mouse button or touch
     if (
       event.button !== POINTER_BUTTON.MAIN &&
@@ -4719,7 +4723,8 @@ class App extends React.Component<AppProps, AppState> {
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement)
+      isTextElement(this.state.editingElement) ||
+      event.ctrlKey
     ) {
       return false;
     }
@@ -4802,6 +4807,81 @@ class App extends React.Component<AppProps, AppState> {
       passive: true,
     });
     window.addEventListener(EVENT.POINTER_UP, teardown);
+    return true;
+  };
+
+  private handleCanvasZoomUsingCtrlAndSpace = (
+    event: React.PointerEvent<HTMLElement>,
+  ): boolean => {
+    const isMainClickOn = event.button === POINTER_BUTTON.MAIN;
+    const areKeysPressed = isHoldingSpace && (event.metaKey || event.ctrlKey);
+    if (
+      !(gesture.pointers.size <= 1) ||
+      !(areKeysPressed && isMainClickOn) ||
+      isTextElement(this.state.editingElement)
+    ) {
+      return false;
+    }
+    event.preventDefault();
+
+    let previousX = event.clientX;
+
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const delta = previousX - event.clientX;
+      const sign = Math.sign(delta);
+      const absDelta = Math.abs(delta);
+
+      if (delta < 0) {
+        setCursor(this.canvas, CURSOR_TYPE.ZOOM_IN);
+      } else {
+        setCursor(this.canvas, CURSOR_TYPE.ZOOM_OUT);
+      }
+
+      let newZoom = this.state.zoom.value - delta / 200;
+      newZoom +=
+        Math.log10(Math.max(1, this.state.zoom.value)) *
+        -sign *
+        Math.min(1, absDelta / 10);
+
+      previousX = event.clientX;
+
+      this.translateCanvas((state) => ({
+        ...getStateForZoom(
+          {
+            viewportX: this.lastViewportPosition.x,
+            viewportY: this.lastViewportPosition.y,
+            nextZoom: getNormalizedZoom(newZoom),
+          },
+          state,
+        ),
+        shouldCacheIgnoreZoom: true,
+      }));
+      window.addEventListener(EVENT.POINTER_UP, teardown);
+
+      this.resetShouldCacheIgnoreZoomDebounced();
+    });
+
+    const teardown = withBatchedUpdates(
+      (lastPointerUp = () => {
+        lastPointerUp = null;
+        if (!isHoldingSpace) {
+          setCursorForShape(this.canvas, this.state);
+        }
+        this.setState({
+          cursorButton: "up",
+        });
+        this.savePointer(event.clientX, event.clientY, "up");
+        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        window.removeEventListener(EVENT.POINTER_UP, teardown);
+        window.removeEventListener(EVENT.BLUR, teardown);
+        onPointerMove.flush();
+      }),
+    );
+    window.addEventListener(EVENT.BLUR, teardown);
+    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      passive: true,
+    });
+
     return true;
   };
 
