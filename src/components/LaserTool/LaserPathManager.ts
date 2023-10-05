@@ -53,7 +53,6 @@ function instantiateCollabolatorState(): CollabolatorState {
     currentPath: undefined,
     finishedPaths: [],
     lastPoint: [-10000, -10000],
-    lastUpdate: 0,
     svg: document.createElementNS("http://www.w3.org/2000/svg", "path"),
   };
 }
@@ -79,7 +78,6 @@ type CollabolatorState = {
   currentPath: LaserPointer | undefined;
   finishedPaths: LaserPointer[];
   lastPoint: [number, number];
-  lastUpdate: number;
   svg: SVGPathElement;
 };
 
@@ -88,6 +86,7 @@ export class LaserPathManager {
   private collaboratorsState: Map<string, CollabolatorState> = new Map();
 
   private rafId: number | undefined;
+  private lastUpdate = 0;
   private container: SVGSVGElement | undefined;
 
   constructor(private app: App) {
@@ -118,15 +117,11 @@ export class LaserPathManager {
   }
 
   private updatePath(state: CollabolatorState) {
-    state.lastUpdate = performance.now();
+    this.lastUpdate = performance.now();
 
     if (!this.isRunning) {
       this.start();
     }
-  }
-
-  private isPathActive(state: CollabolatorState) {
-    return performance.now() - state.lastUpdate < 1500;
   }
 
   private isRunning = false;
@@ -154,12 +149,7 @@ export class LaserPathManager {
 
     this.updateCollabolatorsState();
 
-    if (
-      this.isPathActive(this.ownState) ||
-      Array.from(this.collaboratorsState.values()).some(
-        this.isPathActive.bind(this),
-      )
-    ) {
+    if (performance.now() - this.lastUpdate < DECAY_TIME * 2) {
       this.update();
     } else {
       this.isRunning = false;
