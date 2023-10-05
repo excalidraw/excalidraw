@@ -113,8 +113,8 @@
       "create": "Utwórz łącze",
       "createEmbed": "Stwórz i osadź link",
       "label": "Łącze",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Podlinkuj i osadź",
+      "empty": "Brakujący link"
     },
     "lineEditor": {
       "edit": "Edytuj linię",
@@ -128,8 +128,8 @@
     },
     "statusPublished": "Opublikowano",
     "sidebarLock": "Panel boczny zawsze otwarty",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Zaznacz wszystkie elementy w ramce",
+    "removeAllElementsFromFrame": "Usuń wszystkie elementy z ramki",
     "eyeDropper": "Wybierz kolor z płótna"
   },
   "library": {
@@ -164,16 +164,16 @@
     "darkMode": "Ciemny motyw",
     "lightMode": "Jasny motyw",
     "zenMode": "Tryb Zen",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Przyciąganie do obiektów",
     "exitZenMode": "Wyjdź z trybu Zen",
     "cancel": "Anuluj",
     "clear": "Wyczyść",
     "remove": "Usuń",
-    "embed": "",
+    "embed": "Przełącz osadzenie",
     "publishLibrary": "Opublikuj",
     "submit": "Prześlij",
     "confirm": "Zatwierdź",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Kliknij, aby wejść w interakcję"
   },
   "alerts": {
     "clearReset": "To spowoduje usunięcie wszystkiego z dokumentu. Czy chcesz kontynuować?",
@@ -215,8 +215,8 @@
       "line4": "Jeśli wyłączenie tego ustawienia nie naprawia wyświetlania elementów tekstowych, zgłoś <issueLink>problem</issueLink> na naszym GitHubie lub napisz do nas na <discordLink>Discordzie</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
+      "embeddable": "Elementy osadzone nie mogą zostać dodane do biblioteki.",
+      "image": "Dodawania obrazów do biblioteki nadejdzie wkrótce!"
     }
   },
   "toolBar": {
@@ -234,10 +234,10 @@
     "penMode": "Tryb pióra — zapobiegaj dotknięciom",
     "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
-    "frame": "",
-    "embeddable": "",
+    "frame": "Ramka",
+    "embeddable": "Osadzenie z internetu",
     "hand": "Ręka (narzędzie do przesuwania)",
-    "extraTools": ""
+    "extraTools": "Więcej narzędzi"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -249,7 +249,7 @@
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
-    "embeddable": "",
+    "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",
     "text_selected": "Kliknij dwukrotnie lub naciśnij ENTER, aby edytować tekst",
     "text_editing": "Naciśnij Escape lub Ctrl (Cmd w macOS) + ENTER, aby zakończyć edycję",
     "linearElementMulti": "Aby zakończyć krzywą, ponownie kliknij w ostatni punkt, bądź naciśnij Esc albo Enter",
@@ -266,7 +266,7 @@
     "deepBoxSelect": "Przytrzymaj CtrlOrCmd, aby wybrać w obrębie grupy i uniknąć przeciągania",
     "eraserRevert": "Przytrzymaj Alt, aby przywrócić elementy oznaczone do usunięcia",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "Przytrzymaj Ctrl lub Cmd, aby wyłączyć przyciąganie"
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -426,8 +426,8 @@
     "canvas": "płótno",
     "selection": "zaznaczenie",
     "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Osadzenie tego linku jest obecnie niedozwolone. Zgłoś propozycję na portalu GitHub, aby dodać go do listy dozwolonych wyjątków",
+    "unrecognizedLinkFormat": "Osadzony link ma niewłaściwy format. Spróbuj wkleić całą zawartość pola \"embed\" z oryginalnej strony."
   },
   "colors": {
     "transparent": "Przezroczysty",
@@ -469,31 +469,31 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Eksportuj jako obraz",
+        "button": "Eksportuj jako obraz",
+        "description": "Eksportuj zawartość sceny jako obraz z możliwością importowania."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Zapisz na dysku",
+        "button": "Zapisz na dysku",
+        "description": "Eksportuj zawartość sceny jako plik z możliwością importowania."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Eksportuj do Excalidraw+",
+        "description": "Zapisz scenę do swojego obszaru roboczego Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Wczytaj z pliku",
+        "button": "Wczytaj z pliku",
+        "description": "Wczytanie z pliku <bold>nadpisze istniejącą zawartość</bold>.<br></br>Możesz najpierw utworzyć kopię zapasową swojego rysunku, używając jednej z poniższych opcji."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Wczytaj z linku",
+        "button": "Nadpisz moją zawartość",
+        "description": "Wczytanie zewnętrznego pliku <bold>nadpisze istniejącą zawartość</bold>.<br></br>Możesz najpierw utworzyć kopię zapasową swojego rysunku, używając jednej z poniższych opcji."
       }
     }
   }
