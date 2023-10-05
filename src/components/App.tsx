@@ -8303,18 +8303,18 @@ class App extends React.Component<AppProps, AppState> {
     if (!x || !y) {
       return;
     }
-    const { x: vx, y: vy } = viewportCoordsToSceneCoords(
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       { clientX: x, clientY: y },
       this.state,
     );
 
-    if (isNaN(vx) || isNaN(vy)) {
+    if (isNaN(sceneX) || isNaN(sceneY)) {
       // sometimes the pointer goes off screen
     }
 
     const pointer: CollaboratorPointer = {
-      x: vx,
-      y: vy,
+      x: sceneX,
+      y: sceneY,
       tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
     };
 
