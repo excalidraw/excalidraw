@@ -709,6 +709,8 @@ export interface ExcalidrawProps {
       signal: AbortSignal;
     },
   ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
+  interactive?: boolean;
+  ui?: boolean;
 }
 
 export type SceneData = {
