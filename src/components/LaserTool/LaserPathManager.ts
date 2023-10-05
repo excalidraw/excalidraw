@@ -172,7 +172,7 @@ export class LaserPathManager {
   }
 
   updateCollabolatorsState() {
-    if (!this.container) {
+    if (!this.container || !this.app.state.collaborators.size) {
       return;
     }
 
