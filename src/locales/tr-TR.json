@@ -50,7 +50,7 @@
     "veryLarge": "Çok geniş",
     "solid": "Dolu",
     "hachure": "Taralı",
-    "zigzag": "",
+    "zigzag": "Zikzak",
     "crossHatch": "Çapraz-taralı",
     "thin": "İnce",
     "bold": "Kalın",
@@ -106,15 +106,15 @@
     "increaseFontSize": "Yazı Tipi Boyutunu Büyült",
     "unbindText": "Metni çöz",
     "bindText": "Metni taşıyıcıya bağla",
-    "createContainerFromText": "",
+    "createContainerFromText": "Metni bileşen içinde sar",
     "link": {
       "edit": "Bağlantıyı düzenle",
-      "editEmbed": "",
+      "editEmbed": "Bağlantıyı düzenle & yerleştir",
       "create": "Bağlantı oluştur",
-      "createEmbed": "",
+      "createEmbed": "Bağlantı oluştur & yerleştir",
       "label": "Bağlantı",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Bağlantı & yerleştirme",
+      "empty": "Herhangi bir bağlantı oluşturulmadı"
     },
     "lineEditor": {
       "edit": "Çizgiyi düzenle",
@@ -128,9 +128,9 @@
     },
     "statusPublished": "Yayınlandı",
     "sidebarLock": "Kenar çubuğu açık kalsın",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Çerçevedeki tüm bileşenleri seç",
+    "removeAllElementsFromFrame": "Çerçevedeki tüm bileşenleri sil",
+    "eyeDropper": "Tuvalden renk seç"
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
@@ -164,7 +164,7 @@
     "darkMode": "Koyu tema",
     "lightMode": "Açık tema",
     "zenMode": "Zen modu",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Nesnelere hizala",
     "exitZenMode": "Zen modundan çık",
     "cancel": "İptal",
     "clear": "Temizle",
@@ -173,7 +173,7 @@
     "publishLibrary": "Yayınla",
     "submit": "Gönder",
     "confirm": "Onayla",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Etkileşime girmek için tıkla"
   },
   "alerts": {
     "clearReset": "Tuvalin tamamı temizlenecek. Emin misiniz?",
@@ -196,7 +196,7 @@
     "resetLibrary": "Bu işlem kütüphanenizi sıfırlayacak. Emin misiniz?",
     "removeItemsFromsLibrary": "{{count}} öğe(ler) kitaplıktan kaldırılsın mı?",
     "invalidEncryptionKey": "Şifreleme anahtarı 22 karakter olmalı. Canlı işbirliği devre dışı bırakıldı.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "İnternet bağlantısı bulunamadı. Değişiklikleriniz kaydedilmeyecek!"
   },
   "errors": {
     "unsupportedFileType": "Desteklenmeyen dosya türü.",
@@ -216,7 +216,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
-      "image": ""
+      "image": "Resimleri kütüphaneye ekleme desteği yakında geliyor!"
     }
   },
   "toolBar": {
@@ -234,11 +234,11 @@
     "penMode": "Kalem modu - dokunmayı engelle",
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
     "eraser": "Silgi",
-    "frame": "",
-    "embeddable": "",
-    "laser": "",
+    "frame": "Çerçeve aracı",
+    "embeddable": "Web Yerleştirme",
+    "laser": "Lazer işaretçisi",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "Daha fazla araç"
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
@@ -250,7 +250,7 @@
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
-    "embeddable": "",
+    "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
     "text_selected": "Metni düzenlemek için çift tıklayın veya ENTER'a basın",
     "text_editing": "Düzenlemeyi bitirmek için ESC veya Ctrl/Cmd+ENTER tuşlarına basın",
     "linearElementMulti": "Bitirmek için son noktaya tıklayın ya da Escape veya Enter tuşuna basın",
@@ -375,27 +375,27 @@
     "removeItemsFromLib": "Seçilen ögeleri kütüphaneden kaldır"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Resmi dışa aktar",
     "label": {
-      "withBackground": "",
+      "withBackground": "Arka plan",
       "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "darkMode": "Karanlık mod",
+      "embedScene": "Sahne yerleştir",
+      "scale": "Ölçeklendir",
+      "padding": "Dış boşluk"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Sahne verisi, sahnenin geri yüklenebilmesi için dışarı aktarılan PNG/SVG dosyasına kaydedilecektir. Bu, dışa aktarılan dosya boyutunu arttıracaktır."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG olarak dışa aktar",
+      "exportToSvg": "SVG olarak dışa aktar",
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Panoya kopyala"
     }
   },
   "encrypted": {
@@ -432,19 +432,19 @@
   },
   "colors": {
     "transparent": "Şeffaf",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
+    "black": "Siyah",
+    "white": "Beyaz",
+    "red": "Kırmızı",
+    "pink": "Pembe",
+    "grape": "Koyu Mor",
+    "violet": "Menekşe rengi",
+    "gray": "Gri",
+    "blue": "Mavi",
+    "cyan": "Camgöbeği",
+    "teal": "Deniz mavisi",
+    "green": "Yeşil",
+    "yellow": "Sarı",
+    "orange": "Turuncu",
     "bronze": ""
   },
   "welcomeScreen": {
