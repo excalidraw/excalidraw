@@ -25,8 +25,6 @@
     "@radix-ui/react-tabs": "1.0.2",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "@testing-library/jest-dom": "5.16.2",
-    "@testing-library/react": "12.1.5",
     "@tldraw/vec": "1.7.1",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
@@ -60,6 +58,8 @@
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
+    "@testing-library/jest-dom": "5.16.2",
+    "@testing-library/react": "12.1.5",
     "@types/chai": "4.3.0",
     "@types/jest": "27.4.0",
     "@types/lodash.throttle": "4.1.7",
