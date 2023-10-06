@@ -480,6 +480,4 @@ export const actionToggleLaserPointer = register({
   },
   checked: (appState) => appState.activeTool.type === "laser",
   contextItemLabel: "labels.laser",
-  keyTest: (event) =>
-    event.code === CODES.K && !event[KEYS.CTRL_OR_CMD] && !event.altKey,
 });
