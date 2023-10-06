@@ -1,0 +1,17 @@
+Excalidraw is a collaborative online whiteboard tool primarily designed for creating hand-drawn diagrams and illustrations. When you download your Excalidraw canvas as a PNG, SVG, or image file, it should ideally include all the elements present on your canvas, including any frames or boundaries you have drawn.
+
+If you're facing issues where frames are not displayed in the downloaded image, you can try the following troubleshooting steps:
+
+1. **Check Your Browser**: Ensure you are using a modern and up-to-date web browser. Excalidraw is web-based, so the browser you use can affect its functionality. Try using a different browser if you encounter issues.
+
+2. **Zoom Level**: Sometimes, the zoom level of your canvas can affect the visibility of certain elements. Make sure you are zoomed in or out to a level where the frames are visible on the canvas before downloading.
+
+3. **Clear Cache**: Clear your browser's cache and cookies, as cached data can sometimes cause display issues.
+
+4. **Browser Extensions**: Disable any browser extensions or add-ons that might be interfering with Excalidraw's functionality.
+
+5. **Export Options**: When exporting, check the export options/settings. Ensure that you have selected the appropriate export format (PNG, SVG, etc.), and that you have not inadvertently excluded frames from the export.
+
+6. **Update Excalidraw**: Make sure you are using the latest version of Excalidraw. Developers regularly release updates that may fix bugs and improve functionality.
+
+7. **Report a Bug**: If the issue persists, consider reporting it as a bug to the Excalidraw development team. They may be able to provide specific guidance or address the problem in future updates.
