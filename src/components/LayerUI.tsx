@@ -55,6 +55,7 @@ import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
+import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -77,6 +78,7 @@ interface LayerUIProps {
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
   app: AppClassProperties;
+  isCollaborating: boolean;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -134,6 +136,7 @@ const LayerUI = ({
   renderWelcomeScreen,
   children,
   app,
+  isCollaborating,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -288,6 +291,24 @@ const LayerUI = ({
                           />
                         </Stack.Row>
                       </Island>
+                      {isCollaborating && (
+                        <Island
+                          style={{
+                            marginLeft: 8,
+                            alignSelf: "center",
+                            height: "fit-content",
+                          }}
+                        >
+                          <LaserPointerButton
+                            title={t("toolBar.laser")}
+                            checked={appState.activeTool.type === "laser"}
+                            onChange={() =>
+                              app.setActiveTool({ type: "laser" })
+                            }
+                            isMobile
+                          />
+                        </Island>
+                      )}
                     </Stack.Row>
                   </Stack.Col>
                 </div>
