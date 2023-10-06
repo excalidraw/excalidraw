@@ -956,7 +956,7 @@ describe("textWysiwyg", () => {
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
           85,
-          4.5,
+          4.999999999999986,
         ]
       `);
 
@@ -1001,8 +1001,8 @@ describe("textWysiwyg", () => {
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
-          375,
-          -539,
+          374.99999999999994,
+          -535.0000000000001,
         ]
       `);
     });
@@ -1189,7 +1189,7 @@ describe("textWysiwyg", () => {
       editor.blur();
 
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
-      expect(rectangle.height).toBe(156);
+      expect(rectangle.height).toBeCloseTo(155, 8);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
 
       mouse.select(rectangle);
@@ -1199,9 +1199,12 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
-      expect(rectangle.height).toBe(156);
+      expect(rectangle.height).toBeCloseTo(155, 8);
       // cache updated again
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(156);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBeCloseTo(
+        155,
+        8,
+      );
     });
 
     it("should reset the container height cache when font properties updated", async () => {

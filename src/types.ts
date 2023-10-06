@@ -18,7 +18,6 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
 } from "./element/types";
-import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
@@ -34,15 +33,13 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { SnapLine } from "./snapping";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
-  pointer?: {
-    x: number;
-    y: number;
-  };
+  pointer?: CollaboratorPointer;
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
@@ -56,6 +53,12 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+};
+
+export type CollaboratorPointer = {
+  x: number;
+  y: number;
+  tool: "pointer" | "laser";
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -85,21 +88,31 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type LastActiveTool =
+export type ToolType =
+  | "selection"
+  | "rectangle"
+  | "diamond"
+  | "ellipse"
+  | "arrow"
+  | "line"
+  | "freedraw"
+  | "text"
+  | "image"
+  | "eraser"
+  | "hand"
+  | "frame"
+  | "embeddable"
+  | "laser";
+
+export type ActiveTool =
   | {
-      type:
-        | typeof SHAPES[number]["value"]
-        | "eraser"
-        | "hand"
-        | "frame"
-        | "embeddable";
+      type: ToolType;
       customType: null;
     }
   | {
       type: "custom";
       customType: string;
-    }
-  | null;
+    };
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -150,6 +163,9 @@ export type InteractiveCanvasAppState = Readonly<
     showHyperlinkPopup: AppState["showHyperlinkPopup"];
     // Collaborators
     collaborators: AppState["collaborators"];
+    // SnapLines
+    snapLines: AppState["snapLines"];
+    zenModeEnabled: AppState["zenModeEnabled"];
   }
 >;
 
@@ -191,23 +207,9 @@ export type AppState = {
      * indicates a previous tool we should revert back to if we deselect the
      * currently active tool. At the moment applies to `eraser` and `hand` tool.
      */
-    lastActiveTool: LastActiveTool;
+    lastActiveTool: ActiveTool | null;
     locked: boolean;
-  } & (
-    | {
-        type:
-          | typeof SHAPES[number]["value"]
-          | "eraser"
-          | "hand"
-          | "frame"
-          | "embeddable";
-        customType: null;
-      }
-    | {
-        type: "custom";
-        customType: string;
-      }
-  );
+  } & ActiveTool;
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -287,6 +289,13 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+
+  snapLines: readonly SnapLine[];
+  originSnapOffset: {
+    x: number;
+    y: number;
+  } | null;
+  objectsSnapModeEnabled: boolean;
 };
 
 export type UIAppState = Omit<
@@ -384,7 +393,7 @@ export interface ExcalidrawProps {
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number };
+    pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
@@ -400,6 +409,7 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
   name?: string;
@@ -527,6 +537,8 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
+  togglePenMode: App["togglePenMode"];
+  setActiveTool: App["setActiveTool"];
 };
 
 export type PointerDownState = Readonly<{
@@ -652,4 +664,11 @@ export type FrameNameBoundsCache = {
       versionNonce: ExcalidrawFrameElement["versionNonce"];
     }
   >;
+};
+
+export type KeyboardModifiersObject = {
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
 };
