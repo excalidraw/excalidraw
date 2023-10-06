@@ -91,7 +91,7 @@ export class LaserPathManager {
   private collaboratorsState: Map<string, CollabolatorState> = new Map();
 
   private rafId: number | undefined;
-  private lastUpdate = 0;
+  private isDrawing = false;
   private container: SVGSVGElement | undefined;
 
   constructor(private app: App) {
@@ -100,7 +100,7 @@ export class LaserPathManager {
 
   destroy() {
     this.stop();
-    this.lastUpdate = 0;
+    this.isDrawing = false;
     this.ownState = instantiateCollabolatorState();
     this.collaboratorsState = new Map();
   }
@@ -127,7 +127,7 @@ export class LaserPathManager {
   }
 
   private updatePath(state: CollabolatorState) {
-    this.lastUpdate = performance.now();
+    this.isDrawing = true;
 
     if (!this.isRunning) {
       this.start();
@@ -160,7 +160,7 @@ export class LaserPathManager {
 
     this.updateCollabolatorsState();
 
-    if (performance.now() - this.lastUpdate < DECAY_TIME * 2) {
+    if (this.isDrawing) {
       this.update();
     } else {
       this.isRunning = false;
@@ -250,6 +250,8 @@ export class LaserPathManager {
       return;
     }
 
+    let somePathsExist = false;
+
     for (const [key, state] of this.collaboratorsState.entries()) {
       if (!this.app.state.collaborators.has(key)) {
         state.svg.remove();
@@ -267,6 +269,10 @@ export class LaserPathManager {
 
       if (state.currentPath) {
         paths += ` ${this.draw(state.currentPath)}`;
+      }
+
+      if (paths.trim()) {
+        somePathsExist = true;
       }
 
       state.svg.setAttribute("d", paths);
@@ -287,7 +293,17 @@ export class LaserPathManager {
       paths += ` ${this.draw(this.ownState.currentPath)}`;
     }
 
+    paths = paths.trim();
+
+    if (paths) {
+      somePathsExist = true;
+    }
+
     this.ownState.svg.setAttribute("d", paths);
     this.ownState.svg.setAttribute("fill", "red");
+
+    if (!somePathsExist) {
+      this.isDrawing = false;
+    }
   }
 }
