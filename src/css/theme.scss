@@ -35,7 +35,7 @@
   --button-hover-bg: var(--color-surface-high);
   --button-active-bg: var(--color-surface-high);
   --button-active-border: var(--color-brand-active);
-  --default-border-color: var(--color-surface-high);
+  --default-border-color: var(--color-surface-primary-container);
 
   --default-button-size: 2rem;
   --default-icon-size: 1rem;
@@ -145,6 +145,7 @@
   --color-brand-active: #4440bf;
   --color-border-outline: #767680;
   --color-border-outline-variant: #c5c5d0;
+  --color-surface-primary-container: #e0dfff;
 
   &.theme--dark {
     &.theme--dark-background-none {
@@ -242,5 +243,8 @@
     --color-brand-active: #d0ccff;
     --color-border-outline: #8e8d9c;
     --color-border-outline-variant: #46464f;
+    --color-surface-primary-container: #403e6a;
+
+    --default-border-color: var(--color-surface-high);
   }
 }
