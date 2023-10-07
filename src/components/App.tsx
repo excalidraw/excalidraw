@@ -1217,10 +1217,7 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
-                        <LaserToolOverlay
-                          manager={this.laserPathManager}
-                          appState={this.state}
-                        />
+                        <LaserToolOverlay manager={this.laserPathManager} />
                         {selectedElements.length === 1 &&
                           !this.state.contextMenu &&
                           this.state.showHyperlinkPopup && (

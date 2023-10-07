@@ -1,17 +1,12 @@
 import { useEffect, useRef } from "react";
 import { LaserPathManager } from "./LaserPathManager";
 import "./LaserToolOverlay.scss";
-import { UIAppState } from "../../types";
 
 type LaserToolOverlayProps = {
   manager: LaserPathManager;
-  appState: UIAppState;
 };
 
-export const LaserToolOverlay = ({
-  manager,
-  appState,
-}: LaserToolOverlayProps) => {
+export const LaserToolOverlay = ({ manager }: LaserToolOverlayProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -25,13 +20,7 @@ export const LaserToolOverlay = ({
   }, [manager]);
 
   return (
-    <div
-      className="LaserToolOverlay"
-      style={{
-        top: `-${appState.offsetTop}px`,
-        left: `-${appState.offsetLeft}px`,
-      }}
-    >
+    <div className="LaserToolOverlay">
       <svg ref={svgRef} className="LaserToolOverlayCanvas" />
     </div>
   );

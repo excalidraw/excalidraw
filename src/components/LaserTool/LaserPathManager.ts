@@ -106,6 +106,13 @@ export class LaserPathManager {
   }
 
   startPath(x: number, y: number) {
+    if (this.container) {
+      this.container.style.top = "0px";
+      this.container.style.left = "0px";
+      const { x, y } = this.container.getBoundingClientRect();
+      this.container.style.top = `${-y}px`;
+      this.container.style.left = `${-x}px`;
+    }    
     this.ownState.currentPath = instantiatePath();
     this.ownState.currentPath.addPoint([x, y, performance.now()]);
     this.updatePath(this.ownState);
