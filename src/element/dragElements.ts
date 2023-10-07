@@ -41,7 +41,11 @@ export const dragSelectedElements = (
     elementsInFrames.forEach((element) => elementsToUpdate.add(element));
   }
 
-  const commonBounds = getCommonBounds(Array.from(elementsToUpdate));
+  const commonBounds = getCommonBounds(
+    Array.from(elementsToUpdate).map(
+      (el) => pointerDownState.originalElements.get(el.id) ?? el,
+    ),
+  );
   const adjustedOffset = calculateOffset(
     commonBounds,
     offset,
