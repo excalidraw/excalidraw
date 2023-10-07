@@ -4479,10 +4479,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
-      return;
-    }
-
     this.lastPointerDownEvent = event;
 
     this.setState({
@@ -4490,6 +4486,10 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
+
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
 
     // only handle left mouse button or touch
     if (
