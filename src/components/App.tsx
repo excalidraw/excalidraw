@@ -3885,6 +3885,18 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.multiElement) {
       return;
     }
+
+    if (this.state.viewModeEnabled) {
+      if (this.state.activeTool.type === "laser") {
+        this.setActiveTool({ type: "selection" });
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else {
+        this.setActiveTool({ type: "laser" });
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+      }
+      return;
+    }
+
     // we should only be able to double click when mode is selection
     if (this.state.activeTool.type !== "selection") {
       return;
