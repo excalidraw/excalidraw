@@ -226,7 +226,7 @@ export const ShapesSwitcher = ({
   appState: UIAppState;
   app: AppClassProperties;
 }) => {
-  const {renderMermaid} = useAppProps(); //zsviczian
+  const { renderMermaid } = useAppProps(); //zsviczian
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const device = useDevice();
 
@@ -322,26 +322,28 @@ export const ShapesSwitcher = ({
             }}
             selected={activeTool.type === "embeddable"}
           />
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
-            icon={mermaidLogoIcon}
-            checked={activeTool.type === "mermaid"}
-            name="editor-current-shape"
-            title={capitalizeString(t("toolBar.mermaidToExcalidraw"))}
-            aria-label={capitalizeString(t("toolBar.mermaidToExcalidraw"))}
-            data-testid={`toolbar-mermaidToExcalidraw`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "mermaid", "ui");
-              app.setActiveTool({ type: "mermaid" });
-            }}
-            selected={activeTool.type === "mermaid"}
-          />
+          {renderMermaid && ( //zsviczian
+            <ToolButton
+              className={clsx("Shape", { fillable: false })}
+              type="radio"
+              icon={mermaidLogoIcon}
+              checked={activeTool.type === "mermaid"}
+              name="editor-current-shape"
+              title={capitalizeString(t("toolBar.mermaidToExcalidraw"))}
+              aria-label={capitalizeString(t("toolBar.mermaidToExcalidraw"))}
+              data-testid={`toolbar-mermaidToExcalidraw`}
+              onPointerDown={({ pointerType }) => {
+                if (!appState.penDetected && pointerType === "pen") {
+                  app.togglePenMode(true);
+                }
+              }}
+              onChange={({ pointerType }) => {
+                trackEvent("toolbar", "mermaid", "ui");
+                app.setActiveTool({ type: "mermaid" });
+              }}
+              selected={activeTool.type === "mermaid"}
+            />
+          )}
         </>
       ) : (
         <DropdownMenu open={isExtraToolsMenuOpen}>
@@ -386,16 +388,18 @@ export const ShapesSwitcher = ({
             >
               {t("toolBar.embeddable")}
             </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => {
-                app.setActiveTool({ type: "mermaid" });
-              }}
-              icon={mermaidLogoIcon}
-              data-testid="toolbar-mermaidToExcalidraw"
-              selected={mermaidToolSelected}
-            >
-              {t("toolBar.mermaidToExcalidraw")}
-            </DropdownMenu.Item>
+            {renderMermaid && ( //zsviczian
+              <DropdownMenu.Item
+                onSelect={() => {
+                  app.setActiveTool({ type: "mermaid" });
+                }}
+                icon={mermaidLogoIcon}
+                data-testid="toolbar-mermaidToExcalidraw"
+                selected={mermaidToolSelected}
+              >
+                {t("toolBar.mermaidToExcalidraw")}
+              </DropdownMenu.Item>
+            )}
             <DropdownMenu.Item
               onSelect={() => {
                 app.setActiveTool({ type: "laser" });

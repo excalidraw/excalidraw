@@ -1259,13 +1259,14 @@ class App extends React.Component<AppProps, AppState> {
                           isCollaborating={this.props.isCollaborating}
                         >
                           {this.props.children}
-                          {this.props.renderMermaid && this.state.activeTool.type === "mermaid" && (//zsviczian
-                            <MermaidToExcalidraw
-                              selectedElements={this.scene.getSelectedElements(
-                                this.state, //zsviczian
-                              )}
-                            />
-                          )}
+                          {this.props.renderMermaid &&
+                            this.state.activeTool.type === "mermaid" && ( //zsviczian
+                              <MermaidToExcalidraw
+                                selectedElements={this.scene.getSelectedElements(
+                                  this.state, //zsviczian
+                                )}
+                              />
+                            )}
                         </LayerUI>
 
                         <div className="excalidraw-textEditorContainer" />
@@ -3386,7 +3387,7 @@ class App extends React.Component<AppProps, AppState> {
             nextActiveTool.type === "mermaid" //zsviczian
               ? this.state.selectedElementIds
               : {},
-              prevState,
+            prevState,
           ),
           selectedGroupIds: makeNextSelectedElementIds({}, prevState),
           editingGroupId: null,
