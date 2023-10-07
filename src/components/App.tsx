@@ -46,6 +46,7 @@ import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
+  isLaserPointerActive,
 } from "../appState";
 import { parseClipboard } from "../clipboard";
 import {
@@ -349,6 +350,7 @@ import {
   actionToggleHandTool,
   zoomToFit,
   zoomToFitElements,
+  actionToggleLaserPointer,
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
@@ -3132,7 +3134,22 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (isLaserPointerActive(this.state)) {
+          this.setActiveTool({
+            type: this.state.viewModeEnabled ? "hand" : "selection",
+          });
+        } else {
+          this.setActiveTool({ type: "laser" });
+        }
+        return;
+      }
+
       if (this.state.viewModeEnabled) {
+        //revert to hand in case a key is pressed (K is handled above)
+        if (event.key !== KEYS.K) {
+          this.setActiveTool({ type: "hand" });
+        }
         return;
       }
 
@@ -3280,15 +3297,6 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
-      }
-
-      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
-        if (this.state.activeTool.type === "laser") {
-          this.setActiveTool({ type: "selection" });
-        } else {
-          this.setActiveTool({ type: "laser" });
-        }
-        return;
       }
 
       if (
@@ -5012,7 +5020,7 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
-          this.state.viewModeEnabled)
+          (this.state.viewModeEnabled && !isLaserPointerActive(this.state)))
       ) ||
       isTextElement(this.state.editingElement)
     ) {
@@ -8474,6 +8482,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
+          actionToggleLaserPointer,
         ];
       }
 
