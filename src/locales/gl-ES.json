@@ -50,7 +50,7 @@
     "veryLarge": "Moi grande",
     "solid": "Sólido",
     "hachure": "Folleto",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Raiado transversal",
     "thin": "Estreito",
     "bold": "Groso",
@@ -173,7 +173,7 @@
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Faga clic para interactuar"
   },
   "alerts": {
     "clearReset": "Isto limpará todo o lenzo. Estás seguro?",
@@ -235,8 +235,8 @@
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
     "eraser": "Goma de borrar",
     "frame": "",
-    "embeddable": "",
-    "laser": "",
+    "embeddable": "Inserir na web",
+    "laser": "Punteiro láser",
     "hand": "Man (ferramenta de desprazamento)",
     "extraTools": "Máis ferramentas"
   },
@@ -250,7 +250,7 @@
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
-    "embeddable": "",
+    "embeddable": "Faga clic e arrastre para crear un sitio web embebido",
     "text_selected": "Dobre-clic ou prema ENTER para editar o texto",
     "text_editing": "Prema Escape ou CtrlOrCmd+ENTER para finalizar a edición",
     "linearElementMulti": "Faga clic no último punto ou prema Escape ou Enter para rematar",
@@ -487,12 +487,12 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Cargar dende arquivo",
+        "button": "Cargar dende arquivo",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "Cargar dende un enlace",
         "button": "Substituír o meu contido",
         "description": ""
       }
