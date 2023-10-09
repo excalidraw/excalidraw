@@ -4480,16 +4480,18 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.lastPointerDownEvent = event;
+    this.savePointer(event.clientX, event.clientY, "down");
+
+    // we must exit before we set `cursorButton` state lest it will
+    // send pointer state & laser pointer events in collab when panning
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
 
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
     });
-    this.savePointer(event.clientX, event.clientY, "down");
-
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
-      return;
-    }
 
     // only handle left mouse button or touch
     if (
