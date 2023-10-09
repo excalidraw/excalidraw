@@ -109,12 +109,12 @@
     "createContainerFromText": "ארוז טקסט במיכל",
     "link": {
       "edit": "עריכת קישור",
-      "editEmbed": "",
+      "editEmbed": "ערוך קישור ושבץ",
       "create": "יצירת קישור",
-      "createEmbed": "",
+      "createEmbed": "צור קישור ושבץ",
       "label": "קישור",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "קשר ושבץ",
+      "empty": "לא נקבע קישור"
     },
     "lineEditor": {
       "edit": "ערוך קו",
@@ -128,8 +128,8 @@
     },
     "statusPublished": "פורסם",
     "sidebarLock": "שמור את סרגל הצד פתוח",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "בחר את כל האלמנטים במסגרת",
+    "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
     "eyeDropper": ""
   },
   "library": {
