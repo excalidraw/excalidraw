@@ -445,6 +445,8 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  interactive?: boolean;
+  ui?: boolean;
 }
 
 export type SceneData = {
