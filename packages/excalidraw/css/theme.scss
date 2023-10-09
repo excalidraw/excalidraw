@@ -2,7 +2,8 @@
 @use "./variables.module" as *;
 @forward "./variables.module";
 
-.excalidraw {
+.excalidraw,
+.exc-style {
   --theme-filter: none;
   --button-destructive-bg-color: #{$color-red-1};
   --button-destructive-color: #{$color-red-9};
@@ -176,13 +177,15 @@
     --default-icon-size: 1.25rem;
   }
 
-  &.theme--dark {
+  &.theme--dark,
+  .dark & {
     &.theme--dark-background-none {
       background: none;
     }
   }
 
-  &.theme--dark {
+  &.theme--dark,
+  .dark & {
     --theme-filter: invert(93%) hue-rotate(180deg);
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$color-red-3};

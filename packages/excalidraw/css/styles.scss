@@ -35,7 +35,9 @@ body.excalidraw-cursor-resize * {
   cursor: ew-resize;
 }
 
+.exc-style,
 .excalidraw {
+  color: var(--text-primary-color);
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
@@ -92,6 +94,26 @@ body.excalidraw-cursor-resize * {
       text-decoration: none;
     }
   }
+}
+
+.excalidraw {
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+
+  // serves 2 purposes:
+  // 1. prevent selecting text outside the component when double-clicking or
+  //    dragging inside it (e.g. on canvas)
+  // 2. prevent selecting UI, both from the inside, and from outside the
+  //    component (e.g. if you select text in a sidebar)
+  user-select: none;
 
   canvas {
     touch-action: none;
