@@ -4480,14 +4480,15 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.lastPointerDownEvent = event;
-    this.savePointer(event.clientX, event.clientY, "down");
 
-    // we must exit before we set `cursorButton` state lest it will
-    // send pointer state & laser pointer events in collab when panning
+    // we must exit before we set `cursorButton` state and `savePointer`
+    // else it will send pointer state & laser pointer events in collab when
+    // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
 
+    this.savePointer(event.clientX, event.clientY, "down");
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
@@ -4513,7 +4514,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       selectedElementsAreBeingDragged: false,
     });
-
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
     }
