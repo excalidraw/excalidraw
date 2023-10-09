@@ -4488,11 +4488,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.savePointer(event.clientX, event.clientY, "down");
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
     });
+    this.savePointer(event.clientX, event.clientY, "down");
 
     // only handle left mouse button or touch
     if (
@@ -4514,6 +4514,7 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       selectedElementsAreBeingDragged: false,
     });
+
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
     }
