@@ -30,7 +30,6 @@ export type EyeDropperProperties = {
 
 export const activeEyeDropperAtom = atom<null | EyeDropperProperties>(null);
 
-//@ts-ignore
 export const EyeDropper: React.FC<{
   onCancel: () => void;
   onSelect: EyeDropperProperties["onSelect"];
