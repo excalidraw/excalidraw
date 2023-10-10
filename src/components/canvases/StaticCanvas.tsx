@@ -114,11 +114,13 @@ const areEqual = (
     return false;
   }
 
-  return isShallowEqual(
-    // asserting AppState because we're being passed the whole AppState
-    // but resolve to only the StaticCanvas-relevant props
-    getRelevantAppStateProps(prevProps.appState as AppState),
-    getRelevantAppStateProps(nextProps.appState as AppState),
+  return (
+    isShallowEqual(
+      // asserting AppState because we're being passed the whole AppState
+      // but resolve to only the StaticCanvas-relevant props
+      getRelevantAppStateProps(prevProps.appState as AppState),
+      getRelevantAppStateProps(nextProps.appState as AppState),
+    ) && isShallowEqual(prevProps.renderConfig, nextProps.renderConfig)
   );
 };
 
