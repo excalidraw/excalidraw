@@ -21,6 +21,12 @@ import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
 import React from "react";
 
+const laserPointerCursorSVG = `<svg swidth="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="m9.644 13.69 7.774-7.773a2.357 2.357 0 0 0-3.334-3.334l-7.773 7.774L8 12l1.643 1.69Z" stroke="#1B1B1F" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="m13.25 3.417 3.333 3.333M10 10l2-2M5 15l3-3M2.156 17.894l1-1M5.453 19.029l-.144-1.407M2.377 11.887l.866 1.118M8.354 17.273l-1.194-.758M.953 14.652l1.408.13" stroke="#1B1B1F" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const laserPointerCursorDataURL = `data:${MIME_TYPES.svg},${encodeURIComponent(
+  `${laserPointerCursorSVG}`,
+)}`;
+
 let mockDateTime: string | null = null;
 
 export const setDateTimeForTests = (dateTime: string) => {
@@ -467,6 +473,10 @@ export const setCursorForShape = (
     // do nothing if image tool is selected which suggests there's
     // a image-preview set as the cursor
     // Ignore custom type as well and let host decide
+  } else if (appState.activeTool.type === "laser") {
+    const url = laserPointerCursorDataURL;
+
+    interactiveCanvas.style.cursor = `url(${url}) -20 20, auto`;
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   }
