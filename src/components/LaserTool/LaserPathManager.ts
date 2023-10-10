@@ -106,7 +106,8 @@ export class LaserPathManager {
   }
 
   startPath(x: number, y: number) {
-    if (this.container) { //zsviczian (fix offset)
+    if (this.container) {
+      //zsviczian (fix offset)
       this.container.style.top = "0px";
       this.container.style.left = "0px";
       const { x, y } = this.container.getBoundingClientRect();

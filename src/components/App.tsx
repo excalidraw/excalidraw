@@ -3137,7 +3137,7 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
         if (isLaserPointerActive(this.state)) {
           this.setActiveTool({
-            type: this.state.viewModeEnabled ? "hand" : "selection",
+            type: "selection",
           });
         } else {
           this.setActiveTool({ type: "laser" });
@@ -3148,7 +3148,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.viewModeEnabled) {
         //revert to hand in case a key is pressed (K is handled above)
         if (event.key !== KEYS.K) {
-          this.setActiveTool({ type: "hand" });
+          this.setActiveTool({ type: "selection" });
         }
         return;
       }
@@ -4771,10 +4771,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
-      return;
-    }
-
     this.lastPointerDownEvent = event;
 
     this.setState({
@@ -4782,6 +4778,10 @@ class App extends React.Component<AppProps, AppState> {
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
+
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    }
 
     // only handle left mouse button or touch
     if (
