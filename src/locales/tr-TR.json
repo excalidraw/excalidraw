@@ -378,7 +378,7 @@
     "header": "Resmi dışa aktar",
     "label": {
       "withBackground": "Arka plan",
-      "onlySelected": "",
+      "onlySelected": "Sadece seçilen",
       "darkMode": "Karanlık mod",
       "embedScene": "Sahne yerleştir",
       "scale": "Ölçeklendir",
