@@ -3143,11 +3143,7 @@ class App extends React.Component<AppProps, AppState> {
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
-    if (nextActiveTool.type === "hand") {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-    } else if (!isHoldingSpace) {
-      setCursorForShape(this.interactiveCanvas, this.state);
-    }
+
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
     }
@@ -3164,8 +3160,10 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
         activeEmbeddable: null,
       } as const;
+      let nextState: AppState;
+
       if (nextActiveTool.type !== "selection") {
-        return {
+        nextState = {
           ...prevState,
           activeTool: nextActiveTool,
           selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -3174,12 +3172,21 @@ class App extends React.Component<AppProps, AppState> {
           multiElement: null,
           ...commonResets,
         };
+      } else {
+        nextState = {
+          ...prevState,
+          activeTool: nextActiveTool,
+          ...commonResets,
+        };
       }
-      return {
-        ...prevState,
-        activeTool: nextActiveTool,
-        ...commonResets,
-      };
+
+      if (nextActiveTool.type === "hand") {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else if (!isHoldingSpace) {
+        setCursorForShape(this.interactiveCanvas, nextState);
+      }
+
+      return nextState;
     });
   };
 
