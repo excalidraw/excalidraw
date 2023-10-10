@@ -76,7 +76,7 @@ export type CollaboratorPointer = {
    *
    * @default true
    */
-  renderPointer?: boolean;
+  renderCursor?: boolean;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
