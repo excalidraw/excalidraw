@@ -70,6 +70,13 @@ export type CollaboratorPointer = {
   x: number;
   y: number;
   tool: "pointer" | "laser";
+  /**
+   * Whether to render cursor + username. Useful when you only want to render
+   * laser trail.
+   *
+   * @default true
+   */
+  renderPointer?: boolean;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
