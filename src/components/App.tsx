@@ -123,6 +123,7 @@ import {
   bindOrUnbindSelectedElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
+  getLinearElementEdgeCoors,
   getEligibleElementsForBinding,
   getHoveredElementForBinding,
   isBindingEnabled,
@@ -6037,8 +6038,6 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          this.maybeSuggestBindingForAll(selectedElements);
-
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
             // Move the currently selected elements to the top of the z index stack, and
@@ -7050,33 +7049,48 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        // Grouped arrows shouldn't bind/unbind to an element unless they're explicitly selected and dragged to that element.
-        // If a grouped arrow is bound, unbind when necessary.
         let selectedElements = this.scene.getSelectedElements(this.state);
+        // dragging linear element endpoint for binding
         if (
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.isDragging
         ) {
           selectedElements = selectedElements.filter(
-            (elem) =>
-              !(
-                elem.id === this.state.selectedLinearElement?.elementId &&
-                elem.groupIds.length > 0
-              ),
+            (elem) => elem.id === this.state.selectedLinearElement?.elementId,
+          );
+          (isBindingEnabled(this.state)
+            ? bindOrUnbindSelectedElements
+            : unbindLinearElements)(
+            selectedElements as NonDeleted<ExcalidrawElement>[],
           );
         } else {
-          selectedElements = selectedElements.filter(
-            (elem) =>
-              (isArrowElement(elem) &&
-                ((elem as ExcalidrawLinearElement).endBinding !== null ||
-                  (elem as ExcalidrawLinearElement).startBinding !== null)) ||
-              elem.groupIds.length === 0,
-          );
-        }
+          // unbind linear element endpoints if element has been entirely moved away
+          const linearElements = selectedElements.filter((elem) =>
+            isArrowElement(elem),
+          ) as ExcalidrawLinearElement[];
+          selectedElements = linearElements.filter((elem) => {
+            let shouldInclude = false;
+            const endpoints: ("start" | "end")[] = ["start", "end"];
+            endpoints.forEach((endpoint) => {
+              const endpointCoors = getLinearElementEdgeCoors(elem, endpoint);
+              const hoveredElementAtEndpoint = getHoveredElementForBinding(
+                endpointCoors,
+                this.scene,
+              );
+              const endpointBinding =
+                endpoint === "start" ? elem.startBinding : elem.endBinding;
 
-        (isBindingEnabled(this.state)
-          ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(selectedElements);
+              if (
+                endpointBinding !== null &&
+                hoveredElementAtEndpoint === null
+              ) {
+                shouldInclude = true;
+              }
+            });
+            return shouldInclude;
+          });
+          unbindLinearElements(selectedElements);
+        }
       }
 
       if (activeTool.type === "laser") {

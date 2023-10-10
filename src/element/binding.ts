@@ -497,9 +497,6 @@ export const getEligibleElementsForBinding = (
 const getElligibleElementsForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
-  if (linearElement.groupIds.length > 0) {
-    return [];
-  }
   return [
     getElligibleElementForBindingElement(linearElement, "start"),
     getElligibleElementForBindingElement(linearElement, "end"),
@@ -519,7 +516,7 @@ const getElligibleElementForBindingElement = (
   );
 };
 
-const getLinearElementEdgeCoors = (
+export const getLinearElementEdgeCoors = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
 ): { x: number; y: number } => {
@@ -550,12 +547,6 @@ const getElligibleElementsForBindableElementAndWhere = (
       );
       if (!canBindStart && !canBindEnd) {
         return null;
-      }
-      // don't bind linear element if it's in a group
-      if (canBindStart || canBindEnd) {
-        if (element.groupIds.length > 0) {
-          return null;
-        }
       }
       return [
         element,
