@@ -450,7 +450,7 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
-      "center_heading_plus": "",
+      "center_heading_plus": "Ecalidraw+'a mı gitmek istediniz?",
       "menuHint": "Dışa aktar, seçenekler, diller, ..."
     },
     "defaults": {
@@ -461,10 +461,10 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
+    "mostUsedCustomColors": "En çok kullanılan özel renkler",
+    "colors": "Renkler",
     "shades": "",
-    "hexCode": "",
+    "hexCode": "Hex kodu",
     "noShades": ""
   },
   "overwriteConfirm": {
@@ -476,7 +476,7 @@
       },
       "saveToDisk": {
         "title": "",
-        "button": "",
+        "button": "Diske Kaydet",
         "description": ""
       },
       "excalidrawPlus": {
