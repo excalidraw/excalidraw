@@ -711,6 +711,14 @@ export interface ExcalidrawProps {
   ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
   interactive?: boolean;
   ui?: boolean;
+  activeTool?:
+    | {
+        type: ToolType;
+      }
+    | {
+        type: "custom";
+        customType: string;
+      };
 }
 
 export type SceneData = {
