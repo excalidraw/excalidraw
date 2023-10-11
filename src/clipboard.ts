@@ -173,8 +173,6 @@ export const getSystemClipboard = async (
         (await navigator.clipboard.readText());
 
     const imageUrl = html ? extractImageSrc(html) : null;
-    // console.log("text", text);
-    // console.log(imageUrl);
 
     return (imageUrl || text || "").trim();
   } catch {

@@ -277,6 +277,7 @@ import {
   generateIdFromFile,
   getDataURL,
   getFileFromEvent,
+  ImageLinkToFile,
   isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
@@ -2199,6 +2200,9 @@ class App extends React.Component<AppProps, AppState> {
           // ignore SVG validation/normalization which will be done during image
           // initialization
           file = SVGStringToFile(string);
+        }
+        if (string.match(RE_GDOCS)) {
+          file = await ImageLinkToFile(string);
         }
       }
 
@@ -5470,8 +5474,6 @@ class App extends React.Component<AppProps, AppState> {
       link,
       validated: null,
     });
-
-    console.log(element);
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
