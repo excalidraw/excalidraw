@@ -114,6 +114,16 @@
   }
 }
 
+@mixin filledButtonOnCanvas {
+  border: none;
+  box-shadow: 0 0 0 1px var(--color-surface-lowest);
+  background-color: var(--color-surface-low);
+
+  &:active {
+    box-shadow: 0 0 0 1px var(--color-brand-active);
+  }
+}
+
 $theme-filter: "invert(93%) hue-rotate(180deg)";
 $right-sidebar-width: "302px";
 

@@ -3,9 +3,7 @@
 .excalidraw {
   .sidebar-trigger {
     @include outlineButtonStyles;
-
-    border: 1px solid var(--color-surface-lowest);
-    background-color: var(--color-surface-low);
+    @include filledButtonOnCanvas;
 
     width: auto;
     height: var(--lg-button-size);
