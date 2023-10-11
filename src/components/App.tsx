@@ -1155,6 +1155,9 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectionElement ||
             this.state.draggingElement ||
             this.state.resizingElement ||
+            (this.state.activeTool.type === "laser" &&
+              // technically we can just test on this once we make it more safe
+              this.state.cursorButton === "down") ||
             (this.state.editingElement &&
               !isTextElement(this.state.editingElement))
               ? POINTER_EVENTS.disabled
@@ -4479,11 +4482,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    this.lastPointerDownEvent = event;
+
+    // we must exit before we set `cursorButton` state and `savePointer`
+    // else it will send pointer state & laser pointer events in collab when
+    // panning
     if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
     }
-
-    this.lastPointerDownEvent = event;
 
     this.setState({
       lastPointerDownWith: event.pointerType,

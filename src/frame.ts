@@ -707,6 +707,17 @@ export const isElementInFrame = (
     : element;
 
   if (frame) {
+    // Perf improvement:
+    // For an element that's already in a frame, if it's not being dragged
+    // then there is no need to refer to geometry (which, yes, is slow) to check if it's in a frame.
+    // It has to be in its containing frame.
+    if (
+      !appState.selectedElementIds[element.id] ||
+      !appState.selectedElementsAreBeingDragged
+    ) {
+      return true;
+    }
+
     if (_element.groupIds.length === 0) {
       return elementOverlapsWithFrame(_element, frame);
     }
