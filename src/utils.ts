@@ -1,13 +1,9 @@
-import oc from "open-color";
 import { COLOR_PALETTE } from "./colors";
 import {
-  CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
   isDarwin,
-  MIME_TYPES,
-  THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import {
@@ -15,19 +11,10 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { ActiveTool, AppState, DataURL, ToolType, Zoom } from "./types";
+import { ActiveTool, AppState, ToolType, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
 import React from "react";
-
-const laserPointerCursorSVG = `<svg viewBox="0 0 20 20" width="20" height="20" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round">
-<path d="m6.771 10.113 7.773 7.774a2.359 2.359 0 0 0 1.667.691 2.368 2.368 0 0 0 2.357-2.358c0-.625-.248-1.225-.69-1.667L10.104 6.78 8.461 8.469l-1.69 1.643v.001Zm10.273 3.606-3.333 3.333m-3.25-6.583 2 2m-7-7 3 3M2.567 2.625l1 1M1.432 5.922l1.407-.144m5.735-2.932-1.118.866M3.188 8.823l.758-1.194m1.863-6.207-.13 1.408" style="fill:none;fill-rule:nonzero;stroke:#1b1b1f;stroke-width:1.25px"/>
-</svg>`;
-
-const laserPointerCursorDataURL = `data:${MIME_TYPES.svg},${encodeURIComponent(
-  `${laserPointerCursorSVG}`,
-)}`;
 
 let mockDateTime: string | null = null;
 
@@ -400,87 +387,6 @@ export const updateActiveTool = (
     type: data.type,
     customType: null,
   };
-};
-
-export const resetCursor = (interactiveCanvas: HTMLCanvasElement | null) => {
-  if (interactiveCanvas) {
-    interactiveCanvas.style.cursor = "";
-  }
-};
-
-export const setCursor = (
-  interactiveCanvas: HTMLCanvasElement | null,
-  cursor: string,
-) => {
-  if (interactiveCanvas) {
-    interactiveCanvas.style.cursor = cursor;
-  }
-};
-
-let eraserCanvasCache: any;
-let previewDataURL: string;
-export const setEraserCursor = (
-  interactiveCanvas: HTMLCanvasElement | null,
-  theme: AppState["theme"],
-) => {
-  const cursorImageSizePx = 20;
-
-  const drawCanvas = () => {
-    const isDarkTheme = theme === THEME.DARK;
-    eraserCanvasCache = document.createElement("canvas");
-    eraserCanvasCache.theme = theme;
-    eraserCanvasCache.height = cursorImageSizePx;
-    eraserCanvasCache.width = cursorImageSizePx;
-    const context = eraserCanvasCache.getContext("2d")!;
-    context.lineWidth = 1;
-    context.beginPath();
-    context.arc(
-      eraserCanvasCache.width / 2,
-      eraserCanvasCache.height / 2,
-      5,
-      0,
-      2 * Math.PI,
-    );
-    context.fillStyle = isDarkTheme ? oc.black : oc.white;
-    context.fill();
-    context.strokeStyle = isDarkTheme ? oc.white : oc.black;
-    context.stroke();
-    previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
-  };
-  if (!eraserCanvasCache || eraserCanvasCache.theme !== theme) {
-    drawCanvas();
-  }
-
-  setCursor(
-    interactiveCanvas,
-    `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
-      cursorImageSizePx / 2
-    }, auto`,
-  );
-};
-
-export const setCursorForShape = (
-  interactiveCanvas: HTMLCanvasElement | null,
-  appState: Pick<AppState, "activeTool" | "theme">,
-) => {
-  if (!interactiveCanvas) {
-    return;
-  }
-  if (appState.activeTool.type === "selection") {
-    resetCursor(interactiveCanvas);
-  } else if (isHandToolActive(appState)) {
-    interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
-  } else if (isEraserActive(appState)) {
-    setEraserCursor(interactiveCanvas, appState.theme);
-    // do nothing if image tool is selected which suggests there's
-    // a image-preview set as the cursor
-    // Ignore custom type as well and let host decide
-  } else if (appState.activeTool.type === "laser") {
-    const url = laserPointerCursorDataURL;
-    interactiveCanvas.style.cursor = `url(${url}), auto`;
-  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
-  }
 };
 
 export const isFullScreen = () =>

@@ -241,18 +241,14 @@ import {
   isInputLike,
   isToolIcon,
   isWritableElement,
-  resetCursor,
   resolvablePromise,
   sceneCoordsToViewportCoords,
-  setCursor,
-  setCursorForShape,
   tupleToCoors,
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
   wrapEvent,
   withBatchedUpdatesThrottled,
   updateObject,
-  setEraserCursor,
   updateActiveTool,
   getShortcutKey,
   isTransparent,
@@ -371,6 +367,12 @@ import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
 import { LaserToolOverlay } from "./LaserTool/LaserTool";
 import { LaserPathManager } from "./LaserTool/LaserPathManager";
+import {
+  setEraserCursor,
+  setCursor,
+  resetCursor,
+  setCursorForShape,
+} from "../cursor";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
