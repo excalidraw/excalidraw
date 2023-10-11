@@ -6,9 +6,9 @@
 
 .zoom-button,
 .undo-redo-buttons button {
-  border: 1px solid var(--default-border-color) !important;
+  border: 1px solid transparent !important;
   border-radius: 0 !important;
-  background-color: transparent !important;
+  background-color: var(--color-surface-low) !important;
   font-size: 0.875rem !important;
   width: var(--lg-button-size);
   height: var(--lg-button-size);
@@ -30,11 +30,16 @@
   width: 3.75rem !important;
   justify-content: center;
   color: var(--text-primary-color);
+  border-top-color: var(--color-surface-lowest) !important;
+  border-bottom-color: var(--color-surface-lowest) !important;
 }
 
 .zoom-out-button {
   border-top-left-radius: var(--border-radius-lg) !important;
   border-bottom-left-radius: var(--border-radius-lg) !important;
+  border-left-color: var(--color-surface-lowest) !important;
+  border-top-color: var(--color-surface-lowest) !important;
+  border-bottom-color: var(--color-surface-lowest) !important;
 
   :root[dir="rtl"] & {
     transform: scaleX(-1);
@@ -49,6 +54,9 @@
 .zoom-in-button {
   border-top-right-radius: var(--border-radius-lg) !important;
   border-bottom-right-radius: var(--border-radius-lg) !important;
+  border-right-color: var(--color-surface-lowest) !important;
+  border-top-color: var(--color-surface-lowest) !important;
+  border-bottom-color: var(--color-surface-lowest) !important;
 
   :root[dir="rtl"] & {
     transform: scaleX(-1);
@@ -65,6 +73,9 @@
     border-top-left-radius: var(--border-radius-lg) !important;
     border-bottom-left-radius: var(--border-radius-lg) !important;
     border-right: 0 !important;
+    border-left-color: var(--color-surface-lowest) !important;
+    border-top-color: var(--color-surface-lowest) !important;
+    border-bottom-color: var(--color-surface-lowest) !important;
 
     :root[dir="rtl"] & {
       transform: scaleX(-1);
@@ -79,6 +90,9 @@
   .redo-button-container button {
     border-top-right-radius: var(--border-radius-lg) !important;
     border-bottom-right-radius: var(--border-radius-lg) !important;
+    border-right-color: var(--color-surface-lowest) !important;
+    border-top-color: var(--color-surface-lowest) !important;
+    border-bottom-color: var(--color-surface-lowest) !important;
 
     :root[dir="rtl"] & {
       transform: scaleX(-1);

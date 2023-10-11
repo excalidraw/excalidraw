@@ -4,7 +4,8 @@
   .sidebar-trigger {
     @include outlineButtonStyles;
 
-    background-color: var(--island-bg-color);
+    border: 1px solid var(--color-surface-lowest);
+    background-color: var(--color-surface-low);
 
     width: auto;
     height: var(--lg-button-size);
