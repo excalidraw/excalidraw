@@ -49,7 +49,6 @@ import {
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
-  RE_GDOCS,
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
 } from "../element/embeddable";
@@ -321,7 +320,7 @@ const drawElementOnCanvas = (
       break;
     }
     default: {
-      if (isTextElement(element) && !element.link?.match(RE_GDOCS)) {
+      if (isTextElement(element)) {
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {

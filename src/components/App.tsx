@@ -87,7 +87,6 @@ import {
   YOUTUBE_STATES,
   ZOOM_STEP,
   POINTER_EVENTS,
-  TRANSLATE_CANVAS_AMOUNT,
 } from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -2936,7 +2935,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (this.state.viewModeEnabled && isArrowKey(event.key)) {
+      if (this.state.viewModeEnabled) {
         return;
       }
 
