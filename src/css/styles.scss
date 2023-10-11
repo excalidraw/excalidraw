@@ -628,6 +628,17 @@
     border: 1px solid var(--color-surface-lowest);
     background-color: var(--color-surface-low);
   }
+
+  .App-menu__left {
+    --button-border: transparent;
+    --button-bg: var(--color-surface-low);
+    // --button-hover-bg: #efeff5;
+
+    @at-root .excalidraw.theme--dark#{&} {
+      --button-hover-bg: #363541;
+      --button-bg: var(--color-surface-high);
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {
