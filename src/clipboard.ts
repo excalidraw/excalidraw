@@ -142,6 +142,18 @@ const parsePotentialSpreadsheet = (
   return null;
 };
 
+const extractImageSrc = (htmlString: string): string | null => {
+  const tempElement = document.createElement("div");
+  tempElement.innerHTML = htmlString;
+
+  const imgElement = tempElement.querySelector("img");
+  if (imgElement) {
+    const src = imgElement.getAttribute("src");
+    return src;
+  }
+  return null;
+};
+
 /**
  * Retrieves content from system clipboard (either from ClipboardEvent or
  *  via async clipboard API if supported)
@@ -155,7 +167,16 @@ export const getSystemClipboard = async (
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    return (text || "").trim();
+    const html = event
+      ? event.clipboardData?.getData("text/html")
+      : probablySupportsClipboardReadText &&
+        (await navigator.clipboard.readText());
+
+    const imageUrl = html ? extractImageSrc(html) : null;
+    // console.log("text", text);
+    // console.log(imageUrl);
+
+    return (imageUrl || text || "").trim();
   } catch {
     return "";
   }

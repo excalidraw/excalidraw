@@ -259,6 +259,7 @@ import {
   easeOut,
 } from "../utils";
 import {
+  RE_GDOCS,
   embeddableURLValidator,
   extractSrc,
   getEmbedLink,
@@ -2262,6 +2263,21 @@ class App extends React.Component<AppProps, AppState> {
         });
       } else if (data.text) {
         const maybeUrl = extractSrc(data.text);
+        if (
+          !isPlainPaste &&
+          embeddableURLValidator(maybeUrl, new RegExp(RE_GDOCS))
+        ) {
+          const embeddable = this.insertEmbeddableElement({
+            sceneX,
+            sceneY,
+            link: normalizeLink(maybeUrl),
+          });
+          if (embeddable) {
+            this.setState({ selectedElementIds: { [embeddable.id]: true } });
+          }
+          return;
+        }
+
         if (
           !isPlainPaste &&
           embeddableURLValidator(maybeUrl, this.props.validateEmbeddable) &&
@@ -5454,6 +5470,8 @@ class App extends React.Component<AppProps, AppState> {
       link,
       validated: null,
     });
+
+    console.log(element);
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),

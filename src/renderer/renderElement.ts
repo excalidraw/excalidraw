@@ -49,6 +49,7 @@ import {
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
+  RE_GDOCS,
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
 } from "../element/embeddable";
@@ -266,7 +267,17 @@ const drawElementOnCanvas = (
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
-    case "embeddable":
+    case "embeddable": {
+      if (element.link?.match("googleusercontent.com")) {
+        const img = new Image();
+        img.src = element.link;
+        console.log("loading...");
+        img.onload = () => {
+          context.drawImage(img, 0, 0, element.width, element.height);
+        };
+      }
+      break;
+    }
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -320,7 +331,7 @@ const drawElementOnCanvas = (
       break;
     }
     default: {
-      if (isTextElement(element)) {
+      if (isTextElement(element) && !element.link?.match(RE_GDOCS)) {
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
