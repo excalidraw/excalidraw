@@ -45,6 +45,7 @@ const ChartPreviewBtn = (props: {
         {
           exportBackground: false,
           viewBackgroundColor: oc.white,
+          canvasSize: { mode: "infinite" },
         },
         null, // files
       );

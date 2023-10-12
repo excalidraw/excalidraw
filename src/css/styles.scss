@@ -525,6 +525,10 @@
     }
   }
 
+  &.excalidraw--fixed-size-canvas {
+    background: var(--behind-canvas-color);
+  }
+
   input[type="text"],
   textarea:not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);

@@ -94,7 +94,11 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
       return t("hints.disableSnapping");
     }
 
-    if (!selectedElements.length && !isMobile) {
+    if (
+      !selectedElements.length &&
+      !isMobile &&
+      appState.canvasSize.mode !== "fixed"
+    ) {
       return t("hints.canvasPanning");
     }
 

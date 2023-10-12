@@ -15,6 +15,7 @@
   --icon-fill-color: var(--color-gray-80);
   --icon-green-fill-color: #{$oc-green-9};
   --default-bg-color: #{$oc-white};
+  --behind-canvas-color: #{$oc-gray-5};
   --input-bg-color: #{$oc-white};
   --input-border-color: #{$oc-gray-4};
   --input-hover-bg-color: #{$oc-gray-1};
@@ -153,6 +154,7 @@
     --icon-fill-color: var(--color-gray-40);
     --icon-green-fill-color: #{$oc-green-4};
     --default-bg-color: #121212;
+    --behind-canvas-color: #222;
     --input-bg-color: #121212;
     --input-border-color: #2e2e2e;
     --input-hover-bg-color: #181818;

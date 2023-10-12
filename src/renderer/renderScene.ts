@@ -8,6 +8,7 @@ import {
   Point,
   Zoom,
   AppState,
+  CanvasSize,
 } from "../types";
 import {
   ExcalidrawElement,
@@ -400,6 +401,8 @@ const bootstrapCanvas = ({
   scale,
   normalizedWidth,
   normalizedHeight,
+  canvasSize,
+  fixedCanvasFrameElement,
   theme,
   isExporting,
   viewBackgroundColor,
@@ -408,6 +411,8 @@ const bootstrapCanvas = ({
   scale: number;
   normalizedWidth: number;
   normalizedHeight: number;
+  canvasSize: CanvasSize;
+  fixedCanvasFrameElement: NonDeletedExcalidrawElement | null;
   theme?: AppState["theme"];
   isExporting?: StaticCanvasRenderConfig["isExporting"];
   viewBackgroundColor?: StaticCanvasAppState["viewBackgroundColor"];
@@ -422,19 +427,25 @@ const bootstrapCanvas = ({
   }
 
   // Paint background
+  const isFixedCanvasMode =
+    canvasSize.mode === "fixed" && fixedCanvasFrameElement && !isExporting;
+
   if (typeof viewBackgroundColor === "string") {
     const hasTransparence =
       viewBackgroundColor === "transparent" ||
       viewBackgroundColor.length === 5 || // #RGBA
       viewBackgroundColor.length === 9 || // #RRGGBBA
       /(hsla|rgba)\(/.test(viewBackgroundColor);
-    if (hasTransparence) {
+
+    if (hasTransparence || isFixedCanvasMode) {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
-    context.save();
-    context.fillStyle = viewBackgroundColor;
-    context.fillRect(0, 0, normalizedWidth, normalizedHeight);
-    context.restore();
+    if (!isFixedCanvasMode) {
+      context.save();
+      context.fillStyle = viewBackgroundColor;
+      context.fillRect(0, 0, normalizedWidth, normalizedHeight);
+      context.restore();
+    }
   } else {
     context.clearRect(0, 0, normalizedWidth, normalizedHeight);
   }
@@ -459,12 +470,16 @@ const _renderInteractiveScene = ({
     canvas,
     scale,
   );
+  const canvasSize = appState.canvasSize;
+  const fixedCanvasFrameElement = appState.fixedCanvasFrameElement;
 
   const context = bootstrapCanvas({
     canvas,
     scale,
     normalizedWidth,
     normalizedHeight,
+    canvasSize,
+    fixedCanvasFrameElement,
   });
 
   // Apply zoom
@@ -918,12 +933,16 @@ const _renderStaticScene = ({
     canvas,
     scale,
   );
+  const canvasSize = appState.canvasSize;
+  const fixedCanvasFrameElement = appState.fixedCanvasFrameElement;
 
   const context = bootstrapCanvas({
     canvas,
     scale,
     normalizedWidth,
     normalizedHeight,
+    canvasSize,
+    fixedCanvasFrameElement,
     theme: appState.theme,
     isExporting,
     viewBackgroundColor: appState.viewBackgroundColor,

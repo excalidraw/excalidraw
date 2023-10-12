@@ -20,6 +20,7 @@ export const getDefaultAppState = (): Omit<
   "offsetTop" | "offsetLeft" | "width" | "height"
 > => {
   return {
+    canvasSize: { mode: "default" },
     showWelcomeScreen: false,
     theme: THEME.LIGHT,
     collaborators: new Map(),
@@ -38,6 +39,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     cursorButton: "up",
+    fixedCanvasFrameElement: null,
     activeEmbeddable: null,
     draggingElement: null,
     editingElement: null,
@@ -125,6 +127,7 @@ const APP_STATE_STORAGE_CONF = (<
 >(config: { [K in keyof T]: K extends keyof AppState ? T[K] : never }) =>
   config)({
   showWelcomeScreen: { browser: true, export: false, server: false },
+  canvasSize: { browser: true, export: true, server: true },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
@@ -146,6 +149,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
   cursorButton: { browser: true, export: false, server: false },
+  fixedCanvasFrameElement: { browser: false, export: false, server: false },
   activeEmbeddable: { browser: false, export: false, server: false },
   draggingElement: { browser: false, export: false, server: false },
   editingElement: { browser: false, export: false, server: false },

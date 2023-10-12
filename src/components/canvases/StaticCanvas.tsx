@@ -96,6 +96,8 @@ const getRelevantAppStateProps = (
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
+  canvasSize: appState.canvasSize,
+  fixedCanvasFrameElement: appState.fixedCanvasFrameElement,
 });
 
 const areEqual = (

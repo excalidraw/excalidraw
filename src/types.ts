@@ -84,6 +84,16 @@ export type BinaryFileData = {
   lastRetrieved?: number;
 };
 
+export type CanvasSize =
+  | {
+      mode: "fixed";
+      width: number;
+      height: number;
+      autoZoom?: boolean;
+    }
+  | { mode: "infinite" }
+  | { mode: "default" };
+
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
@@ -131,6 +141,8 @@ type _CommonCanvasAppState = {
   offsetTop: AppState["offsetTop"];
   theme: AppState["theme"];
   pendingImageElementId: AppState["pendingImageElementId"];
+  canvasSize: AppState["canvasSize"];
+  fixedCanvasFrameElement: AppState["fixedCanvasFrameElement"];
 };
 
 export type StaticCanvasAppState = Readonly<
@@ -170,6 +182,7 @@ export type InteractiveCanvasAppState = Readonly<
 >;
 
 export type AppState = {
+  canvasSize: CanvasSize;
   contextMenu: {
     items: ContextMenuItems;
     top: number;
@@ -178,6 +191,7 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
+  fixedCanvasFrameElement: NonDeletedExcalidrawElement | null;
   activeEmbeddable: {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
@@ -445,6 +459,7 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  defaultCanvasSize?: { width: number; height: number; autoZoom?: boolean };
 }
 
 export type SceneData = {

@@ -61,6 +61,7 @@ const canvas = exportToCanvas(
   elements as any,
   {
     ...getDefaultAppState(),
+    canvasSize: { mode: "infinite" },
     offsetTop: 0,
     offsetLeft: 0,
     width: 0,

@@ -1,5 +1,6 @@
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import * as exportUtils from "../../scene/export";
+import { CanvasSize } from "../../types";
 import {
   diamondFixture,
   ellipseFixture,
@@ -19,6 +20,7 @@ describe("exportToSvg", () => {
     exportBackground: false,
     viewBackgroundColor: "#ffffff",
     files: {},
+    canvasSize: {} as CanvasSize,
   };
 
   it("with default arguments", async () => {

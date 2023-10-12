@@ -44,6 +44,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     children,
     validateEmbeddable,
     renderEmbeddable,
+    defaultCanvasSize,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -119,6 +120,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onScrollChange={onScrollChange}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
+          defaultCanvasSize={defaultCanvasSize}
         >
           {children}
         </App>
