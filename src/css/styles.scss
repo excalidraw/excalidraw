@@ -629,7 +629,7 @@
 
   .App-menu__left {
     --button-border: transparent;
-    --button-bg: var(--color-surface-low);
+    --button-bg: var(--color-surface-mid);
 
     @at-root .excalidraw.theme--dark#{&} {
       --button-hover-bg: #363541;
