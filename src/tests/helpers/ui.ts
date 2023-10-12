@@ -464,10 +464,9 @@ export class UI {
     return proxy(origElement);
   }
 
-  static async editText(
-    element: ExcalidrawTextElement | ExcalidrawTextContainer,
-    text: string,
-  ) {
+  static async editText<
+    T extends ExcalidrawTextElement | ExcalidrawTextContainer,
+  >(element: T, text: string) {
     const openedEditor = document.querySelector<HTMLTextAreaElement>(
       ".excalidraw-textEditorContainer > textarea",
     );

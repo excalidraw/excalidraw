@@ -12,6 +12,7 @@ import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -301,18 +302,27 @@ describe("arrow element", () => {
     });
     const label = await UI.editText(arrow, "Hello");
     UI.resize(arrow, "se", [50, 30]);
+    let labelPos = LinearElementEditor.getBoundTextElementPosition(
+      arrow,
+      label,
+    );
 
-    expect(label.x + label.width / 2).toBeCloseTo(arrow.x + arrow.points[2][0]);
-    expect(label.y + label.height / 2).toBeCloseTo(
+    expect(labelPos.x + label.width / 2).toBeCloseTo(
+      arrow.x + arrow.points[2][0],
+    );
+    expect(labelPos.y + label.height / 2).toBeCloseTo(
       arrow.y + arrow.points[2][1],
     );
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
 
     UI.resize(arrow, "w", [20, 0]);
+    labelPos = LinearElementEditor.getBoundTextElementPosition(arrow, label);
 
-    expect(label.x + label.width / 2).toBeCloseTo(arrow.x + arrow.points[2][0]);
-    expect(label.y + label.height / 2).toBeCloseTo(
+    expect(labelPos.x + label.width / 2).toBeCloseTo(
+      arrow.x + arrow.points[2][0],
+    );
+    expect(labelPos.y + label.height / 2).toBeCloseTo(
       arrow.y + arrow.points[2][1],
     );
     expect(label.angle).toBeCloseTo(0);
@@ -735,6 +745,14 @@ describe("multiple selection", () => {
     const scale = move[0] / selectionWidth + 1;
 
     UI.resize([topArrow.get(), bottomArrow.get()], "se", move);
+    const topArrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
+      topArrow,
+      topArrowLabel,
+    );
+    const bottomArrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
+      bottomArrow,
+      bottomArrowLabel,
+    );
 
     expect(topArrow.x).toBeCloseTo(0);
     expect(topArrow.y).toBeCloseTo(selectionTop + (20 - selectionTop) * scale);
@@ -744,10 +762,12 @@ describe("multiple selection", () => {
       [300, 0],
     ]);
 
-    expect(topArrowLabel.x + topArrowLabel.width / 2).toBeCloseTo(
+    expect(topArrowLabelPos.x + topArrowLabel.width / 2).toBeCloseTo(
       topArrow.width / 2,
     );
-    expect(topArrowLabel.y + topArrowLabel.height / 2).toBeCloseTo(topArrow.y);
+    expect(topArrowLabelPos.y + topArrowLabel.height / 2).toBeCloseTo(
+      topArrow.y,
+    );
     expect(topArrowLabel.fontSize).toBeCloseTo(20 * scale);
 
     expect(bottomArrow.x).toBeCloseTo(0);
@@ -760,10 +780,10 @@ describe("multiple selection", () => {
       [300, 0],
     ]);
 
-    expect(bottomArrowLabel.x + bottomArrowLabel.width / 2).toBeCloseTo(
+    expect(bottomArrowLabelPos.x + bottomArrowLabel.width / 2).toBeCloseTo(
       bottomArrow.width / 2,
     );
-    expect(bottomArrowLabel.y + bottomArrowLabel.height / 2).toBeCloseTo(
+    expect(bottomArrowLabelPos.y + bottomArrowLabel.height / 2).toBeCloseTo(
       bottomArrow.y,
     );
     expect(bottomArrowLabel.fontSize).toBeCloseTo(28 * scale);
@@ -927,6 +947,10 @@ describe("multiple selection", () => {
 
     UI.resize([line, image, rectangle, boundArrow], "se", move);
     const lineNewBounds = getBoundsFromPoints(line);
+    const arrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
+      boundArrow,
+      arrowLabel,
+    );
 
     expect(line.x).toBeCloseTo(60 * scaleX);
     expect(line.y).toBeCloseTo(0);
@@ -967,10 +991,10 @@ describe("multiple selection", () => {
     expect(boundArrow.points[1][0]).toBeCloseTo(-60 * scaleX);
     expect(boundArrow.points[1][1]).toBeCloseTo(-80 * scaleY);
 
-    expect(arrowLabel.x + arrowLabel.width / 2).toBeCloseTo(
+    expect(arrowLabelPos.x + arrowLabel.width / 2).toBeCloseTo(
       boundArrow.x + boundArrow.points[1][0] / 2,
     );
-    expect(arrowLabel.y + arrowLabel.height / 2).toBeCloseTo(
+    expect(arrowLabelPos.y + arrowLabel.height / 2).toBeCloseTo(
       boundArrow.y + boundArrow.points[1][1] / 2,
     );
     expect(arrowLabel.angle).toEqual(0);
