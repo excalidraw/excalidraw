@@ -14,6 +14,8 @@
 
     --button-active-bg: var(--color-primary-darker);
 
+    box-shadow: 0 0 0 1px var(--color-surface-lowest);
+
     flex-shrink: 0;
 
     // double .active to force specificity

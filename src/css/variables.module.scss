@@ -11,7 +11,7 @@
     .ToolIcon_type_radio,
     .ToolIcon_type_checkbox {
       &:checked + .ToolIcon__icon {
-        --icon-fill-color: var(--color-primary-darker);
+        --icon-fill-color: var(--color-on-primary-container);
 
         svg {
           fill: var(--icon-fill-color);
@@ -23,11 +23,11 @@
   .ToolIcon_type_radio,
   .ToolIcon_type_checkbox {
     &:checked + .ToolIcon__icon {
-      background: var(--color-primary-light);
-      --keybinding-color: var(--color-gray-60);
+      background: var(--color-surface-primary-container);
+      --keybinding-color: var(--color-on-primary-container);
 
       svg {
-        color: var(--color-primary-darker);
+        color: var(--color-on-primary-container);
       }
     }
   }
@@ -44,7 +44,11 @@
 
     &:active {
       background: var(--button-hover-bg);
-      border: 1px solid var(--color-primary-darkest);
+      border: 1px solid var(--button-active-border);
+
+      svg {
+        color: var(--color-on-primary-container);
+      }
     }
   }
 }
@@ -63,7 +67,7 @@
   border-radius: var(--border-radius-lg);
   cursor: pointer;
   background-color: var(--button-bg, var(--island-bg-color));
-  color: var(--button-color, var(--text-primary-color));
+  color: var(--button-color, var(--color-on-surface));
 
   svg {
     width: var(--button-width, var(--lg-icon-size));
@@ -88,19 +92,35 @@
   }
 
   &.active {
-    background-color: var(--button-selected-bg, var(--color-primary-light));
-    border-color: var(--button-selected-border, var(--color-primary-light));
+    background-color: var(
+      --button-selected-bg,
+      var(--color-surface-primary-container)
+    );
+    border-color: var(
+      --button-selected-border,
+      var(--color-surface-primary-container)
+    );
 
     &:hover {
       background-color: var(
         --button-selected-hover-bg,
-        var(--color-primary-light)
+        var(--color-surface-primary-container)
       );
     }
 
     svg {
-      color: var(--button-color, var(--color-primary-darker));
+      color: var(--button-color, var(--color-on-primary-container));
     }
+  }
+}
+
+@mixin filledButtonOnCanvas {
+  border: none;
+  box-shadow: 0 0 0 1px var(--color-surface-lowest);
+  background-color: var(--color-surface-low);
+
+  &:active {
+    box-shadow: 0 0 0 1px var(--color-brand-active);
   }
 }
 

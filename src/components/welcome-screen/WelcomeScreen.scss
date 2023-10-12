@@ -174,7 +174,7 @@
     justify-content: space-between;
 
     background: none;
-    border: none;
+    border: 1px solid transparent;
 
     padding: 0.75rem;
 
@@ -204,7 +204,7 @@
 
   .welcome-screen-menu-item:hover {
     text-decoration: none;
-    background: var(--color-gray-10);
+    background: var(--button-hover-bg);
 
     .welcome-screen-menu-item__shortcut {
       color: var(--color-gray-50);
@@ -216,7 +216,8 @@
   }
 
   .welcome-screen-menu-item:active {
-    background: var(--color-gray-20);
+    background: var(--button-hover-bg);
+    border-color: var(--color-brand-active);
 
     .welcome-screen-menu-item__shortcut {
       color: var(--color-gray-50);
@@ -247,8 +248,7 @@
     }
 
     .welcome-screen-menu-item:hover {
-      background: var(--color-gray-85);
-
+      background-color: var(--color-surface-low);
       .welcome-screen-menu-item__shortcut {
         color: var(--color-gray-50);
       }
@@ -259,7 +259,6 @@
     }
 
     .welcome-screen-menu-item:active {
-      background-color: var(--color-gray-90);
       .welcome-screen-menu-item__text {
         color: var(--color-gray-10);
       }

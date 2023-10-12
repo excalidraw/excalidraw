@@ -1,27 +1,18 @@
 @import "../css/variables.module";
 
 .excalidraw {
-  --RadioGroup-background: #ffffff;
-  --RadioGroup-border: var(--color-gray-30);
+  --RadioGroup-background: var(--island-bg-color);
+  --RadioGroup-border: var(--color-surface-high);
 
   --RadioGroup-choice-color-off: var(--color-primary);
-  --RadioGroup-choice-color-off-hover: var(--color-primary-darkest);
-  --RadioGroup-choice-background-off: white;
-  --RadioGroup-choice-background-off-active: var(--color-gray-20);
+  --RadioGroup-choice-color-off-hover: var(--color-brand-hover);
+  --RadioGroup-choice-background-off: var(--island-bg-color);
+  --RadioGroup-choice-background-off-active: var(--color-surface-high);
 
-  --RadioGroup-choice-color-on: white;
+  --RadioGroup-choice-color-on: var(--color-surface-lowest);
   --RadioGroup-choice-background-on: var(--color-primary);
-  --RadioGroup-choice-background-on-hover: var(--color-primary-darker);
-  --RadioGroup-choice-background-on-active: var(--color-primary-darkest);
-
-  &.theme--dark {
-    --RadioGroup-background: var(--color-gray-85);
-    --RadioGroup-border: var(--color-gray-70);
-
-    --RadioGroup-choice-background-off: var(--color-gray-85);
-    --RadioGroup-choice-background-off-active: var(--color-gray-70);
-    --RadioGroup-choice-color-on: var(--color-gray-85);
-  }
+  --RadioGroup-choice-background-on-hover: var(--color-brand-hover);
+  --RadioGroup-choice-background-on-active: var(--color-brand-active);
 
   .RadioGroup {
     box-sizing: border-box;

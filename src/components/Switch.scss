@@ -1,15 +1,13 @@
 @import "../css/variables.module";
 
 .excalidraw {
-  --Switch-disabled-color: #d6d6d6;
-  --Switch-track-background: white;
-  --Switch-thumb-background: #3d3d3d;
-
-  &.theme--dark {
-    --Switch-disabled-color: #5c5c5c;
-    --Switch-track-background: #242424;
-    --Switch-thumb-background: #b8b8b8;
-  }
+  --Switch-disabled-color: var(--color-border-outline);
+  --Switch-disabled-toggled-background: var(--color-border-outline-variant);
+  --Switch-disabled-border: var(--color-border-outline-variant);
+  --Switch-track-background: var(--island-bg-color);
+  --Switch-thumb-background: var(--color-on-surface);
+  --Switch-hover-background: var(--color-brand-hover);
+  --Switch-active-background: var(--color-brand-active);
 
   .Switch {
     position: relative;
@@ -28,7 +26,11 @@
 
     &:hover {
       background: var(--Switch-track-background);
-      border: 1px solid #999999;
+      border: 1px solid var(--Switch-hover-background);
+    }
+
+    &:active {
+      border: 1px solid var(--Switch-active-background);
     }
 
     &.toggled {
@@ -43,11 +45,11 @@
 
     &.disabled {
       background: var(--Switch-track-background);
-      border: 1px solid var(--Switch-disabled-color);
+      border: 1px solid var(--Switch-disabled-border);
 
       &.toggled {
-        background: var(--Switch-disabled-color);
-        border: 1px solid var(--Switch-disabled-color);
+        background: var(--Switch-disabled-toggled-background);
+        border: 1px solid var(--Switch-disabled-toggled-background);
       }
     }
 
@@ -92,7 +94,7 @@
     }
 
     &.disabled.toggled:before {
-      background: var(--color-gray-50);
+      background: var(--Switch-disabled-color);
     }
 
     & input {

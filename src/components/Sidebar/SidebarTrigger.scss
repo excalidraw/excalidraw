@@ -3,8 +3,7 @@
 .excalidraw {
   .sidebar-trigger {
     @include outlineButtonStyles;
-
-    background-color: var(--island-bg-color);
+    @include filledButtonOnCanvas;
 
     width: auto;
     height: var(--lg-button-size);

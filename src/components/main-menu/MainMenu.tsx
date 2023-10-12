@@ -43,6 +43,7 @@ const MainMenu = Object.assign(
                 });
               }}
               data-testid="main-menu-trigger"
+              className="main-menu-trigger"
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>

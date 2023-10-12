@@ -444,13 +444,14 @@
     }
 
     &:active {
-      border: 1px solid var(--color-primary-darkest);
+      border: 1px solid var(--button-active-border);
     }
   }
 
   .help-icon {
     @include outlineButtonStyles;
-    background-color: var(--island-bg-color);
+    @include filledButtonOnCanvas;
+
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 
@@ -619,6 +620,20 @@
       font-weight: 400;
       margin: 0 0 0.25rem;
       padding: 0;
+    }
+  }
+
+  .main-menu-trigger {
+    @include filledButtonOnCanvas;
+  }
+
+  .App-menu__left {
+    --button-border: transparent;
+    --button-bg: var(--color-surface-mid);
+
+    @at-root .excalidraw.theme--dark#{&} {
+      --button-hover-bg: #363541;
+      --button-bg: var(--color-surface-high);
     }
   }
 }
