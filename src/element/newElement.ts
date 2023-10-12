@@ -13,6 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -45,7 +46,7 @@ import {
 } from "../constants";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
 
-type ElementConstructorOpts = MarkOptional<
+export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
   | "width"
   | "height"
@@ -130,6 +131,18 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
+export const newEmbeddableElement = (
+  opts: {
+    type: "embeddable";
+    validated: ExcalidrawEmbeddableElement["validated"];
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawEmbeddableElement> => {
+  return {
+    ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
+    validated: opts.validated,
+  };
+};
+
 export const newFrameElement = (
   opts: ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
@@ -174,10 +187,9 @@ export const newTextElement = (
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
-    containerId?: ExcalidrawTextContainer["id"];
+    containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
-    isFrameName?: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -212,7 +224,6 @@ export const newTextElement = (
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
-      isFrameName: opts.isFrameName || false,
     },
     {},
   );
@@ -350,8 +361,8 @@ export const newFreeDrawElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startArrowhead: Arrowhead | null;
-    endArrowhead: Arrowhead | null;
+    startArrowhead?: Arrowhead | null;
+    endArrowhead?: Arrowhead | null;
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
@@ -361,8 +372,8 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
-    startArrowhead: opts.startArrowhead,
-    endArrowhead: opts.endArrowhead,
+    startArrowhead: opts.startArrowhead || null,
+    endArrowhead: opts.endArrowhead || null,
   };
 };
 
@@ -432,7 +443,7 @@ const _deepCopyElement = (val: any, depth: number = 0) => {
   // we're not cloning non-array & non-plain-object objects because we
   // don't support them on excalidraw elements yet. If we do, we need to make
   // sure we start cloning them, so let's warn about it.
-  if (process.env.NODE_ENV === "development") {
+  if (import.meta.env.DEV) {
     if (
       objectType !== "[object Object]" &&
       objectType !== "[object Array]" &&
@@ -466,7 +477,7 @@ export const deepCopyElement = <T extends ExcalidrawElement>(
  * utility wrapper to generate new id. In test env it reuses the old + postfix
  * for test assertions.
  */
-const regenerateId = (
+export const regenerateId = (
   /** supply null if no previous id exists */
   previousId: string | null,
 ) => {

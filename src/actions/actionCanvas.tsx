@@ -10,7 +10,7 @@ import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey, setCursor, updateActiveTool } from "../utils";
+import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
@@ -21,6 +21,7 @@ import {
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { Bounds } from "../element/bounds";
+import { setCursor } from "../cursor";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -396,6 +397,7 @@ export const actionToggleEraserTool = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
+        activeEmbeddable: null,
         activeTool,
       },
       commitToHistory: true,
@@ -422,7 +424,7 @@ export const actionToggleHandTool = register({
         type: "hand",
         lastActiveToolBeforeEraser: appState.activeTool,
       });
-      setCursor(app.canvas, CURSOR_TYPE.GRAB);
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.GRAB);
     }
 
     return {
@@ -430,6 +432,7 @@ export const actionToggleHandTool = register({
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
+        activeEmbeddable: null,
         activeTool,
       },
       commitToHistory: true,

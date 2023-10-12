@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import ReactDOM from "react-dom";
 import {
   render,
@@ -6,7 +7,7 @@ import {
   createPasteEvent,
 } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { KEYS } from "../keys";
 import {
   getDefaultLineHeight,
@@ -21,14 +22,14 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-jest.mock("../keys.ts", () => {
-  const actual = jest.requireActual("../keys.ts");
+vi.mock("../keys.ts", async (importOriginal) => {
+  const module: any = await importOriginal();
   return {
     __esmodule: true,
-    ...actual,
+    ...module,
     isDarwin: false,
     KEYS: {
-      ...actual.KEYS,
+      ...module.KEYS,
       CTRL_OR_CMD: "ctrlKey",
     },
   };
@@ -78,8 +79,13 @@ beforeEach(async () => {
 
   mouse.reset();
 
-  await render(<ExcalidrawApp />);
-  h.app.setAppState({ zoom: { value: 1 as NormalizedZoomValue } });
+  await render(
+    <Excalidraw
+      autoFocus={true}
+      handleKeyboardGlobally={true}
+      initialData={{ appState: { zoom: { value: 1 as NormalizedZoomValue } } }}
+    />,
+  );
   setClipboardText("");
   Object.assign(document, {
     elementFromPoint: () => GlobalTestState.canvas,
@@ -90,7 +96,6 @@ describe("general paste behavior", () => {
   it("should randomize seed on paste", async () => {
     const rectangle = API.createElement({ type: "rectangle" });
     const clipboardJSON = (await copyToClipboard([rectangle], null))!;
-
     pasteWithCtrlCmdV(clipboardJSON);
 
     await waitFor(() => {

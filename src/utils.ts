@@ -1,13 +1,9 @@
-import oc from "open-color";
 import { COLOR_PALETTE } from "./colors";
 import {
-  CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
   isDarwin,
-  MIME_TYPES,
-  THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import {
@@ -15,11 +11,10 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
+import { ActiveTool, AppState, ToolType, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { SHAPES } from "./shapes";
-import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
+import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -160,7 +155,7 @@ export const throttleRAF = <T extends any[]>(
   };
 
   const ret = (...args: T) => {
-    if (process.env.NODE_ENV === "test") {
+    if (import.meta.env.MODE === "test") {
       fn(...args);
       return;
     }
@@ -369,9 +364,11 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: (
-    | { type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame" }
+    | {
+        type: ToolType;
+      }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
+  ) & { lastActiveToolBeforeEraser?: ActiveTool | null },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
@@ -390,81 +387,6 @@ export const updateActiveTool = (
     type: data.type,
     customType: null,
   };
-};
-
-export const resetCursor = (canvas: HTMLCanvasElement | null) => {
-  if (canvas) {
-    canvas.style.cursor = "";
-  }
-};
-
-export const setCursor = (canvas: HTMLCanvasElement | null, cursor: string) => {
-  if (canvas) {
-    canvas.style.cursor = cursor;
-  }
-};
-
-let eraserCanvasCache: any;
-let previewDataURL: string;
-export const setEraserCursor = (
-  canvas: HTMLCanvasElement | null,
-  theme: AppState["theme"],
-) => {
-  const cursorImageSizePx = 20;
-
-  const drawCanvas = () => {
-    const isDarkTheme = theme === THEME.DARK;
-    eraserCanvasCache = document.createElement("canvas");
-    eraserCanvasCache.theme = theme;
-    eraserCanvasCache.height = cursorImageSizePx;
-    eraserCanvasCache.width = cursorImageSizePx;
-    const context = eraserCanvasCache.getContext("2d")!;
-    context.lineWidth = 1;
-    context.beginPath();
-    context.arc(
-      eraserCanvasCache.width / 2,
-      eraserCanvasCache.height / 2,
-      5,
-      0,
-      2 * Math.PI,
-    );
-    context.fillStyle = isDarkTheme ? oc.black : oc.white;
-    context.fill();
-    context.strokeStyle = isDarkTheme ? oc.white : oc.black;
-    context.stroke();
-    previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
-  };
-  if (!eraserCanvasCache || eraserCanvasCache.theme !== theme) {
-    drawCanvas();
-  }
-
-  setCursor(
-    canvas,
-    `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
-      cursorImageSizePx / 2
-    }, auto`,
-  );
-};
-
-export const setCursorForShape = (
-  canvas: HTMLCanvasElement | null,
-  appState: Pick<AppState, "activeTool" | "theme">,
-) => {
-  if (!canvas) {
-    return;
-  }
-  if (appState.activeTool.type === "selection") {
-    resetCursor(canvas);
-  } else if (isHandToolActive(appState)) {
-    canvas.style.cursor = CURSOR_TYPE.GRAB;
-  } else if (isEraserActive(appState)) {
-    setEraserCursor(canvas, appState.theme);
-    // do nothing if image tool is selected which suggests there's
-    // a image-preview set as the cursor
-    // Ignore custom type as well and let host decide
-  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    canvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
-  }
 };
 
 export const isFullScreen = () =>
@@ -765,7 +687,7 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
-export const isTestEnv = () => process.env.NODE_ENV === "test";
+export const isTestEnv = () => import.meta.env.MODE === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
@@ -907,3 +829,87 @@ export const isOnlyExportingSingleFrame = (
     )
   );
 };
+
+export const assertNever = (
+  value: never,
+  message: string,
+  softAssert?: boolean,
+): never => {
+  if (softAssert) {
+    console.error(message);
+    return value;
+  }
+
+  throw new Error(message);
+};
+
+/**
+ * Memoizes on values of `opts` object (strict equality).
+ */
+export const memoize = <T extends Record<string, any>, R extends any>(
+  func: (opts: T) => R,
+) => {
+  let lastArgs: Map<string, any> | undefined;
+  let lastResult: R | undefined;
+
+  const ret = function (opts: T) {
+    const currentArgs = Object.entries(opts);
+
+    if (lastArgs) {
+      let argsAreEqual = true;
+      for (const [key, value] of currentArgs) {
+        if (lastArgs.get(key) !== value) {
+          argsAreEqual = false;
+          break;
+        }
+      }
+      if (argsAreEqual) {
+        return lastResult;
+      }
+    }
+
+    const result = func(opts);
+
+    lastArgs = new Map(currentArgs);
+    lastResult = result;
+
+    return result;
+  };
+
+  ret.clear = () => {
+    lastArgs = undefined;
+    lastResult = undefined;
+  };
+
+  return ret as typeof func & { clear: () => void };
+};
+
+export const isRenderThrottlingEnabled = (() => {
+  // we don't want to throttle in react < 18 because of #5439 and it was
+  // getting more complex to maintain the fix
+  let IS_REACT_18_AND_UP: boolean;
+  try {
+    const version = React.version.split(".");
+    IS_REACT_18_AND_UP = Number(version[0]) > 17;
+  } catch {
+    IS_REACT_18_AND_UP = false;
+  }
+
+  let hasWarned = false;
+
+  return () => {
+    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
+      if (!IS_REACT_18_AND_UP) {
+        if (!hasWarned) {
+          hasWarned = true;
+          console.warn(
+            "Excalidraw: render throttling is disabled on React versions < 18.",
+          );
+        }
+        return false;
+      }
+      return true;
+    }
+    return false;
+  };
+})();

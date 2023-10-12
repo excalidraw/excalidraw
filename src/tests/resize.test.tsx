@@ -6,17 +6,19 @@ import { reseed } from "../random";
 import { UI, Keyboard } from "./helpers/ui";
 import { resize } from "./utils";
 import { ExcalidrawTextElement } from "../element/types";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 
@@ -124,7 +126,7 @@ describe("resize rectangle ellipses and diamond elements", () => {
 
 describe("Test text element", () => {
   it("should update font size via keyboard", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
 
     const textElement = API.createElement({
       type: "text",

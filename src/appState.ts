@@ -38,6 +38,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     cursorButton: "up",
+    activeEmbeddable: null,
     draggingElement: null,
     editingElement: null,
     editingGroupId: null,
@@ -98,6 +99,12 @@ export const getDefaultAppState = (): Omit<
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
+    snapLines: [],
+    originSnapOffset: {
+      x: 0,
+      y: 0,
+    },
+    objectsSnapModeEnabled: false,
   };
 };
 
@@ -139,6 +146,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
   cursorButton: { browser: true, export: false, server: false },
+  activeEmbeddable: { browser: false, export: false, server: false },
   draggingElement: { browser: false, export: false, server: false },
   editingElement: { browser: false, export: false, server: false },
   editingGroupId: { browser: true, export: false, server: false },
@@ -204,6 +212,9 @@ const APP_STATE_STORAGE_CONF = (<
   pendingImageElementId: { browser: false, export: false, server: false },
   showHyperlinkPopup: { browser: false, export: false, server: false },
   selectedLinearElement: { browser: true, export: false, server: false },
+  snapLines: { browser: false, export: false, server: false },
+  originSnapOffset: { browser: false, export: false, server: false },
+  objectsSnapModeEnabled: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

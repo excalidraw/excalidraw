@@ -3,8 +3,11 @@
 
 :root {
   --zIndex-canvas: 1;
-  --zIndex-wysiwyg: 2;
-  --zIndex-layerUI: 3;
+  --zIndex-interactiveCanvas: 2;
+  --zIndex-wysiwyg: 3;
+  --zIndex-layerUI: 4;
+  --zIndex-eyeDropperBackdrop: 5;
+  --zIndex-eyeDropperPreview: 6;
 
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
@@ -69,12 +72,34 @@
 
     z-index: var(--zIndex-canvas);
 
+    &.interactive {
+      z-index: var(--zIndex-interactiveCanvas);
+    }
+
     // Remove the main canvas from document flow to avoid resizeObserver
     // feedback loop (see https://github.com/excalidraw/excalidraw/pull/3379)
   }
 
+  &__canvas-wrapper,
+  &__canvas.static {
+    pointer-events: none;
+  }
+
   &__canvas {
     position: absolute;
+  }
+
+  &__embeddable {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  &__embeddable-container {
+    position: absolute;
+    z-index: 2;
+    transform-origin: top left;
+    pointer-events: none;
   }
 
   &.theme--dark {
@@ -228,7 +253,7 @@
       max-height: 100%;
       display: flex;
       flex-direction: column;
-      pointer-events: initial;
+      pointer-events: var(--ui-pointerEvents);
 
       .panelColumn {
         padding: 8px 8px 0 8px;
@@ -276,7 +301,7 @@
     pointer-events: none !important;
 
     & > * {
-      pointer-events: all;
+      pointer-events: var(--ui-pointerEvents);
     }
   }
 
@@ -287,14 +312,14 @@
     cursor: default;
     pointer-events: none !important;
 
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+
     @media (min-width: 1536px) {
       grid-template-columns: 1fr 1fr 1fr;
       grid-gap: 3rem;
     }
-  }
-
-  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
-    pointer-events: all;
   }
 
   .App-menu_top > *:first-child {
@@ -400,17 +425,6 @@
     }
   }
 
-  .disable-zen-mode {
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-gray-20);
-    border: 1px solid var(--color-gray-30);
-    padding: 10px 20px;
-
-    &:hover {
-      background-color: var(--color-gray-30);
-    }
-  }
-
   .scroll-back-to-content {
     border-radius: var(--border-radius-lg);
     background-color: var(--island-bg-color);
@@ -422,7 +436,7 @@
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
-    pointer-events: all;
+    pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
     &:hover {
@@ -659,5 +673,35 @@
       font-family: "Cascadia";
       font-size: 0.8em;
     }
+  }
+}
+
+.excalidraw__embeddable-container {
+  .excalidraw__embeddable-container__inner {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--embeddable-radius);
+  }
+
+  .excalidraw__embeddable__outer {
+    width: 100%;
+    height: 100%;
+    & > * {
+      border-radius: var(--embeddable-radius);
+    }
+  }
+
+  .excalidraw__embeddable-hint {
+    position: absolute;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 1.6rem;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+    font-family: "Assistant";
   }
 }

@@ -3,7 +3,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { AppState } from "../types";
+import { AppState, InteractiveCanvasAppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -11,6 +11,7 @@ import {
   getFrameElements,
 } from "../frame";
 import { isShallowEqual } from "../utils";
+import { isElementInViewport } from "../element/sizeHelpers";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -89,6 +90,26 @@ export const getElementsWithinSelection = (
   return elementsInSelection;
 };
 
+export const getVisibleAndNonSelectedElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedElementsSet = new Set(
+    selectedElements.map((element) => element.id),
+  );
+  return elements.filter((element) => {
+    const isVisible = isElementInViewport(
+      element,
+      appState.width,
+      appState.height,
+      appState,
+    );
+
+    return !selectedElementsSet.has(element.id) && isVisible;
+  });
+};
+
 // FIXME move this into the editor instance to keep utility methods stateless
 export const isSomeElementSelected = (function () {
   let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
@@ -146,7 +167,7 @@ export const getCommonAttributeOfSelectedElements = <T>(
 
 export const getSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds">,
+  appState: Pick<InteractiveCanvasAppState, "selectedElementIds">,
   opts?: {
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;

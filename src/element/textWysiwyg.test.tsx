@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { GlobalTestState, render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
@@ -41,7 +41,7 @@ describe("textWysiwyg", () => {
   describe("start text editing", () => {
     const { h } = window;
     beforeEach(async () => {
-      await render(<ExcalidrawApp />);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
       h.elements = [];
     });
 
@@ -243,7 +243,7 @@ describe("textWysiwyg", () => {
     });
 
     beforeEach(async () => {
-      await render(<ExcalidrawApp />);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
       //@ts-ignore
       h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
 
@@ -477,7 +477,7 @@ describe("textWysiwyg", () => {
     const { h } = window;
 
     beforeEach(async () => {
-      await render(<ExcalidrawApp />);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
       h.elements = [];
 
       rectangle = UI.createElement("rectangle", {
@@ -759,7 +759,7 @@ describe("textWysiwyg", () => {
       expect(h.elements[1].type).toBe("text");
 
       API.setSelectedElements([h.elements[0], h.elements[1]]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -903,7 +903,7 @@ describe("textWysiwyg", () => {
       mouse.clickAt(10, 20);
       mouse.down();
       mouse.up();
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -955,9 +955,9 @@ describe("textWysiwyg", () => {
       // should center align horizontally and vertically by default
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
+        [
           85,
-          4.5,
+          4.999999999999986,
         ]
       `);
 
@@ -979,7 +979,7 @@ describe("textWysiwyg", () => {
       // should left align horizontally and bottom vertically after resize
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
+        [
           15,
           65,
         ]
@@ -1001,9 +1001,9 @@ describe("textWysiwyg", () => {
       // should right align horizontally and top vertically after resize
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-        Array [
-          375,
-          -539,
+        [
+          374.99999999999994,
+          -535.0000000000001,
         ]
       `);
     });
@@ -1154,7 +1154,7 @@ describe("textWysiwyg", () => {
 
       h.elements = [container, text];
       API.setSelectedElements([container, text]);
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1168,7 +1168,7 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
         "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
       );
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1190,7 +1190,7 @@ describe("textWysiwyg", () => {
       editor.blur();
 
       resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
-      expect(rectangle.height).toBe(156);
+      expect(rectangle.height).toBeCloseTo(155, 8);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
 
       mouse.select(rectangle);
@@ -1200,9 +1200,12 @@ describe("textWysiwyg", () => {
 
       await new Promise((r) => setTimeout(r, 0));
       editor.blur();
-      expect(rectangle.height).toBe(156);
+      expect(rectangle.height).toBeCloseTo(155, 8);
       // cache updated again
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(156);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBeCloseTo(
+        155,
+        8,
+      );
     });
 
     it("should reset the container height cache when font properties updated", async () => {
@@ -1279,7 +1282,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Left"));
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             15,
             25,
           ]
@@ -1290,7 +1293,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center"));
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             30,
             25,
           ]
@@ -1302,7 +1305,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             45,
             25,
           ]
@@ -1313,7 +1316,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             15,
             45,
           ]
@@ -1325,7 +1328,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             30,
             45,
           ]
@@ -1337,7 +1340,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center vertically"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             45,
             45,
           ]
@@ -1349,7 +1352,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align bottom"));
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             15,
             65,
           ]
@@ -1360,7 +1363,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Center"));
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             30,
             65,
           ]
@@ -1371,7 +1374,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Right"));
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
-          Array [
+          [
             45,
             65,
           ]
@@ -1406,7 +1409,7 @@ describe("textWysiwyg", () => {
 
       API.setSelectedElements([textElement]);
 
-      fireEvent.contextMenu(GlobalTestState.canvas, {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
         clientY: 30,
@@ -1508,5 +1511,31 @@ describe("textWysiwyg", () => {
       expect(text.containerId).toBe(null);
       expect(text.text).toBe("Excalidraw");
     });
+  });
+
+  it("should bump the version of labelled arrow when label updated", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    const arrow = UI.createElement("arrow", {
+      width: 300,
+      height: 0,
+    });
+
+    mouse.select(arrow);
+    Keyboard.keyPress(KEYS.ENTER);
+    let editor = getTextEditor();
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello");
+    editor.blur();
+
+    const { version } = arrow;
+
+    mouse.select(arrow);
+    Keyboard.keyPress(KEYS.ENTER);
+    editor = getTextEditor();
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello\nworld!");
+    editor.blur();
+
+    expect(arrow.version).toEqual(version + 1);
   });
 });

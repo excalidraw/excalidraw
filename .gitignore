@@ -26,3 +26,5 @@ src/packages/excalidraw/example/public/bundle.js
 src/packages/excalidraw/example/public/excalidraw-assets-dev
 src/packages/excalidraw/example/public/excalidraw.development.js
 coverage
+dev-dist
+html

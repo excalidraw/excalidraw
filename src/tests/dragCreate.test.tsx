@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import {
@@ -10,14 +10,18 @@ import {
 } from "./test-utils";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderInteractiveScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 
@@ -26,12 +30,12 @@ const { h } = window;
 describe("Test dragCreate", () => {
   describe("add element to the scene when pointer dragging long enough", () => {
     it("rectangle", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("rectangle");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -42,7 +46,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -57,12 +62,12 @@ describe("Test dragCreate", () => {
     });
 
     it("ellipse", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("ellipse");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -73,7 +78,9 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -88,12 +95,12 @@ describe("Test dragCreate", () => {
     });
 
     it("diamond", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("diamond");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -104,7 +111,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -119,12 +127,12 @@ describe("Test dragCreate", () => {
     });
 
     it("arrow", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("arrow");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -135,7 +143,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -154,12 +163,12 @@ describe("Test dragCreate", () => {
     });
 
     it("line", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("line");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -170,7 +179,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(9);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -197,12 +207,12 @@ describe("Test dragCreate", () => {
     });
 
     it("rectangle", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("rectangle");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -210,18 +220,19 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(5);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
 
     it("ellipse", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("ellipse");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -229,18 +240,19 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(5);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
 
     it("diamond", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(<Excalidraw />);
       // select tool
       const tool = getByToolName("diamond");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -248,18 +260,21 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderScene).toHaveBeenCalledTimes(7);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(5);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
 
     it("arrow", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(
+        <Excalidraw handleKeyboardGlobally={true} />,
+      );
       // select tool
       const tool = getByToolName("arrow");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -272,18 +287,21 @@ describe("Test dragCreate", () => {
         key: KEYS.ENTER,
       });
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
 
     it("line", async () => {
-      const { getByToolName, container } = await render(<ExcalidrawApp />);
+      const { getByToolName, container } = await render(
+        <Excalidraw handleKeyboardGlobally={true} />,
+      );
       // select tool
       const tool = getByToolName("line");
       fireEvent.click(tool);
 
-      const canvas = container.querySelector("canvas")!;
+      const canvas = container.querySelector("canvas.interactive")!;
 
       // start from (30, 20)
       fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
@@ -296,7 +314,8 @@ describe("Test dragCreate", () => {
         key: KEYS.ENTER,
       });
 
-      expect(renderScene).toHaveBeenCalledTimes(8);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });

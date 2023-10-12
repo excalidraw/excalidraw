@@ -4,7 +4,8 @@ import { removeAllElementsFromFrame } from "../frame";
 import { getFrameElements } from "../frame";
 import { KEYS } from "../keys";
 import { AppClassProperties, AppState } from "../types";
-import { setCursorForShape, updateActiveTool } from "../utils";
+import { updateActiveTool } from "../utils";
+import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 
 const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
@@ -108,7 +109,7 @@ export const actionSetFrameAsActiveTool = register({
       type: "frame",
     });
 
-    setCursorForShape(app.canvas, {
+    setCursorForShape(app.interactiveCanvas, {
       ...appState,
       activeTool: nextActiveTool,
     });

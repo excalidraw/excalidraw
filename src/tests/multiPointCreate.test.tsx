@@ -5,19 +5,23 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
+import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderScene = jest.spyOn(Renderer, "renderScene");
+const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
+const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+
 beforeEach(() => {
   localStorage.clear();
-  renderScene.mockClear();
+  renderInteractiveScene.mockClear();
+  renderStaticScene.mockClear();
   reseed(7);
 });
 
@@ -25,7 +29,7 @@ const { h } = window;
 
 describe("remove shape in non linear elements", () => {
   beforeAll(() => {
-    mockBoundingClientRect();
+    mockBoundingClientRect({ width: 1000, height: 1000 });
   });
 
   afterAll(() => {
@@ -33,56 +37,60 @@ describe("remove shape in non linear elements", () => {
   });
 
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
     const tool = getByToolName("rectangle");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
+
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect(h.elements.length).toEqual(0);
   });
 
   it("ellipse", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
     const tool = getByToolName("ellipse");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect(h.elements.length).toEqual(0);
   });
 
   it("diamond", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
     const tool = getByToolName("diamond");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
     fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
 
-    expect(renderScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect(h.elements.length).toEqual(0);
   });
 });
 
 describe("multi point mode in linear elements", () => {
   it("arrow", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
     const tool = getByToolName("arrow");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     // first point is added on pointer down
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
 
@@ -102,7 +110,8 @@ describe("multi point mode in linear elements", () => {
       key: KEYS.ENTER,
     });
 
-    expect(renderScene).toHaveBeenCalledTimes(15);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(11);
+    expect(renderStaticScene).toHaveBeenCalledTimes(9);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;
@@ -120,12 +129,12 @@ describe("multi point mode in linear elements", () => {
   });
 
   it("line", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
     const tool = getByToolName("line");
     fireEvent.click(tool);
 
-    const canvas = container.querySelector("canvas")!;
+    const canvas = container.querySelector("canvas.interactive")!;
     // first point is added on pointer down
     fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
 
@@ -144,8 +153,8 @@ describe("multi point mode in linear elements", () => {
     fireEvent.keyDown(document, {
       key: KEYS.ENTER,
     });
-
-    expect(renderScene).toHaveBeenCalledTimes(15);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(11);
+    expect(renderStaticScene).toHaveBeenCalledTimes(9);
     expect(h.elements.length).toEqual(1);
 
     const element = h.elements[0] as ExcalidrawLinearElement;

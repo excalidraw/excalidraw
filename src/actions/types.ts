@@ -51,6 +51,7 @@ export type ActionName =
   | "pasteStyles"
   | "gridMode"
   | "zenMode"
+  | "objectsSnapMode"
   | "stats"
   | "changeStrokeColor"
   | "changeBackgroundColor"
@@ -121,6 +122,7 @@ export type ActionName =
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"
   | "setFrameAsActiveTool"
+  | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer";
 

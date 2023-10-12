@@ -1,7 +1,8 @@
+import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
 import { queryByTestId } from "@testing-library/react";
 
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem, LibraryItems } from "../types";
@@ -29,15 +30,19 @@ const mockLibraryFilePromise = new Promise<Blob>(async (resolve, reject) => {
   }
 });
 
-jest.mock("../data/filesystem.ts", () => ({
-  __esmodule: true,
-  ...jest.requireActual("../data/filesystem.ts"),
-  fileOpen: jest.fn(() => mockLibraryFilePromise),
-}));
+vi.mock("../data/filesystem.ts", async (importOriginal) => {
+  const module = await importOriginal();
+  return {
+    __esmodule: true,
+    //@ts-ignore
+    ...module,
+    fileOpen: vi.fn(() => mockLibraryFilePromise),
+  };
+});
 
 describe("library", () => {
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
     h.app.library.resetLibrary();
   });
 
@@ -184,7 +189,7 @@ describe("library", () => {
 
 describe("library menu", () => {
   it("should load library from file picker", async () => {
-    const { container } = await render(<ExcalidrawApp />);
+    const { container } = await render(<Excalidraw />);
 
     const latestLibrary = await h.app.library.getLatestLibrary();
     expect(latestLibrary.length).toBe(0);

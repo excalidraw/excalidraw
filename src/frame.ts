@@ -14,9 +14,9 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "./element/textElement";
-import { arrayToMap, findIndex } from "./utils";
+import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppClassProperties, AppState } from "./types";
+import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
 import { moveOneRight } from "./zindex";
@@ -457,53 +457,86 @@ export const addElementsToFrame = (
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  const _elementsToAdd: ExcalidrawElement[] = [];
+  const currTargetFrameChildrenMap = new Map(
+    allElements.reduce(
+      (acc: [ExcalidrawElement["id"], ExcalidrawElement][], element) => {
+        if (element.frameId === frame.id) {
+          acc.push([element.id, element]);
+        }
+        return acc;
+      },
+      [],
+    ),
+  );
 
-  for (const element of elementsToAdd) {
-    _elementsToAdd.push(element);
+  const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
+
+  const finalElementsToAdd: ExcalidrawElement[] = [];
+
+  // - add bound text elements if not already in the array
+  // - filter out elements that are already in the frame
+  for (const element of omitGroupsContainingFrames(
+    allElements,
+    elementsToAdd,
+  )) {
+    if (!currTargetFrameChildrenMap.has(element.id)) {
+      finalElementsToAdd.push(element);
+    }
 
     const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      _elementsToAdd.push(boundTextElement);
+    if (
+      boundTextElement &&
+      !suppliedElementsToAddSet.has(boundTextElement.id) &&
+      !currTargetFrameChildrenMap.has(boundTextElement.id)
+    ) {
+      finalElementsToAdd.push(boundTextElement);
     }
   }
 
-  let nextElements = allElements.slice();
+  const finalElementsToAddSet = new Set(finalElementsToAdd.map((el) => el.id));
 
-  const frameBoundary = findIndex(nextElements, (e) => e.frameId === frame.id);
+  const nextElements: ExcalidrawElement[] = [];
 
-  for (const element of omitGroupsContainingFrames(
-    allElements,
-    _elementsToAdd,
-  )) {
-    if (element.frameId !== frame.id && !isFrameElement(element)) {
-      mutateElement(
-        element,
-        {
-          frameId: frame.id,
-        },
-        false,
-      );
+  const processedElements = new Set<ExcalidrawElement["id"]>();
 
-      const frameIndex = findIndex(nextElements, (e) => e.id === frame.id);
-      const elementIndex = findIndex(nextElements, (e) => e.id === element.id);
-
-      if (elementIndex < frameBoundary) {
-        nextElements = [
-          ...nextElements.slice(0, elementIndex),
-          ...nextElements.slice(elementIndex + 1, frameBoundary),
-          element,
-          ...nextElements.slice(frameBoundary),
-        ];
-      } else if (elementIndex > frameIndex) {
-        nextElements = [
-          ...nextElements.slice(0, frameIndex),
-          element,
-          ...nextElements.slice(frameIndex, elementIndex),
-          ...nextElements.slice(elementIndex + 1),
-        ];
-      }
+  for (const element of allElements) {
+    if (processedElements.has(element.id)) {
+      continue;
     }
+
+    processedElements.add(element.id);
+
+    if (
+      finalElementsToAddSet.has(element.id) ||
+      (element.frameId && element.frameId === frame.id)
+    ) {
+      // will be added in bulk once we process target frame
+      continue;
+    }
+
+    // target frame
+    if (element.id === frame.id) {
+      const currFrameChildren = getFrameElements(allElements, frame.id);
+      currFrameChildren.forEach((child) => {
+        processedElements.add(child.id);
+      });
+      // console.log(currFrameChildren, finalElementsToAdd, element);
+      nextElements.push(...currFrameChildren, ...finalElementsToAdd, element);
+      continue;
+    }
+
+    // console.log("(2)", element.frameId);
+    nextElements.push(element);
+  }
+
+  for (const element of finalElementsToAdd) {
+    mutateElement(
+      element,
+      {
+        frameId: frame.id,
+      },
+      false,
+    );
   }
 
   return nextElements;
@@ -519,6 +552,7 @@ export const removeElementsFromFrame = (
   for (const element of elementsToRemove) {
     if (element.frameId) {
       _elementsToRemove.push(element);
+
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
         _elementsToRemove.push(boundTextElement);
@@ -567,7 +601,7 @@ export const replaceAllElementsInFrame = (
   );
 };
 
-/** does not mutate elements, but return new ones */
+/** does not mutate elements, but returns new ones */
 export const updateFrameMembershipOfSelectedElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
   appState: AppState,
@@ -648,7 +682,7 @@ export const omitGroupsContainingFrames = (
  */
 export const getTargetFrame = (
   element: ExcalidrawElement,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element) || element
@@ -660,11 +694,12 @@ export const getTargetFrame = (
     : getContainingFrame(_element);
 };
 
+// TODO: this a huge bottleneck for large scenes, optimise
 // given an element, return if the element is in some frame
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElements: ExcalidrawElementsIncludingDeleted,
-  appState: AppState,
+  appState: StaticCanvasAppState,
 ) => {
   const frame = getTargetFrame(element, appState);
   const _element = isTextElement(element)
@@ -672,6 +707,17 @@ export const isElementInFrame = (
     : element;
 
   if (frame) {
+    // Perf improvement:
+    // For an element that's already in a frame, if it's not being dragged
+    // then there is no need to refer to geometry (which, yes, is slow) to check if it's in a frame.
+    // It has to be in its containing frame.
+    if (
+      !appState.selectedElementIds[element.id] ||
+      !appState.selectedElementsAreBeingDragged
+    ) {
+      return true;
+    }
+
     if (_element.groupIds.length === 0) {
       return elementOverlapsWithFrame(_element, frame);
     }

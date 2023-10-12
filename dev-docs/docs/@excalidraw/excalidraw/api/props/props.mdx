@@ -17,7 +17,6 @@ All `props` are *optional*.
 | [`langCode`](#langcode) | `string` | `en` | Language code string to be used in Excalidraw |
 | [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | _ | Render function that renders custom UI in top right corner |
 | [`renderCustomStats`](/docs/@excalidraw/excalidraw/api/props/render-props#rendercustomstats) | `function` | _ | Render function that can be used to render custom stats on the stats dialog. |
-| [`renderSidebar`](/docs/@excalidraw/excalidraw/api/props/render-props#rendersidebar) | `function` | _ | Render function that renders custom sidebar. |
 | [`viewModeEnabled`](#viewmodeenabled) | `boolean` | _ | This indicates if the app is in `view` mode. |
 | [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This indicates if the `zen` mode is enabled |
 | [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This indicates if the `grid` mode is enabled |
@@ -29,6 +28,8 @@ All `props` are *optional*.
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
+| [`validateEmbeddable`](#validateEmbeddable) | string[] | `boolean | RegExp | RegExp[] | ((link: string) => boolean | undefined)` | \_ | use for custom src url validation |
+| [`renderEmbeddable`](/docs/@excalidraw/excalidraw/api/props/render-props#renderEmbeddable) | `function` | \_ | Render function that can override the built-in `<iframe>` |
 
 ### Storing custom data on Excalidraw elements
 
@@ -215,7 +216,6 @@ Indicates whether to bind keyboard events to `document`. Disabled by default, me
 
 Enable this if you want Excalidraw to handle keyboard even if the component isn't focused (e.g. a user is interacting with the navbar, sidebar, or similar).
 
-
 ### autoFocus
 
 This prop indicates whether to `focus` the Excalidraw component on page load. Defaults to false.
@@ -228,3 +228,12 @@ Allows you to override `id` generation for files added on canvas (images). By de
 (file: File) => string | Promise<string>
 ```
 
+### validateEmbeddable
+
+```tsx
+validateEmbeddable?: boolean | string[] | RegExp | RegExp[] | ((link: string) => boolean | undefined)
+```
+
+This is an optional property. By default we support a handful of well-known sites. You may allow additional sites or disallow the default ones by supplying a custom validator. If you pass `true`, all URLs will be allowed. You can also supply a list of hostnames, RegExp (or list of RegExp objects), or a function. If the function returns `undefined`, the built-in validator will be used.
+
+Supplying a list of hostnames (with or without `www.`) is the preferred way to allow a specific list of domains.
