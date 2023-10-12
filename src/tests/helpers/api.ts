@@ -94,6 +94,7 @@ export class API {
     angle?: number;
     id?: string;
     isDeleted?: boolean;
+    frameId?: ExcalidrawElement["id"];
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
@@ -151,12 +152,12 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
-      | "frameId"
       | "link"
       | "updated"
     > = {
       x,
       y,
+      frameId: rest.frameId ?? null,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:

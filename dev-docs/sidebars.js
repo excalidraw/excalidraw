@@ -23,7 +23,11 @@ const sidebars = {
       },
       items: ["introduction/development", "introduction/contributing"],
     },
-    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
+    {
+      type: "category",
+      label: "Codebase",
+      items: ["codebase/json-schema", "codebase/frames"],
+    },
     {
       type: "category",
       label: "@excalidraw/excalidraw",

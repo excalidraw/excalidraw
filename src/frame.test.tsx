@@ -177,7 +177,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect2, frame]);
       });
 
-      it.skip("should add elements", async () => {
+      it("should add elements", async () => {
         h.elements = [rect2, rect3, frame];
 
         func(frame, rect2);
@@ -188,7 +188,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect3, rect2, frame]);
       });
 
-      it.skip("should add elements when there are other other elements in between", async () => {
+      it("should add elements when there are other other elements in between", async () => {
         h.elements = [rect1, rect2, rect4, rect3, frame];
 
         func(frame, rect2);
@@ -199,7 +199,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect1, rect4, rect3, rect2, frame]);
       });
 
-      it.skip("should add elements when there are other elements in between and the order is reversed", async () => {
+      it("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, rect2, rect1, frame];
 
         func(frame, rect2);
@@ -234,7 +234,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect1, rect2, rect3, frame, rect4]);
       });
 
-      it.skip("should add elements when there are other elements in between and the order is reversed", async () => {
+      it("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, frame, rect2, rect1];
 
         func(frame, rect2);
@@ -435,6 +435,122 @@ describe("adding elements to frames", () => {
       expect(rect2_copy.frameId).toBe(frame.id);
       expect(rect2.frameId).toBe(null);
       expectEqualIds([rect2_copy, frame, rect2]);
+    });
+
+    it("random order 01", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const frame3 = API.createElement({
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        x: 25,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame1.id,
+      });
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        x: 225,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame2.id,
+      });
+      const rectangle3 = API.createElement({
+        type: "rectangle",
+        x: 325,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame3.id,
+      });
+      const rectangle4 = API.createElement({
+        type: "rectangle",
+        x: 350,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame3.id,
+      });
+
+      h.elements = [
+        frame1,
+        rectangle4,
+        rectangle1,
+        rectangle3,
+        frame3,
+        rectangle2,
+        frame2,
+      ];
+
+      API.setSelectedElements([rectangle2]);
+
+      const origSize = h.elements.length;
+
+      expect(h.elements.length).toBe(origSize);
+      dragElementIntoFrame(frame3, rectangle2);
+      expect(h.elements.length).toBe(origSize);
+    });
+
+    it("random order 02", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        x: 25,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame1.id,
+      });
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        x: 225,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame2.id,
+      });
+
+      h.elements = [rectangle1, rectangle2, frame1, frame2];
+
+      API.setSelectedElements([rectangle2]);
+
+      expect(h.elements.length).toBe(4);
+      dragElementIntoFrame(frame2, rectangle1);
+      expect(h.elements.length).toBe(4);
     });
   });
 });
