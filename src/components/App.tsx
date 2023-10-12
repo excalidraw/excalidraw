@@ -81,7 +81,6 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
-  THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
@@ -993,148 +992,151 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private renderFrameNames = () => {
-    if (!this.state.frameRendering.enabled || !this.state.frameRendering.name) {
-      return null;
-    }
+    // Hide the frame name
+    return null;
 
-    const isDarkTheme = this.state.theme === "dark";
+    // if (!this.state.frameRendering.enabled || !this.state.frameRendering.name) {
+    //   return null;
+    // }
 
-    return this.scene.getNonDeletedFrames().map((f, index) => {
-      if (
-        !isElementInViewport(
-          f,
-          this.canvas.width / window.devicePixelRatio,
-          this.canvas.height / window.devicePixelRatio,
-          {
-            offsetLeft: this.state.offsetLeft,
-            offsetTop: this.state.offsetTop,
-            scrollX: this.state.scrollX,
-            scrollY: this.state.scrollY,
-            zoom: this.state.zoom,
-          },
-        )
-      ) {
-        // if frame not visible, don't render its name
-        return null;
-      }
+    // const isDarkTheme = this.state.theme === "dark";
 
-      const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x, sceneY: f.y },
-        this.state,
-      );
+    // return this.scene.getNonDeletedFrames().map((f, index) => {
+    //   if (
+    //     !isElementInViewport(
+    //       f,
+    //       this.canvas.width / window.devicePixelRatio,
+    //       this.canvas.height / window.devicePixelRatio,
+    //       {
+    //         offsetLeft: this.state.offsetLeft,
+    //         offsetTop: this.state.offsetTop,
+    //         scrollX: this.state.scrollX,
+    //         scrollY: this.state.scrollY,
+    //         zoom: this.state.zoom,
+    //       },
+    //     )
+    //   ) {
+    //     // if frame not visible, don't render its name
+    //     return null;
+    //   }
 
-      const { x: x2 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x + f.width, sceneY: f.y + f.height },
-        this.state,
-      );
+    //   const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
+    //     { sceneX: f.x, sceneY: f.y },
+    //     this.state,
+    //   );
 
-      const FRAME_NAME_GAP = 20;
-      const FRAME_NAME_EDIT_PADDING = 6;
+    //   const { x: x2 } = sceneCoordsToViewportCoords(
+    //     { sceneX: f.x + f.width, sceneY: f.y + f.height },
+    //     this.state,
+    //   );
 
-      const reset = () => {
-        if (f.name?.trim() === "") {
-          mutateElement(f, { name: null });
-        }
+    //   const FRAME_NAME_GAP = 20;
+    //   const FRAME_NAME_EDIT_PADDING = 6;
 
-        this.setState({ editingFrame: null });
-      };
+    //   const reset = () => {
+    //     if (f.name?.trim() === "") {
+    //       mutateElement(f, { name: null });
+    //     }
 
-      let frameNameJSX;
+    //     this.setState({ editingFrame: null });
+    //   };
 
-      if (f.id === this.state.editingFrame) {
-        const frameNameInEdit = f.name == null ? `Frame ${index + 1}` : f.name;
+    //   let frameNameJSX;
 
-        frameNameJSX = (
-          <input
-            autoFocus
-            value={frameNameInEdit}
-            onChange={(e) => {
-              mutateElement(f, {
-                name: e.target.value,
-              });
-            }}
-            onBlur={() => reset()}
-            onKeyDown={(event) => {
-              // for some inexplicable reason, `onBlur` triggered on ESC
-              // does not reset `state.editingFrame` despite being called,
-              // and we need to reset it here as well
-              if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
-                reset();
-              }
-            }}
-            style={{
-              background: this.state.viewBackgroundColor,
-              filter: isDarkTheme ? THEME_FILTER : "none",
-              zIndex: 2,
-              border: "none",
-              display: "block",
-              padding: `${FRAME_NAME_EDIT_PADDING}px`,
-              borderRadius: 4,
-              boxShadow: "inset 0 0 0 1px var(--color-primary)",
-              fontFamily: "Assistant",
-              fontSize: "14px",
-              transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
-              color: "var(--color-gray-80)",
-              overflow: "hidden",
-              maxWidth: `${Math.min(
-                x2 - x1 - FRAME_NAME_EDIT_PADDING,
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING,
-              )}px`,
-            }}
-            size={frameNameInEdit.length + 1 || 1}
-            dir="auto"
-            autoComplete="off"
-            autoCapitalize="off"
-            autoCorrect="off"
-          />
-        );
-      } else {
-        frameNameJSX =
-          f.name == null || f.name.trim() === ""
-            ? `Frame ${index + 1}`
-            : f.name.trim();
-      }
+    //   if (f.id === this.state.editingFrame) {
+    //     const frameNameInEdit = f.name == null ? `Frame ${index + 1}` : f.name;
 
-      return (
-        <div
-          id={this.getFrameNameDOMId(f)}
-          key={f.id}
-          style={{
-            position: "absolute",
-            top: `${y1 - FRAME_NAME_GAP - this.state.offsetTop}px`,
-            left: `${
-              x1 -
-              this.state.offsetLeft -
-              (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
-            }px`,
-            zIndex: 2,
-            fontSize: "14px",
-            color: isDarkTheme
-              ? "var(--color-gray-60)"
-              : "var(--color-gray-50)",
-            width: "max-content",
-            maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
-            overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            cursor: CURSOR_TYPE.MOVE,
-            pointerEvents: this.state.viewModeEnabled
-              ? POINTER_EVENTS.disabled
-              : POINTER_EVENTS.enabled,
-          }}
-          onPointerDown={(event) => this.handleCanvasPointerDown(event)}
-          onWheel={(event) => this.handleWheel(event)}
-          onContextMenu={this.handleCanvasContextMenu}
-          onDoubleClick={() => {
-            this.setState({
-              editingFrame: f.id,
-            });
-          }}
-        >
-          {frameNameJSX}
-        </div>
-      );
-    });
+    //     frameNameJSX = (
+    //       <input
+    //         autoFocus
+    //         value={frameNameInEdit}
+    //         onChange={(e) => {
+    //           mutateElement(f, {
+    //             name: e.target.value,
+    //           });
+    //         }}
+    //         onBlur={() => reset()}
+    //         onKeyDown={(event) => {
+    //           // for some inexplicable reason, `onBlur` triggered on ESC
+    //           // does not reset `state.editingFrame` despite being called,
+    //           // and we need to reset it here as well
+    //           if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+    //             reset();
+    //           }
+    //         }}
+    //         style={{
+    //           background: this.state.viewBackgroundColor,
+    //           filter: isDarkTheme ? THEME_FILTER : "none",
+    //           zIndex: 2,
+    //           border: "none",
+    //           display: "block",
+    //           padding: `${FRAME_NAME_EDIT_PADDING}px`,
+    //           borderRadius: 4,
+    //           boxShadow: "inset 0 0 0 1px var(--color-primary)",
+    //           fontFamily: "Assistant",
+    //           fontSize: "14px",
+    //           transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
+    //           color: "var(--color-gray-80)",
+    //           overflow: "hidden",
+    //           maxWidth: `${Math.min(
+    //             x2 - x1 - FRAME_NAME_EDIT_PADDING,
+    //             document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING,
+    //           )}px`,
+    //         }}
+    //         size={frameNameInEdit.length + 1 || 1}
+    //         dir="auto"
+    //         autoComplete="off"
+    //         autoCapitalize="off"
+    //         autoCorrect="off"
+    //       />
+    //     );
+    //   } else {
+    //     frameNameJSX =
+    //       f.name == null || f.name.trim() === ""
+    //         ? `Frame ${index + 1}`
+    //         : f.name.trim();
+    //   }
+
+    //   return (
+    //     <div
+    //       id={this.getFrameNameDOMId(f)}
+    //       key={f.id}
+    //       style={{
+    //         position: "absolute",
+    //         top: `${y1 - FRAME_NAME_GAP - this.state.offsetTop}px`,
+    //         left: `${
+    //           x1 -
+    //           this.state.offsetLeft -
+    //           (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
+    //         }px`,
+    //         zIndex: 2,
+    //         fontSize: "14px",
+    //         color: isDarkTheme
+    //           ? "var(--color-gray-60)"
+    //           : "var(--color-gray-50)",
+    //         width: "max-content",
+    //         maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
+    //         overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
+    //         whiteSpace: "nowrap",
+    //         textOverflow: "ellipsis",
+    //         cursor: CURSOR_TYPE.MOVE,
+    //         pointerEvents: this.state.viewModeEnabled
+    //           ? POINTER_EVENTS.disabled
+    //           : POINTER_EVENTS.enabled,
+    //       }}
+    //       onPointerDown={(event) => this.handleCanvasPointerDown(event)}
+    //       onWheel={(event) => this.handleWheel(event)}
+    //       onContextMenu={this.handleCanvasContextMenu}
+    //       onDoubleClick={() => {
+    //         this.setState({
+    //           editingFrame: f.id,
+    //         });
+    //       }}
+    //     >
+    //       {frameNameJSX}
+    //     </div>
+    //   );
+    // });
   };
 
   public render() {
