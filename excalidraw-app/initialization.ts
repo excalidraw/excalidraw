@@ -1,8 +1,11 @@
 import { zoomToFit } from "../src/actions/actionCanvas";
-import { clearElementsForLocalStorage } from "../src/element";
 import { ExcalidrawImperativeAPI } from "../src/types";
 import { moveAllLeft } from "../src/zindex";
 import { CollabAPI } from "./collab/Collab";
+import {
+  convertToExcalidrawElements,
+  ExcalidrawElementSkeleton,
+} from "../src/data/transform";
 
 export function loadFixedCanvasSize(
   localDataState: any,
@@ -23,13 +26,9 @@ export function loadFixedCanvasSize(
 
   const canvasWidth = appState.canvasSize.width;
   const canvasHeight = appState.canvasSize.height;
-
-  const initialElements = clearElementsForLocalStorage([
+  const initialElements = [
     {
       type: "frame",
-      version: 110,
-      versionNonce: 548469602,
-      isDeleted: false,
       id: "CtfrFGQ6SOW14GOkSqQFq",
       fillStyle: "solid",
       strokeWidth: 0,
@@ -43,15 +42,7 @@ export function loadFixedCanvasSize(
       backgroundColor: "transparent",
       width: canvasWidth,
       height: canvasHeight,
-      seed: 137481726,
-      groupIds: [],
-      frameId: null,
-      roundness: null,
-      boundElements: [],
-      updated: 1696936932260,
-      link: null,
       locked: true,
-      name: null,
     },
     {
       id: "moDgKT4MmX_QRzzgTlcVC",
@@ -68,24 +59,17 @@ export function loadFixedCanvasSize(
       strokeStyle: "solid",
       roughness: 1,
       opacity: 100,
-      groupIds: [],
       frameId: "CtfrFGQ6SOW14GOkSqQFq",
       roundness: null,
-      seed: 902013247,
-      version: 92,
-      versionNonce: 512116985,
-      isDeleted: false,
-      boundElements: [],
-      updated: 1696937670028,
-      link: null,
       locked: true,
-      status: "saved",
-      fileId: null,
       scale: [1, 1],
     },
-  ]);
+  ];
 
-  localDataState.elements = moveAllLeft(initialElements, appState);
+  localDataState.elements = moveAllLeft(
+    convertToExcalidrawElements(initialElements as ExcalidrawElementSkeleton[]),
+    appState,
+  );
 
   localDataState.appState = zoomToFit({
     targetElements: localDataState.elements,
