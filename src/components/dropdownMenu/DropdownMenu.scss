@@ -101,9 +101,29 @@
 
   .dropdown-menu-button {
     @include outlineButtonStyles;
-    background-color: var(--color-surface-mid);
     width: var(--lg-button-size);
     height: var(--lg-button-size);
+
+    --background: var(--color-surface-mid);
+
+    background-color: var(--background);
+
+    @at-root .excalidraw.theme--dark#{&} {
+      --background: var(--color-surface-high);
+      &:hover {
+        --background: #363541;
+      }
+    }
+
+    &:hover {
+      --background: var(--color-surface-high);
+      background-color: var(--background);
+      text-decoration: none;
+    }
+
+    &:active {
+      border-color: var(--color-primary);
+    }
 
     svg {
       width: var(--lg-icon-size);
