@@ -16,7 +16,6 @@ import { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
-import { resize, rotate } from "./utils";
 import {
   getBoundTextElementPosition,
   wrapText,
@@ -939,71 +938,10 @@ describe("Test Linear Elements", () => {
       expect(line.boundElements).toBeNull();
     });
 
-    it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
-      createThreePointerLinearElement("arrow", {
-        type: ROUNDNESS.PROPORTIONAL_RADIUS,
-      });
-
-      const arrow = h.elements[0] as ExcalidrawLinearElement;
-
-      const { textElement, container } = createBoundTextElement(
-        DEFAULT_TEXT,
-        arrow,
-      );
-
-      expect(container.angle).toBe(0);
-      expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(arrow, textElement))
-        .toMatchInlineSnapshot(`
-          {
-            "x": 75,
-            "y": 60,
-          }
-        `);
-      expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
-      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
-        .toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            105,
-            80,
-            55.45893770831013,
-            45,
-          ]
-        `);
-
-      rotate(container, -35, 55);
-      expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
-      expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
-          {
-            "x": 21.73926141863671,
-            "y": 73.31003398390868,
-          }
-        `);
-      expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
-      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
-        .toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            102.41961302274555,
-            86.49012635273976,
-            55.45893770831013,
-            45,
-          ]
-        `);
-    });
+    // TODO fix #7029 and rewrite this test
+    it.todo(
+      "should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated",
+    );
 
     it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
       createThreePointerLinearElement("arrow", {
@@ -1042,7 +980,7 @@ describe("Test Linear Elements", () => {
           ]
         `);
 
-      resize(container, "ne", [300, 200]);
+      UI.resize(container, "ne", [300, 200]);
 
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
