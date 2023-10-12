@@ -22,6 +22,7 @@
   .App-toolbar__extra-tools-trigger {
     box-shadow: none;
     border: 0;
+    background-color: transparent;
 
     &:active {
       background-color: var(--button-hover-bg);
