@@ -26,7 +26,7 @@
     <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  />
   </a>
   <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
-    <img alt="PRs welcome!" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  />
+    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  />
   </a>
   <a href="https://docs.excalidraw.com/docs/introduction/contributing">
     <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  />
