@@ -359,7 +359,7 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "type": "text",
   "updated": 1,
   "version": 2,
-  "versionNonce": 147566946,
+  "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
   "x": 0,
