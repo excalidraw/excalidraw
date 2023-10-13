@@ -189,7 +189,7 @@ const restoreElement = (
         fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      const text = element.text ?? "";
+      const text = (typeof element.text === "string" && element.text) || "";
 
       // line-height might not be specified either when creating elements
       // programmatically, or when importing old diagrams.
@@ -222,9 +222,17 @@ const restoreElement = (
         baseline,
       });
 
+      // if empty text, mark as deleted. We keep in array
+      // for data integrity purposes (collab etc.)
+      if (!text && !element.isDeleted) {
+        element = { ...element, originalText: text, isDeleted: true };
+        element = bumpVersion(element);
+      }
+
       if (refreshDimensions) {
         element = { ...element, ...refreshTextDimensions(element) };
       }
+
       return element;
     case "freedraw": {
       return restoreElementWithProperties(element, {
@@ -299,6 +307,7 @@ const restoreElement = (
     // We also don't want to throw, but instead return void so we filter
     // out these unsupported elements from the restored array.
   }
+  return null;
 };
 
 /**

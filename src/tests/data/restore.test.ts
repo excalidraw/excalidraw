@@ -86,12 +86,15 @@ describe("restoreElements", () => {
     textElement.text = null;
     textElement.font = "10 unknown";
 
+    expect(textElement.isDeleted).toBe(false);
     const restoredText = restore.restoreElements(
       [textElement],
       null,
     )[0] as ExcalidrawTextElement;
+    expect(restoredText.isDeleted).toBe(true);
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),
+      versionNonce: expect.any(Number),
     });
   });
 
