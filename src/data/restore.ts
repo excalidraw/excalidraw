@@ -36,7 +36,6 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { isValidSubtype } from "../element/subtypes";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
@@ -161,7 +160,7 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
-  if ("subtype" in element && isValidSubtype(element.subtype, base.type)) {
+  if ("subtype" in element) {
     base.subtype = element.subtype;
   }
   if ("customData" in element) {
