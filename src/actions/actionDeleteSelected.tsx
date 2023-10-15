@@ -27,6 +27,10 @@ const deleteSelectedElements = (
 
   return {
     elements: elements.map((el) => {
+      if (el.locked) {
+        return el;
+      }
+
       if (appState.selectedElementIds[el.id]) {
         return newElementWith(el, { isDeleted: true });
       }
@@ -80,6 +84,7 @@ export const actionDeleteSelected = register({
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
+
       const element = LinearElementEditor.getElement(elementId);
       if (!element) {
         return false;
