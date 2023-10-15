@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { actionShortcuts } from "../../actions";
 import { ActionManager } from "../../actions/manager";
 import {
   ExitZenModeAction,
@@ -9,7 +8,6 @@ import {
 } from "../Actions";
 import { useDevice } from "../App";
 import { useTunnels } from "../../context/tunnels";
-import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
 import { UIAppState } from "../../types";
@@ -25,7 +23,7 @@ const Footer = ({
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
 }) => {
-  const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
+  const { FooterCenterTunnel } = useTunnels();
 
   const device = useDevice();
   const showFinalize =
@@ -74,7 +72,7 @@ const Footer = ({
         </Stack.Col>
       </div>
       <FooterCenterTunnel.Out />
-      <div
+      {/* <div
         className={clsx("layer-ui__wrapper__footer-right zen-mode-transition", {
           "transition-right": appState.zenModeEnabled,
         })}
@@ -85,7 +83,7 @@ const Footer = ({
             onClick={() => actionManager.executeAction(actionShortcuts)}
           />
         </div>
-      </div>
+      </div> */}
       <ExitZenModeAction
         actionManager={actionManager}
         showExitZenModeBtn={showExitZenModeBtn}
