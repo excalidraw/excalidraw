@@ -7,7 +7,6 @@ import clsx from "clsx";
 import { nanoid } from "nanoid";
 
 import {
-  actionAddToLibrary,
   actionBringForward,
   actionBringToFront,
   actionCopy,
@@ -32,8 +31,6 @@ import {
   actionUnbindText,
   actionBindText,
   actionUngroup,
-  actionLink,
-  actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
 } from "../actions";
@@ -8262,20 +8259,24 @@ class App extends React.Component<AppProps, AppState> {
       actionWrapTextInContainer,
       actionUngroup,
       CONTEXT_MENU_SEPARATOR,
-      actionAddToLibrary,
-      CONTEXT_MENU_SEPARATOR,
+      // actionAddToLibrary,
+      // CONTEXT_MENU_SEPARATOR,
+
       actionSendBackward,
       actionBringForward,
       actionSendToBack,
       actionBringToFront,
+
       CONTEXT_MENU_SEPARATOR,
       actionFlipHorizontal,
       actionFlipVertical,
+
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
-      actionLink,
+      // actionLink,
       actionDuplicateSelection,
-      actionToggleElementLock,
+      // actionToggleElementLock,
+
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];
