@@ -213,12 +213,10 @@ export const SelectedShapeActions = ({
 };
 
 export const ShapesSwitcher = ({
-  interactiveCanvas,
   activeTool,
   appState,
   app,
 }: {
-  interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
   appState: UIAppState;
   app: AppClassProperties;

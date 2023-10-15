@@ -36,7 +36,6 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: () => void;
-  interactiveCanvas: HTMLCanvasElement | null;
 
   renderTopRightUI?: (
     isMobile: boolean,
@@ -57,7 +56,6 @@ export const MobileMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  interactiveCanvas,
 
   renderTopRightUI,
   renderCustomStats,
@@ -84,7 +82,6 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
-                      interactiveCanvas={interactiveCanvas}
                       activeTool={appState.activeTool}
                       app={app}
                     />
