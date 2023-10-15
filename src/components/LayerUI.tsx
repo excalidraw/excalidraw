@@ -73,7 +73,6 @@ interface LayerUIProps {
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
@@ -131,7 +130,6 @@ const LayerUI = ({
   renderTopRightUI,
   renderCustomStats,
   UIOptions,
-  onImageAction,
   onExportImage,
   renderWelcomeScreen,
   children,
@@ -283,11 +281,6 @@ const LayerUI = ({
                             interactiveCanvas={interactiveCanvas}
                             activeTool={appState.activeTool}
                             app={app}
-                            onImageAction={({ pointerType }) => {
-                              onImageAction({
-                                insertOnCanvasDirectly: pointerType !== "mouse",
-                              });
-                            }}
                           />
                         </Stack.Row>
                       </Island>
@@ -473,7 +466,6 @@ const LayerUI = ({
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
           interactiveCanvas={interactiveCanvas}
-          onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}

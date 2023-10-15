@@ -1205,7 +1205,6 @@ class App extends React.Component<AppProps, AppState> {
                             this.state.zenModeEnabled
                           }
                           UIOptions={this.props.UIOptions}
-                          onImageAction={this.onImageAction}
                           onExportImage={this.onExportImage}
                           renderWelcomeScreen={
                             !this.state.isLoading &&
@@ -3135,9 +3134,13 @@ class App extends React.Component<AppProps, AppState> {
 
   setActiveTool = (
     tool:
-      | {
-          type: ToolType;
-        }
+      | (
+          | { type: Exclude<ToolType, "image"> }
+          | {
+              type: Extract<ToolType, "image">;
+              insertOnCanvasDirectly?: boolean;
+            }
+        )
       | { type: "custom"; customType: string },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
@@ -3153,7 +3156,10 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
     if (nextActiveTool.type === "image") {
-      this.onImageAction();
+      this.onImageAction({
+        insertOnCanvasDirectly:
+          (tool.type === "image" && tool.insertOnCanvasDirectly) ?? false,
+      });
     }
 
     this.setState((prevState) => {
@@ -7353,9 +7359,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onImageAction = async (
-    { insertOnCanvasDirectly } = { insertOnCanvasDirectly: false },
-  ) => {
+  private onImageAction = async ({
+    insertOnCanvasDirectly,
+  }: {
+    insertOnCanvasDirectly: boolean;
+  }) => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;

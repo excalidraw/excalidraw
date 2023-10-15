@@ -38,7 +38,6 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   interactiveCanvas: HTMLCanvasElement | null;
 
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -59,7 +58,7 @@ export const MobileMenu = ({
   onHandToolToggle,
   onPenModeToggle,
   interactiveCanvas,
-  onImageAction,
+
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
@@ -88,11 +87,6 @@ export const MobileMenu = ({
                       interactiveCanvas={interactiveCanvas}
                       activeTool={appState.activeTool}
                       app={app}
-                      onImageAction={({ pointerType }) => {
-                        onImageAction({
-                          insertOnCanvasDirectly: pointerType !== "mouse",
-                        });
-                      }}
                     />
                   </Stack.Row>
                 </Island>
