@@ -3132,7 +3132,7 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   setActiveTool = (
-    tool:
+    tool: (
       | (
           | { type: Exclude<ToolType, "image"> }
           | {
@@ -3140,7 +3140,8 @@ class App extends React.Component<AppProps, AppState> {
               insertOnCanvasDirectly?: boolean;
             }
         )
-      | { type: "custom"; customType: string },
+      | { type: "custom"; customType: string }
+    ) & { locked?: boolean },
   ) => {
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
@@ -4591,7 +4592,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+      setCursorForShape(this.interactiveCanvas, this.state);
     } else if (this.state.activeTool.type === "frame") {
       this.createFrameElementOnPointerDown(pointerDownState);
     } else if (this.state.activeTool.type === "laser") {
