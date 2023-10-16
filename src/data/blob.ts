@@ -8,7 +8,7 @@ import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState, DataURL, LibraryItem } from "../types";
 import { ValueOf } from "../utility-types";
-import { bytesToHexString } from "../utils";
+import { bytesToHexString, isPromiseLike } from "../utils";
 import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
@@ -207,10 +207,13 @@ export const loadLibraryFromBlob = async (
 };
 
 export const canvasToBlob = async (
-  canvas: HTMLCanvasElement,
+  canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,
 ): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
+      if (isPromiseLike(canvas)) {
+        canvas = await canvas;
+      }
       canvas.toBlob((blob) => {
         if (!blob) {
           return reject(
