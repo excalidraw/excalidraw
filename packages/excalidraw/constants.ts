@@ -109,7 +109,7 @@ export const FONT_FAMILY = {
   Assistant: 4,
 };
 
-export const FALLBACK_FONT = {
+export const FALLBACK_FONTS = {
   [FONT_FAMILY.Virgil]: "Itim",
 };
 
