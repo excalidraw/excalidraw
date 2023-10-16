@@ -25,16 +25,6 @@ export class Emitter<T extends any[] = []> {
     return () => this.off(_handlers);
   }
 
-  once(...handlers: Subscriber<T>[] | Subscriber<T>[][]) {
-    const _handlers = handlers
-      .flat()
-      .filter((item) => typeof item === "function");
-
-    const detach = this.on(..._handlers);
-    _handlers.push(() => detach());
-    return detach;
-  }
-
   off(...handlers: Subscriber<T>[] | Subscriber<T>[][]) {
     const _handlers = handlers.flat();
     this.subscribers = this.subscribers.filter(
