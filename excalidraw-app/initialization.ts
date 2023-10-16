@@ -1,31 +1,20 @@
 import { zoomToFit } from "../src/actions/actionCanvas";
-import { ExcalidrawImperativeAPI } from "../src/types";
 import { moveAllLeft } from "../src/zindex";
-import { CollabAPI } from "./collab/Collab";
 import {
   convertToExcalidrawElements,
   ExcalidrawElementSkeleton,
 } from "../src/data/transform";
 
-export function loadFixedCanvasSize(
-  localDataState: any,
-  opts: {
-    collabAPI: CollabAPI | null;
-    excalidrawAPI: ExcalidrawImperativeAPI;
-  },
-): void {
-  const { excalidrawAPI } = opts;
-  const appState = excalidrawAPI.getAppState();
-
+export function loadFixedCanvasSize(localDataState: any): void {
   if (
     localDataState.elements?.length > 0 ||
-    appState.canvasSize.mode !== "fixed"
+    localDataState.appState?.canvasSize.mode !== "fixed"
   ) {
     return;
   }
 
-  const canvasWidth = appState.canvasSize.width;
-  const canvasHeight = appState.canvasSize.height;
+  const canvasWidth = localDataState.appState.canvasSize.width;
+  const canvasHeight = localDataState.appState.canvasSize.height;
   const initialElements = [
     {
       type: "frame",
@@ -68,12 +57,12 @@ export function loadFixedCanvasSize(
 
   localDataState.elements = moveAllLeft(
     convertToExcalidrawElements(initialElements as ExcalidrawElementSkeleton[]),
-    appState,
+    localDataState.appState,
   );
 
   localDataState.appState = zoomToFit({
     targetElements: localDataState.elements,
-    appState,
+    appState: localDataState.appState,
     fitToViewport: true,
     viewportZoomFactor: 1,
   }).appState;

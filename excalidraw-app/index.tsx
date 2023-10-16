@@ -151,7 +151,7 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
-  loadFixedCanvasSize(localDataState, opts);
+  loadFixedCanvasSize(localDataState);
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
