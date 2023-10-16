@@ -18,6 +18,12 @@ exports[`export > exporting svg containing transformed images > svg export outpu
         font-family: "Assistant";
         src: url("https://excalidraw.com/Assistant-Regular.woff2");
       }
+      @font-face {
+        font-family: \\"Itim\\";
+        src: url(\\"Itim-Regular.woff2\\");
+        font-display: swap;
+        unicode-range: U+0E00–U+0E7F;
+      }
     </style>
     
   </defs>
