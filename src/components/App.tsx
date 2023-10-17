@@ -2431,18 +2431,12 @@ class App extends React.Component<AppProps, AppState> {
 
         const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
         if (text.length) {
-          const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-            x,
-            y: currentY,
-          });
-
           const element = newTextElement({
             ...textElementProps,
             x,
             y: currentY,
             text,
             lineHeight,
-            frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -3456,6 +3450,11 @@ class App extends React.Component<AppProps, AppState> {
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, this.frameNameBoundsCache, x, y),
     ).filter((element) => {
+      // arrows don't clip even if they're children of frames,
+      // so always allow hitbox regardless of beinging contained in frame
+      if (isArrowElement(element)) {
+        return true;
+      }
       // hitting a frame's element from outside the frame is not considered a hit
       const containingFrame = getContainingFrame(element);
       return containingFrame &&
