@@ -69,6 +69,7 @@ import {
 } from "../element/Hyperlink";
 import { renderSnaps } from "./renderSnaps";
 import {
+  isArrowElement,
   isEmbeddableElement,
   isFrameElement,
   isLinearElement,
@@ -984,7 +985,10 @@ const _renderStaticScene = ({
 
           // TODO do we need to check isElementInFrame here?
           if (frame && isElementInFrame(element, elements, appState)) {
-            frameClip(frame, context, renderConfig, appState);
+            // do not clip arrows
+            if (!isArrowElement(element)) {
+              frameClip(frame, context, renderConfig, appState);
+            }
           }
           renderElement(element, rc, context, renderConfig, appState);
           context.restore();
