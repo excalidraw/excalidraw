@@ -151,7 +151,10 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   let localDataState = importFromLocalStorage();
-  localDataState = getDataStateAfterFixCanvasSize(localDataState);
+  localDataState = getDataStateAfterFixCanvasSize(
+    localDataState,
+    opts.excalidrawAPI,
+  );
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;

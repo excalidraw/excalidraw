@@ -4,19 +4,23 @@ import {
   convertToExcalidrawElements,
   ExcalidrawElementSkeleton,
 } from "../data/transform";
+import { ExcalidrawImperativeAPI } from "../types";
 
-export const getDataStateAfterFixCanvasSize = (localDataState: any) => {
+export const getDataStateAfterFixCanvasSize = (
+  localDataState: any,
+  excalidrawAPI: ExcalidrawImperativeAPI,
+) => {
+  const appState = excalidrawAPI.getAppState();
+
   if (
-    !localDataState.elements ||
-    !localDataState.appState ||
     localDataState.elements?.length > 0 ||
-    localDataState.appState.canvasSize.mode !== "fixed"
+    appState.canvasSize.mode !== "fixed"
   ) {
     return localDataState;
   }
 
-  const canvasWidth = localDataState.appState.canvasSize.width;
-  const canvasHeight = localDataState.appState.canvasSize.height;
+  const canvasWidth = appState.canvasSize.width;
+  const canvasHeight = appState.canvasSize.height;
   const initialElements = [
     {
       type: "frame",
@@ -59,12 +63,12 @@ export const getDataStateAfterFixCanvasSize = (localDataState: any) => {
 
   localDataState.elements = moveAllLeft(
     convertToExcalidrawElements(initialElements as ExcalidrawElementSkeleton[]),
-    localDataState.appState,
+    appState,
   );
 
   localDataState.appState = zoomToFit({
     targetElements: localDataState.elements,
-    appState: localDataState.appState,
+    appState,
     fitToViewport: true,
     viewportZoomFactor: 1,
   }).appState;
