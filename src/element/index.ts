@@ -110,3 +110,5 @@ export const clearElementsForExport = (
 export const clearElementsForLocalStorage = (
   elements: readonly ExcalidrawElement[],
 ) => _clearElements(elements);
+
+export { getDataStateAfterFixCanvasSize } from "./getDataStateAfterFixCanvasSize";

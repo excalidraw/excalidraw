@@ -1,16 +1,18 @@
-import { zoomToFit } from "../src/actions/actionCanvas";
-import { moveAllLeft } from "../src/zindex";
+import { zoomToFit } from "../actions/actionCanvas";
+import { moveAllLeft } from "../zindex";
 import {
   convertToExcalidrawElements,
   ExcalidrawElementSkeleton,
-} from "../src/data/transform";
+} from "../data/transform";
 
-export function loadFixedCanvasSize(localDataState: any): void {
+export const getDataStateAfterFixCanvasSize = (localDataState: any) => {
   if (
+    !localDataState.elements ||
+    !localDataState.appState ||
     localDataState.elements?.length > 0 ||
-    localDataState.appState?.canvasSize.mode !== "fixed"
+    localDataState.appState.canvasSize.mode !== "fixed"
   ) {
-    return;
+    return localDataState;
   }
 
   const canvasWidth = localDataState.appState.canvasSize.width;
@@ -66,4 +68,6 @@ export function loadFixedCanvasSize(localDataState: any): void {
     fitToViewport: true,
     viewportZoomFactor: 1,
   }).appState;
-}
+
+  return localDataState;
+};
