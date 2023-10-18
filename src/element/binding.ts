@@ -27,6 +27,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { isValidFrameChild } from "../frame";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -210,6 +211,15 @@ export const bindLinearElement = (
         type: "arrow",
       }),
     });
+  }
+  if (linearElement.frameId && !isValidFrameChild(linearElement)) {
+    mutateElement(
+      linearElement,
+      {
+        frameId: null,
+      },
+      false,
+    );
   }
 };
 

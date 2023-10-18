@@ -17,7 +17,6 @@ import {
 } from "./types";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
-import { resize } from "../tests/utils";
 import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
 
 // Unmount ReactDOM from root
@@ -953,7 +952,7 @@ describe("textWysiwyg", () => {
       editor.blur();
 
       // should center align horizontally and vertically by default
-      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
           85,
@@ -977,7 +976,7 @@ describe("textWysiwyg", () => {
       editor.blur();
 
       // should left align horizontally and bottom vertically after resize
-      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
           15,
@@ -999,7 +998,7 @@ describe("textWysiwyg", () => {
       editor.blur();
 
       // should right align horizontally and top vertically after resize
-      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
           374.99999999999994,
@@ -1049,7 +1048,7 @@ describe("textWysiwyg", () => {
       expect(rectangle.height).toBe(75);
       expect(textElement.fontSize).toBe(20);
 
-      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 50], {
+      UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 50], {
         shift: true,
       });
       expect(rectangle.width).toBe(200);
@@ -1189,7 +1188,7 @@ describe("textWysiwyg", () => {
       updateTextEditor(editor, "Hello");
       editor.blur();
 
-      resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
+      UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect(rectangle.height).toBeCloseTo(155, 8);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(null);
 
@@ -1513,28 +1512,16 @@ describe("textWysiwyg", () => {
     });
   });
 
-  it("should bump the version of labelled arrow when label updated", async () => {
+  it("should bump the version of a labeled arrow when the label is updated", async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     const arrow = UI.createElement("arrow", {
       width: 300,
       height: 0,
     });
-
-    mouse.select(arrow);
-    Keyboard.keyPress(KEYS.ENTER);
-    let editor = getTextEditor();
-    await new Promise((r) => setTimeout(r, 0));
-    updateTextEditor(editor, "Hello");
-    editor.blur();
-
+    await UI.editText(arrow, "Hello");
     const { version } = arrow;
 
-    mouse.select(arrow);
-    Keyboard.keyPress(KEYS.ENTER);
-    editor = getTextEditor();
-    await new Promise((r) => setTimeout(r, 0));
-    updateTextEditor(editor, "Hello\nworld!");
-    editor.blur();
+    await UI.editText(arrow, "Hello\nworld!");
 
     expect(arrow.version).toEqual(version + 1);
   });
