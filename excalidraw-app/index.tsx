@@ -96,7 +96,7 @@ import { ShareableLinkDialog } from "../src/components/ShareableLinkDialog";
 import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../src/components/Trans";
-import { getDataStateAfterFixCanvasSize } from "../src/element/getDataStateAfterFixCanvasSize";
+import { fixCanvasSize } from "../src/element/fixCanvasSize";
 
 polyfill();
 
@@ -151,10 +151,7 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   let localDataState = importFromLocalStorage();
-  localDataState = getDataStateAfterFixCanvasSize(
-    localDataState,
-    opts.excalidrawAPI,
-  );
+  localDataState = fixCanvasSize(localDataState, opts.excalidrawAPI);
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;

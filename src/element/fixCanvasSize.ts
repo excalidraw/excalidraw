@@ -1,12 +1,12 @@
-import { zoomToFit } from "../actions/actionCanvas";
 import { moveAllLeft } from "../zindex";
 import {
   convertToExcalidrawElements,
   ExcalidrawElementSkeleton,
 } from "../data/transform";
 import { ExcalidrawImperativeAPI } from "../types";
+import { zoomToFitAllElements } from "./zoomToFitAllElements";
 
-export const getDataStateAfterFixCanvasSize = (
+export const fixCanvasSize = (
   localDataState: any,
   excalidrawAPI: ExcalidrawImperativeAPI,
 ) => {
@@ -66,12 +66,10 @@ export const getDataStateAfterFixCanvasSize = (
     appState,
   );
 
-  localDataState.appState = zoomToFit({
-    targetElements: localDataState.elements,
+  localDataState.appState = zoomToFitAllElements(
+    localDataState.elements,
     appState,
-    fitToViewport: true,
-    viewportZoomFactor: 1,
-  }).appState;
+  );
 
   return localDataState;
 };
