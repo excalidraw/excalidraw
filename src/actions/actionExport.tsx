@@ -191,7 +191,10 @@ export const actionSaveFileToDisk = register({
         },
         app.files,
       );
-      return { commitToHistory: false, appState: { ...appState, fileHandle } };
+      return {
+        commitToHistory: false,
+        appState: { ...appState, openDialog: null, fileHandle },
+      };
     } catch (error: any) {
       if (error?.name !== "AbortError") {
         console.error(error);
