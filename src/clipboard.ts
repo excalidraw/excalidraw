@@ -18,11 +18,14 @@ type ElementsClipboard = {
   files: BinaryFiles | undefined;
 };
 
+export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
+
 export interface ClipboardData {
   spreadsheet?: Spreadsheet;
   elements?: readonly ExcalidrawElement[];
   files?: BinaryFiles;
   text?: string;
+  mixedContent?: PastedMixedContent;
   errorMessage?: string;
   programmaticAPI?: boolean;
 }
@@ -142,22 +145,74 @@ const parsePotentialSpreadsheet = (
   return null;
 };
 
+/** internal, specific to parsing paste events. Do not reuse. */
+function parseHTMLTree(el: ChildNode) {
+  let result: PastedMixedContent = [];
+  for (const node of el.childNodes) {
+    if (node.nodeType === 3) {
+      const text = node.textContent?.trim();
+      if (text) {
+        result.push({ type: "text", value: text });
+      }
+    } else if (node instanceof HTMLImageElement) {
+      const url = node.getAttribute("src");
+      if (url && url.startsWith("http")) {
+        result.push({ type: "imageUrl", value: url });
+      }
+    } else {
+      result = result.concat(parseHTMLTree(node));
+    }
+  }
+  return result;
+}
+
+const maybeParseHTMLPaste = (event: ClipboardEvent) => {
+  const html = event.clipboardData?.getData("text/html");
+
+  if (!html) {
+    return null;
+  }
+
+  try {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    const content = parseHTMLTree(doc.body);
+
+    if (content.length) {
+      return content;
+    }
+  } catch (error: any) {
+    console.error(`error in parseHTMLFromPaste: ${error.message}`);
+  }
+
+  return null;
+};
+
 /**
  * Retrieves content from system clipboard (either from ClipboardEvent or
  *  via async clipboard API if supported)
  */
-export const getSystemClipboard = async (
+const getSystemClipboard = async (
   event: ClipboardEvent | null,
-): Promise<string> => {
+  isPlainPaste = false,
+): Promise<
+  | { type: "text"; value: string }
+  | { type: "mixedContent"; value: PastedMixedContent }
+> => {
   try {
+    const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
+    if (mixedContent) {
+      return { type: "mixedContent", value: mixedContent };
+    }
+
     const text = event
       ? event.clipboardData?.getData("text/plain")
       : probablySupportsClipboardReadText &&
         (await navigator.clipboard.readText());
 
-    return (text || "").trim();
+    return { type: "text", value: (text || "").trim() };
   } catch {
-    return "";
+    return { type: "text", value: "" };
   }
 };
 
@@ -168,14 +223,20 @@ export const parseClipboard = async (
   event: ClipboardEvent | null,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
-  const systemClipboard = await getSystemClipboard(event);
+  const systemClipboard = await getSystemClipboard(event, isPlainPaste);
+
+  if (systemClipboard.type === "mixedContent") {
+    return {
+      mixedContent: systemClipboard.value,
+    };
+  }
 
   // if system clipboard empty, couldn't be resolved, or contains previously
   // copied excalidraw scene as SVG, fall back to previously copied excalidraw
   // elements
   if (
     !systemClipboard ||
-    (!isPlainPaste && systemClipboard.includes(SVG_EXPORT_TAG))
+    (!isPlainPaste && systemClipboard.value.includes(SVG_EXPORT_TAG))
   ) {
     return getAppClipboard();
   }
@@ -183,7 +244,7 @@ export const parseClipboard = async (
   // if system clipboard contains spreadsheet, use it even though it's
   // technically possible it's staler than in-app clipboard
   const spreadsheetResult =
-    !isPlainPaste && parsePotentialSpreadsheet(systemClipboard);
+    !isPlainPaste && parsePotentialSpreadsheet(systemClipboard.value);
 
   if (spreadsheetResult) {
     return spreadsheetResult;
@@ -192,7 +253,7 @@ export const parseClipboard = async (
   const appClipboardData = getAppClipboard();
 
   try {
-    const systemClipboardData = JSON.parse(systemClipboard);
+    const systemClipboardData = JSON.parse(systemClipboard.value);
     const programmaticAPI =
       systemClipboardData.type === EXPORT_DATA_TYPES.excalidrawClipboardWithAPI;
     if (clipboardContainsElements(systemClipboardData)) {
@@ -216,7 +277,7 @@ export const parseClipboard = async (
           ? JSON.stringify(appClipboardData.elements, null, 2)
           : undefined,
       }
-    : { text: systemClipboard };
+    : { text: systemClipboard.value };
 };
 
 export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
