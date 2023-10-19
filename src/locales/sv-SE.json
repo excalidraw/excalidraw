@@ -203,7 +203,7 @@
     "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Kunde inte hämta bilden.",
     "invalidSVGString": "Ogiltig SVG.",
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
     "importLibraryError": "Kunde inte ladda bibliotek",
