@@ -203,6 +203,7 @@
     "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG غير صالح.",
     "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
     "importLibraryError": "تعذر تحميل المكتبة",
@@ -237,7 +238,7 @@
     "frame": "أداة الإطار",
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
-    "hand": "يد (أداة التخطيط)",
+    "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من أﻷدوات"
   },
   "headings": {
