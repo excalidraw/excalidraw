@@ -203,6 +203,7 @@
     "imageInsertError": "عکس ارسال نشد. بعداً دوباره تلاش کنید...",
     "fileTooBig": "فایل خیلی بزرگ است حداکثر اندازه مجاز {{maxSize}}.",
     "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
