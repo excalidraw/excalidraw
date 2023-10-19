@@ -203,6 +203,7 @@
     "imageInsertError": "Nem sikerült beszúrni a képet. Próbáld újra később...",
     "fileTooBig": "A fájl túl nagy. A megengedett maximális méret {{maxSize}}.",
     "svgImageInsertError": "Nem sikerült beszúrni az SVG-képet. Az SVG szintaktika érvénytelennek tűnik.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Érvénytelen SVG.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
