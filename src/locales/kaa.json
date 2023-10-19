@@ -203,6 +203,7 @@
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
+    "failedToFetchImage": "",
     "invalidSVGString": "Jaramsız SVG.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "Kitapxananı júklew ámelge aspadı",
