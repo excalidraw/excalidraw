@@ -21,13 +21,34 @@ export function adjustAppStateForCanvasSize(
   if (canvasSize.mode !== "fixed") {
     return { ...state, canvasSize };
   }
-  const { width: dstw, height: dsth } = state;
-  let { width: srcw, height: srch } = canvasSize;
-  const scale = Math.min(dstw / srcw, dsth / srch);
-  [srcw, srch] = [srcw, srch].map((v) => v * scale);
+  const { width: viewportWidth, height: viewportHeight } = state;
+  let { width: canvasWidth, height: canvasHeight } = canvasSize;
+
+  let scale = 0;
+  if (viewportWidth > canvasWidth) {
+    scale = Math.max(
+      viewportWidth / canvasWidth,
+      viewportHeight / canvasHeight,
+    );
+  } else {
+    scale = Math.min(
+      viewportWidth / canvasWidth,
+      viewportHeight / canvasHeight,
+    );
+  }
+
+  [canvasWidth, canvasHeight] = [canvasWidth, canvasHeight].map(
+    (v) => v * scale,
+  );
   const scroll = {
-    scrollX: dstw > srcw ? (dstw - srcw) / 2 / scale : 0,
-    scrollY: dsth > srch ? (dsth - srch) / 2 / scale : 0,
+    scrollX:
+      viewportWidth > canvasWidth
+        ? (viewportWidth - canvasWidth) / 2 / scale
+        : 0,
+    scrollY:
+      viewportHeight > canvasHeight
+        ? (viewportHeight - canvasHeight) / 2 / scale
+        : 0,
     zoom: {
       value: getNormalizedZoom(scale),
     },
