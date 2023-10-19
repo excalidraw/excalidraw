@@ -203,7 +203,7 @@
     "imageInsertError": "Das Bild konnte nicht eingefügt werden. Versuche es später erneut...",
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Bild konnte nicht abgerufen werden.",
     "invalidSVGString": "Ungültige SVG.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
