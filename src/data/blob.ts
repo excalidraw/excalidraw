@@ -327,6 +327,31 @@ export const SVGStringToFile = (SVGString: string, filename: string = "") => {
   }) as File & { type: typeof MIME_TYPES.svg };
 };
 
+export const ImageURLToFile = async (
+  imageUrl: string,
+  filename: string = "",
+): Promise<File | undefined> => {
+  let response;
+  try {
+    response = await fetch(imageUrl);
+  } catch (error: any) {
+    throw new Error(t("errors.failedToFetchImage"));
+  }
+
+  if (!response.ok) {
+    throw new Error(t("errors.failedToFetchImage"));
+  }
+
+  const blob = await response.blob();
+
+  if (blob.type && isSupportedImageFile(blob)) {
+    const name = filename || blob.name || "";
+    return new File([blob], name, { type: blob.type });
+  }
+
+  throw new Error(t("errors.unsupportedFileType"));
+};
+
 export const getFileFromEvent = async (
   event: React.DragEvent<HTMLDivElement>,
 ) => {
