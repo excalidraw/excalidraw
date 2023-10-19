@@ -203,6 +203,7 @@
     "imageInsertError": "Nepyko įkelti paveiksliuko. Pabandyk vėliau...",
     "fileTooBig": "Per didelis failas. Didžiausias leidžiamas dydis yra {{maxSize}}.",
     "svgImageInsertError": "Nepavyko įtraukti SVG paveiksliuko. Panašu, jog SVG yra nevalidus.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Nevalidus SVG.",
     "cannotResolveCollabServer": "Nepavyko prisijungti prie serverio bendradarbiavimui. Perkrauk puslapį ir pabandyk prisijungti dar kartą.",
     "importLibraryError": "Nepavyko įkelti bibliotekos",
