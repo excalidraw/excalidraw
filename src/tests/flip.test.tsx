@@ -727,7 +727,7 @@ describe("freedraw", () => {
 describe("image", () => {
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
-      const clipboardEvent = createPasteEvent("", file ? [file] : []);
+      const clipboardEvent = createPasteEvent({}, file ? [file] : []);
       document.dispatchEvent(clipboardEvent);
     };
 
