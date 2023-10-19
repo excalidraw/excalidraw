@@ -203,6 +203,7 @@
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Ongeldige SVG.",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
