@@ -42,13 +42,10 @@ const Footer = ({
       >
         <Stack.Col gap={2}>
           <Section heading="canvasActions">
-            {(appState.canvasSize.mode !== "fixed" ||
-              !appState.canvasSize.autoZoom) && (
-              <ZoomActions
-                renderAction={actionManager.renderAction}
-                zoom={appState.zoom}
-              />
-            )}
+            <ZoomActions
+              renderAction={actionManager.renderAction}
+              zoom={appState.zoom}
+            />
 
             {!appState.viewModeEnabled && (
               <UndoRedoActions

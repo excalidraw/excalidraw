@@ -112,4 +112,3 @@ export const clearElementsForLocalStorage = (
 ) => _clearElements(elements);
 
 export { fixCanvasSize } from "./fixCanvasSize";
-export { zoomToFitAllElements } from "./zoomToFitAllElements";

@@ -15,7 +15,3 @@ export function isPointerOutsideCanvas(
   }
   return x < 0 || x > canvasSize.width || y < 0 || y > canvasSize.height;
 }
-
-export function shouldPreventPanOrZoom(canvasSize: CanvasSize): boolean {
-  return canvasSize.mode === "fixed" && !!canvasSize.autoZoom;
-}

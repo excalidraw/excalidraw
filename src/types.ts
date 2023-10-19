@@ -89,7 +89,6 @@ export type CanvasSize =
       mode: "fixed";
       width: number;
       height: number;
-      autoZoom?: boolean;
     }
   | { mode: "infinite" }
   | { mode: "default" };
@@ -459,7 +458,7 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
-  defaultCanvasSize?: { width: number; height: number; autoZoom?: boolean };
+  defaultCanvasSize?: { width: number; height: number };
 }
 
 export type SceneData = {

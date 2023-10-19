@@ -723,7 +723,7 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
         theme={theme}
-        defaultCanvasSize={{ width: 595, height: 842, autoZoom: false }}
+        defaultCanvasSize={{ width: 595, height: 842 }}
         renderTopRightUI={(isMobile) => {
           // if (isMobile || !collabAPI || isCollabDisabled) {
           return null;

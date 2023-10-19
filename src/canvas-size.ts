@@ -22,18 +22,16 @@ export function adjustAppStateForCanvasSize(
     return { ...state, canvasSize };
   }
   const { width: dstw, height: dsth } = state;
-  let { width: srcw, height: srch, autoZoom } = canvasSize;
+  let { width: srcw, height: srch } = canvasSize;
   const scale = Math.min(dstw / srcw, dsth / srch);
   [srcw, srch] = [srcw, srch].map((v) => v * scale);
-  const scroll = autoZoom
-    ? {
-        scrollX: dstw > srcw ? (dstw - srcw) / 2 / scale : 0,
-        scrollY: dsth > srch ? (dsth - srch) / 2 / scale : 0,
-        zoom: {
-          value: getNormalizedZoom(scale),
-        },
-      }
-    : {};
+  const scroll = {
+    scrollX: dstw > srcw ? (dstw - srcw) / 2 / scale : 0,
+    scrollY: dsth > srch ? (dsth - srch) / 2 / scale : 0,
+    zoom: {
+      value: getNormalizedZoom(scale),
+    },
+  };
   return {
     ...state,
     canvasSize,

@@ -369,10 +369,7 @@ import {
   resetCursor,
   setCursorForShape,
 } from "../cursor";
-import {
-  isPointerOutsideCanvas,
-  shouldPreventPanOrZoom,
-} from "./customization";
+import { isPointerOutsideCanvas } from "./customization";
 import { adjustAppStateForCanvasSize } from "../canvas-size";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -1493,6 +1490,8 @@ class App extends React.Component<AppProps, AppState> {
           theme,
           name,
           errorMessage,
+          width: window.innerWidth,
+          height: window.innerHeight,
         });
 
         this.setState(
@@ -1868,24 +1867,22 @@ class App extends React.Component<AppProps, AppState> {
       this.fonts.onFontsLoaded(loadedFontFaces);
     });
 
-    if (!shouldPreventPanOrZoom(this.state.canvasSize)) {
-      // Safari-only desktop pinch zoom
-      document.addEventListener(
-        EVENT.GESTURE_START,
-        this.onGestureStart as any,
-        false,
-      );
-      document.addEventListener(
-        EVENT.GESTURE_CHANGE,
-        this.onGestureChange as any,
-        false,
-      );
-      document.addEventListener(
-        EVENT.GESTURE_END,
-        this.onGestureEnd as any,
-        false,
-      );
-    }
+    // Safari-only desktop pinch zoom
+    document.addEventListener(
+      EVENT.GESTURE_START,
+      this.onGestureStart as any,
+      false,
+    );
+    document.addEventListener(
+      EVENT.GESTURE_CHANGE,
+      this.onGestureChange as any,
+      false,
+    );
+    document.addEventListener(
+      EVENT.GESTURE_END,
+      this.onGestureEnd as any,
+      false,
+    );
 
     if (this.state.viewModeEnabled) {
       return;
@@ -3874,10 +3871,6 @@ class App extends React.Component<AppProps, AppState> {
       initialScale &&
       gesture.initialDistance
     ) {
-      if (shouldPreventPanOrZoom(this.state.canvasSize)) {
-        return;
-      }
-
       const center = getCenter(gesture.pointers);
       const deltaX = center.x - gesture.lastCenter.x;
       const deltaY = center.y - gesture.lastCenter.y;
@@ -4199,11 +4192,7 @@ class App extends React.Component<AppProps, AppState> {
           isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
         );
       } else if (this.state.viewModeEnabled) {
-        if (shouldPreventPanOrZoom(this.state.canvasSize)) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
-        } else {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-        }
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (this.state.selectedLinearElement) {
@@ -4793,8 +4782,7 @@ class App extends React.Component<AppProps, AppState> {
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement) ||
-      shouldPreventPanOrZoom(this.state.canvasSize)
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
@@ -5022,10 +5010,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (
-      this.state.viewModeEnabled &&
-      shouldPreventPanOrZoom(this.state.canvasSize)
-    ) {
+    if (this.state.viewModeEnabled) {
       return true;
     }
 
@@ -8287,7 +8272,7 @@ class App extends React.Component<AppProps, AppState> {
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
       event.preventDefault();
-      if (isPanning || shouldPreventPanOrZoom(this.state.canvasSize)) {
+      if (isPanning) {
         return;
       }
 

@@ -4,7 +4,6 @@ import {
   ExcalidrawElementSkeleton,
 } from "../data/transform";
 import { ExcalidrawImperativeAPI } from "../types";
-import { zoomToFitAllElements } from "./zoomToFitAllElements";
 
 export const fixCanvasSize = (
   localDataState: any,
@@ -66,10 +65,7 @@ export const fixCanvasSize = (
     appState,
   );
 
-  localDataState.appState = zoomToFitAllElements(
-    localDataState.elements,
-    appState,
-  );
+  localDataState.appState = appState;
 
   return localDataState;
 };
