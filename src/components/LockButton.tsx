@@ -20,6 +20,17 @@ const ICONS = {
 };
 
 export const LockButton = (props: LockIconProps) => {
+  const handleButtonClick = () => {
+    if (props.onChange) {
+      props.onChange();
+    }
+    const checked = !props.checked;
+    const button = document.querySelector(".ToolIcon_type_button");
+    if (button) {
+      button.setAttribute("data-checked", checked ? "true" : "false");
+    }
+  };
+
   return (
     <label
       className={clsx(
@@ -31,12 +42,12 @@ export const LockButton = (props: LockIconProps) => {
       )}
       title={`${props.title} — Q`}
     >
-      <input
-        className="ToolIcon_type_checkbox"
-        type="checkbox"
+      <button
+        className="ToolIcon_type_button"
+        type="button"
+        data-checked={props.checked ? "true" : "false"}
         name={props.name}
-        onChange={props.onChange}
-        checked={props.checked}
+        onClick={handleButtonClick}
         aria-label={props.title}
         data-testid="toolbar-lock"
       />

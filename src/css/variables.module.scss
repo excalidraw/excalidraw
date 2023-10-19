@@ -20,6 +20,25 @@
     }
   }
 
+  &.fillable {
+    .ToolIcon_type_button[data-checked="true"] + .ToolIcon__icon {
+      --icon-fill-color: var(--color-primary-darker);
+
+      svg {
+        fill: var(--icon-fill-color);
+      }
+    }
+  }
+
+  .ToolIcon_type_button[data-checked="true"] + .ToolIcon__icon {
+    background: var(--color-primary-light);
+    --keybinding-color: var(--color-gray-60);
+
+    svg {
+      color: var(--color-primary-darker);
+    }
+  }
+
   .ToolIcon_type_radio,
   .ToolIcon_type_checkbox {
     &:checked + .ToolIcon__icon {
