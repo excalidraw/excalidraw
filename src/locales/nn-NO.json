@@ -203,6 +203,7 @@
     "imageInsertError": "Kunne ikkje sette inn biletet. Prøv igjen seinare...",
     "fileTooBig": "Fila er for stor. Maksimal tillate storleik er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikkje sette inn SVG-biletet. SVG-koden ser ugyldig ut.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Ugyldig SVG.",
     "cannotResolveCollabServer": "Kunne ikkje kople til samarbeidsserveren. Ver vennleg å oppdatere inn sida og prøv på nytt.",
     "importLibraryError": "",
