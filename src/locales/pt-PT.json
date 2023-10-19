@@ -203,6 +203,7 @@
     "imageInsertError": "Não foi possível inserir a imagem, tente novamente mais tarde...",
     "fileTooBig": "O ficheiro é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG inválido.",
     "cannotResolveCollabServer": "Não foi possível fazer a ligação ao servidor colaborativo. Por favor, volte a carregar a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
