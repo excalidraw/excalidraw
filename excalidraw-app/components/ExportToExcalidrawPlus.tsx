@@ -80,7 +80,8 @@ export const ExportToExcalidrawPlus: React.FC<{
   appState: Partial<AppState>;
   files: BinaryFiles;
   onError: (error: Error) => void;
-}> = ({ elements, appState, files, onError }) => {
+  onSuccess: () => void;
+}> = ({ elements, appState, files, onError, onSuccess }) => {
   const { t } = useI18n();
   return (
     <Card color="primary">
@@ -107,6 +108,7 @@ export const ExportToExcalidrawPlus: React.FC<{
           try {
             trackEvent("export", "eplus", `ui (${getFrame()})`);
             await exportToExcalidrawPlus(elements, appState, files);
+            onSuccess();
           } catch (error: any) {
             console.error(error);
             if (error.name !== "AbortError") {
