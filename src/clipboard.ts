@@ -192,14 +192,15 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
  * Retrieves content from system clipboard (either from ClipboardEvent or
  *  via async clipboard API if supported)
  */
-export const getSystemClipboard = async (
+const getSystemClipboard = async (
   event: ClipboardEvent | null,
+  isPlainPaste = false,
 ): Promise<
   | { type: "text"; value: string }
   | { type: "mixedContent"; value: PastedMixedContent }
 > => {
   try {
-    const mixedContent = event && maybeParseHTMLPaste(event);
+    const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
     if (mixedContent) {
       return { type: "mixedContent", value: mixedContent };
     }
@@ -222,7 +223,7 @@ export const parseClipboard = async (
   event: ClipboardEvent | null,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
-  const systemClipboard = await getSystemClipboard(event);
+  const systemClipboard = await getSystemClipboard(event, isPlainPaste);
 
   if (systemClipboard.type === "mixedContent") {
     return {
