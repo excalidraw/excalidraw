@@ -40,19 +40,24 @@ export function adjustAppStateForCanvasSize(
   [canvasWidth, canvasHeight] = [canvasWidth, canvasHeight].map(
     (v) => v * scale,
   );
-  const scroll = {
-    scrollX:
-      viewportWidth > canvasWidth
-        ? (viewportWidth - canvasWidth) / 2 / scale
-        : 0,
-    scrollY:
-      viewportHeight > canvasHeight
-        ? (viewportHeight - canvasHeight) / 2 / scale
-        : 0,
-    zoom: {
-      value: getNormalizedZoom(scale),
-    },
-  };
+
+  const scroll =
+    round(scale, 2) !== round(state.zoom.value, 2)
+      ? {
+          scrollX:
+            viewportWidth > canvasWidth
+              ? (viewportWidth - canvasWidth) / 2 / scale
+              : 0,
+          scrollY:
+            viewportHeight > canvasHeight
+              ? (viewportHeight - canvasHeight) / 2 / scale
+              : 0,
+          zoom: {
+            value: getNormalizedZoom(scale),
+          },
+        }
+      : {};
+
   return {
     ...state,
     canvasSize,
@@ -80,4 +85,9 @@ export function adjustAppStateForCanvasSize(
           height: canvasSize.height,
         }),
   };
+}
+
+function round(num: number, decimalPlaces = 0) {
+  const p = Math.pow(10, decimalPlaces);
+  return Math.round(num * p) / p;
 }
