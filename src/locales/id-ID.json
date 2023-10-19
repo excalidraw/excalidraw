@@ -203,6 +203,7 @@
     "imageInsertError": "Tidak dapat menyisipkan gambar. Coba lagi nanti...",
     "fileTooBig": "File terlalu besar. Ukuran maksimum yang dibolehkan {{maxSize}}.",
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
     "importLibraryError": "Tidak dapat memuat pustaka",
