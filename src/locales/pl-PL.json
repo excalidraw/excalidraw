@@ -203,6 +203,7 @@
     "imageInsertError": "Nie udało się wstawić obrazu. Spróbuj ponownie później...",
     "fileTooBig": "Plik jest zbyt duży. Maksymalny dozwolony rozmiar to {{maxSize}}.",
     "svgImageInsertError": "Nie udało się wstawić obrazu SVG. Znacznik SVG wygląda na nieprawidłowy.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Nieprawidłowy SVG.",
     "cannotResolveCollabServer": "Nie można połączyć się z serwerem współpracy w czasie rzeczywistym. Proszę odświeżyć stronę i spróbować ponownie.",
     "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
