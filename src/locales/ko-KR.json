@@ -203,6 +203,7 @@
     "imageInsertError": "이미지를 삽입할 수 없습니다. 나중에 다시 시도 하십시오",
     "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{maxSize}} 입니다.",
     "svgImageInsertError": "SVG 이미지를 삽입하지 못했습니다. SVG 문법이 유효하지 않은 것 같습니다.",
+    "failedToFetchImage": "",
     "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
