@@ -193,7 +193,12 @@ export const actionSaveFileToDisk = register({
       );
       return {
         commitToHistory: false,
-        appState: { ...appState, openDialog: null, fileHandle },
+        appState: {
+          ...appState,
+          openDialog: null,
+          fileHandle,
+          toast: { message: t("toast.fileSaved") },
+        },
       };
     } catch (error: any) {
       if (error?.name !== "AbortError") {
