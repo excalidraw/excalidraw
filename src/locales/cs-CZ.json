@@ -203,6 +203,7 @@
     "imageInsertError": "Nelze vložit obrázek. Zkuste to později...",
     "fileTooBig": "Soubor je příliš velký. Maximální povolená velikost je {{maxSize}}.",
     "svgImageInsertError": "Nelze vložit SVG obrázek. Značení SVG je neplatné.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Neplatný SVG.",
     "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
     "importLibraryError": "Nelze načíst knihovnu",
