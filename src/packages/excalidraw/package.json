@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.16.1",
+  "name": "@notud/excalidraw",
+  "version": "0.16.2",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
@@ -11,7 +11,7 @@
     "access": "public"
   },
   "description": "Excalidraw as a React component",
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/enotefile/excalidraw",
   "license": "MIT",
   "keywords": [
     "excalidraw",
@@ -74,8 +74,8 @@
     "webpack-dev-server": "4.9.3",
     "webpack-merge": "5.8.0"
   },
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/src/packages/excalidraw",
+  "bugs": "https://github.com/enotefile/excalidraw/issues",
+  "homepage": "https://github.com/enotefile/excalidraw/tree/master/src/packages/excalidraw",
   "scripts": {
     "gen:types": "tsc --project ../../../tsconfig-types.json",
     "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",

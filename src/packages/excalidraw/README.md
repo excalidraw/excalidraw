@@ -1,19 +1,20 @@
 # Excalidraw
 
 **Excalidraw** is exported as a component to directly embed in your projects.
+This project is a beta version.
 
 ## Installation
 
 You can use `npm`
 
 ```bash
-npm install react react-dom @excalidraw/excalidraw
+npm install react react-dom @notud/excalidraw
 ```
 
 or via `yarn`
 
 ```bash
-yarn add react react-dom @excalidraw/excalidraw
+yarn add react react-dom @notud/excalidraw
 ```
 
 After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.

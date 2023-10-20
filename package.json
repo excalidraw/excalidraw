@@ -100,7 +100,6 @@
   "homepage": ".",
   "name": "excalidraw",
   "prettier": "@excalidraw/prettier-config",
-  "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true VITE_APP_DISABLE_TRACKING=true vite build",
