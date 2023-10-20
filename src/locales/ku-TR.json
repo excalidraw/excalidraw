@@ -109,8 +109,12 @@
     "createContainerFromText": "دەق لە چوارچێوەیەکدا بپێچە",
     "link": {
       "edit": "دەستکاریکردنی بەستەر",
+      "editEmbed": "",
       "create": "دروستکردنی بەستەر",
-      "label": "بەستەر"
+      "createEmbed": "",
+      "label": "بەستەر",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "دەستکاری کردنی دێڕ",
@@ -160,13 +164,16 @@
     "darkMode": "دۆخی تاریک",
     "lightMode": "دۆخی ڕووناک",
     "zenMode": "دۆخی زێن",
+    "objectsSnapMode": "",
     "exitZenMode": "بەجێهێشتنی دۆخی زێن",
     "cancel": "هەڵوەشاندنەوە",
     "clear": "خاوێنکردنەوە",
     "remove": "لابردن",
+    "embed": "",
     "publishLibrary": "بڵاوکردنەوە",
     "submit": "پێشکەشکردن",
-    "confirm": "دوپاتکردنەوە"
+    "confirm": "دوپاتکردنەوە",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "ئەمە هەموو تابلۆکە خاوێن دەکاتەوە، دڵنیایت؟",
@@ -196,6 +203,7 @@
     "imageInsertError": "نەیتوانی وێنە داخڵ بکات. دواتر هەوڵ بدە",
     "fileTooBig": "فایلەکە زۆر گەورەیە. زۆرترین قەبارەی ڕێگەپێدراو {{maxSize}}}.",
     "svgImageInsertError": "نەیتوانی وێنەی SVG داخڵ بکات. نیشانەی ئێس ڤی جی نادروست دیارە.",
+    "failedToFetchImage": "",
     "invalidSVGString": "ئێس ڤی جی نادروستە.",
     "cannotResolveCollabServer": "ناتوانێت پەیوەندی بکات بە سێرڤەری کۆلاب. تکایە لاپەڕەکە دووبارە باربکەوە و دووبارە هەوڵ بدەوە.",
     "importLibraryError": "نەیتوانی کتێبخانە بار بکات",
@@ -206,6 +214,10 @@
       "line2": "ئەمە ئەکرێ ببێتە هۆی تێکدانی <bold>دانە دەقییەکان</bold> لە وێنەکێشانەکانتدا.",
       "line3": "ئێمە بە توندی پێشنیاری لەکارخستنی ئەم ڕێکخستنە دەکەین. بۆ لە کارخستنی دەتوانیت بەم <link>هەنگاوانە</link>دا بڕۆیت.",
       "line4": "ئەگەر لەکارخستنی ئەم ڕێکخستنە نەبوە هۆی چاککردنەوەی پێشاندانی دانە دەقییەکان، تکایە <issueLink>کێشە</issueLink>یەک بکەرەوە لەسەر گیتهەبەکەمان، یان بۆمان بنوسە لەسەر <discordLink>دیسکۆرد</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "زیادکردن/ نوێکردنەوەی لینک بۆ شێوەی دیاریکراو",
     "eraser": "سڕەر",
     "frame": "ئامرازی چوارچێوە",
+    "embeddable": "",
+    "laser": "",
     "hand": "دەست (ئامرازی پانکردن)",
     "extraTools": "ئامرازی زیاتر"
   },
@@ -237,6 +251,7 @@
     "linearElement": "کرتە بکە بۆ دەستپێکردنی چەند خاڵێک، ڕایبکێشە بۆ یەک هێڵ",
     "freeDraw": "کرتە بکە و ڕایبکێشە، کاتێک تەواو بوویت دەست هەڵگرە",
     "text": "زانیاری: هەروەها دەتوانیت دەق زیادبکەیت بە دوو کرتەکردن لە هەر شوێنێک لەگەڵ ئامڕازی دەستنیشانکردن",
+    "embeddable": "",
     "text_selected": "دووجار کلیک بکە یان ENTER بکە بۆ دەستکاریکردنی دەق",
     "text_editing": "بۆ تەواوکردنی دەستکاریکردنەکە Escape یان Ctrl/Cmd+ENTER بکە",
     "linearElementMulti": "کلیک لەسەر کۆتا خاڵ بکە یان Escape یان Enter بکە بۆ تەواوکردن",
@@ -252,7 +267,8 @@
     "bindTextToElement": "بۆ زیادکردنی دەق enter بکە",
     "deepBoxSelect": "CtrlOrCmd ڕابگرە بۆ هەڵبژاردنی قووڵ، و بۆ ڕێگریکردن لە ڕاکێشان",
     "eraserRevert": "بۆ گەڕاندنەوەی ئەو توخمانەی کە بۆ سڕینەوە نیشانە کراون، Alt ڕابگرە",
-    "firefox_clipboard_write": "ئەم تایبەتمەندییە بە ئەگەرێکی زۆرەوە دەتوانرێت چالاک بکرێت بە ڕێکخستنی ئاڵای \"dom.events.asyncClipboard.clipboardItem\" بۆ \"true\". بۆ گۆڕینی ئاڵاکانی وێبگەڕ لە فایەرفۆکسدا، سەردانی لاپەڕەی \"about:config\" بکە."
+    "firefox_clipboard_write": "ئەم تایبەتمەندییە بە ئەگەرێکی زۆرەوە دەتوانرێت چالاک بکرێت بە ڕێکخستنی ئاڵای \"dom.events.asyncClipboard.clipboardItem\" بۆ \"true\". بۆ گۆڕینی ئاڵاکانی وێبگەڕ لە فایەرفۆکسدا، سەردانی لاپەڕەی \"about:config\" بکە.",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "ناتوانرێ پێشبینین پیشان بدرێت",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "هەڵگیراوە بۆ {filename}",
     "canvas": "تابلۆ",
     "selection": "دەستنیشانکراوەکان",
-    "pasteAsSingleElement": "بۆ دانانەوە وەکو یەک توخم یان دانانەوە بۆ نێو دەسکاریکەرێکی دەق کە بوونی هەیە {{shortcut}} بەکاربهێنە"
+    "pasteAsSingleElement": "بۆ دانانەوە وەکو یەک توخم یان دانانەوە بۆ نێو دەسکاریکەرێکی دەق کە بوونی هەیە {{shortcut}} بەکاربهێنە",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "ڕوون",
@@ -449,5 +467,36 @@
     "shades": "سێبەرەکان",
     "hexCode": "کۆدی هێکس",
     "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

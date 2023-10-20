@@ -22,11 +22,18 @@
   .App-toolbar__extra-tools-trigger {
     box-shadow: none;
     border: 0;
+    background-color: transparent;
 
     &:active {
       background-color: var(--button-hover-bg);
       box-shadow: 0 0 0 1px
         var(--button-active-border, var(--color-primary-darkest)) inset;
+    }
+
+    &--selected,
+    &--selected:hover {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
     }
   }
 

@@ -2,7 +2,8 @@ import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
-import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
+import { getFontString, updateActiveTool } from "../utils";
+import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
 import { getContainerElement, wrapText } from "./textElement";
 import { isEmbeddableElement } from "./typeChecks";
@@ -27,6 +28,7 @@ const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
 const RE_YOUTUBE =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;

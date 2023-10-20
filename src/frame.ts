@@ -14,7 +14,7 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "./element/textElement";
-import { arrayToMap, findIndex } from "./utils";
+import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
@@ -323,7 +323,24 @@ export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
 export const getFrameElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frameId: string,
-) => allElements.filter((element) => element.frameId === frameId);
+  opts?: { includeBoundArrows?: boolean },
+) => {
+  return allElements.filter((element) => {
+    if (element.frameId === frameId) {
+      return true;
+    }
+    if (opts?.includeBoundArrows && element.type === "arrow") {
+      const bindingId = element.startBinding?.elementId;
+      if (bindingId) {
+        const boundElement = Scene.getScene(element)?.getElement(bindingId);
+        if (boundElement?.frameId === frameId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  });
+};
 
 export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
@@ -451,91 +468,137 @@ export const getContainingFrame = (
   return null;
 };
 
+export const isValidFrameChild = (element: ExcalidrawElement) => {
+  return (
+    element.type !== "frame" &&
+    // arrows that are bound to elements cannot be frame children
+    (element.type !== "arrow" || (!element.startBinding && !element.endBinding))
+  );
+};
+
 // --------------------------- Frame Operations -------------------------------
+
+/**
+ * Retains (or repairs for target frame) the ordering invriant where children
+ * elements come right before the parent frame:
+ * [el, el, child, child, frame, el]
+ */
 export const addElementsToFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  const _elementsToAdd: ExcalidrawElement[] = [];
+  const { allElementsIndexMap, currTargetFrameChildrenMap } =
+    allElements.reduce(
+      (acc, element, index) => {
+        acc.allElementsIndexMap.set(element.id, index);
+        if (element.frameId === frame.id) {
+          acc.currTargetFrameChildrenMap.set(element.id, true);
+        }
+        return acc;
+      },
+      {
+        allElementsIndexMap: new Map<ExcalidrawElement["id"], number>(),
+        currTargetFrameChildrenMap: new Map<ExcalidrawElement["id"], true>(),
+      },
+    );
 
-  for (const element of elementsToAdd) {
-    _elementsToAdd.push(element);
+  const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
 
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      _elementsToAdd.push(boundTextElement);
-    }
-  }
+  const finalElementsToAdd: ExcalidrawElement[] = [];
 
-  const allElementsIndex = allElements.reduce(
-    (acc: Record<string, number>, element, index) => {
-      acc[element.id] = index;
-      return acc;
-    },
-    {},
-  );
-
-  const frameIndex = allElementsIndex[frame.id];
-  // need to be calculated before the mutation below occurs
-  const leftFrameBoundaryIndex = findIndex(
-    allElements,
-    (e) => e.frameId === frame.id,
-  );
-
-  const existingFrameChildren = allElements.filter(
-    (element) => element.frameId === frame.id,
-  );
-
-  const addedFrameChildren_left: ExcalidrawElement[] = [];
-  const addedFrameChildren_right: ExcalidrawElement[] = [];
-
+  // - add bound text elements if not already in the array
+  // - filter out elements that are already in the frame
   for (const element of omitGroupsContainingFrames(
     allElements,
-    _elementsToAdd,
+    elementsToAdd,
   )) {
-    if (element.frameId !== frame.id && !isFrameElement(element)) {
-      if (allElementsIndex[element.id] > frameIndex) {
-        addedFrameChildren_right.push(element);
-      } else {
-        addedFrameChildren_left.push(element);
+    if (!currTargetFrameChildrenMap.has(element.id)) {
+      if (!isValidFrameChild(element)) {
+        continue;
       }
+      finalElementsToAdd.push(element);
+    }
 
-      mutateElement(
-        element,
-        {
-          frameId: frame.id,
-        },
-        false,
-      );
+    const boundTextElement = getBoundTextElement(element);
+    if (
+      boundTextElement &&
+      !suppliedElementsToAddSet.has(boundTextElement.id) &&
+      !currTargetFrameChildrenMap.has(boundTextElement.id)
+    ) {
+      finalElementsToAdd.push(boundTextElement);
     }
   }
 
-  const frameElement = allElements[frameIndex];
-  const nextFrameChildren = addedFrameChildren_left
-    .concat(existingFrameChildren)
-    .concat(addedFrameChildren_right);
+  const finalElementsToAddSet = new Set(finalElementsToAdd.map((el) => el.id));
 
-  const nextFrameChildrenMap = nextFrameChildren.reduce(
-    (acc: Record<string, boolean>, element) => {
-      acc[element.id] = true;
-      return acc;
-    },
-    {},
-  );
+  const nextElements: ExcalidrawElement[] = [];
 
-  const nextOtherElements_left = allElements
-    .slice(0, leftFrameBoundaryIndex >= 0 ? leftFrameBoundaryIndex : frameIndex)
-    .filter((element) => !nextFrameChildrenMap[element.id]);
+  const processedElements = new Set<ExcalidrawElement["id"]>();
 
-  const nextOtherElement_right = allElements
-    .slice(frameIndex + 1)
-    .filter((element) => !nextFrameChildrenMap[element.id]);
+  for (const element of allElements) {
+    if (processedElements.has(element.id)) {
+      continue;
+    }
 
-  const nextElements = nextOtherElements_left
-    .concat(nextFrameChildren)
-    .concat([frameElement])
-    .concat(nextOtherElement_right);
+    processedElements.add(element.id);
+
+    if (
+      finalElementsToAddSet.has(element.id) ||
+      (element.frameId && element.frameId === frame.id)
+    ) {
+      // will be added in bulk once we process target frame
+      continue;
+    }
+
+    // target frame
+    if (element.id === frame.id) {
+      const currFrameChildren = getFrameElements(allElements, frame.id);
+      currFrameChildren.forEach((child) => {
+        processedElements.add(child.id);
+      });
+
+      // if not found, add all children on top by assigning the lowest index
+      const targetFrameIndex = allElementsIndexMap.get(frame.id) ?? -1;
+
+      const { newChildren_left, newChildren_right } = finalElementsToAdd.reduce(
+        (acc, element) => {
+          // if index not found, add on top of current frame children
+          const elementIndex = allElementsIndexMap.get(element.id) ?? Infinity;
+          if (elementIndex < targetFrameIndex) {
+            acc.newChildren_left.push(element);
+          } else {
+            acc.newChildren_right.push(element);
+          }
+          return acc;
+        },
+        {
+          newChildren_left: [] as ExcalidrawElement[],
+          newChildren_right: [] as ExcalidrawElement[],
+        },
+      );
+
+      nextElements.push(
+        ...newChildren_left,
+        ...currFrameChildren,
+        ...newChildren_right,
+        element,
+      );
+      continue;
+    }
+
+    nextElements.push(element);
+  }
+
+  for (const element of finalElementsToAdd) {
+    mutateElement(
+      element,
+      {
+        frameId: frame.id,
+      },
+      false,
+    );
+  }
 
   return nextElements;
 };
@@ -705,6 +768,17 @@ export const isElementInFrame = (
     : element;
 
   if (frame) {
+    // Perf improvement:
+    // For an element that's already in a frame, if it's not being dragged
+    // then there is no need to refer to geometry (which, yes, is slow) to check if it's in a frame.
+    // It has to be in its containing frame.
+    if (
+      !appState.selectedElementIds[element.id] ||
+      !appState.selectedElementsAreBeingDragged
+    ) {
+      return true;
+    }
+
     if (_element.groupIds.length === 0) {
       return elementOverlapsWithFrame(_element, frame);
     }
