@@ -363,18 +363,21 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
-  data: (
+  data: ((
     | {
         type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: ActiveTool | null },
+  ) & { locked?: boolean }) & {
+    lastActiveToolBeforeEraser?: ActiveTool | null;
+  },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
       ...appState.activeTool,
       type: "custom",
       customType: data.customType,
+      locked: data.locked ?? appState.activeTool.locked,
     };
   }
 
@@ -386,6 +389,7 @@ export const updateActiveTool = (
         : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
+    locked: data.locked ?? appState.activeTool.locked,
   };
 };
 

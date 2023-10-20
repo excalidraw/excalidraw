@@ -99,5 +99,7 @@ export const setCursorForShape = (
     interactiveCanvas.style.cursor = `url(${url}), auto`;
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
+  } else {
+    interactiveCanvas.style.cursor = CURSOR_TYPE.AUTO;
   }
 };
