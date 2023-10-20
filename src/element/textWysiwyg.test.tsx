@@ -8,7 +8,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
-import { queryByText, waitFor } from "@testing-library/react";
+import { queryByText } from "@testing-library/react";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import {
