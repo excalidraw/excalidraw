@@ -109,8 +109,12 @@
     "createContainerFromText": "將文字包於容器中",
     "link": {
       "edit": "編輯連結",
+      "editEmbed": "編輯連結&嵌入",
       "create": "建立連結",
-      "label": "連結"
+      "createEmbed": "建立連結&嵌入",
+      "label": "連結",
+      "labelEmbed": "連結&嵌入",
+      "empty": "未設定連結"
     },
     "lineEditor": {
       "edit": "編輯線條",
@@ -160,13 +164,16 @@
     "darkMode": "深色模式",
     "lightMode": "淺色模式",
     "zenMode": "專注模式",
+    "objectsSnapMode": "吸附至物件",
     "exitZenMode": "離開專注模式",
     "cancel": "取消",
     "clear": "清除",
     "remove": "刪除",
+    "embed": "切換嵌入",
     "publishLibrary": "發布",
     "submit": "送出",
-    "confirm": "確認"
+    "confirm": "確認",
+    "embeddableInteractionButton": "點擊以互動"
   },
   "alerts": {
     "clearReset": "這將會清除整個 canvas。你確定嗎？",
@@ -196,6 +203,7 @@
     "imageInsertError": "無法插入圖片。請稍後再試…",
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
+    "failedToFetchImage": "無法獲取圖片。",
     "invalidSVGString": "無效的 SVG。",
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
     "importLibraryError": "無法載入資料庫",
@@ -206,6 +214,10 @@
       "line2": "這可能造成您畫布中 <bold>文字元素</bold> 的異常。",
       "line3": "我們強烈建議您關閉此設定。您可以依照 <link>這些步驟</link> 來進行。",
       "line4": "若關閉此設定並未修復文字元素的顯示問題，請回報於我們 GitHub 上的 <issueLink>issue</issueLink>，或在 <discordLink>Discord</discordLink> 上告訴我們。"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "可嵌入元素無法加入資料庫",
+      "image": "即將支援加入圖片至資料庫！"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦",
     "frame": "框架工具",
+    "embeddable": "嵌入網站",
+    "laser": "雷射筆",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具"
   },
@@ -237,6 +251,7 @@
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
+    "embeddable": "點擊並拖移以建立嵌入網站",
     "text_selected": "雙擊滑鼠或按 Enter 以編輯文字",
     "text_editing": "按跳脫鍵或 Ctrl 或 Cmd + Enter 以結束編輯",
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
@@ -252,7 +267,8 @@
     "bindTextToElement": "按下 Enter 以加入文字。",
     "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳",
     "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素",
-    "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。"
+    "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。",
+    "disableSnapping": "按住 Ctrl 或 Cmd 以禁用吸附"
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "儲存為 {filename}",
     "canvas": "畫布",
     "selection": "已選項目",
-    "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器"
+    "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器",
+    "unableToEmbed": "目前不允許嵌入此網址。您可至 GitHub 提出 issue 以要求將此網址加入合格名單。",
+    "unrecognizedLinkFormat": "您嵌入的連結格式不符。請嘗試貼入原網站所提供的「嵌入」字串。"
   },
   "colors": {
     "transparent": "透明",
@@ -449,5 +467,36 @@
     "shades": "漸變色",
     "hexCode": "Hex 碼",
     "noShades": "沒有此顏色的漸變色"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "匯出為圖片",
+        "button": "匯出為圖片",
+        "description": "將場景匯出為可供匯入的圖片檔案"
+      },
+      "saveToDisk": {
+        "title": "儲存至硬碟",
+        "button": "儲存至硬碟",
+        "description": "將場景匯出為可供匯入的檔案"
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "匯出至 Excalidraw+",
+        "description": "將此場景儲存至您的 Excalidraw+ 工作區"
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "從檔案載入",
+        "button": "從檔案載入",
+        "description": "從檔案載入將<bold>取代您目前的內容</bold>。<br></br>可先使用下方的選項備份您的繪圖。"
+      },
+      "shareableLink": {
+        "title": "從連結載入",
+        "button": "取代我的內容",
+        "description": "載入外部繪圖將<bold>取代您目前的內容</bold>。<br></br>可先使用下方的選項備份您的繪圖。"
+      }
+    }
   }
 }
