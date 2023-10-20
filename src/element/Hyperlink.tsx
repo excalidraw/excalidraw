@@ -210,6 +210,7 @@ export const Hyperlink = ({
   };
   const { x, y } = getCoordsForPopover(element, appState);
   if (
+    appState.selectionElement ||
     appState.draggingElement ||
     appState.resizingElement ||
     appState.isRotating ||
