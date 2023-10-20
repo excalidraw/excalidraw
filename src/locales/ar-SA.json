@@ -50,7 +50,7 @@
     "veryLarge": "كبير جدا",
     "solid": "كامل",
     "hachure": "خطوط",
-    "zigzag": "",
+    "zigzag": "متعرج",
     "crossHatch": "خطوط متقطعة",
     "thin": "نحيف",
     "bold": "داكن",
@@ -106,11 +106,15 @@
     "increaseFontSize": "تكبير حجم الخط",
     "unbindText": "فك ربط النص",
     "bindText": "ربط النص بالحاوية",
-    "createContainerFromText": "",
+    "createContainerFromText": "نص مغلف في حاوية",
     "link": {
       "edit": "تعديل الرابط",
+      "editEmbed": "تحرير الرابط وإدراجه",
       "create": "إنشاء رابط",
-      "label": "رابط"
+      "createEmbed": "إنشاء رابط و إدراجه",
+      "label": "رابط",
+      "labelEmbed": "رابط و إدراج",
+      "empty": "لم يتم تعيين رابط"
     },
     "lineEditor": {
       "edit": "تحرير السطر",
@@ -124,9 +128,9 @@
     },
     "statusPublished": "نُشر",
     "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "تحديد جميع العناصر في الإطار",
+    "removeAllElementsFromFrame": "إزالة جميع العناصر من الإطار",
+    "eyeDropper": "اختيار اللون من القماش"
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -160,13 +164,16 @@
     "darkMode": "الوضع المظلم",
     "lightMode": "الوضع المضيء",
     "zenMode": "وضع التأمل",
+    "objectsSnapMode": "التقط إلى العناصر",
     "exitZenMode": "إلغاء الوضع الليلى",
     "cancel": "إلغاء",
     "clear": "مسح",
     "remove": "إزالة",
+    "embed": "تبديل الإدراج",
     "publishLibrary": "انشر",
     "submit": "أرسل",
-    "confirm": "تأكيد"
+    "confirm": "تأكيد",
+    "embeddableInteractionButton": "اضغط للتفاعل"
   },
   "alerts": {
     "clearReset": "هذا سيُزيل كامل اللوحة. هل أنت متأكد؟",
@@ -189,23 +196,28 @@
     "resetLibrary": "هذا سوف يمسح مكتبتك. هل أنت متأكد؟",
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفاً. التعاون المباشر معطل.",
-    "collabOfflineWarning": ""
+    "collabOfflineWarning": "لا يوجد اتصال بالانترنت.\nلن يتم حفظ التغييرات التي قمت بها!"
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
     "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG غير صالح.",
     "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
     "importLibraryError": "تعذر تحميل المكتبة",
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "يبدو أنك تستخدم متصفح Brave مع إعداد <bold>حظر صارم لتتبع البصمة</bold>.",
+      "line2": "قد يؤدي هذا إلى كسر <bold>عناصر النص</bold> في الرسومات الخاصة بك.",
+      "line3": "من المستحسن إلغاء تفعيل هذا الإعداد. يمكنك اتباع <link>هذه الخطوات</link> لفعل ذلك.",
+      "line4": "إذا لم يصلح تعطيل هذا الإعداد طريقة عرض النصوص، الرجاء كتابة <issueLink>بلاغ</issueLink> على حسابنا في GitHub، أو راسلنا على <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "لا يمكن إضافة العناصر القابلة للتضمين في المكتبة.",
+      "image": "سوف يتم دعم إضافة صور إلى المكتبة قريباً!"
     }
   },
   "toolBar": {
@@ -223,9 +235,11 @@
     "penMode": "وضع القلم - امنع اللمس",
     "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
-    "frame": "",
-    "hand": "",
-    "extraTools": ""
+    "frame": "أداة الإطار",
+    "embeddable": "تضمين ويب",
+    "laser": "مؤشر ليزر",
+    "hand": "يد (أداة الإزاحة)",
+    "extraTools": "المزيد من أﻷدوات"
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -237,6 +251,7 @@
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
+    "embeddable": "اضغط مع السحب لإنشاء موقع ويب مضمّن",
     "text_selected": "انقر نقراً مزدوجاً أو اضغط ادخال لتعديل النص",
     "text_editing": "اضغط على Esc أو (Ctrl أو Cmd) + Enter لإنهاء التعديل",
     "linearElementMulti": "انقر فوق النقطة الأخيرة أو اضغط على Esc أو Enter للإنهاء",
@@ -245,14 +260,15 @@
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط بأستمرار على SHIFT،\nاضغط بأستمرار على ALT أيضا لتغيير الحجم من المركز",
     "rotate": "يمكنك تقييد الزوايا من خلال الضغط على SHIFT أثناء الدوران",
     "lineEditor_info": "اضغط على مفتاح (Ctrl أو Cmd) و انقر بشكل مزدوج، أو اضغط على مفتاحي (Ctrl أو Cmd) و (Enter) لتعديل النقاط",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
+    "lineEditor_pointSelected": "اضغط على حذف لإزالة النقطة (النِّقَاط)، Ctrl/Cmd+D للتكرار، أو اسحب للانتقال",
+    "lineEditor_nothingSelected": "اختر نقطة لتعديلها (اضغط على SHIFT لتحديد عدة نِقَاط),\nأو اضغط على ALT و انقر بالفأرة لإضافة نِقَاط جديدة",
+    "placeImage": "انقر لوضع الصورة، أو انقر واسحب لتعيين حجمها يدوياً",
     "publishLibrary": "نشر مكتبتك",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "bindTextToElement": "اضغط على إدخال لإضافة نص",
+    "deepBoxSelect": "اضغط على Ctrl\\Cmd للاختيار العميق، ولمنع السحب",
+    "eraserRevert": "اضغط على Alt لاستعادة العناصر المعلَّمة للحذف",
+    "firefox_clipboard_write": "يمكن على الأرجح تمكين هذه الميزة عن طريق تعيين علم \"dom.events.asyncClipboard.clipboardItem\" إلى \"true\". لتغيير أعلام المتصفح في Firefox، قم بزيارة صفحة \"about:config\".",
+    "disableSnapping": "اضغط على Ctrl أو Cmd لتعطيل الالتقاط"
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -260,11 +276,11 @@
     "canvasTooBigTip": "نصيحة: حاول تحريك العناصر البعيدة بشكل أقرب قليلاً."
   },
   "errorSplash": {
-    "headingMain": "",
+    "headingMain": "حدث خطأ. حاول <button>تحديث الصفحة</button>.",
     "clearCanvasMessage": "إذا لم تعمل إعادة التحميل، حاول مرة أخرى ",
     "clearCanvasCaveat": " هذا سيؤدي إلى فقدان العمل ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "تم تتبع الخطأ في المعرف {{eventId}} على نظامنا.",
+    "openIssueMessage": "حرصنا على عدم إضافة معلومات المشهد في بلاغ الخطأ. في حال كون مشهدك لا يحمل أي معلومات خاصة نرجو المتابعة على <button>نظام تتبع الأخطاء</button>. نرجو إضافة المعلومات أدناه بنسخها ولصقها في محتوى البلاغ على GitHub.",
     "sceneContent": "محتوى المشهد:"
   },
   "roomDialog": {
@@ -294,16 +310,16 @@
   "helpDialog": {
     "blog": "اقرأ مدونتنا",
     "click": "انقر",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "تحديد عميق",
+    "deepBoxSelect": "تحديد عميق داخل المربع، ومنع السحب",
     "curvedArrow": "سهم مائل",
     "curvedLine": "خط مائل",
     "documentation": "دليل الاستخدام",
     "doubleClick": "انقر مرتين",
     "drag": "اسحب",
     "editor": "المحرر",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "تحرير سطر/نقاط سهم",
+    "editText": "تعديل النص / إضافة تسمية",
     "github": "عثرت على مشكلة؟ إرسال",
     "howto": "اتبع التعليمات",
     "or": "أو",
@@ -316,9 +332,9 @@
     "view": "عرض",
     "zoomToFit": "تكبير للملائمة",
     "zoomToSelection": "تكبير للعنصر المحدد",
-    "toggleElementLock": "",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "toggleElementLock": "إغلاق/فتح المحدد",
+    "movePageUpDown": "نقل الصفحة أعلى/أسفل",
+    "movePageLeftRight": "نقل الصفحة يسار/يمين"
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"
@@ -336,20 +352,20 @@
       "authorName": "اسمك أو اسم المستخدم",
       "libraryName": "اسم مكتبتك",
       "libraryDesc": "وصف مكتبتك لمساعدة الناس على فهم استخدامها",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "githubHandle": "معالج GitHub (اختياري)، حتى تتمكن من تحرير المكتبة عند إرسالها للمراجعة",
+      "twitterHandle": "اسم مستخدم تويتر (اختياري)، حتى نعرف من الذي سيتم الإشارة إليه عند الترويج عبر تويتر",
+      "website": "رابط إلى موقعك الشخصي أو في مكان آخر (اختياري)"
     },
     "errors": {
       "required": "مطلوب",
       "website": "أدخل عنوان URL صالح"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "تقديم مكتبتك لتضمينها في مستودع المكتبة العامة <link></link> لأشخاص آخرين لاستخدامها في رسومهم.",
+    "noteGuidelines": "تحتاج المكتبة إلى الموافقة أولا. يرجى قراءة <link>المعايير</link> قبل تقديمها. سوف تحتاج إلى حساب GitHub للتواصل وإجراء التغييرات عند الطلب، ولكن ليس مطلوبا بشكل صارم.",
+    "noteLicense": "تقديمك يعني موافقتك على نشر المكتبة المقدمة تحت <link>MIT ترخيص</link>، ما يعني أن لأي أحد الحق في استخدامها دون قيود.",
     "noteItems": "يجب أن يكون لكل عنصر مكتبة اسمه الخاص حتى يكون قابلاً للتصفية. سيتم تضمين عناصر المكتبة التالية:",
     "atleastOneLibItem": "يرجى تحديد عنصر مكتبة واحد على الأقل للبدء",
-    "republishWarning": ""
+    "republishWarning": "ملاحظة: بعض العناصر المحددة معينة على أنه نشرها أو تقديمها من قبل. يجب عليك فقط إعادة إرسال العناصر عند تحديث مكتبة موجودة أو إرسالها."
   },
   "publishSuccessDialog": {
     "title": "تم إرسال المكتبة",
@@ -360,27 +376,27 @@
     "removeItemsFromLib": "إزالة العناصر المحددة من المكتبة"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "تصدير الصورة",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "الخلفية",
+      "onlySelected": "المحدد فقط",
+      "darkMode": "الوضع الداكن",
+      "embedScene": "تضمين المشهد",
+      "scale": "الحجم",
+      "padding": "الهوامش"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "سيتم حفظ بيانات المشهد في ملف PNG/SVG المصدّر بحيث يمكن استعادة المشهد منه.\nسيزيد حجم الملف المصدر."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "تصدير بصيغة PNG",
+      "exportToSvg": "تصدير بصيغة SVG",
+      "copyPngToClipboard": "نسخ الـ PNG إلى الحافظة"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "نسخ إلى الحافظة"
     }
   },
   "encrypted": {
@@ -411,43 +427,76 @@
     "fileSavedToFilename": "حفظ باسم {filename}",
     "canvas": "لوحة الرسم",
     "selection": "العنصر المحدد",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "استخدم {{shortcut}} للصق كعنصر واحد،\nأو لصق في محرر نص موجود",
+    "unableToEmbed": "تضمين هذا الرابط غير مسموح حاليًا. افتح بلاغاً على GitHub لطلب عنوان Url القائمة البيضاء",
+    "unrecognizedLinkFormat": "الرابط الذي ضمنته لا يتطابق مع التنسيق المتوقع. الرجاء محاولة لصق النص 'المضمن' المُزوَد من موقع المصدر"
   },
   "colors": {
     "transparent": "شفاف",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "أسود",
+    "white": "أبيض",
+    "red": "أحمر",
+    "pink": "وردي",
+    "grape": "عنبي",
+    "violet": "بنفسجي",
+    "gray": "رمادي",
+    "blue": "أزرق",
+    "cyan": "سماوي",
+    "teal": "أزرق مخضر",
+    "green": "أخضر",
+    "yellow": "أصفر",
+    "orange": "برتقالي",
+    "bronze": "برونزي"
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "جميع بياناتك محفوظة محليا في المتصفح الخاص بك.",
+      "center_heading_plus": "هل تريد الذهاب إلى Excalidraw+ بدلاً من ذلك؟",
+      "menuHint": "التصدير والتفضيلات واللغات ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
-      "helpHint": ""
+      "menuHint": "التصدير والتفضيلات وغيرها...",
+      "center_heading": "الرسم البياني التصويري. بشكل مبسط.",
+      "toolbarHint": "اختر أداة و ابدأ الرسم!",
+      "helpHint": "الاختصارات و المساعدة"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "الألوان المخصصة الأكثر استخداما",
+    "colors": "الألوان",
+    "shades": "الدرجات",
+    "hexCode": "رمز Hex",
+    "noShades": "لا تتوفر درجات لهذا اللون"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "تصدير كصورة",
+        "button": "تصدير كصورة",
+        "description": "تصدير بيانات المشهد إلى ملف يمكنك الاستيراد منه لاحقاً."
+      },
+      "saveToDisk": {
+        "title": "حفظ الملف للجهاز",
+        "button": "حفظ الملف للجهاز",
+        "description": "تصدير بيانات المشهد إلى ملف يمكنك الاستيراد منه لاحقاً."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "تصدير إلى Excalidraw+",
+        "description": "حفظ المشهد إلى مساحة العمل +Excalidraw الخاصة بك."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "تحميل من ملف",
+        "button": "تحميل من ملف",
+        "description": "سيتم التحميل من الملف <bold>استبدال المحتوى الموجود</bold>.<br></br>يمكنك النسخ الاحتياطي لرسمك أولاً باستخدام أحد الخيارات أدناه."
+      },
+      "shareableLink": {
+        "title": "تحميل من رابط",
+        "button": "استبدال محتواي",
+        "description": "سيتسبب تحميل رسمة خارجية <bold>باستبدال محتواك الموجود حالياً</bold>.<br></br>بإمكانك إجراء النسخ الاحتياطي لرسمتك الحالية باستخدام أحد الخيارات أدناه."
+      }
+    }
   }
 }
