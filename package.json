@@ -49,11 +49,11 @@
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
-    "points-on-curve": "0.2.0",
+    "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "roughjs": "4.5.2",
+    "roughjs": "4.6.4",
     "sass": "1.51.0",
     "socket.io-client": "2.3.1",
     "tunnel-rat": "0.1.2"

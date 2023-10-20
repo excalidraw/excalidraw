@@ -12,6 +12,7 @@ import type {
 import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
+import { simplify } from "points-on-curve";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -334,7 +335,8 @@ export const _generateElementShape = (
 
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
-        shape = generator.polygon(element.points as [number, number][], {
+        const simplifiedPoints = simplify(element.points, 0.75);
+        shape = generator.curve(simplifiedPoints as [number, number][], {
           ...generateRoughOptions(element),
           stroke: "none",
         });
