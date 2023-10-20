@@ -494,12 +494,7 @@ const hitTestFreeDrawElement = (
   // for filled freedraw shapes, support
   // selecting from inside
   if (shape && shape.sets.length) {
-    return hitTestCurveInside(
-      shape,
-      x,
-      y,
-      element.roundness ? "round" : "sharp",
-    );
+    return hitTestCurveInside(shape, x, y, "round");
   }
 
   return false;
