@@ -109,8 +109,12 @@
     "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
+      "editEmbed": "",
       "create": "Buat tautan",
-      "label": "Tautan"
+      "createEmbed": "",
+      "label": "Tautan",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Edit tautan",
@@ -124,9 +128,9 @@
     },
     "statusPublished": "Telah terbit",
     "sidebarLock": "Biarkan sidebar tetap terbuka",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Pilih semua elemen di bingkai",
+    "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
+    "eyeDropper": "Ambil warna dari kanvas"
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -160,13 +164,16 @@
     "darkMode": "Mode gelap",
     "lightMode": "Mode terang",
     "zenMode": "Mode zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
     "clear": "Hapus",
     "remove": "Hapus",
+    "embed": "",
     "publishLibrary": "Terbitkan",
     "submit": "Kirimkan",
-    "confirm": "Konfirmasi"
+    "confirm": "Konfirmasi",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Ini akan menghapus semua yang ada dikanvas. Apakah kamu yakin ?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Tidak dapat menyisipkan gambar. Coba lagi nanti...",
     "fileTooBig": "File terlalu besar. Ukuran maksimum yang dibolehkan {{maxSize}}.",
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
     "importLibraryError": "Tidak dapat memuat pustaka",
@@ -206,6 +214,10 @@
       "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
       "line3": "Kami sangat menyarankan mematikan pengaturan ini. Anda dapat mengikuti <link>langkah-langkah ini</link> untuk melakukannya.",
       "line4": "Jika mematikan pengaturan ini tidak membenarkan tampilan elemen teks, mohon buka\n<issueLink>isu</issueLink> di GitHub kami, atau chat kami di <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -223,9 +235,11 @@
     "penMode": "Mode pena - mencegah sentuhan",
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
-    "frame": "",
+    "frame": "Alat bingkai",
+    "embeddable": "",
+    "laser": "",
     "hand": "Tangan (alat panning)",
-    "extraTools": ""
+    "extraTools": "Alat-alat lain"
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -237,6 +251,7 @@
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
+    "embeddable": "",
     "text_selected": "Klik ganda atau tekan ENTER untuk edit teks",
     "text_editing": "Tekan Escape atau CtrlAtauCmd+ENTER untuk selesai mengedit",
     "linearElementMulti": "Klik pada titik akhir atau tekan Escape atau Enter untuk menyelesaikan",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
     "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus",
-    "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\"."
+    "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -360,27 +376,27 @@
     "removeItemsFromLib": "Hapus item yang dipilih dari pustaka"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Ekspor gambar",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Latar",
+      "onlySelected": "Hanya yang dipilih",
+      "darkMode": "Mode gelap",
+      "embedScene": "Sematkan pemandangan",
+      "scale": "Skala",
+      "padding": "Lapisan"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Data pemandangan akan disimpan dalam file PNG/SVG yang diekspor sehingga pemandangan itu dapat dipulihkan darinya.\nAkan membesarkan ukuran file yang diekspor."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Ekspor ke PNG",
+      "exportToSvg": "Ekspor ke SVG",
+      "copyPngToClipboard": "Salin PNG ke papan klip"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Salin ke papan klip"
     }
   },
   "encrypted": {
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
     "selection": "pilihan",
-    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada"
+    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparan",
@@ -449,5 +467,36 @@
     "shades": "Nuansa",
     "hexCode": "Kode hexa",
     "noShades": "Tidak ada nuansa untuk warna ini"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Ekspor sebagai gambar",
+        "button": "Ekspor sebagai gambar",
+        "description": "Ekspor data pemandangan sebagai gambar yang dapat anda impor nanti."
+      },
+      "saveToDisk": {
+        "title": "Simpan ke disk",
+        "button": "Simpan ke disk",
+        "description": "Ekspor data pemandangan ke file yang dapat Anda dapat impor nanti."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Ekspor ke Excalidraw+",
+        "description": "Simpan pemandangan ke ruang kerja Excalidraw+ Anda."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Muat dari file",
+        "button": "Muat dari file",
+        "description": "Memuat dari file yang akan <bold>menggantikan konten Anda sekarang</bold>.<br></br>Anda dapat mencadangkan gambar anda dulu menggunakan opsi-opsi ini."
+      },
+      "shareableLink": {
+        "title": "Muat dari link",
+        "button": "Ganti konten saya",
+        "description": "Memuat dari file yang akan <bold>menggantikan konten Anda sekarang</bold>.<br></br>Anda dapat mencadangkan gambar anda dulu menggunakan opsi-opsi ini."
+      }
+    }
   }
 }

@@ -50,7 +50,7 @@
     "veryLarge": "特大",
     "solid": "ベタ塗り",
     "hachure": "斜線",
-    "zigzag": "",
+    "zigzag": "ジグザグ",
     "crossHatch": "網掛け",
     "thin": "細",
     "bold": "太字",
@@ -106,11 +106,15 @@
     "increaseFontSize": "フォントサイズを拡大",
     "unbindText": "テキストのバインド解除",
     "bindText": "テキストをコンテナにバインド",
-    "createContainerFromText": "",
+    "createContainerFromText": "コンテナ内でテキストを折り返す",
     "link": {
       "edit": "リンクを編集",
+      "editEmbed": "リンクの編集と埋め込み",
       "create": "リンクを作成",
-      "label": "リンク"
+      "createEmbed": "リンクの作成と埋め込み",
+      "label": "リンク",
+      "labelEmbed": "リンクと埋め込み",
+      "empty": "リンクが設定されていません"
     },
     "lineEditor": {
       "edit": "行を編集",
@@ -124,9 +128,9 @@
     },
     "statusPublished": "公開済み",
     "sidebarLock": "サイドバーを開いたままにする",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "フレーム内のすべての要素を選択",
+    "removeAllElementsFromFrame": "フレーム内のすべての要素を削除",
+    "eyeDropper": "キャンバスから色を選択"
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -160,13 +164,16 @@
     "darkMode": "ダークモード",
     "lightMode": "ライトモード",
     "zenMode": "Zenモード",
+    "objectsSnapMode": "",
     "exitZenMode": "集中モードをやめる",
     "cancel": "キャンセル",
     "clear": "消去",
     "remove": "削除",
+    "embed": "埋め込みの切り替え",
     "publishLibrary": "公開",
     "submit": "送信",
-    "confirm": "確認"
+    "confirm": "確認",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "この操作によってキャンバス全体が消えます。よろしいですか？",
@@ -196,16 +203,21 @@
     "imageInsertError": "画像を挿入できませんでした。後でもう一度お試しください...",
     "fileTooBig": "ファイルが大きすぎます。許可される最大サイズは {{maxSize}} です。",
     "svgImageInsertError": "SVGイメージを挿入できませんでした。SVGマークアップは無効に見えます。",
+    "failedToFetchImage": "",
     "invalidSVGString": "無効なSVGです。",
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
     "importLibraryError": "ライブラリを読み込めませんでした。",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "<bold>Aggressly Block Fingerprinting</bold> の設定が有効なBraveブラウザを使用しているようです。",
+      "line2": "これにより、図面の <bold>テキスト要素</bold> が壊れる可能性があります。",
+      "line3": "この設定を無効にすることを強く推奨します。 <link>設定手順</link> をこちらから確認できます。",
+      "line4": "この設定を無効にすると、テキスト要素の表示が修正されません。 GitHub で <issueLink>Issue</issueLink> を開くか、 <discordLink>Discord</discordLink> にご記入ください"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -223,9 +235,11 @@
     "penMode": "ペンモード - タッチ防止",
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
-    "frame": "",
+    "frame": "フレームツール",
+    "embeddable": "Web埋め込み",
+    "laser": "",
     "hand": "手 (パンニングツール)",
-    "extraTools": ""
+    "extraTools": "その他のツール"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -237,6 +251,7 @@
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
+    "embeddable": "",
     "text_selected": "テキストを編集するには、ダブルクリックまたはEnterキーを押します",
     "text_editing": "Esc キーまたは CtrlOrCmd+ENTER キーを押して編集を終了します",
     "linearElementMulti": "最後のポイントをクリックするか、エスケープまたはEnterを押して終了します",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Enterを押してテキストを追加",
     "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
     "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す",
-    "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。"
+    "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -360,27 +376,27 @@
     "removeItemsFromLib": "選択したアイテムをライブラリから削除"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "画像をエクスポート",
     "label": {
-      "withBackground": "",
+      "withBackground": "背景",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "ダークモード",
       "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "scale": "スケール",
+      "padding": "余白"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG にエクスポート",
+      "exportToSvg": "SVG にエクスポート",
+      "copyPngToClipboard": "クリップボードにPNGをコピー"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "クリップボードにコピー"
     }
   },
   "encrypted": {
@@ -411,24 +427,26 @@
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
     "selection": "選択",
-    "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け"
+    "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "透明",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "黒",
+    "white": "白",
+    "red": "赤",
+    "pink": "ピンク",
+    "grape": "グレープ",
+    "violet": "バイオレット",
+    "gray": "灰色",
+    "blue": "青",
+    "cyan": "シアン",
+    "teal": "ティール",
+    "green": "緑",
+    "yellow": "黄",
+    "orange": "オレンジ",
+    "bronze": "ブロンズ"
   },
   "welcomeScreen": {
     "app": {
@@ -444,10 +462,41 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
+    "mostUsedCustomColors": "最も使用されているカスタム色",
+    "colors": "色",
+    "shades": "影",
+    "hexCode": "Hexコード",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "画像としてエクスポート",
+        "button": "画像としてエクスポート",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "ディスクに保存",
+        "button": "ディスクに保存",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Excalidraw+にエクスポート",
+        "description": "Excalidraw+ ワークスペースにシーンを保存します。"
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "ファイルからロード",
+        "button": "ファイルからロード",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "リンクからロード",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

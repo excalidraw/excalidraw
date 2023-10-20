@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Sửa liên kết",
+      "editEmbed": "",
       "create": "Tạo liên kết",
-      "label": "Liên kết"
+      "createEmbed": "",
+      "label": "Liên kết",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Điều chỉnh nét",
@@ -160,13 +164,16 @@
     "darkMode": "Chế độ tối",
     "lightMode": "Chế độ sáng",
     "zenMode": "Chế độ zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Thoát chể độ zen",
     "cancel": "Hủy",
     "clear": "Làm sạch",
     "remove": "Xóa",
+    "embed": "",
     "publishLibrary": "Đăng tải",
     "submit": "Gửi",
-    "confirm": "Xác nhận"
+    "confirm": "Xác nhận",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Điều này sẽ dọn hết canvas. Bạn có chắc không?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Không thể thêm ảnh. Hãy thử lại sau...",
     "fileTooBig": "Tệp tin quá lớn. Dung lượng tối đa cho phép là {{maxSize}}.",
     "svgImageInsertError": "Không thể thêm ảnh SVG. Mã SVG có vẻ sai.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG không hợp lệ.",
     "cannotResolveCollabServer": "Không thể kết nối với máy chủ hợp tác. Hãy tải lại trang và thử lại.",
     "importLibraryError": "Không thể tải thư viện",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Thêm/ Chỉnh sửa liên kết cho hình được chọn",
     "eraser": "Xóa",
     "frame": "",
+    "embeddable": "",
+    "laser": "",
     "hand": "Tay kéo",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "Ấn để bắt đầu nhiểm điểm vẽ, kéo để vẽ một đường thẳng",
     "freeDraw": "Ấn bà kéo, thả khi bạn xong",
     "text": "Mẹo: bạn có thể thêm văn bản tại bất cứ đâu bằng cách ấn hai lần bằng tool lựa chọn",
+    "embeddable": "",
     "text_selected": "Ấn 2 lần hoặc nhấn ENTER để chỉnh văn bản",
     "text_editing": "Nhấn Escape hoặc Ctrl/Cmd+ENTER để hoàn thành chỉnh sửa",
     "linearElementMulti": "Nhấn vào điểm cuối hoặc nhấn Escape hoặc Enter để kết thúc",
@@ -252,7 +267,8 @@
     "bindTextToElement": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
-    "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\"."
+    "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Không thể xem trước",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "",
     "canvas": "canvas",
     "selection": "",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "",
@@ -449,5 +467,36 @@
     "shades": "",
     "hexCode": "",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

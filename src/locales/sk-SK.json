@@ -109,8 +109,12 @@
     "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
+      "editEmbed": "Editovať a zapustiť odkaz",
       "create": "Vytvoriť odkaz",
-      "label": "Odkaz"
+      "createEmbed": "Vytvoriť a zapustiť odkaz",
+      "label": "Odkaz",
+      "labelEmbed": "Zapustiť odkaz",
+      "empty": "Nie je nastavený žiaden odkaz"
     },
     "lineEditor": {
       "edit": "Upraviť čiaru",
@@ -124,8 +128,8 @@
     },
     "statusPublished": "Zverejnené",
     "sidebarLock": "Nechať bočný panel otvorený",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Vybrať všetky prvky v ráme",
+    "removeAllElementsFromFrame": "Odstrániť všetky prvky z rámu",
     "eyeDropper": "Vybrať farbu z plátna"
   },
   "library": {
@@ -160,13 +164,16 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Svetlý režim",
     "zenMode": "Režim zen",
+    "objectsSnapMode": "Prichytiť k objektom",
     "exitZenMode": "Zrušiť režim zen",
     "cancel": "Zrušiť",
     "clear": "Vymazať",
     "remove": "Odstrániť",
+    "embed": "Prepnúť zapustenie",
     "publishLibrary": "Uverejniť",
     "submit": "Potvrdiť",
-    "confirm": "Potvrdiť"
+    "confirm": "Potvrdiť",
+    "embeddableInteractionButton": "Kliknite pre interakciu"
   },
   "alerts": {
     "clearReset": "Týmto sa vyčistí celé plátno. Ste si istí?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Nepodarilo sa vložiť obrázok. Skúste to znova neskôr...",
     "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Nevalidné SVG.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
@@ -206,6 +214,10 @@
       "line2": "To môže spôsobiť nesprávne zobrazenie <bold>textových prvkov</bold> vo vašej kresbe.",
       "line3": "Dôrazne odporúčame vypnutie toho nastavenia. Môžete tak spraviť vykonaním <link>týchto krokov</link>.",
       "line4": "Ak vypnutie toho nastavenia nevyrieši problém so zobrazením textových prvkov, prosím ohláste <issueLink>problém</issueLink> na našom GitHub-e alebo nám napíšte na náš <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Zapustené prvky nie je možné pridať do knižnice.",
+      "image": "Podpora pre pridávanie obrázkov do knižnice bude dostupná už čoskoro!"
     }
   },
   "toolBar": {
@@ -223,9 +235,11 @@
     "penMode": "Režim pera – zabrániť dotyku",
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
-    "frame": "",
+    "frame": "Nástroj rám",
+    "embeddable": "Web Embed",
+    "laser": "",
     "hand": "Ruka (nástroj pre pohyb plátna)",
-    "extraTools": ""
+    "extraTools": "Ďalšie nástroje"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -237,6 +251,7 @@
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
+    "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
     "text_selected": "Použite dvojklik alebo stlačte Enter na editáciu textu",
     "text_editing": "Stlačte Escape alebo CtrlOrCmd+ENTER na ukončenie editovania",
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Stlačte enter na pridanie textu",
     "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu poťiahnutia",
     "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie",
-    "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\"."
+    "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\".",
+    "disableSnapping": "Podržte CtrlOrCmd pre vypnutie prichytávania"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
     "selection": "výberu",
-    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu"
+    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu",
+    "unableToEmbed": "Zapustenie tejto URL nie je povolené. Vytvorte issue na GitHub-e a požiadajte povolenie tejto URL",
+    "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou"
   },
   "colors": {
     "transparent": "Priehľadná",
@@ -449,5 +467,36 @@
     "shades": "Odtiene",
     "hexCode": "Hex kód",
     "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Exportovať ako obrázok",
+        "button": "Exportovať ako obrázok",
+        "description": "Exportovať údaje scény ako obrázok, z ktorého môžu byť neskôr importované."
+      },
+      "saveToDisk": {
+        "title": "Uložiť na disk",
+        "button": "Uložiť na disk",
+        "description": "Exportovať údaje scény do súboru, z ktorého môžu byť neskôr importované."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Exportovať ako Excalidraw+",
+        "description": "Uložiť scénu do vášho Excalidraw+ pracovného priestoru."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Načítať zo súboru",
+        "button": "Načítať zo súboru",
+        "description": "Načítanie zo súboru <bold>nahradí váš existujúci obsah</bold>.<br></br>Vašu kresbu môžete zálohovať jednou z nižšie uvedených možností."
+      },
+      "shareableLink": {
+        "title": "Načítať z odkazu",
+        "button": "Nahradiť môj obsah",
+        "description": "Načítanie externej kresby <bold>nahradí váš existujúci obsah</bold>.<br></br>Vašu kresbu môžete zálohovať jednou z nižšie uvedených možností."
+      }
+    }
   }
 }

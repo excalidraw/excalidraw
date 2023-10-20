@@ -109,8 +109,12 @@
     "createContainerFromText": "Envolver el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
+      "editEmbed": "Editar enlace e incrustar",
       "create": "Crear enlace",
-      "label": "Enlace"
+      "createEmbed": "Crear enlace e incrustar",
+      "label": "Enlace",
+      "labelEmbed": "Enlazar e incrustar",
+      "empty": "No se ha establecido un enlace"
     },
     "lineEditor": {
       "edit": "Editar línea",
@@ -124,9 +128,9 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Mantener barra lateral abierta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Seleccionar todos los elementos en el marco",
+    "removeAllElementsFromFrame": "Eliminar todos los elementos del marco",
+    "eyeDropper": "Seleccionar un color del lienzo"
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
@@ -160,13 +164,16 @@
     "darkMode": "Modo oscuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo Zen",
+    "objectsSnapMode": "Ajustar a los objetos",
     "exitZenMode": "Salir del modo Zen",
     "cancel": "Cancelar",
     "clear": "Borrar",
     "remove": "Eliminar",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "embeddableInteractionButton": "Pulsa para interactuar"
   },
   "alerts": {
     "clearReset": "Esto limpiará todo el lienzo. Estás seguro?",
@@ -196,16 +203,21 @@
     "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG no válido.",
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
     "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
+      "line1": "Parece que estás usando el navegador Brave con el ajuste <bold>Forzar el bloqueo de huellas digitales</bold> habilitado.",
+      "line2": "Esto podría resultar en errores en los <bold>Elementos de Texto</bold> en tus dibujos.",
+      "line3": "Recomendamos fuertemente deshabilitar esta configuración. Puedes seguir <link>estos pasos</link> sobre cómo hacerlo.",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,8 +236,10 @@
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
     "eraser": "Borrar",
     "frame": "",
+    "embeddable": "Incrustar Web",
+    "laser": "Puntero láser",
     "hand": "Mano (herramienta de panoramización)",
-    "extraTools": ""
+    "extraTools": "Más herramientas"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -237,6 +251,7 @@
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
+    "embeddable": "Haga clic y arrastre para crear un sitio web incrustado",
     "text_selected": "Doble clic o pulse ENTER para editar el texto",
     "text_editing": "Pulse Escape o Ctrl/Cmd + ENTER para terminar de editar",
     "linearElementMulti": "Haz clic en el último punto o presiona Escape o Enter para finalizar",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Presione Entrar para agregar",
     "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
     "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación",
-    "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\"."
+    "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\".",
+    "disableSnapping": "Mantén pulsado CtrlOrCmd para desactivar el ajuste"
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -360,27 +376,27 @@
     "removeItemsFromLib": "Eliminar elementos seleccionados de la biblioteca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imagen",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Fondo",
+      "onlySelected": "Sólo seleccionados",
+      "darkMode": "Modo oscuro",
+      "embedScene": "Incrustar escena",
+      "scale": "Escalar",
+      "padding": "Espaciado"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar a PNG",
+      "exportToSvg": "Exportar a SVG",
+      "copyPngToClipboard": "Copiar PNG al portapapeles"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar al portapapeles"
     }
   },
   "encrypted": {
@@ -411,24 +427,26 @@
     "fileSavedToFilename": "Guardado en {filename}",
     "canvas": "lienzo",
     "selection": "selección",
-    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un solo elemento,\no pegar en un editor de texto existente"
+    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un solo elemento,\no pegar en un editor de texto existente",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparente",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Negro",
+    "white": "Blanco",
+    "red": "Rojo",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
+    "gray": "Gris",
+    "blue": "Azul",
+    "cyan": "Cian",
+    "teal": "Turquesa",
+    "green": "Verde",
+    "yellow": "Amarillo",
+    "orange": "Naranja",
+    "bronze": "Bronce"
   },
   "welcomeScreen": {
     "app": {
@@ -444,10 +462,41 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
+    "mostUsedCustomColors": "Colores personalizados más utilizados",
+    "colors": "Colores",
     "shades": "",
-    "hexCode": "",
+    "hexCode": "Código Hexadecimal",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Exportar como imagen",
+        "button": "Exportar como imagen",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "Guardar en el disco",
+        "button": "Guardar en el disco",
+        "description": "Exporta los datos de la escena a un archivo desde el cual podrás importar más tarde."
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "Exportar a Excalidraw+",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Cargar desde un archivo",
+        "button": "Cargar desde un archivo",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "Cargar desde un enlace",
+        "button": "Reemplazar mi contenido",
+        "description": "Cargar un dibujo externo <bold>reemplazará tu contenido existente</bold>.<br></br>Puedes primero hacer una copia de seguridad de tu dibujo usando una de las opciones de abajo."
+      }
+    }
   }
 }

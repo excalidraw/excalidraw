@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
+      "editEmbed": "",
       "create": "লিঙ্ক তৈরী",
-      "label": "লিঙ্ক নামকরণ"
+      "createEmbed": "",
+      "label": "লিঙ্ক নামকরণ",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "",
@@ -160,13 +164,16 @@
     "darkMode": "ডার্ক মোড",
     "lightMode": "লাইট মোড",
     "zenMode": "জেন মোড",
+    "objectsSnapMode": "",
     "exitZenMode": "জেন মোড বন্ধ করুন",
     "cancel": "বাতিল",
     "clear": "সাফ",
     "remove": "বিয়োগ",
+    "embed": "",
     "publishLibrary": "সংগ্রহ প্রকাশ করুন",
     "submit": "জমা করুন",
-    "confirm": "নিশ্চিত করুন"
+    "confirm": "নিশ্চিত করুন",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "এটি পুরো ক্যানভাস সাফ করবে। আপনি কি নিশ্চিত?",
@@ -196,6 +203,7 @@
     "imageInsertError": "ছবি সন্নিবেশ করা যায়নি। পরে আবার চেষ্টা করুন...",
     "fileTooBig": "ফাইলটি খুব বড়। সর্বাধিক অনুমোদিত আকার হল {{maxSize}}৷",
     "svgImageInsertError": "এসভীজী ছবি সন্নিবেশ করা যায়নি। এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
+    "failedToFetchImage": "",
     "invalidSVGString": "এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
     "eraser": "ঝাড়ন",
     "frame": "",
+    "embeddable": "",
+    "laser": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "একাধিক বিন্দু শুরু করতে ক্লিক করুন, একক লাইনের জন্য টেনে আনুন",
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
+    "embeddable": "",
     "text_selected": "লেখা সম্পাদনা করতে ডাবল-ক্লিক করুন বা এন্টার টিপুন",
     "text_editing": "লেখা সম্পাদনা শেষ করতে এসকেপ বা কন্ট্রোল/কম্যান্ড যোগে এন্টার টিপুন",
     "linearElementMulti": "শেষ বিন্দুতে ক্লিক করুন অথবা শেষ করতে এসকেপ বা এন্টার টিপুন",
@@ -252,7 +267,8 @@
     "bindTextToElement": "লেখা যোগ করতে এন্টার টিপুন",
     "deepBoxSelect": "",
     "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "বাছাই",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "",
@@ -449,5 +467,36 @@
     "shades": "",
     "hexCode": "",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

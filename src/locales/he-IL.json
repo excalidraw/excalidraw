@@ -50,7 +50,7 @@
     "veryLarge": "גדול מאוד",
     "solid": "מוצק",
     "hachure": "קווים מקבילים קצרים להצגת כיוון וחדות שיפוע במפה",
-    "zigzag": "",
+    "zigzag": "זיגזג",
     "crossHatch": "קווים מוצלבים שתי וערב",
     "thin": "דק",
     "bold": "מודגש",
@@ -109,8 +109,12 @@
     "createContainerFromText": "ארוז טקסט במיכל",
     "link": {
       "edit": "עריכת קישור",
+      "editEmbed": "ערוך קישור ושבץ",
       "create": "יצירת קישור",
-      "label": "קישור"
+      "createEmbed": "צור קישור ושבץ",
+      "label": "קישור",
+      "labelEmbed": "קשר ושבץ",
+      "empty": "לא נקבע קישור"
     },
     "lineEditor": {
       "edit": "ערוך קו",
@@ -124,8 +128,8 @@
     },
     "statusPublished": "פורסם",
     "sidebarLock": "שמור את סרגל הצד פתוח",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "בחר את כל האלמנטים במסגרת",
+    "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
     "eyeDropper": ""
   },
   "library": {
@@ -160,13 +164,16 @@
     "darkMode": "מצב כהה",
     "lightMode": "מצב בהיר",
     "zenMode": "מצב זן",
+    "objectsSnapMode": "",
     "exitZenMode": "צא ממצב זן",
     "cancel": "ביטול",
     "clear": "ניקוי",
     "remove": "הסר",
+    "embed": "",
     "publishLibrary": "פרסום",
     "submit": "שליחה",
-    "confirm": "אשר"
+    "confirm": "אשר",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הקנבס. אתה בטוח?",
@@ -196,6 +203,7 @@
     "imageInsertError": "לא ניתן היה להוסיף את התמונה. אנא נסה שוב מאוחר יותר...",
     "fileTooBig": "הקובץ גדול מדי. הגודל המירבי המותר הינו {{maxSize}}.",
     "svgImageInsertError": "לא ניתן היה להוסיף את תמונת ה-SVG. הסימונים בתוך קובץ ה-SVG עשויים להיות שגויים.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG שגוי.",
     "cannotResolveCollabServer": "לא הצלחתי להתחבר לשרת השיתוף. אנא רענן את הדף ונסה שוב.",
     "importLibraryError": "לא ניתן היה לטעון את הספריה",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "הוספה/עדכון קישור של הצורה שנבחרה",
     "eraser": "מחק",
     "frame": "",
+    "embeddable": "",
+    "laser": "",
     "hand": "יד (כלי הזזה)",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
+    "embeddable": "",
     "text_selected": "לחץ לחיצה כפולה או הקש על אנטר לעריכת הטקסט",
     "text_editing": "כדי לסיים את העריכה לחץ על מקש Escape או על Ctrl (Cmd במחשבי אפל) ומקש Enter",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
@@ -252,7 +267,8 @@
     "bindTextToElement": "הקש Enter כדי להוספת טקסט",
     "deepBoxSelect": "החזק Ctrl / Cmd לבחירה עמוקה ולמניעת גרירה",
     "eraserRevert": "החזק Alt להחזרת רכיבים מסומנים למחיקה",
-    "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״."
+    "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "קנבאס",
     "selection": "בחירה",
-    "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים"
+    "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "שקוף",
@@ -449,5 +467,36 @@
     "shades": "",
     "hexCode": "",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

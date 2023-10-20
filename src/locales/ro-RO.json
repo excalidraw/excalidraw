@@ -109,8 +109,12 @@
     "createContainerFromText": "Încadrare text într-un container",
     "link": {
       "edit": "Editare URL",
+      "editEmbed": "Editare URL și încorporare",
       "create": "Creare URL",
-      "label": "URL"
+      "createEmbed": "Creare URL și încorporare",
+      "label": "URL",
+      "labelEmbed": "URL și încorporare",
+      "empty": "Nu este setat niciun URL"
     },
     "lineEditor": {
       "edit": "Editare linie",
@@ -160,13 +164,16 @@
     "darkMode": "Mod întunecat",
     "lightMode": "Mod luminos",
     "zenMode": "Mod zen",
+    "objectsSnapMode": "Ancorare la obiecte",
     "exitZenMode": "Ieșire din modul zen",
     "cancel": "Anulare",
     "clear": "Ștergere",
     "remove": "Eliminare",
+    "embed": "Comutare încorporare",
     "publishLibrary": "Publicare",
     "submit": "Trimitere",
-    "confirm": "Confirmare"
+    "confirm": "Confirmare",
+    "embeddableInteractionButton": "Clic pentru interacționare"
   },
   "alerts": {
     "clearReset": "Această opțiune va șterge întreaga pânză. Confirmi?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
     "importLibraryError": "Biblioteca nu a putut fi încărcată",
@@ -206,6 +214,10 @@
       "line2": "Acest lucru poate duce la întreruperea <bold>elementelor text</bold> din desene.",
       "line3": "Îți recomandăm ferm să dezactivezi această setare. Poți urma <link>acești pași</link> pentru a face acest lucru.",
       "line4": "Dacă dezactivarea acestei setări nu duce la remedierea afișării elementelor text, deschide un tichet de <issueLink>problemă</issueLink> pe pagina noastră de GitHub sau scrie-ne pe <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Elementele încorporabile nu pot fi adăugate la bibliotecă.",
+      "image": "În curând vor putea fi adăugate imagini în bibliotecă!"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
     "frame": "",
+    "embeddable": "Încorporare web",
+    "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
+    "embeddable": "Dă clic și trage pentru a crea un cod de încorporare de pagină web",
     "text_selected": "Dă dublu clic sau apasă tasta Enter pentru a edita textul",
     "text_editing": "Apasă tasta Escape sau Ctrl sau Cmd + Enter pentru a finaliza editarea",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă tasta Escape sau tasta Enter pentru a termina",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Apasă tasta Enter pentru a adăuga text",
     "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
     "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere",
-    "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”."
+    "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”.",
+    "disableSnapping": "Ține apăsat CtrlOrCmd pentru a dezactiva ancorarea"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Salvat în {filename}",
     "canvas": "pânza",
     "selection": "selecția",
-    "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent"
+    "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent",
+    "unableToEmbed": "Încorporarea acestui URL nu este permisă momentan. Deschideți un tichet cu probleme pe GitHub pentru a solicita adăugarea acestui URL în lista albă",
+    "unrecognizedLinkFormat": "URL-ul pe care l-ai încorporat nu coincide cu formatul așteptat. Încearcă să lipești șirul „de încorporat” furnizat de pagina sursă"
   },
   "colors": {
     "transparent": "Transparent",
@@ -449,5 +467,36 @@
     "shades": "Nuanțe",
     "hexCode": "Cod hexa",
     "noShades": "Nu este disponibilă nicio nuanță pentru această culoare"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Exportare ca imagine",
+        "button": "Exportare ca imagine",
+        "description": "Exportă datele scenei ca fișier din care poți importa mai târziu."
+      },
+      "saveToDisk": {
+        "title": "Salvare pe disc",
+        "button": "Salvare pe disc",
+        "description": "Exportă datele scenei pe un fișier din care poți importa mai târziu."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Exportare în Excalidraw+",
+        "description": "Salvează scena în spațiul de lucru Excalidraw+."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Încărcare din fișier",
+        "button": "Încărcare din fișier",
+        "description": "Încărcarea dintr-un fișier va <bold>înlocui conținutul existent</bold>.<br></br>Poți face mai întâi o copie de rezervă a desenului folosind una dintre opțiunile de mai jos."
+      },
+      "shareableLink": {
+        "title": "Încărcare din lnk",
+        "button": "Înlocuiește conținutul meu",
+        "description": "Încărcarea unui desen extern va <bold>înlocui conținutul existent</bold>.<br></br>Poți face mai întâi o copie de rezervă a desenului folosind una dintre opțiunile de mai jos."
+      }
+    }
   }
 }

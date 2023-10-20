@@ -109,8 +109,12 @@
     "createContainerFromText": "Zabalit text do kontejneru",
     "link": {
       "edit": "Upravit odkaz",
+      "editEmbed": "",
       "create": "Vytvořit odkaz",
-      "label": "Odkaz"
+      "createEmbed": "",
+      "label": "Odkaz",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Upravit čáru",
@@ -160,13 +164,16 @@
     "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
     "zenMode": "Zen mód",
+    "objectsSnapMode": "",
     "exitZenMode": "Opustit zen mód",
     "cancel": "Zrušit",
     "clear": "Vyčistit",
     "remove": "Odstranit",
+    "embed": "",
     "publishLibrary": "Zveřejnit",
     "submit": "Odeslat",
-    "confirm": "Potvrdit"
+    "confirm": "Potvrdit",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Toto vymaže celé plátno. Jste si jisti?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Nelze vložit obrázek. Zkuste to později...",
     "fileTooBig": "Soubor je příliš velký. Maximální povolená velikost je {{maxSize}}.",
     "svgImageInsertError": "Nelze vložit SVG obrázek. Značení SVG je neplatné.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Neplatný SVG.",
     "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
     "importLibraryError": "Nelze načíst knihovnu",
@@ -206,6 +214,10 @@
       "line2": "To by mohlo vést k narušení <bold>Textových elementů</bold> ve vašich výkresech.",
       "line3": "Důrazně doporučujeme zakázat toto nastavení. Můžete sledovat <link>tyto kroky</link> jak to udělat.",
       "line4": "Pokud vypnutí tohoto nastavení neopravuje zobrazení textových prvků, prosím, otevřete <issueLink>problém</issueLink> na našem GitHubu, nebo nám napište na <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Přidat/aktualizovat odkaz pro vybraný tvar",
     "eraser": "Guma",
     "frame": "",
+    "embeddable": "",
+    "laser": "",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
+    "embeddable": "",
     "text_selected": "Dvojklikem nebo stisknutím klávesy ENTER upravíte text",
     "text_editing": "Stiskněte Escape nebo Ctrl/Cmd+ENTER pro dokončení úprav",
     "linearElementMulti": "Klikněte na poslední bod nebo stiskněte Escape anebo Enter pro dokončení",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Stiskněte Enter pro přidání textu",
     "deepBoxSelect": "Podržte Ctrl/Cmd pro hluboký výběr a pro zabránění táhnutí",
     "eraserRevert": "Podržením klávesy Alt vrátíte prvky označené pro smazání",
-    "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\"."
+    "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Náhled nelze zobrazit",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden prvek,\nnebo vložte do existujícího textového editoru"
+    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden prvek,\nnebo vložte do existujícího textového editoru",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Průhledná",
@@ -449,5 +467,36 @@
     "shades": "Stíny",
     "hexCode": "Hex kód",
     "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

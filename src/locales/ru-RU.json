@@ -109,8 +109,12 @@
     "createContainerFromText": "Поместить текст в контейнер",
     "link": {
       "edit": "Редактировать ссылку",
+      "editEmbed": "",
       "create": "Создать ссылку",
-      "label": "Ссылка"
+      "createEmbed": "",
+      "label": "Ссылка",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Редактирование строки",
@@ -160,13 +164,16 @@
     "darkMode": "Темная тема",
     "lightMode": "Светлая тема",
     "zenMode": "Режим Дзен",
+    "objectsSnapMode": "Привязка к объектам",
     "exitZenMode": "Выключить режим концентрации внимания",
     "cancel": "Отменить",
     "clear": "Очистить",
     "remove": "Удалить",
+    "embed": "",
     "publishLibrary": "Опубликовать",
     "submit": "Отправить",
-    "confirm": "Подтвердить"
+    "confirm": "Подтвердить",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Не удалось вставить изображение. Попробуйте позже...",
     "fileTooBig": "Очень большой файл. Максимально разрешенный размер {{maxSize}}.",
     "svgImageInsertError": "Не удалось вставить изображение SVG. Разметка SVG выглядит недействительной.",
+    "failedToFetchImage": "Не удалось получить изображение.",
     "invalidSVGString": "Некорректный SVG.",
     "cannotResolveCollabServer": "Не удалось подключиться к серверу совместного редактирования. Перезагрузите страницу и повторите попытку.",
     "importLibraryError": "Не удалось загрузить библиотеку",
@@ -206,6 +214,10 @@
       "line2": "Это может привести к поломке <bold>Текстовых объектов</bold> на рисунке.",
       "line3": "Мы настоятельно рекомендуем отключить эту настройку. Для этого нужно выполнить <link>эти шаги</link>.",
       "line4": "Если отключение этой настройки не исправит отображение текстовых объектов, создайте <issueLink>issue</issueLink> на нашем GitHub или напишите нам в <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Добавить/обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
     "frame": "",
+    "embeddable": "",
+    "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
+    "embeddable": "",
     "text_selected": "Дважды щелкните мышью или нажмите ENTER, чтобы редактировать текст",
     "text_editing": "Нажмите Escape либо Ctrl или Cmd + ENTER для завершения редактирования",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Нажмите Enter для добавления текста",
     "deepBoxSelect": "Удерживайте Ctrl или Cmd для глубокого выделения, чтобы предотвратить перетаскивание",
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
-    "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\"."
+    "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Сохранено в {filename}",
     "canvas": "холст",
     "selection": "выделение",
-    "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор"
+    "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Прозрачный",
@@ -449,5 +467,36 @@
     "shades": "Оттенки",
     "hexCode": "Шестнадцатеричный код",
     "noShades": "Нет доступных оттенков для этого цвета"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Экспортировать как изображение",
+        "button": "Экспортировать как изображение",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "Сохранить на диск",
+        "button": "Сохранить на диск",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Экспорт в Excalidraw+",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Загрузить из файла",
+        "button": "Загрузить из файла",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "Загрузить по ссылке",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

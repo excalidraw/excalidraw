@@ -109,8 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
+      "editEmbed": "Link bewerken & insluiten",
       "create": "Maak link",
-      "label": "Link"
+      "createEmbed": "Link maken en insluiten",
+      "label": "Link",
+      "labelEmbed": "Link toevoegen & insluiten",
+      "empty": "Er is geen link ingesteld"
     },
     "lineEditor": {
       "edit": "Bewerk regel",
@@ -160,13 +164,16 @@
     "darkMode": "Donkere modus",
     "lightMode": "Lichte modus",
     "zenMode": "Zen modus",
+    "objectsSnapMode": "",
     "exitZenMode": "Verlaat zen modus",
     "cancel": "Annuleren",
     "clear": "Wissen",
     "remove": "Verwijderen",
+    "embed": "Insluiten in-/uitschakelen",
     "publishLibrary": "Publiceren",
     "submit": "Versturen",
-    "confirm": "Bevestigen"
+    "confirm": "Bevestigen",
+    "embeddableInteractionButton": "Klik voor interactie"
   },
   "alerts": {
     "clearReset": "Dit zal het hele canvas verwijderen. Weet je het zeker?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Afbeelding invoegen mislukt. Probeer het later opnieuw...",
     "fileTooBig": "Bestand is te groot. Maximale grootte is {{maxSize}}.",
     "svgImageInsertError": "Kon geen SVG-afbeelding invoegen. De SVG-opmaak ziet er niet geldig uit.",
+    "failedToFetchImage": "",
     "invalidSVGString": "Ongeldige SVG.",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Ingesloten elementen kunnen niet worden toegevoegd aan de bibliotheek.",
+      "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "frame": "",
+    "embeddable": "Web insluiten",
+    "laser": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
+    "embeddable": "Klink-sleep om een website-insluiting te maken",
     "text_selected": "Dubbelklik of druk op ENTER om tekst te bewerken",
     "text_editing": "Druk op Escape of CtrlOrCmd+ENTER om het bewerken te voltooien",
     "linearElementMulti": "Klik op het laatste punt of druk op Escape of Enter om te stoppen",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Druk op enter om tekst toe te voegen",
     "deepBoxSelect": "",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
     "selection": "selectie",
-    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor"
+    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
+    "unableToEmbed": "Het insluiten van deze url is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
+    "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken"
   },
   "colors": {
     "transparent": "Transparant",
@@ -449,5 +467,36 @@
     "shades": "",
     "hexCode": "",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

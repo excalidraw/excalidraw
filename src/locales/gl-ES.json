@@ -50,7 +50,7 @@
     "veryLarge": "Moi grande",
     "solid": "Sólido",
     "hachure": "Folleto",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Raiado transversal",
     "thin": "Estreito",
     "bold": "Groso",
@@ -109,8 +109,12 @@
     "createContainerFromText": "Envolver o texto nun contedor",
     "link": {
       "edit": "Editar ligazón",
+      "editEmbed": "",
       "create": "Crear ligazón",
-      "label": "Ligazón"
+      "createEmbed": "",
+      "label": "Ligazón",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Editar liña",
@@ -160,13 +164,16 @@
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Saír do modo zen",
     "cancel": "Cancelar",
     "clear": "Limpar",
     "remove": "Eliminar",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "embeddableInteractionButton": "Faga clic para interactuar"
   },
   "alerts": {
     "clearReset": "Isto limpará todo o lenzo. Estás seguro?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Non se puido inserir a imaxe. Probe de novo máis tarde...",
     "fileTooBig": "O ficheiro é demasiado grande. O tamaño máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Non se puido inserir como imaxe SVG. O marcado SVG semella inválido.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG inválido.",
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
     "importLibraryError": "Non se puido cargar a biblioteca",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,8 +236,10 @@
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
     "eraser": "Goma de borrar",
     "frame": "",
+    "embeddable": "Inserir na web",
+    "laser": "Punteiro láser",
     "hand": "Man (ferramenta de desprazamento)",
-    "extraTools": ""
+    "extraTools": "Máis ferramentas"
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -237,6 +251,7 @@
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
+    "embeddable": "Faga clic e arrastre para crear un sitio web embebido",
     "text_selected": "Dobre-clic ou prema ENTER para editar o texto",
     "text_editing": "Prema Escape ou CtrlOrCmd+ENTER para finalizar a edición",
     "linearElementMulti": "Faga clic no último punto ou prema Escape ou Enter para rematar",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Prema a tecla enter para engadir texto",
     "deepBoxSelect": "Manteña pulsado CtrlOrCmd para seleccionar en profundidade e evitar o arrastre",
     "eraserRevert": "Manteña pulsado Alt para reverter os elementos marcados para a súa eliminación",
-    "firefox_clipboard_write": "Esta función pódese activar establecendo a opción \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar as opcións do navegador en Firefox, visita a páxina \"about:config\"."
+    "firefox_clipboard_write": "Esta función pódese activar establecendo a opción \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar as opcións do navegador en Firefox, visita a páxina \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Non se pode mostrar a vista previa",
@@ -360,11 +376,11 @@
     "removeItemsFromLib": "Eliminar os elementos seleccionados da biblioteca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imaxe",
     "label": {
-      "withBackground": "",
+      "withBackground": "Fondo",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "Modo escuro",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -373,14 +389,14 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar a PNG",
+      "exportToSvg": "Exportar a SVG",
+      "copyPngToClipboard": "Copiar PNG ao portapapeis"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar ao portapapeis"
     }
   },
   "encrypted": {
@@ -411,24 +427,26 @@
     "fileSavedToFilename": "Gardado en {filename}",
     "canvas": "lenzo",
     "selection": "selección",
-    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente"
+    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparente",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
+    "black": "Negro",
+    "white": "Branco",
+    "red": "Vermello",
+    "pink": "Rosa",
+    "grape": "Uva",
+    "violet": "Violeta",
+    "gray": "Gris",
+    "blue": "Azul",
     "cyan": "",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "Verde",
+    "yellow": "Marelo",
+    "orange": "Laranxa",
+    "bronze": "Bronce"
   },
   "welcomeScreen": {
     "app": {
@@ -445,9 +463,40 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
+    "colors": "Cores",
     "shades": "",
     "hexCode": "",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Exportar como imaxe",
+        "button": "Exportar como imaxe",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "Gardar no disco",
+        "button": "Gardar no disco",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Exportar a Excalidraw+",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Cargar dende arquivo",
+        "button": "Cargar dende arquivo",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "Cargar dende un enlace",
+        "button": "Substituír o meu contido",
+        "description": ""
+      }
+    }
   }
 }
