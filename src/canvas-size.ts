@@ -5,6 +5,7 @@ import { AppProps, AppState, CanvasSize } from "./types";
 
 export function adjustAppStateForCanvasSize(
   state: AppState,
+  isSizeChanged: boolean,
   defaultCanvasSize?: AppProps["defaultCanvasSize"],
 ): AppState {
   if (state.canvasSize.mode === "infinite") {
@@ -21,42 +22,8 @@ export function adjustAppStateForCanvasSize(
   if (canvasSize.mode !== "fixed") {
     return { ...state, canvasSize };
   }
-  const { width: viewportWidth, height: viewportHeight } = state;
-  let { width: canvasWidth, height: canvasHeight } = canvasSize;
 
-  let scale = 0;
-  if (viewportWidth > canvasWidth) {
-    scale = Math.max(
-      viewportWidth / canvasWidth,
-      viewportHeight / canvasHeight,
-    );
-  } else {
-    scale = Math.min(
-      viewportWidth / canvasWidth,
-      viewportHeight / canvasHeight,
-    );
-  }
-
-  [canvasWidth, canvasHeight] = [canvasWidth, canvasHeight].map(
-    (v) => v * scale,
-  );
-
-  const scroll =
-    round(scale, 2) !== round(state.zoom.value, 2)
-      ? {
-          scrollX:
-            viewportWidth > canvasWidth
-              ? (viewportWidth - canvasWidth) / 2 / scale
-              : 0,
-          scrollY:
-            viewportHeight > canvasHeight
-              ? (viewportHeight - canvasHeight) / 2 / scale
-              : 0,
-          zoom: {
-            value: getNormalizedZoom(scale),
-          },
-        }
-      : {};
+  const scroll = updateCanvasSize(state, canvasSize, isSizeChanged);
 
   return {
     ...state,
@@ -87,7 +54,50 @@ export function adjustAppStateForCanvasSize(
   };
 }
 
-function round(num: number, decimalPlaces = 0) {
-  const p = Math.pow(10, decimalPlaces);
-  return Math.round(num * p) / p;
+function updateCanvasSize(
+  state: AppState,
+  canvasSize: CanvasSize,
+  isSizeChanged: boolean,
+) {
+  if (canvasSize.mode !== "fixed" || !isSizeChanged) {
+    return {};
+  }
+
+  const { width: viewportWidth, height: viewportHeight } = state;
+  let { width: canvasWidth, height: canvasHeight } = canvasSize;
+  let scale = 0;
+  if (viewportWidth > canvasWidth) {
+    scale = Math.max(
+      viewportWidth / canvasWidth,
+      viewportHeight / canvasHeight,
+    );
+  } else {
+    scale = Math.min(
+      viewportWidth / canvasWidth,
+      viewportHeight / canvasHeight,
+    );
+  }
+
+  [canvasWidth, canvasHeight] = [canvasWidth, canvasHeight].map(
+    (v) => v * scale,
+  );
+
+  return {
+    scrollX:
+      viewportWidth > canvasWidth
+        ? (viewportWidth - canvasWidth) / 2 / scale
+        : 0,
+    scrollY:
+      viewportHeight > canvasHeight
+        ? (viewportHeight - canvasHeight) / 2 / scale
+        : 0,
+    zoom: {
+      value: getNormalizedZoom(scale),
+    },
+  };
 }
+
+// function round(num: number, decimalPlaces = 0) {
+//   const p = Math.pow(10, decimalPlaces);
+//   return Math.round(num * p) / p;
+// }

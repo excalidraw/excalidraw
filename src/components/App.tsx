@@ -530,6 +530,7 @@ class App extends React.Component<AppProps, AppState> {
         width: window.innerWidth,
         height: window.innerHeight,
       },
+      true,
       defaultCanvasSize,
     );
 
@@ -1498,6 +1499,7 @@ class App extends React.Component<AppProps, AppState> {
           (state) => {
             return adjustAppStateForCanvasSize(
               newState as AppState,
+              false,
               this.props.defaultCanvasSize,
             );
           },
@@ -8426,6 +8428,7 @@ class App extends React.Component<AppProps, AppState> {
             offsetLeft,
             offsetTop,
           },
+          true,
           this.props.defaultCanvasSize,
         ),
         () => {
