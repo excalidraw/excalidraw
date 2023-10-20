@@ -6,7 +6,7 @@ export const getTextEditor = async (waitForEditor = true) => {
       ".excalidraw-textEditorContainer > textarea",
     ) as HTMLTextAreaElement;
   if (waitForEditor) {
-    waitFor(() => expect(query()).not.toBe(null));
+    await waitFor(() => expect(query()).not.toBe(null));
     return query();
   }
   return query();
