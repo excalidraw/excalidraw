@@ -46,7 +46,7 @@ describe("setActiveTool()", () => {
     expect(h.state.activeTool.type).toBe("rectangle");
   });
 
-  it("should setting custom tool", async () => {
+  it("should set custom tool", async () => {
     expect(h.state.activeTool.type).toBe("selection");
     excalidrawAPI.setActiveTool({ type: "custom", customType: "comment" });
     expect(h.state.activeTool.type).toBe("custom");
