@@ -1,9 +1,9 @@
 import { vi } from "vitest";
-import { Excalidraw } from "../packages/excalidraw/index";
-import { ExcalidrawImperativeAPI } from "../types";
-import { resolvablePromise } from "../utils";
-import { render } from "./test-utils";
-import { Pointer } from "./helpers/ui";
+import { Excalidraw } from "../../packages/excalidraw/index";
+import { ExcalidrawImperativeAPI } from "../../types";
+import { resolvablePromise } from "../../utils";
+import { render } from "../test-utils";
+import { Pointer } from "../helpers/ui";
 
 describe("event callbacks", () => {
   const h = window.h;
