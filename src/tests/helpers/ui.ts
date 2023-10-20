@@ -32,6 +32,7 @@ import {
 } from "../../element/typeChecks";
 import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { rotatePoint } from "../../math";
+import { getTextEditor } from "../queries/dom";
 
 const { h } = window;
 
@@ -476,11 +477,7 @@ export class UI {
       Keyboard.keyPress(KEYS.ENTER);
     }
 
-    const editor =
-      openedEditor ??
-      document.querySelector<HTMLTextAreaElement>(
-        ".excalidraw-textEditorContainer > textarea",
-      );
+    const editor = await getTextEditor();
     if (!editor) {
       throw new Error("Can't find wysiwyg text editor in the dom");
     }

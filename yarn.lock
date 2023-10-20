@@ -4684,6 +4684,11 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
+hachure-fill@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/hachure-fill/-/hachure-fill-0.5.2.tgz#d19bc4cc8750a5962b47fb1300557a85fcf934cc"
+  integrity sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==
+
 has-bigints@^1.0.1, has-bigints@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/has-bigints/-/has-bigints-1.0.2.tgz#0871bd3e3d51626f6ca0966668ba35d5602d6eaa"
@@ -6028,6 +6033,11 @@ points-on-curve@0.2.0, points-on-curve@^0.2.0:
   resolved "https://registry.yarnpkg.com/points-on-curve/-/points-on-curve-0.2.0.tgz#7dbb98c43791859434284761330fa893cb81b4d1"
   integrity sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A==
 
+points-on-curve@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/points-on-curve/-/points-on-curve-1.0.1.tgz#03fcdc08e48e3bfdc7e8bd1d7ccd4d5f11e132c6"
+  integrity sha512-3nmX4/LIiyuwGLwuUrfhTlDeQFlAhi7lyK/zcRNGhalwapDWgAGR82bUpmn2mA03vII3fvNCG8jAONzKXwpxAg==
+
 points-on-path@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/points-on-path/-/points-on-path-0.2.1.tgz#553202b5424c53bed37135b318858eacff85dd52"
@@ -6449,11 +6459,12 @@ rollup@^3.25.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-roughjs@4.5.2:
-  version "4.5.2"
-  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.5.2.tgz#aab644dcb41e9a75826c8bd5a5b0a859095f2f10"
-  integrity sha512-2xSlLDKdsWyFxrveYWk9YQ/Y9UfK38EAMRNkYkMqYBJvPX8abCa9PN0x3w02H8Oa6/0bcZICJU+U95VumPqseg==
+roughjs@4.6.4:
+  version "4.6.4"
+  resolved "https://registry.yarnpkg.com/roughjs/-/roughjs-4.6.4.tgz#b6f39b44645854a6e0a4a28b078368701eb7f939"
+  integrity sha512-s6EZ0BntezkFYMf/9mGn7M8XGIoaav9QQBCnJROWB3brUWQ683Q2LbRD/hq0Z3bAJ/9NVpU/5LpiTWvQMyLDhw==
   dependencies:
+    hachure-fill "^0.5.2"
     path-data-parser "^0.1.0"
     points-on-curve "^0.2.0"
     points-on-path "^0.2.1"
