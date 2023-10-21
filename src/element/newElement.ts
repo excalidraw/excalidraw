@@ -374,6 +374,7 @@ export const newLinearElement = (
     endBinding: null,
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
+    segmentSplitIndices: [],
   };
 };
 

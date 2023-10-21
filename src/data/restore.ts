@@ -285,6 +285,7 @@ const restoreElement = (
         points,
         x,
         y,
+        segmentSplitIndices: [],
       });
     }
 

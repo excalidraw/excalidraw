@@ -1472,6 +1472,28 @@ export class LinearElementEditor {
 
     return coords;
   };
+
+  static toggleSegmentSplitAtIndex(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    appState: AppState,
+    index: number,
+  ) {
+    let found = false;
+    const splitIndices = (element.segmentSplitIndices || []).filter((idx) => {
+      if (idx === index) {
+        found = true;
+        return false;
+      }
+      return true;
+    });
+    if (!found) {
+      splitIndices.push(index);
+    }
+
+    mutateElement(element, {
+      segmentSplitIndices: splitIndices,
+    });
+  }
 }
 
 const normalizeSelectedPoints = (
