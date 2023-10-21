@@ -1,5 +1,5 @@
 import { updateBoundElements } from "./binding";
-import { getCommonBounds } from "./bounds";
+import { Bounds, getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
@@ -8,7 +8,11 @@ import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
-import { isFrameElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isFrameElement,
+} from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -35,44 +39,41 @@ export const dragSelectedElements = (
   if (frames.length > 0) {
     const elementsInFrames = scene
       .getNonDeletedElements()
+      .filter((e) => !isBoundToContainer(e))
       .filter((e) => e.frameId !== null)
       .filter((e) => frames.includes(e.frameId!));
 
     elementsInFrames.forEach((element) => elementsToUpdate.add(element));
   }
 
+  const commonBounds = getCommonBounds(
+    Array.from(elementsToUpdate).map(
+      (el) => pointerDownState.originalElements.get(el.id) ?? el,
+    ),
+  );
+  const adjustedOffset = calculateOffset(
+    commonBounds,
+    offset,
+    snapOffset,
+    gridSize,
+  );
+
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(
-      pointerDownState,
-      element,
-      offset,
-      snapOffset,
-      gridSize,
-    );
+    updateElementCoords(pointerDownState, element, adjustedOffset);
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
     if (
+      // Don't update coords of arrow label since we calculate its position during render
+      !isArrowElement(element) &&
       // container isn't part of any group
       // (perf optim so we don't check `isSelectedViaGroup()` in every case)
-      !element.groupIds.length ||
-      // container is part of a group, but we're dragging the container directly
-      (appState.editingGroupId && !isSelectedViaGroup(appState, element))
+      (!element.groupIds.length ||
+        // container is part of a group, but we're dragging the container directly
+        (appState.editingGroupId && !isSelectedViaGroup(appState, element)))
     ) {
       const textElement = getBoundTextElement(element);
-      if (
-        textElement &&
-        // when container is added to a frame, so will its bound text
-        // so the text is already in `elementsToUpdate` and we should avoid
-        // updating its coords again
-        (!textElement.frameId || !frames.includes(textElement.frameId))
-      ) {
-        updateElementCoords(
-          pointerDownState,
-          textElement,
-          offset,
-          snapOffset,
-          gridSize,
-        );
+      if (textElement) {
+        updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
     updateBoundElements(element, {
@@ -81,23 +82,20 @@ export const dragSelectedElements = (
   });
 };
 
-const updateElementCoords = (
-  pointerDownState: PointerDownState,
-  element: NonDeletedExcalidrawElement,
+const calculateOffset = (
+  commonBounds: Bounds,
   dragOffset: { x: number; y: number },
   snapOffset: { x: number; y: number },
   gridSize: AppState["gridSize"],
-) => {
-  const originalElement =
-    pointerDownState.originalElements.get(element.id) ?? element;
-
-  let nextX = originalElement.x + dragOffset.x + snapOffset.x;
-  let nextY = originalElement.y + dragOffset.y + snapOffset.y;
+): { x: number; y: number } => {
+  const [x, y] = commonBounds;
+  let nextX = x + dragOffset.x + snapOffset.x;
+  let nextY = y + dragOffset.y + snapOffset.y;
 
   if (snapOffset.x === 0 || snapOffset.y === 0) {
     const [nextGridX, nextGridY] = getGridPoint(
-      originalElement.x + dragOffset.x,
-      originalElement.y + dragOffset.y,
+      x + dragOffset.x,
+      y + dragOffset.y,
       gridSize,
     );
 
@@ -109,6 +107,22 @@ const updateElementCoords = (
       nextY = nextGridY;
     }
   }
+  return {
+    x: nextX - x,
+    y: nextY - y,
+  };
+};
+
+const updateElementCoords = (
+  pointerDownState: PointerDownState,
+  element: NonDeletedExcalidrawElement,
+  dragOffset: { x: number; y: number },
+) => {
+  const originalElement =
+    pointerDownState.originalElements.get(element.id) ?? element;
+
+  const nextX = originalElement.x + dragOffset.x;
+  const nextY = originalElement.y + dragOffset.y;
 
   mutateElement(element, {
     x: nextX,

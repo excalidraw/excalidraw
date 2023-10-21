@@ -7,8 +7,6 @@
     margin-top: 0.25rem;
 
     &--mobile {
-      bottom: 55px;
-      top: auto;
       left: 0;
       width: 100%;
       row-gap: 0.75rem;
@@ -57,6 +55,11 @@
 
       @media screen and (min-width: 1921px) {
         height: 2.25rem;
+      }
+
+      &--selected {
+        background: var(--color-primary-light);
+        --icon-fill-color: var(--color-primary-darker);
       }
 
       &__text {

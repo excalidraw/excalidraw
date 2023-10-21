@@ -280,6 +280,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 6px; //zsviczian
+
+    .dropdown-menu--mobile {
+      bottom: 55px;
+      top: auto;
+    }
   }
 
   .App-mobile-menu {
@@ -601,6 +606,8 @@
     background-color: var(--island-bg-color);
 
     .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
       border-radius: 0;
     }
 
@@ -610,8 +617,8 @@
   }
 
   .App-toolbar--mobile {
-    overflow-x: auto;
-    max-width: 90vw;
+    overflow: visible;
+    max-width: 98vw;
 
     .ToolIcon__keybinding {
       display: block; //zsviczian

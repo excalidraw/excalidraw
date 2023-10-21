@@ -4,7 +4,7 @@ const autoprefixer = require("autoprefixer");
 const { parseEnvVariables } = require("./env");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
+//const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
 
 module.exports = {
   mode: "development",
@@ -44,6 +44,14 @@ module.exports = {
           "sass-loader",
         ],
       },
+      // So that type module works with webpack
+      // https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
         exclude:
@@ -58,7 +66,7 @@ module.exports = {
               transpileOnly: true,
               configFile: path.resolve(__dirname, "../tsconfig.dev.json"),
             },
-          },        
+          },
         ],
       },
       {

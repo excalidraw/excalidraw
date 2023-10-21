@@ -17,6 +17,7 @@ import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
+  isLaserPointerActive,
 } from "../appState";
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
@@ -463,6 +464,47 @@ export const actionToggleHandTool = register({
     };
   },
   keyTest: (event) => event.key === KEYS.H,
+});
+
+export const actionToggleLaserPointer = register({
+  name: "toggleLaserPointerTool",
+  viewMode: true,
+  trackEvent: { category: "menu" },
+  perform(elements, appState, _, app) {
+    let activeTool: AppState["activeTool"];
+
+    if (isLaserPointerActive(appState)) {
+      activeTool = updateActiveTool(appState, {
+        ...(appState.activeTool.lastActiveTool || {
+          type: appState.viewModeEnabled ? "hand" : "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
+      setCursor(
+        app.interactiveCanvas,
+        appState.viewModeEnabled ? CURSOR_TYPE.GRAB : CURSOR_TYPE.POINTER,
+      );
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "laser",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      commitToHistory: true,
+    };
+  },
+  checked: (appState) => appState.activeTool.type === "laser",
+  contextItemLabel: "labels.laser",
 });
 
 //zsviczian

@@ -19,7 +19,6 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
 } from "./element/types";
-import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
@@ -42,10 +41,7 @@ import { ColorPaletteCustom } from "./colors";
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
-  pointer?: {
-    x: number;
-    y: number;
-  };
+  pointer?: CollaboratorPointer;
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
@@ -59,6 +55,12 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+};
+
+export type CollaboratorPointer = {
+  x: number;
+  y: number;
+  tool: "pointer" | "laser";
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -88,21 +90,32 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type LastActiveTool =
+export type ToolType =
+  | "selection"
+  | "rectangle"
+  | "diamond"
+  | "ellipse"
+  | "arrow"
+  | "line"
+  | "freedraw"
+  | "text"
+  | "image"
+  | "eraser"
+  | "hand"
+  | "frame"
+  | "embeddable"
+  | "laser"
+  | "mermaid";
+
+export type ActiveTool =
   | {
-      type:
-        | typeof SHAPES[number]["value"]
-        | "eraser"
-        | "hand"
-        | "frame"
-        | "embeddable";
+      type: ToolType;
       customType: null;
     }
   | {
       type: "custom";
       customType: string;
-    }
-  | null;
+    };
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -199,23 +212,9 @@ export type AppState = {
      * indicates a previous tool we should revert back to if we deselect the
      * currently active tool. At the moment applies to `eraser` and `hand` tool.
      */
-    lastActiveTool: LastActiveTool;
+    lastActiveTool: ActiveTool | null;
     locked: boolean;
-  } & (
-    | {
-        type:
-          | typeof SHAPES[number]["value"]
-          | "eraser"
-          | "hand"
-          | "frame"
-          | "embeddable";
-        customType: null;
-      }
-    | {
-        type: "custom";
-        customType: string;
-      }
-  );
+  } & ActiveTool;
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -313,12 +312,12 @@ export type AppState = {
   customPens?: any[]; //zsviczian
   currentStrokeOptions?: any; //zsviczian
   resetCustomPen?: any; //zsviczian
-  gridColor: {Bold: string, Regular: string, MajorGridFrequency?: number}; //zsviczian
+  gridColor: { Bold: string; Regular: string; MajorGridFrequency?: number }; //zsviczian
   dynamicStyle: string; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 
-  snapLines: SnapLine[];
+  snapLines: readonly SnapLine[];
   originSnapOffset: {
     x: number;
     y: number;
@@ -421,7 +420,7 @@ export interface ExcalidrawProps {
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number };
+    pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
@@ -495,6 +494,7 @@ export interface ExcalidrawProps {
     //zsivzian
     appState: AppState,
   ) => JSX.Element | null;
+  renderMermaid?: boolean; //zsviczian
 }
 
 export type SceneData = {
@@ -587,6 +587,12 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
+  scrollToContent: App["scrollToContent"]; //zsviczian
+  addFiles: App["addFiles"]; //zsviczian
+  setSelection: App["setSelection"]; //zsviczian
+  addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"]; //zsviczian
+  togglePenMode: App["togglePenMode"];
+  setActiveTool: App["setActiveTool"];
 };
 
 export type PointerDownState = Readonly<{

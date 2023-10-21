@@ -13,6 +13,12 @@ Please add the latest change on the top under the correct section.
 
 ## 0.16.1 (2023-09-21)
 
+### Features
+
+- Add `selected` prop for `MainMenu.Item` and `MainMenu.ItemCustom` components to indicate active state. [7078](https://github.com/excalidraw/excalidraw/pull/7078)
+
+## 0.16.1 (2023-09-21)
+
 ## Excalidraw Library
 
 **_This section lists the updates made to the excalidraw library and will not affect the integration._**

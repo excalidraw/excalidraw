@@ -1,5 +1,6 @@
 {
   "labels": {
+    "laser": "Toggle laser pointer",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
@@ -238,8 +239,10 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "embeddable": "Web Embed",
+    "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
-    "extraTools": "More tools"
+    "extraTools": "More tools",
+    "mermaidToExcalidraw": "Mermaid to Excalidraw"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -498,5 +501,12 @@
         "description": "Loading external drawing will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first by using one of the options below."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid to Excalidraw",
+    "button": "Insert",
+    "description": "Currently only <flowchartLink>flowcharts</flowchartLink> are supported. The other types will be rendered as image in Excalidraw.",
+    "syntax": "Mermaid Syntax",
+    "preview": "Preview"
   }
 }
