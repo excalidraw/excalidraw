@@ -109,8 +109,12 @@
     "createContainerFromText": "Bilatu testua edukiontzi batean",
     "link": {
       "edit": "Editatu esteka",
+      "editEmbed": "Editatu esteka eta kapsulatu",
       "create": "Sortu esteka",
-      "label": "Esteka"
+      "createEmbed": "Sortu esteka eta kapsulatu",
+      "label": "Esteka",
+      "labelEmbed": "Esteka eta kapsula",
+      "empty": "Ez da estekarik ezarri"
     },
     "lineEditor": {
       "edit": "Editatu lerroa",
@@ -160,13 +164,16 @@
     "darkMode": "Modu iluna",
     "lightMode": "Modu argia",
     "zenMode": "Zen modua",
+    "objectsSnapMode": "Atxiki objektuei",
     "exitZenMode": "Irten Zen modutik",
     "cancel": "Utzi",
     "clear": "Garbitu",
     "remove": "Kendu",
+    "embed": "Aldatu kapsulatzea",
     "publishLibrary": "Argitaratu",
     "submit": "Bidali",
-    "confirm": "Bai"
+    "confirm": "Bai",
+    "embeddableInteractionButton": "Egin klik elkar eragiteko"
   },
   "alerts": {
     "clearReset": "Honek oihal osoa garbituko du. Ziur zaude?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Ezin izan da irudia txertatu. Saiatu berriro geroago...",
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
     "importLibraryError": "Ezin izan da liburutegia kargatu",
@@ -206,6 +214,10 @@
       "line2": "Honek zure marrazkietako <bold>Testu-elementuak</bold> hautsi ditzake.",
       "line3": "Ezarpen hau desgaitzea gomendatzen dugu. <link>urrats hauek</link> jarrai ditzakezu hori nola egin jakiteko.",
       "line4": "Ezarpen hau desgaituz gero, testu-elementuen bistaratzea konpontzen ez bada, ireki <issueLink>arazo</issueLink> gure GitHub-en edo idatzi iezaguzu <discordLink>Discord</discordLink> helbidera"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
+      "image": "Laster egongo da irudiak liburutegian gehitzeko laguntza!"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
     "frame": "Marko tresna",
+    "embeddable": "Web kapsulatzea",
+    "laser": "Laser punteroa",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago"
   },
@@ -237,6 +251,7 @@
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
+    "embeddable": "Egin klik eta arrastatu webgunea kapsulatzeko",
     "text_selected": "Egin klik bikoitza edo sakatu SARTU testua editatzeko",
     "text_editing": "Sakatu Esc edo Ctrl+SARTU editatzen amaitzeko",
     "linearElementMulti": "Egin klik azken puntuan edo sakatu Esc edo Sartu amaitzeko",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Sakatu Sartu testua gehitzeko",
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
     "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
-    "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera."
+    "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera.",
+    "disableSnapping": "Eduki sakatuta Ctrl edo Cmd tekla atxikipena desgaitzeko"
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
     "selection": "hautapena",
-    "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean"
+    "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean",
+    "unableToEmbed": "Url hau txertatzea ez da une honetan onartzen. Sortu issue bat GitHub-en Urla zerrenda zurian sartzea eskatzeko",
+    "unrecognizedLinkFormat": "Kapsulatu duzun esteka ez dator bat espero den formatuarekin. Mesedez, saiatu iturburu-guneak emandako 'kapsulatu' katea itsasten"
   },
   "colors": {
     "transparent": "Gardena",
@@ -449,5 +467,36 @@
     "shades": "Ñabardurak",
     "hexCode": "Hez kodea",
     "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Esportatu irudi gisa",
+        "button": "Esportatu irudi gisa",
+        "description": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun irudi gisa."
+      },
+      "saveToDisk": {
+        "title": "Gorde diskoan",
+        "button": "Gorde diskoan",
+        "description": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun fitxategi batan."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Esportatu Excalidraw+ra",
+        "description": "Gorde eszena zure Excalidraw+ laneko areara."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Fitxategitik kargatu",
+        "button": "Fitxategitik kargatu",
+        "description": "Fitxategi batetik kargatzeak <bold>lehendik duzun edukia ordezkatuko du</bold>.<br></br>Lehenengo marrazkiaren babeskopia egin dezakezu beheko aukeretako bat erabiliz."
+      },
+      "shareableLink": {
+        "title": "Estekatik kargatu",
+        "button": "Ordeztu nire edukia",
+        "description": "Kanpoko irudi bat kargatzeak <bold>lehendik duzun edukia ordezkatuko du</bold>.<br></br>. Zure marrazkiaren babeskopia egin dezakezu lehenik beheko aukeretako bat erabiliz."
+      }
+    }
   }
 }
