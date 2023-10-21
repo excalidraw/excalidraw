@@ -83,12 +83,12 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
     }
   };
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
       isMountedRef.current = false;
-    },
-    [],
-  );
+    };
+  }, []);
 
   const lastPointerTypeRef = useRef<PointerType | null>(null);
 

@@ -1,0 +1,32 @@
+# Frames
+
+## Ordering
+
+Frames should be ordered where frame children come first, followed by the frame element itself:
+
+```
+[
+  other_element,
+  frame1_child1,
+  frame1_child2,
+  frame1,
+  other_element,
+  frame2_child1,
+  frame2_child2,
+  frame2,
+  other_element,
+  ...
+]
+```
+
+If not oredered correctly, the editor will still function, but the elements may not be rendered and clipped correctly. Further, the renderer relies on this ordering for performance optimizations.
+
+# Arrows
+
+An arrow can be a child of a frame only if it has no binding (either start or end) to any other element, regardless of whether the bound element is inside the frame or not.
+
+This ensures that when an arrow is bound to an element outside the frame, it's rendered and behaves correctly.
+
+Therefore, when an arrow (that's a child of a frame) gets bound to an element, it's automatically removed from the frame.
+
+Bound-arrow is duplicated alongside a frame only if the arrow start is bound to an element within that frame.

@@ -155,7 +155,12 @@ const duplicateElements = (
             groupId,
           ).flatMap((element) =>
             isFrameElement(element)
-              ? [...getFrameElements(elements, element.id), element]
+              ? [
+                  ...getFrameElements(elements, element.id, {
+                    includeBoundArrows: true,
+                  }),
+                  element,
+                ]
               : [element],
           );
 
@@ -181,7 +186,9 @@ const duplicateElements = (
           continue;
         }
         if (isElementAFrame) {
-          const elementsInFrame = getFrameElements(sortedElements, element.id);
+          const elementsInFrame = getFrameElements(sortedElements, element.id, {
+            includeBoundArrows: true,
+          });
 
           elementsWithClones.push(
             ...markAsProcessed([

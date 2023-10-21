@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement, PointerType } from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { useAppProps, useDevice } from "../components/App";
 import {
@@ -214,15 +214,11 @@ export const SelectedShapeActions = ({
 };
 
 export const ShapesSwitcher = ({
-  interactiveCanvas,
   activeTool,
-  onImageAction,
   appState,
   app,
 }: {
-  interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
-  onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: UIAppState;
   app: AppClassProperties;
 }) => {
@@ -266,9 +262,13 @@ export const ShapesSwitcher = ({
               if (appState.activeTool.type !== value) {
                 trackEvent("toolbar", value, "ui");
               }
-              app.setActiveTool({ type: value });
               if (value === "image") {
-                onImageAction({ pointerType });
+                app.setActiveTool({
+                  type: value,
+                  insertOnCanvasDirectly: pointerType !== "mouse",
+                });
+              } else {
+                app.setActiveTool({ type: value });
               }
             }}
           />

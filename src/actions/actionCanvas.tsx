@@ -10,7 +10,7 @@ import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppClassProperties, AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey, setCursor, updateActiveTool } from "../utils";
+import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 import {
@@ -25,6 +25,7 @@ import {
 } from "../colors";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { Bounds } from "../element/bounds";
+import { setCursor } from "../cursor";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
