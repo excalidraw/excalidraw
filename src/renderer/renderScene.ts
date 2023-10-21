@@ -157,10 +157,13 @@ const fillCircle = (
   cy: number,
   radius: number,
   stroke = true,
+  noFill = false,
 ) => {
   context.beginPath();
   context.arc(cx, cy, radius, 0, Math.PI * 2);
-  context.fill();
+  if (!noFill) {
+    context.fill();
+  }
   if (stroke) {
     context.stroke();
   }
@@ -224,6 +227,7 @@ const renderSingleLinearPoint = (
   point: Point,
   radius: number,
   isSelected: boolean,
+  isSegmentSplitting: boolean,
   isPhantomPoint = false,
 ) => {
   context.strokeStyle = "#5e5ad8";
@@ -242,6 +246,16 @@ const renderSingleLinearPoint = (
     radius / appState.zoom.value,
     !isPhantomPoint,
   );
+  if (isSegmentSplitting) {
+    fillCircle(
+      context,
+      point[0],
+      point[1],
+      (radius + 4) / appState.zoom.value,
+      true,
+      true,
+    );
+  }
 };
 
 const renderLinearPointHandles = (
@@ -265,7 +279,9 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(context, appState, point, radius, isSelected);
+    const segmented = element.segmentSplitIndices ? element.segmentSplitIndices.includes(idx) : false;
+
+    renderSingleLinearPoint(context, appState, point, radius, isSelected, segmented);
   });
 
   //Rendering segment mid points
@@ -293,6 +309,7 @@ const renderLinearPointHandles = (
           segmentMidPoint,
           radius,
           false,
+          false,
         );
         highlightPoint(segmentMidPoint, context, appState);
       } else {
@@ -303,6 +320,7 @@ const renderLinearPointHandles = (
           segmentMidPoint,
           radius,
           false,
+          false,
         );
       }
     } else if (appState.editingLinearElement || points.length === 2) {
@@ -311,6 +329,7 @@ const renderLinearPointHandles = (
         appState,
         segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
+        false,
         false,
         true,
       );
