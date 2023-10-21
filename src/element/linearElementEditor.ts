@@ -1475,7 +1475,6 @@ export class LinearElementEditor {
 
   static toggleSegmentSplitAtIndex(
     element: NonDeleted<ExcalidrawLinearElement>,
-    appState: AppState,
     index: number,
   ) {
     let found = false;
@@ -1491,7 +1490,7 @@ export class LinearElementEditor {
     }
 
     mutateElement(element, {
-      segmentSplitIndices: splitIndices,
+      segmentSplitIndices: splitIndices.sort(),
     });
   }
 }

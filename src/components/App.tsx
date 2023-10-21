@@ -3750,9 +3750,27 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
+
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
+      const pointUnderCursorIndex = LinearElementEditor.getPointIndexUnderCursor(
+        selectedElements[0],
+        this.state.zoom,
+        sceneX,
+        sceneY,
+      );
+      if (pointUnderCursorIndex >= 0) {
+        LinearElementEditor.toggleSegmentSplitAtIndex(
+          selectedElements[0],
+          pointUnderCursorIndex,
+        );
+        return;
+      }
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (!this.state.editingLinearElement ||
@@ -3775,11 +3793,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     resetCursor(this.interactiveCanvas);
-
-    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-    );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
