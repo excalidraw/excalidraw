@@ -11,7 +11,7 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.16.1 (2023-09-21)
 
 ### Features
 
