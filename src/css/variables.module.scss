@@ -25,6 +25,7 @@
     &:checked + .ToolIcon__icon {
       background: var(--color-surface-primary-container);
       --keybinding-color: var(--color-on-primary-container);
+      --icon-fill-color: var(--color-on-primary-container); //zsviczian
 
       svg {
         color: var(--color-on-primary-container);
