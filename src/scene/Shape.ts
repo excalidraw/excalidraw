@@ -14,6 +14,7 @@ import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
 import { ROUGHNESS } from "../constants";
+import { Point } from "../types";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -228,7 +229,7 @@ export const _generateElementShape = (
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
-      const points = element.points.length ? element.points : [[0, 0]];
+      const points = element.points.length ? element.points : [[0, 0]] as Point[];
 
       // curve is always the first element
       // this simplifies finding the curve for an element
@@ -239,7 +240,20 @@ export const _generateElementShape = (
           shape = [generator.linearPath(points as [number, number][], options)];
         }
       } else {
-        shape = [generator.curve(points as [number, number][], options)];
+        const pointList: Point[][] = [];
+        const splits = element.segmentSplitIndices || [];
+        let currentIndex = 0;
+        for (const index of splits) {
+          const slice = points.slice(currentIndex, index + 1);
+          if (slice.length) {
+            pointList.push([...slice]);
+          }
+          currentIndex = index;
+        }
+        if (currentIndex < (points.length - 1)) {
+          pointList.push(points.slice(currentIndex));
+        }
+        shape = [generator.curve(pointList as [number, number][][], options)];
       }
 
       // add lines only in arrow

@@ -741,7 +741,7 @@ export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
 ): [number, number, number, number] => {
-  // This might be computationally heavey
+  // This might be computationally heavy
   const gen = rough.generator();
   const curve =
     element.roundness == null
