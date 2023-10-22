@@ -285,7 +285,7 @@ const restoreElement = (
         points,
         x,
         y,
-        segmentSplitIndices: [],
+        segmentSplitIndices: element.segmentSplitIndices ? [...element.segmentSplitIndices] : [],
       });
     }
 
