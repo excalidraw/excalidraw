@@ -203,7 +203,7 @@
     "imageInsertError": "Nepodarilo sa vložiť obrázok. Skúste to znova neskôr...",
     "fileTooBig": "Súbor je príliš veľký. Maximálna povolená veľkosť je {{maxSize}}.",
     "svgImageInsertError": "Nepodarilo sa vložiť SVG obrázok. SVG formát je pravdepodobne nevalidný.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Načítanie obrázka zlyhalo.",
     "invalidSVGString": "Nevalidné SVG.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
@@ -237,7 +237,7 @@
     "eraser": "Guma",
     "frame": "Nástroj rám",
     "embeddable": "Web Embed",
-    "laser": "",
+    "laser": "Laserový ukazovateľ",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje"
   },
