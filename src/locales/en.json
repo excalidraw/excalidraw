@@ -42,6 +42,8 @@
     "fontFamily": "Font family",
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
+    "noto": "Noto",
+    "fontWeight": "Font weight",
     "normal": "Normal",
     "code": "Code",
     "small": "Small",

@@ -128,6 +128,8 @@ export const SelectedShapeActions = ({
         <>
           {renderAction("changeFontSize")}
 
+          {renderAction("changeFontWeight")}
+
           {renderAction("changeFontFamily")}
 
           {suppportsHorizontalAlign(targetElements) &&

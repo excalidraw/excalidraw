@@ -220,7 +220,8 @@ export const createPlaceholderEmbeddableLabel = (
     Math.min(element.width / 2, element.width / text.length),
     element.width / 30,
   );
-  const fontFamily = FONT_FAMILY.Helvetica;
+  const fontFamily = FONT_FAMILY.Noto;
+  const fontWeight = "normal";
 
   const fontString = getFontString({
     fontSize,
@@ -235,6 +236,7 @@ export const createPlaceholderEmbeddableLabel = (
     backgroundColor: "transparent",
     fontFamily,
     fontSize,
+    fontWeight,
     text: wrapText(text, fontString, element.width - 20),
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,

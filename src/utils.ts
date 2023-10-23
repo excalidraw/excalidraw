@@ -3,12 +3,14 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  FONT_WEIGHT,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import {
   FontFamilyValues,
   FontString,
+  FontWeightValues,
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { ActiveTool, AppState, ToolType, Zoom } from "./types";
@@ -92,6 +94,19 @@ export const getFontFamilyString = ({
   return WINDOWS_EMOJI_FALLBACK_FONT;
 };
 
+export const getFontWeightString = ({
+  fontWeight,
+}: {
+  fontWeight: FontWeightValues;
+}) => {
+  for (const [fontWeightString, id] of Object.entries(FONT_WEIGHT)) {
+    if (id === fontWeight) {
+      return `${fontWeightString}`;
+    }
+  }
+  return FONT_WEIGHT.normal;
+};
+
 /** returns fontSize+fontFamily string for assignment to DOM elements */
 export const getFontString = ({
   fontSize,
@@ -100,7 +115,9 @@ export const getFontString = ({
   fontSize: number;
   fontFamily: FontFamilyValues;
 }) => {
-  return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+  return `${fontSize}px ${getFontFamilyString({
+    fontFamily,
+  })}` as FontString;
 };
 
 export const debounce = <T extends any[]>(

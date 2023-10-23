@@ -1,4 +1,4 @@
-import { AppState } from "../../src/types";
+import { AppState } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -49,7 +49,9 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_WEIGHT,
   FONT_FAMILY,
+  FONT_WEIGHT,
   ROUNDNESS,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -75,6 +77,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  FontWeightValues,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
@@ -708,6 +711,11 @@ export const actionChangeFontFamily = register({
         text: t("labels.code"),
         icon: FontFamilyCodeIcon,
       },
+      {
+        value: FONT_FAMILY.Noto,
+        text: t("labels.noto"),
+        icon: FontFamilyNormalIcon,
+      },
     ];
 
     return (
@@ -730,6 +738,77 @@ export const actionChangeFontFamily = register({
               return null;
             },
             appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeFontWeight = register({
+  name: "changeFontWeight",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              { fontWeight: value },
+            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            return newElement;
+          }
+
+          return oldElement;
+        },
+        true,
+      ),
+      appState: {
+        ...appState,
+        currentItemFontWeight: value,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <legend>{t("labels.fontWeight")}</legend>
+        <ButtonIconSelect<FontWeightValues | false>
+          group="font-weight"
+          options={[
+            {
+              value: FONT_WEIGHT.normal,
+              text: t("labels.normal"),
+              icon: TextAlignLeftIcon,
+              testId: "font-weight-normal",
+            },
+            {
+              value: FONT_WEIGHT.bold,
+              text: t("labels.bold"),
+              icon: TextAlignCenterIcon,
+              testId: "font-weight-bold",
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontWeight;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.fontWeight;
+              }
+              return null;
+            },
+            appState.currentItemFontWeight || DEFAULT_FONT_WEIGHT,
           )}
           onChange={(value) => updateData(value)}
         />

@@ -36,3 +36,17 @@
   font-display: swap;
   font-weight: 700;
 }
+
+@font-face {
+  font-family: "Noto";
+  src: url("GoNotoCurrent-Regular.ttf") format("truetype");
+  font-display: swap;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "Noto";
+  src: url("GoNotoCurrent-Bold.ttf") format("truetype");
+  font-display: swap;
+  font-weight: bold;
+}

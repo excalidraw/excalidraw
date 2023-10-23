@@ -1,6 +1,7 @@
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_WEIGHT,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -449,6 +450,7 @@ export const convertToExcalidrawElements = (
       case "text": {
         const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
+        const fontWeight = element?.fontWeight || DEFAULT_FONT_WEIGHT;
         const lineHeight =
           element?.lineHeight || getDefaultLineHeight(fontFamily);
         const text = element.text ?? "";
@@ -463,6 +465,7 @@ export const convertToExcalidrawElements = (
           width: metrics.width,
           height: metrics.height,
           fontFamily,
+          fontWeight,
           fontSize,
           ...element,
         });
