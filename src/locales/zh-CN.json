@@ -203,7 +203,7 @@
     "imageInsertError": "无法插入图像。请稍后再试……",
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "无法获取图片。",
     "invalidSVGString": "无效的 SVG。",
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
     "importLibraryError": "无法加载素材库",
