@@ -279,9 +279,20 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    const segmented = element.roundness ? (element.segmentSplitIndices ? element.segmentSplitIndices.includes(idx) : false) : false;
+    const segmented = element.roundness
+      ? element.segmentSplitIndices
+        ? element.segmentSplitIndices.includes(idx)
+        : false
+      : false;
 
-    renderSingleLinearPoint(context, appState, point, radius, isSelected, segmented);
+    renderSingleLinearPoint(
+      context,
+      appState,
+      point,
+      radius,
+      isSelected,
+      segmented,
+    );
   });
 
   //Rendering segment mid points

@@ -3759,19 +3759,20 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (selectedElements[0].roundness) {
-        const pointUnderCursorIndex = LinearElementEditor.getPointIndexUnderCursor(
-          selectedElements[0],
-          this.state.zoom,
-          sceneX,
-          sceneY,
-        );
+        const pointUnderCursorIndex =
+          LinearElementEditor.getPointIndexUnderCursor(
+            selectedElements[0],
+            this.state.zoom,
+            sceneX,
+            sceneY,
+          );
         if (pointUnderCursorIndex >= 0) {
           LinearElementEditor.toggleSegmentSplitAtIndex(
             selectedElements[0],
             pointUnderCursorIndex,
           );
           return;
-        } 
+        }
       }
       if (
         event[KEYS.CTRL_OR_CMD] &&

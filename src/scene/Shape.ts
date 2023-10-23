@@ -229,7 +229,9 @@ export const _generateElementShape = (
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
-      const points = element.points.length ? element.points : [[0, 0]] as Point[];
+      const points = element.points.length
+        ? element.points
+        : ([[0, 0]] as Point[]);
 
       // curve is always the first element
       // this simplifies finding the curve for an element
@@ -250,7 +252,7 @@ export const _generateElementShape = (
           }
           currentIndex = index;
         }
-        if (currentIndex < (points.length - 1)) {
+        if (currentIndex < points.length - 1) {
           pointList.push(points.slice(currentIndex));
         }
         shape = [generator.curve(pointList as [number, number][][], options)];

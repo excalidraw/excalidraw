@@ -1078,7 +1078,9 @@ export class LinearElementEditor {
       }
     });
 
-    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY, { segmentSplitIndices: splits });
+    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY, {
+      segmentSplitIndices: splits,
+    });
   }
 
   static addPoints(
@@ -1217,7 +1219,9 @@ export class LinearElementEditor {
       midpoint,
       ...element.points.slice(segmentMidpoint.index!),
     ];
-    const splits = (element.segmentSplitIndices || []).map((index) => (index >= segmentMidpoint.index!) ? (index + 1) : index);
+    const splits = (element.segmentSplitIndices || []).map((index) =>
+      index >= segmentMidpoint.index! ? index + 1 : index,
+    );
 
     mutateElement(element, {
       points,
@@ -1241,7 +1245,11 @@ export class LinearElementEditor {
     nextPoints: readonly Point[],
     offsetX: number,
     offsetY: number,
-    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding, segmentSplitIndices?: number[] },
+    otherUpdates?: {
+      startBinding?: PointBinding;
+      endBinding?: PointBinding;
+      segmentSplitIndices?: number[];
+    },
   ) {
     const nextCoords = getElementPointsCoords(element, nextPoints);
     const prevCoords = getElementPointsCoords(element, element.points);
