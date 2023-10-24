@@ -1042,13 +1042,15 @@ export class LinearElementEditor {
     let offsetX = 0;
     let offsetY = 0;
 
-    const isDeletingOriginPoint = pointIndices.includes(0);
+    const indexSet = new Set(pointIndices);
+
+    const isDeletingOriginPoint = indexSet.has(0);
 
     // if deleting first point, make the next to be [0,0] and recalculate
     // positions of the rest with respect to it
     if (isDeletingOriginPoint) {
       const firstNonDeletedPoint = element.points.find((point, idx) => {
-        return !pointIndices.includes(idx);
+        return !indexSet.has(idx);
       });
       if (firstNonDeletedPoint) {
         offsetX = firstNonDeletedPoint[0];
@@ -1057,7 +1059,7 @@ export class LinearElementEditor {
     }
 
     const nextPoints = element.points.reduce((acc: Point[], point, idx) => {
-      if (!pointIndices.includes(idx)) {
+      if (!indexSet.has(idx)) {
         acc.push(
           !acc.length ? [0, 0] : [point[0] - offsetX, point[1] - offsetY],
         );
@@ -1067,7 +1069,7 @@ export class LinearElementEditor {
 
     const splits: number[] = [];
     (element.segmentSplitIndices || []).forEach((index) => {
-      if (!pointIndices.includes(index)) {
+      if (!indexSet.has(index)) {
         let shift = 0;
         for (const pointIndex of pointIndices) {
           if (index > pointIndex) {
@@ -1079,7 +1081,7 @@ export class LinearElementEditor {
     });
 
     LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY, {
-      segmentSplitIndices: splits,
+      segmentSplitIndices: splits.sort((a, b) => a - b),
     });
   }
 
@@ -1225,7 +1227,7 @@ export class LinearElementEditor {
 
     mutateElement(element, {
       points,
-      segmentSplitIndices: splits,
+      segmentSplitIndices: splits.sort((a, b) => a - b),
     });
 
     ret.pointerDownState = {
@@ -1513,7 +1515,7 @@ export class LinearElementEditor {
     }
 
     mutateElement(element, {
-      segmentSplitIndices: splitIndices.sort(),
+      segmentSplitIndices: splitIndices.sort((a, b) => a - b),
     });
   }
 }
