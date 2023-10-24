@@ -362,16 +362,16 @@ const highlightPoint = (
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  renderAsSquare = false,
 ) => {
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
+  const radius = LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
 
-  fillCircle(
-    context,
-    point[0],
-    point[1],
-    LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
-    false,
-  );
+  if (renderAsSquare) {
+    fillSquare(context, point[0], point[1], radius * 2, false);
+  } else {
+    fillCircle(context, point[0], point[1], radius, false);
+  }
 };
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -393,10 +393,15 @@ const renderLinearElementPointHighlight = (
     element,
     hoverPointIndex,
   );
+  const segmented = element.roundness
+    ? element.segmentSplitIndices
+      ? element.segmentSplitIndices.includes(hoverPointIndex)
+      : false
+    : false;
+
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-
-  highlightPoint(point, context, appState);
+  highlightPoint(point, context, appState, segmented);
   context.restore();
 };
 
