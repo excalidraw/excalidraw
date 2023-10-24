@@ -3759,6 +3759,8 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (!event[KEYS.CTRL_OR_CMD]) {
+        // If double clicked without any ctrl/cmd modifier on top of a point,
+        // toggle split mode for that point. Else, treat as regular double click.
         const pointUnderCursorIndex =
           LinearElementEditor.getPointIndexUnderCursor(
             selectedElements[0],
