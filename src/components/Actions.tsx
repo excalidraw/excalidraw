@@ -11,7 +11,6 @@ import {
   hasBackground,
   hasStrokeStyle,
   hasStrokeWidth,
-  hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
 import { AppClassProperties, UIAppState, Zoom } from "../types";
@@ -20,7 +19,7 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement } from "../element/typeChecks";
+import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";

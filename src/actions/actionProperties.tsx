@@ -51,6 +51,7 @@ import {
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
+  STROKE_WIDTH,
   VERTICAL_ALIGN,
 } from "../constants";
 import {
@@ -358,16 +359,19 @@ export const actionChangeFillStyle = register({
               } (${getShortcutKey("Alt-Click")})`,
               icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
               active: allElementsZigZag ? true : undefined,
+              testId: `fill-hachure`,
             },
             {
               value: "cross-hatch",
               text: t("labels.crossHatch"),
               icon: FillCrossHatchIcon,
+              testId: `fill-cross-hatch`,
             },
             {
               value: "solid",
               text: t("labels.solid"),
               icon: FillSolidIcon,
+              testId: `fill-solid`,
             },
           ]}
           value={getFormValue(
@@ -415,19 +419,22 @@ export const actionChangeStrokeWidth = register({
         group="stroke-width"
         options={[
           {
-            value: 1,
+            value: STROKE_WIDTH.thin,
             text: t("labels.thin"),
             icon: StrokeWidthBaseIcon,
+            testId: "strokeWidth-thin",
           },
           {
-            value: 2,
+            value: STROKE_WIDTH.bold,
             text: t("labels.bold"),
             icon: StrokeWidthBoldIcon,
+            testId: "strokeWidth-bold",
           },
           {
-            value: 4,
+            value: STROKE_WIDTH.extraBold,
             text: t("labels.extraBold"),
             icon: StrokeWidthExtraBoldIcon,
+            testId: "strokeWidth-extraBold",
           },
         ]}
         value={getFormValue(
@@ -726,21 +733,25 @@ export const actionChangeFontFamily = register({
       value: FontFamilyValues;
       text: string;
       icon: JSX.Element;
+      testId: string;
     }[] = [
       {
         value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
         icon: FreedrawIcon,
+        testId: "font-family-virgil",
       },
       {
         value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
         icon: FontFamilyNormalIcon,
+        testId: "font-family-normal",
       },
       {
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: FontFamilyCodeIcon,
+        testId: "font-family-code",
       },
     ];
 
