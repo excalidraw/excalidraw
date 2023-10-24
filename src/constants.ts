@@ -302,6 +302,12 @@ export const ROUGHNESS = {
   cartoonist: 2,
 } as const;
 
+export const STROKE_WIDTH = {
+  thin: 1,
+  bold: 2,
+  extraBold: 4,
+} as const;
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
