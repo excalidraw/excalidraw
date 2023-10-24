@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";
@@ -13,9 +13,7 @@ import {
   render,
   screen,
   togglePopover,
-  waitFor,
 } from "./test-utils";
-import { defaultLang } from "../i18n";
 import { FONT_FAMILY } from "../constants";
 import { vi } from "vitest";
 
@@ -56,7 +54,7 @@ beforeEach(async () => {
   finger1.reset();
   finger2.reset();
 
-  await render(<ExcalidrawApp />);
+  await render(<Excalidraw handleKeyboardGlobally={true} />);
   h.setState({ height: 768, width: 1024 });
 });
 
@@ -441,26 +439,6 @@ describe("regression tests", () => {
       ctrlKey: true,
     });
     expect(h.state.zoom.value).toBe(1);
-  });
-
-  it("rerenders UI on language change", async () => {
-    // select rectangle tool to show properties menu
-    UI.clickTool("rectangle");
-    // english lang should display `thin` label
-    expect(screen.queryByTitle(/thin/i)).not.toBeNull();
-    fireEvent.click(document.querySelector(".dropdown-menu-button")!);
-
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: "de-DE" },
-    });
-    // switching to german, `thin` label should no longer exist
-    await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
-    // reset language
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: defaultLang.code },
-    });
-    // switching back to English
-    await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
   });
 
   it("make a group and duplicate it", () => {

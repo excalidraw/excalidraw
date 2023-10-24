@@ -104,14 +104,14 @@ export default defineConfig({
           "Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
         icons: [
           {
-            src: "logo-180x180.png",
-            sizes: "180x180",
+            src: "android-chrome-192x192.png",
+            sizes: "192x192",
             type: "image/png",
           },
           {
             src: "apple-touch-icon.png",
             type: "image/png",
-            sizes: "256x256",
+            sizes: "180x180",
           },
         ],
         start_url: "/",

@@ -12,10 +12,21 @@ import type {
 import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
+import { simplify } from "points-on-curve";
+import { ROUGHNESS } from "../constants";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
 const getDashArrayDotted = (strokeWidth: number) => [1.5, 6 + strokeWidth];
+
+function adjustRoughness(size: number, roughness: number): number {
+  if (size >= 50) {
+    return roughness;
+  }
+  const factor = 2 + (50 - size) / 10;
+
+  return roughness / factor;
+}
 
 export const generateRoughOptions = (
   element: ExcalidrawElement,
@@ -43,9 +54,13 @@ export const generateRoughOptions = (
     // calculate them (and we don't want the fills to be modified)
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
-    roughness: element.roughness,
+    roughness: adjustRoughness(
+      Math.min(element.width, element.height),
+      element.roughness,
+    ),
     stroke: element.strokeColor,
-    preserveVertices: continuousPath,
+    preserveVertices:
+      continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
 
   switch (element.type) {
@@ -334,7 +349,8 @@ export const _generateElementShape = (
 
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
-        shape = generator.polygon(element.points as [number, number][], {
+        const simplifiedPoints = simplify(element.points, 0.75);
+        shape = generator.curve(simplifiedPoints as [number, number][], {
           ...generateRoughOptions(element),
           stroke: "none",
         });

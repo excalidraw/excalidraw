@@ -43,6 +43,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
+import { isValidFrameChild } from "../frame";
 
 type RestoredAppState = Omit<
   AppState,
@@ -67,6 +68,7 @@ export const AllowedExcalidrawActiveTools: Record<
   frame: true,
   embeddable: true,
   hand: true,
+  laser: false,
 };
 
 export type RestoredDataState = {
@@ -188,7 +190,7 @@ const restoreElement = (
         fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      const text = element.text ?? "";
+      const text = (typeof element.text === "string" && element.text) || "";
 
       // line-height might not be specified either when creating elements
       // programmatically, or when importing old diagrams.
@@ -221,9 +223,17 @@ const restoreElement = (
         baseline,
       });
 
+      // if empty text, mark as deleted. We keep in array
+      // for data integrity purposes (collab etc.)
+      if (!text && !element.isDeleted) {
+        element = { ...element, originalText: text, isDeleted: true };
+        element = bumpVersion(element);
+      }
+
       if (refreshDimensions) {
         element = { ...element, ...refreshTextDimensions(element) };
       }
+
       return element;
     case "freedraw": {
       return restoreElementWithProperties(element, {
@@ -298,6 +308,7 @@ const restoreElement = (
     // We also don't want to throw, but instead return void so we filter
     // out these unsupported elements from the restored array.
   }
+  return null;
 };
 
 /**
@@ -386,7 +397,7 @@ const repairBoundElement = (
 };
 
 /**
- * Remove an element's frameId if its containing frame is non-existent
+ * resets `frameId` if no longer applicable.
  *
  * NOTE mutates elements.
  */
@@ -394,12 +405,16 @@ const repairFrameMembership = (
   element: Mutable<ExcalidrawElement>,
   elementsMap: Map<string, Mutable<ExcalidrawElement>>,
 ) => {
-  if (element.frameId) {
-    const containingFrame = elementsMap.get(element.frameId);
+  if (!element.frameId) {
+    return;
+  }
 
-    if (!containingFrame) {
-      element.frameId = null;
-    }
+  if (
+    !isValidFrameChild(element) ||
+    // target frame not exists
+    !elementsMap.get(element.frameId)
+  ) {
+    element.frameId = null;
   }
 };
 
@@ -443,6 +458,8 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
+    // repair frame membership *after* bindings we do in restoreElement()
+    // since we rely on bindings to be correct
     if (element.frameId) {
       repairFrameMembership(element, restoredElementsMap);
     }

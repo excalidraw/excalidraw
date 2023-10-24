@@ -1,25 +1,16 @@
 @import "../css/variables.module";
 
 .excalidraw {
-  --ExcTextField--color: var(--color-gray-80);
-  --ExcTextField--label-color: var(--color-gray-80);
-  --ExcTextField--background: white;
-  --ExcTextField--readonly--background: var(--color-gray-10);
-  --ExcTextField--readonly--color: var(--color-gray-80);
-  --ExcTextField--border: var(--color-gray-40);
-  --ExcTextField--border-hover: var(--color-gray-50);
-  --ExcTextField--placeholder: var(--color-gray-40);
-
-  &.theme--dark {
-    --ExcTextField--color: var(--color-gray-10);
-    --ExcTextField--label-color: var(--color-gray-20);
-    --ExcTextField--background: var(--color-gray-85);
-    --ExcTextField--readonly--background: var(--color-gray-80);
-    --ExcTextField--readonly--color: var(--color-gray-40);
-    --ExcTextField--border: var(--color-gray-70);
-    --ExcTextField--border-hover: var(--color-gray-60);
-    --ExcTextField--placeholder: var(--color-gray-80);
-  }
+  --ExcTextField--color: var(--color-on-surface);
+  --ExcTextField--label-color: var(--color-on-surface);
+  --ExcTextField--background: transparent;
+  --ExcTextField--readonly--background: var(--color-surface-high);
+  --ExcTextField--readonly--color: var(--color-on-surface);
+  --ExcTextField--border: var(--color-border-outline);
+  --ExcTextField--readonly--border: var(--color-border-outline-variant);
+  --ExcTextField--border-hover: var(--color-brand-hover);
+  --ExcTextField--border-active: var(--color-brand-active);
+  --ExcTextField--placeholder: var(--color-border-outline-variant);
 
   .ExcTextField {
     &--fullWidth {
@@ -61,7 +52,7 @@
 
         &:active,
         &:focus-within {
-          border-color: var(--color-primary);
+          border-color: var(--ExcTextField--border-active);
         }
       }
 
@@ -107,7 +98,7 @@
 
       &--readonly {
         background: var(--ExcTextField--readonly--background);
-        border-color: transparent;
+        border-color: var(--ExcTextField--readonly--border);
 
         & input {
           color: var(--ExcTextField--readonly--color);

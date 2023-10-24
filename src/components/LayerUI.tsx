@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React from "react";
 import { ActionManager } from "../actions/manager";
 import { CLASSES, DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_WIDTH } from "../constants";
-import { isTextElement, showSelectedShapeActions } from "../element";
+import { showSelectedShapeActions } from "../element";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { Language, t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
@@ -52,13 +52,16 @@ import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
+import { mutateElement } from "../element/mutateElement";
+import { ShapeCache } from "../scene/ShapeCache";
+import Scene from "../scene/Scene";
+import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: UIAppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement;
-  interactiveCanvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
@@ -69,11 +72,11 @@ interface LayerUIProps {
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
   app: AppClassProperties;
+  isCollaborating: boolean;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -118,7 +121,6 @@ const LayerUI = ({
   setAppState,
   elements,
   canvas,
-  interactiveCanvas,
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
@@ -126,11 +128,11 @@ const LayerUI = ({
   renderTopRightUI,
   renderCustomStats,
   UIOptions,
-  onImageAction,
   onExportImage,
   renderWelcomeScreen,
   children,
   app,
+  isCollaborating,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -274,17 +276,29 @@ const LayerUI = ({
 
                           <ShapesSwitcher
                             appState={appState}
-                            interactiveCanvas={interactiveCanvas}
                             activeTool={appState.activeTool}
-                            setAppState={setAppState}
-                            onImageAction={({ pointerType }) => {
-                              onImageAction({
-                                insertOnCanvasDirectly: pointerType !== "mouse",
-                              });
-                            }}
+                            app={app}
                           />
                         </Stack.Row>
                       </Island>
+                      {isCollaborating && (
+                        <Island
+                          style={{
+                            marginLeft: 8,
+                            alignSelf: "center",
+                            height: "fit-content",
+                          }}
+                        >
+                          <LaserPointerButton
+                            title={t("toolBar.laser")}
+                            checked={appState.activeTool.type === "laser"}
+                            onChange={() =>
+                              app.setActiveTool({ type: "laser" })
+                            }
+                            isMobile
+                          />
+                        </Island>
+                      )}
                     </Stack.Row>
                   </Stack.Col>
                 </div>
@@ -368,10 +382,43 @@ const LayerUI = ({
       )}
       {eyeDropperState && !device.isMobile && (
         <EyeDropper
-          swapPreviewOnAlt={eyeDropperState.swapPreviewOnAlt}
-          previewType={eyeDropperState.previewType}
+          colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
             setEyeDropperState(null);
+          }}
+          onChange={(colorPickerType, color, selectedElements, { altKey }) => {
+            if (
+              colorPickerType !== "elementBackground" &&
+              colorPickerType !== "elementStroke"
+            ) {
+              return;
+            }
+
+            if (selectedElements.length) {
+              for (const element of selectedElements) {
+                mutateElement(
+                  element,
+                  {
+                    [altKey && eyeDropperState.swapPreviewOnAlt
+                      ? colorPickerType === "elementBackground"
+                        ? "strokeColor"
+                        : "backgroundColor"
+                      : colorPickerType === "elementBackground"
+                      ? "backgroundColor"
+                      : "strokeColor"]: color,
+                  },
+                  false,
+                );
+                ShapeCache.delete(element);
+              }
+              Scene.getScene(selectedElements[0])?.informMutation();
+            } else if (colorPickerType === "elementBackground") {
+              setAppState({
+                currentItemBackgroundColor: color,
+              });
+            } else {
+              setAppState({ currentItemStrokeColor: color });
+            }
           }}
           onSelect={(color, event) => {
             setEyeDropperState((state) => {
@@ -415,8 +462,6 @@ const LayerUI = ({
           onLockToggle={onLockToggle}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
-          interactiveCanvas={interactiveCanvas}
-          onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
@@ -427,13 +472,7 @@ const LayerUI = ({
       {!device.isMobile && (
         <>
           <div
-            className={clsx("layer-ui__wrapper", {
-              "disable-pointerEvents":
-                appState.draggingElement ||
-                appState.resizingElement ||
-                (appState.editingElement &&
-                  !isTextElement(appState.editingElement)),
-            })}
+            className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
               isSidebarDocked &&
@@ -509,18 +548,8 @@ const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
     return false;
   }
 
-  const {
-    canvas: _pC,
-    interactiveCanvas: _pIC,
-    appState: prevAppState,
-    ...prev
-  } = prevProps;
-  const {
-    canvas: _nC,
-    interactiveCanvas: _nIC,
-    appState: nextAppState,
-    ...next
-  } = nextProps;
+  const { canvas: _pC, appState: prevAppState, ...prev } = prevProps;
+  const { canvas: _nC, appState: nextAppState, ...next } = nextProps;
 
   return (
     isShallowEqual(

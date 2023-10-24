@@ -11,7 +11,7 @@ import {
 
 import * as toolQueries from "./queries/toolQueries";
 import { ImportedDataState } from "../data/types";
-import { STORAGE_KEYS } from "../excalidraw-app/app_constants";
+import { STORAGE_KEYS } from "../../excalidraw-app/app_constants";
 
 import { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
@@ -208,10 +208,8 @@ export const assertSelectedElements = (
   expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
 };
 
-export const createPasteEvent = (
-  text:
-    | string
-    | /* getData function */ ((type: string) => string | Promise<string>),
+export const createPasteEvent = <T extends "text/plain" | "text/html">(
+  items: Record<T, string>,
   files?: File[],
 ) => {
   return Object.assign(
@@ -222,11 +220,12 @@ export const createPasteEvent = (
     }),
     {
       clipboardData: {
-        getData: typeof text === "string" ? () => text : text,
+        getData: (type: string) =>
+          (items as Record<string, string>)[type] || "",
         files: files || [],
       },
     },
-  );
+  ) as any as ClipboardEvent;
 };
 
 export const toggleMenu = (container: HTMLElement) => {

@@ -1,5 +1,5 @@
 import { render, waitFor } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { API } from "./helpers/api";
 import {
   encodePngMetadata,
@@ -42,7 +42,7 @@ Object.defineProperty(window, "TextDecoder", {
 
 describe("export", () => {
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw />);
   });
 
   it("export embedded png and reimport", async () => {
