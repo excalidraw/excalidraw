@@ -235,27 +235,38 @@ export const _generateElementShape = (
 
       // curve is always the first element
       // this simplifies finding the curve for an element
+      const splits = element.segmentSplitIndices || [];
       if (!element.roundness) {
-        if (options.fill) {
-          shape = [generator.polygon(points as [number, number][], options)];
+        if (splits.length === 0) {
+          if (options.fill) {
+            shape = [generator.polygon(points as [number, number][], options)];
+          } else {
+            shape = [
+              generator.linearPath(points as [number, number][], options),
+            ];
+          }
         } else {
-          shape = [generator.linearPath(points as [number, number][], options)];
+          const splitInverse: number[] = [];
+          const splitSet = new Set(splits);
+          for (let i = 0; i < points.length; i++) {
+            if (!splitSet.has(i)) {
+              splitInverse.push(i);
+            }
+          }
+          shape = [
+            generator.curve(
+              computeMultipleCurvesFromSplits(points, splitInverse),
+              options,
+            ),
+          ];
         }
       } else {
-        const pointList: Point[][] = [];
-        const splits = element.segmentSplitIndices || [];
-        let currentIndex = 0;
-        for (const index of splits) {
-          const slice = points.slice(currentIndex, index + 1);
-          if (slice.length) {
-            pointList.push([...slice]);
-          }
-          currentIndex = index;
-        }
-        if (currentIndex < points.length - 1) {
-          pointList.push(points.slice(currentIndex));
-        }
-        shape = [generator.curve(pointList as [number, number][][], options)];
+        shape = [
+          generator.curve(
+            computeMultipleCurvesFromSplits(points, splits),
+            options,
+          ),
+        ];
       }
 
       // add lines only in arrow
@@ -391,4 +402,23 @@ export const _generateElementShape = (
       return null;
     }
   }
+};
+
+const computeMultipleCurvesFromSplits = (
+  points: readonly Point[],
+  splits: readonly number[],
+): [number, number][][] => {
+  const pointList: Point[][] = [];
+  let currentIndex = 0;
+  for (const index of splits) {
+    const slice = points.slice(currentIndex, index + 1);
+    if (slice.length) {
+      pointList.push([...slice]);
+    }
+    currentIndex = index;
+  }
+  if (currentIndex < points.length - 1) {
+    pointList.push(points.slice(currentIndex));
+  }
+  return pointList as [number, number][][];
 };
