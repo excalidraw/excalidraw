@@ -157,13 +157,25 @@ const fillCircle = (
   cy: number,
   radius: number,
   stroke = true,
-  noFill = false,
 ) => {
   context.beginPath();
   context.arc(cx, cy, radius, 0, Math.PI * 2);
-  if (!noFill) {
-    context.fill();
+  context.fill();
+  if (stroke) {
+    context.stroke();
   }
+};
+
+const fillSquare = (
+  context: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  side: number,
+  stroke = true,
+) => {
+  context.beginPath();
+  context.rect(cx - side / 2, cy - side / 2, side, side);
+  context.fill();
   if (stroke) {
     context.stroke();
   }
@@ -227,7 +239,7 @@ const renderSingleLinearPoint = (
   point: Point,
   radius: number,
   isSelected: boolean,
-  isSegmentSplitting: boolean,
+  renderAsSquare: boolean,
   isPhantomPoint = false,
 ) => {
   context.strokeStyle = "#5e5ad8";
@@ -239,22 +251,18 @@ const renderSingleLinearPoint = (
     context.fillStyle = "rgba(177, 151, 252, 0.7)";
   }
 
-  fillCircle(
-    context,
-    point[0],
-    point[1],
-    radius / appState.zoom.value,
-    !isPhantomPoint,
-  );
-  if (isSegmentSplitting) {
-    fillCircle(
+  const effectiveRadius = radius / appState.zoom.value;
+
+  if (renderAsSquare) {
+    fillSquare(
       context,
       point[0],
       point[1],
-      (radius + 4) / appState.zoom.value,
-      true,
-      true,
+      effectiveRadius * 2,
+      !isPhantomPoint,
     );
+  } else {
+    fillCircle(context, point[0], point[1], effectiveRadius, !isPhantomPoint);
   }
 };
 
