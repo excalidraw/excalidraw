@@ -266,6 +266,16 @@ const renderSingleLinearPoint = (
   }
 };
 
+const isLinearPointAtIndexSquared = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  index: number,
+) => {
+  const splitting = element.segmentSplitIndices
+    ? element.segmentSplitIndices.includes(index)
+    : false;
+  return element.roundness ? splitting : !splitting;
+};
+
 const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -287,19 +297,13 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    const segmented = element.roundness
-      ? element.segmentSplitIndices
-        ? element.segmentSplitIndices.includes(idx)
-        : false
-      : false;
-
     renderSingleLinearPoint(
       context,
       appState,
       point,
       radius,
       isSelected,
-      segmented,
+      isLinearPointAtIndexSquared(element, idx),
     );
   });
 
@@ -393,15 +397,15 @@ const renderLinearElementPointHighlight = (
     element,
     hoverPointIndex,
   );
-  const segmented = element.roundness
-    ? element.segmentSplitIndices
-      ? element.segmentSplitIndices.includes(hoverPointIndex)
-      : false
-    : false;
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  highlightPoint(point, context, appState, segmented);
+  highlightPoint(
+    point,
+    context,
+    appState,
+    isLinearPointAtIndexSquared(element, hoverPointIndex),
+  );
   context.restore();
 };
 

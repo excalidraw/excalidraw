@@ -3758,7 +3758,7 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-      if (selectedElements[0].roundness) {
+      if (!event[KEYS.CTRL_OR_CMD]) {
         const pointUnderCursorIndex =
           LinearElementEditor.getPointIndexUnderCursor(
             selectedElements[0],
