@@ -535,6 +535,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
             >
               <button
                 class="color-picker__button active"
+                data-testid="color-top-pick-#ffffff"
                 style="--swatch-color: #ffffff;"
                 title="#ffffff"
                 type="button"
@@ -545,6 +546,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#f8f9fa"
                 style="--swatch-color: #f8f9fa;"
                 title="#f8f9fa"
                 type="button"
@@ -555,6 +557,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#f5faff"
                 style="--swatch-color: #f5faff;"
                 title="#f5faff"
                 type="button"
@@ -565,6 +568,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#fffce8"
                 style="--swatch-color: #fffce8;"
                 title="#fffce8"
                 type="button"
@@ -575,6 +579,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#fdf8f6"
                 style="--swatch-color: #fdf8f6;"
                 title="#fdf8f6"
                 type="button"
