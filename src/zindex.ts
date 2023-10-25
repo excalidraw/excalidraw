@@ -252,14 +252,21 @@ const shiftElementsByOne = (
     groupedIndices = groupedIndices.reverse();
   }
 
+  const selectedFrames = new Set<ExcalidrawFrameElement["id"]>(
+    indicesToMove
+      .filter((idx) => elements[idx].type === "frame")
+      .map((idx) => elements[idx].id),
+  );
+
   groupedIndices.forEach((indices, i) => {
     const leadingIndex = indices[0];
     const trailingIndex = indices[indices.length - 1];
     const boundaryIndex = direction === "left" ? leadingIndex : trailingIndex;
 
-    const containingFrame = indices.some(
-      (idx) => elements[idx].type === "frame",
-    )
+    const containingFrame = indices.some((idx) => {
+      const el = elements[idx];
+      return el.frameId && selectedFrames.has(el.frameId);
+    })
       ? null
       : elements[boundaryIndex]?.frameId;
 
