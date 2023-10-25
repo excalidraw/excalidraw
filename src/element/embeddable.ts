@@ -49,7 +49,7 @@ const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
 const RE_GIPHY =
-  /https:\/\/(?:www\.)?giphy.com\/(?:clips|embed)\/.*?-?([a-zA-Z0-9]+)(?:\/|$)/;
+  /giphy.com\/(?:clips|embed)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
 
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
