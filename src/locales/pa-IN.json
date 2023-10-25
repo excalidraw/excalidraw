@@ -109,8 +109,12 @@
     "createContainerFromText": "ਪਾਠ ਨੂੰ ਕੰਟੇਨਰ ਵਿੱਚ ਇਕੱਠਾ ਕਰੋ",
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
+      "editEmbed": "",
       "create": "ਕੜੀ ਬਣਾਓ",
-      "label": "ਕੜੀ"
+      "createEmbed": "",
+      "label": "ਕੜੀ",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "ਪੰਕਤੀ ਸੋਧੋ",
@@ -160,13 +164,16 @@
     "darkMode": "ਡਾਰਕ ਮੋਡ",
     "lightMode": "ਲਾਇਟ ਮੋਡ",
     "zenMode": "ਜ਼ੈੱਨ ਮੋਡ",
+    "objectsSnapMode": "",
     "exitZenMode": "ਜ਼ੈੱਨ ਮੋਡ 'ਚੋਂ ਬਾਹਰ ਨਿਕਲੋ",
     "cancel": "ਰੱਦ ਕਰੋ",
     "clear": "ਸਾਫ਼ ਕਰੋ",
     "remove": "ਹਟਾਓ",
+    "embed": "",
     "publishLibrary": "ਪ੍ਰਕਾਸ਼ਤ ਕਰੋ",
     "submit": "ਜਮ੍ਹਾ ਕਰਵਾਓ",
-    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ"
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "ਇਹ ਸਾਰਾ ਕੈਨਵਸ ਸਾਫ ਕਰ ਦੇਵੇਗਾ। ਕੀ ਤੁਸੀਂ ਪੱਕਾ ਇੰਝ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
@@ -196,6 +203,7 @@
     "imageInsertError": "ਚਿੱਤਰ ਸ਼ਾਮਲ ਨਹੀਂ ਜਾ ਸਕਿਆ, ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ...",
     "fileTooBig": "ਫਾਈਲ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡੀ ਹੈ। ਵੱਧ-ਤੋਂ-ਵੱਧ ਪ੍ਰਵਾਨਤ ਅਕਾਰ {{maxSize}} ਹੈ।",
     "svgImageInsertError": "SVG ਤਸਵੀਰ ਸ਼ਾਮਲ ਨਹੀਂ ਕਰ ਸਕੇ। SVG ਮਾਰਕ-ਅੱਪ ਨਜਾਇਜ਼ ਲੱਗ ਰਿਹਾ ਹੈ।",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
     "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "",
     "eraser": "ਰਬੜ",
     "frame": "",
+    "embeddable": "",
+    "laser": "",
     "hand": "",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਲਕੀਰ ਲਈ ਘਸੀਟੋ",
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
     "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",
+    "embeddable": "",
     "text_selected": "ਪਾਠ ਨੂੰ ਸੋਧਣ ਲਈ ਡਬਲ-ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
     "text_editing": "ਸੋਧ ਮੁਕੰਮਲ ਕਰਨ ਲਈ ਐਸਕੇਪ (Esc) ਜਾਂ Ctrl-ਜਾਂ-Cmd+ਐਂਟਰ (enter) ਦਬਾਓ",
     "linearElementMulti": "ਮੁਕੰਮਲ ਕਰਨ ਲਈ ਆਖਰੀ ਬਿੰਦੂ 'ਤੇ ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਇਸਕੇਪ ਜਾਂ ਐਂਟਰ ਦਬਾਓ",
@@ -252,7 +267,8 @@
     "bindTextToElement": "ਪਾਠ ਜੋੜਨ ਲਈ ਐੰਟਰ ਦਬਾਓ",
     "deepBoxSelect": "",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "ਝਲਕ ਨਹੀਂ ਦਿਖਾ ਸਕਦੇ",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "{filename} ਵਿੱਚ ਸਾਂਭੀ",
     "canvas": "ਕੈਨਵਸ",
     "selection": "ਚੋਣ",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "ਪਾਰਦਰਸ਼ੀ",
@@ -449,5 +467,36 @@
     "shades": "ਸ਼ੇਡਾਂ",
     "hexCode": "ਹੈਕਸ ਕੋਡ",
     "noShades": "ਇਸ ਰੰਗ ਦੀ ਕੋਈ ਸ਼ੇਡ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

@@ -109,8 +109,12 @@
     "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
+      "editEmbed": "Redigera länk & bädda in",
       "create": "Skapa länk",
-      "label": "Länk"
+      "createEmbed": "Skapa länk & bädda in",
+      "label": "Länk",
+      "labelEmbed": "Länka & bädda in",
+      "empty": "Ingen länk är angiven"
     },
     "lineEditor": {
       "edit": "Redigera linje",
@@ -160,13 +164,16 @@
     "darkMode": "Mörkt läge",
     "lightMode": "Ljust läge",
     "zenMode": "Zen-läge",
+    "objectsSnapMode": "Fäst mot objekt",
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
     "clear": "Rensa",
     "remove": "Ta bort",
+    "embed": "Växla inbäddning",
     "publishLibrary": "Publicera",
     "submit": "Skicka",
-    "confirm": "Bekräfta"
+    "confirm": "Bekräfta",
+    "embeddableInteractionButton": "Klicka för att interagera"
   },
   "alerts": {
     "clearReset": "Detta rensar hela canvasen. Är du säker?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Kunde inte infoga bild. Försök igen senare...",
     "fileTooBig": "Filen är för stor. Maximal tillåten storlek är {{maxSize}}.",
     "svgImageInsertError": "Kunde inte infoga SVG-bild. SVG-koden ser ogiltig ut.",
+    "failedToFetchImage": "Kunde inte hämta bilden.",
     "invalidSVGString": "Ogiltig SVG.",
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
     "importLibraryError": "Kunde inte ladda bibliotek",
@@ -206,6 +214,10 @@
       "line2": "Detta kan resultera i trasiga <bold>Textelement</bold> i dina ritningar.",
       "line3": "Vi rekommenderar starkt att du inaktiverar den här inställningen. Du kan följa <link>dessa steg</link> för att inaktivera den.",
       "line4": "Om inaktivering av denna inställning inte åtgärdar visningen av textelement, öppna ett <issueLink>ärende</issueLink> på vår GitHub, eller skriv till oss på <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Inbäddbara element kan inte läggas till i biblioteket.",
+      "image": "Stöd för att lägga till bilder till biblioteket kommer snart!"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
     "frame": "Rutverktyg",
+    "embeddable": "Bädda in (web)",
+    "laser": "Laserpekare",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg"
   },
@@ -237,6 +251,7 @@
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
+    "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",
     "text_selected": "Dubbelklicka eller tryck ENTER för att redigera text",
     "text_editing": "Tryck Escape eller CtrlOrCmd + ENTER för att slutföra redigeringen",
     "linearElementMulti": "Klicka på sista punkten eller tryck Escape eller Enter för att avsluta",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Tryck på Enter för att lägga till text",
     "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
     "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning",
-    "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan."
+    "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan.",
+    "disableSnapping": "Håll Ctrl eller Cmd för att inaktivera fästning"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Sparad till {filename}",
     "canvas": "canvas",
     "selection": "markering",
-    "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare"
+    "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare",
+    "unableToEmbed": "Att bädda in denna webbadress är för närvarande inte tillåtet. Skapa en problemrapport på GitHub för att begära att webbadressen vitlistas.",
+    "unrecognizedLinkFormat": "Länken du bäddade in matchar inte det förväntade formatet. Försök klistra in 'embed'-strängen som tillhandahålls av källwebbplatsen"
   },
   "colors": {
     "transparent": "Genomskinlig",
@@ -449,5 +467,36 @@
     "shades": "Nyanser",
     "hexCode": "Hex-kod",
     "noShades": "Inga nyanser tillgängliga för denna färg"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Exportera som bild",
+        "button": "Exportera som bild",
+        "description": "Exportera scendata som en bild från vilken du kan importera senare."
+      },
+      "saveToDisk": {
+        "title": "Spara till disk",
+        "button": "Spara till disk",
+        "description": "Exportera scendata till en fil från vilken du kan importera senare."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Exportera till Excalidraw+",
+        "description": "Spara skissen till din Excalidraw+ arbetsyta."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Läs in från fil",
+        "button": "Läs in från fil",
+        "description": "Laddar från en fil kommer <bold>ersätta ditt befintliga innehåll</bold>.<br></br>Du kan säkerhetskopiera din ritning först med hjälp av ett av alternativen nedan."
+      },
+      "shareableLink": {
+        "title": "Läs in från länk",
+        "button": "Ersätt mitt innehåll",
+        "description": "Inläsning av en extern ritning kommer <bold>ersätta ditt befintliga innehåll</bold>.<br></br>Du kan säkerhetskopiera din ritning först genom att använda ett av alternativen nedan."
+      }
+    }
   }
 }

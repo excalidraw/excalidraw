@@ -2,13 +2,13 @@
 .undo-redo-buttons {
   background-color: var(--island-bg-color);
   border-radius: var(--border-radius-lg);
+  box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
 
 .zoom-button,
 .undo-redo-buttons button {
-  border: 1px solid var(--default-border-color) !important;
   border-radius: 0 !important;
-  background-color: transparent !important;
+  background-color: var(--color-surface-low) !important;
   font-size: 0.875rem !important;
   width: var(--lg-button-size);
   height: var(--lg-button-size);

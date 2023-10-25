@@ -62,7 +62,6 @@ interface LayerUIProps {
   appState: UIAppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement;
-  interactiveCanvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
@@ -73,7 +72,6 @@ interface LayerUIProps {
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
@@ -123,7 +121,6 @@ const LayerUI = ({
   setAppState,
   elements,
   canvas,
-  interactiveCanvas,
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
@@ -131,7 +128,6 @@ const LayerUI = ({
   renderTopRightUI,
   renderCustomStats,
   UIOptions,
-  onImageAction,
   onExportImage,
   renderWelcomeScreen,
   children,
@@ -280,14 +276,8 @@ const LayerUI = ({
 
                           <ShapesSwitcher
                             appState={appState}
-                            interactiveCanvas={interactiveCanvas}
                             activeTool={appState.activeTool}
                             app={app}
-                            onImageAction={({ pointerType }) => {
-                              onImageAction({
-                                insertOnCanvasDirectly: pointerType !== "mouse",
-                              });
-                            }}
                           />
                         </Stack.Row>
                       </Island>
@@ -472,8 +462,6 @@ const LayerUI = ({
           onLockToggle={onLockToggle}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
-          interactiveCanvas={interactiveCanvas}
-          onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
@@ -560,18 +548,8 @@ const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
     return false;
   }
 
-  const {
-    canvas: _pC,
-    interactiveCanvas: _pIC,
-    appState: prevAppState,
-    ...prev
-  } = prevProps;
-  const {
-    canvas: _nC,
-    interactiveCanvas: _nIC,
-    appState: nextAppState,
-    ...next
-  } = nextProps;
+  const { canvas: _pC, appState: prevAppState, ...prev } = prevProps;
+  const { canvas: _nC, appState: nextAppState, ...next } = nextProps;
 
   return (
     isShallowEqual(

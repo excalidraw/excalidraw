@@ -97,10 +97,6 @@
       }
     }
 
-    // &:hover {
-    //   background-color: var(--button-gray-2);
-    // }
-
     &:active {
       background-color: var(--button-gray-3);
     }
@@ -110,7 +106,6 @@
     }
 
     &--hide {
-      // visibility: hidden;
       display: none !important;
     }
   }

@@ -452,22 +452,31 @@ export const getContainingFrame = (
 };
 
 // --------------------------- Frame Operations -------------------------------
+
+/**
+ * Retains (or repairs for target frame) the ordering invriant where children
+ * elements come right before the parent frame:
+ * [el, el, child, child, frame, el]
+ */
 export const addElementsToFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  const currTargetFrameChildrenMap = new Map(
+  const { allElementsIndexMap, currTargetFrameChildrenMap } =
     allElements.reduce(
-      (acc: [ExcalidrawElement["id"], ExcalidrawElement][], element) => {
+      (acc, element, index) => {
+        acc.allElementsIndexMap.set(element.id, index);
         if (element.frameId === frame.id) {
-          acc.push([element.id, element]);
+          acc.currTargetFrameChildrenMap.set(element.id, true);
         }
         return acc;
       },
-      [],
-    ),
-  );
+      {
+        allElementsIndexMap: new Map<ExcalidrawElement["id"], number>(),
+        currTargetFrameChildrenMap: new Map<ExcalidrawElement["id"], true>(),
+      },
+    );
 
   const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
 
@@ -520,12 +529,36 @@ export const addElementsToFrame = (
       currFrameChildren.forEach((child) => {
         processedElements.add(child.id);
       });
-      // console.log(currFrameChildren, finalElementsToAdd, element);
-      nextElements.push(...currFrameChildren, ...finalElementsToAdd, element);
+
+      // if not found, add all children on top by assigning the lowest index
+      const targetFrameIndex = allElementsIndexMap.get(frame.id) ?? -1;
+
+      const { newChildren_left, newChildren_right } = finalElementsToAdd.reduce(
+        (acc, element) => {
+          // if index not found, add on top of current frame children
+          const elementIndex = allElementsIndexMap.get(element.id) ?? Infinity;
+          if (elementIndex < targetFrameIndex) {
+            acc.newChildren_left.push(element);
+          } else {
+            acc.newChildren_right.push(element);
+          }
+          return acc;
+        },
+        {
+          newChildren_left: [] as ExcalidrawElement[],
+          newChildren_right: [] as ExcalidrawElement[],
+        },
+      );
+
+      nextElements.push(
+        ...newChildren_left,
+        ...currFrameChildren,
+        ...newChildren_right,
+        element,
+      );
       continue;
     }
 
-    // console.log("(2)", element.frameId);
     nextElements.push(element);
   }
 
@@ -707,6 +740,17 @@ export const isElementInFrame = (
     : element;
 
   if (frame) {
+    // Perf improvement:
+    // For an element that's already in a frame, if it's not being dragged
+    // then there is no need to refer to geometry (which, yes, is slow) to check if it's in a frame.
+    // It has to be in its containing frame.
+    if (
+      !appState.selectedElementIds[element.id] ||
+      !appState.selectedElementsAreBeingDragged
+    ) {
+      return true;
+    }
+
     if (_element.groupIds.length === 0) {
       return elementOverlapsWithFrame(_element, frame);
     }
