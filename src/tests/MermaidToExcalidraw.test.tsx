@@ -1,14 +1,9 @@
-import {
-  act,
-  fireEvent,
-  getTextEditor,
-  render,
-  updateTextEditor,
-} from "./test-utils";
+import { act, fireEvent, render } from "./test-utils";
 import { Excalidraw } from "../packages/excalidraw/index";
 import React from "react";
 import { expect, vi } from "vitest";
 import * as MermaidToExcalidraw from "@excalidraw/mermaid-to-excalidraw";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 
 vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
   const module = (await importActual()) as any;
@@ -141,7 +136,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
   it("should show error in preview when mermaid library throws error", async () => {
     const dialog = document.querySelector(".dialog-mermaid")!;
     const selector = ".mermaid-to-excalidraw-wrapper-text textarea";
-    const editor = getTextEditor(selector);
+    let editor = await getTextEditor(selector, false);
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
@@ -158,8 +153,9 @@ describe("Test <MermaidToExcalidraw/>", () => {
       updateTextEditor(editor, "flowchart TD1");
       await new Promise((cb) => setTimeout(cb, 0));
     });
+    editor = await getTextEditor(selector, false);
 
-    expect(getTextEditor(selector).textContent).toBe("flowchart TD1");
+    expect(editor.textContent).toBe("flowchart TD1");
     expect(dialog.querySelector('[data-testid="mermaid-error"]'))
       .toMatchInlineSnapshot(`
         <div
