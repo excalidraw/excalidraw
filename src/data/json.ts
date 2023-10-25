@@ -64,7 +64,7 @@ export const serializeAsJSON = (
           undefined,
   };
 
-  return JSON.stringify(data, null, 2);
+  return JSON.stringify(data);
 };
 
 export const saveAsJSON = async (
@@ -135,7 +135,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
     source: EXPORT_SOURCE,
     libraryItems,
   };
-  return JSON.stringify(data, null, 2);
+  return JSON.stringify(data);
 };
 
 export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {

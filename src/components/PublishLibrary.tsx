@@ -304,7 +304,7 @@ const PublishLibrary = ({
       source: EXPORT_SOURCE,
       libraryItems: clonedLibItems,
     };
-    const content = JSON.stringify(libContent, null, 2);
+    const content = JSON.stringify(libContent);
     const lib = new Blob([content], { type: "application/json" });
 
     const formData = new FormData();
