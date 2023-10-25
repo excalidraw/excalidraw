@@ -1715,6 +1715,7 @@ class App extends React.Component<AppProps, AppState> {
       isLandscape: width > height,
       isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
+        width !== 0 && //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
         this.allowMobileMode && //zsviczian
         (width < MQ_MAX_WIDTH_PORTRAIT ||
           (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)),

@@ -345,6 +345,26 @@ export const ShapesSwitcher = ({
               selected={activeTool.type === "mermaid"}
             />
           )}
+          <ToolButton //zsviczian
+            className={clsx("Shape", { fillable: false })}
+            type="radio"
+            icon={laserPointerToolIcon}
+            checked={activeTool.type === "laser"}
+            name="editor-current-shape"
+            title={capitalizeString(t("toolBar.laser"))}
+            aria-label={capitalizeString(t("toolBar.laser"))}
+            data-testid={`toolbar-laser`}
+            onPointerDown={({ pointerType }) => {
+              if (!appState.penDetected && pointerType === "pen") {
+                app.togglePenMode(true);
+              }
+            }}
+            onChange={({ pointerType }) => {
+              trackEvent("toolbar", "laser", "ui");
+              app.setActiveTool({ type: "laser" });
+            }}
+            selected={activeTool.type === "laser"}
+          />
         </>
       ) : (
         <DropdownMenu open={isExtraToolsMenuOpen}>
