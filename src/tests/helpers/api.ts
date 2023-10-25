@@ -6,7 +6,6 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   FileId,
-  ExcalidrawFrameElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
