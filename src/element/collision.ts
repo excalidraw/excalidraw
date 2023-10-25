@@ -494,7 +494,9 @@ const hitTestFreeDrawElement = (
   // for filled freedraw shapes, support
   // selecting from inside
   if (shape && shape.sets.length) {
-    return hitTestCurveInside(shape, x, y, "round");
+    return element.fillStyle === "solid"
+      ? hitTestCurveInside(shape, x, y, "round")
+      : hitTestRoughShape(shape, x, y, threshold);
   }
 
   return false;
