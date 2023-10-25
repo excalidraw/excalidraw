@@ -195,7 +195,7 @@ const getTargetElementsMap = <T extends ExcalidrawElement>(
   }, {} as Record<string, ExcalidrawElement>);
 };
 
-const _shiftElements = (
+const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
@@ -263,22 +263,7 @@ const _shiftElements = (
   });
 };
 
-const shiftElements = (
-  appState: AppState,
-  elements: readonly ExcalidrawElement[],
-  direction: "left" | "right",
-  elementsToBeMoved?: readonly ExcalidrawElement[],
-) => {
-  return shift(
-    elements,
-    appState,
-    direction,
-    _shiftElements,
-    elementsToBeMoved,
-  );
-};
-
-const _shiftElementsToEnd = (
+const shiftElementsToEnd = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
@@ -349,38 +334,21 @@ const _shiftElementsToEnd = (
       ];
 };
 
-const shiftElementsToEnd = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  direction: "left" | "right",
-  elementsToBeMoved?: readonly ExcalidrawElement[],
-) => {
-  return shift(
-    elements,
-    appState,
-    direction,
-    _shiftElementsToEnd,
-    elementsToBeMoved,
-  );
-};
-
-function shift(
-  elements: readonly ExcalidrawElement[],
+function shiftElementsAccountingForFrames(
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
   shiftFunction: (
     elements: ExcalidrawElement[],
     appState: AppState,
     direction: "left" | "right",
-    elementsToBeMoved?: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | readonly ExcalidrawElement[],
-  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) {
-  const elementsMap = arrayToMap(elements);
-  const frameElementsMap = groupByFrames(elements);
+  const elementsMap = arrayToMap(allElements);
+  const frameElementsMap = groupByFrames(allElements);
 
   // in case root is non-existent, we promote children elements to root
-  let rootElements = elements.filter(
+  let rootElements = allElements.filter(
     (element) =>
       isRootElement(element) ||
       (element.frameId && !elementsMap.has(element.frameId)),
@@ -397,7 +365,6 @@ function shift(
     rootElements,
     appState,
     direction,
-    elementsToBeMoved,
   ) as ExcalidrawElement[];
 
   // shift the elements in frames if needed
@@ -409,7 +376,6 @@ function shift(
           frameElements,
           appState,
           direction,
-          elementsToBeMoved,
         ) as ExcalidrawElement[],
       );
     }
@@ -437,33 +403,49 @@ function shift(
 // -----------------------------------------------------------------------------
 
 export const moveOneLeft = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
-  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElements(appState, elements, "left", elementsToBeMoved);
+  return shiftElementsAccountingForFrames(
+    allElements,
+    appState,
+    "left",
+    shiftElementsByOne,
+  );
 };
 
 export const moveOneRight = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
-  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElements(appState, elements, "right", elementsToBeMoved);
+  return shiftElementsAccountingForFrames(
+    allElements,
+    appState,
+    "right",
+    shiftElementsByOne,
+  );
 };
 
 export const moveAllLeft = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
-  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElementsToEnd(elements, appState, "left", elementsToBeMoved);
+  return shiftElementsAccountingForFrames(
+    allElements,
+    appState,
+    "left",
+    shiftElementsToEnd,
+  );
 };
 
 export const moveAllRight = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   appState: AppState,
-  elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  return shiftElementsToEnd(elements, appState, "right", elementsToBeMoved);
+  return shiftElementsAccountingForFrames(
+    allElements,
+    appState,
+    "right",
+    shiftElementsToEnd,
+  );
 };
