@@ -201,6 +201,11 @@ const MermaidToExcalidraw = () => {
               flowchartLink={(el) => (
                 <a href="https://mermaid.js.org/syntax/flowchart.html">{el}</a>
               )}
+              sequenceLink={(el) => (
+                <a href="https://mermaid.js.org/syntax/sequenceDiagram.html">
+                  {el}
+                </a>
+              )}
             />
             <br />
           </span>
