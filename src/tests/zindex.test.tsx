@@ -12,6 +12,11 @@ import {
 import { AppState } from "../types";
 import { API } from "./helpers/api";
 import { selectGroupsForSelectedElements } from "../groups";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  ExcalidrawSelectionElement,
+} from "../element/types";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -23,9 +28,15 @@ beforeEach(() => {
 
 const { h } = window;
 
+type ExcalidrawElementType = Exclude<
+  ExcalidrawElement,
+  ExcalidrawSelectionElement
+>["type"];
+
 const populateElements = (
   elements: {
     id: string;
+    type?: ExcalidrawElementType;
     isDeleted?: boolean;
     isSelected?: boolean;
     groupIds?: string[];
@@ -34,6 +45,7 @@ const populateElements = (
     width?: number;
     height?: number;
     containerId?: string;
+    frameId?: ExcalidrawFrameElement["id"];
   }[],
   appState?: Partial<AppState>,
 ) => {
@@ -50,9 +62,11 @@ const populateElements = (
       width = 100,
       height = 100,
       containerId = null,
+      frameId = null,
+      type,
     }) => {
       const element = API.createElement({
-        type: containerId ? "text" : "rectangle",
+        type: type ?? (containerId ? "text" : "rectangle"),
         id,
         isDeleted,
         x,
@@ -61,6 +75,7 @@ const populateElements = (
         height,
         groupIds,
         containerId,
+        frameId: frameId || null,
       });
       if (isSelected) {
         selectedElementIds[element.id] = true;
@@ -116,6 +131,8 @@ const assertZindex = ({
     isSelected?: true;
     groupIds?: string[];
     containerId?: string;
+    frameId?: ExcalidrawFrameElement["id"];
+    type?: ExcalidrawElementType;
   }[];
   appState?: Partial<AppState>;
   operations: [Actions, string[]][];
@@ -1180,6 +1197,288 @@ describe("z-index manipulation", () => {
         editingGroupId: "g1",
       },
       operations: [[actionBringForward, ["A", "B", "C", "D"]]],
+    });
+  });
+});
+
+describe("z-indexing with frames", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  // naming scheme:
+  // F#   ... frame element
+  // F#_# ... frame child of F# (rectangle)
+  // R#   ... unrelated element (rectangle)
+
+  it("moving whole frame by one (normalized)", () => {
+    // normalized frame order
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +1
+        [actionBringForward, ["R1", "F1_1", "F1_2", "F1", "R2"]],
+        // +1
+        [actionBringForward, ["R1", "R2", "F1_1", "F1_2", "F1"]],
+        // noop
+        [actionBringForward, ["R1", "R2", "F1_1", "F1_2", "F1"]],
+        // -1
+        [actionSendBackward, ["R1", "F1_1", "F1_2", "F1", "R2"]],
+        // -1
+        [actionSendBackward, ["F1_1", "F1_2", "F1", "R1", "R2"]],
+        // noop
+        [actionSendBackward, ["F1_1", "F1_2", "F1", "R1", "R2"]],
+      ],
+    });
+  });
+
+  it("moving whole frame by one (DENORMALIZED)", () => {
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +1
+        [actionBringForward, ["R1", "F1_1", "F1", "F1_2", "R2"]],
+        // +1
+        [actionBringForward, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+        // noop
+        [actionBringForward, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R1" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +1
+        [actionBringForward, ["R1", "F1_1", "F1", "R2", "F1_2"]],
+        // +1
+        [actionBringForward, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+        // noop
+        [actionBringForward, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R3" },
+      ],
+      operations: [
+        // +1
+        [actionBringForward, ["R1", "F1_1", "R2", "F1", "R3", "F1_2"]],
+        // +1
+        // FIXME incorrect, should put F1_1 after R3
+        [actionBringForward, ["R1", "R2", "F1_1", "R3", "F1", "F1_2"]],
+        // +1
+        // FIXME should be noop from previous step after it's fixed
+        [actionBringForward, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R3" },
+      ],
+      operations: [
+        // -1
+        [actionSendBackward, ["F1_1", "F1", "R1", "F1_2", "R2", "R3"]],
+        // -1
+        [actionSendBackward, ["F1_1", "F1", "F1_2", "R1", "R2", "R3"]],
+      ],
+    });
+  });
+
+  it("moving selected frame children by one (normalized)", () => {
+    // normalized frame order
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", isSelected: true },
+        { id: "F1_2", frameId: "F1" },
+        { id: "F1", type: "frame" },
+        { id: "R1" },
+      ],
+      operations: [
+        // +1
+        [actionBringForward, ["F1_2", "F1_1", "F1", "R1"]],
+        // noop
+        [actionBringForward, ["F1_2", "F1_1", "F1", "R1"]],
+      ],
+    });
+
+    // normalized frame order, multiple frames
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", isSelected: true },
+        { id: "F1_2", frameId: "F1" },
+        { id: "F1", type: "frame" },
+        { id: "R1" },
+        { id: "F2_1", frameId: "F2", isSelected: true },
+        { id: "F2_2", frameId: "F2" },
+        { id: "F2", type: "frame" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +1
+        [
+          actionBringForward,
+          ["F1_2", "F1_1", "F1", "R1", "F2_2", "F2_1", "F2", "R2"],
+        ],
+        // noop
+        [
+          actionBringForward,
+          ["F1_2", "F1_1", "F1", "R1", "F2_2", "F2_1", "F2", "R2"],
+        ],
+      ],
+    });
+  });
+
+  it("moving selected frame children by one (DENORMALIZED)", () => {
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", isSelected: true },
+        { id: "F1", type: "frame" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R1" },
+      ],
+      operations: [
+        // +1
+        // NOTE not sure what we wanna do here
+        [actionBringForward, ["F1", "F1_2", "F1_1", "R1"]],
+        // noop
+        [actionBringForward, ["F1", "F1_2", "F1_1", "R1"]],
+        // -1
+        [actionSendBackward, ["F1", "F1_1", "F1_2", "R1"]],
+        // noop
+        [actionSendBackward, ["F1", "F1_1", "F1_2", "R1"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", isSelected: true },
+        { id: "R1" },
+        { id: "F1", type: "frame" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +1
+        // NOTE not sure what we wanna do here
+        [actionBringForward, ["R1", "F1", "F1_2", "F1_1", "R2"]],
+        // noop
+        [actionBringForward, ["R1", "F1", "F1_2", "F1_1", "R2"]],
+        // -1
+        [actionSendBackward, ["R1", "F1", "F1_1", "F1_2", "R2"]],
+        // noop
+        [actionSendBackward, ["R1", "F1", "F1_1", "F1_2", "R2"]],
+      ],
+    });
+  });
+
+  it("moving whole frame to front/end", () => {
+    // normalized frame order
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +∞
+        [actionBringToFront, ["R1", "R2", "F1_1", "F1_2", "F1"]],
+        // noop
+        [actionBringToFront, ["R1", "R2", "F1_1", "F1_2", "F1"]],
+        // -∞
+        [actionSendToBack, ["F1_1", "F1_2", "F1", "R1", "R2"]],
+        // noop
+        [actionSendToBack, ["F1_1", "F1_2", "F1", "R1", "R2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +∞
+        [actionBringToFront, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+        // noop
+        [actionBringToFront, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+        // -∞
+        [actionSendToBack, ["F1_1", "F1", "F1_2", "R1", "R2"]],
+        // noop
+        [actionSendToBack, ["F1_1", "F1", "F1_2", "R1", "R2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R1" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R2" },
+      ],
+      operations: [
+        // +∞
+        [actionBringToFront, ["R1", "R2", "F1_1", "F1", "F1_2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R3" },
+      ],
+      operations: [
+        // +1
+        [actionBringToFront, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
+      ],
     });
   });
 });
