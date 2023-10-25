@@ -165,6 +165,21 @@ const fillCircle = (
   }
 };
 
+const fillSquare = (
+  context: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  side: number,
+  stroke = true,
+) => {
+  context.beginPath();
+  context.rect(cx - side / 2, cy - side / 2, side, side);
+  context.fill();
+  if (stroke) {
+    context.stroke();
+  }
+};
+
 const strokeGrid = (
   context: CanvasRenderingContext2D,
   gridSize: number,
@@ -223,6 +238,7 @@ const renderSingleLinearPoint = (
   point: Point,
   radius: number,
   isSelected: boolean,
+  renderAsSquare: boolean,
   isPhantomPoint = false,
 ) => {
   context.strokeStyle = "#5e5ad8";
@@ -234,13 +250,29 @@ const renderSingleLinearPoint = (
     context.fillStyle = "rgba(177, 151, 252, 0.7)";
   }
 
-  fillCircle(
-    context,
-    point[0],
-    point[1],
-    radius / appState.zoom.value,
-    !isPhantomPoint,
-  );
+  const effectiveRadius = radius / appState.zoom.value;
+
+  if (renderAsSquare) {
+    fillSquare(
+      context,
+      point[0],
+      point[1],
+      effectiveRadius * 2,
+      !isPhantomPoint,
+    );
+  } else {
+    fillCircle(context, point[0], point[1], effectiveRadius, !isPhantomPoint);
+  }
+};
+
+const isLinearPointAtIndexSquared = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  index: number,
+) => {
+  const splitting = element.segmentSplitIndices
+    ? element.segmentSplitIndices.includes(index)
+    : false;
+  return element.roundness ? splitting : !splitting;
 };
 
 const renderLinearPointHandles = (
@@ -264,7 +296,14 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(context, appState, point, radius, isSelected);
+    renderSingleLinearPoint(
+      context,
+      appState,
+      point,
+      radius,
+      isSelected,
+      isLinearPointAtIndexSquared(element, idx),
+    );
   });
 
   //Rendering segment mid points
@@ -292,6 +331,7 @@ const renderLinearPointHandles = (
           segmentMidPoint,
           radius,
           false,
+          false,
         );
         highlightPoint(segmentMidPoint, context, appState);
       } else {
@@ -302,6 +342,7 @@ const renderLinearPointHandles = (
           segmentMidPoint,
           radius,
           false,
+          false,
         );
       }
     } else if (appState.editingLinearElement || points.length === 2) {
@@ -310,6 +351,7 @@ const renderLinearPointHandles = (
         appState,
         segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
+        false,
         false,
         true,
       );
@@ -323,16 +365,16 @@ const highlightPoint = (
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  renderAsSquare = false,
 ) => {
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
+  const radius = LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
 
-  fillCircle(
-    context,
-    point[0],
-    point[1],
-    LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
-    false,
-  );
+  if (renderAsSquare) {
+    fillSquare(context, point[0], point[1], radius * 2, false);
+  } else {
+    fillCircle(context, point[0], point[1], radius, false);
+  }
 };
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -354,10 +396,15 @@ const renderLinearElementPointHighlight = (
     element,
     hoverPointIndex,
   );
+
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-
-  highlightPoint(point, context, appState);
+  highlightPoint(
+    point,
+    context,
+    appState,
+    isLinearPointAtIndexSquared(element, hoverPointIndex),
+  );
   context.restore();
 };
 

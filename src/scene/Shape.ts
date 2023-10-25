@@ -14,6 +14,7 @@ import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
 import { ROUGHNESS } from "../constants";
+import { Point } from "../types";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -228,18 +229,44 @@ export const _generateElementShape = (
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
-      const points = element.points.length ? element.points : [[0, 0]];
+      const points = element.points.length
+        ? element.points
+        : ([[0, 0]] as Point[]);
 
       // curve is always the first element
       // this simplifies finding the curve for an element
+      const splits = element.segmentSplitIndices || [];
       if (!element.roundness) {
-        if (options.fill) {
-          shape = [generator.polygon(points as [number, number][], options)];
+        if (splits.length === 0) {
+          if (options.fill) {
+            shape = [generator.polygon(points as [number, number][], options)];
+          } else {
+            shape = [
+              generator.linearPath(points as [number, number][], options),
+            ];
+          }
         } else {
-          shape = [generator.linearPath(points as [number, number][], options)];
+          const splitInverse: number[] = [];
+          const splitSet = new Set(splits);
+          for (let i = 0; i < points.length; i++) {
+            if (!splitSet.has(i)) {
+              splitInverse.push(i);
+            }
+          }
+          shape = [
+            generator.curve(
+              computeMultipleCurvesFromSplits(points, splitInverse),
+              options,
+            ),
+          ];
         }
       } else {
-        shape = [generator.curve(points as [number, number][], options)];
+        shape = [
+          generator.curve(
+            computeMultipleCurvesFromSplits(points, splits),
+            options,
+          ),
+        ];
       }
 
       // add lines only in arrow
@@ -375,4 +402,23 @@ export const _generateElementShape = (
       return null;
     }
   }
+};
+
+const computeMultipleCurvesFromSplits = (
+  points: readonly Point[],
+  splits: readonly number[],
+): [number, number][][] => {
+  const pointList: Point[][] = [];
+  let currentIndex = 0;
+  for (const index of splits) {
+    const slice = points.slice(currentIndex, index + 1);
+    if (slice.length) {
+      pointList.push([...slice]);
+    }
+    currentIndex = index;
+  }
+  if (currentIndex < points.length - 1) {
+    pointList.push(points.slice(currentIndex));
+  }
+  return pointList as [number, number][][];
 };

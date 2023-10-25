@@ -547,7 +547,10 @@ export class LinearElementEditor {
     endPointIndex: number,
   ) {
     let segmentMidPoint = centerPoint(startPoint, endPoint);
-    if (element.points.length > 2 && element.roundness) {
+    const splits = element.segmentSplitIndices || [];
+    const treatAsCurve =
+      splits.includes(endPointIndex) || splits.includes(endPointIndex - 1);
+    if (element.points.length > 2 && (element.roundness || treatAsCurve)) {
       const controlPoints = getControlPointsForBezierCurve(
         element,
         element.points[endPointIndex],
@@ -1042,13 +1045,15 @@ export class LinearElementEditor {
     let offsetX = 0;
     let offsetY = 0;
 
-    const isDeletingOriginPoint = pointIndices.includes(0);
+    const indexSet = new Set(pointIndices);
+
+    const isDeletingOriginPoint = indexSet.has(0);
 
     // if deleting first point, make the next to be [0,0] and recalculate
     // positions of the rest with respect to it
     if (isDeletingOriginPoint) {
       const firstNonDeletedPoint = element.points.find((point, idx) => {
-        return !pointIndices.includes(idx);
+        return !indexSet.has(idx);
       });
       if (firstNonDeletedPoint) {
         offsetX = firstNonDeletedPoint[0];
@@ -1057,7 +1062,7 @@ export class LinearElementEditor {
     }
 
     const nextPoints = element.points.reduce((acc: Point[], point, idx) => {
-      if (!pointIndices.includes(idx)) {
+      if (!indexSet.has(idx)) {
         acc.push(
           !acc.length ? [0, 0] : [point[0] - offsetX, point[1] - offsetY],
         );
@@ -1065,7 +1070,22 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
+    const splits: number[] = [];
+    (element.segmentSplitIndices || []).forEach((index) => {
+      if (!indexSet.has(index)) {
+        let shift = 0;
+        for (const pointIndex of pointIndices) {
+          if (index > pointIndex) {
+            shift++;
+          }
+        }
+        splits.push(index - shift);
+      }
+    });
+
+    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY, {
+      segmentSplitIndices: splits.sort((a, b) => a - b),
+    });
   }
 
   static addPoints(
@@ -1204,9 +1224,13 @@ export class LinearElementEditor {
       midpoint,
       ...element.points.slice(segmentMidpoint.index!),
     ];
+    const splits = (element.segmentSplitIndices || []).map((index) =>
+      index >= segmentMidpoint.index! ? index + 1 : index,
+    );
 
     mutateElement(element, {
       points,
+      segmentSplitIndices: splits.sort((a, b) => a - b),
     });
 
     ret.pointerDownState = {
@@ -1226,7 +1250,11 @@ export class LinearElementEditor {
     nextPoints: readonly Point[],
     offsetX: number,
     offsetY: number,
-    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
+    otherUpdates?: {
+      startBinding?: PointBinding;
+      endBinding?: PointBinding;
+      segmentSplitIndices?: number[];
+    },
   ) {
     const nextCoords = getElementPointsCoords(element, nextPoints);
     const prevCoords = getElementPointsCoords(element, element.points);
@@ -1472,6 +1500,27 @@ export class LinearElementEditor {
 
     return coords;
   };
+
+  static toggleSegmentSplitAtIndex(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    index: number,
+  ) {
+    let found = false;
+    const splitIndices = (element.segmentSplitIndices || []).filter((idx) => {
+      if (idx === index) {
+        found = true;
+        return false;
+      }
+      return true;
+    });
+    if (!found) {
+      splitIndices.push(index);
+    }
+
+    mutateElement(element, {
+      segmentSplitIndices: splitIndices.sort((a, b) => a - b),
+    });
+  }
 }
 
 const normalizeSelectedPoints = (

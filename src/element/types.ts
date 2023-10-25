@@ -195,6 +195,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
     points: readonly Point[];
+    segmentSplitIndices: readonly number[] | null;
     lastCommittedPoint: Point | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
