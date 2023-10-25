@@ -760,3 +760,12 @@ export type KeyboardModifiersObject = {
   altKey: boolean;
   metaKey: boolean;
 };
+
+export type Primitive =
+  | number
+  | string
+  | boolean
+  | bigint
+  | symbol
+  | null
+  | undefined;

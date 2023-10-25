@@ -1,4 +1,4 @@
-import { AppState } from "../../src/types";
+import { AppState, Primitive } from "../../src/types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -54,6 +54,7 @@ import {
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
+  STROKE_WIDTH,
   VERTICAL_ALIGN,
 } from "../constants";
 import {
@@ -85,7 +86,6 @@ import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
-  canChangeRoundness,
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
@@ -121,25 +121,44 @@ export const changeProperty = (
   });
 };
 
-export const getFormValue = function <T>(
+export const getFormValue = function <T extends Primitive>(
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
-  defaultValue: T,
+  isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
+  defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
   const editingElement = appState.editingElement;
   const nonDeletedElements = getNonDeletedElements(elements);
-  return (
-    (editingElement && getAttribute(editingElement)) ??
-    (isSomeElementSelected(nonDeletedElements, appState)
-      ? getCommonAttributeOfSelectedElements(
-          nonDeletedElements,
+
+  let ret: T | null = null;
+
+  if (editingElement) {
+    ret = getAttribute(editingElement);
+  }
+
+  if (!ret) {
+    const hasSelection = isSomeElementSelected(nonDeletedElements, appState);
+
+    if (hasSelection) {
+      ret =
+        getCommonAttributeOfSelectedElements(
+          isRelevantElement === true
+            ? nonDeletedElements
+            : nonDeletedElements.filter((el) => isRelevantElement(el)),
           appState,
           getAttribute,
-        )
-      : defaultValue) ??
-    defaultValue
-  );
+        ) ??
+        (typeof defaultValue === "function"
+          ? defaultValue(true)
+          : defaultValue);
+    } else {
+      ret =
+        typeof defaultValue === "function" ? defaultValue(false) : defaultValue;
+    }
+  }
+
+  return ret;
 };
 
 const offsetElementAfterFontResize = (
@@ -273,6 +292,7 @@ export const actionChangeStrokeColor = register({
           elements,
           appState,
           (element) => element.strokeColor,
+          true,
           appState.currentItemStrokeColor,
         )}
         onChange={(color) => updateData({ currentItemStrokeColor: color })}
@@ -323,6 +343,7 @@ export const actionChangeBackgroundColor = register({
           elements,
           appState,
           (element) => element.backgroundColor,
+          true,
           appState.currentItemBackgroundColor,
         )}
         onChange={(color) => updateData({ currentItemBackgroundColor: color })}
@@ -372,23 +393,28 @@ export const actionChangeFillStyle = register({
               } (${getShortcutKey("Alt-Click")})`,
               icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
               active: allElementsZigZag ? true : undefined,
+              testId: `fill-hachure`,
             },
             {
               value: "cross-hatch",
               text: t("labels.crossHatch"),
               icon: FillCrossHatchIcon,
+              testId: `fill-cross-hatch`,
             },
             {
               value: "solid",
               text: t("labels.solid"),
               icon: FillSolidIcon,
+              testId: `fill-solid`,
             },
           ]}
           value={getFormValue(
             elements,
             appState,
             (element) => element.fillStyle,
-            appState.currentItemFillStyle,
+            (element) => element.hasOwnProperty("fillStyle"),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemFillStyle,
           )}
           onClick={(value, event) => {
             const nextValue =
@@ -427,31 +453,31 @@ export const actionChangeStrokeWidth = register({
         group="stroke-width"
         options={[
           {
-            value: 0.5,
-            text: t("labels.extraThin"),
-            icon: StrokeWidthThinIcon,
-          },
-          {
-            value: 1,
+            value: STROKE_WIDTH.thin,
             text: t("labels.thin"),
             icon: StrokeWidthBaseIcon,
+            testId: "strokeWidth-thin",
           },
           {
-            value: 2,
+            value: STROKE_WIDTH.bold,
             text: t("labels.bold"),
             icon: StrokeWidthBoldIcon,
+            testId: "strokeWidth-bold",
           },
           {
-            value: 4,
+            value: STROKE_WIDTH.extraBold,
             text: t("labels.extraBold"),
             icon: StrokeWidthExtraBoldIcon,
+            testId: "strokeWidth-extraBold",
           },
         ]}
         value={getFormValue(
           elements,
           appState,
           (element) => element.strokeWidth,
-          appState.currentItemStrokeWidth,
+          (element) => element.hasOwnProperty("strokeWidth"),
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemStrokeWidth,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -500,7 +526,9 @@ export const actionChangeSloppiness = register({
           elements,
           appState,
           (element) => element.roughness,
-          appState.currentItemRoughness,
+          (element) => element.hasOwnProperty("roughness"),
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemRoughness,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -548,7 +576,9 @@ export const actionChangeStrokeStyle = register({
           elements,
           appState,
           (element) => element.strokeStyle,
-          appState.currentItemStrokeStyle,
+          (element) => element.hasOwnProperty("strokeStyle"),
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemStrokeStyle,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -588,6 +618,7 @@ export const actionChangeOpacity = register({
             elements,
             appState,
             (element) => element.opacity,
+            true,
             appState.currentItemOpacity,
           ) ?? undefined
         }
@@ -646,7 +677,12 @@ export const actionChangeFontSize = register({
             }
             return null;
           },
-          appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+          (element) =>
+            isTextElement(element) || getBoundTextElement(element) !== null,
+          (hasSelection) =>
+            hasSelection
+              ? null
+              : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
         )}
         onChange={(value) => updateData(value)}
       />
@@ -731,21 +767,25 @@ export const actionChangeFontFamily = register({
       value: FontFamilyValues;
       text: string;
       icon: JSX.Element;
+      testId: string;
     }[] = [
       {
         value: FONT_FAMILY.Virgil,
         text: t("labels.handDrawn"),
         icon: FreedrawIcon,
+        testId: "font-family-virgil",
       },
       {
         value: FONT_FAMILY.Helvetica,
         text: t("labels.normal"),
         icon: FontFamilyNormalIcon,
+        testId: "font-family-normal",
       },
       {
         value: FONT_FAMILY.Cascadia,
         text: t("labels.code"),
         icon: FontFamilyCodeIcon,
+        testId: "font-family-code",
       },
       ...(showFourthFont
         ? [
@@ -753,6 +793,7 @@ export const actionChangeFontFamily = register({
               value: FONT_FAMILY.LocalFont,
               text: t("labels.localFont"),
               icon: FontFamilyLocalFontIcon,
+              testId: "font-family-fourth",
             },
           ]
         : []),
@@ -777,7 +818,12 @@ export const actionChangeFontFamily = register({
               }
               return null;
             },
-            appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -854,7 +900,10 @@ export const actionChangeTextAlign = register({
               }
               return null;
             },
-            appState.currentItemTextAlign,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemTextAlign,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -930,7 +979,9 @@ export const actionChangeVerticalAlign = register({
               }
               return null;
             },
-            VERTICAL_ALIGN.MIDDLE,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            (hasSelection) => (hasSelection ? null : VERTICAL_ALIGN.MIDDLE),
           )}
           onChange={(value) => updateData(value)}
         />
@@ -995,9 +1046,9 @@ export const actionChangeRoundness = register({
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
-            (canChangeRoundness(appState.activeTool.type) &&
-              appState.currentItemRoundness) ||
-              null,
+            (element) => element.hasOwnProperty("roundness"),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemRoundness,
           )}
           onChange={(value) => updateData(value)}
         />
@@ -1091,6 +1142,7 @@ export const actionChangeArrowhead = register({
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.startArrowhead
                   : appState.currentItemStartArrowhead,
+              true,
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
@@ -1137,6 +1189,7 @@ export const actionChangeArrowhead = register({
                 isLinearElement(element) && canHaveArrowheads(element.type)
                   ? element.endArrowhead
                   : appState.currentItemEndArrowhead,
+              true,
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
