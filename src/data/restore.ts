@@ -43,7 +43,6 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
-import { isValidFrameChild } from "../frame";
 
 type RestoredAppState = Omit<
   AppState,
@@ -397,7 +396,7 @@ const repairBoundElement = (
 };
 
 /**
- * resets `frameId` if no longer applicable.
+ * Remove an element's frameId if its containing frame is non-existent
  *
  * NOTE mutates elements.
  */
@@ -405,16 +404,12 @@ const repairFrameMembership = (
   element: Mutable<ExcalidrawElement>,
   elementsMap: Map<string, Mutable<ExcalidrawElement>>,
 ) => {
-  if (!element.frameId) {
-    return;
-  }
+  if (element.frameId) {
+    const containingFrame = elementsMap.get(element.frameId);
 
-  if (
-    !isValidFrameChild(element) ||
-    // target frame not exists
-    !elementsMap.get(element.frameId)
-  ) {
-    element.frameId = null;
+    if (!containingFrame) {
+      element.frameId = null;
+    }
   }
 };
 
@@ -458,8 +453,6 @@ export const restoreElements = (
   // repair binding. Mutates elements.
   const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
-    // repair frame membership *after* bindings we do in restoreElement()
-    // since we rely on bindings to be correct
     if (element.frameId) {
       repairFrameMembership(element, restoredElementsMap);
     }

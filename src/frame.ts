@@ -323,24 +323,7 @@ export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
 export const getFrameElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frameId: string,
-  opts?: { includeBoundArrows?: boolean },
-) => {
-  return allElements.filter((element) => {
-    if (element.frameId === frameId) {
-      return true;
-    }
-    if (opts?.includeBoundArrows && element.type === "arrow") {
-      const bindingId = element.startBinding?.elementId;
-      if (bindingId) {
-        const boundElement = Scene.getScene(element)?.getElement(bindingId);
-        if (boundElement?.frameId === frameId) {
-          return true;
-        }
-      }
-    }
-    return false;
-  });
-};
+) => allElements.filter((element) => element.frameId === frameId);
 
 export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
@@ -468,14 +451,6 @@ export const getContainingFrame = (
   return null;
 };
 
-export const isValidFrameChild = (element: ExcalidrawElement) => {
-  return (
-    element.type !== "frame" &&
-    // arrows that are bound to elements cannot be frame children
-    (element.type !== "arrow" || (!element.startBinding && !element.endBinding))
-  );
-};
-
 // --------------------------- Frame Operations -------------------------------
 
 /**
@@ -514,9 +489,6 @@ export const addElementsToFrame = (
     elementsToAdd,
   )) {
     if (!currTargetFrameChildrenMap.has(element.id)) {
-      if (!isValidFrameChild(element)) {
-        continue;
-      }
       finalElementsToAdd.push(element);
     }
 
