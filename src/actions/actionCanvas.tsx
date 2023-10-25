@@ -438,5 +438,5 @@ export const actionToggleHandTool = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.key === KEYS.H,
+  keyTest: (event) => !event.altKey && event.key === KEYS.H,
 });
