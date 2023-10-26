@@ -434,7 +434,9 @@ export const convertToExcalidrawElements = (
   if (!elementsSkeleton) {
     return [];
   }
-  const elements = JSON.parse(JSON.stringify(elementsSkeleton));
+  const elements: ExcalidrawElementSkeleton[] = JSON.parse(
+    JSON.stringify(elementsSkeleton),
+  );
 
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
