@@ -40,7 +40,7 @@ import {
 import { MarkOptional } from "../utility-types";
 import { assertNever, getFontString } from "../utils";
 import { getSizeFromPoints } from "../points";
-import { nanoid } from "nanoid";
+import { randomId } from "../random";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -411,7 +411,7 @@ const bindLinearElementToElement = (
 class ElementStore {
   excalidrawElements = new Map<string, ExcalidrawElement>();
 
-  add = (ele?: ExcalidrawElement, originalId?: string) => {
+  add = (ele?: ExcalidrawElement) => {
     if (!ele) {
       return;
     }
@@ -447,7 +447,7 @@ export const convertToExcalidrawElements = (
     let excalidrawElement: ExcalidrawElement;
     const originalId = element.id;
     if (opts?.regenerateIds !== false) {
-      Object.assign(element, { id: nanoid() });
+      Object.assign(element, { id: randomId() });
     }
 
     switch (element.type) {

@@ -6,11 +6,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "#d8f5a2",
   "boundElements": [
     {
-      "id": "id40",
+      "id": "id41",
       "type": "arrow",
     },
     {
-      "id": "id41",
+      "id": "id42",
       "type": "arrow",
     },
   ],
@@ -45,7 +45,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id41",
+      "id": "id42",
       "type": "arrow",
     },
   ],
@@ -110,7 +110,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id42",
+    "elementId": "id43",
     "focus": -0.08139534883720931,
     "gap": 1,
   },
@@ -186,7 +186,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id40",
+      "id": "id41",
       "type": "arrow",
     },
   ],
@@ -222,7 +222,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id43",
+      "id": "id44",
       "type": "arrow",
     },
   ],
@@ -266,7 +266,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id43",
+      "id": "id44",
       "type": "arrow",
     },
   ],
@@ -309,7 +309,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id44",
+      "id": "id45",
       "type": "text",
     },
   ],
@@ -367,7 +367,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id43",
+  "containerId": "id44",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -406,13 +406,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id33",
+      "id": "id34",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id35",
+    "elementId": "id36",
     "focus": 0,
     "gap": 1,
   },
@@ -441,7 +441,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id34",
+    "elementId": "id35",
     "focus": 0,
     "gap": 1,
   },
@@ -464,7 +464,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id32",
+  "containerId": "id33",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -503,7 +503,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id32",
+      "id": "id33",
       "type": "arrow",
     },
   ],
@@ -538,7 +538,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id32",
+      "id": "id33",
       "type": "arrow",
     },
   ],
@@ -573,13 +573,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id37",
+      "id": "id38",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id39",
+    "elementId": "id40",
     "focus": 0,
     "gap": 1,
   },
@@ -608,7 +608,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id38",
+    "elementId": "id39",
     "focus": 0,
     "gap": 1,
   },
@@ -631,7 +631,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id36",
+  "containerId": "id37",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -671,7 +671,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id36",
+      "id": "id37",
       "type": "arrow",
     },
   ],
@@ -715,7 +715,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id36",
+      "id": "id37",
       "type": "arrow",
     },
   ],
@@ -1226,7 +1226,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id28",
+      "id": "id29",
       "type": "text",
     },
   ],
@@ -1276,7 +1276,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id29",
+      "id": "id30",
       "type": "text",
     },
   ],
@@ -1326,7 +1326,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id30",
+      "id": "id31",
       "type": "text",
     },
   ],
@@ -1376,7 +1376,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id31",
+      "id": "id32",
       "type": "text",
     },
   ],
@@ -1426,7 +1426,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id24",
+  "containerId": "id25",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1465,7 +1465,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id25",
+  "containerId": "id26",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1504,7 +1504,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id26",
+  "containerId": "id27",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1544,7 +1544,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id27",
+  "containerId": "id28",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1584,7 +1584,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id18",
+      "id": "id19",
       "type": "text",
     },
   ],
@@ -1619,7 +1619,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id19",
+      "id": "id20",
       "type": "text",
     },
   ],
@@ -1654,7 +1654,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id20",
+      "id": "id21",
       "type": "text",
     },
   ],
@@ -1689,7 +1689,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "#fff3bf",
   "boundElements": [
     {
-      "id": "id21",
+      "id": "id22",
       "type": "text",
     },
   ],
@@ -1724,7 +1724,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id22",
+      "id": "id23",
       "type": "text",
     },
   ],
@@ -1759,7 +1759,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "#ffec99",
   "boundElements": [
     {
-      "id": "id23",
+      "id": "id24",
       "type": "text",
     },
   ],
@@ -1794,7 +1794,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id12",
+  "containerId": "id13",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1833,7 +1833,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id13",
+  "containerId": "id14",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1873,7 +1873,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id14",
+  "containerId": "id15",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1915,7 +1915,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id15",
+  "containerId": "id16",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1955,7 +1955,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id16",
+  "containerId": "id17",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1996,7 +1996,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id17",
+  "containerId": "id18",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,

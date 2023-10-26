@@ -21,7 +21,7 @@ describe("Test Transform", () => {
       elements as ExcalidrawElementSkeleton[],
     );
     expect(data.length).toBe(1);
-    expect(data[0].id).toBe("test-id");
+    expect(data[0].id).toBe("id0");
 
     data = convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
