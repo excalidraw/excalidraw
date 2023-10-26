@@ -91,6 +91,7 @@ const ColorPickerPopupContent = ({
         onChange={(color) => {
           onChange(color);
         }}
+        colorPickerType={type}
       />
     </div>
   );
@@ -140,7 +141,7 @@ const ColorPickerPopupContent = ({
         alignOffset={-16}
         sideOffset={20}
         style={{
-          zIndex: 9999,
+          zIndex: "var(--zIndex-layerUI)",
           backgroundColor: "var(--popup-bg-color)",
           maxWidth: "208px",
           maxHeight: window.innerHeight,
@@ -165,6 +166,7 @@ const ColorPickerPopupContent = ({
                   state = state || {
                     keepOpenOnAlt: true,
                     onSelect: onChange,
+                    colorPickerType: type,
                   };
                   state.keepOpenOnAlt = true;
                   return state;
@@ -175,6 +177,7 @@ const ColorPickerPopupContent = ({
                   : {
                       keepOpenOnAlt: false,
                       onSelect: onChange,
+                      colorPickerType: type,
                     };
               });
             }}

@@ -1,11 +1,11 @@
 import { ExcalidrawElement } from "./types";
-import { invalidateShapeForElement } from "../renderer/renderElement";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -89,7 +89,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     typeof fileId != "undefined" ||
     typeof points !== "undefined"
   ) {
-    invalidateShapeForElement(element);
+    ShapeCache.delete(element);
   }
 
   element.version++;
@@ -140,8 +140,8 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
  *
  * NOTE: does not trigger re-render.
  */
-export const bumpVersion = (
-  element: Mutable<ExcalidrawElement>,
+export const bumpVersion = <T extends Mutable<ExcalidrawElement>>(
+  element: T,
   version?: ExcalidrawElement["version"],
 ) => {
   element.version = (version ?? element.version) + 1;

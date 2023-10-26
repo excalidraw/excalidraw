@@ -1,5 +1,11 @@
 import React from "react";
-import { AppState, Device, ExcalidrawProps, UIAppState } from "../types";
+import {
+  AppClassProperties,
+  AppState,
+  Device,
+  ExcalidrawProps,
+  UIAppState,
+} from "../types";
 import { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
@@ -30,9 +36,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: () => void;
-  canvas: HTMLCanvasElement | null;
 
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -41,6 +45,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen: boolean;
+  app: AppClassProperties;
 };
 
 export const MobileMenu = ({
@@ -51,13 +56,13 @@ export const MobileMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  canvas,
-  onImageAction,
+
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
   device,
   renderWelcomeScreen,
+  app,
 }: MobileMenuProps) => {
   const {
     WelcomeScreenCenterTunnel,
@@ -77,14 +82,8 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
-                      canvas={canvas}
                       activeTool={appState.activeTool}
-                      setAppState={setAppState}
-                      onImageAction={({ pointerType }) => {
-                        onImageAction({
-                          insertOnCanvasDirectly: pointerType !== "mouse",
-                        });
-                      }}
+                      app={app}
                     />
                   </Stack.Row>
                 </Island>
@@ -119,9 +118,9 @@ export const MobileMenu = ({
         </Section>
         <HintViewer
           appState={appState}
-          elements={elements}
           isMobile={true}
           device={device}
+          app={app}
         />
       </FixedSideContainer>
     );
@@ -194,7 +193,7 @@ export const MobileMenu = ({
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({
-                      ...calculateScrollCenter(elements, appState, canvas),
+                      ...calculateScrollCenter(elements, appState),
                     }));
                   }}
                 >

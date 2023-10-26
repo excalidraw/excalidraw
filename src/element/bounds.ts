@@ -10,10 +10,7 @@ import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
 import { Point } from "../types";
-import {
-  getShapeForElement,
-  generateRoughOptions,
-} from "../renderer/renderElement";
+import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
   isFreeDrawElement,
@@ -24,6 +21,7 @@ import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 export type RectangleBox = {
   x: number;
@@ -160,7 +158,7 @@ export const getElementAbsoluteCoords = (
   ];
 };
 
-/**
+/*
  * for a given element, `getElementLineSegments` returns line segments
  * that can be used for visual collision detection (useful for frames)
  * as opposed to bounding box collision detection
@@ -621,7 +619,7 @@ const getLinearElementRotatedBounds = (
   }
 
   // first element is always the curve
-  const cachedShape = getShapeForElement(element)?.[0];
+  const cachedShape = ShapeCache.get(element)?.[0];
   const shape = cachedShape ?? generateLinearElementShape(element);
   const ops = getCurvePathOps(shape);
   const transformXY = (x: number, y: number) =>
@@ -674,6 +672,19 @@ export const getCommonBounds = (
   });
 
   return [minX, minY, maxX, maxY];
+};
+
+export const getDraggedElementsBounds = (
+  elements: ExcalidrawElement[],
+  dragOffset: { x: number; y: number },
+) => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  return [
+    minX + dragOffset.x,
+    minY + dragOffset.y,
+    maxX + dragOffset.x,
+    maxY + dragOffset.y,
+  ];
 };
 
 export const getResizedElementAbsoluteCoords = (

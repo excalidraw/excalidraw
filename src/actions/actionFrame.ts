@@ -3,19 +3,13 @@ import { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameElements } from "../frame";
 import { KEYS } from "../keys";
-import { getSelectedElements } from "../scene";
-import { AppState } from "../types";
-import { setCursorForShape, updateActiveTool } from "../utils";
+import { AppClassProperties, AppState } from "../types";
+import { updateActiveTool } from "../utils";
+import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 
-const isSingleFrameSelected = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
+const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
+  const selectedElements = app.scene.getSelectedElements(appState);
 
   return selectedElements.length === 1 && selectedElements[0].type === "frame";
 };
@@ -23,11 +17,8 @@ const isSingleFrameSelected = (
 export const actionSelectAllElementsInFrame = register({
   name: "selectAllElementsInFrame",
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) => {
-    const selectedFrame = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    )[0];
+  perform: (elements, appState, _, app) => {
+    const selectedFrame = app.scene.getSelectedElements(appState)[0];
 
     if (selectedFrame && selectedFrame.type === "frame") {
       const elementsInFrame = getFrameElements(
@@ -55,17 +46,15 @@ export const actionSelectAllElementsInFrame = register({
     };
   },
   contextItemLabel: "labels.selectAllElementsInFrame",
-  predicate: (elements, appState) => isSingleFrameSelected(elements, appState),
+  predicate: (elements, appState, _, app) =>
+    isSingleFrameSelected(appState, app),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
   name: "removeAllElementsFromFrame",
   trackEvent: { category: "history" },
-  perform: (elements, appState) => {
-    const selectedFrame = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-    )[0];
+  perform: (elements, appState, _, app) => {
+    const selectedFrame = app.scene.getSelectedElements(appState)[0];
 
     if (selectedFrame && selectedFrame.type === "frame") {
       return {
@@ -87,11 +76,12 @@ export const actionRemoveAllElementsFromFrame = register({
     };
   },
   contextItemLabel: "labels.removeAllElementsFromFrame",
-  predicate: (elements, appState) => isSingleFrameSelected(elements, appState),
+  predicate: (elements, appState, _, app) =>
+    isSingleFrameSelected(appState, app),
 });
 
-export const actionToggleFrameRendering = register({
-  name: "toggleFrameRendering",
+export const actionupdateFrameRendering = register({
+  name: "updateFrameRendering",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
@@ -99,13 +89,16 @@ export const actionToggleFrameRendering = register({
       elements,
       appState: {
         ...appState,
-        shouldRenderFrames: !appState.shouldRenderFrames,
+        frameRendering: {
+          ...appState.frameRendering,
+          enabled: !appState.frameRendering.enabled,
+        },
       },
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.toggleFrameRendering",
-  checked: (appState: AppState) => appState.shouldRenderFrames,
+  contextItemLabel: "labels.updateFrameRendering",
+  checked: (appState: AppState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({
@@ -116,7 +109,7 @@ export const actionSetFrameAsActiveTool = register({
       type: "frame",
     });
 
-    setCursorForShape(app.canvas, {
+    setCursorForShape(app.interactiveCanvas, {
       ...appState,
       activeTool: nextActiveTool,
     });

@@ -306,30 +306,32 @@ This is the history API. history.clear() will clear the history.
 
 ## scrollToContent
 
-<pre>
-  (<br />
-  {"  "}
-  target?:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
-    ExcalidrawElement
-  </a>{" "}
-  &#124;{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
-    ExcalidrawElement
-  </a>
-  [],
-  <br />
-  {"  "}opts?: &#123; fitToContent?: boolean; animate?: boolean; duration?: number
-  &#125;
-  <br />) => void
-</pre>
+```tsx
+(
+  target?: ExcalidrawElement | ExcalidrawElement[],
+  opts?:
+      | {
+          fitToContent?: boolean;
+          animate?: boolean;
+          duration?: number;
+        }
+      | {
+          fitToViewport?: boolean;
+          viewportZoomFactor?: number;
+          animate?: boolean;
+          duration?: number;
+        }
+) => void
+```
 
 Scroll the nearest element out of the elements supplied to the center of the viewport. Defaults to the elements on the scene.
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | <code>ExcalidrawElement &#124; ExcalidrawElement[]</code> | All scene elements | The element(s) to scroll to. |
-| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
+| opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
+| opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
 | opts.animate | boolean | false | Whether to animate between starting and ending position. Note that for larger scenes the animation may not be smooth due to performance issues. |
 | opts.duration | number | 500 | Duration of the animation if `opts.animate` is `true`. |
 
@@ -402,15 +404,15 @@ This API can be used to customise the mouse cursor on the canvas and has the bel
 (cursor: string) => void
 ```
 
-## toggleMenu
+## toggleSidebar
 
 ```tsx
-(type: "library" | "customSidebar", force?: boolean) => boolean;
+(opts: { name: string; tab?: string; force?: boolean }) => boolean;
 ```
 
-This API can be used to toggle a specific menu (currently only the sidebars), and returns whether the menu was toggled on or off. If the `force` flag passed, it will force the menu to be toggled either on/off based on the `boolean` passed.
+This API can be used to toggle sidebar, optionally opening a specific sidebar tab. It returns whether the sidebar was toggled on or off. If the `force` flag passed, it will force the sidebar to be toggled either on/off.
 
-This API is especially useful when you render a custom sidebar using [`renderSidebar`](#rendersidebar) prop, and you want to toggle it from your app based on a user action.
+This API is especially useful when you render a custom [`<Sidebar/>`](/docs/@excalidraw/excalidraw/api/children-components/sidebar), and you want to toggle it from your app based on a user action.
 
 ## resetCursor
 

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items if passed from host 1`] = `
+exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
   class="dropdown-menu"
   data-testid="dropdown-menu"
@@ -108,7 +108,7 @@ exports[`<Excalidraw/> <MainMenu/> should render main menu with host menu items 
 </div>
 `;
 
-exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu with default items when "UIOPtions" is "undefined" 1`] = `
+exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should render menu with default items when "UIOPtions" is "undefined" 1`] = `
 <div
   class="dropdown-menu"
   data-testid="dropdown-menu"
@@ -516,6 +516,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
       style="margin-top: 0.5rem;"
     >
       <div
+        data-testid="canvas-background-label"
         style="font-size: .75rem; margin-bottom: .5rem;"
       >
         Canvas background
@@ -534,6 +535,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
             >
               <button
                 class="color-picker__button active"
+                data-testid="color-top-pick-#ffffff"
                 style="--swatch-color: #ffffff;"
                 title="#ffffff"
                 type="button"
@@ -544,6 +546,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#f8f9fa"
                 style="--swatch-color: #f8f9fa;"
                 title="#f8f9fa"
                 type="button"
@@ -554,6 +557,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#f5faff"
                 style="--swatch-color: #f5faff;"
                 title="#f5faff"
                 type="button"
@@ -564,6 +568,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#fffce8"
                 style="--swatch-color: #fffce8;"
                 title="#fffce8"
                 type="button"
@@ -574,6 +579,7 @@ exports[`<Excalidraw/> Test UIOptions prop Test canvasActions should render menu
               </button>
               <button
                 class="color-picker__button"
+                data-testid="color-top-pick-#fdf8f6"
                 style="--swatch-color: #fdf8f6;"
                 title="#fdf8f6"
                 type="button"

@@ -4,7 +4,7 @@ import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { UngroupIcon, GroupIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { isSomeElementSelected } from "../scene";
 import {
   getSelectedGroupIds,
   selectGroup,
@@ -22,7 +22,7 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawTextElement,
 } from "../element/types";
-import { AppState } from "../types";
+import { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
@@ -51,14 +51,12 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  app: AppClassProperties,
 ) => {
-  const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
-    appState,
-    {
-      includeBoundTextElement: true,
-    },
-  );
+  const selectedElements = app.scene.getSelectedElements({
+    selectedElementIds: appState.selectedElementIds,
+    includeBoundTextElement: true,
+  });
   return (
     selectedElements.length >= 2 && !allElementsInSameGroup(selectedElements)
   );
@@ -68,13 +66,10 @@ export const actionGroup = register({
   name: "group",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
-    const selectedElements = getSelectedElements(
-      getNonDeletedElements(elements),
-      appState,
-      {
-        includeBoundTextElement: true,
-      },
-    );
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: true,
+    });
     if (selectedElements.length < 2) {
       // nothing to group
       return { appState, elements, commitToHistory: false };
@@ -154,22 +149,26 @@ export const actionGroup = register({
     ];
 
     return {
-      appState: selectGroup(
-        newGroupId,
-        { ...appState, selectedGroupIds: {} },
-        getNonDeletedElements(nextElements),
-      ),
+      appState: {
+        ...appState,
+        ...selectGroup(
+          newGroupId,
+          { ...appState, selectedGroupIds: {} },
+          getNonDeletedElements(nextElements),
+        ),
+      },
       elements: nextElements,
       commitToHistory: true,
     };
   },
   contextItemLabel: "labels.group",
-  predicate: (elements, appState) => enableActionGroup(elements, appState),
+  predicate: (elements, appState, _, app) =>
+    enableActionGroup(elements, appState, app),
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <ToolButton
-      hidden={!enableActionGroup(elements, appState)}
+      hidden={!enableActionGroup(elements, appState, app)}
       type="button"
       icon={<GroupIcon theme={appState.theme} />}
       onClick={() => updateData(null)}
@@ -191,7 +190,7 @@ export const actionUngroup = register({
 
     let nextElements = [...elements];
 
-    const selectedElements = getSelectedElements(nextElements, appState);
+    const selectedElements = app.scene.getSelectedElements(appState);
     const frames = selectedElements
       .filter((element) => element.frameId)
       .map((element) =>
@@ -216,8 +215,10 @@ export const actionUngroup = register({
     });
 
     const updateAppState = selectGroupsForSelectedElements(
-      { ...appState, selectedGroupIds: {} },
+      appState,
       getNonDeletedElements(nextElements),
+      appState,
+      null,
     );
 
     frames.forEach((frame) => {
@@ -232,11 +233,20 @@ export const actionUngroup = register({
     });
 
     // remove binded text elements from selection
-    boundTextElementIds.forEach(
-      (id) => (updateAppState.selectedElementIds[id] = false),
+    updateAppState.selectedElementIds = Object.entries(
+      updateAppState.selectedElementIds,
+    ).reduce(
+      (acc: { [key: ExcalidrawElement["id"]]: true }, [id, selected]) => {
+        if (selected && !boundTextElementIds.includes(id)) {
+          acc[id] = true;
+        }
+        return acc;
+      },
+      {},
     );
+
     return {
-      appState: updateAppState,
+      appState: { ...appState, ...updateAppState },
       elements: nextElements,
       commitToHistory: true,
     };

@@ -109,8 +109,12 @@
     "createContainerFromText": "Envolver texto em um contêiner",
     "link": {
       "edit": "Editar link",
+      "editEmbed": "",
       "create": "Criar link",
-      "label": "Link"
+      "createEmbed": "",
+      "label": "Link",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Editar linha",
@@ -124,9 +128,9 @@
     },
     "statusPublished": "Publicado",
     "sidebarLock": "Manter barra lateral aberta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Selecionar todos os elementos no quadro",
+    "removeAllElementsFromFrame": "Remover todos os elementos do quadro",
+    "eyeDropper": "Escolher cor da tela"
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
@@ -160,13 +164,16 @@
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
     "zenMode": "Modo Zen",
+    "objectsSnapMode": "",
     "exitZenMode": "Sair do modo zen",
     "cancel": "Cancelar",
     "clear": "Limpar",
     "remove": "Remover",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Isto irá limpar toda a tela. Você tem certeza?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Não foi possível inserir imagem. Tente novamente mais tarde...",
     "fileTooBig": "O arquivo é muito grande. O tamanho máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Não foi possível inserir a imagem SVG. A marcação SVG parece inválida.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG Inválido.",
     "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
@@ -206,6 +214,10 @@
       "line2": "Isso pode acabar quebrando <bold>Elementos de Texto</bold> em seus desenhos.",
       "line3": "Recomendamos fortemente desativar essa configuração. Você pode acessar o <link>passo a passo</link> sobre como fazer isso.",
       "line4": "Se desativar essa configuração não corrigir a exibição de elementos de texto, por favor abra uma <issueLink>issue</issueLink> em nosso GitHub, ou mande uma mensagem em nosso <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -223,9 +235,11 @@
     "penMode": "Modo caneta — impede o toque",
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha",
-    "frame": "",
+    "frame": "Ferramenta de quadro",
+    "embeddable": "",
+    "laser": "",
     "hand": "Mão (ferramenta de rolagem)",
-    "extraTools": ""
+    "extraTools": "Mais ferramentas"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -237,6 +251,7 @@
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
+    "embeddable": "",
     "text_selected": "Clique duplo ou tecle ENTER para editar o texto",
     "text_editing": "Pressione Esc ou Ctrl/Cmd+ENTER para encerrar a edição",
     "linearElementMulti": "Clique no último ponto ou pressione Escape ou Enter para terminar",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Pressione Enter para adicionar o texto",
     "deepBoxSelect": "Segure Ctrl/Cmd para seleção profunda e para evitar arrastar",
     "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão",
-    "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\"."
+    "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",
     "selection": "seleção",
-    "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente"
+    "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "Transparente",
@@ -449,5 +467,36 @@
     "shades": "Tons",
     "hexCode": "Código hexadecimal",
     "noShades": "Sem tons disponíveis para essa cor"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Exportar como imagem",
+        "button": "Exportar como imagem",
+        "description": "Exportar os dados da cena para um arquivo que você poderá importar mais tarde."
+      },
+      "saveToDisk": {
+        "title": "Salvar no computador",
+        "button": "Salvar no computador",
+        "description": "Exportar os dados da cena para um arquivo que você poderá importar mais tarde."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Exportar para Excalidraw+",
+        "description": "Salvar a cena na sua área de trabalho Excalidraw+."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Carregar de arquivo",
+        "button": "Carregar de arquivo",
+        "description": "Carregar de um arquivo irá <bold> substituir o conteúdo existente</bold>.<br></br>Você pode salvar seu desenho primeiro usando uma das opções abaixo."
+      },
+      "shareableLink": {
+        "title": "Carregar de um link",
+        "button": "Substituir meu conteúdo",
+        "description": "Carregar um desenho externo irá <bold> substituir seu conteúdo existente</bold>.<br></br>Você pode salvar seu desenho antes utilizando uma das opções abaixo."
+      }
+    }
   }
 }

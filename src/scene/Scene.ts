@@ -11,12 +11,41 @@ import {
 } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameElement } from "../element/typeChecks";
+import { getSelectedElements } from "./selection";
+import { AppState } from "../types";
+import { Assert, SameType } from "../utility-types";
+import { randomInteger } from "../random";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
+
+type SelectionHash = string & { __brand: "selectionHash" };
+
+const hashSelectionOpts = (
+  opts: Parameters<InstanceType<typeof Scene>["getSelectedElements"]>[0],
+) => {
+  const keys = ["includeBoundTextElement", "includeElementsInFrames"] as const;
+
+  type HashableKeys = Omit<typeof opts, "selectedElementIds" | "elements">;
+
+  // just to ensure we're hashing all expected keys
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type _ = Assert<
+    SameType<
+      Required<HashableKeys>,
+      Pick<Required<HashableKeys>, typeof keys[number]>
+    >
+  >;
+
+  let hash = "";
+  for (const key of keys) {
+    hash += `${key}:${opts[key] ? "1" : "0"}`;
+  }
+  return hash as SelectionHash;
+};
 
 // ideally this would be a branded type but it'd be insanely hard to work with
 // in our codebase
@@ -68,6 +97,16 @@ class Scene {
   private nonDeletedFrames: readonly NonDeleted<ExcalidrawFrameElement>[] = [];
   private frames: readonly ExcalidrawFrameElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
+  private selectedElementsCache: {
+    selectedElementIds: AppState["selectedElementIds"] | null;
+    elements: readonly NonDeletedExcalidrawElement[] | null;
+    cache: Map<SelectionHash, NonDeletedExcalidrawElement[]>;
+  } = {
+    selectedElementIds: null,
+    elements: null,
+    cache: new Map(),
+  };
+  private versionNonce: number | undefined;
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -81,12 +120,62 @@ class Scene {
     return this.frames;
   }
 
+  getSelectedElements(opts: {
+    // NOTE can be ommitted by making Scene constructor require App instance
+    selectedElementIds: AppState["selectedElementIds"];
+    /**
+     * for specific cases where you need to use elements not from current
+     * scene state. This in effect will likely result in cache-miss, and
+     * the cache won't be updated in this case.
+     */
+    elements?: readonly ExcalidrawElement[];
+    // selection-related options
+    includeBoundTextElement?: boolean;
+    includeElementsInFrames?: boolean;
+  }): NonDeleted<ExcalidrawElement>[] {
+    const hash = hashSelectionOpts(opts);
+
+    const elements = opts?.elements || this.nonDeletedElements;
+    if (
+      this.selectedElementsCache.elements === elements &&
+      this.selectedElementsCache.selectedElementIds === opts.selectedElementIds
+    ) {
+      const cached = this.selectedElementsCache.cache.get(hash);
+      if (cached) {
+        return cached;
+      }
+    } else if (opts?.elements == null) {
+      // if we're operating on latest scene elements and the cache is not
+      //  storing the latest elements, clear the cache
+      this.selectedElementsCache.cache.clear();
+    }
+
+    const selectedElements = getSelectedElements(
+      elements,
+      { selectedElementIds: opts.selectedElementIds },
+      opts,
+    );
+
+    // cache only if we're not using custom elements
+    if (opts?.elements == null) {
+      this.selectedElementsCache.selectedElementIds = opts.selectedElementIds;
+      this.selectedElementsCache.elements = this.nonDeletedElements;
+      this.selectedElementsCache.cache.set(hash, selectedElements);
+    }
+
+    return selectedElements;
+  }
+
   getNonDeletedFrames(): readonly NonDeleted<ExcalidrawFrameElement>[] {
     return this.nonDeletedFrames;
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
     return (this.elementsMap.get(id) as T | undefined) || null;
+  }
+
+  getVersionNonce() {
+    return this.versionNonce;
   }
 
   getNonDeletedElement(
@@ -147,6 +236,8 @@ class Scene {
   }
 
   informMutation() {
+    this.versionNonce = randomInteger();
+
     for (const callback of Array.from(this.callbacks)) {
       callback();
     }
@@ -168,11 +259,21 @@ class Scene {
   }
 
   destroy() {
+    this.nonDeletedElements = [];
+    this.elements = [];
+    this.nonDeletedFrames = [];
+    this.frames = [];
+    this.elementsMap.clear();
+    this.selectedElementsCache.selectedElementIds = null;
+    this.selectedElementsCache.elements = null;
+    this.selectedElementsCache.cache.clear();
+
     Scene.sceneMapById.forEach((scene, elementKey) => {
       if (scene === this) {
         Scene.sceneMapById.delete(elementKey);
       }
     });
+
     // done not for memory leaks, but to guard against possible late fires
     // (I guess?)
     this.callbacks.clear();

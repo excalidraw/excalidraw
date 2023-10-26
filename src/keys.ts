@@ -10,6 +10,7 @@ export const CODES = {
   BRACKET_LEFT: "BracketLeft",
   ONE: "Digit1",
   TWO: "Digit2",
+  THREE: "Digit3",
   NINE: "Digit9",
   QUOTE: "Quote",
   ZERO: "Digit0",
@@ -20,6 +21,7 @@ export const CODES = {
   V: "KeyV",
   Z: "KeyZ",
   R: "KeyR",
+  S: "KeyS",
 } as const;
 
 export const KEYS = {
@@ -64,6 +66,7 @@ export const KEYS = {
   Y: "y",
   Z: "z",
   K: "k",
+  W: "w",
 
   0: "0",
   1: "1",

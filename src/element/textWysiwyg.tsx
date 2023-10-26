@@ -20,10 +20,9 @@ import {
   ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
-import { mutateElement } from "./mutateElement";
+import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
-  getContainerDims,
   getContainerElement,
   getTextElementAngle,
   getTextWidth,
@@ -117,7 +116,7 @@ export const textWysiwyg = ({
   }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement;
   excalidrawContainer: HTMLDivElement | null;
   app: App;
 }) => {
@@ -177,20 +176,19 @@ export const textWysiwyg = ({
           updatedTextElement,
           editable,
         );
-        const containerDims = getContainerDims(container);
 
         let originalContainerData;
         if (propertiesUpdated) {
           originalContainerData = updateOriginalContainerCache(
             container.id,
-            containerDims.height,
+            container.height,
           );
         } else {
           originalContainerData = originalContainerCache[container.id];
           if (!originalContainerData) {
             originalContainerData = updateOriginalContainerCache(
               container.id,
-              containerDims.height,
+              container.height,
             );
           }
         }
@@ -214,7 +212,7 @@ export const textWysiwyg = ({
           // autoshrink container height until original container height
           // is reached when text is removed
           !isArrowElement(container) &&
-          containerDims.height > originalContainerData.height &&
+          container.height > originalContainerData.height &&
           textElementHeight < maxHeight
         ) {
           const targetContainerHeight = computeContainerDimensionForBoundText(
@@ -543,6 +541,9 @@ export const textWysiwyg = ({
               id: element.id,
             }),
           });
+        } else if (isArrowElement(container)) {
+          // updating an arrow label may change bounds, prevent stale cache:
+          bumpVersion(container);
         }
       } else {
         mutateElement(container, {
@@ -583,7 +584,7 @@ export const textWysiwyg = ({
     window.removeEventListener("pointerdown", onPointerDown);
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
-
+    window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
 
     editable.remove();
@@ -700,6 +701,7 @@ export const textWysiwyg = ({
     passive: false,
     capture: true,
   });
+  window.addEventListener("beforeunload", handleSubmit);
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);

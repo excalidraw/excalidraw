@@ -18,6 +18,7 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
+  ExcalidrawEmbeddableElement,
   ExcalidrawDiamondElement,
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
@@ -38,13 +39,17 @@ import {
 import { FrameNameBoundsCache, Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
-import { getShapeForElement } from "../renderer/renderElement";
-import { hasBoundTextElement, isImageElement } from "./typeChecks";
+import {
+  hasBoundTextElement,
+  isEmbeddableElement,
+  isImageElement,
+} from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
+import { ShapeCache } from "../scene/ShapeCache";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -57,7 +62,9 @@ const isElementDraggableFromInside = (
     return true;
   }
   const isDraggableFromInside =
-    !isTransparent(element.backgroundColor) || hasBoundTextElement(element);
+    !isTransparent(element.backgroundColor) ||
+    hasBoundTextElement(element) ||
+    isEmbeddableElement(element);
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
@@ -248,6 +255,7 @@ type HitTestArgs = {
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
   switch (args.element.type) {
     case "rectangle":
+    case "embeddable":
     case "image":
     case "text":
     case "diamond":
@@ -306,6 +314,7 @@ export const distanceToBindableElement = (
     case "rectangle":
     case "image":
     case "text":
+    case "embeddable":
     case "frame":
       return distanceToRectangle(element, point);
     case "diamond":
@@ -337,6 +346,7 @@ const distanceToRectangle = (
     | ExcalidrawTextElement
     | ExcalidrawFreeDrawElement
     | ExcalidrawImageElement
+    | ExcalidrawEmbeddableElement
     | ExcalidrawFrameElement,
   point: Point,
 ): number => {
@@ -479,12 +489,14 @@ const hitTestFreeDrawElement = (
     B = element.points[i + 1];
   }
 
-  const shape = getShapeForElement(element);
+  const shape = ShapeCache.get(element);
 
   // for filled freedraw shapes, support
   // selecting from inside
   if (shape && shape.sets.length) {
-    return hitTestRoughShape(shape, x, y, threshold);
+    return element.fillStyle === "solid"
+      ? hitTestCurveInside(shape, x, y, "round")
+      : hitTestRoughShape(shape, x, y, threshold);
   }
 
   return false;
@@ -492,7 +504,7 @@ const hitTestFreeDrawElement = (
 
 const hitTestLinear = (args: HitTestArgs): boolean => {
   const { element, threshold } = args;
-  if (!getShapeForElement(element)) {
+  if (!ShapeCache.get(element)) {
     return false;
   }
 
@@ -510,7 +522,7 @@ const hitTestLinear = (args: HitTestArgs): boolean => {
   }
   const [relX, relY] = GAPoint.toTuple(point);
 
-  const shape = getShapeForElement(element as ExcalidrawLinearElement);
+  const shape = ShapeCache.get(element as ExcalidrawLinearElement);
 
   if (!shape) {
     return false;
@@ -645,17 +657,23 @@ export const determineFocusDistance = (
   const c = line[1];
   const mabs = Math.abs(m);
   const nabs = Math.abs(n);
+  let ret;
   switch (element.type) {
     case "rectangle":
     case "image":
     case "text":
+    case "embeddable":
     case "frame":
-      return c / (hwidth * (nabs + q * mabs));
+      ret = c / (hwidth * (nabs + q * mabs));
+      break;
     case "diamond":
-      return mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+      ret = mabs < nabs ? c / (nabs * hwidth) : c / (mabs * hheight);
+      break;
     case "ellipse":
-      return c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+      ret = c / (hwidth * Math.sqrt(n ** 2 + q ** 2 * m ** 2));
+      break;
   }
+  return ret || 0;
 };
 
 export const determineFocusPoint = (
@@ -682,6 +700,7 @@ export const determineFocusPoint = (
     case "image":
     case "text":
     case "diamond":
+    case "embeddable":
     case "frame":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
       break;
@@ -733,6 +752,7 @@ const getSortedElementLineIntersections = (
     case "image":
     case "text":
     case "diamond":
+    case "embeddable":
     case "frame":
       const corners = getCorners(element);
       intersections = corners
@@ -768,6 +788,7 @@ const getCorners = (
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement
+    | ExcalidrawEmbeddableElement
     | ExcalidrawFrameElement,
   scale: number = 1,
 ): GA.Point[] => {
@@ -777,6 +798,7 @@ const getCorners = (
     case "rectangle":
     case "image":
     case "text":
+    case "embeddable":
     case "frame":
       return [
         GA.point(hx, hy),
@@ -926,6 +948,7 @@ export const findFocusPointForRectangulars = (
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement
+    | ExcalidrawEmbeddableElement
     | ExcalidrawFrameElement,
   // Between -1 and 1 for how far away should the focus point be relative
   // to the size of the element. Sign determines orientation.

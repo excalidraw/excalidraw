@@ -109,8 +109,12 @@
     "createContainerFromText": "உரையைக் கொள்கலனுள் சுருட்டு",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
+      "editEmbed": "",
       "create": "தொடுப்பைப் படை",
-      "label": "தொடுப்பு"
+      "createEmbed": "",
+      "label": "தொடுப்பு",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "தொடுப்பைத் திருத்து",
@@ -160,13 +164,16 @@
     "darkMode": "கருமை பயன்முறை",
     "lightMode": "வெளிர்ந்த பயன்முறை",
     "zenMode": "ஜென் பயன்முறை",
+    "objectsSnapMode": "",
     "exitZenMode": "ஜென் பயன்முறையை விலகு",
     "cancel": "ரத்துசெய்",
     "clear": "துடை",
     "remove": "நீக்கு",
+    "embed": "",
     "publishLibrary": "பிரசுரி",
     "submit": "சமர்ப்பி",
-    "confirm": "உறுதிசெய்"
+    "confirm": "உறுதிசெய்",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "இது முழு கித்தானையும் துடைக்கும். நீங்கள் உறுதியா?",
@@ -196,6 +203,7 @@
     "imageInsertError": "படத்தைப் புகுத்தவியலா. பிறகு மீண்டும் முயலவும்...",
     "fileTooBig": "கோப்பு மிகப்பெரிது. அனுமதிக்கப்பட்ட அதிகபட்ச அளவு {{maxSize}}.",
     "svgImageInsertError": "எஸ்விஜி படத்தைப் புகுத்தவியலா. எஸ்விஜியின் மார்க்அப் செல்லாததாக தெரிகிறது.",
+    "failedToFetchImage": "",
     "invalidSVGString": "செல்லாத SVG.",
     "cannotResolveCollabServer": "கூட்டுப்பணிச் சேவையகத்துடன் இணைக்க முடியவில்லை. பக்கத்தை மீளேற்றி மீண்டும் முயலவும்.",
     "importLibraryError": "நூலகத்தை ஏற்ற முடியவில்லை",
@@ -206,6 +214,10 @@
       "line2": "",
       "line3": "",
       "line4": ""
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -220,12 +232,14 @@
     "text": "உரை",
     "library": "நூலகம்",
     "lock": "தேர்ந்த கருவியை வரைந்த பின்பும் வைத்திரு",
-    "penMode": "",
+    "penMode": "பேனா - தடுப்பு தொடுதல்",
     "link": "தேர்தெடுத்த வடிவத்திற்குத் தொடுப்பைச் சேர்/ புதுப்பி",
     "eraser": "அழிப்பி",
-    "frame": "",
-    "hand": "",
-    "extraTools": ""
+    "frame": "சட்டகம் கருவி",
+    "embeddable": "",
+    "laser": "",
+    "hand": "கை (பார்வை நகர்கும் கருவி)",
+    "extraTools": "மற்ற கருவிகள்"
   },
   "headings": {
     "canvasActions": "கித்தான் செயல்கள்",
@@ -237,6 +251,7 @@
     "linearElement": "பல புள்ளிகளைத் துவக்க சொடுக்கு, ஒற்றை வரிக்கு பிடித்திழு",
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
+    "embeddable": "",
     "text_selected": "உரையைத் திருத்த இரு-சொடுக்கு அ ENTERஐ அழுத்து",
     "text_editing": "திருத்துவதை முடிக்க Escape அ CtrlOrCmd+ENTERஐ அழுத்து",
     "linearElementMulti": "கடைசி புள்ளியில் சொடுக்கு அ முடிக்க Escape அ Enter அழுத்து",
@@ -252,7 +267,8 @@
     "bindTextToElement": "உரையைச் சேர்க்க enterஐ அழுத்து",
     "deepBoxSelect": "ஆழ்ந்துத் தேரவும் பிடித்திழுத்தலைத் தவிர்க்கவும் CtrlOrCmdஐ அழுத்திப்பிடி",
     "eraserRevert": "",
-    "firefox_clipboard_write": ""
+    "firefox_clipboard_write": "",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
@@ -317,8 +333,8 @@
     "zoomToFit": "அனைத்துறுப்புகளும் பொருந்தும்படி விரிவாக்கு",
     "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
     "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்",
-    "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageUpDown": "மேலே/கீழே நகர்த்தவும்",
+    "movePageLeftRight": "இடது/வலது பக்கம் நகர்த்தவும்"
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
@@ -360,26 +376,26 @@
     "removeItemsFromLib": "நூலகத்திலிருந்து தேர்ந்தெடுத்த உருப்படிகளை நீக்கு"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "படத்தை ஏற்றுமதிதல",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
+      "withBackground": "பின்னணி",
+      "onlySelected": "தேர்ந்ததை மட்டும்",
+      "darkMode": "இருள் பயன்முறை",
+      "embedScene": "காட்சியை உட்பொதி",
+      "scale": "அளவுகோல்",
       "padding": ""
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
+      "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
@@ -411,24 +427,26 @@
     "fileSavedToFilename": "{filename}-க்கு சேமிக்கப்பட்டது",
     "canvas": "கித்தான்",
     "selection": "தெரிவு",
-    "pasteAsSingleElement": ""
+    "pasteAsSingleElement": "",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "ஒளிபுகுத்தன்மை",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "கருப்பு",
+    "white": "வெள்ளை",
+    "red": "சிவப்பு",
+    "pink": "இளஞ்சிவப்பு",
+    "grape": "திராட்சை",
+    "violet": "ஊதா",
+    "gray": "சாம்பல்",
+    "blue": "நீலம்",
+    "cyan": "மயில்நிறம்",
+    "teal": "டீல்",
+    "green": "பச்சை",
+    "yellow": "மஞ்சள்",
+    "orange": "ஆரஞ்சு",
+    "bronze": "வெண்கலம்"
   },
   "welcomeScreen": {
     "app": {
@@ -449,5 +467,36 @@
     "shades": "",
     "hexCode": "",
     "noShades": ""
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

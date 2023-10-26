@@ -16,8 +16,8 @@ import {
   Theme,
   StrokeRoundness,
   ExcalidrawFrameElement,
+  ExcalidrawEmbeddableElement,
 } from "./element/types";
-import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
@@ -33,15 +33,13 @@ import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
+import { SnapLine } from "./snapping";
 import { Merge, ForwardRef, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
 export type Collaborator = {
-  pointer?: {
-    x: number;
-    y: number;
-  };
+  pointer?: CollaboratorPointer;
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
@@ -55,6 +53,12 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+};
+
+export type CollaboratorPointer = {
+  x: number;
+  y: number;
+  tool: "pointer" | "laser";
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -84,19 +88,86 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type LastActiveTool =
+export type ToolType =
+  | "selection"
+  | "rectangle"
+  | "diamond"
+  | "ellipse"
+  | "arrow"
+  | "line"
+  | "freedraw"
+  | "text"
+  | "image"
+  | "eraser"
+  | "hand"
+  | "frame"
+  | "embeddable"
+  | "laser";
+
+export type ActiveTool =
   | {
-      type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
+      type: ToolType;
       customType: null;
     }
   | {
       type: "custom";
       customType: string;
-    }
-  | null;
+    };
 
 export type SidebarName = string;
 export type SidebarTabName = string;
+
+type _CommonCanvasAppState = {
+  zoom: AppState["zoom"];
+  scrollX: AppState["scrollX"];
+  scrollY: AppState["scrollY"];
+  width: AppState["width"];
+  height: AppState["height"];
+  viewModeEnabled: AppState["viewModeEnabled"];
+  editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
+  selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
+  frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
+  offsetLeft: AppState["offsetLeft"];
+  offsetTop: AppState["offsetTop"];
+  theme: AppState["theme"];
+  pendingImageElementId: AppState["pendingImageElementId"];
+};
+
+export type StaticCanvasAppState = Readonly<
+  _CommonCanvasAppState & {
+    shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
+    /** null indicates transparent bg */
+    viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+    exportScale: AppState["exportScale"];
+    selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
+    gridSize: AppState["gridSize"];
+    frameRendering: AppState["frameRendering"];
+  }
+>;
+
+export type InteractiveCanvasAppState = Readonly<
+  _CommonCanvasAppState & {
+    // renderInteractiveScene
+    activeEmbeddable: AppState["activeEmbeddable"];
+    editingLinearElement: AppState["editingLinearElement"];
+    selectionElement: AppState["selectionElement"];
+    selectedGroupIds: AppState["selectedGroupIds"];
+    selectedLinearElement: AppState["selectedLinearElement"];
+    multiElement: AppState["multiElement"];
+    isBindingEnabled: AppState["isBindingEnabled"];
+    suggestedBindings: AppState["suggestedBindings"];
+    isRotating: AppState["isRotating"];
+    elementsToHighlight: AppState["elementsToHighlight"];
+    // App
+    openSidebar: AppState["openSidebar"];
+    showHyperlinkPopup: AppState["showHyperlinkPopup"];
+    // Collaborators
+    collaborators: AppState["collaborators"];
+    // SnapLines
+    snapLines: AppState["snapLines"];
+    zenModeEnabled: AppState["zenModeEnabled"];
+  }
+>;
 
 export type AppState = {
   contextMenu: {
@@ -107,6 +178,10 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
+  activeEmbeddable: {
+    element: NonDeletedExcalidrawElement;
+    state: "hover" | "active";
+  } | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -115,7 +190,12 @@ export type AppState = {
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
   frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
-  shouldRenderFrames: boolean;
+  frameRendering: {
+    enabled: boolean;
+    name: boolean;
+    outline: boolean;
+    clip: boolean;
+  };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   // element being edited, but not necessarily added to elements array yet
@@ -127,18 +207,9 @@ export type AppState = {
      * indicates a previous tool we should revert back to if we deselect the
      * currently active tool. At the moment applies to `eraser` and `hand` tool.
      */
-    lastActiveTool: LastActiveTool;
+    lastActiveTool: ActiveTool | null;
     locked: boolean;
-  } & (
-    | {
-        type: typeof SHAPES[number]["value"] | "eraser" | "hand" | "frame";
-        customType: null;
-      }
-    | {
-        type: "custom";
-        customType: string;
-      }
-  );
+  } & ActiveTool;
   penMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
@@ -181,8 +252,8 @@ export type AppState = {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
-  selectedElementIds: { [id: string]: boolean };
-  previousSelectedElementIds: { [id: string]: boolean };
+  selectedElementIds: Readonly<{ [id: string]: true }>;
+  previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
   toast: { message: string; closable?: boolean; duration?: number } | null;
@@ -218,6 +289,13 @@ export type AppState = {
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
   selectedLinearElement: LinearElementEditor | null;
+
+  snapLines: readonly SnapLine[];
+  originSnapOffset: {
+    x: number;
+    y: number;
+  } | null;
+  objectsSnapModeEnabled: boolean;
 };
 
 export type UIAppState = Omit<
@@ -315,7 +393,7 @@ export interface ExcalidrawProps {
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number };
+    pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
@@ -331,6 +409,7 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
   name?: string;
@@ -356,6 +435,16 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
+  validateEmbeddable?:
+    | boolean
+    | string[]
+    | RegExp
+    | RegExp[]
+    | ((link: string) => boolean | undefined);
+  renderEmbeddable?: (
+    element: NonDeleted<ExcalidrawEmbeddableElement>,
+    appState: AppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {
@@ -377,13 +466,13 @@ export type ExportOpts = {
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement,
   ) => JSX.Element;
 };
 
@@ -428,7 +517,9 @@ export type AppProps = Merge<
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
   props: AppProps;
-  canvas: HTMLCanvasElement | null;
+  interactiveCanvas: HTMLCanvasElement | null;
+  /** static canvas */
+  canvas: HTMLCanvasElement;
   focusContainer(): void;
   library: Library;
   imageCache: Map<
@@ -446,6 +537,8 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   lastViewportPosition: App["lastViewportPosition"];
+  togglePenMode: App["togglePenMode"];
+  setActiveTool: App["setActiveTool"];
 };
 
 export type PointerDownState = Readonly<{
@@ -514,6 +607,8 @@ export type PointerDownState = Readonly<{
   };
 }>;
 
+type UnsubscribeCallback = () => void;
+
 export type ExcalidrawImperativeAPI = {
   updateScene: InstanceType<typeof App>["updateScene"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
@@ -543,7 +638,28 @@ export type ExcalidrawImperativeAPI = {
    * the frames are still interactive in edit mode. As such, this API should be
    * used in conjunction with view mode (props.viewModeEnabled).
    */
-  toggleFrameRendering: InstanceType<typeof App>["toggleFrameRendering"];
+  updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
+  onChange: (
+    callback: (
+      elements: readonly ExcalidrawElement[],
+      appState: AppState,
+      files: BinaryFiles,
+    ) => void,
+  ) => UnsubscribeCallback;
+  onPointerDown: (
+    callback: (
+      activeTool: AppState["activeTool"],
+      pointerDownState: PointerDownState,
+      event: React.PointerEvent<HTMLElement>,
+    ) => void,
+  ) => UnsubscribeCallback;
+  onPointerUp: (
+    callback: (
+      activeTool: AppState["activeTool"],
+      pointerDownState: PointerDownState,
+      event: PointerEvent,
+    ) => void,
+  ) => UnsubscribeCallback;
 };
 
 export type Device = Readonly<{
@@ -572,3 +688,19 @@ export type FrameNameBoundsCache = {
     }
   >;
 };
+
+export type KeyboardModifiersObject = {
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
+};
+
+export type Primitive =
+  | number
+  | string
+  | boolean
+  | bigint
+  | symbol
+  | null
+  | undefined;
