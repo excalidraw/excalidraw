@@ -1,4 +1,3 @@
-import { BBox, bbox } from "./bbox";
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -13,6 +12,7 @@ import {
 } from "../element/typeChecks";
 import { isValueInRange, rotatePoint } from "../math";
 import type { Point } from "../types";
+import { Bounds } from "../element/bounds";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
@@ -77,7 +77,7 @@ const getMinMaxPoints = (points: Points) => {
   return ret;
 };
 
-const getRotatedBBox = (element: Element): BBox => {
+const getRotatedBBox = (element: Element): Bounds => {
   const points = getElementRelativePoints(element);
 
   const { cx, cy } = getMinMaxPoints(points);
@@ -88,24 +88,26 @@ const getRotatedBBox = (element: Element): BBox => {
   );
   const { minX, minY, maxX, maxY } = getMinMaxPoints(rotatedPoints);
 
-  return bbox(
-    [minX + element.x, minY + element.y],
-    [maxX + element.x, maxY + element.y],
-  );
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
 };
 
 export const isElementInsideBBox = (
   element: Element,
-  bbox: BBox,
+  bbox: Bounds,
   eitherDirection = false,
 ): boolean => {
   const elementBBox = getRotatedBBox(element);
 
   const elementInsideBbox =
-    bbox[0][0] <= elementBBox[0][0] &&
-    bbox[1][0] >= elementBBox[1][0] &&
-    bbox[0][1] <= elementBBox[0][1] &&
-    bbox[1][1] >= elementBBox[1][1];
+    bbox[0] <= elementBBox[0] &&
+    bbox[2] >= elementBBox[2] &&
+    bbox[1] <= elementBBox[1] &&
+    bbox[3] >= elementBBox[3];
 
   if (!eitherDirection) {
     return elementInsideBbox;
@@ -116,24 +118,24 @@ export const isElementInsideBBox = (
   }
 
   return (
-    elementBBox[0][0] <= bbox[0][0] &&
-    elementBBox[1][0] >= bbox[1][0] &&
-    elementBBox[0][1] <= bbox[0][1] &&
-    elementBBox[1][1] >= bbox[1][1]
+    elementBBox[0] <= bbox[0] &&
+    elementBBox[2] >= bbox[2] &&
+    elementBBox[1] <= bbox[1] &&
+    elementBBox[3] >= bbox[3]
   );
 };
 
 export const elementPartiallyOverlapsWithOrContainsBBox = (
   element: Element,
-  bbox: BBox,
+  bbox: Bounds,
 ): boolean => {
   const elementBBox = getRotatedBBox(element);
 
   return (
-    (isValueInRange(elementBBox[0][0], bbox[0][0], bbox[1][0]) ||
-      isValueInRange(bbox[0][0], elementBBox[0][0], elementBBox[1][0])) &&
-    (isValueInRange(elementBBox[0][1], bbox[0][1], bbox[1][1]) ||
-      isValueInRange(bbox[0][1], elementBBox[0][1], elementBBox[1][1]))
+    (isValueInRange(elementBBox[0], bbox[0], bbox[2]) ||
+      isValueInRange(bbox[0], elementBBox[0], elementBBox[2])) &&
+    (isValueInRange(elementBBox[1], bbox[1], bbox[3]) ||
+      isValueInRange(bbox[1], elementBBox[1], elementBBox[3]))
   );
 };
 
@@ -144,7 +146,7 @@ export const elementsOverlappingBBox = ({
   errorMargin = 0,
 }: {
   elements: Elements;
-  bounds: BBox;
+  bounds: Bounds;
   /** safety offset. Defaults to 0. */
   errorMargin?: number;
   /**
@@ -154,10 +156,12 @@ export const elementsOverlappingBBox = ({
    **/
   type: "overlap" | "contain" | "inside";
 }) => {
-  const adjustedBBox = bbox(
-    [bounds[0][0] - errorMargin, bounds[0][1] - errorMargin],
-    [bounds[1][0] + errorMargin, bounds[1][1] + errorMargin],
-  );
+  const adjustedBBox: Bounds = [
+    bounds[0] - errorMargin,
+    bounds[1] - errorMargin,
+    bounds[2] + errorMargin,
+    bounds[3] + errorMargin,
+  ];
 
   const includedElementSet = new Set<string>();
 
@@ -220,13 +224,12 @@ window.debug = () => {
 
   const boundsElement = window.h.elements[boundsIndex];
 
-  const boundsBBox = bbox(
-    [boundsElement.x, boundsElement.y],
-    [
-      boundsElement.x + boundsElement.width,
-      boundsElement.y + boundsElement.height,
-    ],
-  );
+  const boundsBBox: Bounds = [
+    boundsElement.x,
+    boundsElement.y,
+    boundsElement.x + boundsElement.width,
+    boundsElement.y + boundsElement.height,
+  ];
 
   const allElements = [
     ...window.h.elements.slice(0, boundsIndex),

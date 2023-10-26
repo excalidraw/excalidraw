@@ -1,16 +1,14 @@
+import { Bounds } from "../element/bounds";
 import { Point } from "../types";
 
 export type LineSegment = [Point, Point];
-export type BBox = [topLeft: Point, bottomRight: Point];
 
-export function bbox(topLeft: Point, bottomRight: Point): BBox {
-  return [topLeft, bottomRight];
-}
-
-export function getBBox(line: LineSegment): BBox {
+export function getBBox(line: LineSegment): Bounds {
   return [
-    [Math.min(line[0][0], line[1][0]), Math.min(line[0][1], line[1][1])],
-    [Math.max(line[0][0], line[1][0]), Math.max(line[0][1], line[1][1])],
+    Math.min(line[0][0], line[1][0]),
+    Math.min(line[0][1], line[1][1]),
+    Math.max(line[0][0], line[1][0]),
+    Math.max(line[0][1], line[1][1]),
   ];
 }
 
@@ -18,13 +16,8 @@ export function crossProduct(a: Point, b: Point) {
   return a[0] * b[1] - b[0] * a[1];
 }
 
-export function doBBoxesIntersect(a: BBox, b: BBox) {
-  return (
-    a[0][0] <= b[1][0] &&
-    a[1][0] >= b[0][0] &&
-    a[0][1] <= b[1][1] &&
-    a[1][1] >= b[0][1]
-  );
+export function doBBoxesIntersect(a: Bounds, b: Bounds) {
+  return a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
 }
 
 export function translate(a: Point, b: Point): Point {
