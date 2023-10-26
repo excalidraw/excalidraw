@@ -34,7 +34,12 @@ export type RectangleBox = {
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
 // x and y position of top left corner, x and y position of bottom right corner
-export type Bounds = readonly [x1: number, y1: number, x2: number, y2: number];
+export type Bounds = readonly [
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+];
 
 export class ElementBounds {
   private static boundsCache = new WeakMap<
@@ -63,7 +68,7 @@ export class ElementBounds {
   }
 
   private static calculateBounds(element: ExcalidrawElement): Bounds {
-    let bounds: [number, number, number, number];
+    let bounds: Bounds;
 
     const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
 
@@ -387,7 +392,7 @@ const getCubicBezierCurveBound = (
 export const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
   transformXY?: (x: number, y: number) => [number, number],
-): [number, number, number, number] => {
+): Bounds => {
   let currentP: Point = [0, 0];
 
   const { minX, minY, maxX, maxY } = ops.reduce(
@@ -435,9 +440,9 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-const getBoundsFromPoints = (
+export const getBoundsFromPoints = (
   points: ExcalidrawFreeDrawElement["points"],
-): [number, number, number, number] => {
+): Bounds => {
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -589,7 +594,7 @@ const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
   cy: number,
-): [number, number, number, number] => {
+): Bounds => {
   if (element.points.length < 2) {
     const [pointX, pointY] = element.points[0];
     const [x, y] = rotate(
@@ -600,7 +605,7 @@ const getLinearElementRotatedBounds = (
       element.angle,
     );
 
-    let coords: [number, number, number, number] = [x, y, x, y];
+    let coords: Bounds = [x, y, x, y];
     const boundTextElement = getBoundTextElement(element);
     if (boundTextElement) {
       const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
@@ -625,12 +630,7 @@ const getLinearElementRotatedBounds = (
   const transformXY = (x: number, y: number) =>
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
   const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
-  let coords: [number, number, number, number] = [
-    res[0],
-    res[1],
-    res[2],
-    res[3],
-  ];
+  let coords: Bounds = [res[0], res[1], res[2], res[3]];
   const boundTextElement = getBoundTextElement(element);
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
@@ -692,7 +692,7 @@ export const getResizedElementAbsoluteCoords = (
   nextWidth: number,
   nextHeight: number,
   normalizePoints: boolean,
-): [number, number, number, number] => {
+): Bounds => {
   if (!(isLinearElement(element) || isFreeDrawElement(element))) {
     return [
       element.x,
@@ -709,7 +709,7 @@ export const getResizedElementAbsoluteCoords = (
     normalizePoints,
   );
 
-  let bounds: [number, number, number, number];
+  let bounds: Bounds;
 
   if (isFreeDrawElement(element)) {
     // Free Draw
@@ -740,7 +740,7 @@ export const getResizedElementAbsoluteCoords = (
 export const getElementPointsCoords = (
   element: ExcalidrawLinearElement,
   points: readonly (readonly [number, number])[],
-): [number, number, number, number] => {
+): Bounds => {
   // This might be computationally heavey
   const gen = rough.generator();
   const curve =
