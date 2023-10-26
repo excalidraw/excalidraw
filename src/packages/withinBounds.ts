@@ -1,5 +1,5 @@
 import { BBox, bbox } from "./bbox";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -11,8 +11,8 @@ import {
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
-import { rotatePoint } from "../math";
-import { Point } from "../types";
+import { isValueInRange, rotatePoint } from "../math";
+import type { Point } from "../types";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
@@ -94,25 +94,39 @@ const getRotatedBBox = (element: Element): BBox => {
   );
 };
 
-function isElementInsideBBox(element: Element, bbox: BBox): boolean {
+export const isElementInsideBBox = (
+  element: Element,
+  bbox: BBox,
+  eitherDirection = false,
+): boolean => {
   const elementBBox = getRotatedBBox(element);
 
-  return (
+  const elementInsideBbox =
     bbox[0][0] < elementBBox[0][0] &&
     bbox[1][0] > elementBBox[1][0] &&
     bbox[0][1] < elementBBox[0][1] &&
-    bbox[1][1] > elementBBox[1][1]
+    bbox[1][1] > elementBBox[1][1];
+
+  if (!eitherDirection) {
+    return elementInsideBbox;
+  }
+
+  if (elementInsideBbox) {
+    return true;
+  }
+
+  return (
+    elementBBox[0][0] < bbox[0][0] &&
+    elementBBox[1][0] > bbox[1][0] &&
+    elementBBox[0][1] < bbox[0][1] &&
+    elementBBox[1][1] > bbox[1][1]
   );
-}
+};
 
-function isValueInRange(value: number, min: number, max: number) {
-  return value >= min && value <= max;
-}
-
-function elementPartiallyOverlapsWithOrContainsBBox(
+export const elementPartiallyOverlapsWithOrContainsBBox = (
   element: Element,
   bbox: BBox,
-): boolean {
+): boolean => {
   const elementBBox = getRotatedBBox(element);
 
   return (
@@ -121,23 +135,18 @@ function elementPartiallyOverlapsWithOrContainsBBox(
     (isValueInRange(elementBBox[0][1], bbox[0][1], bbox[1][1]) ||
       isValueInRange(bbox[0][1], elementBBox[0][1], elementBBox[1][1]))
   );
-}
-
-export function isElementOverlappingBBox(element: Element, bbox: BBox) {
-  return (
-    isElementInsideBBox(element, bbox) ||
-    elementPartiallyOverlapsWithOrContainsBBox(element, bbox)
-  );
-}
+};
 
 export const elementsOverlappingBBox = ({
   elements,
   bounds,
+  type,
   errorMargin = 0,
 }: {
   elements: Elements;
   bounds: BBox;
   errorMargin: number;
+  type: "overlap" | "contain";
 }) => {
   const adjustedBBox = bbox(
     [bounds[0][0] - errorMargin, bounds[0][1] - errorMargin],
@@ -151,7 +160,10 @@ export const elementsOverlappingBBox = ({
       continue;
     }
 
-    const isOverlaping = isElementOverlappingBBox(element, adjustedBBox);
+    const isOverlaping =
+      type === "overlap"
+        ? elementPartiallyOverlapsWithOrContainsBBox(element, adjustedBBox)
+        : isElementInsideBBox(element, adjustedBBox, true);
 
     if (isOverlaping) {
       includedElementSet.add(element.id);
