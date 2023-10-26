@@ -109,18 +109,10 @@ function isValueInRange(value: number, min: number, max: number) {
   return value >= min && value <= max;
 }
 
-function isElementIntersectingBBox(element: Element, bbox: BBox): boolean {
-  const elementBBox = getRotatedBBox(element);
-
-  return (
-    bbox[0][0] < elementBBox[0][0] &&
-    bbox[1][0] > elementBBox[1][0] &&
-    bbox[0][1] < elementBBox[0][1] &&
-    bbox[1][1] > elementBBox[1][1]
-  );
-}
-
-function isElementContainingBBox(element: Element, bbox: BBox): boolean {
+function elementPartiallyOverlapsWithOrContainsBBox(
+  element: Element,
+  bbox: BBox,
+): boolean {
   const elementBBox = getRotatedBBox(element);
 
   return (
@@ -134,8 +126,7 @@ function isElementContainingBBox(element: Element, bbox: BBox): boolean {
 export function isElementOverlappingBBox(element: Element, bbox: BBox) {
   return (
     isElementInsideBBox(element, bbox) ||
-    isElementIntersectingBBox(element, bbox) ||
-    isElementContainingBBox(element, bbox)
+    elementPartiallyOverlapsWithOrContainsBBox(element, bbox)
   );
 }
 
