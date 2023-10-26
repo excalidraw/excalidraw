@@ -15,7 +15,9 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Add `selected` prop for `MainMenu.Item` and `MainMenu.ItemCustom` components to indicate active state. [7078](https://github.com/excalidraw/excalidraw/pull/7078)
+- Regenerate ids by default when using transform api and also update bindings by 0.5px to avoid possible overlapping [#7195](https://github.com/excalidraw/excalidraw/pull/7195)
+
+- Add `selected` prop for `MainMenu.Item` and `MainMenu.ItemCustom` components to indicate active state. [#7078](https://github.com/excalidraw/excalidraw/pull/7078)
 
 ## 0.16.1 (2023-09-21)
 
