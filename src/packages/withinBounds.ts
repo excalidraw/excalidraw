@@ -102,10 +102,10 @@ export const isElementInsideBBox = (
   const elementBBox = getRotatedBBox(element);
 
   const elementInsideBbox =
-    bbox[0][0] < elementBBox[0][0] &&
-    bbox[1][0] > elementBBox[1][0] &&
-    bbox[0][1] < elementBBox[0][1] &&
-    bbox[1][1] > elementBBox[1][1];
+    bbox[0][0] <= elementBBox[0][0] &&
+    bbox[1][0] >= elementBBox[1][0] &&
+    bbox[0][1] <= elementBBox[0][1] &&
+    bbox[1][1] >= elementBBox[1][1];
 
   if (!eitherDirection) {
     return elementInsideBbox;
@@ -116,10 +116,10 @@ export const isElementInsideBBox = (
   }
 
   return (
-    elementBBox[0][0] < bbox[0][0] &&
-    elementBBox[1][0] > bbox[1][0] &&
-    elementBBox[0][1] < bbox[0][1] &&
-    elementBBox[1][1] > bbox[1][1]
+    elementBBox[0][0] <= bbox[0][0] &&
+    elementBBox[1][0] >= bbox[1][0] &&
+    elementBBox[0][1] <= bbox[0][1] &&
+    elementBBox[1][1] >= bbox[1][1]
   );
 };
 
@@ -145,8 +145,14 @@ export const elementsOverlappingBBox = ({
 }: {
   elements: Elements;
   bounds: BBox;
-  errorMargin: number;
-  type: "overlap" | "contain";
+  /** safety offset. Defaults to 0. */
+  errorMargin?: number;
+  /**
+   * - overlap: elements overlapping or inside bounds
+   * - contain: elements inside bounds or bounds inside elements
+   * - inside: elements inside bounds
+   **/
+  type: "overlap" | "contain" | "inside";
 }) => {
   const adjustedBBox = bbox(
     [bounds[0][0] - errorMargin, bounds[0][1] - errorMargin],
@@ -163,6 +169,8 @@ export const elementsOverlappingBBox = ({
     const isOverlaping =
       type === "overlap"
         ? elementPartiallyOverlapsWithOrContainsBBox(element, adjustedBBox)
+        : type === "inside"
+        ? isElementInsideBBox(element, adjustedBBox)
         : isElementInsideBBox(element, adjustedBBox, true);
 
     if (isOverlaping) {
