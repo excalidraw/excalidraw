@@ -6,11 +6,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "#d8f5a2",
   "boundElements": [
     {
-      "id": "id40",
+      "id": "id41",
       "type": "arrow",
     },
     {
-      "id": "id41",
+      "id": "id42",
       "type": "arrow",
     },
   ],
@@ -45,7 +45,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id41",
+      "id": "id42",
       "type": "arrow",
     },
   ],
@@ -97,12 +97,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "opacity": 100,
   "points": [
     [
-      0,
-      0,
+      0.5,
+      0.5,
     ],
     [
-      395,
-      35,
+      394.5,
+      34.5,
     ],
   ],
   "roughness": 1,
@@ -110,7 +110,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id42",
+    "elementId": "id43",
     "focus": -0.08139534883720931,
     "gap": 1,
   },
@@ -150,11 +150,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      400,
+      399.5,
       0,
     ],
   ],
@@ -186,7 +186,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id40",
+      "id": "id41",
       "type": "arrow",
     },
   ],
@@ -222,7 +222,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id43",
+      "id": "id44",
       "type": "arrow",
     },
   ],
@@ -266,7 +266,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id43",
+      "id": "id44",
       "type": "arrow",
     },
   ],
@@ -309,7 +309,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id44",
+      "id": "id45",
       "type": "text",
     },
   ],
@@ -317,7 +317,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endBinding": {
     "elementId": "text-2",
     "focus": 0,
-    "gap": 5,
+    "gap": 205,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -331,11 +331,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -355,7 +355,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "updated": 1,
   "version": 3,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 255,
   "y": 239,
 }
@@ -367,7 +367,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id43",
+  "containerId": "id44",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -395,7 +395,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 340,
+  "x": 240,
   "y": 226.5,
 }
 `;
@@ -406,13 +406,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id33",
+      "id": "id34",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id35",
+    "elementId": "id36",
     "focus": 0,
     "gap": 1,
   },
@@ -428,11 +428,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -441,7 +441,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id34",
+    "elementId": "id35",
     "focus": 0,
     "gap": 1,
   },
@@ -452,7 +452,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "updated": 1,
   "version": 3,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 255,
   "y": 239,
 }
@@ -464,7 +464,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id32",
+  "containerId": "id33",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -492,7 +492,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 340,
+  "x": 240,
   "y": 226.5,
 }
 `;
@@ -503,7 +503,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id32",
+      "id": "id33",
       "type": "arrow",
     },
   ],
@@ -538,7 +538,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id32",
+      "id": "id33",
       "type": "arrow",
     },
   ],
@@ -562,7 +562,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 555,
+  "x": 355,
   "y": 189,
 }
 `;
@@ -573,13 +573,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id37",
+      "id": "id38",
       "type": "text",
     },
   ],
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id39",
+    "elementId": "id40",
     "focus": 0,
     "gap": 1,
   },
@@ -595,11 +595,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -608,7 +608,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id38",
+    "elementId": "id39",
     "focus": 0,
     "gap": 1,
   },
@@ -619,7 +619,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "updated": 1,
   "version": 3,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 255,
   "y": 239,
 }
@@ -631,7 +631,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id36",
+  "containerId": "id37",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -659,7 +659,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 340,
+  "x": 240,
   "y": 226.5,
 }
 `;
@@ -671,7 +671,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id36",
+      "id": "id37",
       "type": "arrow",
     },
   ],
@@ -715,7 +715,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id36",
+      "id": "id37",
       "type": "arrow",
     },
   ],
@@ -747,7 +747,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
-  "x": 555,
+  "x": 355,
   "y": 226.5,
 }
 `;
@@ -801,11 +801,11 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -821,7 +821,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "updated": 1,
   "version": 1,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 100,
   "y": 20,
 }
@@ -846,11 +846,11 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -866,7 +866,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "updated": 1,
   "version": 1,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 450,
   "y": 20,
 }
@@ -895,7 +895,7 @@ exports[`Test Transform > should transform linear elements 3`] = `
       0,
     ],
     [
-      300,
+      100,
       0,
     ],
   ],
@@ -911,7 +911,7 @@ exports[`Test Transform > should transform linear elements 3`] = `
   "updated": 1,
   "version": 1,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 100,
   "y": 60,
 }
@@ -940,7 +940,7 @@ exports[`Test Transform > should transform linear elements 4`] = `
       0,
     ],
     [
-      300,
+      100,
       0,
     ],
   ],
@@ -956,7 +956,7 @@ exports[`Test Transform > should transform linear elements 4`] = `
   "updated": 1,
   "version": 1,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 450,
   "y": 60,
 }
@@ -1226,56 +1226,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id28",
-      "type": "text",
-    },
-  ],
-  "endArrowhead": "arrow",
-  "endBinding": null,
-  "fillStyle": "solid",
-  "frameId": null,
-  "groupIds": [],
-  "height": 0,
-  "id": Any<String>,
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": [
-    [
-      0,
-      0,
-    ],
-    [
-      300,
-      0,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "startArrowhead": null,
-  "startBinding": null,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "arrow",
-  "updated": 1,
-  "version": 1,
-  "versionNonce": Any<Number>,
-  "width": 300,
-  "x": 100,
-  "y": 100,
-}
-`;
-
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 2`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
       "id": "id29",
       "type": "text",
     },
@@ -1294,11 +1244,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -1314,13 +1264,13 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "updated": 1,
   "version": 1,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 100,
-  "y": 200,
+  "y": 100,
 }
 `;
 
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 3`] = `
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 2`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1335,7 +1285,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 130,
+  "height": 0,
   "id": Any<String>,
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -1344,11 +1294,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -1357,20 +1307,20 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": null,
-  "strokeColor": "#1098ad",
+  "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 2,
+  "version": 1,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
   "x": 100,
-  "y": 300,
+  "y": 200,
 }
 `;
 
-exports[`Test Transform > should transform to labelled arrows when label provided for arrows 4`] = `
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -1394,11 +1344,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0,
+      0.5,
       0,
     ],
     [
-      300,
+      99.5,
       0,
     ],
   ],
@@ -1414,7 +1364,57 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "updated": 1,
   "version": 2,
   "versionNonce": Any<Number>,
-  "width": 300,
+  "width": 100,
+  "x": 100,
+  "y": 300,
+}
+`;
+
+exports[`Test Transform > should transform to labelled arrows when label provided for arrows 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id32",
+      "type": "text",
+    },
+  ],
+  "endArrowhead": "arrow",
+  "endBinding": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 130,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0.5,
+      0,
+    ],
+    [
+      99.5,
+      0,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#1098ad",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 100,
   "x": 100,
   "y": 400,
 }
@@ -1426,7 +1426,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id24",
+  "containerId": "id25",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1454,7 +1454,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 185,
+  "x": 85,
   "y": 87.5,
 }
 `;
@@ -1465,7 +1465,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id25",
+  "containerId": "id26",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1493,7 +1493,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 200,
-  "x": 150,
+  "x": 50,
   "y": 187.5,
 }
 `;
@@ -1504,7 +1504,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id26",
+  "containerId": "id27",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1533,7 +1533,7 @@ LABELLED ARROW",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 150,
-  "x": 175,
+  "x": 75,
   "y": 275,
 }
 `;
@@ -1544,7 +1544,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id27",
+  "containerId": "id28",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1573,7 +1573,7 @@ LABELLED ARROW",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 150,
-  "x": 175,
+  "x": 75,
   "y": 375,
 }
 `;
@@ -1584,7 +1584,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id18",
+      "id": "id19",
       "type": "text",
     },
   ],
@@ -1619,7 +1619,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id19",
+      "id": "id20",
       "type": "text",
     },
   ],
@@ -1654,7 +1654,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id20",
+      "id": "id21",
       "type": "text",
     },
   ],
@@ -1689,7 +1689,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "#fff3bf",
   "boundElements": [
     {
-      "id": "id21",
+      "id": "id22",
       "type": "text",
     },
   ],
@@ -1724,7 +1724,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id22",
+      "id": "id23",
       "type": "text",
     },
   ],
@@ -1759,7 +1759,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "#ffec99",
   "boundElements": [
     {
-      "id": "id23",
+      "id": "id24",
       "type": "text",
     },
   ],
@@ -1794,7 +1794,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id12",
+  "containerId": "id13",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1833,7 +1833,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id13",
+  "containerId": "id14",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1873,7 +1873,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id14",
+  "containerId": "id15",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1915,7 +1915,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id15",
+  "containerId": "id16",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1955,7 +1955,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id16",
+  "containerId": "id17",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -1996,7 +1996,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id17",
+  "containerId": "id18",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
