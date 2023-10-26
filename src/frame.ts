@@ -22,6 +22,7 @@ import { isFrameElement } from "./element";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
+import { doLineSegmentsIntersect } from "./packages/utils";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -55,130 +56,21 @@ export const bindElementsToFramesAfterDuplication = (
   }
 };
 
-// --------------------------- Frame Geometry ---------------------------------
-class Point {
-  x: number;
-  y: number;
+export function isElementIntersectingFrame(
+  element: ExcalidrawElement,
+  frame: ExcalidrawFrameElement,
+) {
+  const frameLineSegments = getElementLineSegments(frame);
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
+  const elementLineSegments = getElementLineSegments(element);
 
-class LineSegment {
-  first: Point;
-  second: Point;
+  const intersecting = frameLineSegments.some((frameLineSegment) =>
+    elementLineSegments.some((elementLineSegment) =>
+      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+    ),
+  );
 
-  constructor(pointA: Point, pointB: Point) {
-    this.first = pointA;
-    this.second = pointB;
-  }
-
-  public getBoundingBox(): [Point, Point] {
-    return [
-      new Point(
-        Math.min(this.first.x, this.second.x),
-        Math.min(this.first.y, this.second.y),
-      ),
-      new Point(
-        Math.max(this.first.x, this.second.x),
-        Math.max(this.first.y, this.second.y),
-      ),
-    ];
-  }
-}
-
-// https://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-class FrameGeometry {
-  private static EPSILON = 0.000001;
-
-  private static crossProduct(a: Point, b: Point) {
-    return a.x * b.y - b.x * a.y;
-  }
-
-  private static doBoundingBoxesIntersect(
-    a: [Point, Point],
-    b: [Point, Point],
-  ) {
-    return (
-      a[0].x <= b[1].x &&
-      a[1].x >= b[0].x &&
-      a[0].y <= b[1].y &&
-      a[1].y >= b[0].y
-    );
-  }
-
-  private static isPointOnLine(a: LineSegment, b: Point) {
-    const aTmp = new LineSegment(
-      new Point(0, 0),
-      new Point(a.second.x - a.first.x, a.second.y - a.first.y),
-    );
-    const bTmp = new Point(b.x - a.first.x, b.y - a.first.y);
-    const r = this.crossProduct(aTmp.second, bTmp);
-    return Math.abs(r) < this.EPSILON;
-  }
-
-  private static isPointRightOfLine(a: LineSegment, b: Point) {
-    const aTmp = new LineSegment(
-      new Point(0, 0),
-      new Point(a.second.x - a.first.x, a.second.y - a.first.y),
-    );
-    const bTmp = new Point(b.x - a.first.x, b.y - a.first.y);
-    return this.crossProduct(aTmp.second, bTmp) < 0;
-  }
-
-  private static lineSegmentTouchesOrCrossesLine(
-    a: LineSegment,
-    b: LineSegment,
-  ) {
-    return (
-      this.isPointOnLine(a, b.first) ||
-      this.isPointOnLine(a, b.second) ||
-      (this.isPointRightOfLine(a, b.first)
-        ? !this.isPointRightOfLine(a, b.second)
-        : this.isPointRightOfLine(a, b.second))
-    );
-  }
-
-  private static doLineSegmentsIntersect(
-    a: [readonly [number, number], readonly [number, number]],
-    b: [readonly [number, number], readonly [number, number]],
-  ) {
-    const aSegment = new LineSegment(
-      new Point(a[0][0], a[0][1]),
-      new Point(a[1][0], a[1][1]),
-    );
-    const bSegment = new LineSegment(
-      new Point(b[0][0], b[0][1]),
-      new Point(b[1][0], b[1][1]),
-    );
-
-    const box1 = aSegment.getBoundingBox();
-    const box2 = bSegment.getBoundingBox();
-    return (
-      this.doBoundingBoxesIntersect(box1, box2) &&
-      this.lineSegmentTouchesOrCrossesLine(aSegment, bSegment) &&
-      this.lineSegmentTouchesOrCrossesLine(bSegment, aSegment)
-    );
-  }
-
-  public static isElementIntersectingFrame(
-    element: ExcalidrawElement,
-    frame: ExcalidrawFrameElement,
-  ) {
-    const frameLineSegments = getElementLineSegments(frame);
-
-    const elementLineSegments = getElementLineSegments(element);
-
-    const intersecting = frameLineSegments.some((frameLineSegment) =>
-      elementLineSegments.some((elementLineSegment) =>
-        this.doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
-      ),
-    );
-
-    return intersecting;
-  }
+  return intersecting;
 }
 
 export const getElementsCompletelyInFrame = (
@@ -206,10 +98,7 @@ export const isElementContainingFrame = (
 export const getElementsIntersectingFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameElement,
-) =>
-  elements.filter((element) =>
-    FrameGeometry.isElementIntersectingFrame(element, frame),
-  );
+) => elements.filter((element) => isElementIntersectingFrame(element, frame));
 
 export const elementsAreInFrameBounds = (
   elements: readonly ExcalidrawElement[],
@@ -235,7 +124,7 @@ export const elementOverlapsWithFrame = (
 ) => {
   return (
     elementsAreInFrameBounds([element], frame) ||
-    FrameGeometry.isElementIntersectingFrame(element, frame) ||
+    isElementIntersectingFrame(element, frame) ||
     isElementContainingFrame([frame], element, frame)
   );
 };
@@ -272,7 +161,7 @@ export const groupsAreAtLeastIntersectingTheFrame = (
   return !!elementsInGroup.find(
     (element) =>
       elementsAreInFrameBounds([element], frame) ||
-      FrameGeometry.isElementIntersectingFrame(element, frame),
+      isElementIntersectingFrame(element, frame),
   );
 };
 
@@ -293,7 +182,7 @@ export const groupsAreCompletelyOutOfFrame = (
     elementsInGroup.find(
       (element) =>
         elementsAreInFrameBounds([element], frame) ||
-        FrameGeometry.isElementIntersectingFrame(element, frame),
+        isElementIntersectingFrame(element, frame),
     ) === undefined
   );
 };
@@ -353,7 +242,7 @@ export const getElementsInResizingFrame = (
   );
 
   for (const element of elementsNotCompletelyInFrame) {
-    if (!FrameGeometry.isElementIntersectingFrame(element, frame)) {
+    if (!isElementIntersectingFrame(element, frame)) {
       if (element.groupIds.length === 0) {
         nextElementsInFrame.delete(element);
       }

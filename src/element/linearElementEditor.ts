@@ -21,6 +21,7 @@ import {
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import {
+  Bounds,
   getCurvePathOps,
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
@@ -1316,7 +1317,7 @@ export class LinearElementEditor {
 
   static getMinMaxXYWithBoundText = (
     element: ExcalidrawLinearElement,
-    elementBounds: [number, number, number, number],
+    elementBounds: Bounds,
     boundTextElement: ExcalidrawTextElementWithContainer,
   ): [number, number, number, number, number, number] => {
     let [x1, y1, x2, y2] = elementBounds;
