@@ -1,85 +1,101 @@
 import { BBox, bbox } from "./bbox";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import {
   isArrowElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
-import { getBoundsFromPoints } from "../element/bounds";
 import { rotatePoint } from "../math";
 import { Point } from "../types";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
 
-function getVertices(bbox: BBox): [Point, Point, Point, Point] {
-  return [bbox[0], [bbox[1][0], bbox[0][1]], bbox[1], [bbox[0][0], bbox[1][1]]];
-}
+type Points = readonly Point[];
 
-function getPrimitiveBBox(element: Element): BBox {
-  if (isFreeDrawElement(element)) {
-    const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
-
-    return bbox(
-      [minX + element.x, minY + element.y],
-      [maxX + element.x, maxY + element.y],
-    );
-  } else if (isLinearElement(element)) {
-    const { minX, minY, maxX, maxY } = element.points.reduce(
-      (limits, [x, y]) => {
-        limits.minY = Math.min(limits.minY, y);
-        limits.minX = Math.min(limits.minX, x);
-
-        limits.maxX = Math.max(limits.maxX, x);
-        limits.maxY = Math.max(limits.maxY, y);
-
-        return limits;
-      },
-      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity },
-    );
-
-    return bbox(
-      [element.x + minX, element.y + minY],
-      [element.x + maxX, element.y + maxY],
-    );
+/** @returns vertices relative to element's top-left [0,0] position  */
+const getNonLinearElementRelativePoints = (
+  element: Exclude<
+    Element,
+    ExcalidrawLinearElement | ExcalidrawFreeDrawElement
+  >,
+): [TopLeft: Point, TopRight: Point, BottomRight: Point, BottomLeft: Point] => {
+  if (element.type === "diamond") {
+    return [
+      [element.width / 2, 0],
+      [element.width, element.height / 2],
+      [element.width / 2, element.height],
+      [0, element.height / 2],
+    ];
   }
-
-  return bbox(
-    [element.x, element.y],
-    [element.x + element.width, element.y + element.height],
-  );
-}
-
-function getElementBBox(element: Element): BBox {
-  const primitiveBBox = getPrimitiveBBox(element);
-
-  const centerPoint: Point = [
-    primitiveBBox[0][0] + (primitiveBBox[1][0] - primitiveBBox[0][0]) / 2,
-    primitiveBBox[0][1] + (primitiveBBox[1][1] - primitiveBBox[0][1]) / 2,
+  return [
+    [0, 0],
+    [0 + element.width, 0],
+    [0 + element.width, element.height],
+    [0, element.height],
   ];
+};
 
-  const [otl, otr, obr, obl] = getVertices(primitiveBBox);
+/** @returns vertices relative to element's top-left [0,0] position  */
+const getElementRelativePoints = (element: ExcalidrawElement): Points => {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    return element.points;
+  }
+  return getNonLinearElementRelativePoints(element);
+};
 
-  const rtl = rotatePoint(otl, centerPoint, element.angle);
-  const rbr = rotatePoint(obr, centerPoint, element.angle);
-  const rtr = rotatePoint(otr, centerPoint, element.angle);
-  const rbl = rotatePoint(obl, centerPoint, element.angle);
+const getMinMaxPoints = (points: Points) => {
+  const ret = points.reduce(
+    (limits, [x, y]) => {
+      limits.minY = Math.min(limits.minY, y);
+      limits.minX = Math.min(limits.minX, x);
+
+      limits.maxX = Math.max(limits.maxX, x);
+      limits.maxY = Math.max(limits.maxY, y);
+
+      return limits;
+    },
+    {
+      minX: Infinity,
+      minY: Infinity,
+      maxX: -Infinity,
+      maxY: -Infinity,
+      cx: 0,
+      cy: 0,
+    },
+  );
+
+  ret.cx = (ret.maxX + ret.minX) / 2;
+  ret.cy = (ret.maxY + ret.minY) / 2;
+
+  return ret;
+};
+
+const getRotatedBBox = (element: Element): BBox => {
+  const points = getElementRelativePoints(element);
+
+  const { cx, cy } = getMinMaxPoints(points);
+  const centerPoint: Point = [cx, cy];
+
+  const rotatedPoints = points.map((point) =>
+    rotatePoint([point[0], point[1]], centerPoint, element.angle),
+  );
+  const { minX, minY, maxX, maxY } = getMinMaxPoints(rotatedPoints);
 
   return bbox(
-    [
-      Math.min(rtl[0], rbr[0], rtr[0], rbl[0]),
-      Math.min(rtl[1], rbr[1], rtr[1], rbl[1]),
-    ],
-    [
-      Math.max(rtl[0], rbr[0], rtr[0], rbl[0]),
-      Math.max(rtl[1], rbr[1], rtr[1], rbl[1]),
-    ],
+    [minX + element.x, minY + element.y],
+    [maxX + element.x, maxY + element.y],
   );
-}
+};
 
 function isElementInsideBBox(element: Element, bbox: BBox): boolean {
-  const elementBBox = getElementBBox(element);
+  const elementBBox = getRotatedBBox(element);
 
   return (
     bbox[0][0] < elementBBox[0][0] &&
@@ -94,7 +110,7 @@ function isValueInRange(value: number, min: number, max: number) {
 }
 
 function isElementIntersectingBBox(element: Element, bbox: BBox): boolean {
-  const elementBBox = getElementBBox(element);
+  const elementBBox = getRotatedBBox(element);
 
   return (
     bbox[0][0] < elementBBox[0][0] &&
@@ -105,7 +121,7 @@ function isElementIntersectingBBox(element: Element, bbox: BBox): boolean {
 }
 
 function isElementContainingBBox(element: Element, bbox: BBox): boolean {
-  const elementBBox = getElementBBox(element);
+  const elementBBox = getRotatedBBox(element);
 
   return (
     (isValueInRange(elementBBox[0][0], bbox[0][0], bbox[1][0]) ||
