@@ -228,7 +228,7 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
-  const mermaidToolSelected = activeTool.type === "mermaid";
+  const mermaidToolSelected = appState.openDialog === "mermaid";
 
   return (
     <>
@@ -324,7 +324,7 @@ export const ShapesSwitcher = ({
             {t("toolBar.laser")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "mermaid" })}
+            onSelect={() => app.setOpenDialog("mermaid")}
             icon={mermaidLogoIcon}
             data-testid="toolbar-embeddable"
             selected={mermaidToolSelected}

@@ -102,8 +102,7 @@ export type ToolType =
   | "hand"
   | "frame"
   | "embeddable"
-  | "laser"
-  | "mermaid";
+  | "laser";
 
 export type ActiveTool =
   | {
@@ -242,7 +241,7 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
-  openDialog: "imageExport" | "help" | "jsonExport" | null;
+  openDialog: "imageExport" | "help" | "jsonExport" | "mermaid" | null;
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -544,6 +543,7 @@ export type AppClassProperties = {
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
   setActiveTool: App["setActiveTool"];
+  setOpenDialog: App["setOpenDialog"];
 };
 
 export type PointerDownState = Readonly<{

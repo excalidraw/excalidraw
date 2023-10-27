@@ -169,7 +169,7 @@ const MermaidToExcalidraw = () => {
   }, [deferredText]);
 
   const onClose = () => {
-    app.setActiveTool({ type: "selection" });
+    app.setOpenDialog(null);
     saveMermaidDataToStorage(text);
   };
 

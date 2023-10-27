@@ -67,7 +67,6 @@ export const AllowedExcalidrawActiveTools: Record<
   frame: true,
   embeddable: true,
   hand: true,
-  mermaid: true,
   laser: false,
 };
 

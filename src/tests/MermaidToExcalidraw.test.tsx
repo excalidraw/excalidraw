@@ -102,12 +102,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
       <Excalidraw
         initialData={{
           appState: {
-            activeTool: {
-              type: "mermaid",
-              lastActiveTool: null,
-              locked: false,
-              customType: null,
-            },
+            openDialog: "mermaid",
           },
         }}
       />,

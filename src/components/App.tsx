@@ -1246,7 +1246,7 @@ class App extends React.Component<AppProps, AppState> {
                           isCollaborating={this.props.isCollaborating}
                         >
                           {this.props.children}
-                          {this.state.activeTool.type === "mermaid" && (
+                          {this.state.openDialog === "mermaid" && (
                             <MermaidToExcalidraw />
                           )}
                         </LayerUI>
@@ -3322,6 +3322,10 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  setOpenDialog = (dialogType: AppState["openDialog"]) => {
+    this.setState({ openDialog: dialogType });
+  };
+
   private setCursor = (cursor: string) => {
     setCursor(this.interactiveCanvas, cursor);
   };
@@ -4739,8 +4743,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand" &&
-      this.state.activeTool.type !== "mermaid"
+      this.state.activeTool.type !== "hand"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
