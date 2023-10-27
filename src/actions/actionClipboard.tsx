@@ -10,25 +10,33 @@ import { actionDeleteSelected } from "./actionDeleteSelected";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
+import { isFirefox } from "../constants";
 
 export const actionCopy = register({
   name: "copy",
   trackEvent: { category: "element" },
-  perform: (elements, appState, _, app) => {
+  perform: async (elements, appState, _, app) => {
     const elementsToCopy = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     });
 
-    copyToClipboard(elementsToCopy, app.files);
+    try {
+      await copyToClipboard(elementsToCopy, app.files);
+    } catch (error: any) {
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: error.message,
+        },
+      };
+    }
 
     return {
       commitToHistory: false,
     };
-  },
-  predicate: (elements, appState, appProps, app) => {
-    return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.copy",
   // don't supply a shortcut since we handle this conditionally via onCopy event
@@ -38,14 +46,90 @@ export const actionCopy = register({
 export const actionPaste = register({
   name: "paste",
   trackEvent: { category: "element" },
-  perform: (elements: any, appStates: any, data, app) => {
-    app.pasteFromClipboard(null);
+  perform: async (elements, appState, data, app) => {
+    const MIME_TYPES: Record<string, string> = {};
+    try {
+      try {
+        const clipboardItems = await navigator.clipboard?.read();
+        for (const item of clipboardItems) {
+          for (const type of item.types) {
+            try {
+              const blob = await item.getType(type);
+              MIME_TYPES[type] = await blob.text();
+            } catch (error: any) {
+              console.warn(
+                `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
+              );
+            }
+          }
+        }
+        if (Object.keys(MIME_TYPES).length === 0) {
+          console.warn(
+            "No clipboard data found from clipboard.read(). Falling back to clipboard.readText()",
+          );
+          // throw so we fall back onto clipboard.readText()
+          throw new Error("No clipboard data found");
+        }
+      } catch (error: any) {
+        try {
+          MIME_TYPES["text/plain"] = await navigator.clipboard?.readText();
+        } catch (error: any) {
+          console.warn(`Cannot readText() from clipboard: ${error.message}`);
+          if (isFirefox) {
+            return {
+              commitToHistory: false,
+              appState: {
+                ...appState,
+                errorMessage: t("hints.firefox_clipboard_write"),
+              },
+            };
+          }
+          throw error;
+        }
+      }
+    } catch (error: any) {
+      console.error(`actionPaste: ${error.message}`);
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: error.message,
+        },
+      };
+    }
+    try {
+      console.log("actionPaste (1)", { MIME_TYPES });
+      const event = new ClipboardEvent("paste", {
+        clipboardData: new DataTransfer(),
+      });
+      for (const [type, value] of Object.entries(MIME_TYPES)) {
+        try {
+          event.clipboardData?.setData(type, value);
+        } catch (error: any) {
+          console.warn(
+            `Cannot set ${type} as clipboardData item: ${error.message}`,
+          );
+        }
+      }
+      event.clipboardData?.types.forEach((type) => {
+        console.log(
+          `actionPaste (2) event.clipboardData?.getData(${type})`,
+          event.clipboardData?.getData(type),
+        );
+      });
+      app.pasteFromClipboard(event);
+    } catch (error: any) {
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: error.message,
+        },
+      };
+    }
     return {
       commitToHistory: false,
     };
-  },
-  predicate: (elements, appState, appProps, app) => {
-    return app.device.isMobile && !!navigator.clipboard;
   },
   contextItemLabel: "labels.paste",
   // don't supply a shortcut since we handle this conditionally via onCopy event

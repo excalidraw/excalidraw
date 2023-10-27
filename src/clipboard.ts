@@ -118,7 +118,7 @@ export const copyToClipboard = async (
     await copyTextToSystemClipboard(json);
   } catch (error: any) {
     PREFER_APP_CLIPBOARD = true;
-    console.error(error);
+    throw error;
   }
 };
 
@@ -193,7 +193,7 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
  *  via async clipboard API if supported)
  */
 const getSystemClipboard = async (
-  event: ClipboardEvent | null,
+  event: ClipboardEvent,
   isPlainPaste = false,
 ): Promise<
   | { type: "text"; value: string }
@@ -205,10 +205,7 @@ const getSystemClipboard = async (
       return { type: "mixedContent", value: mixedContent };
     }
 
-    const text = event
-      ? event.clipboardData?.getData("text/plain")
-      : probablySupportsClipboardReadText &&
-        (await navigator.clipboard.readText());
+    const text = event.clipboardData?.getData("text/plain");
 
     return { type: "text", value: (text || "").trim() };
   } catch {
@@ -220,7 +217,7 @@ const getSystemClipboard = async (
  * Attempts to parse clipboard. Prefers system clipboard.
  */
 export const parseClipboard = async (
-  event: ClipboardEvent | null,
+  event: ClipboardEvent,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
   const systemClipboard = await getSystemClipboard(event, isPlainPaste);

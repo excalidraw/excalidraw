@@ -1275,6 +1275,12 @@ class App extends React.Component<AppProps, AppState> {
                             top={this.state.contextMenu.top}
                             left={this.state.contextMenu.left}
                             actionManager={this.actionManager}
+                            onClose={(cb) => {
+                              this.setState({ contextMenu: null }, () => {
+                                this.focusContainer();
+                                cb?.();
+                              });
+                            }}
                           />
                         )}
                         <StaticCanvas
@@ -2195,14 +2201,21 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public pasteFromClipboard = withBatchedUpdates(
-    async (event: ClipboardEvent | null) => {
+    async (event: ClipboardEvent) => {
       const isPlainPaste = !!(IS_PLAIN_PASTE && event);
+
+      console.warn(
+        "pasteFromClipboard",
+        event?.clipboardData?.types,
+        event?.clipboardData?.getData("text/plain"),
+      );
 
       // #686
       const target = document.activeElement;
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
       if (event && !isExcalidrawActive) {
+        console.log("exit (1)");
         return;
       }
 
@@ -2215,6 +2228,7 @@ class App extends React.Component<AppProps, AppState> {
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
           isWritableElement(target))
       ) {
+        console.log("exit (2)");
         return;
       }
 
