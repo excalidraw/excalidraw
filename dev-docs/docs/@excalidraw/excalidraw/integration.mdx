@@ -41,7 +41,7 @@ import { useState, useEffect } from "react";
 export default function App() {
   const [Excalidraw, setExcalidraw] = useState(null);
   useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) => setExcalidraw(comp.Excalidraw));
+    import("@excalidraw/excalidraw").then((comp) => setExcalidraw(comp.default.Excalidraw));
   }, []);
   return <>{Excalidraw && <Excalidraw />}</>;
 }
