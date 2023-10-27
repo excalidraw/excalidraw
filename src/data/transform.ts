@@ -40,7 +40,7 @@ import {
 import { MarkOptional } from "../utility-types";
 import { assertNever, getFontString } from "../utils";
 import { getSizeFromPoints } from "../points";
-import { nanoid } from "nanoid";
+import { randomId } from "../random";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -428,12 +428,15 @@ class ElementStore {
 }
 
 export const convertToExcalidrawElements = (
-  elements: ExcalidrawElementSkeleton[] | null,
+  elementsSkeleton: ExcalidrawElementSkeleton[] | null,
   opts?: { regenerateIds: boolean },
 ) => {
-  if (!elements) {
+  if (!elementsSkeleton) {
     return [];
   }
+  const elements: ExcalidrawElementSkeleton[] = JSON.parse(
+    JSON.stringify(elementsSkeleton),
+  );
 
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
@@ -443,8 +446,8 @@ export const convertToExcalidrawElements = (
   for (const element of elements) {
     let excalidrawElement: ExcalidrawElement;
     const originalId = element.id;
-    if (opts?.regenerateIds) {
-      Object.assign(element, { id: nanoid() });
+    if (opts?.regenerateIds !== false) {
+      Object.assign(element, { id: randomId() });
     }
 
     switch (element.type) {

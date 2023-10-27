@@ -5,7 +5,31 @@ import {
 } from "./transform";
 import { ExcalidrawArrowElement } from "../element/types";
 
+const opts = { regenerateIds: false };
+
 describe("Test Transform", () => {
+  it("should generate id unless opts.regenerateIds is set to false explicitly", () => {
+    const elements = [
+      {
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        id: "rect-1",
+      },
+    ];
+    let data = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+    );
+    expect(data.length).toBe(1);
+    expect(data[0].id).toBe("id0");
+
+    data = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+    expect(data[0].id).toBe("rect-1");
+  });
+
   it("should transform regular shapes", () => {
     const elements = [
       {
@@ -59,6 +83,7 @@ describe("Test Transform", () => {
 
     convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
+      opts,
     ).forEach((ele) => {
       expect(ele).toMatchSnapshot({
         seed: expect.any(Number),
@@ -87,6 +112,7 @@ describe("Test Transform", () => {
     ];
     convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
+      opts,
     ).forEach((ele) => {
       expect(ele).toMatchSnapshot({
         seed: expect.any(Number),
@@ -128,6 +154,7 @@ describe("Test Transform", () => {
     ];
     const excaldrawElements = convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
+      opts,
     );
 
     expect(excaldrawElements.length).toBe(4);
@@ -210,6 +237,7 @@ describe("Test Transform", () => {
     ];
     const excaldrawElements = convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
+      opts,
     );
 
     expect(excaldrawElements.length).toBe(12);
@@ -267,6 +295,7 @@ describe("Test Transform", () => {
     ];
     const excaldrawElements = convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
+      opts,
     );
 
     expect(excaldrawElements.length).toBe(8);
@@ -300,6 +329,7 @@ describe("Test Transform", () => {
       ];
       const excaldrawElements = convertToExcalidrawElements(
         elements as ExcalidrawElementSkeleton[],
+        opts,
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -383,6 +413,7 @@ describe("Test Transform", () => {
 
       const excaldrawElements = convertToExcalidrawElements(
         elements as ExcalidrawElementSkeleton[],
+        opts,
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -498,6 +529,7 @@ describe("Test Transform", () => {
 
       const excaldrawElements = convertToExcalidrawElements(
         elements as ExcalidrawElementSkeleton[],
+        opts,
       );
 
       expect(excaldrawElements.length).toBe(5);
@@ -546,6 +578,7 @@ describe("Test Transform", () => {
 
       const excaldrawElements = convertToExcalidrawElements(
         elements as ExcalidrawElementSkeleton[],
+        opts,
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -599,6 +632,7 @@ describe("Test Transform", () => {
 
       const excaldrawElements = convertToExcalidrawElements(
         elements as ExcalidrawElementSkeleton[],
+        opts,
       );
 
       expect(excaldrawElements.length).toBe(4);
@@ -649,6 +683,7 @@ describe("Test Transform", () => {
       ];
       const excaldrawElements = convertToExcalidrawElements(
         elements as ExcalidrawElementSkeleton[],
+        opts,
       );
       expect(excaldrawElements.length).toBe(2);
       const [arrow, rect] = excaldrawElements;
@@ -691,6 +726,7 @@ describe("Test Transform", () => {
     ];
     const excaldrawElements = convertToExcalidrawElements(
       elements as ExcalidrawElementSkeleton[],
+      opts,
     );
 
     expect(excaldrawElements.length).toBe(1);
