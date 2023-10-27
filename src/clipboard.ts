@@ -10,7 +10,7 @@ import { isInitializedImageElement } from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
-import { isPromiseLike, isTestEnv } from "./utils";
+import { isPromiseLike } from "./utils";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -29,6 +29,10 @@ export interface ClipboardData {
   errorMessage?: string;
   programmaticAPI?: boolean;
 }
+
+type SystemClipboardResult =
+  | { type: "text"; value: string }
+  | { type: "mixedContent"; value: PastedMixedContent };
 
 let CLIPBOARD = "";
 let PREFER_APP_CLIPBOARD = false;
@@ -61,10 +65,13 @@ const clipboardContainsElements = (
   return false;
 };
 
-export const copyToClipboard = async (
-  elements: readonly NonDeletedExcalidrawElement[],
-  files: BinaryFiles | null,
-) => {
+export const serializeAsClipboardJSON = ({
+  elements,
+  files,
+}: {
+  elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles | null;
+}) => {
   const framesToCopy = new Set(
     elements.filter((element) => element.type === "frame"),
   );
@@ -86,7 +93,7 @@ export const copyToClipboard = async (
     );
   }
 
-  // select binded text elements when copying
+  // select bound text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: elements.map((element) => {
@@ -105,11 +112,15 @@ export const copyToClipboard = async (
     }),
     files: files ? _files : undefined,
   };
-  const json = JSON.stringify(contents);
 
-  if (isTestEnv()) {
-    return json;
-  }
+  return JSON.stringify(contents);
+};
+
+export const copyToClipboard = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  files: BinaryFiles | null,
+) => {
+  const json = serializeAsClipboardJSON({ elements, files });
 
   CLIPBOARD = json;
 
@@ -198,10 +209,6 @@ const maybeParseHTMLPaste = (
 
   return null;
 };
-
-type SystemClipboardResult =
-  | { type: "text"; value: string }
-  | { type: "mixedContent"; value: PastedMixedContent };
 
 /**
  * Retrieves content from system clipboard (either from ClipboardEvent or

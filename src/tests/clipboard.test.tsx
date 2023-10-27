@@ -16,7 +16,7 @@ import {
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
-import { copyToClipboard } from "../clipboard";
+import { serializeAsClipboardJSON } from "../clipboard";
 
 const { h } = window;
 
@@ -86,7 +86,10 @@ beforeEach(async () => {
 describe("general paste behavior", () => {
   it("should randomize seed on paste", async () => {
     const rectangle = API.createElement({ type: "rectangle" });
-    const clipboardJSON = (await copyToClipboard([rectangle], null))!;
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rectangle],
+      files: null,
+    });
     pasteWithCtrlCmdV(clipboardJSON);
 
     await waitFor(() => {
@@ -97,7 +100,10 @@ describe("general paste behavior", () => {
 
   it("should retain seed on shift-paste", async () => {
     const rectangle = API.createElement({ type: "rectangle" });
-    const clipboardJSON = (await copyToClipboard([rectangle], null))!;
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rectangle],
+      files: null,
+    });
 
     // assert we don't randomize seed on shift-paste
     pasteWithCtrlCmdShiftV(clipboardJSON);
