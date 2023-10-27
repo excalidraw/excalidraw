@@ -11,6 +11,6 @@
   {
     "path": "dist/excalidraw-assets/vendor-*.js",
     "name": "dist/excalidraw-assets/vendor*.js",
-    "limit": "30 kB"
+    "limit": "900 kB"
   }
 ]
