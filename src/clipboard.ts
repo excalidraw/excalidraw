@@ -166,7 +166,9 @@ function parseHTMLTree(el: ChildNode) {
   return result;
 }
 
-const maybeParseHTMLPaste = (event: ClipboardEvent) => {
+const maybeParseHTMLPaste = (
+  event: ClipboardEvent,
+): SystemClipboardResult | null => {
   const html = event.clipboardData?.getData("text/html");
 
   if (!html) {
@@ -179,7 +181,16 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
     const content = parseHTMLTree(doc.body);
 
     if (content.length) {
-      return content;
+      if (content.every((item) => item.type === "text")) {
+        return {
+          type: "text",
+          value: content
+            .map((item) => item.value)
+            .join("\n")
+            .trim(),
+        };
+      }
+      return { type: "mixedContent", value: content };
     }
   } catch (error: any) {
     console.error(`error in parseHTMLFromPaste: ${error.message}`);
@@ -188,6 +199,10 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
   return null;
 };
 
+type SystemClipboardResult =
+  | { type: "text"; value: string }
+  | { type: "mixedContent"; value: PastedMixedContent };
+
 /**
  * Retrieves content from system clipboard (either from ClipboardEvent or
  *  via async clipboard API if supported)
@@ -195,14 +210,11 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
 const getSystemClipboard = async (
   event: ClipboardEvent | null,
   isPlainPaste = false,
-): Promise<
-  | { type: "text"; value: string }
-  | { type: "mixedContent"; value: PastedMixedContent }
-> => {
+): Promise<SystemClipboardResult> => {
   try {
     const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
     if (mixedContent) {
-      return { type: "mixedContent", value: mixedContent };
+      return mixedContent;
     }
 
     const text = event
