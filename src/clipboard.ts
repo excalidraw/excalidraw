@@ -261,7 +261,7 @@ export const parseClipboard = async (
         elements: systemClipboardData.elements,
         files: systemClipboardData.files,
         text: isPlainPaste
-          ? JSON.stringify(systemClipboardData.elements, null, 2)
+          ? JSON.stringify(systemClipboardData.elements)
           : undefined,
         programmaticAPI,
       };
@@ -274,7 +274,7 @@ export const parseClipboard = async (
     ? {
         ...appClipboardData,
         text: isPlainPaste
-          ? JSON.stringify(appClipboardData.elements, null, 2)
+          ? JSON.stringify(appClipboardData.elements)
           : undefined,
       }
     : { text: systemClipboard.value };
