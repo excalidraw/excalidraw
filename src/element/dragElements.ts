@@ -8,7 +8,11 @@ import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
-import { isFrameElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isFrameElement,
+} from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -35,6 +39,7 @@ export const dragSelectedElements = (
   if (frames.length > 0) {
     const elementsInFrames = scene
       .getNonDeletedElements()
+      .filter((e) => !isBoundToContainer(e))
       .filter((e) => e.frameId !== null)
       .filter((e) => frames.includes(e.frameId!));
 
@@ -58,20 +63,16 @@ export const dragSelectedElements = (
     // update coords of bound text only if we're dragging the container directly
     // (we don't drag the group that it's part of)
     if (
+      // Don't update coords of arrow label since we calculate its position during render
+      !isArrowElement(element) &&
       // container isn't part of any group
       // (perf optim so we don't check `isSelectedViaGroup()` in every case)
-      !element.groupIds.length ||
-      // container is part of a group, but we're dragging the container directly
-      (appState.editingGroupId && !isSelectedViaGroup(appState, element))
+      (!element.groupIds.length ||
+        // container is part of a group, but we're dragging the container directly
+        (appState.editingGroupId && !isSelectedViaGroup(appState, element)))
     ) {
       const textElement = getBoundTextElement(element);
-      if (
-        textElement &&
-        // when container is added to a frame, so will its bound text
-        // so the text is already in `elementsToUpdate` and we should avoid
-        // updating its coords again
-        (!textElement.frameId || !frames.includes(textElement.frameId))
-      ) {
+      if (textElement) {
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }

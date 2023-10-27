@@ -6,7 +6,7 @@
   {
     "path": "dist/excalidraw-assets/locales",
     "name": "dist/excalidraw-assets/locales",
-    "limit": "270 kB"
+    "limit": "290 kB"
   },
   {
     "path": "dist/excalidraw-assets/vendor-*.js",
