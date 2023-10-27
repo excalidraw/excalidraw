@@ -641,5 +641,15 @@ export const convertToExcalidrawElements = (
       }
     }
   }
+  // update frame id of elements with the newly generated frame id
+  elementStore.getElements().forEach((element) => {
+    if (element.frameId) {
+      const newFrameId = oldToNewElementIdMap.get(element.frameId);
+      if (newFrameId) {
+        Object.assign(element, { frameId: newFrameId });
+      }
+    }
+  });
+
   return elementStore.getElements();
 };
