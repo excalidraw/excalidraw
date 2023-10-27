@@ -60,6 +60,7 @@ const flipSelectedElements = (
     getNonDeletedElements(elements),
     appState,
     {
+      includeBoundTextElement: true,
       includeElementsInFrames: true,
     },
   );

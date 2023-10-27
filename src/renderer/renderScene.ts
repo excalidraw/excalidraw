@@ -6,8 +6,8 @@ import {
   StaticCanvasAppState,
   BinaryFiles,
   Point,
-  CommonCanvasAppState,
   Zoom,
+  AppState,
 } from "../types";
 import {
   ExcalidrawElement,
@@ -67,6 +67,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
+import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
   isFrameElement,
@@ -407,7 +408,7 @@ const bootstrapCanvas = ({
   scale: number;
   normalizedWidth: number;
   normalizedHeight: number;
-  theme?: CommonCanvasAppState["theme"];
+  theme?: AppState["theme"];
   isExporting?: StaticCanvasRenderConfig["isExporting"];
   viewBackgroundColor?: StaticCanvasAppState["viewBackgroundColor"];
 }): CanvasRenderingContext2D => {
@@ -720,6 +721,8 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
+  renderSnaps(context, appState);
+
   // Reset zoom
   context.restore();
 
@@ -934,10 +937,8 @@ const _renderStaticScene = ({
     strokeGrid(
       context,
       appState.gridSize,
-      -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
-        (appState.scrollX % appState.gridSize),
-      -Math.ceil(appState.zoom.value / appState.gridSize) * appState.gridSize +
-        (appState.scrollY % appState.gridSize),
+      appState.scrollX,
+      appState.scrollY,
       appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,

@@ -1,5 +1,5 @@
 import { fireEvent, render } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../../src/packages/excalidraw/index";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
@@ -12,7 +12,7 @@ const mouse = new Pointer("mouse");
 
 describe("element binding", () => {
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
   it("should create valid binding if duplicate start/end points", async () => {

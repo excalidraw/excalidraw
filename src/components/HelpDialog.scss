@@ -19,19 +19,34 @@
     }
 
     &__btn {
+      --background: var(--color-surface-mid);
+
       display: flex;
       column-gap: 0.5rem;
       align-items: center;
-      border: 1px solid var(--default-border-color);
+      background-color: var(--background);
       padding: 0.625rem 1rem;
+      border: 1px solid var(--background);
       border-radius: var(--border-radius-lg);
       color: var(--text-primary-color);
       font-weight: 600;
       font-size: 0.75rem;
       letter-spacing: 0.4px;
 
+      @at-root .excalidraw.theme--dark#{&} {
+        --background: var(--color-surface-high);
+        &:hover {
+          --background: #363541;
+        }
+      }
+
       &:hover {
+        --background: var(--color-surface-high);
         text-decoration: none;
+      }
+
+      &:active {
+        border-color: var(--color-primary);
       }
     }
 

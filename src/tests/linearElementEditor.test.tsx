@@ -5,7 +5,7 @@ import {
   ExcalidrawTextElementWithContainer,
   FontString,
 } from "../element/types";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
@@ -16,7 +16,6 @@ import { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
-import { resize, rotate } from "./utils";
 import {
   getBoundTextElementPosition,
   wrapText,
@@ -43,7 +42,7 @@ describe("Test Linear Elements", () => {
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
     reseed(7);
-    const comp = await render(<ExcalidrawApp />);
+    const comp = await render(<Excalidraw handleKeyboardGlobally={true} />);
     h.state.width = 1000;
     h.state.height = 1000;
     container = comp.container;
@@ -175,13 +174,13 @@ describe("Test Linear Elements", () => {
     const line = h.elements[0] as ExcalidrawLinearElement;
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-    expect(renderStaticScene).toHaveBeenCalledTimes(4);
+    expect(renderStaticScene).toHaveBeenCalledTimes(5);
     expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
 
     // drag line from midpoint
     drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(5);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       [
@@ -275,7 +274,7 @@ describe("Test Linear Elements", () => {
       // drag line from midpoint
       drag(midpoint, [midpoint[0] + delta, midpoint[1] + delta]);
       expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
 
       expect(line.points.length).toEqual(3);
       expect(line.points).toMatchInlineSnapshot(`
@@ -313,7 +312,7 @@ describe("Test Linear Elements", () => {
       fireEvent.click(screen.getByTitle("Round"));
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(10);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
       const midPointsWithRoundEdge = LinearElementEditor.getEditorMidPoints(
         h.elements[0] as ExcalidrawLinearElement,
@@ -359,7 +358,7 @@ describe("Test Linear Elements", () => {
       drag(startPoint, endPoint);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
-      expect(renderStaticScene).toHaveBeenCalledTimes(7);
+      expect(renderStaticScene).toHaveBeenCalledTimes(9);
 
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
@@ -418,7 +417,7 @@ describe("Test Linear Elements", () => {
         ]);
 
         expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-        expect(renderStaticScene).toHaveBeenCalledTimes(7);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
 
         expect(line.points.length).toEqual(5);
 
@@ -459,7 +458,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
         expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
-        expect(renderStaticScene).toHaveBeenCalledTimes(6);
+        expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -486,7 +485,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
         expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
-        expect(renderStaticScene).toHaveBeenCalledTimes(6);
+        expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -521,7 +520,7 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-        expect(renderStaticScene).toHaveBeenCalledTimes(7);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -568,7 +567,7 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[1] + delta,
         ]);
         expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-        expect(renderStaticScene).toHaveBeenCalledTimes(7);
+        expect(renderStaticScene).toHaveBeenCalledTimes(9);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -644,7 +643,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
         expect(renderInteractiveScene).toHaveBeenCalledTimes(14);
-        expect(renderStaticScene).toHaveBeenCalledTimes(6);
+        expect(renderStaticScene).toHaveBeenCalledTimes(8);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(line);
         expect([newPoints[0][0], newPoints[0][1]]).toEqual([
@@ -939,71 +938,10 @@ describe("Test Linear Elements", () => {
       expect(line.boundElements).toBeNull();
     });
 
-    it("should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated", () => {
-      createThreePointerLinearElement("arrow", {
-        type: ROUNDNESS.PROPORTIONAL_RADIUS,
-      });
-
-      const arrow = h.elements[0] as ExcalidrawLinearElement;
-
-      const { textElement, container } = createBoundTextElement(
-        DEFAULT_TEXT,
-        arrow,
-      );
-
-      expect(container.angle).toBe(0);
-      expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(arrow, textElement))
-        .toMatchInlineSnapshot(`
-          {
-            "x": 75,
-            "y": 60,
-          }
-        `);
-      expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
-      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
-        .toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            105,
-            80,
-            55.45893770831013,
-            45,
-          ]
-        `);
-
-      rotate(container, -35, 55);
-      expect(container.angle).toMatchInlineSnapshot(`1.3988061968364685`);
-      expect(textElement.angle).toBe(0);
-      expect(getBoundTextElementPosition(container, textElement))
-        .toMatchInlineSnapshot(`
-          {
-            "x": 21.73926141863671,
-            "y": 73.31003398390868,
-          }
-        `);
-      expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
-      expect(LinearElementEditor.getElementAbsoluteCoords(container, true))
-        .toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            102.41961302274555,
-            86.49012635273976,
-            55.45893770831013,
-            45,
-          ]
-        `);
-    });
+    // TODO fix #7029 and rewrite this test
+    it.todo(
+      "should not rotate the bound text and update position of bound text and bounding box correctly when arrow rotated",
+    );
 
     it("should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized", () => {
       createThreePointerLinearElement("arrow", {
@@ -1042,20 +980,20 @@ describe("Test Linear Elements", () => {
           ]
         `);
 
-      resize(container, "ne", [300, 200]);
+      UI.resize(container, "ne", [300, 200]);
 
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": 367,
+            "width": 366.11716195150507,
           }
         `);
 
       expect(getBoundTextElementPosition(container, textElement))
         .toMatchInlineSnapshot(`
           {
-            "x": 272,
+            "x": 271.11716195150507,
             "y": 45,
           }
         `);
@@ -1069,9 +1007,9 @@ describe("Test Linear Elements", () => {
           [
             20,
             35,
-            502,
+            501.11716195150507,
             95,
-            205.9061448421403,
+            205.4589377083102,
             52.5,
           ]
         `);

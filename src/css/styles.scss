@@ -6,6 +6,8 @@
   --zIndex-interactiveCanvas: 2;
   --zIndex-wysiwyg: 3;
   --zIndex-layerUI: 4;
+  --zIndex-eyeDropperBackdrop: 5;
+  --zIndex-eyeDropperPreview: 6;
 
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
@@ -251,7 +253,7 @@
       max-height: 100%;
       display: flex;
       flex-direction: column;
-      pointer-events: initial;
+      pointer-events: var(--ui-pointerEvents);
 
       .panelColumn {
         padding: 8px 8px 0 8px;
@@ -299,7 +301,7 @@
     pointer-events: none !important;
 
     & > * {
-      pointer-events: all;
+      pointer-events: var(--ui-pointerEvents);
     }
   }
 
@@ -310,14 +312,14 @@
     cursor: default;
     pointer-events: none !important;
 
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+
     @media (min-width: 1536px) {
       grid-template-columns: 1fr 1fr 1fr;
       grid-gap: 3rem;
     }
-  }
-
-  .layer-ui__wrapper:not(.disable-pointerEvents) .App-menu_top > * {
-    pointer-events: all;
   }
 
   .App-menu_top > *:first-child {
@@ -423,17 +425,6 @@
     }
   }
 
-  .disable-zen-mode {
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-gray-20);
-    border: 1px solid var(--color-gray-30);
-    padding: 10px 20px;
-
-    &:hover {
-      background-color: var(--color-gray-30);
-    }
-  }
-
   .scroll-back-to-content {
     border-radius: var(--border-radius-lg);
     background-color: var(--island-bg-color);
@@ -445,7 +436,7 @@
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
-    pointer-events: all;
+    pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
     &:hover {
@@ -453,13 +444,14 @@
     }
 
     &:active {
-      border: 1px solid var(--color-primary-darkest);
+      border: 1px solid var(--button-active-border);
     }
   }
 
   .help-icon {
     @include outlineButtonStyles;
-    background-color: var(--island-bg-color);
+    @include filledButtonOnCanvas;
+
     width: var(--lg-button-size);
     height: var(--lg-button-size);
 
@@ -628,6 +620,20 @@
       font-weight: 400;
       margin: 0 0 0.25rem;
       padding: 0;
+    }
+  }
+
+  .main-menu-trigger {
+    @include filledButtonOnCanvas;
+  }
+
+  .App-menu__left {
+    --button-border: transparent;
+    --button-bg: var(--color-surface-mid);
+
+    @at-root .excalidraw.theme--dark#{&} {
+      --button-hover-bg: #363541;
+      --button-bg: var(--color-surface-high);
     }
   }
 }

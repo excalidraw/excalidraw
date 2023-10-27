@@ -164,6 +164,7 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
+    "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
     "clear": "Clear",
@@ -202,6 +203,7 @@
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
+    "failedToFetchImage": "Failed to fetch image.",
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
@@ -235,6 +237,7 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "embeddable": "Web Embed",
+    "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools"
   },
@@ -264,7 +267,8 @@
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
-    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page."
+    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",

@@ -17,6 +17,7 @@ import path from "path";
 import { getMimeType } from "../../data/blob";
 import {
   newEmbeddableElement,
+  newFrameElement,
   newFreeDrawElement,
   newImageElement,
 } from "../../element/newElement";
@@ -24,6 +25,7 @@ import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import { Mutable } from "../../utility-types";
+import { assertNever } from "../../utils";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -92,6 +94,7 @@ export class API {
     angle?: number;
     id?: string;
     isDeleted?: boolean;
+    frameId?: ExcalidrawElement["id"] | null;
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
@@ -149,12 +152,12 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
-      | "frameId"
       | "link"
       | "updated"
     > = {
       x,
       y,
+      frameId: rest.frameId ?? null,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
@@ -243,6 +246,15 @@ export class API {
           status: rest.status || "saved",
           scale: rest.scale || [1, 1],
         });
+        break;
+      case "frame":
+        element = newFrameElement({ ...base, width, height });
+        break;
+      default:
+        assertNever(
+          type,
+          `API.createElement: unimplemented element type ${type}}`,
+        );
         break;
     }
     if (element.type === "arrow") {

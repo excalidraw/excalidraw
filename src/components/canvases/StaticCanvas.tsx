@@ -37,10 +37,25 @@ const StaticCanvas = (props: StaticCanvasProps) => {
       canvas.classList.add("excalidraw__canvas", "static");
     }
 
-    canvas.style.width = `${props.appState.width}px`;
-    canvas.style.height = `${props.appState.height}px`;
-    canvas.width = props.appState.width * props.scale;
-    canvas.height = props.appState.height * props.scale;
+    const widthString = `${props.appState.width}px`;
+    const heightString = `${props.appState.height}px`;
+    if (canvas.style.width !== widthString) {
+      canvas.style.width = widthString;
+    }
+    if (canvas.style.height !== heightString) {
+      canvas.style.height = heightString;
+    }
+
+    const scaledWidth = props.appState.width * props.scale;
+    const scaledHeight = props.appState.height * props.scale;
+    // setting width/height resets the canvas even if dimensions not changed,
+    // which would cause flicker when we skip frame (due to throttling)
+    if (canvas.width !== scaledWidth) {
+      canvas.width = scaledWidth;
+    }
+    if (canvas.height !== scaledHeight) {
+      canvas.height = scaledHeight;
+    }
 
     renderStaticScene(
       {
@@ -61,13 +76,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
 
 const getRelevantAppStateProps = (
   appState: AppState,
-): Omit<
-  StaticCanvasAppState,
-  | "editingElement"
-  | "selectedElementIds"
-  | "editingGroupId"
-  | "frameToHighlight"
-> => ({
+): StaticCanvasAppState => ({
   zoom: appState.zoom,
   scrollX: appState.scrollX,
   scrollY: appState.scrollY,
@@ -84,6 +93,9 @@ const getRelevantAppStateProps = (
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,
   frameRendering: appState.frameRendering,
+  selectedElementIds: appState.selectedElementIds,
+  frameToHighlight: appState.frameToHighlight,
+  editingGroupId: appState.editingGroupId,
 });
 
 const areEqual = (
@@ -102,11 +114,13 @@ const areEqual = (
     return false;
   }
 
-  return isShallowEqual(
-    // asserting AppState because we're being passed the whole AppState
-    // but resolve to only the StaticCanvas-relevant props
-    getRelevantAppStateProps(prevProps.appState as AppState),
-    getRelevantAppStateProps(nextProps.appState as AppState),
+  return (
+    isShallowEqual(
+      // asserting AppState because we're being passed the whole AppState
+      // but resolve to only the StaticCanvas-relevant props
+      getRelevantAppStateProps(prevProps.appState as AppState),
+      getRelevantAppStateProps(nextProps.appState as AppState),
+    ) && isShallowEqual(prevProps.renderConfig, nextProps.renderConfig)
   );
 };
 
