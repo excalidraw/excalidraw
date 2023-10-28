@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Les éléments intégrés ne peuvent pas être ajoutés à la librairie.",
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Sélection",
