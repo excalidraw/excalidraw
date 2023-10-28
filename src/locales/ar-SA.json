@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "لا يمكن إضافة العناصر القابلة للتضمين في المكتبة.",
       "image": "سوف يتم دعم إضافة صور إلى المكتبة قريباً!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "تحديد",
