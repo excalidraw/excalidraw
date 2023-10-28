@@ -1,11 +1,6 @@
 import { vi } from "vitest";
 import ReactDOM from "react-dom";
-import {
-  render,
-  waitFor,
-  GlobalTestState,
-  createPasteEvent,
-} from "./test-utils";
+import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import { Excalidraw } from "../packages/excalidraw/index";
 import { KEYS } from "../keys";
@@ -16,7 +11,7 @@ import {
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
-import { serializeAsClipboardJSON } from "../clipboard";
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
 const { h } = window;
 
@@ -37,7 +32,9 @@ vi.mock("../keys.ts", async (importOriginal) => {
 
 const sendPasteEvent = (text: string) => {
   const clipboardEvent = createPasteEvent({
-    "text/plain": text,
+    types: {
+      "text/plain": text,
+    },
   });
   document.dispatchEvent(clipboardEvent);
 };

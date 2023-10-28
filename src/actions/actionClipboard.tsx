@@ -3,25 +3,38 @@ import { register } from "./register";
 import {
   copyTextToSystemClipboard,
   copyToClipboard,
+  createPasteEvent,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
+  readSystemClipboard,
 } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { exportCanvas } from "../data/index";
 import { getNonDeletedElements, isTextElement } from "../element";
 import { t } from "../i18n";
+import { isFirefox } from "../constants";
 
 export const actionCopy = register({
   name: "copy",
   trackEvent: { category: "element" },
-  perform: (elements, appState, _, app) => {
+  perform: async (elements, appState, _, app) => {
     const elementsToCopy = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     });
 
-    copyToClipboard(elementsToCopy, app.files);
+    try {
+      await copyToClipboard(elementsToCopy, app.files);
+    } catch (error: any) {
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: error.message,
+        },
+      };
+    }
 
     return {
       commitToHistory: false,
@@ -38,8 +51,45 @@ export const actionCopy = register({
 export const actionPaste = register({
   name: "paste",
   trackEvent: { category: "element" },
-  perform: (elements: any, appStates: any, data, app) => {
-    app.pasteFromClipboard(null);
+  perform: async (elements, appState, data, app) => {
+    let types;
+    try {
+      types = await readSystemClipboard();
+    } catch (error: any) {
+      console.error(`actionPaste: ${error.message}`);
+
+      if (isFirefox) {
+        return {
+          commitToHistory: false,
+          appState: {
+            ...appState,
+            errorMessage: t("hints.firefox_clipboard_write"),
+          },
+        };
+      }
+
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: t("errors.asyncPasteFailedOnRead"),
+        },
+      };
+    }
+
+    try {
+      app.pasteFromClipboard(createPasteEvent({ types }));
+    } catch (error: any) {
+      console.error(error);
+      return {
+        commitToHistory: false,
+        appState: {
+          ...appState,
+          errorMessage: t("errors.asyncPasteFailedOnParse"),
+        },
+      };
+    }
+
     return {
       commitToHistory: false,
     };
