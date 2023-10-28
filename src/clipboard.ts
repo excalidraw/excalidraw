@@ -3,14 +3,18 @@ import {
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { BinaryFiles } from "./types";
-import { SVG_EXPORT_TAG } from "./scene/export";
 import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "./constants";
+import {
+  ALLOWED_PASTE_MIME_TYPES,
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+} from "./constants";
 import { isInitializedImageElement } from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
-import { isPromiseLike, isTestEnv } from "./utils";
+import { isMemberOf, isPromiseLike } from "./utils";
+import { t } from "./i18n";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -30,8 +34,11 @@ export interface ClipboardData {
   programmaticAPI?: boolean;
 }
 
-let CLIPBOARD = "";
-let PREFER_APP_CLIPBOARD = false;
+type AllowedPasteMimeTypes = typeof ALLOWED_PASTE_MIME_TYPES[number];
+
+type ParsedClipboardEvent =
+  | { type: "text"; value: string }
+  | { type: "mixedContent"; value: PastedMixedContent };
 
 export const probablySupportsClipboardReadText =
   "clipboard" in navigator && "readText" in navigator.clipboard;
@@ -61,10 +68,61 @@ const clipboardContainsElements = (
   return false;
 };
 
-export const copyToClipboard = async (
-  elements: readonly NonDeletedExcalidrawElement[],
-  files: BinaryFiles | null,
-) => {
+export const createPasteEvent = ({
+  types,
+  files,
+}: {
+  types?: { [key in AllowedPasteMimeTypes]?: string };
+  files?: File[];
+}) => {
+  if (!types && !files) {
+    console.warn("createPasteEvent: no types or files provided");
+  }
+
+  const event = new ClipboardEvent("paste", {
+    clipboardData: new DataTransfer(),
+  });
+
+  if (types) {
+    for (const [type, value] of Object.entries(types)) {
+      try {
+        event.clipboardData?.setData(type, value);
+        if (event.clipboardData?.getData(type) !== value) {
+          throw new Error(`Failed to set "${type}" as clipboardData item`);
+        }
+      } catch (error: any) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  if (files) {
+    let idx = -1;
+    for (const file of files) {
+      idx++;
+      try {
+        event.clipboardData?.items.add(file);
+        if (event.clipboardData?.files[idx] !== file) {
+          throw new Error(
+            `Failed to set file "${file.name}" as clipboardData item`,
+          );
+        }
+      } catch (error: any) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  return event;
+};
+
+export const serializeAsClipboardJSON = ({
+  elements,
+  files,
+}: {
+  elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles | null;
+}) => {
   const framesToCopy = new Set(
     elements.filter((element) => element.type === "frame"),
   );
@@ -86,7 +144,7 @@ export const copyToClipboard = async (
     );
   }
 
-  // select binded text elements when copying
+  // select bound text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: elements.map((element) => {
@@ -105,34 +163,20 @@ export const copyToClipboard = async (
     }),
     files: files ? _files : undefined,
   };
-  const json = JSON.stringify(contents);
 
-  if (isTestEnv()) {
-    return json;
-  }
-
-  CLIPBOARD = json;
-
-  try {
-    PREFER_APP_CLIPBOARD = false;
-    await copyTextToSystemClipboard(json);
-  } catch (error: any) {
-    PREFER_APP_CLIPBOARD = true;
-    console.error(error);
-  }
+  return JSON.stringify(contents);
 };
 
-const getAppClipboard = (): Partial<ElementsClipboard> => {
-  if (!CLIPBOARD) {
-    return {};
-  }
-
-  try {
-    return JSON.parse(CLIPBOARD);
-  } catch (error: any) {
-    console.error(error);
-    return {};
-  }
+export const copyToClipboard = async (
+  elements: readonly NonDeletedExcalidrawElement[],
+  files: BinaryFiles | null,
+  /** supply if available to make the operation more certain to succeed */
+  clipboardEvent?: ClipboardEvent | null,
+) => {
+  await copyTextToSystemClipboard(
+    serializeAsClipboardJSON({ elements, files }),
+    clipboardEvent,
+  );
 };
 
 const parsePotentialSpreadsheet = (
@@ -166,7 +210,9 @@ function parseHTMLTree(el: ChildNode) {
   return result;
 }
 
-const maybeParseHTMLPaste = (event: ClipboardEvent) => {
+const maybeParseHTMLPaste = (
+  event: ClipboardEvent,
+): { type: "mixedContent"; value: PastedMixedContent } | null => {
   const html = event.clipboardData?.getData("text/html");
 
   if (!html) {
@@ -179,7 +225,7 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
     const content = parseHTMLTree(doc.body);
 
     if (content.length) {
-      return content;
+      return { type: "mixedContent", value: content };
     }
   } catch (error: any) {
     console.error(`error in parseHTMLFromPaste: ${error.message}`);
@@ -188,27 +234,88 @@ const maybeParseHTMLPaste = (event: ClipboardEvent) => {
   return null;
 };
 
+export const readSystemClipboard = async () => {
+  const types: { [key in AllowedPasteMimeTypes]?: string } = {};
+
+  try {
+    if (navigator.clipboard?.readText) {
+      return { "text/plain": await navigator.clipboard?.readText() };
+    }
+  } catch (error: any) {
+    // @ts-ignore
+    if (navigator.clipboard?.read) {
+      console.warn(
+        `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+      );
+    } else {
+      throw error;
+    }
+  }
+
+  let clipboardItems: ClipboardItems;
+
+  try {
+    clipboardItems = await navigator.clipboard?.read();
+  } catch (error: any) {
+    if (error.name === "DataError") {
+      console.warn(
+        `navigator.clipboard.read() error, clipboard is probably empty: ${error.message}`,
+      );
+      return types;
+    }
+    throw error;
+  }
+
+  for (const item of clipboardItems) {
+    for (const type of item.types) {
+      if (!isMemberOf(ALLOWED_PASTE_MIME_TYPES, type)) {
+        continue;
+      }
+      try {
+        types[type] = await (await item.getType(type)).text();
+      } catch (error: any) {
+        console.warn(
+          `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
+        );
+      }
+    }
+  }
+
+  if (Object.keys(types).length === 0) {
+    console.warn("No clipboard data found from clipboard.read().");
+    return types;
+  }
+
+  return types;
+};
+
 /**
- * Retrieves content from system clipboard (either from ClipboardEvent or
- *  via async clipboard API if supported)
+ * Parses "paste" ClipboardEvent.
  */
-const getSystemClipboard = async (
-  event: ClipboardEvent | null,
+const parseClipboardEvent = async (
+  event: ClipboardEvent,
   isPlainPaste = false,
-): Promise<
-  | { type: "text"; value: string }
-  | { type: "mixedContent"; value: PastedMixedContent }
-> => {
+): Promise<ParsedClipboardEvent> => {
   try {
     const mixedContent = !isPlainPaste && event && maybeParseHTMLPaste(event);
+
     if (mixedContent) {
-      return { type: "mixedContent", value: mixedContent };
+      if (mixedContent.value.every((item) => item.type === "text")) {
+        return {
+          type: "text",
+          value:
+            event.clipboardData?.getData("text/plain") ||
+            mixedContent.value
+              .map((item) => item.value)
+              .join("\n")
+              .trim(),
+        };
+      }
+
+      return mixedContent;
     }
 
-    const text = event
-      ? event.clipboardData?.getData("text/plain")
-      : probablySupportsClipboardReadText &&
-        (await navigator.clipboard.readText());
+    const text = event.clipboardData?.getData("text/plain");
 
     return { type: "text", value: (text || "").trim() };
   } catch {
@@ -220,40 +327,32 @@ const getSystemClipboard = async (
  * Attempts to parse clipboard. Prefers system clipboard.
  */
 export const parseClipboard = async (
-  event: ClipboardEvent | null,
+  event: ClipboardEvent,
   isPlainPaste = false,
 ): Promise<ClipboardData> => {
-  const systemClipboard = await getSystemClipboard(event, isPlainPaste);
+  const parsedEventData = await parseClipboardEvent(event, isPlainPaste);
 
-  if (systemClipboard.type === "mixedContent") {
+  if (parsedEventData.type === "mixedContent") {
     return {
-      mixedContent: systemClipboard.value,
+      mixedContent: parsedEventData.value,
     };
   }
 
-  // if system clipboard empty, couldn't be resolved, or contains previously
-  // copied excalidraw scene as SVG, fall back to previously copied excalidraw
-  // elements
-  if (
-    !systemClipboard ||
-    (!isPlainPaste && systemClipboard.value.includes(SVG_EXPORT_TAG))
-  ) {
-    return getAppClipboard();
+  try {
+    // if system clipboard contains spreadsheet, use it even though it's
+    // technically possible it's staler than in-app clipboard
+    const spreadsheetResult =
+      !isPlainPaste && parsePotentialSpreadsheet(parsedEventData.value);
+
+    if (spreadsheetResult) {
+      return spreadsheetResult;
+    }
+  } catch (error: any) {
+    console.error(error);
   }
-
-  // if system clipboard contains spreadsheet, use it even though it's
-  // technically possible it's staler than in-app clipboard
-  const spreadsheetResult =
-    !isPlainPaste && parsePotentialSpreadsheet(systemClipboard.value);
-
-  if (spreadsheetResult) {
-    return spreadsheetResult;
-  }
-
-  const appClipboardData = getAppClipboard();
 
   try {
-    const systemClipboardData = JSON.parse(systemClipboard.value);
+    const systemClipboardData = JSON.parse(parsedEventData.value);
     const programmaticAPI =
       systemClipboardData.type === EXPORT_DATA_TYPES.excalidrawClipboardWithAPI;
     if (clipboardContainsElements(systemClipboardData)) {
@@ -266,18 +365,9 @@ export const parseClipboard = async (
         programmaticAPI,
       };
     }
-  } catch (e) {}
-  // system clipboard doesn't contain excalidraw elements → return plaintext
-  // unless we set a flag to prefer in-app clipboard because browser didn't
-  // support storing to system clipboard on copy
-  return PREFER_APP_CLIPBOARD && appClipboardData.elements
-    ? {
-        ...appClipboardData,
-        text: isPlainPaste
-          ? JSON.stringify(appClipboardData.elements, null, 2)
-          : undefined,
-      }
-    : { text: systemClipboard.value };
+  } catch {}
+
+  return { text: parsedEventData.value };
 };
 
 export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
@@ -310,28 +400,49 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
   }
 };
 
-export const copyTextToSystemClipboard = async (text: string | null) => {
-  let copied = false;
+export const copyTextToSystemClipboard = async (
+  text: string | null,
+  clipboardEvent?: ClipboardEvent | null,
+) => {
+  // (1) first try using Async Clipboard API
   if (probablySupportsClipboardWriteText) {
     try {
       // NOTE: doesn't work on FF on non-HTTPS domains, or when document
       // not focused
       await navigator.clipboard.writeText(text || "");
-      copied = true;
+      return;
     } catch (error: any) {
       console.error(error);
     }
   }
 
-  // Note that execCommand doesn't allow copying empty strings, so if we're
-  // clearing clipboard using this API, we must copy at least an empty char
-  if (!copied && !copyTextViaExecCommand(text || " ")) {
-    throw new Error("couldn't copy");
+  // (2) if fails and we have access to ClipboardEvent, use plain old setData()
+  try {
+    if (clipboardEvent) {
+      clipboardEvent.clipboardData?.setData("text/plain", text || "");
+      if (clipboardEvent.clipboardData?.getData("text/plain") !== text) {
+        throw new Error("Failed to setData on clipboardEvent");
+      }
+      return;
+    }
+  } catch (error: any) {
+    console.error(error);
+  }
+
+  // (3) if that fails, use document.execCommand
+  if (!copyTextViaExecCommand(text)) {
+    throw new Error(t("errors.copyToSystemClipboardFailed"));
   }
 };
 
 // adapted from https://github.com/zenorocha/clipboard.js/blob/ce79f170aa655c408b6aab33c9472e8e4fa52e19/src/clipboard-action.js#L48
-const copyTextViaExecCommand = (text: string) => {
+const copyTextViaExecCommand = (text: string | null) => {
+  // execCommand doesn't allow copying empty strings, so if we're
+  // clearing clipboard using this API, we must copy at least an empty char
+  if (!text) {
+    text = " ";
+  }
+
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const textarea = document.createElement("textarea");
