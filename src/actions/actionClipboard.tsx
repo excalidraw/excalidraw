@@ -53,7 +53,13 @@ export const actionPaste = register({
     try {
       types = await readSystemClipboard();
     } catch (error: any) {
-      console.error(`actionPaste: ${error.message}`);
+      if (error.name === "AbortError" || error.name === "NotAllowedError") {
+        // user probably aborted the action. Though not 100% sure, it's best
+        // to not annoy them with an error message.
+        return false;
+      }
+
+      console.error(`actionPaste ${error.name}: ${error.message}`);
 
       if (isFirefox) {
         return {
