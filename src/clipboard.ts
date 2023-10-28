@@ -236,35 +236,54 @@ const maybeParseHTMLPaste = (
 
 export const readSystemClipboard = async () => {
   const types: { [key in AllowedPasteMimeTypes]?: string } = {};
+
   try {
-    const clipboardItems = await navigator.clipboard?.read();
-    for (const item of clipboardItems) {
-      for (const type of item.types) {
-        if (!isMemberOf(ALLOWED_PASTE_MIME_TYPES, type)) {
-          continue;
-        }
-        try {
-          types[type] = await (await item.getType(type)).text();
-        } catch (error: any) {
-          console.warn(
-            `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
-          );
-        }
-      }
-    }
-    if (Object.keys(types).length === 0) {
-      console.warn(
-        "No clipboard data found from clipboard.read(). Falling back to clipboard.readText()",
-      );
-      // throw so we fall back onto clipboard.readText()
-      throw new Error("No clipboardItems found");
+    if (navigator.clipboard?.readText) {
+      return { "text/plain": await navigator.clipboard?.readText() };
     }
   } catch (error: any) {
-    try {
-      types["text/plain"] = await navigator.clipboard?.readText();
-    } catch (error: any) {
-      throw new Error(`Cannot readText() from clipboard: ${error.message}`);
+    // @ts-ignore
+    if (navigator.clipboard?.read) {
+      console.warn(
+        `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+      );
+    } else {
+      throw error;
     }
+  }
+
+  let clipboardItems: ClipboardItems;
+
+  try {
+    clipboardItems = await navigator.clipboard?.read();
+  } catch (error: any) {
+    if (error.name === "DataError") {
+      console.warn(
+        `navigator.clipboard.read() error, clipboard is probably empty: ${error.message}`,
+      );
+      return types;
+    }
+    throw error;
+  }
+
+  for (const item of clipboardItems) {
+    for (const type of item.types) {
+      if (!isMemberOf(ALLOWED_PASTE_MIME_TYPES, type)) {
+        continue;
+      }
+      try {
+        types[type] = await (await item.getType(type)).text();
+      } catch (error: any) {
+        console.warn(
+          `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
+        );
+      }
+    }
+  }
+
+  if (Object.keys(types).length === 0) {
+    console.warn("No clipboard data found from clipboard.read().");
+    return types;
   }
 
   return types;
