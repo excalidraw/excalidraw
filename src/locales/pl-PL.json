@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Elementy osadzone nie mogą zostać dodane do biblioteki.",
       "image": "Dodawania obrazów do biblioteki nadejdzie wkrótce!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Zaznaczenie",
