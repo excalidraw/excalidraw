@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
       "image": "Laster egongo da irudiak liburutegian gehitzeko laguntza!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Hautapena",
