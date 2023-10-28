@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Вбудовані елементи не можна додати в бібліотеку.",
       "image": "Підтримка додавання зображень в бібліотеку найближчим часом!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Виділення",
