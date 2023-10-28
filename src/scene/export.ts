@@ -17,7 +17,7 @@ import {
 } from "../element/image";
 import Scene from "./Scene";
 
-export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],

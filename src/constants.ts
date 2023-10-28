@@ -148,6 +148,8 @@ export const IMAGE_MIME_TYPES = {
   jfif: "image/jfif",
 } as const;
 
+export const ALLOWED_PASTE_MIME_TYPES = ["text/plain", "text/html"] as const;
+
 export const MIME_TYPES = {
   json: "application/json",
   // excalidraw data
