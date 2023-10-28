@@ -59,14 +59,14 @@
     "right": "",
     "extraBold": "",
     "architect": "",
-    "artist": "",
+    "artist": "Súwretshi",
     "cartoonist": "",
     "fileTitle": "Fayl ataması",
-    "colorPicker": "",
+    "colorPicker": "Reńdi tańlaw",
     "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
-    "layers": "",
+    "layers": "Qatlamlar",
     "actions": "Háreketler",
     "language": "Til",
     "liveCollaboration": "",
@@ -170,7 +170,7 @@
     "clear": "Tazalaw",
     "remove": "Óshiriw",
     "embed": "",
-    "publishLibrary": "",
+    "publishLibrary": "Jariyalaw",
     "submit": "Jiberiw",
     "confirm": "Tastıyıqlaw",
     "embeddableInteractionButton": ""
@@ -271,7 +271,7 @@
     "disableSnapping": ""
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "Aldınnan kóriwdi kórsetiw múmkin emes",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
@@ -350,15 +350,15 @@
     "website": "Veb-sayt",
     "placeholder": {
       "authorName": "Atıńız yamasa paydalanıwshı atı",
-      "libraryName": "",
+      "libraryName": "Kitapxanańız ataması",
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
-      "website": ""
+      "website": "Jeke veb-saytıńız yamasa basqa saytqa silteme (májbúriy emes)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Májbúriy",
+      "website": "Jaramlı URL mánzil kirgiziń"
     },
     "noteDescription": "",
     "noteGuidelines": "",
@@ -368,7 +368,7 @@
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "Kitapxana jiberildi",
     "content": ""
   },
   "confirmDialog": {
@@ -382,7 +382,7 @@
       "onlySelected": "",
       "darkMode": "Qarańǵı tema",
       "embedScene": "",
-      "scale": "",
+      "scale": "Kólem",
       "padding": ""
     },
     "tooltip": {
@@ -416,7 +416,7 @@
     "version": "Versiya",
     "versionCopy": "Kóshirip alıw ushın basıń",
     "versionNotAvailable": "",
-    "width": ""
+    "width": "Eni"
   },
   "toast": {
     "addedToLibrary": "Kitapxanaǵa qosıldı",
@@ -451,18 +451,18 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
-      "center_heading_plus": "",
+      "center_heading_plus": "Excalidraw+ ge ótiwdi qáleysiz be?",
       "menuHint": "Eksportlaw, sazlawlar, tiller, ..."
     },
     "defaults": {
       "menuHint": "Eksportlaw, sazlawlar hám basqa...",
-      "center_heading": "",
+      "center_heading": "Diagrammalar. Ápiwayı.",
       "toolbarHint": "",
       "helpHint": ""
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "Kóp qollanılatuǵın arnawlı reńler",
     "colors": "Reńler",
     "shades": "",
     "hexCode": "",
