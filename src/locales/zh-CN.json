@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "嵌入元素不能添加到素材库。",
       "image": "我们不久将支持添加图片到素材库"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "选择",
