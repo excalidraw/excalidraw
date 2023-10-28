@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "可嵌入元素無法加入資料庫",
       "image": "即將支援加入圖片至資料庫！"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "選取",
