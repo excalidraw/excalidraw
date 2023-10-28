@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Zapustené prvky nie je možné pridať do knižnice.",
       "image": "Podpora pre pridávanie obrázkov do knižnice bude dostupná už čoskoro!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Výber",
