@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Innebygde elementer kan ikke legges til i biblioteket.",
       "image": "Støtte for å legge til bilder i biblioteket kommer snart!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Velg",
