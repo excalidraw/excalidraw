@@ -4,7 +4,7 @@ import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
-import { KEYS } from "../keys";
+import { CODES, KEYS } from "../keys";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -67,6 +67,8 @@ export const actionFullScreen = register({
       commitToHistory: false,
     };
   },
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.F,
 });
 
 export const actionShortcuts = register({
