@@ -305,10 +305,12 @@ const parseClipboardEvent = async (
       if (mixedContent.value.every((item) => item.type === "text")) {
         return {
           type: "text",
-          value: mixedContent.value
-            .map((item) => item.value)
-            .join("\n")
-            .trim(),
+          value:
+            event.clipboardData?.getData("text/plain") ||
+            mixedContent.value
+              .map((item) => item.value)
+              .join("\n")
+              .trim(),
         };
       }
 
