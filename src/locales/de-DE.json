@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Einbettbare Elemente können der Bibliothek nicht hinzugefügt werden.",
       "image": "Unterstützung für das Hinzufügen von Bildern in die Bibliothek kommt bald!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Auswahl",
