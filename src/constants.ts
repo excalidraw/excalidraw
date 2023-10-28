@@ -450,6 +450,7 @@ export const ROUGHNESS = {
 } as const;
 
 export const STROKE_WIDTH = {
+  extraThin: 0.5, //zsviczian
   thin: 1,
   bold: 2,
   extraBold: 4,
