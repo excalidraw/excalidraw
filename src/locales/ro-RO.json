@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Elementele încorporabile nu pot fi adăugate la bibliotecă.",
       "image": "În curând vor putea fi adăugate imagini în bibliotecă!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selecție",
