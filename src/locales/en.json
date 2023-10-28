@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Embeddable elements cannot be added to the library.",
       "image": "Support for adding images to the library coming soon!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
+    "asyncPasteFailedOnParse": "Couldn't paste.",
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
   },
   "toolBar": {
     "selection": "Selection",
