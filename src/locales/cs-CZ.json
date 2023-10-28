@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Výběr",
