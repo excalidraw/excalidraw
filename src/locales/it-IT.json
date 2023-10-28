@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
       "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selezione",
