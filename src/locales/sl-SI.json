@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Vdelani elementi ne morejo biti dodani v knjižnico.",
       "image": "Podpora za dodajanje slik v knjižnico prihaja kmalu!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Izbor",
