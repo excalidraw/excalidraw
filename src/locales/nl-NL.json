@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Ingesloten elementen kunnen niet worden toegevoegd aan de bibliotheek.",
       "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selectie",
