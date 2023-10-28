@@ -218,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "",
       "image": "Resimleri kütüphaneye ekleme desteği yakında geliyor!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Seçme",
