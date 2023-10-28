@@ -2116,7 +2116,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
-    this.cutAll();
+    this.actionManager.executeAction(actionCut, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
   });
@@ -2128,18 +2128,10 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
-    this.copyAll();
+    this.actionManager.executeAction(actionCopy, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
   });
-
-  private cutAll = () => {
-    this.actionManager.executeAction(actionCut, "keyboard");
-  };
-
-  private copyAll = () => {
-    this.actionManager.executeAction(actionCopy, "keyboard");
-  };
 
   private static resetTapTwice() {
     didTapTwice = false;

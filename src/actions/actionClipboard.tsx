@@ -17,7 +17,7 @@ import { isFirefox } from "../constants";
 export const actionCopy = register({
   name: "copy",
   trackEvent: { category: "element" },
-  perform: async (elements, appState, _, app) => {
+  perform: async (elements, appState, event: ClipboardEvent | null, app) => {
     const elementsToCopy = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
@@ -25,7 +25,7 @@ export const actionCopy = register({
     });
 
     try {
-      await copyToClipboard(elementsToCopy, app.files);
+      await copyToClipboard(elementsToCopy, app.files, event);
     } catch (error: any) {
       return {
         commitToHistory: false,
@@ -99,8 +99,8 @@ export const actionPaste = register({
 export const actionCut = register({
   name: "cut",
   trackEvent: { category: "element" },
-  perform: (elements, appState, data, app) => {
-    actionCopy.perform(elements, appState, data, app);
+  perform: (elements, appState, event: ClipboardEvent | null, app) => {
+    actionCopy.perform(elements, appState, event, app);
     return actionDeleteSelected.perform(elements, appState);
   },
   contextItemLabel: "labels.cut",
