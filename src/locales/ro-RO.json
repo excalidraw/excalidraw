@@ -219,9 +219,9 @@
       "embeddable": "Elementele încorporabile nu pot fi adăugate la bibliotecă.",
       "image": "În curând vor putea fi adăugate imagini în bibliotecă!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Lipirea nu a putut fi efectuată (nu s-a putut citit din memoria temporară a sistemului).",
+    "asyncPasteFailedOnParse": "Lipirea nu a putut fi efectuată.",
+    "copyToSystemClipboardFailed": "Nu s-a putut copia în memoria temporară."
   },
   "toolBar": {
     "selection": "Selecție",
