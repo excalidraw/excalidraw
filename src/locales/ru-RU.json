@@ -219,9 +219,9 @@
       "embeddable": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Не удалось вставить (невозможно прочитать из системного буфера обмена).",
+    "asyncPasteFailedOnParse": "Не удалось вставить.",
+    "copyToSystemClipboardFailed": "Не удалось скопировать в буфер обмена."
   },
   "toolBar": {
     "selection": "Выделение области",
