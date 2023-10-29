@@ -221,7 +221,7 @@
     },
     "asyncPasteFailedOnRead": "",
     "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "copyToSystemClipboardFailed": "无法复制到剪贴板。"
   },
   "toolBar": {
     "selection": "选择",
