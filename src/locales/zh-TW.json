@@ -219,9 +219,9 @@
       "embeddable": "可嵌入元素無法加入資料庫",
       "image": "即將支援加入圖片至資料庫！"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "無法貼上（無法由系統剪貼簿讀入）",
+    "asyncPasteFailedOnParse": "無法貼上",
+    "copyToSystemClipboardFailed": "無法複製至剪貼簿"
   },
   "toolBar": {
     "selection": "選取",
