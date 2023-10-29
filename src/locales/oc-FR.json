@@ -50,7 +50,7 @@
     "veryLarge": "Gradassa",
     "solid": "Solide",
     "hachure": "Raia",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Raia crosada",
     "thin": "Fin",
     "bold": "Espés",
@@ -109,12 +109,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Modificar lo ligam",
-      "editEmbed": "",
+      "editEmbed": "Modificar lo ligam e l’integracion",
       "create": "Crear un ligam",
-      "createEmbed": "",
+      "createEmbed": "Crear un ligam e son integracion",
       "label": "Ligam",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Ligam e integracion",
+      "empty": "Cap de ligam pas definit"
     },
     "lineEditor": {
       "edit": "Modificar la linha",
@@ -130,7 +130,7 @@
     "sidebarLock": "Gardar la barra laterala dobèrta",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "Prendre la color a partir d’un canabàs"
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -173,7 +173,7 @@
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Clicar per interagir"
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -203,7 +203,7 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Fracàs de la recuperacion de l’imatge.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
@@ -220,7 +220,7 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
+    "asyncPasteFailedOnParse": "Empegatge impossible.",
     "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
@@ -240,9 +240,9 @@
     "eraser": "Goma",
     "frame": "",
     "embeddable": "",
-    "laser": "",
+    "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
-    "extraTools": ""
+    "extraTools": "Mai d’aisinas"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -379,27 +379,27 @@
     "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imatges",
     "label": {
-      "withBackground": "",
+      "withBackground": "Rèireplan",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "Mòde escur",
       "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "scale": "Escala",
+      "padding": "Espaçament"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar en PNG",
+      "exportToSvg": "Exportar en SVG",
+      "copyPngToClipboard": "Copiar PNG al quichapapièrs"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar al quichapapièrs"
     }
   },
   "encrypted": {
@@ -436,20 +436,20 @@
   },
   "colors": {
     "transparent": "Transparéncia",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Negre",
+    "white": "Blanc",
+    "red": "Roge",
+    "pink": "Ròse",
+    "grape": "Bordèu",
+    "violet": "Violet",
+    "gray": "Gris",
+    "blue": "Blau",
+    "cyan": "Cian",
+    "teal": "Sarcèla",
+    "green": "Verd",
+    "yellow": "Jaune",
+    "orange": "Irange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -465,39 +465,39 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Colors personalizadas mai utilizadas",
+    "colors": "Colors",
+    "shades": "Nuanças",
+    "hexCode": "Còdi exadecimal",
+    "noShades": "Cap de nuança pas disponibla per aquesta color"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Exportar coma imatge",
+        "button": "Exportar coma imatge",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Salvar al disc",
+        "button": "Salvar al disc",
+        "description": "Exportar las donadas de la scèna cap a un fichièr que podètz importar mai tard."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportar dins Excalidraw+",
+        "description": "Enregistrar la scèna dins vòstre espaci de trabalh Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Cargar d’un fichièr",
+        "button": "Cargar d’un fichièr",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
+        "title": "Cargar d’un ligam",
+        "button": "Remplaçar mon contengut",
         "description": ""
       }
     }
