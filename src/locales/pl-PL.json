@@ -219,9 +219,9 @@
       "embeddable": "Elementy osadzone nie mogą zostać dodane do biblioteki.",
       "image": "Dodawania obrazów do biblioteki nadejdzie wkrótce!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Nie udało się wkleić (nie udało się odczytać ze schowka systemowego).",
+    "asyncPasteFailedOnParse": "Nie udało się wkleić.",
+    "copyToSystemClipboardFailed": "Nie udało się skopiować do schowka."
   },
   "toolBar": {
     "selection": "Zaznaczenie",
