@@ -219,8 +219,8 @@
       "embeddable": "嵌入元素不能添加到素材库。",
       "image": "我们不久将支持添加图片到素材库"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
+    "asyncPasteFailedOnRead": "无法粘贴（无法读取系统剪贴板）。",
+    "asyncPasteFailedOnParse": "无法粘贴。",
     "copyToSystemClipboardFailed": "无法复制到剪贴板。"
   },
   "toolBar": {
