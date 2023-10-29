@@ -219,9 +219,9 @@
       "embeddable": "Einbettbare Elemente können der Bibliothek nicht hinzugefügt werden.",
       "image": "Unterstützung für das Hinzufügen von Bildern in die Bibliothek kommt bald!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Einfügen fehlgeschlagen (konnte aus der Zwischenablage des Systems nicht gelesen werden).",
+    "asyncPasteFailedOnParse": "Einfügen fehlgeschlagen.",
+    "copyToSystemClipboardFailed": "Kopieren in die Zwischenablage fehlgeschlagen."
   },
   "toolBar": {
     "selection": "Auswahl",
