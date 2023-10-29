@@ -203,7 +203,7 @@
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Impossibile recuperare l'immagine.",
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
@@ -219,9 +219,9 @@
       "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
       "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Impossibile incollare (non è possibile leggere dagli appunti di sistema).",
+    "asyncPasteFailedOnParse": "Impossibile incollare.",
+    "copyToSystemClipboardFailed": "Impossibile copiare negli appunti."
   },
   "toolBar": {
     "selection": "Selezione",
