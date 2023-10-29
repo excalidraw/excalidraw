@@ -219,9 +219,9 @@
       "embeddable": "Vdelani elementi ne morejo biti dodani v knjižnico.",
       "image": "Podpora za dodajanje slik v knjižnico prihaja kmalu!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Ni bilo mogoče prilepiti (ni bilo mogoče brati iz sistemskega odložišča).",
+    "asyncPasteFailedOnParse": "Ni bilo mogoče prilepiti.",
+    "copyToSystemClipboardFailed": "Ni bilo mogoče kopirati v odložišče."
   },
   "toolBar": {
     "selection": "Izbor",
