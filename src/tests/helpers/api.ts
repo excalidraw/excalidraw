@@ -94,7 +94,7 @@ export class API {
     angle?: number;
     id?: string;
     isDeleted?: boolean;
-    frameId?: ExcalidrawElement["id"];
+    frameId?: ExcalidrawElement["id"] | null;
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
