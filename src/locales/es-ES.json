@@ -219,9 +219,9 @@
       "embeddable": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "No se pudo pegar (no se pudo leer desde el portapapeles del sistema).",
+    "asyncPasteFailedOnParse": "No se pudo pegar.",
+    "copyToSystemClipboardFailed": "No se pudo copiar al portapapeles."
   },
   "toolBar": {
     "selection": "Selección",
