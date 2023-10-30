@@ -457,7 +457,7 @@ export const convertToExcalidrawElements = (
         const normalizedText = normalizeText(text);
         const metrics = measureText(
           normalizedText,
-          getFontString({ fontFamily, fontSize }),
+          getFontString({ fontFamily, fontSize, fontWeight }),
           lineHeight,
         );
 
@@ -469,6 +469,7 @@ export const convertToExcalidrawElements = (
           fontSize,
           ...element,
         });
+
         break;
       }
       case "image": {

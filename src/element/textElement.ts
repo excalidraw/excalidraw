@@ -15,6 +15,7 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_WEIGHT,
   FONT_FAMILY,
   isSafari,
   TEXT_ALIGN,
@@ -62,6 +63,7 @@ export const redrawTextBoundingBox = (
     width: textElement.width,
     height: textElement.height,
     baseline: textElement.baseline,
+    fontWeight: textElement.fontWeight,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -297,14 +299,16 @@ export const measureText = (
 ) => {
   text = text
     .split("\n")
-    // replace empty lines with single space because leading/trailing empty
-    // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
-  const fontSize = parseFloat(font);
+
+  const fontSizeMatch = font.match(/(\d+(\.\d+)?)/); // Regular expression to match a number
+  const fontSize = fontSizeMatch ? parseFloat(fontSizeMatch[0]) : 16; // Default to 16 if not found
+
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
   const baseline = measureBaseline(text, font, lineHeight);
+
   return { width, height, baseline };
 };
 
@@ -948,6 +952,7 @@ export const isMeasureTextSupported = () => {
     getFontString({
       fontSize: DEFAULT_FONT_SIZE,
       fontFamily: DEFAULT_FONT_FAMILY,
+      fontWeight: DEFAULT_FONT_WEIGHT,
     }),
   );
   return width > 0;
@@ -974,7 +979,8 @@ const DEFAULT_LINE_HEIGHT = {
   // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
   // Couldnt find this one I will check later TODO: Check real one
-  [FONT_FAMILY.Noto]: 1.28 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.NotoSans]: 1.15 as ExcalidrawTextElement["lineHeight"],
+  [FONT_FAMILY.NotoSerif]: 1.15 as ExcalidrawTextElement["lineHeight"],
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {

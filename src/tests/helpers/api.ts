@@ -109,6 +109,7 @@ export class API {
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
+    fontWeight?: T extends "text" ? ExcalidrawTextElement["fontWeight"] : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
     verticalAlign?: T extends "text"
       ? ExcalidrawTextElement["verticalAlign"]
@@ -202,10 +203,12 @@ export class API {
       case "text":
         const fontSize = rest.fontSize ?? appState.currentItemFontSize;
         const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
+        const fontWeight = rest.fontWeight ?? appState.currentItemFontWeight;
         element = newTextElement({
           ...base,
           text: rest.text || "test",
           fontSize,
+          fontWeight,
           fontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
           verticalAlign: rest.verticalAlign ?? DEFAULT_VERTICAL_ALIGN,

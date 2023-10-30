@@ -76,16 +76,18 @@ export class Fonts {
         ...new Set(
           elements
             .filter((element) => isTextElement(element))
-            .map((element) => (element as ExcalidrawTextElement).fontFamily),
+            .map((element) => element as ExcalidrawTextElement),
         ),
-      ].map((fontFamily) => {
+      ].map((element) => {
         const fontString = getFontString({
-          fontFamily,
+          fontFamily: element.fontFamily,
           fontSize: 16,
+          fontWeight: element.fontWeight,
         });
         if (!document.fonts?.check?.(fontString)) {
           return document.fonts?.load?.(fontString);
         }
+
         return undefined;
       }),
     );

@@ -3,7 +3,6 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
-  FONT_WEIGHT,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -94,28 +93,17 @@ export const getFontFamilyString = ({
   return WINDOWS_EMOJI_FALLBACK_FONT;
 };
 
-export const getFontWeightString = ({
-  fontWeight,
-}: {
-  fontWeight: FontWeightValues;
-}) => {
-  for (const [fontWeightString, id] of Object.entries(FONT_WEIGHT)) {
-    if (id === fontWeight) {
-      return `${fontWeightString}`;
-    }
-  }
-  return FONT_WEIGHT.normal;
-};
-
 /** returns fontSize+fontFamily string for assignment to DOM elements */
 export const getFontString = ({
   fontSize,
   fontFamily,
+  fontWeight,
 }: {
   fontSize: number;
   fontFamily: FontFamilyValues;
+  fontWeight: FontWeightValues;
 }) => {
-  return `${fontSize}px ${getFontFamilyString({
+  return `${fontWeight} ${fontSize}px ${getFontFamilyString({
     fontFamily,
   })}` as FontString;
 };

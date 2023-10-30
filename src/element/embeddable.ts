@@ -1,5 +1,5 @@
 import { register } from "../actions/register";
-import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
+import { FONT_FAMILY, FONT_WEIGHT, VERTICAL_ALIGN } from "../constants";
 import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
@@ -220,12 +220,13 @@ export const createPlaceholderEmbeddableLabel = (
     Math.min(element.width / 2, element.width / text.length),
     element.width / 30,
   );
-  const fontFamily = FONT_FAMILY.Noto;
-  const fontWeight = "normal";
+  const fontFamily = FONT_FAMILY.Virgil;
+  const fontWeight = FONT_WEIGHT.normal;
 
   const fontString = getFontString({
     fontSize,
     fontFamily,
+    fontWeight,
   });
 
   return newTextElement({

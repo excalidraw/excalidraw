@@ -38,15 +38,13 @@
 }
 
 @font-face {
-  font-family: "Noto";
-  src: url("GoNotoCurrent-Regular.ttf") format("truetype");
+  font-family: 'NotoSerif';
+  src: url('GoNotoCurrentSerif.ttf') format("truetype");
   font-display: swap;
-  font-weight: normal;
 }
 
 @font-face {
-  font-family: "Noto";
-  src: url("GoNotoCurrent-Bold.ttf") format("truetype");
+  font-family: "NotoSans";
+  src: url("GoNotoCurrent-Regular.ttf") format("truetype");
   font-display: swap;
-  font-weight: bold;
 }

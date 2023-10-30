@@ -43,6 +43,8 @@
     "addWatermark": "Add \"Made with Excalidraw\"",
     "handDrawn": "Hand-drawn",
     "noto": "Noto",
+    "notoSans": "Noto Sans",
+    "notoSerif": "Noto Serif",
     "fontWeight": "Font weight",
     "normal": "Normal",
     "code": "Code",

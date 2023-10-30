@@ -712,8 +712,13 @@ export const actionChangeFontFamily = register({
         icon: FontFamilyCodeIcon,
       },
       {
-        value: FONT_FAMILY.Noto,
-        text: t("labels.noto"),
+        value: FONT_FAMILY.NotoSans,
+        text: t("labels.notoSans"),
+        icon: FontFamilyNormalIcon,
+      },
+      {
+        value: FONT_FAMILY.NotoSerif,
+        text: t("labels.notoSerif"),
         icon: FontFamilyNormalIcon,
       },
     ];
@@ -758,7 +763,10 @@ export const actionChangeFontWeight = register({
           if (isTextElement(oldElement)) {
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
-              { fontWeight: value },
+              {
+                fontWeight: value,
+                lineHeight: getDefaultLineHeight(value),
+              },
             );
             redrawTextBoundingBox(newElement, getContainerElement(oldElement));
             return newElement;

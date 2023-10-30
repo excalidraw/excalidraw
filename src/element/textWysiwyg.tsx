@@ -353,6 +353,7 @@ export const textWysiwyg = ({
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
+        fontWeight: app.state.currentItemFontWeight,
       });
       if (container) {
         const wrappedText = wrapText(
