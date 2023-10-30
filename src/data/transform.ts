@@ -161,6 +161,7 @@ export type ExcalidrawElementSkeleton =
   | ({
       type: "frame";
       elements: Array<ExcalidrawElement["id"]>;
+      name?: string;
     } & Partial<ExcalidrawFrameElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
@@ -441,7 +442,6 @@ export const convertToExcalidrawElements = (
   const elements: ExcalidrawElementSkeleton[] = JSON.parse(
     JSON.stringify(elementsSkeleton),
   );
-  console.log("HELLLL");
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
   const oldToNewElementIdMap = new Map<string, string>();
@@ -541,7 +541,11 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "frame": {
-        excalidrawElement = newFrameElement({ x: 0, y: 0, ...element });
+        excalidrawElement = newFrameElement({
+          x: 0,
+          y: 0,
+          ...element,
+        });
         break;
       }
       case "freedraw":
@@ -689,6 +693,5 @@ export const convertToExcalidrawElements = (
   //     }
   //   }
   // });
-  console.log(elementStore.getElements, "heyll");
   return elementStore.getElements();
 };

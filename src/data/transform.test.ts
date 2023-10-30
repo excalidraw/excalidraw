@@ -308,9 +308,7 @@ describe("Test Transform", () => {
       });
     });
 
-    it('should transform frames and update frame ids when regenerated', () => {
-      
-    })
+    it("should transform frames and update frame ids when regenerated", () => {});
   });
 
   describe("Test arrow bindings", () => {
