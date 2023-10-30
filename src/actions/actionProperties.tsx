@@ -45,6 +45,7 @@ import {
   TextAlignCenterIcon,
   TextAlignRightIcon,
   FillZigZagIcon,
+  FontFamilyNotoIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -759,19 +760,19 @@ export const actionChangeFontFamily = register({
       {
         value: FONT_FAMILY["Noto Sans"],
         text: t("labels.notoSans"),
-        icon: FontFamilyNormalIcon,
+        icon: FontFamilyNotoIcon,
         testId: "font-family-noto-sans",
       },
       {
         value: FONT_FAMILY["Noto Serif"],
         text: t("labels.notoSerif"),
-        icon: FontFamilyNormalIcon,
+        icon: FontFamilyNotoIcon,
         testId: "font-family-noto-serif",
       },
       {
         value: FONT_FAMILY["Noto Sans Mono"],
         text: t("labels.notoMono"),
-        icon: FontFamilyNormalIcon,
+        icon: FontFamilyNotoIcon,
         testId: "font-family-noto-serif",
       },
     ];

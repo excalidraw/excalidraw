@@ -69,6 +69,15 @@ const modifiedTablerIconProps: Opts = {
   strokeLinejoin: "round",
 } as const;
 
+const notoIconProps: Opts = {
+  width: 50.8,
+  height: 60.8,
+  fill: "none",
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
 // -----------------------------------------------------------------------------
 
 // tabler-icons: present
@@ -1411,6 +1420,20 @@ export const FontFamilyNormalIcon = createIcon(
     </g>
   </>,
   modifiedTablerIconProps,
+);
+
+export const FontFamilyNotoIcon = createIcon(
+  <>
+    <g
+      stroke="#010000"
+      strokeWidth="3.175"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M11.52 44.979V5.821l27.761 39.158V5.821" />
+    </g>
+  </>,
+  notoIconProps,
 );
 
 export const FontFamilyCodeIcon = createIcon(
