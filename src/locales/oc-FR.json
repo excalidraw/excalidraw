@@ -219,9 +219,9 @@
       "embeddable": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Empegatge impossible (lectura impossibla a partir del quichapapièrs).",
     "asyncPasteFailedOnParse": "Empegatge impossible.",
-    "copyToSystemClipboardFailed": ""
+    "copyToSystemClipboardFailed": "Còpia impossibla al quichapapièrs."
   },
   "toolBar": {
     "selection": "Seleccion",
