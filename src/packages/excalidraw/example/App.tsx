@@ -145,7 +145,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           ...initialData,
           elements: convertToExcalidrawElements(initialData.elements),
         });
-
         excalidrawAPI.addFiles(imagesArray);
       };
     };

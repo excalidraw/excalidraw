@@ -183,7 +183,6 @@ const bindTextToContainer = (
     ...textProps,
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
-    frameId: container?.frameId,
   });
 
   Object.assign(container, {
@@ -684,14 +683,5 @@ export const convertToExcalidrawElements = (
     Object.assign(excalidrawElement, { x: x1, y: y1, width, height });
   }
 
-  // update frame id of elements with the newly generated frame id
-  // elementStore.getElements().forEach((element) => {
-  //   if (element.frameId) {
-  //     const newFrameId = oldToNewElementIdMap.get(element.frameId);
-  //     if (newFrameId) {
-  //       Object.assign(element, { frameId: newFrameId });
-  //     }
-  //   }
-  // });
   return elementStore.getElements();
 };
