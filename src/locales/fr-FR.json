@@ -203,7 +203,7 @@
     "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Échec de récupération de l'image.",
     "invalidSVGString": "SVG invalide.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
@@ -220,8 +220,8 @@
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Impossible de coller.",
+    "copyToSystemClipboardFailed": "Échec de la copie dans le presse-papiers."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -240,7 +240,7 @@
     "eraser": "Gomme",
     "frame": "Outil de cadre",
     "embeddable": "Intégration Web",
-    "laser": "",
+    "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils"
   },
