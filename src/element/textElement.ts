@@ -978,9 +978,6 @@ const DEFAULT_LINE_HEIGHT = {
   [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
   // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
-  // TODO: Check real one this just my guess for Asian chars and Arabic
-  [FONT_FAMILY.NotoSans]: 1.5 as ExcalidrawTextElement["lineHeight"],
-  [FONT_FAMILY.NotoSerif]: 1.5 as ExcalidrawTextElement["lineHeight"],
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {

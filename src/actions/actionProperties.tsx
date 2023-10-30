@@ -757,14 +757,20 @@ export const actionChangeFontFamily = register({
         testId: "font-family-code",
       },
       {
-        value: FONT_FAMILY.NotoSans,
+        value: FONT_FAMILY["Noto Sans"],
         text: t("labels.notoSans"),
         icon: FontFamilyNormalIcon,
         testId: "font-family-noto-sans",
       },
       {
-        value: FONT_FAMILY.NotoSerif,
+        value: FONT_FAMILY["Noto Serif"],
         text: t("labels.notoSerif"),
+        icon: FontFamilyNormalIcon,
+        testId: "font-family-noto-serif",
+      },
+      {
+        value: FONT_FAMILY["Noto Sans Mono"],
+        text: t("labels.notoMono"),
         icon: FontFamilyNormalIcon,
         testId: "font-family-noto-serif",
       },

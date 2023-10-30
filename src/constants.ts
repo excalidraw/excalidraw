@@ -109,8 +109,9 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
-  NotoSans: 4,
-  NotoSerif: 5,
+  "Noto Sans": 4,
+  "Noto Serif": 5,
+  "Noto Sans Mono": 6,
 };
 
 export const FONT_WEIGHT = {
