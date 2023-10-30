@@ -760,11 +760,13 @@ export const actionChangeFontFamily = register({
         value: FONT_FAMILY.NotoSans,
         text: t("labels.notoSans"),
         icon: FontFamilyNormalIcon,
+        testId: "font-family-noto-sans",
       },
       {
         value: FONT_FAMILY.NotoSerif,
         text: t("labels.notoSerif"),
         icon: FontFamilyNormalIcon,
+        testId: "font-family-noto-serif",
       },
     ];
 
@@ -866,7 +868,12 @@ export const actionChangeFontWeight = register({
               }
               return null;
             },
-            appState.currentItemFontWeight || DEFAULT_FONT_WEIGHT,
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontWeight || DEFAULT_FONT_WEIGHT,
           )}
           onChange={(value) => updateData(value)}
         />
