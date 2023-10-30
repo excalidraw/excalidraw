@@ -656,7 +656,12 @@ export const convertToExcalidrawElements = (
     if (element.type !== "frame") {
       continue;
     }
-    const excalidrawElement = elementStore.getElement(id)!;
+    const excalidrawElement = elementStore.getElement(id);
+
+    if (!excalidrawElement) {
+      throw new Error(`Excalidraw element with id ${id} doesn't exist`);
+    }
+
     let x1 = Infinity;
     let y1 = Infinity;
     let x2 = -Infinity;
@@ -664,8 +669,18 @@ export const convertToExcalidrawElements = (
     const PADDING = 10;
 
     element.elements.forEach((id) => {
-      const newElementId = oldToNewElementIdMap.get(id)!;
-      const frameElement = elementStore.getElement(newElementId)!;
+      const newElementId = oldToNewElementIdMap.get(id);
+
+      if (!newElementId) {
+        throw new Error(`Element with ${id} wasn't mapped correctly`);
+      }
+
+      const frameElement = elementStore.getElement(newElementId);
+
+      if (!frameElement) {
+        throw new Error(`Frame element with id ${newElementId} doesn't exist`);
+      }
+
       x1 = Math.min(x1, frameElement.x);
       y1 = Math.min(y1, frameElement.y);
       x2 = Math.max(x2, frameElement.x + frameElement.width);
