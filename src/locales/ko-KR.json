@@ -219,9 +219,9 @@
       "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
       "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "붙여넣는데 실패했습니다. (시스템 클립보드를 읽는데 실패했습니다)",
+    "asyncPasteFailedOnParse": "붙여넣는데 실패했습니다.",
+    "copyToSystemClipboardFailed": "클립보드로 복사하는데 실패했습니다."
   },
   "toolBar": {
     "selection": "선택",
