@@ -101,9 +101,8 @@
   },
   "homepage": ".",
   "name": "excalidraw",
-  "version": "0.16.2",
   "prettier": "@excalidraw/prettier-config",
-  "private": false,
+  "private": true,
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true VITE_APP_DISABLE_TRACKING=true vite build",
@@ -132,6 +131,7 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "release:github": "node scripts/release-gt.js"
   }
 }
