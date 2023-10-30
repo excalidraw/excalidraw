@@ -113,7 +113,7 @@
       "create": "Ajouter un lien",
       "createEmbed": "Créer un lien & intégrer",
       "label": "Lien",
-      "labelEmbed": "",
+      "labelEmbed": "Lier & intégrer",
       "empty": "Aucun lien défini"
     },
     "lineEditor": {
@@ -219,7 +219,7 @@
       "embeddable": "Les éléments intégrés ne peuvent pas être ajoutés à la librairie.",
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Impossible de coller (impossible de lire le presse-papiers système).",
     "asyncPasteFailedOnParse": "Impossible de coller.",
     "copyToSystemClipboardFailed": "Échec de la copie dans le presse-papiers."
   },
@@ -386,7 +386,7 @@
       "darkMode": "Mode sombre",
       "embedScene": "Intégrer la scène",
       "scale": "Échelle",
-      "padding": ""
+      "padding": "Marge interne"
     },
     "tooltip": {
       "embedScene": "Les données de la scène seront sauvegardées dans le fichier PNG/SVG exporté afin que la scène puisse être restaurée depuis celui-ci.\nCela augmentera la taille du fichier exporté."
