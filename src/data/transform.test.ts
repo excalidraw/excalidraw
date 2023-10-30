@@ -307,6 +307,10 @@ describe("Test Transform", () => {
         id: expect.any(String),
       });
     });
+
+    it('should transform frames and update frame ids when regenerated', () => {
+      
+    })
   });
 
   describe("Test arrow bindings", () => {

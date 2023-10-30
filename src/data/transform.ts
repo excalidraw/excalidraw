@@ -12,6 +12,7 @@ import {
 import { bindLinearElement } from "../element/binding";
 import {
   ElementConstructorOpts,
+  newFrameElement,
   newImageElement,
   newTextElement,
 } from "../element/newElement";
@@ -135,9 +136,7 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      | ExcalidrawEmbeddableElement
-      | ExcalidrawFreeDrawElement
-      | ExcalidrawFrameElement
+      ExcalidrawEmbeddableElement | ExcalidrawFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -158,7 +157,11 @@ export type ExcalidrawElementSkeleton =
       x: number;
       y: number;
       fileId: FileId;
-    } & Partial<ExcalidrawImageElement>);
+    } & Partial<ExcalidrawImageElement>)
+  | ({
+      type: "frame";
+      elements: Array<ExcalidrawElement["id"]>;
+    } & Partial<ExcalidrawFrameElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 100,
@@ -179,6 +182,7 @@ const bindTextToContainer = (
     ...textProps,
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
+    frameId: container?.frameId,
   });
 
   Object.assign(container, {
@@ -437,7 +441,7 @@ export const convertToExcalidrawElements = (
   const elements: ExcalidrawElementSkeleton[] = JSON.parse(
     JSON.stringify(elementsSkeleton),
   );
-
+  console.log("HELLLL");
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
   const oldToNewElementIdMap = new Map<string, string>();
@@ -536,8 +540,11 @@ export const convertToExcalidrawElements = (
 
         break;
       }
+      case "frame": {
+        excalidrawElement = newFrameElement({ x: 0, y: 0, ...element });
+        break;
+      }
       case "freedraw":
-      case "frame":
       case "embeddable": {
         excalidrawElement = element;
         break;
@@ -641,15 +648,47 @@ export const convertToExcalidrawElements = (
       }
     }
   }
-  // update frame id of elements with the newly generated frame id
-  elementStore.getElements().forEach((element) => {
-    if (element.frameId) {
-      const newFrameId = oldToNewElementIdMap.get(element.frameId);
-      if (newFrameId) {
-        Object.assign(element, { frameId: newFrameId });
-      }
-    }
-  });
 
+  for (const [id, element] of elementsWithIds) {
+    if (element.type !== "frame") {
+      continue;
+    }
+    const excalidrawElement = elementStore.getElement(id)!;
+    let x1 = Infinity;
+    let y1 = Infinity;
+    let x2 = -Infinity;
+    let y2 = -Infinity;
+    const PADDING = 10;
+
+    element.elements.forEach((id) => {
+      const newElementId = oldToNewElementIdMap.get(id)!;
+      const frameElement = elementStore.getElement(newElementId)!;
+      x1 = Math.min(x1, frameElement.x);
+      y1 = Math.min(y1, frameElement.y);
+      x2 = Math.max(x2, frameElement.x + frameElement.width);
+      y2 = Math.max(y2, frameElement.y + frameElement.height);
+      Object.assign(frameElement, { frameId: excalidrawElement.id });
+    });
+
+    x1 = x1 - PADDING;
+    x2 = x2 + PADDING;
+    y1 = y1 - PADDING;
+    y2 = y2 + PADDING;
+
+    const width = x2 - x1;
+    const height = y2 - y1;
+    Object.assign(excalidrawElement, { x: x1, y: y1, width, height });
+  }
+
+  // update frame id of elements with the newly generated frame id
+  // elementStore.getElements().forEach((element) => {
+  //   if (element.frameId) {
+  //     const newFrameId = oldToNewElementIdMap.get(element.frameId);
+  //     if (newFrameId) {
+  //       Object.assign(element, { frameId: newFrameId });
+  //     }
+  //   }
+  // });
+  console.log(elementStore.getElements, "heyll");
   return elementStore.getElements();
 };
