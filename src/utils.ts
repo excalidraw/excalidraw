@@ -9,6 +9,7 @@ import {
 import {
   FontFamilyValues,
   FontString,
+  FontWeightValues,
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { ActiveTool, AppState, ToolType, Zoom } from "./types";
@@ -96,11 +97,15 @@ export const getFontFamilyString = ({
 export const getFontString = ({
   fontSize,
   fontFamily,
+  fontWeight,
 }: {
   fontSize: number;
   fontFamily: FontFamilyValues;
+  fontWeight: FontWeightValues;
 }) => {
-  return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+  return `${fontWeight} ${fontSize}px ${getFontFamilyString({
+    fontFamily,
+  })}` as FontString;
 };
 
 export const debounce = <T extends any[]>(

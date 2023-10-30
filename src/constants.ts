@@ -1,6 +1,10 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
-import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import {
+  ExcalidrawElement,
+  FontFamilyValues,
+  FontWeightValues,
+} from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
@@ -105,6 +109,14 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
+  "Noto Sans": 4,
+  "Noto Serif": 5,
+  "Noto Sans Mono": 6,
+};
+
+export const FONT_WEIGHT = {
+  normal: "normal",
+  bold: "bold",
 };
 
 export const THEME = {
@@ -128,6 +140,8 @@ export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
+
+export const DEFAULT_FONT_WEIGHT: FontWeightValues = "normal";
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";

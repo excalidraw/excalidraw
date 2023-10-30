@@ -1,6 +1,7 @@
 import { Point } from "../types";
 import {
   FONT_FAMILY,
+  FONT_WEIGHT,
   ROUNDNESS,
   TEXT_ALIGN,
   THEME,
@@ -19,6 +20,8 @@ export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeRoundness = "round" | "sharp";
 export type RoundnessType = ValueOf<typeof ROUNDNESS>;
 export type StrokeStyle = "solid" | "dashed" | "dotted";
+export type FontWeightKeys = keyof typeof FONT_WEIGHT;
+export type FontWeightValues = typeof FONT_WEIGHT[FontWeightKeys];
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
@@ -151,6 +154,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     type: "text";
     fontSize: number;
     fontFamily: FontFamilyValues;
+    fontWeight: FontWeightValues;
     text: string;
     baseline: number;
     textAlign: TextAlign;

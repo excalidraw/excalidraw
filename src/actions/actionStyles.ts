@@ -11,6 +11,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_FONT_WEIGHT,
 } from "../constants";
 import {
   getBoundTextElement,
@@ -100,11 +101,14 @@ export const actionPasteStyles = register({
           if (isTextElement(newElement)) {
             const fontSize =
               elementStylesToCopyFrom?.fontSize || DEFAULT_FONT_SIZE;
+            const fontWeight =
+              elementStylesToCopyFrom?.fontWeight || DEFAULT_FONT_WEIGHT;
             const fontFamily =
               elementStylesToCopyFrom?.fontFamily || DEFAULT_FONT_FAMILY;
             newElement = newElementWith(newElement, {
               fontSize,
               fontFamily,
+              fontWeight,
               textAlign:
                 elementStylesToCopyFrom?.textAlign || DEFAULT_TEXT_ALIGN,
               lineHeight:

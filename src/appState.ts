@@ -3,6 +3,7 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_WEIGHT,
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
   THEME,
@@ -28,6 +29,7 @@ export const getDefaultAppState = (): Omit<
     currentItemEndArrowhead: "arrow",
     currentItemFillStyle: DEFAULT_ELEMENT_PROPS.fillStyle,
     currentItemFontFamily: DEFAULT_FONT_FAMILY,
+    currentItemFontWeight: DEFAULT_FONT_WEIGHT,
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
@@ -132,6 +134,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemEndArrowhead: { browser: true, export: false, server: false },
   currentItemFillStyle: { browser: true, export: false, server: false },
   currentItemFontFamily: { browser: true, export: false, server: false },
+  currentItemFontWeight: { browser: true, export: false, server: false },
   currentItemFontSize: { browser: true, export: false, server: false },
   currentItemRoundness: {
     browser: true,
