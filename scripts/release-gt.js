@@ -26,12 +26,17 @@ const releaseToGitHub = () => {
 
     execSync("yarn --frozen-lockfile");
     execSync("yarn --frozen-lockfile", { cwd: excalidrawDir });
-    execSync("yarn run build:umd", { cwd: excalidrawDir });
-
+    execSync("yarn run pack", { cwd: excalidrawDir });
 
     validatePackageContents();
+
+    const tgzFileName = `excalidraw-excalidraw-v${pkg.version}.tgz`;
+    const tgzFilePath = path.join(excalidrawDir, tgzFileName);
+    if (!fs.existsSync(tgzFilePath)) {
+      throw new Error(`The .tgz file does not exist: ${tgzFilePath}`);
+    }
     execSync(
-      `gh release create ${version} --title "Release ${version}" --notes "Auto-generated release" -R MotaWord/excalidraw`,
+      `gh release create ${version} ${tgzFilePath} --title "Release ${version}" --notes "Auto-generated release" -R MotaWord/excalidraw`,
       {
         cwd: path.join(excalidrawDir),
       },
