@@ -40,7 +40,7 @@ const elements: ExcalidrawElementSkeleton[] = [
   },
   {
     type: "frame",
-    elements: ["1", "2"],
+    children: ["1", "2"],
     name: "My frame",
   },
 ];

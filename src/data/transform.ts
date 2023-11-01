@@ -5,6 +5,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import {
+  getCommonBounds,
   newElement,
   newLinearElement,
   redrawTextBoundingBox,
@@ -160,7 +161,7 @@ export type ExcalidrawElementSkeleton =
     } & Partial<ExcalidrawImageElement>)
   | ({
       type: "frame";
-      elements: Array<ExcalidrawElement["id"]>;
+      children: readonly ExcalidrawElement["id"][];
       name?: string;
     } & Partial<ExcalidrawFrameElement>);
 
@@ -652,6 +653,9 @@ export const convertToExcalidrawElements = (
     }
   }
 
+  // Once all the excalidraw elements are created, we can add frames since we
+  // need to calculate coordinates and dimensions of frame which is possibe after all
+  // frame children are processed.
   for (const [id, element] of elementsWithIds) {
     if (element.type !== "frame") {
       continue;
@@ -662,40 +666,31 @@ export const convertToExcalidrawElements = (
       throw new Error(`Excalidraw element with id ${id} doesn't exist`);
     }
 
-    let x1 = Infinity;
-    let y1 = Infinity;
-    let x2 = -Infinity;
-    let y2 = -Infinity;
-    const PADDING = 10;
-
-    element.elements.forEach((id) => {
+    const childrenElements = element.children.map((id) => {
       const newElementId = oldToNewElementIdMap.get(id);
-
       if (!newElementId) {
         throw new Error(`Element with ${id} wasn't mapped correctly`);
       }
-
       const elementInFrame = elementStore.getElement(newElementId);
-
       if (!elementInFrame) {
         throw new Error(`Frame element with id ${newElementId} doesn't exist`);
       }
-
-      x1 = Math.min(x1, elementInFrame.x);
-      y1 = Math.min(y1, elementInFrame.y);
-      x2 = Math.max(x2, elementInFrame.x + elementInFrame.width);
-      y2 = Math.max(y2, elementInFrame.y + elementInFrame.height);
       Object.assign(elementInFrame, { frameId: frame.id });
+
+      return elementInFrame;
     });
 
-    x1 = x1 - PADDING;
-    x2 = x2 + PADDING;
-    y1 = y1 - PADDING;
-    y2 = y2 + PADDING;
+    let [minX, minY, maxX, maxY] = getCommonBounds(childrenElements);
 
-    const width = x2 - x1;
-    const height = y2 - y1;
-    Object.assign(frame, { x: x1, y: y1, width, height });
+    const PADDING = 10;
+    minX = minX - PADDING;
+    minY = minY - PADDING;
+    maxX = maxX + PADDING;
+    maxY = maxY + PADDING;
+
+    const width = maxX - minX;
+    const height = maxY - minY;
+    Object.assign(frame, { x: minX, y: minY, width, height });
   }
 
   return elementStore.getElements();
