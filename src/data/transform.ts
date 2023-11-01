@@ -688,8 +688,9 @@ export const convertToExcalidrawElements = (
     maxX = maxX + PADDING;
     maxY = maxY + PADDING;
 
-    const width = maxX - minX;
-    const height = maxY - minY;
+    // Take the max of calculated and provided frame dimensions, whichever is higher
+    const width = Math.max(frame?.width, maxX - minX);
+    const height = Math.max(frame?.height, maxY - minY);
     Object.assign(frame, { x: minX, y: minY, width, height });
   }
 
