@@ -1275,6 +1275,12 @@ class App extends React.Component<AppProps, AppState> {
                             top={this.state.contextMenu.top}
                             left={this.state.contextMenu.left}
                             actionManager={this.actionManager}
+                            onClose={(callback) => {
+                              this.setState({ contextMenu: null }, () => {
+                                this.focusContainer();
+                                callback?.();
+                              });
+                            }}
                           />
                         )}
                         <StaticCanvas
@@ -2110,7 +2116,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
-    this.cutAll();
+    this.actionManager.executeAction(actionCut, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
   });
@@ -2122,18 +2128,10 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
-    this.copyAll();
+    this.actionManager.executeAction(actionCopy, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
   });
-
-  private cutAll = () => {
-    this.actionManager.executeAction(actionCut, "keyboard");
-  };
-
-  private copyAll = () => {
-    this.actionManager.executeAction(actionCopy, "keyboard");
-  };
 
   private static resetTapTwice() {
     didTapTwice = false;
@@ -2195,8 +2193,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public pasteFromClipboard = withBatchedUpdates(
-    async (event: ClipboardEvent | null) => {
-      const isPlainPaste = !!(IS_PLAIN_PASTE && event);
+    async (event: ClipboardEvent) => {
+      const isPlainPaste = !!IS_PLAIN_PASTE;
 
       // #686
       const target = document.activeElement;

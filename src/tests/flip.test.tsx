@@ -1,6 +1,5 @@
 import ReactDOM from "react-dom";
 import {
-  createPasteEvent,
   fireEvent,
   GlobalTestState,
   render,
@@ -27,6 +26,7 @@ import { vi } from "vitest";
 import * as blob from "../data/blob";
 import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
+import { createPasteEvent } from "../clipboard";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -727,7 +727,7 @@ describe("freedraw", () => {
 describe("image", () => {
   const createImage = async () => {
     const sendPasteEvent = (file?: File) => {
-      const clipboardEvent = createPasteEvent({}, file ? [file] : []);
+      const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });
       document.dispatchEvent(clipboardEvent);
     };
 

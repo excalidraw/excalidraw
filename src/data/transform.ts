@@ -5,6 +5,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import {
+  getCommonBounds,
   newElement,
   newLinearElement,
   redrawTextBoundingBox,
@@ -12,6 +13,7 @@ import {
 import { bindLinearElement } from "../element/binding";
 import {
   ElementConstructorOpts,
+  newFrameElement,
   newImageElement,
   newTextElement,
 } from "../element/newElement";
@@ -135,9 +137,7 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      | ExcalidrawEmbeddableElement
-      | ExcalidrawFreeDrawElement
-      | ExcalidrawFrameElement
+      ExcalidrawEmbeddableElement | ExcalidrawFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -158,7 +158,12 @@ export type ExcalidrawElementSkeleton =
       x: number;
       y: number;
       fileId: FileId;
-    } & Partial<ExcalidrawImageElement>);
+    } & Partial<ExcalidrawImageElement>)
+  | ({
+      type: "frame";
+      children: readonly ExcalidrawElement["id"][];
+      name?: string;
+    } & Partial<ExcalidrawFrameElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 100,
@@ -437,7 +442,6 @@ export const convertToExcalidrawElements = (
   const elements: ExcalidrawElementSkeleton[] = JSON.parse(
     JSON.stringify(elementsSkeleton),
   );
-
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
   const oldToNewElementIdMap = new Map<string, string>();
@@ -536,8 +540,15 @@ export const convertToExcalidrawElements = (
 
         break;
       }
+      case "frame": {
+        excalidrawElement = newFrameElement({
+          x: 0,
+          y: 0,
+          ...element,
+        });
+        break;
+      }
       case "freedraw":
-      case "frame":
       case "embeddable": {
         excalidrawElement = element;
         break;
@@ -641,5 +652,60 @@ export const convertToExcalidrawElements = (
       }
     }
   }
+
+  // Once all the excalidraw elements are created, we can add frames since we
+  // need to calculate coordinates and dimensions of frame which is possibe after all
+  // frame children are processed.
+  for (const [id, element] of elementsWithIds) {
+    if (element.type !== "frame") {
+      continue;
+    }
+    const frame = elementStore.getElement(id);
+
+    if (!frame) {
+      throw new Error(`Excalidraw element with id ${id} doesn't exist`);
+    }
+    const childrenElements: ExcalidrawElement[] = [];
+
+    element.children.forEach((id) => {
+      const newElementId = oldToNewElementIdMap.get(id);
+      if (!newElementId) {
+        throw new Error(`Element with ${id} wasn't mapped correctly`);
+      }
+
+      const elementInFrame = elementStore.getElement(newElementId);
+      if (!elementInFrame) {
+        throw new Error(`Frame element with id ${newElementId} doesn't exist`);
+      }
+      Object.assign(elementInFrame, { frameId: frame.id });
+
+      elementInFrame?.boundElements?.forEach((boundElement) => {
+        const ele = elementStore.getElement(boundElement.id);
+        if (!ele) {
+          throw new Error(
+            `Bound element with id ${boundElement.id} doesn't exist`,
+          );
+        }
+        Object.assign(ele, { frameId: frame.id });
+        childrenElements.push(ele);
+      });
+
+      childrenElements.push(elementInFrame);
+    });
+
+    let [minX, minY, maxX, maxY] = getCommonBounds(childrenElements);
+
+    const PADDING = 10;
+    minX = minX - PADDING;
+    minY = minY - PADDING;
+    maxX = maxX + PADDING;
+    maxY = maxY + PADDING;
+
+    // Take the max of calculated and provided frame dimensions, whichever is higher
+    const width = Math.max(frame?.width, maxX - minX);
+    const height = Math.max(frame?.height, maxY - minY);
+    Object.assign(frame, { x: minX, y: minY, width, height });
+  }
+
   return elementStore.getElements();
 };
