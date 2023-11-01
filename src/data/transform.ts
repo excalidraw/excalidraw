@@ -656,9 +656,9 @@ export const convertToExcalidrawElements = (
     if (element.type !== "frame") {
       continue;
     }
-    const excalidrawElement = elementStore.getElement(id);
+    const frame = elementStore.getElement(id);
 
-    if (!excalidrawElement) {
+    if (!frame) {
       throw new Error(`Excalidraw element with id ${id} doesn't exist`);
     }
 
@@ -675,17 +675,17 @@ export const convertToExcalidrawElements = (
         throw new Error(`Element with ${id} wasn't mapped correctly`);
       }
 
-      const frameElement = elementStore.getElement(newElementId);
+      const elementInFrame = elementStore.getElement(newElementId);
 
-      if (!frameElement) {
+      if (!elementInFrame) {
         throw new Error(`Frame element with id ${newElementId} doesn't exist`);
       }
 
-      x1 = Math.min(x1, frameElement.x);
-      y1 = Math.min(y1, frameElement.y);
-      x2 = Math.max(x2, frameElement.x + frameElement.width);
-      y2 = Math.max(y2, frameElement.y + frameElement.height);
-      Object.assign(frameElement, { frameId: excalidrawElement.id });
+      x1 = Math.min(x1, elementInFrame.x);
+      y1 = Math.min(y1, elementInFrame.y);
+      x2 = Math.max(x2, elementInFrame.x + elementInFrame.width);
+      y2 = Math.max(y2, elementInFrame.y + elementInFrame.height);
+      Object.assign(elementInFrame, { frameId: frame.id });
     });
 
     x1 = x1 - PADDING;
@@ -695,7 +695,7 @@ export const convertToExcalidrawElements = (
 
     const width = x2 - x1;
     const height = y2 - y1;
-    Object.assign(excalidrawElement, { x: x1, y: y1, width, height });
+    Object.assign(frame, { x: x1, y: y1, width, height });
   }
 
   return elementStore.getElements();
