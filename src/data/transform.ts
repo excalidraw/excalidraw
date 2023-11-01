@@ -665,19 +665,32 @@ export const convertToExcalidrawElements = (
     if (!frame) {
       throw new Error(`Excalidraw element with id ${id} doesn't exist`);
     }
+    const childrenElements: ExcalidrawElement[] = [];
 
-    const childrenElements = element.children.map((id) => {
+    element.children.forEach((id) => {
       const newElementId = oldToNewElementIdMap.get(id);
       if (!newElementId) {
         throw new Error(`Element with ${id} wasn't mapped correctly`);
       }
+
       const elementInFrame = elementStore.getElement(newElementId);
       if (!elementInFrame) {
         throw new Error(`Frame element with id ${newElementId} doesn't exist`);
       }
       Object.assign(elementInFrame, { frameId: frame.id });
 
-      return elementInFrame;
+      elementInFrame?.boundElements?.forEach((boundElement) => {
+        const ele = elementStore.getElement(boundElement.id);
+        if (!ele) {
+          throw new Error(
+            `Bound element with id ${boundElement.id} doesn't exist`,
+          );
+        }
+        Object.assign(ele, { frameId: frame.id });
+        childrenElements.push(ele);
+      });
+
+      childrenElements.push(elementInFrame);
     });
 
     let [minX, minY, maxX, maxY] = getCommonBounds(childrenElements);

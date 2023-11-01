@@ -1,16 +1,151 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Test Transform > Test Frames > should transform frames and update frame ids when regenerated 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "solid",
+  "frameId": "id33",
+  "groupIds": [],
+  "height": 100,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 1,
+  "versionNonce": Any<Number>,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`Test Transform > Test Frames > should transform frames and update frame ids when regenerated 2`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#fff3bf",
+  "boundElements": [
+    {
+      "id": "id34",
+      "type": "text",
+    },
+  ],
+  "fillStyle": "solid",
+  "frameId": "id33",
+  "groupIds": [],
+  "height": 96,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "diamond",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": Any<Number>,
+  "width": 340,
+  "x": 120,
+  "y": 20,
+}
+`;
+
+exports[`Test Transform > Test Frames > should transform frames and update frame ids when regenerated 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 126,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "name": "My frame",
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "frame",
+  "updated": 1,
+  "version": 1,
+  "versionNonce": Any<Number>,
+  "width": 470,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`Test Transform > Test Frames > should transform frames and update frame ids when regenerated 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "baseline": 0,
+  "boundElements": null,
+  "containerId": "2",
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 30,
+  "frameId": "id33",
+  "groupIds": [],
+  "height": 37.5,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "HELLO EXCALIDRAW",
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#099268",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "HELLO EXCALIDRAW",
+  "textAlign": "center",
+  "type": "text",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "verticalAlign": "middle",
+  "width": 160,
+  "x": 210,
+  "y": 49.25,
+}
+`;
+
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 1`] = `
 {
   "angle": 0,
   "backgroundColor": "#d8f5a2",
   "boundElements": [
     {
-      "id": "id41",
+      "id": "id45",
       "type": "arrow",
     },
     {
-      "id": "id42",
+      "id": "id46",
       "type": "arrow",
     },
   ],
@@ -45,7 +180,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id42",
+      "id": "id46",
       "type": "arrow",
     },
   ],
@@ -110,7 +245,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id43",
+    "elementId": "id47",
     "focus": -0.08139534883720931,
     "gap": 1,
   },
@@ -186,7 +321,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id41",
+      "id": "id45",
       "type": "arrow",
     },
   ],
@@ -222,7 +357,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id44",
+      "id": "id48",
       "type": "arrow",
     },
   ],
@@ -266,7 +401,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id44",
+      "id": "id48",
       "type": "arrow",
     },
   ],
@@ -309,7 +444,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id45",
+      "id": "id49",
       "type": "text",
     },
   ],
@@ -367,7 +502,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
-  "containerId": "id44",
+  "containerId": "id48",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -401,173 +536,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 `;
 
 exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 1`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id34",
-      "type": "text",
-    },
-  ],
-  "endArrowhead": "arrow",
-  "endBinding": {
-    "elementId": "id36",
-    "focus": 0,
-    "gap": 1,
-  },
-  "fillStyle": "solid",
-  "frameId": null,
-  "groupIds": [],
-  "height": 0,
-  "id": Any<String>,
-  "isDeleted": false,
-  "lastCommittedPoint": null,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "points": [
-    [
-      0.5,
-      0,
-    ],
-    [
-      99.5,
-      0,
-    ],
-  ],
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "startArrowhead": null,
-  "startBinding": {
-    "elementId": "id35",
-    "focus": 0,
-    "gap": 1,
-  },
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "arrow",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 255,
-  "y": 239,
-}
-`;
-
-exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 2`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "baseline": 0,
-  "boundElements": null,
-  "containerId": "id33",
-  "fillStyle": "solid",
-  "fontFamily": 1,
-  "fontSize": 20,
-  "frameId": null,
-  "groupIds": [],
-  "height": 25,
-  "id": Any<String>,
-  "isDeleted": false,
-  "lineHeight": 1.25,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "originalText": "HELLO WORLD!!",
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "text": "HELLO WORLD!!",
-  "textAlign": "center",
-  "type": "text",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "verticalAlign": "middle",
-  "width": 130,
-  "x": 240,
-  "y": 226.5,
-}
-`;
-
-exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 3`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id33",
-      "type": "arrow",
-    },
-  ],
-  "fillStyle": "solid",
-  "frameId": null,
-  "groupIds": [],
-  "height": 100,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 155,
-  "y": 189,
-}
-`;
-
-exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 4`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "id33",
-      "type": "arrow",
-    },
-  ],
-  "fillStyle": "solid",
-  "frameId": null,
-  "groupIds": [],
-  "height": 100,
-  "id": Any<String>,
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": null,
-  "seed": Any<Number>,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "ellipse",
-  "updated": 1,
-  "version": 2,
-  "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 355,
-  "y": 189,
-}
-`;
-
-exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -625,13 +593,180 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 }
 `;
 
-exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 2`] = `
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 2`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "baseline": 0,
   "boundElements": null,
   "containerId": "id37",
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "HELLO WORLD!!",
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "HELLO WORLD!!",
+  "textAlign": "center",
+  "type": "text",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "verticalAlign": "middle",
+  "width": 130,
+  "x": 240,
+  "y": 226.5,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id37",
+      "type": "arrow",
+    },
+  ],
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 100,
+  "x": 155,
+  "y": 189,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id37",
+      "type": "arrow",
+    },
+  ],
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": Any<String>,
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "ellipse",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 100,
+  "x": 355,
+  "y": 189,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id42",
+      "type": "text",
+    },
+  ],
+  "endArrowhead": "arrow",
+  "endBinding": {
+    "elementId": "id44",
+    "focus": 0,
+    "gap": 1,
+  },
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 0,
+  "id": Any<String>,
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0.5,
+      0,
+    ],
+    [
+      99.5,
+      0,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "startArrowhead": null,
+  "startBinding": {
+    "elementId": "id43",
+    "focus": 0,
+    "gap": 1,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": Any<Number>,
+  "width": 100,
+  "x": 255,
+  "y": 239,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 2`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "baseline": 0,
+  "boundElements": null,
+  "containerId": "id41",
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 20,
@@ -671,7 +806,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id37",
+      "id": "id41",
       "type": "arrow",
     },
   ],
@@ -715,7 +850,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "baseline": 0,
   "boundElements": [
     {
-      "id": "id37",
+      "id": "id41",
       "type": "arrow",
     },
   ],
@@ -888,7 +1023,7 @@ exports[`Test Transform > should transform frames and update frame ids when rege
   "fillStyle": "solid",
   "fontFamily": 1,
   "fontSize": 30,
-  "frameId": null,
+  "frameId": "id33",
   "groupIds": [],
   "height": 37.5,
   "id": Any<String>,
