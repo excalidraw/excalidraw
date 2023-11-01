@@ -7,6 +7,7 @@ const elements: ExcalidrawElementSkeleton[] = [
     x: 10,
     y: 10,
     strokeWidth: 2,
+    id: "1",
   },
   {
     type: "diamond",
@@ -19,6 +20,7 @@ const elements: ExcalidrawElementSkeleton[] = [
       strokeColor: "#099268",
       fontSize: 30,
     },
+    id: "2",
   },
   {
     type: "arrow",
@@ -35,6 +37,11 @@ const elements: ExcalidrawElementSkeleton[] = [
     width: 230,
     height: 230,
     fileId: "rocket" as FileId,
+  },
+  {
+    type: "frame",
+    children: ["1", "2"],
+    name: "My frame",
   },
 ];
 export default {
