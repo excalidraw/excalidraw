@@ -17,7 +17,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -27,7 +26,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -37,7 +35,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -4604,7 +4601,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -4614,7 +4610,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -4624,7 +4619,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -5187,7 +5181,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -5197,7 +5190,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -5207,7 +5199,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -5855,7 +5846,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6109,7 +6099,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6119,7 +6108,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6129,7 +6117,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6486,7 +6473,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "name": "cut",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6496,7 +6482,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": undefined,
         "name": "copy",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6506,7 +6491,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": undefined,
         "name": "paste",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
