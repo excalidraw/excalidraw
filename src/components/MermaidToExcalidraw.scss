@@ -7,6 +7,17 @@
     grid-template-rows: 1fr auto;
     height: 100%;
     column-gap: 4rem;
+
+    @media screen and (max-width: 860px) {
+      flex-direction: column;
+      display: flex;
+      .mermaid-to-excalidraw-wrapper {
+        flex-direction: column;
+        display: flex;
+        gap: 1rem;
+      }
+      gap: 1rem;
+    }
   }
 
   .mermaid-to-excalidraw-buttons {
@@ -127,9 +138,6 @@
         display: flex;
       }
     }
-    @media screen and (max-width: 860px) {
-      flex-direction: column;
-    }
 
     &-preview {
       display: flex;
@@ -167,20 +175,25 @@
       font-weight: 500;
     }
 
-    .Modal__content {
-      height: 90%;
-      max-height: 750px;
+    .Modal__content .Island {
+      box-shadow: none;
+    }
 
-      .Island {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        flex: 1 1 auto;
+    @at-root .excalidraw:not(.excalidraw--mobile)#{&} {
+      .Modal__content {
+        height: 90%;
+        max-height: 750px;
 
-        .Dialog__content {
+        .Island {
+          height: 100%;
           display: flex;
-          // flex-direction: column;
+          flex-direction: column;
           flex: 1 1 auto;
+
+          .Dialog__content {
+            display: flex;
+            flex: 1 1 auto;
+          }
         }
       }
     }
