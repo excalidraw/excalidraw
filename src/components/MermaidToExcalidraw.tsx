@@ -110,17 +110,14 @@ const MermaidToExcalidraw = () => {
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      const data = importMermaidDataFromStorage() || MERMAID_EXAMPLE;
-
-      setText(data);
-    }
-  }, [loading]);
+    const data = importMermaidDataFromStorage() || MERMAID_EXAMPLE;
+    setText(data);
+  }, []);
 
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
-      if (!canvasNode || !mermaidToExcalidrawLib.current) {
+      if (loading || !canvasNode || !mermaidToExcalidrawLib.current) {
         return;
       }
       try {
@@ -166,7 +163,7 @@ const MermaidToExcalidraw = () => {
       }
     };
     renderExcalidrawPreview();
-  }, [deferredText]);
+  }, [deferredText, loading]);
 
   const onClose = () => {
     app.setOpenDialog(null);

@@ -416,7 +416,7 @@ const bindLinearElementToElement = (
 class ElementStore {
   excalidrawElements = new Map<string, ExcalidrawElement>();
 
-  add = (ele?: ExcalidrawElement, originalId?: string) => {
+  add = (ele?: ExcalidrawElement) => {
     if (!ele) {
       return;
     }
