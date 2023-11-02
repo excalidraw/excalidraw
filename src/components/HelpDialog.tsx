@@ -255,10 +255,6 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={["Shift+PgUp/PgDn"]}
             />
             <Shortcut
-              label={t("buttons.fullScreen")}
-              shortcuts={[getShortcutKey("Alt+F")]}
-            />
-            <Shortcut
               label={t("buttons.zenMode")}
               shortcuts={[getShortcutKey("Alt+Z")]}
             />
