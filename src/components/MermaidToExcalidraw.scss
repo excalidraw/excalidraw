@@ -3,7 +3,48 @@
 $verticalBreakpoint: 860px;
 
 .excalidraw {
-  .mermarid-to-excalidraw-body {
+  .dialog-mermaid {
+    &-title {
+      margin-bottom: 5px;
+      margin-top: 2px;
+    }
+    &-desc {
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .Modal__content .Island {
+      box-shadow: none;
+    }
+
+    @at-root .excalidraw:not(.excalidraw--mobile)#{&} {
+      padding: 1.25rem;
+
+      .Modal__content {
+        height: 100%;
+        max-height: 750px;
+
+        @media screen and (max-width: $verticalBreakpoint) {
+          height: auto !important;
+        }
+
+        .Island {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          flex: 1 1 auto;
+
+          .Dialog__content {
+            display: flex;
+            flex: 1 1 auto;
+          }
+        }
+      }
+    }
+  }
+
+  .dialog-mermaid-body {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -18,11 +59,7 @@ $verticalBreakpoint: 860px;
     }
   }
 
-  .mermaid-to-excalidraw-buttons {
-    grid-column: 2;
-  }
-
-  .mermaid-to-excalidraw-wrapper {
+  .dialog-mermaid-panels {
     display: grid;
     width: 100%;
     grid-template-columns: 1fr 1fr;
@@ -38,8 +75,8 @@ $verticalBreakpoint: 860px;
       gap: 1rem;
     }
 
-    .mermaid-to-excalidraw-wrapper-preview-wrapper.has-error {
-      .mermaid-to-excalidraw-wrapper-preview-canvas-container {
+    .dialog-mermaid-panels-preview-wrapper.has-error {
+      .dialog-mermaid-panels-preview-canvas-container {
         display: none !important;
       }
     }
@@ -115,7 +152,35 @@ $verticalBreakpoint: 860px;
       flex-grow: 1;
     }
 
-    &-preview-insert {
+    &-preview {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mermaid-error {
+      color: red;
+      font-weight: 800;
+      font-size: 30px;
+      word-break: break-word;
+      overflow: auto;
+      max-height: 100%;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+      p {
+        font-weight: normal;
+        font-family: Cascadia;
+        text-align: left;
+        white-space: pre-wrap;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  .dialog-mermaid-buttons {
+    grid-column: 2;
+
+    .dialog-mermaid-insert {
       &.excalidraw-button {
         font-family: "Assistant";
         font-weight: 600;
@@ -146,71 +211,6 @@ $verticalBreakpoint: 860px;
       span {
         padding-left: 0.5rem;
         display: flex;
-      }
-    }
-
-    &-preview {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mermaid-error {
-      color: red;
-      font-weight: 800;
-      font-size: 30px;
-      word-break: break-word;
-      overflow: auto;
-      max-height: 100%;
-      height: 100%;
-      width: 100%;
-      text-align: center;
-      p {
-        font-weight: normal;
-        font-family: Cascadia;
-        text-align: left;
-        white-space: pre-wrap;
-        font-size: 0.875rem;
-      }
-    }
-  }
-
-  .dialog-mermaid {
-    &-title {
-      margin-bottom: 5px;
-      margin-top: 2px;
-    }
-    &-desc {
-      font-size: 15px;
-      font-style: italic;
-      font-weight: 500;
-    }
-
-    .Modal__content .Island {
-      box-shadow: none;
-    }
-
-    @at-root .excalidraw:not(.excalidraw--mobile)#{&} {
-      padding: 1.25rem;
-
-      .Modal__content {
-        height: 100%;
-        max-height: 750px;
-
-        @media screen and (max-width: $verticalBreakpoint) {
-          height: auto !important;
-        }
-
-        .Island {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          flex: 1 1 auto;
-
-          .Dialog__content {
-            display: flex;
-            flex: 1 1 auto;
-          }
-        }
       }
     }
   }

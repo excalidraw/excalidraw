@@ -130,7 +130,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
   it("should show error in preview when mermaid library throws error", async () => {
     const dialog = document.querySelector(".dialog-mermaid")!;
-    const selector = ".mermaid-to-excalidraw-wrapper-text textarea";
+    const selector = ".dialog-mermaid-panels-text textarea";
     let editor = await getTextEditor(selector, false);
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();

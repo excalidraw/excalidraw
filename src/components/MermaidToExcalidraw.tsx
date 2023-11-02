@@ -95,6 +95,7 @@ const MermaidToExcalidraw = () => {
 
   useEffect(() => {
     const loadMermaidToExcalidrawLib = async () => {
+      // await new Promise((r) => setTimeout(r, 2500));
       const api = await import(
         /* webpackChunkName:"mermaid-to-excalidraw" */ "@excalidraw/mermaid-to-excalidraw"
       );
@@ -206,9 +207,9 @@ const MermaidToExcalidraw = () => {
         </>
       }
     >
-      <div className="mermarid-to-excalidraw-body">
-        <div className="mermaid-to-excalidraw-wrapper">
-          <div className="mermaid-to-excalidraw-wrapper-text">
+      <div className="dialog-mermaid-body">
+        <div className="dialog-mermaid-panels">
+          <div className="dialog-mermaid-panels-text">
             <label>{t("mermaid.syntax")}</label>
 
             <textarea
@@ -216,10 +217,10 @@ const MermaidToExcalidraw = () => {
               value={text}
             />
           </div>
-          <div className="mermaid-to-excalidraw-wrapper-preview">
+          <div className="dialog-mermaid-panels-preview">
             <label>{t("mermaid.preview")}</label>
             <div
-              className={clsx("mermaid-to-excalidraw-wrapper-preview-wrapper", {
+              className={clsx("dialog-mermaid-panels-preview-wrapper", {
                 "has-error": !!error,
               })}
             >
@@ -227,7 +228,7 @@ const MermaidToExcalidraw = () => {
               {mermaidToExcalidrawLib.loaded ? (
                 <div
                   ref={canvasRef}
-                  className="mermaid-to-excalidraw-wrapper-preview-canvas-container"
+                  className="dialog-mermaid-panels-preview-canvas-container"
                 />
               ) : (
                 <Spinner size="2rem" />
@@ -235,11 +236,8 @@ const MermaidToExcalidraw = () => {
             </div>
           </div>
         </div>
-        <div className="mermaid-to-excalidraw-buttons">
-          <Button
-            className="mermaid-to-excalidraw-wrapper-preview-insert"
-            onSelect={onSelect}
-          >
+        <div className="dialog-mermaid-buttons">
+          <Button className="dialog-mermaid-insert" onSelect={onSelect}>
             {t("mermaid.button")}
             <span>{ArrowRightIcon}</span>
           </Button>
