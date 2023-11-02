@@ -110,10 +110,15 @@
       word-break: break-word;
       overflow: auto;
       max-height: 100%;
+      height: 100%;
+      width: 100%;
       text-align: center;
       p {
-        font-size: 18px;
-        font-weight: 600;
+        font-weight: normal;
+        font-family: Cascadia;
+        text-align: left;
+        white-space: pre-wrap;
+        font-size: 0.875rem;
       }
     }
   }

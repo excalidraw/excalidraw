@@ -110,9 +110,11 @@ const MermaidToExcalidraw = () => {
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
+      const parent = canvasNode?.parentElement;
       if (
         !mermaidToExcalidrawLib.loaded ||
         !canvasNode ||
+        !parent ||
         !mermaidToExcalidrawLib.api
       ) {
         return;
@@ -137,7 +139,6 @@ const MermaidToExcalidraw = () => {
           }),
           files,
         };
-        const parent = canvasNode.parentElement!;
         const maxWidth = parent.offsetWidth;
         const maxHeight = parent.offsetHeight;
         let dimension = Math.max(maxWidth, maxHeight);
@@ -157,6 +158,7 @@ const MermaidToExcalidraw = () => {
         canvasNode.replaceChildren(canvas);
       } catch (e: any) {
         resetPreview();
+        parent.style.background = "var(--default-bg-color)";
         if (deferredText) {
           setError(e.message);
         }
