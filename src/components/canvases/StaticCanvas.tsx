@@ -95,6 +95,7 @@ const getRelevantAppStateProps = (
   frameRendering: appState.frameRendering,
   linkOpacity: appState.linkOpacity, //zsviczian
   gridColor: appState.gridColor, //zsviczian
+  frameColor: appState.frameColor, //zsviczian
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,

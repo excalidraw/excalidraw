@@ -15,7 +15,7 @@ export const Modal: React.FC<{
   labelledBy: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
-  style: string; //zsviczian
+  style: {[x: string]: string;}; //zsviczian
 }> = (props) => {
   const { closeOnClickOutside = true, style } = props; //zsviczian added style for Dynamic Styles
   const modalRoot = useCreatePortalContainer({

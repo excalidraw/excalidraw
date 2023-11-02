@@ -110,7 +110,8 @@ export const getDefaultAppState = (): Omit<
     currentStrokeOptions: null, //zsviczian
     resetCustomPen: null, //zsviczian
     gridColor: { Bold: "#cccccc", Regular: "#e5e5e5" }, //zsviczian
-    dynamicStyle: "", //zsviczian
+    dynamicStyle: {}, //zsviczian
+    frameColor: { stroke: "#bbb", fill: "rgba(0, 0, 200, 0.04)" }, //zsviczian
     invertBindingBehaviour: false, //zsviczian
     selectedLinearElement: null,
     snapLines: [],
@@ -237,6 +238,7 @@ const APP_STATE_STORAGE_CONF = (<
   resetCustomPen: { browser: false, export: false, server: false }, //zsviczian
   gridColor: { browser: false, export: false, server: false }, //zsviczian
   dynamicStyle: { browser: false, export: false, server: false }, //zsviczian
+  frameColor: { browser: false, export: false, server: false }, //zsviczian
   invertBindingBehaviour: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
   snapLines: { browser: false, export: false, server: false },

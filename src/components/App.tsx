@@ -1134,7 +1134,7 @@ class App extends React.Component<AppProps, AppState> {
               display: "block",
               padding: `${FRAME_NAME_EDIT_PADDING}px`,
               borderRadius: 4,
-              boxShadow: "inset 0 0 0 1px var(--color-primary)",
+              boxShadow: "inset 0 0 0 2px var(--color-on-primary-container)", //zsviczian (change to container)
               fontFamily: "Assistant",
               fontSize: "14px",
               transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
@@ -1219,7 +1219,7 @@ class App extends React.Component<AppProps, AppState> {
         editingElement: this.state.editingElement,
         pendingImageElementId: this.state.pendingImageElementId,
       });
-
+    
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1229,7 +1229,7 @@ class App extends React.Component<AppProps, AppState> {
             (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
               this.state.trayModeEnabled), //zsviczian
         })}
-        style={{
+        style={{...{//zsviczian added dynamicStyle
           ["--ui-pointerEvents" as any]:
             this.state.selectionElement ||
             this.state.draggingElement ||
@@ -1241,7 +1241,7 @@ class App extends React.Component<AppProps, AppState> {
               !isTextElement(this.state.editingElement))
               ? POINTER_EVENTS.disabled
               : POINTER_EVENTS.enabled,
-        }}
+        }, ...this.state.dynamicStyle,}} //zsviczian
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}

@@ -610,10 +610,10 @@ export const renderElement = (
           element.x + appState.scrollX,
           element.y + appState.scrollY,
         );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
+        context.fillStyle = appState.frameColor.fill;
 
         context.lineWidth = 2 / appState.zoom.value;
-        context.strokeStyle = FRAME_STYLE.strokeColor;
+        context.strokeStyle = appState.frameColor.stroke; //FRAME_STYLE.strokeColor;
 
         if (FRAME_STYLE.radius && context.roundRect) {
           context.beginPath();
