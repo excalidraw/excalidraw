@@ -195,7 +195,7 @@
   .buttonList label:focus-within,
   input:focus-visible {
     outline: transparent;
-    box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
   .buttonList {
@@ -537,13 +537,13 @@
 
     &:not(:focus) {
       &:hover {
-        background-color: var(--input-hover-bg-color);
+        border-color: var(--color-brand-hover);
       }
     }
 
     &:focus {
       outline: none;
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+      border-color: var(--color-brand-hover);
     }
   }
 
