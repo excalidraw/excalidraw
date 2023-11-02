@@ -53,26 +53,33 @@
       }
     }
 
-    &-preview-insert.excalidraw-button {
-      font-family: "Assistant";
-      font-weight: 600;
-      height: 2.5rem;
-      margin-top: 1em;
-      margin-bottom: 0.3em;
-      width: 7.5rem;
-      font-size: 12px;
-      background-color: var(--color-primary);
-      &:hover {
-        background-color: var(--color-primary-darker);
-      }
-      &:active {
-        background-color: var(--color-primary-darkest);
+    &-preview-insert {
+      &.excalidraw-button {
+        font-family: "Assistant";
+        font-weight: 600;
+        height: 2.5rem;
+        margin-top: 1em;
+        margin-bottom: 0.3em;
+        width: 7.5rem;
+        font-size: 12px;
+        background-color: var(--color-primary);
+        &:hover {
+          background-color: var(--color-primary-darker);
+        }
+        &:active {
+          background-color: var(--color-primary-darkest);
+        }
+
+        color: $oc-white;
+
+        @media screen and (max-width: 860px) {
+          width: 100%;
+        }
       }
 
-      color: $oc-white;
-
-      @media screen and (max-width: 860px) {
-        width: 100%;
+      span {
+        padding-left: 0.5rem;
+        display: flex;
       }
     }
     @media screen and (max-width: 860px) {

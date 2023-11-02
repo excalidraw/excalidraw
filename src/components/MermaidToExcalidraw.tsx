@@ -223,9 +223,7 @@ const MermaidToExcalidraw = () => {
             onSelect={onSelect}
           >
             {t("mermaid.button")}
-            <span style={{ paddingLeft: "8px", display: "flex" }}>
-              {ArrowRightIcon}
-            </span>
+            <span>{ArrowRightIcon}</span>
           </Button>
         </div>
       </div>
