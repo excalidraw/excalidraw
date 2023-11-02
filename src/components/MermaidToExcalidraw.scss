@@ -117,4 +117,16 @@
       }
     }
   }
+
+  .dialog-mermaid {
+    &-title {
+      margin-bottom: 5px;
+      margin-top: 2px;
+    }
+    &-desc {
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 500;
+    }
+  }
 }

@@ -180,12 +180,8 @@ const MermaidToExcalidraw = () => {
       onCloseRequest={onClose}
       title={
         <>
-          <p style={{ marginBottom: "5px", marginTop: "2px" }}>
-            {t("mermaid.title")}
-          </p>
-          <span
-            style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
-          >
+          <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
+          <span className="dialog-mermaid-desc">
             <Trans
               i18nKey="mermaid.description"
               flowchartLink={(el) => (
