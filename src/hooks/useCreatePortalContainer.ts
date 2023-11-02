@@ -17,9 +17,13 @@ export const useCreatePortalContainer = (opts?: {
 
   useLayoutEffect(() => {
     if (div) {
+      div.className = "";
+      div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
       div.classList.toggle("excalidraw--mobile", device.isMobile);
+      div.classList.toggle("excalidraw--mobile", isMobileRef.current);
+      div.classList.toggle("theme--dark", theme === "dark");
     }
-  }, [div, device.isMobile]);
+  }, [div, theme, device.isMobile, opts?.className]);
 
   useLayoutEffect(() => {
     const container = opts?.parentSelector
@@ -32,10 +36,6 @@ export const useCreatePortalContainer = (opts?: {
 
     const div = document.createElement("div");
 
-    div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
-    div.classList.toggle("excalidraw--mobile", isMobileRef.current);
-    div.classList.toggle("theme--dark", theme === "dark");
-
     container.appendChild(div);
 
     setDiv(div);
@@ -43,7 +43,7 @@ export const useCreatePortalContainer = (opts?: {
     return () => {
       container.removeChild(div);
     };
-  }, [excalidrawContainer, theme, opts?.className, opts?.parentSelector]);
+  }, [excalidrawContainer, opts?.parentSelector]);
 
   return div;
 };
