@@ -46,7 +46,7 @@
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
         left center;
       border-radius: var(--border-radius-lg);
-      border: 1px solid #e4e4eb;
+      border: 1px solid var(--dialog-border-color);
 
       @media screen and (max-width: 860px) {
         width: auto;
@@ -93,7 +93,7 @@
       textarea {
         padding: 0.85rem;
         border-radius: var(--border-radius-lg);
-        border: 1px solid #e4e4eb;
+        border: 1px solid var(--dialog-border-color);
         white-space: pre-wrap;
       }
     }
