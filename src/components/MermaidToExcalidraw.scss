@@ -1,4 +1,7 @@
 @import "../css/variables.module";
+
+$verticalBreakpoint: 860px;
+
 .excalidraw {
   .mermarid-to-excalidraw-body {
     width: 100%;
@@ -8,14 +11,9 @@
     height: 100%;
     column-gap: 4rem;
 
-    @media screen and (max-width: 860px) {
+    @media screen and (max-width: $verticalBreakpoint) {
       flex-direction: column;
       display: flex;
-      .mermaid-to-excalidraw-wrapper {
-        flex-direction: column;
-        display: flex;
-        gap: 1rem;
-      }
       gap: 1rem;
     }
   }
@@ -34,6 +32,12 @@
     grid-row: 1;
     grid-column: 1 / 3;
 
+    @media screen and (max-width: $verticalBreakpoint) {
+      flex-direction: column;
+      display: flex;
+      gap: 1rem;
+    }
+
     .mermaid-to-excalidraw-wrapper-preview-wrapper.has-error {
       .mermaid-to-excalidraw-wrapper-preview-canvas-container {
         display: none !important;
@@ -47,7 +51,7 @@
       margin-bottom: 4px;
       margin-left: 4px;
 
-      @media screen and (max-width: 860px) {
+      @media screen and (max-width: $verticalBreakpoint) {
         margin-top: 4px;
       }
     }
@@ -67,7 +71,7 @@
         box-sizing: border-box;
         width: 100%;
 
-        @media screen and (max-width: 860px) {
+        @media screen and (max-width: $verticalBreakpoint) {
           width: auto;
           height: 10rem;
         }
@@ -81,22 +85,24 @@
       padding: 0.85rem;
       box-sizing: border-box;
       width: 100%;
-      height: 100%;
-      display: flex;
+      // acts as min-height
+      height: 200px;
       flex-grow: 1;
 
-      height: 19rem;
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
         left center;
       border-radius: var(--border-radius-lg);
       border: 1px solid var(--dialog-border-color);
 
+      @media screen and (max-width: $verticalBreakpoint) {
+        // acts as min-height
+        height: 400px;
+        width: auto;
+      }
+
       canvas {
         max-width: 100%;
         max-height: 100%;
-      }
-      @media screen and (max-width: 860px) {
-        width: auto;
       }
     }
 
@@ -118,7 +124,9 @@
         margin-bottom: 0.3em;
         width: 7.5rem;
         font-size: 12px;
+        color: $oc-white;
         background-color: var(--color-primary);
+
         &:hover {
           background-color: var(--color-primary-darker);
         }
@@ -126,14 +134,12 @@
           background-color: var(--color-primary-darkest);
         }
 
-        color: $oc-white;
+        @media screen and (max-width: $verticalBreakpoint) {
+          width: 100%;
+        }
 
         @at-root .excalidraw.theme--dark#{&} {
           color: var(--color-gray-100);
-        }
-
-        @media screen and (max-width: 860px) {
-          width: 100%;
         }
       }
 
@@ -184,9 +190,15 @@
     }
 
     @at-root .excalidraw:not(.excalidraw--mobile)#{&} {
+      padding: 1.25rem;
+
       .Modal__content {
-        height: 90%;
+        height: 100%;
         max-height: 750px;
+
+        @media screen and (max-width: $verticalBreakpoint) {
+          height: auto !important;
+        }
 
         .Island {
           height: 100%;
