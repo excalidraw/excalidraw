@@ -224,11 +224,14 @@ const MermaidToExcalidraw = () => {
               })}
             >
               {error && <ErrorComp error={error} />}
-              {!mermaidToExcalidrawLib.loaded && <Spinner size="2rem" />}
-              <div
-                ref={canvasRef}
-                className="mermaid-to-excalidraw-wrapper-preview-canvas-container"
-              />
+              {mermaidToExcalidrawLib.loaded ? (
+                <div
+                  ref={canvasRef}
+                  className="mermaid-to-excalidraw-wrapper-preview-canvas-container"
+                />
+              ) : (
+                <Spinner size="2rem" />
+              )}
             </div>
           </div>
         </div>
