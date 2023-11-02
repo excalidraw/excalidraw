@@ -48,19 +48,8 @@ const importMermaidDataFromStorage = () => {
 
 const ErrorComp = ({ error }: { error: string }) => {
   return (
-    <div
-      data-testid="mermaid-error"
-      style={{
-        color: "red",
-        fontWeight: 800,
-        fontSize: "30px",
-        wordBreak: "break-word",
-        overflow: "auto",
-        maxHeight: "100%",
-        textAlign: "center",
-      }}
-    >
-      Error! <p style={{ fontSize: "18px", fontWeight: "600" }}>{error}</p>
+    <div data-testid="mermaid-error" className="mermaid-error">
+      Error! <p>{error}</p>
     </div>
   );
 };
@@ -152,7 +141,7 @@ const MermaidToExcalidraw = () => {
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
         await canvasToBlob(canvas);
-        parent.style.background = "#fff";
+        parent.style.background = "var(--default-bg-color)";
         canvasNode.replaceChildren(canvas);
       } catch (e: any) {
         console.error(e.message);
@@ -210,27 +199,15 @@ const MermaidToExcalidraw = () => {
       }
     >
       <div className="mermaid-to-excalidraw-wrapper">
-        <div
-          className="mermaid-to-excalidraw-wrapper-text"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
+        <div className="mermaid-to-excalidraw-wrapper-text">
           <label>{t("mermaid.syntax")}</label>
 
           <textarea
-            style={{
-              padding: "0.85rem",
-              borderRadius: "8px",
-              border: "1px solid #e4e4eb",
-              whiteSpace: "pre-wrap",
-            }}
             onChange={(event) => setText(event.target.value)}
             value={text}
           />
         </div>
-        <div
-          className="mermaid-to-excalidraw-wrapper-preview"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
+        <div className="mermaid-to-excalidraw-wrapper-preview">
           <label>{t("mermaid.preview")}</label>
           <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
             {error && <ErrorComp error={error} />}
