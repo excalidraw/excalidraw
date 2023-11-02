@@ -128,6 +128,10 @@
 
         color: $oc-white;
 
+        @at-root .excalidraw.theme--dark#{&} {
+          color: var(--color-gray-100);
+        }
+
         @media screen and (max-width: 860px) {
           width: 100%;
         }
