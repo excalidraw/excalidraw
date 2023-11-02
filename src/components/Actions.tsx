@@ -228,7 +228,6 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
-  const mermaidToolSelected = appState.openDialog === "mermaid";
 
   return (
     <>
@@ -284,8 +283,7 @@ export const ShapesSwitcher = ({
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
-              (laserToolSelected && !app.props.isCollaborating) ||
-              mermaidToolSelected,
+              (laserToolSelected && !app.props.isCollaborating),
           })}
           onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
           title={t("toolBar.extraTools")}
@@ -327,7 +325,6 @@ export const ShapesSwitcher = ({
             onSelect={() => app.setOpenDialog("mermaid")}
             icon={mermaidLogoIcon}
             data-testid="toolbar-embeddable"
-            selected={mermaidToolSelected}
           >
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>

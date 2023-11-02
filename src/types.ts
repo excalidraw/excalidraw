@@ -539,7 +539,6 @@ export type AppClassProperties = {
   lastViewportPosition: App["lastViewportPosition"];
   scrollToContent: App["scrollToContent"];
   addFiles: App["addFiles"];
-  setSelection: App["setSelection"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
   setActiveTool: App["setActiveTool"];
