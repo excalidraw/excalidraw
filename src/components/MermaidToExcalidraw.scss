@@ -25,7 +25,7 @@
         width: 20rem;
         height: 19rem;
         resize: none;
-        border-radius: 8px;
+        border-radius: var(--border-radius-lg);
         padding: 1rem;
 
         @media screen and (max-width: 860px) {
@@ -45,7 +45,7 @@
       height: 19rem;
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
         left center;
-      border-radius: 8px;
+      border-radius: var(--border-radius-lg);
       border: 1px solid #e4e4eb;
 
       @media screen and (max-width: 860px) {
@@ -85,7 +85,7 @@
 
       textarea {
         padding: 0.85rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius-lg);
         border: 1px solid #e4e4eb;
         white-space: pre-wrap;
       }

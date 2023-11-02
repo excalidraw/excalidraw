@@ -154,13 +154,11 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(dialog.querySelector('[data-testid="mermaid-error"]'))
       .toMatchInlineSnapshot(`
         <div
+          class="mermaid-error"
           data-testid="mermaid-error"
-          style="color: red; font-weight: 800; font-size: 30px; word-break: break-word; overflow: auto; max-height: 100%; text-align: center;"
         >
           Error! 
-          <p
-            style="font-size: 18px; font-weight: 600;"
-          >
+          <p>
             ERROR
           </p>
         </div>

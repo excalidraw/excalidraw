@@ -62,7 +62,7 @@ const MermaidToExcalidraw = () => {
     ) => Promise<MermaidToExcalidrawResult>;
   } | null>(null);
   const [text, setText] = useState("");
-  const deferredText = useDeferredValue(text);
+  const deferredText = useDeferredValue(text.trim());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -85,6 +85,7 @@ const MermaidToExcalidraw = () => {
       return;
     }
     parent.style.background = "";
+    setError(null);
     canvasNode.replaceChildren();
   };
 
@@ -107,6 +108,10 @@ const MermaidToExcalidraw = () => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
       if (loading || !canvasNode || !mermaidToExcalidrawLib.current) {
+        return;
+      }
+      if (!deferredText) {
+        resetPreview();
         return;
       }
       try {
@@ -144,7 +149,6 @@ const MermaidToExcalidraw = () => {
         parent.style.background = "var(--default-bg-color)";
         canvasNode.replaceChildren(canvas);
       } catch (e: any) {
-        console.error(e.message);
         resetPreview();
         if (deferredText) {
           setError(e.message);
