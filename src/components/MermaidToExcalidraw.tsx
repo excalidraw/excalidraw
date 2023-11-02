@@ -55,15 +55,18 @@ const ErrorComp = ({ error }: { error: string }) => {
 };
 
 const MermaidToExcalidraw = () => {
-  const mermaidToExcalidrawLib = useRef<{
-    parseMermaidToExcalidraw: (
-      defination: string,
-      options: MermaidOptions,
-    ) => Promise<MermaidToExcalidrawResult>;
-  } | null>(null);
+  const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] = useState<{
+    loaded: boolean;
+    api: {
+      parseMermaidToExcalidraw: (
+        defination: string,
+        options: MermaidOptions,
+      ) => Promise<MermaidToExcalidrawResult>;
+    } | null;
+  }>({ loaded: false, api: null });
+
   const [text, setText] = useState("");
   const deferredText = useDeferredValue(text.trim());
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -91,10 +94,10 @@ const MermaidToExcalidraw = () => {
 
   useEffect(() => {
     const loadMermaidToExcalidrawLib = async () => {
-      mermaidToExcalidrawLib.current = await import(
+      const api = await import(
         /* webpackChunkName:"mermaid-to-excalidraw" */ "@excalidraw/mermaid-to-excalidraw"
       );
-      setLoading(false);
+      setMermaidToExcalidrawLib({ loaded: true, api });
     };
     loadMermaidToExcalidrawLib();
   }, []);
@@ -107,7 +110,11 @@ const MermaidToExcalidraw = () => {
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
-      if (loading || !canvasNode || !mermaidToExcalidrawLib.current) {
+      if (
+        !mermaidToExcalidrawLib.loaded ||
+        !canvasNode ||
+        !mermaidToExcalidrawLib.api
+      ) {
         return;
       }
       if (!deferredText) {
@@ -116,7 +123,7 @@ const MermaidToExcalidraw = () => {
       }
       try {
         const { elements, files } =
-          await mermaidToExcalidrawLib.current.parseMermaidToExcalidraw(
+          await mermaidToExcalidrawLib.api.parseMermaidToExcalidraw(
             deferredText,
             {
               fontSize: DEFAULT_FONT_SIZE,
@@ -156,7 +163,7 @@ const MermaidToExcalidraw = () => {
       }
     };
     renderExcalidrawPreview();
-  }, [deferredText, loading]);
+  }, [deferredText, mermaidToExcalidrawLib]);
 
   const onClose = () => {
     app.setOpenDialog(null);
@@ -211,7 +218,7 @@ const MermaidToExcalidraw = () => {
           <label>{t("mermaid.preview")}</label>
           <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
             {error && <ErrorComp error={error} />}
-            {loading && <Spinner size="2rem" />}
+            {!mermaidToExcalidrawLib.loaded && <Spinner size="2rem" />}
             <div ref={canvasRef} />
           </div>
           <Button
