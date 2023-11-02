@@ -18,6 +18,7 @@ import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dis
 import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
 import { t } from "../i18n";
 import Trans from "./Trans";
+import clsx from "clsx";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
@@ -139,17 +140,14 @@ const MermaidToExcalidraw = () => {
           }),
           files,
         };
-        const maxWidth = parent.offsetWidth;
-        const maxHeight = parent.offsetHeight;
-        let dimension = Math.max(maxWidth, maxHeight);
-        dimension = Math.min(dimension, parent.offsetWidth - 10);
-        dimension = Math.min(dimension, parent.offsetHeight - 10);
 
         const canvas = await exportToCanvas({
           elements: data.current.elements,
           files: data.current.files,
           exportPadding: DEFAULT_EXPORT_PADDING,
-          maxWidthOrHeight: dimension,
+          maxWidthOrHeight:
+            Math.max(parent.offsetWidth, parent.offsetHeight) *
+            window.devicePixelRatio,
         });
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
@@ -187,6 +185,7 @@ const MermaidToExcalidraw = () => {
     <Dialog
       className="dialog-mermaid"
       onCloseRequest={onClose}
+      size={1200}
       title={
         <>
           <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
@@ -207,22 +206,33 @@ const MermaidToExcalidraw = () => {
         </>
       }
     >
-      <div className="mermaid-to-excalidraw-wrapper">
-        <div className="mermaid-to-excalidraw-wrapper-text">
-          <label>{t("mermaid.syntax")}</label>
+      <div className="mermarid-to-excalidraw-body">
+        <div className="mermaid-to-excalidraw-wrapper">
+          <div className="mermaid-to-excalidraw-wrapper-text">
+            <label>{t("mermaid.syntax")}</label>
 
-          <textarea
-            onChange={(event) => setText(event.target.value)}
-            value={text}
-          />
-        </div>
-        <div className="mermaid-to-excalidraw-wrapper-preview">
-          <label>{t("mermaid.preview")}</label>
-          <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
-            {error && <ErrorComp error={error} />}
-            {!mermaidToExcalidrawLib.loaded && <Spinner size="2rem" />}
-            <div ref={canvasRef} />
+            <textarea
+              onChange={(event) => setText(event.target.value)}
+              value={text}
+            />
           </div>
+          <div className="mermaid-to-excalidraw-wrapper-preview">
+            <label>{t("mermaid.preview")}</label>
+            <div
+              className={clsx("mermaid-to-excalidraw-wrapper-preview-wrapper", {
+                "has-error": !!error,
+              })}
+            >
+              {error && <ErrorComp error={error} />}
+              {!mermaidToExcalidrawLib.loaded && <Spinner size="2rem" />}
+              <div
+                ref={canvasRef}
+                className="mermaid-to-excalidraw-wrapper-preview-canvas-container"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mermaid-to-excalidraw-buttons">
           <Button
             className="mermaid-to-excalidraw-wrapper-preview-insert"
             onSelect={onSelect}
