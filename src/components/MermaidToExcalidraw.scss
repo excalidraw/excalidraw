@@ -85,7 +85,6 @@
       display: flex;
       flex-grow: 1;
 
-      // width: 20rem;
       height: 19rem;
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
         left center;
@@ -98,6 +97,10 @@
       }
       @media screen and (max-width: 860px) {
         width: auto;
+      }
+
+      .Spinner {
+        position: absolute;
       }
     }
     &-preview-canvas-container {
