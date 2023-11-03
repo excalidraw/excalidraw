@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
+    "@excalidraw/mermaid-to-excalidraw": "0.1.2",
     "@excalidraw/laser-pointer": "1.2.0",
     "@excalidraw/random-username": "1.0.0",
     "@radix-ui/react-popover": "1.0.3",
@@ -125,7 +126,7 @@
     "test": "yarn test:app",
     "test:coverage": "vitest --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
-    "test:ui": "yarn test --ui",
+    "test:ui": "yarn test --ui --coverage.enabled=true",
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
