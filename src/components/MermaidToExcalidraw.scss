@@ -74,12 +74,6 @@ $verticalBreakpoint: 860px;
       gap: 1rem;
     }
 
-    .dialog-mermaid-panels-preview-wrapper.has-error {
-      .dialog-mermaid-panels-preview-canvas-container {
-        display: none !important;
-      }
-    }
-
     label {
       font-size: 14px;
       font-style: normal;

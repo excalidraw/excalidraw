@@ -220,14 +220,13 @@ const MermaidToExcalidraw = () => {
           <div className="dialog-mermaid-panels-preview">
             <label>{t("mermaid.preview")}</label>
             <div
-              className={clsx("dialog-mermaid-panels-preview-wrapper", {
-                "has-error": !!error,
-              })}
+              className="dialog-mermaid-panels-preview-wrapper"
             >
               {error && <ErrorComp error={error} />}
               {mermaidToExcalidrawLib.loaded ? (
                 <div
                   ref={canvasRef}
+                  style={{display: error ? "none" : undefined}}
                   className="dialog-mermaid-panels-preview-canvas-container"
                 />
               ) : (
