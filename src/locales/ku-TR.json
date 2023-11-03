@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "دەست (ئامرازی پانکردن)",
-    "extraTools": "ئامرازی زیاتر"
+    "extraTools": "ئامرازی زیاتر",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "کردارەکانی تابلۆ",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
