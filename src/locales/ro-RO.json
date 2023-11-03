@@ -242,7 +242,8 @@
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -501,5 +502,12 @@
         "description": "Încărcarea unui desen extern va <bold>înlocui conținutul existent</bold>.<br></br>Poți face mai întâi o copie de rezervă a desenului folosind una dintre opțiunile de mai jos."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
