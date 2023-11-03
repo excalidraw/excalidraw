@@ -242,7 +242,8 @@
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
     "hand": "Mano (herramienta de panoramización)",
-    "extraTools": "Más herramientas"
+    "extraTools": "Más herramientas",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -501,5 +502,12 @@
         "description": "Cargar un dibujo externo <bold>reemplazará tu contenido existente</bold>.<br></br>Puedes primero hacer una copia de seguridad de tu dibujo usando una de las opciones de abajo."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
