@@ -130,6 +130,8 @@ export const SelectedShapeActions = ({
 
           {renderAction("changeFontWeight")}
 
+          {renderAction("changeFontStyle")}
+
           {renderAction("changeFontFamily")}
 
           {(appState.activeTool.type === "text" ||

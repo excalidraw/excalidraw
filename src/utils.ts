@@ -9,6 +9,7 @@ import {
 import {
   FontFamilyValues,
   FontString,
+  FontStyleValues,
   FontWeightValues,
   NonDeletedExcalidrawElement,
 } from "./element/types";
@@ -98,12 +99,14 @@ export const getFontString = ({
   fontSize,
   fontFamily,
   fontWeight,
+  fontStyle,
 }: {
   fontSize: number;
   fontFamily: FontFamilyValues;
   fontWeight: FontWeightValues;
+  fontStyle: FontStyleValues;
 }) => {
-  return `${fontWeight} ${fontSize}px ${getFontFamilyString({
+  return `${fontStyle} ${fontWeight} ${fontSize}px ${getFontFamilyString({
     fontFamily,
   })}` as FontString;
 };

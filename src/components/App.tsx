@@ -1593,6 +1593,7 @@ class App extends React.Component<AppProps, AppState> {
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
+
       if (initialData?.libraryItems) {
         this.library
           .updateLibrary({
@@ -1614,6 +1615,7 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
     const scene = restore(initialData, null, null, { repairBindings: true });
+
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -3644,6 +3646,7 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
     const fontSize = this.state.currentItemFontSize;
     const fontWeight = this.state.currentItemFontWeight;
+    const fontStyle = this.state.currentItemFontStyle;
 
     if (
       !existingTextElement &&
@@ -3655,6 +3658,7 @@ class App extends React.Component<AppProps, AppState> {
         fontSize,
         fontFamily,
         fontWeight,
+        fontStyle,
       };
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),

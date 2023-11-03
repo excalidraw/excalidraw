@@ -75,6 +75,7 @@ describe("duplicating single elements", () => {
       strokeWidth: 1,
       strokeStyle: "solid",
       fontWeight: "bold",
+      fontStyle: "normal",
       roundness: null,
       roughness: 1,
       opacity: 100,

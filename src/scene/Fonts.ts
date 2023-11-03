@@ -82,6 +82,7 @@ export class Fonts {
         const fontString = getFontString({
           fontFamily: element.fontFamily,
           fontSize: 16,
+          fontStyle: element.fontStyle,
           fontWeight: element.fontWeight,
         });
         if (!document.fonts?.check?.(fontString)) {

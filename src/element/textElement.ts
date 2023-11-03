@@ -15,6 +15,7 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_STYLE,
   DEFAULT_FONT_WEIGHT,
   FONT_FAMILY,
   isSafari,
@@ -64,6 +65,7 @@ export const redrawTextBoundingBox = (
     height: textElement.height,
     baseline: textElement.baseline,
     fontWeight: textElement.fontWeight,
+    fontStyle: textElement.fontStyle,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -953,6 +955,7 @@ export const isMeasureTextSupported = () => {
       fontSize: DEFAULT_FONT_SIZE,
       fontFamily: DEFAULT_FONT_FAMILY,
       fontWeight: DEFAULT_FONT_WEIGHT,
+      fontStyle: DEFAULT_FONT_STYLE,
     }),
   );
   return width > 0;

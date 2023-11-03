@@ -230,6 +230,7 @@ const measureFontSizeFromWidth = (
       fontSize: nextFontSize,
       fontFamily: element.fontFamily,
       fontWeight: element.fontWeight,
+      fontStyle: element.fontStyle,
     }),
     element.lineHeight,
   );

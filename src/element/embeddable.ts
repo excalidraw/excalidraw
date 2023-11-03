@@ -1,5 +1,10 @@
 import { register } from "../actions/register";
-import { FONT_FAMILY, FONT_WEIGHT, VERTICAL_ALIGN } from "../constants";
+import {
+  FONT_FAMILY,
+  FONT_STYLE,
+  FONT_WEIGHT,
+  VERTICAL_ALIGN,
+} from "../constants";
 import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
@@ -226,11 +231,13 @@ export const createPlaceholderEmbeddableLabel = (
   );
   const fontFamily = FONT_FAMILY.Helvetica;
   const fontWeight = FONT_WEIGHT.normal;
+  const fontStyle = FONT_STYLE.normal;
 
   const fontString = getFontString({
     fontSize,
     fontFamily,
     fontWeight,
+    fontStyle,
   });
 
   return newTextElement({
@@ -242,6 +249,7 @@ export const createPlaceholderEmbeddableLabel = (
     fontFamily,
     fontSize,
     fontWeight,
+    fontStyle,
     text: wrapText(text, fontString, element.width - 20),
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,

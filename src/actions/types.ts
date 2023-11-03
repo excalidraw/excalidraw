@@ -110,6 +110,7 @@ export type ActionName =
   | "toggleTheme"
   | "increaseFontSize"
   | "changeFontWeight"
+  | "changeFontStyle"
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"

@@ -15,6 +15,7 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
   FontWeightValues,
+  FontStyleValues,
 } from "./types";
 import {
   arrayToMap,
@@ -41,6 +42,7 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_STYLE,
   DEFAULT_FONT_WEIGHT,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
@@ -188,6 +190,7 @@ export const newTextElement = (
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     fontWeight?: FontWeightValues;
+    fontStyle?: FontStyleValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"] | null;
@@ -198,11 +201,12 @@ export const newTextElement = (
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const fontWeight = opts.fontWeight || DEFAULT_FONT_WEIGHT;
+  const fontStyle = opts.fontStyle || DEFAULT_FONT_STYLE;
   const lineHeight = opts.lineHeight || getDefaultLineHeight(fontFamily);
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
-    getFontString({ fontFamily, fontSize, fontWeight }),
+    getFontString({ fontFamily, fontSize, fontWeight, fontStyle }),
     lineHeight,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
@@ -219,6 +223,7 @@ export const newTextElement = (
       fontSize,
       fontWeight,
       fontFamily,
+      fontStyle,
       textAlign,
       verticalAlign,
       x: opts.x - offsets.x,

@@ -78,6 +78,15 @@ const notoIconProps: Opts = {
   strokeLinejoin: "round",
 } as const;
 
+const weightIconProps: Opts = {
+  width: 256,
+  height: 256,
+  fill: "none",
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
 // -----------------------------------------------------------------------------
 
 // tabler-icons: present
@@ -1470,6 +1479,74 @@ export const TextAlignLeftIcon = createIcon(
     <line x1="4" y1="16" x2="16" y2="16" />
   </g>,
   tablerIconProps,
+);
+
+export const TextFontWeightThin = createIcon(
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="1.25"
+  >
+    <path
+      stroke="none"
+      fill="#000000"
+      d="M30,10.8c-1.9,1.3-2.1,2.5-1.9,17.9l0.1,14.6l1.2,1.2c1.6,1.5,4.2,1.7,5.7,0.2c0.9-1,1-1.5,1.2-13.5l0.2-12.5l43.7-0.1l43.6-0.1V128v109.7h-12.4H98.9l-1.1,1.2c-1.3,1.2-1.6,4.1-0.6,5.3c1.3,1.8,1.8,1.8,30.7,1.8c28.9,0,29.4,0,30.7-1.8c1-1.3,0.7-4.1-0.6-5.3l-1.1-1.2h-12.5h-12.4V128V18.4l43.7,0.1l43.6,0.1l0.1,12.4l0,12.4l1.2,1.1c1.6,1.7,4.1,1.6,5.8,0l1.2-1.2l0.1-14.6c0.1-15.3,0-16.5-1.9-17.9C224.5,9.7,31.5,9.7,30,10.8z"
+    />
+  </g>,
+  weightIconProps,
+);
+
+export const TextFontWeightNormal = createIcon(
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+  >
+    <path
+      stroke="none"
+      fill="#000000"
+      d="M25.5,11c-1.1,0.5-2.5,1.7-3.2,2.6c-1.1,1.6-1.2,2.5-1.4,16.1c-0.1,12.9-0.1,14.7,0.9,16.5c2.1,4.1,6.7,5.6,10.8,3.7c3.6-1.7,4-2.9,4.3-13.7l0.3-9.8l40.4-0.2l40.3-0.1V128v101.9h-14.1c-12.7,0-14.3,0.1-16.3,1.1c-1.1,0.6-2.6,1.9-3.2,2.8c-1.3,2.3-1.3,6.3,0.2,8.6c2.3,3.8,0.5,3.6,43.5,3.6c37.6,0,39-0.1,40.8-1.1c5.1-3.1,4.9-11-0.4-13.8c-1.8-1-3.5-1.1-18.2-1.1H134l0.1-101.8l0.2-101.8l42.4-0.2l42.3-0.1v9.5c0,8.6,0.1,9.8,1.1,11.4c2.2,3.7,7.4,4.8,11,2.4c3.7-2.5,4-3.6,4-19.1c0-15.4-0.2-16.6-4-19.1l-2-1.3H128.3C33.4,10,27.4,10.1,25.5,11z"
+    />
+  </g>,
+  weightIconProps,
+);
+
+export const TextFontWeightBold = createIcon(
+  <g
+    stroke="#000000"
+    fill="#000000"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="12"
+  >
+    <path
+      stroke="#000000"
+      fill="#000000"
+      d="M25.5,11c-1.1,0.5-2.5,1.7-3.2,2.6c-1.1,1.6-1.2,2.5-1.4,16.1c-0.1,12.9-0.1,14.7,0.9,16.5c2.1,4.1,6.7,5.6,10.8,3.7c3.6-1.7,4-2.9,4.3-13.7l0.3-9.8l40.4-0.2l40.3-0.1V128v101.9h-14.1c-12.7,0-14.3,0.1-16.3,1.1c-1.1,0.6-2.6,1.9-3.2,2.8c-1.3,2.3-1.3,6.3,0.2,8.6c2.3,3.8,0.5,3.6,43.5,3.6c37.6,0,39-0.1,40.8-1.1c5.1-3.1,4.9-11-0.4-13.8c-1.8-1-3.5-1.1-18.2-1.1H134l0.1-101.8l0.2-101.8l42.4-0.2l42.3-0.1v9.5c0,8.6,0.1,9.8,1.1,11.4c2.2,3.7,7.4,4.8,11,2.4c3.7-2.5,4-3.6,4-19.1c0-15.4-0.2-16.6-4-19.1l-2-1.3H128.3C33.4,10,27.4,10.1,25.5,11z"
+    />
+  </g>,
+  weightIconProps,
+);
+
+export const TextFontStyleItalic = createIcon(
+  <g
+    stroke="currentColor"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+  >
+    <path
+      stroke="none"
+      fill="#000000"
+      d="M208.8,21.3V10H149h-15.3H82.8v11.3h48.8L91.4,234.7H47.2V246h42.1h15.3h68.7v-11.3h-66.5l40.1-213.3H208.8z"
+    />
+  </g>,
+  weightIconProps,
 );
 
 export const TextAlignCenterIcon = createIcon(

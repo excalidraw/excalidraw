@@ -108,6 +108,7 @@ export class API {
     // text props
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
     fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
+    fontStyle?: T extends "text" ? ExcalidrawTextElement["fontStyle"] : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
     fontWeight?: T extends "text" ? ExcalidrawTextElement["fontWeight"] : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
@@ -204,10 +205,12 @@ export class API {
         const fontSize = rest.fontSize ?? appState.currentItemFontSize;
         const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
         const fontWeight = rest.fontWeight ?? appState.currentItemFontWeight;
+        const fontStyle = rest.fontStyle ?? appState.currentItemFontStyle;
         element = newTextElement({
           ...base,
           text: rest.text || "test",
           fontSize,
+          fontStyle,
           fontWeight,
           fontFamily,
           textAlign: rest.textAlign ?? appState.currentItemTextAlign,
