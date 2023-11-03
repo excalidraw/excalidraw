@@ -242,7 +242,8 @@
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
     "hand": "Roka (orodje za premikanje)",
-    "extraTools": "Več orodij"
+    "extraTools": "Več orodij",
+    "mermaidToExcalidraw": "Mermaid v Excalidraw"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -501,5 +502,12 @@
         "description": "Nalaganje zunanje risbe bo <bold>prepisalo vašo obstoječo vsebino</bold>.<br></br>Svojo risbo lahko najprej varnostno kopirate z eno od spodnjih možnosti."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid v Excalidraw",
+    "button": "Vstavi",
+    "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink> in <sequenceLink>diagrami zaporedij</sequenceLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
+    "syntax": "Sintaksa Mermaid",
+    "preview": "Predogled"
   }
 }
