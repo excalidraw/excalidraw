@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "Afus (afecku n usmutti n tmuɣli)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
