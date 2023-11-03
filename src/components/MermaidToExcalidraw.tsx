@@ -94,7 +94,6 @@ const MermaidToExcalidraw = () => {
 
   useEffect(() => {
     const loadMermaidToExcalidrawLib = async () => {
-      // await new Promise((r) => setTimeout(r, 2500));
       const api = await import(
         /* webpackChunkName:"mermaid-to-excalidraw" */ "@excalidraw/mermaid-to-excalidraw"
       );
@@ -155,7 +154,6 @@ const MermaidToExcalidraw = () => {
         parent.style.background = "var(--default-bg-color)";
         canvasNode.replaceChildren(canvas);
       } catch (e: any) {
-        resetPreview();
         parent.style.background = "var(--default-bg-color)";
         if (deferredText) {
           setError(e.message);
@@ -223,7 +221,7 @@ const MermaidToExcalidraw = () => {
               {mermaidToExcalidrawLib.loaded ? (
                 <div
                   ref={canvasRef}
-                  style={{ display: error ? "none" : undefined }}
+                  style={{ opacity: error ? "0.2" : 1 }}
                   className="dialog-mermaid-panels-preview-canvas-container"
                 />
               ) : (

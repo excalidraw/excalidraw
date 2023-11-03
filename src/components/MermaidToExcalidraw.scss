@@ -123,6 +123,7 @@ $verticalBreakpoint: 860px;
       // acts as min-height
       height: 200px;
       flex-grow: 1;
+      position: relative;
 
       background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
         left center;
@@ -165,12 +166,16 @@ $verticalBreakpoint: 860px;
       height: 100%;
       width: 100%;
       text-align: center;
+      position: absolute;
+      z-index: 10;
+
       p {
-        font-weight: normal;
+        font-weight: 500;
         font-family: Cascadia;
         text-align: left;
         white-space: pre-wrap;
         font-size: 0.875rem;
+        padding: 0 10px;
       }
     }
   }
