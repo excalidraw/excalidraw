@@ -242,7 +242,8 @@
     "embeddable": "Web埋め込み",
     "laser": "",
     "hand": "手 (パンニングツール)",
-    "extraTools": "その他のツール"
+    "extraTools": "その他のツール",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
