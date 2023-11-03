@@ -2649,10 +2649,10 @@
     loupe "^2.3.6"
     pretty-format "^29.5.0"
 
-"@zsviczian/mermaid-to-excalidraw@^0.1.1-obsidian-5":
-  version "0.1.1-obsidian-5"
-  resolved "https://registry.yarnpkg.com/@zsviczian/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.1-obsidian-5.tgz#12a20ba15db019ef875fe42c2103388276d17132"
-  integrity sha512-hlX2y9hZRQD1WPSnZTOXkFWy9uLMBLH75o2ZvCm2+Gljko32Lk2sm9qKcbmfB+R3ReHNtJRvXUJjQPAIFB/6Xg==
+"@zsviczian/mermaid-to-excalidraw@^0.1.1-obsidian-7":
+  version "0.1.1-obsidian-7"
+  resolved "https://registry.yarnpkg.com/@zsviczian/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.1-obsidian-7.tgz#76926c80ad217a76ea1380ad7165035ce84cf549"
+  integrity sha512-rd3/BL866Q+MEAI3i1loKdTTSayuDDFaZhgEsSZQhiesyGNl9mDU2Hgp6LKiKfj3vD03aMfiAseN3z4ub0o1Hw==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
     cross-env "^7.0.3"

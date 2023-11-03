@@ -280,6 +280,7 @@ export default MermaidToExcalidraw;
 export const mermaidToExcalidraw = async (
   mermaidDefinition: string,
   opts: MermaidOptions = { fontSize: DEFAULT_FONT_SIZE },
+  forceSVG:boolean = false,
 ): Promise<
   | {
       elements: ExcalidrawElement[];
@@ -291,6 +292,7 @@ export const mermaidToExcalidraw = async (
     const { elements, files } = await parseMermaidToExcalidraw(
       mermaidDefinition,
       opts,
+      forceSVG,
     );
 
     return {
