@@ -242,7 +242,8 @@
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
     "hand": "Mano (strumento di panoramica)",
-    "extraTools": "Altri strumenti"
+    "extraTools": "Altri strumenti",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -501,5 +502,12 @@
         "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
