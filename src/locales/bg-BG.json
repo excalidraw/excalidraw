@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": "Още инструменти"
+    "extraTools": "Още инструменти",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
