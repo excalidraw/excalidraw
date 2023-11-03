@@ -1293,8 +1293,8 @@ class App extends React.Component<AppProps, AppState> {
                           isCollaborating={this.props.isCollaborating}
                         >
                           {this.props.children}
-                          {this.props.renderMermaid &&
-                            this.state.activeTool.type === "mermaid" && ( //zsviczian
+                          {this.props.renderMermaid && //zsviczian
+                            this.state.openDialog === "mermaid" && (
                               <MermaidToExcalidraw
                                 selectedElements={this.scene.getSelectedElements(
                                   this.state, //zsviczian
@@ -1332,6 +1332,12 @@ class App extends React.Component<AppProps, AppState> {
                             top={this.state.contextMenu.top}
                             left={this.state.contextMenu.left}
                             actionManager={this.actionManager}
+                            onClose={(callback) => {
+                              this.setState({ contextMenu: null }, () => {
+                                this.focusContainer();
+                                callback?.();
+                              });
+                            }}
                           />
                         )}
                         <StaticCanvas
@@ -2175,7 +2181,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
-    this.cutAll();
+    this.actionManager.executeAction(actionCut, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
   });
@@ -2187,18 +2193,10 @@ class App extends React.Component<AppProps, AppState> {
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
     }
-    this.copyAll();
+    this.actionManager.executeAction(actionCopy, "keyboard", event);
     event.preventDefault();
     event.stopPropagation();
   });
-
-  private cutAll = () => {
-    this.actionManager.executeAction(actionCut, "keyboard");
-  };
-
-  private copyAll = () => {
-    this.actionManager.executeAction(actionCopy, "keyboard");
-  };
 
   private static resetTapTwice() {
     didTapTwice = false;
@@ -2260,8 +2258,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public pasteFromClipboard = withBatchedUpdates(
-    async (event: ClipboardEvent | null) => {
-      const isPlainPaste = !!(IS_PLAIN_PASTE && event);
+    async (event: ClipboardEvent) => {
+      const isPlainPaste = !!IS_PLAIN_PASTE;
 
       // #686
       const target = document.activeElement;
@@ -3544,6 +3542,10 @@ class App extends React.Component<AppProps, AppState> {
         ...commonResets,
       };
     });
+  };
+
+  setOpenDialog = (dialogType: AppState["openDialog"]) => {
+    this.setState({ openDialog: dialogType });
   };
 
   private setCursor = (cursor: string) => {
