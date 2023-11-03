@@ -1588,10 +1588,10 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/mermaid-to-excalidraw@0.1.1-sequence4":
-  version "0.1.1-sequence4"
-  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.1-sequence4.tgz#22800695ff359defa30b340073493b3d4897acee"
-  integrity sha512-uZi4weEGerL2ayedo7y/Fd70Gd9JqlTc5X4Pj9jhcJdoYOGii6RqfuXgiTwOC9o3adEYsfZQGuHvP0WQt5VWwg==
+"@excalidraw/mermaid-to-excalidraw@0.1.1-sequence5":
+  version "0.1.1-sequence5"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.1-sequence5.tgz#7705dcc03ed8c2ac6758527f6dd272f71cd0ef21"
+  integrity sha512-Eo2add7RWUUM7BpkvOvqhx3jWVrNTBrPUVuUf4/9nuNQqI9MgxmprUeVLd4BXw9z+HDd/dmtSZWEB+JJHFwnKw==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
     mermaid "10.2.3"
