@@ -131,5 +131,5 @@ export class Debug {
     };
   };
 }
-
+//@ts-ignore
 window.debug = Debug;

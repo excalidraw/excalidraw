@@ -366,6 +366,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
+import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import { LaserToolOverlay } from "./LaserTool/LaserTool";
 import { LaserPathManager } from "./LaserTool/LaserPathManager";
 import {
@@ -1245,7 +1246,11 @@ class App extends React.Component<AppProps, AppState> {
                           isCollaborating={this.props.isCollaborating}
                         >
                           {this.props.children}
+                          {this.state.openDialog === "mermaid" && (
+                            <MermaidToExcalidraw />
+                          )}
                         </LayerUI>
+
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
@@ -2324,11 +2329,12 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private addElementsFromPasteOrLibrary = (opts: {
+  addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
+    fitToContent?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -2433,6 +2439,12 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
     this.setActiveTool({ type: "selection" });
+
+    if (opts.fitToContent) {
+      this.scrollToContent(newElements, {
+        fitToContent: true,
+      });
+    }
   };
 
   // TODO rewrite this to paste both text & images at the same time if
@@ -3306,6 +3318,10 @@ class App extends React.Component<AppProps, AppState> {
         ...commonResets,
       };
     });
+  };
+
+  setOpenDialog = (dialogType: AppState["openDialog"]) => {
+    this.setState({ openDialog: dialogType });
   };
 
   private setCursor = (cursor: string) => {
@@ -4258,6 +4274,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
+
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
       hitElement,
