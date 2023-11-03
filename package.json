@@ -129,7 +129,6 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
-    "release": "node scripts/release.js",
-    "release:github": "node scripts/release-gt.js"
+    "release": "node scripts/release.js"
   }
 }
