@@ -243,7 +243,7 @@
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid la Excalidraw"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid la Excalidraw",
+    "button": "Introducere",
+    "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink> și <sequenceLink>Diagramele de secvență</sequenceLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "syntax": "Sintaxă Mermaid",
+    "preview": "Previzualizare"
   }
 }
