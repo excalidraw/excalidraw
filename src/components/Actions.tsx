@@ -225,7 +225,6 @@ export const ShapesSwitcher = ({
 }) => {
   const { renderMermaid } = useAppProps(); //zsviczian
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
-  const device = useDevice();
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
@@ -276,165 +275,65 @@ export const ShapesSwitcher = ({
         );
       })}
       <div className="App-toolbar__divider" />
-      {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
-      {device.isMobile ? (
-        <>
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
+
+      <DropdownMenu open={isExtraToolsMenuOpen}>
+        <DropdownMenu.Trigger
+          className={clsx("App-toolbar__extra-tools-trigger", {
+            "App-toolbar__extra-tools-trigger--selected":
+              frameToolSelected ||
+              embeddableToolSelected ||
+              // in collab we're already highlighting the laser button
+              // outside toolbar, so let's not highlight extra-tools button
+              // on top of it
+              (laserToolSelected && !app.props.isCollaborating),
+          })}
+          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+          title={t("toolBar.extraTools")}
+        >
+          {extraToolsIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
+          onSelect={() => setIsExtraToolsMenuOpen(false)}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "frame" })}
             icon={frameToolIcon}
-            checked={activeTool.type === "frame"}
-            name="editor-current-shape"
-            title={`${capitalizeString(
-              t("toolBar.frame"),
-            )} — ${KEYS.F.toLocaleUpperCase()}`}
-            keyBindingLabel={KEYS.F.toLocaleUpperCase()}
-            aria-label={capitalizeString(t("toolBar.frame"))}
-            aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
-            data-testid={`toolbar-frame`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "frame", "ui");
-              app.setActiveTool({ type: "frame" });
-            }}
-            selected={activeTool.type === "frame"}
-          />
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
+            shortcut={KEYS.F.toLocaleUpperCase()}
+            data-testid="toolbar-frame"
+            selected={frameToolSelected}
+          >
+            {t("toolBar.frame")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "embeddable" })}
             icon={EmbedIcon}
-            checked={activeTool.type === "embeddable"}
-            name="editor-current-shape"
-            title={capitalizeString(t("toolBar.embeddable"))}
-            aria-label={capitalizeString(t("toolBar.embeddable"))}
-            data-testid={`toolbar-embeddable`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "embeddable", "ui");
-              app.setActiveTool({ type: "embeddable" });
-            }}
-            selected={activeTool.type === "embeddable"}
-          />
-          {renderMermaid && ( //zsviczian
-            <ToolButton
-              className={clsx("Shape", { fillable: false })}
-              type="radio"
-              icon={mermaidLogoIcon}
-              checked={activeTool.type === "mermaid"}
-              name="editor-current-shape"
-              title={capitalizeString(t("toolBar.mermaidToExcalidraw"))}
-              aria-label={capitalizeString(t("toolBar.mermaidToExcalidraw"))}
-              data-testid={`toolbar-mermaidToExcalidraw`}
-              onPointerDown={({ pointerType }) => {
-                if (!appState.penDetected && pointerType === "pen") {
-                  app.togglePenMode(true);
-                }
-              }}
-              onChange={({ pointerType }) => {
-                trackEvent("toolbar", "mermaid", "ui");
-                app.setActiveTool({ type: "mermaid" });
-              }}
-              selected={activeTool.type === "mermaid"}
-            />
-          )}
-          <ToolButton //zsviczian
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
+            data-testid="toolbar-embeddable"
+            selected={embeddableToolSelected}
+          >
+            {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "laser" })}
             icon={laserPointerToolIcon}
-            checked={activeTool.type === "laser"}
-            name="editor-current-shape"
-            title={capitalizeString(t("toolBar.laser"))}
-            aria-label={capitalizeString(t("toolBar.laser"))}
-            data-testid={`toolbar-laser`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "laser", "ui");
-              app.setActiveTool({ type: "laser" });
-            }}
-            selected={activeTool.type === "laser"}
-          />
-        </>
-      ) : (
-        <DropdownMenu open={isExtraToolsMenuOpen}>
-          <DropdownMenu.Trigger
-            className={clsx("App-toolbar__extra-tools-trigger", {
-              "App-toolbar__extra-tools-trigger--selected":
-                frameToolSelected ||
-                embeddableToolSelected ||
-                // in collab we're already highlighting the laser button
-                // outside toolbar, so let's not highlight extra-tools button
-                // on top of it
-                (laserToolSelected && !app.props.isCollaborating),
-            })}
-            onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
-            title={t("toolBar.extraTools")}
+            data-testid="toolbar-laser"
+            selected={laserToolSelected}
+            shortcut={KEYS.K.toLocaleUpperCase()}
           >
-            {extraToolsIcon}
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content
-            onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-            onSelect={() => setIsExtraToolsMenuOpen(false)}
-            className="App-toolbar__extra-tools-dropdown"
-          >
+            {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          {renderMermaid && ( //zsviczian
             <DropdownMenu.Item
-              onSelect={() => {
-                app.setActiveTool({ type: "frame" });
-              }}
-              icon={frameToolIcon}
-              shortcut={KEYS.F.toLocaleUpperCase()}
-              data-testid="toolbar-frame"
-              selected={frameToolSelected}
-            >
-              {t("toolBar.frame")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => {
-                app.setActiveTool({ type: "embeddable" });
-              }}
-              icon={EmbedIcon}
+              onSelect={() => app.setOpenDialog("mermaid")}
+              icon={mermaidLogoIcon}
               data-testid="toolbar-embeddable"
-              selected={embeddableToolSelected}
             >
-              {t("toolBar.embeddable")}
+              {t("toolBar.mermaidToExcalidraw")}
             </DropdownMenu.Item>
-            {renderMermaid && ( //zsviczian
-              <DropdownMenu.Item
-                onSelect={() => {
-                  app.setActiveTool({ type: "mermaid" });
-                }}
-                icon={mermaidLogoIcon}
-                data-testid="toolbar-mermaidToExcalidraw"
-                selected={mermaidToolSelected}
-              >
-                {t("toolBar.mermaidToExcalidraw")}
-              </DropdownMenu.Item>
-            )}
-            <DropdownMenu.Item
-              onSelect={() => {
-                app.setActiveTool({ type: "laser" });
-              }}
-              icon={laserPointerToolIcon}
-              data-testid="toolbar-laser"
-              selected={laserToolSelected}
-              shortcut={KEYS.K.toLocaleUpperCase()}
-            >
-              {t("toolBar.laser")}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu>
-      )}
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu>
     </>
   );
 };

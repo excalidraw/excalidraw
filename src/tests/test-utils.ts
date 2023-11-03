@@ -208,26 +208,6 @@ export const assertSelectedElements = (
   expect(selectedElementIds).toEqual(expect.arrayContaining(ids));
 };
 
-export const createPasteEvent = <T extends "text/plain" | "text/html">(
-  items: Record<T, string>,
-  files?: File[],
-) => {
-  return Object.assign(
-    new Event("paste", {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-    }),
-    {
-      clipboardData: {
-        getData: (type: string) =>
-          (items as Record<string, string>)[type] || "",
-        files: files || [],
-      },
-    },
-  ) as any as ClipboardEvent;
-};
-
 export const toggleMenu = (container: HTMLElement) => {
   // open menu
   fireEvent.click(container.querySelector(".dropdown-menu-button")!);

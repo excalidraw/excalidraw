@@ -17,15 +17,15 @@ import { ArrowRightIcon } from "./icons";
 import Spinner from "./Spinner";
 import "./MermaidToExcalidraw.scss";
 
-import { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
+import { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces"; //zsviczian
 import { parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw"; //zsviczian
-import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw"; //zsviczian
 import { t } from "../i18n";
 import Trans from "./Trans";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
-  "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[test]";
+  "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
 
 const saveMermaidDataToStorage = (data: string) => {
   try {
@@ -52,19 +52,8 @@ const importMermaidDataFromStorage = () => {
 
 const ErrorComp = ({ error }: { error: string }) => {
   return (
-    <div
-      data-testid="mermaid-error"
-      style={{
-        color: "red",
-        fontWeight: 800,
-        fontSize: "30px",
-        wordBreak: "break-word",
-        overflow: "auto",
-        maxHeight: "100%",
-        textAlign: "center",
-      }}
-    >
-      Error! <p style={{ fontSize: "18px", fontWeight: "600" }}>{error}</p>
+    <div data-testid="mermaid-error" className="mermaid-error">
+      Error! <p>{error}</p>
     </div>
   );
 };
@@ -72,17 +61,21 @@ const ErrorComp = ({ error }: { error: string }) => {
 const MermaidToExcalidraw = ({
   selectedElements, //zsviczian
 }: {
-  selectedElements: readonly NonDeletedExcalidrawElement[];
+  selectedElements: readonly NonDeletedExcalidrawElement[]; //zsviczian
 }) => {
-  const mermaidToExcalidrawLib = useRef<{
-    parseMermaidToExcalidraw: (
-      defination: string,
-      options: MermaidOptions,
-    ) => Promise<MermaidToExcalidrawResult>;
-  } | null>(null);
+  const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] = useState<{
+    loaded: boolean;
+    api: {
+      parseMermaidToExcalidraw: (
+        defination: string,
+        options: MermaidOptions,
+      ) => Promise<MermaidToExcalidrawResult>;
+    } | null;
+  }>({ loaded: false, api: null });
+
   const [text, setText] = useState("");
-  const deferredText = useDeferredValue(text);
-  const [loading, setLoading] = useState(true);
+  const deferredText = useDeferredValue(text.trim());
+  const [loading, setLoading] = useState(true); //zsviczian
   const [error, setError] = useState(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -104,15 +97,16 @@ const MermaidToExcalidraw = ({
       return;
     }
     parent.style.background = "";
+    setError(null);
     canvasNode.replaceChildren();
   };
 
   useEffect(() => {
     const loadMermaidToExcalidrawLib = async () => {
-      mermaidToExcalidrawLib.current = await import(
-        /* webpackChunkName:"mermaid-to-excalidraw" */ "@zsviczian/mermaid-to-excalidraw"
+      const api = await import(
+        /* webpackChunkName:"mermaid-to-excalidraw" */ "@zsviczian/mermaid-to-excalidraw" //zsviczian
       );
-      setLoading(false);
+      setMermaidToExcalidrawLib({ loaded: true, api });
     };
     loadMermaidToExcalidrawLib();
   }, []);
@@ -133,22 +127,30 @@ const MermaidToExcalidraw = ({
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
       const canvasNode = canvasRef.current;
+      const parent = canvasNode?.parentElement;
       if (
+        !mermaidToExcalidrawLib.loaded ||
         !canvasNode ||
-        !mermaidToExcalidrawLib.current ||
+        !parent ||
+        !mermaidToExcalidrawLib.api ||
         deferredText === "" //zsviczian
       ) {
         return;
       }
+      if (!deferredText) {
+        resetPreview();
+        return;
+      }
       try {
         const { elements, files } =
-          await mermaidToExcalidrawLib.current.parseMermaidToExcalidraw(
+          await mermaidToExcalidrawLib.api.parseMermaidToExcalidraw(
             deferredText,
             {
               fontSize: DEFAULT_FONT_SIZE,
             },
           );
         setError(null);
+
         data.current = {
           elements: convertToExcalidrawElements(
             elements.map((el) => {
@@ -164,37 +166,32 @@ const MermaidToExcalidraw = ({
           ),
           files,
         };
-        const parent = canvasNode.parentElement!;
-        const maxWidth = parent.offsetWidth;
-        const maxHeight = parent.offsetHeight;
-        let dimension = Math.max(maxWidth, maxHeight);
-        dimension = Math.min(dimension, parent.offsetWidth - 10);
-        dimension = Math.min(dimension, parent.offsetHeight - 10);
 
         const canvas = await exportToCanvas({
           elements: data.current.elements,
           files: data.current.files,
           exportPadding: DEFAULT_EXPORT_PADDING,
-          maxWidthOrHeight: dimension,
+          maxWidthOrHeight:
+            Math.max(parent.offsetWidth, parent.offsetHeight) *
+            window.devicePixelRatio,
         });
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
         await canvasToBlob(canvas);
-        parent.style.background = "#fff";
+        parent.style.background = "var(--default-bg-color)";
         canvasNode.replaceChildren(canvas);
       } catch (e: any) {
-        console.error(e.message);
-        resetPreview();
+        parent.style.background = "var(--default-bg-color)";
         if (deferredText) {
           setError(e.message);
         }
       }
     };
     renderExcalidrawPreview();
-  }, [deferredText, text]);
+  }, [deferredText, mermaidToExcalidrawLib]);
 
   const onClose = () => {
-    app.setActiveTool({ type: "selection" });
+    app.setOpenDialog(null);
     saveMermaidDataToStorage(text);
   };
 
@@ -213,18 +210,20 @@ const MermaidToExcalidraw = ({
     <Dialog
       className="dialog-mermaid"
       onCloseRequest={onClose}
+      size={1200}
       title={
         <>
-          <p style={{ marginBottom: "5px", marginTop: "2px" }}>
-            {t("mermaid.title")}
-          </p>
-          <span
-            style={{ fontSize: "15px", fontStyle: "italic", fontWeight: 500 }}
-          >
+          <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
+          <span className="dialog-mermaid-desc">
             <Trans
               i18nKey="mermaid.description"
               flowchartLink={(el) => (
                 <a href="https://mermaid.js.org/syntax/flowchart.html">{el}</a>
+              )}
+              sequenceLink={(el) => (
+                <a href="https://mermaid.js.org/syntax/sequenceDiagram.html">
+                  {el}
+                </a>
               )}
             />
             <br />
@@ -232,42 +231,36 @@ const MermaidToExcalidraw = ({
         </>
       }
     >
-      <div className="mermaid-to-excalidraw-wrapper">
-        <div
-          className="mermaid-to-excalidraw-wrapper-text"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
-          <label>{t("mermaid.syntax")}</label>
+      <div className="dialog-mermaid-body">
+        <div className="dialog-mermaid-panels">
+          <div className="dialog-mermaid-panels-text">
+            <label>{t("mermaid.syntax")}</label>
 
-          <textarea
-            style={{
-              padding: "0.85rem",
-              borderRadius: "8px",
-              border: "1px solid #e4e4eb",
-              whiteSpace: "pre-wrap",
-            }}
-            onChange={(event) => setText(event.target.value)}
-            value={text}
-          />
-        </div>
-        <div
-          className="mermaid-to-excalidraw-wrapper-preview"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
-          <label>{t("mermaid.preview")}</label>
-          <div className="mermaid-to-excalidraw-wrapper-preview-canvas">
-            {error && <ErrorComp error={error} />}
-            {loading && <Spinner size="2rem" />}
-            <div ref={canvasRef} />
+            <textarea
+              onChange={(event) => setText(event.target.value)}
+              value={text}
+            />
           </div>
-          <Button
-            className="mermaid-to-excalidraw-wrapper-preview-insert"
-            onSelect={onSelect}
-          >
+          <div className="dialog-mermaid-panels-preview">
+            <label>{t("mermaid.preview")}</label>
+            <div className="dialog-mermaid-panels-preview-wrapper">
+              {error && <ErrorComp error={error} />}
+              {mermaidToExcalidrawLib.loaded ? (
+                <div
+                  ref={canvasRef}
+                  style={{ opacity: error ? "0.15" : 1 }}
+                  className="dialog-mermaid-panels-preview-canvas-container"
+                />
+              ) : (
+                <Spinner size="2rem" />
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="dialog-mermaid-buttons">
+          <Button className="dialog-mermaid-insert" onSelect={onSelect}>
             {t("mermaid.button")}
-            <span style={{ paddingLeft: "8px", display: "flex" }}>
-              {ArrowRightIcon}
-            </span>
+            <span>{ArrowRightIcon}</span>
           </Button>
         </div>
       </div>

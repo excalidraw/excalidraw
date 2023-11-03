@@ -468,16 +468,16 @@ export class UI {
   static async editText<
     T extends ExcalidrawTextElement | ExcalidrawTextContainer,
   >(element: T, text: string) {
-    const openedEditor = document.querySelector<HTMLTextAreaElement>(
-      ".excalidraw-textEditorContainer > textarea",
-    );
+    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
+    const openedEditor =
+      document.querySelector<HTMLTextAreaElement>(textEditorSelector);
 
     if (!openedEditor) {
       mouse.select(element);
       Keyboard.keyPress(KEYS.ENTER);
     }
 
-    const editor = await getTextEditor();
+    const editor = await getTextEditor(textEditorSelector);
     if (!editor) {
       throw new Error("Can't find wysiwyg text editor in the dom");
     }
