@@ -242,7 +242,8 @@
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
-    "extraTools": "Weitere Werkzeuge"
+    "extraTools": "Weitere Werkzeuge",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -501,5 +502,12 @@
         "description": "Das Laden einer externen Zeichnung wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
