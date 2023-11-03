@@ -243,7 +243,7 @@
     "laser": "雷射筆",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid 至 Excalidraw"
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid 至 Excalidraw",
+    "button": "插入",
+    "description": "目前僅支援 <flowchartLink>Flowcharts</flowchartLink> 及 <sequenceLink>Sequence Diagrams</sequenceLink>。其餘檔案類型在 Excalidraw 將會以圖像呈現。",
+    "syntax": "Mermaid 語法",
+    "preview": "預覽"
   }
 }
