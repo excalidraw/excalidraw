@@ -141,7 +141,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
        B --> C{Let me think}
        C -->|One| D[Laptop]
        C -->|Two| E[iPhone]
-       C -->|Three| F[test]"
+       C -->|Three| F[Car]"
     `);
 
     await act(async () => {
