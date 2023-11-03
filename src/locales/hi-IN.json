@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसकाने का औज़ार)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -501,5 +502,12 @@
         "description": "बाहर का चित्र लोड करने पर <bold>यह आपके कार्य की जगह लेलेगा </bold><br></br>आप आपकी ड्रॉइंग पहले निम्न दर्शित विकल्पो में से एक चुनके और उपयोग करके सम्हाल सकते हों."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
