@@ -18,7 +18,6 @@ import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dis
 import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
 import { t } from "../i18n";
 import Trans from "./Trans";
-import clsx from "clsx";
 
 const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
 const MERMAID_EXAMPLE =
@@ -219,14 +218,12 @@ const MermaidToExcalidraw = () => {
           </div>
           <div className="dialog-mermaid-panels-preview">
             <label>{t("mermaid.preview")}</label>
-            <div
-              className="dialog-mermaid-panels-preview-wrapper"
-            >
+            <div className="dialog-mermaid-panels-preview-wrapper">
               {error && <ErrorComp error={error} />}
               {mermaidToExcalidrawLib.loaded ? (
                 <div
                   ref={canvasRef}
-                  style={{display: error ? "none" : undefined}}
+                  style={{ display: error ? "none" : undefined }}
                   className="dialog-mermaid-panels-preview-canvas-container"
                 />
               ) : (
