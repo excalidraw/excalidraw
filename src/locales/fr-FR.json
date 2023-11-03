@@ -242,7 +242,8 @@
     "embeddable": "Intégration Web",
     "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
-    "extraTools": "Plus d'outils"
+    "extraTools": "Plus d'outils",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -501,5 +502,12 @@
         "description": "Charger un dessin externe va <bold>remplacer votre contenu existant</bold>.<br></br>Vous pouvez d'abord sauvegarder votre dessin en utilisant l'une des options ci-dessous."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
