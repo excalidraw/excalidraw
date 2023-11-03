@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
-    "extraTools": "மற்ற கருவிகள்"
+    "extraTools": "மற்ற கருவிகள்",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "கித்தான் செயல்கள்",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
