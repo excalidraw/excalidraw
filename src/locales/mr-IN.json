@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "लेसर टॉर्च",
     "hand": "हात ( सरकवण्या चे उपकरण)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "पटल क्रिया",
@@ -501,5 +502,12 @@
         "description": "बाहरी चित्र लोड केल्या वर ते <bold>तुमचा सध्याचा कामा ठिकाणि एईल </bold><br></br> तुम्हीं तुमचं चित्र एकाधं खाली दिलेलं विकल्प निवडुन पहले सुरक्षीत करु शकता."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
