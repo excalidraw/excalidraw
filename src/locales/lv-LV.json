@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "Roka (panoramēšanas rīks)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
