@@ -242,7 +242,8 @@
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
     "hand": "يد (أداة الإزاحة)",
-    "extraTools": "المزيد من أﻷدوات"
+    "extraTools": "المزيد من أﻷدوات",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -501,5 +502,12 @@
         "description": "سيتسبب تحميل رسمة خارجية <bold>باستبدال محتواك الموجود حالياً</bold>.<br></br>بإمكانك إجراء النسخ الاحتياطي لرسمتك الحالية باستخدام أحد الخيارات أدناه."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
