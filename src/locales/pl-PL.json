@@ -243,7 +243,7 @@
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Konwertuj diagram Mermaid do Excalidraw",
+    "button": "Wstaw",
+    "description": "Obecnie jedynie <flowchartLink>proste grafy</flowchartLink> i <sequenceLink>sekwencje</sequenceLink> są wspierane. Pozostałe typy diagramów będą wyświetlane jako obrazy w Excalidraw.",
+    "syntax": "Składnia diagramów Mermaid",
+    "preview": "Podgląd"
   }
 }
