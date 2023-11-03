@@ -1339,30 +1339,43 @@ function med(A: number[], B: number[]) {
   return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
 }
 
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
-
 function getSvgPathFromStroke(points: number[][]): string {
   if (!points.length) {
     return "";
   }
+  let path =
+    "M " + toFixed2(points[0][0]) + "," + toFixed2(points[0][1]) + " " + "Q ";
+  for (let i = 0; i < points.length - 1; i++) {
+    const point = points[i];
+    const mean = med(point, points[i + 1]);
+    path +=
+      toFixed2(point[0]) +
+      "," +
+      toFixed2(point[1]) +
+      " " +
+      toFixed2(mean[0]) +
+      "," +
+      toFixed2(mean[1]) +
+      " ";
+  }
+  const lastPoint = points[points.length - 1];
+  const mean = med(lastPoint, points[0]);
+  path +=
+    toFixed2(lastPoint[0]) +
+    "," +
+    toFixed2(lastPoint[1]) +
+    " " +
+    toFixed2(mean[0]) +
+    "," +
+    toFixed2(mean[1]) +
+    " L " +
+    toFixed2(points[0][0]) +
+    "," +
+    toFixed2(points[0][1]) +
+    " Z";
+  return path;
+}
 
-  const max = points.length - 1;
-
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
+function toFixed2(n: number): number {
+  return Math.floor(n * 100) / 100;
 }
