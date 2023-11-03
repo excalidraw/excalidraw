@@ -242,7 +242,8 @@
     "embeddable": "Weblap beágyazása",
     "laser": "Lézermutató",
     "hand": "",
-    "extraTools": "További eszközök"
+    "extraTools": "További eszközök",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Vászon műveletek",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
