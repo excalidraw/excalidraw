@@ -242,7 +242,8 @@
     "embeddable": "嵌入网页",
     "laser": "激光笔",
     "hand": "抓手（平移工具）",
-    "extraTools": "更多工具"
+    "extraTools": "更多工具",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -501,5 +502,12 @@
         "description": "加载外部绘图将<bold>替换您现有的内容</bold>。<br></br>您可以先使用下列方式备份您的绘图。"
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
