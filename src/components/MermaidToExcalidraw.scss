@@ -105,6 +105,7 @@ $verticalBreakpoint: 860px;
         padding: 0.85rem;
         box-sizing: border-box;
         width: 100%;
+        font-family: monospace;
 
         @media screen and (max-width: $verticalBreakpoint) {
           width: auto;
