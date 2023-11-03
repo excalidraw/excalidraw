@@ -112,17 +112,15 @@ const MermaidToExcalidraw = ({
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      const selectedMermaidImage = selectedElements.filter(
-        (el) => el.type === "image" && el.customData?.mermaidText,
-      )[0]; //zsviczian
-      const data = selectedMermaidImage
-        ? selectedMermaidImage.customData?.mermaidText
-        : importMermaidDataFromStorage() || MERMAID_EXAMPLE;
+    const selectedMermaidImage = selectedElements.filter(
+      (el) => el.type === "image" && el.customData?.mermaidText,
+    )[0]; //zsviczian
+    const data = selectedMermaidImage
+      ? selectedMermaidImage.customData?.mermaidText
+      : importMermaidDataFromStorage() || MERMAID_EXAMPLE;
 
-      setText(data);
-    }
-  }, [loading, selectedElements]);
+    setText(data);
+  }, [selectedElements]);
 
   useEffect(() => {
     const renderExcalidrawPreview = async () => {
