@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "Mà (eina de desplaçament)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "De Mermaid a Excalidraw"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "De Mermaid a Excalidraw",
+    "button": "Insereix",
+    "description": "Ara per ara, només s'admeten <flowchartLink>diagrames de flux</flowchartLink> i <sequenceLink>diagrames de seqüència</sequenceLink>. Els altres tipus es renderitzaran com a imatge a l'Excalidraw.",
+    "syntax": "Sintaxi de Mermaid",
+    "preview": "Previsualització"
   }
 }
