@@ -242,7 +242,8 @@
     "embeddable": "Web Embed",
     "laser": "Laserový ukazovateľ",
     "hand": "Ruka (nástroj pre pohyb plátna)",
-    "extraTools": "Ďalšie nástroje"
+    "extraTools": "Ďalšie nástroje",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -501,5 +502,12 @@
         "description": "Načítanie externej kresby <bold>nahradí váš existujúci obsah</bold>.<br></br>Vašu kresbu môžete zálohovať jednou z nižšie uvedených možností."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
