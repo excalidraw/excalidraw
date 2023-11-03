@@ -242,7 +242,8 @@
     "embeddable": "Inserir na web",
     "laser": "Punteiro láser",
     "hand": "Man (ferramenta de desprazamento)",
-    "extraTools": "Máis ferramentas"
+    "extraTools": "Máis ferramentas",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
