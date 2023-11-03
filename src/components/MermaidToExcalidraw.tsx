@@ -221,7 +221,7 @@ const MermaidToExcalidraw = () => {
               {mermaidToExcalidrawLib.loaded ? (
                 <div
                   ref={canvasRef}
-                  style={{ opacity: error ? "0.2" : 1 }}
+                  style={{ opacity: error ? "0.15" : 1 }}
                   className="dialog-mermaid-panels-preview-canvas-container"
                 />
               ) : (
