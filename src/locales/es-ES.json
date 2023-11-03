@@ -243,7 +243,7 @@
     "laser": "Puntero láser",
     "hand": "Mano (herramienta de panoramización)",
     "extraTools": "Más herramientas",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid a Excalidraw"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "Mermaid a Excalidraw",
+    "button": "Insertar",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Sintaxis Mermaid",
+    "preview": "Vista previa"
   }
 }
