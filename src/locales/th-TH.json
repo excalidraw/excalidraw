@@ -242,7 +242,8 @@
     "embeddable": "ฝังเว็บ",
     "laser": "",
     "hand": "",
-    "extraTools": "เครื่องมืออื่นๆ"
+    "extraTools": "เครื่องมืออื่นๆ",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
