@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "Mão (ferramenta de rolagem)",
-    "extraTools": "Mais ferramentas"
+    "extraTools": "Mais ferramentas",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -501,5 +502,12 @@
         "description": "Carregar um desenho externo irá <bold> substituir seu conteúdo existente</bold>.<br></br>Você pode salvar seu desenho antes utilizando uma das opções abaixo."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
