@@ -19,10 +19,10 @@ import { mutateElement } from "./element/mutateElement";
 import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { isFrameElement } from "./element";
-import { moveOneRight } from "./zindex";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
+import { doLineSegmentsIntersect } from "./packages/utils";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -56,130 +56,21 @@ export const bindElementsToFramesAfterDuplication = (
   }
 };
 
-// --------------------------- Frame Geometry ---------------------------------
-class Point {
-  x: number;
-  y: number;
+export function isElementIntersectingFrame(
+  element: ExcalidrawElement,
+  frame: ExcalidrawFrameElement,
+) {
+  const frameLineSegments = getElementLineSegments(frame);
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
+  const elementLineSegments = getElementLineSegments(element);
 
-class LineSegment {
-  first: Point;
-  second: Point;
+  const intersecting = frameLineSegments.some((frameLineSegment) =>
+    elementLineSegments.some((elementLineSegment) =>
+      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+    ),
+  );
 
-  constructor(pointA: Point, pointB: Point) {
-    this.first = pointA;
-    this.second = pointB;
-  }
-
-  public getBoundingBox(): [Point, Point] {
-    return [
-      new Point(
-        Math.min(this.first.x, this.second.x),
-        Math.min(this.first.y, this.second.y),
-      ),
-      new Point(
-        Math.max(this.first.x, this.second.x),
-        Math.max(this.first.y, this.second.y),
-      ),
-    ];
-  }
-}
-
-// https://martin-thoma.com/how-to-check-if-two-line-segments-intersect/
-class FrameGeometry {
-  private static EPSILON = 0.000001;
-
-  private static crossProduct(a: Point, b: Point) {
-    return a.x * b.y - b.x * a.y;
-  }
-
-  private static doBoundingBoxesIntersect(
-    a: [Point, Point],
-    b: [Point, Point],
-  ) {
-    return (
-      a[0].x <= b[1].x &&
-      a[1].x >= b[0].x &&
-      a[0].y <= b[1].y &&
-      a[1].y >= b[0].y
-    );
-  }
-
-  private static isPointOnLine(a: LineSegment, b: Point) {
-    const aTmp = new LineSegment(
-      new Point(0, 0),
-      new Point(a.second.x - a.first.x, a.second.y - a.first.y),
-    );
-    const bTmp = new Point(b.x - a.first.x, b.y - a.first.y);
-    const r = this.crossProduct(aTmp.second, bTmp);
-    return Math.abs(r) < this.EPSILON;
-  }
-
-  private static isPointRightOfLine(a: LineSegment, b: Point) {
-    const aTmp = new LineSegment(
-      new Point(0, 0),
-      new Point(a.second.x - a.first.x, a.second.y - a.first.y),
-    );
-    const bTmp = new Point(b.x - a.first.x, b.y - a.first.y);
-    return this.crossProduct(aTmp.second, bTmp) < 0;
-  }
-
-  private static lineSegmentTouchesOrCrossesLine(
-    a: LineSegment,
-    b: LineSegment,
-  ) {
-    return (
-      this.isPointOnLine(a, b.first) ||
-      this.isPointOnLine(a, b.second) ||
-      (this.isPointRightOfLine(a, b.first)
-        ? !this.isPointRightOfLine(a, b.second)
-        : this.isPointRightOfLine(a, b.second))
-    );
-  }
-
-  private static doLineSegmentsIntersect(
-    a: [readonly [number, number], readonly [number, number]],
-    b: [readonly [number, number], readonly [number, number]],
-  ) {
-    const aSegment = new LineSegment(
-      new Point(a[0][0], a[0][1]),
-      new Point(a[1][0], a[1][1]),
-    );
-    const bSegment = new LineSegment(
-      new Point(b[0][0], b[0][1]),
-      new Point(b[1][0], b[1][1]),
-    );
-
-    const box1 = aSegment.getBoundingBox();
-    const box2 = bSegment.getBoundingBox();
-    return (
-      this.doBoundingBoxesIntersect(box1, box2) &&
-      this.lineSegmentTouchesOrCrossesLine(aSegment, bSegment) &&
-      this.lineSegmentTouchesOrCrossesLine(bSegment, aSegment)
-    );
-  }
-
-  public static isElementIntersectingFrame(
-    element: ExcalidrawElement,
-    frame: ExcalidrawFrameElement,
-  ) {
-    const frameLineSegments = getElementLineSegments(frame);
-
-    const elementLineSegments = getElementLineSegments(element);
-
-    const intersecting = frameLineSegments.some((frameLineSegment) =>
-      elementLineSegments.some((elementLineSegment) =>
-        this.doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
-      ),
-    );
-
-    return intersecting;
-  }
+  return intersecting;
 }
 
 export const getElementsCompletelyInFrame = (
@@ -207,10 +98,7 @@ export const isElementContainingFrame = (
 export const getElementsIntersectingFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameElement,
-) =>
-  elements.filter((element) =>
-    FrameGeometry.isElementIntersectingFrame(element, frame),
-  );
+) => elements.filter((element) => isElementIntersectingFrame(element, frame));
 
 export const elementsAreInFrameBounds = (
   elements: readonly ExcalidrawElement[],
@@ -236,7 +124,7 @@ export const elementOverlapsWithFrame = (
 ) => {
   return (
     elementsAreInFrameBounds([element], frame) ||
-    FrameGeometry.isElementIntersectingFrame(element, frame) ||
+    isElementIntersectingFrame(element, frame) ||
     isElementContainingFrame([frame], element, frame)
   );
 };
@@ -273,7 +161,7 @@ export const groupsAreAtLeastIntersectingTheFrame = (
   return !!elementsInGroup.find(
     (element) =>
       elementsAreInFrameBounds([element], frame) ||
-      FrameGeometry.isElementIntersectingFrame(element, frame),
+      isElementIntersectingFrame(element, frame),
   );
 };
 
@@ -294,7 +182,7 @@ export const groupsAreCompletelyOutOfFrame = (
     elementsInGroup.find(
       (element) =>
         elementsAreInFrameBounds([element], frame) ||
-        FrameGeometry.isElementIntersectingFrame(element, frame),
+        isElementIntersectingFrame(element, frame),
     ) === undefined
   );
 };
@@ -354,7 +242,7 @@ export const getElementsInResizingFrame = (
   );
 
   for (const element of elementsNotCompletelyInFrame) {
-    if (!FrameGeometry.isElementIntersectingFrame(element, frame)) {
+    if (!isElementIntersectingFrame(element, frame)) {
       if (element.groupIds.length === 0) {
         nextElementsInFrame.delete(element);
       }
@@ -463,20 +351,17 @@ export const addElementsToFrame = (
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameElement,
 ) => {
-  const { allElementsIndexMap, currTargetFrameChildrenMap } =
-    allElements.reduce(
-      (acc, element, index) => {
-        acc.allElementsIndexMap.set(element.id, index);
-        if (element.frameId === frame.id) {
-          acc.currTargetFrameChildrenMap.set(element.id, true);
-        }
-        return acc;
-      },
-      {
-        allElementsIndexMap: new Map<ExcalidrawElement["id"], number>(),
-        currTargetFrameChildrenMap: new Map<ExcalidrawElement["id"], true>(),
-      },
-    );
+  const { currTargetFrameChildrenMap } = allElements.reduce(
+    (acc, element, index) => {
+      if (element.frameId === frame.id) {
+        acc.currTargetFrameChildrenMap.set(element.id, true);
+      }
+      return acc;
+    },
+    {
+      currTargetFrameChildrenMap: new Map<ExcalidrawElement["id"], true>(),
+    },
+  );
 
   const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
 
@@ -502,66 +387,6 @@ export const addElementsToFrame = (
     }
   }
 
-  const finalElementsToAddSet = new Set(finalElementsToAdd.map((el) => el.id));
-
-  const nextElements: ExcalidrawElement[] = [];
-
-  const processedElements = new Set<ExcalidrawElement["id"]>();
-
-  for (const element of allElements) {
-    if (processedElements.has(element.id)) {
-      continue;
-    }
-
-    processedElements.add(element.id);
-
-    if (
-      finalElementsToAddSet.has(element.id) ||
-      (element.frameId && element.frameId === frame.id)
-    ) {
-      // will be added in bulk once we process target frame
-      continue;
-    }
-
-    // target frame
-    if (element.id === frame.id) {
-      const currFrameChildren = getFrameElements(allElements, frame.id);
-      currFrameChildren.forEach((child) => {
-        processedElements.add(child.id);
-      });
-
-      // if not found, add all children on top by assigning the lowest index
-      const targetFrameIndex = allElementsIndexMap.get(frame.id) ?? -1;
-
-      const { newChildren_left, newChildren_right } = finalElementsToAdd.reduce(
-        (acc, element) => {
-          // if index not found, add on top of current frame children
-          const elementIndex = allElementsIndexMap.get(element.id) ?? Infinity;
-          if (elementIndex < targetFrameIndex) {
-            acc.newChildren_left.push(element);
-          } else {
-            acc.newChildren_right.push(element);
-          }
-          return acc;
-        },
-        {
-          newChildren_left: [] as ExcalidrawElement[],
-          newChildren_right: [] as ExcalidrawElement[],
-        },
-      );
-
-      nextElements.push(
-        ...newChildren_left,
-        ...currFrameChildren,
-        ...newChildren_right,
-        element,
-      );
-      continue;
-    }
-
-    nextElements.push(element);
-  }
-
   for (const element of finalElementsToAdd) {
     mutateElement(
       element,
@@ -571,8 +396,7 @@ export const addElementsToFrame = (
       false,
     );
   }
-
-  return nextElements;
+  return allElements.slice();
 };
 
 export const removeElementsFromFrame = (
@@ -580,20 +404,34 @@ export const removeElementsFromFrame = (
   elementsToRemove: NonDeletedExcalidrawElement[],
   appState: AppState,
 ) => {
-  const _elementsToRemove: ExcalidrawElement[] = [];
+  const _elementsToRemove = new Map<
+    ExcalidrawElement["id"],
+    ExcalidrawElement
+  >();
+
+  const toRemoveElementsByFrame = new Map<
+    ExcalidrawFrameElement["id"],
+    ExcalidrawElement[]
+  >();
 
   for (const element of elementsToRemove) {
     if (element.frameId) {
-      _elementsToRemove.push(element);
+      _elementsToRemove.set(element.id, element);
+
+      const arr = toRemoveElementsByFrame.get(element.frameId) || [];
+      arr.push(element);
 
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
-        _elementsToRemove.push(boundTextElement);
+        _elementsToRemove.set(boundTextElement.id, boundTextElement);
+        arr.push(boundTextElement);
       }
+
+      toRemoveElementsByFrame.set(element.frameId, arr);
     }
   }
 
-  for (const element of _elementsToRemove) {
+  for (const [, element] of _elementsToRemove) {
     mutateElement(
       element,
       {
@@ -603,13 +441,7 @@ export const removeElementsFromFrame = (
     );
   }
 
-  const nextElements = moveOneRight(
-    allElements,
-    appState,
-    Array.from(_elementsToRemove),
-  );
-
-  return nextElements;
+  return allElements.slice();
 };
 
 export const removeAllElementsFromFrame = (

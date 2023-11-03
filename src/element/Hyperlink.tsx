@@ -392,7 +392,7 @@ export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   appState: Pick<UIAppState, "zoom">,
-): [x: number, y: number, width: number, height: number] => {
+): Bounds => {
   const size = DEFAULT_LINK_SIZE;
   const zoom = appState.zoom.value > 1 ? appState.zoom.value : 1; //zsviczian
   const linkWidth = size / zoom; //zsviczian

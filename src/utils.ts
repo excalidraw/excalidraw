@@ -917,3 +917,17 @@ export const isRenderThrottlingEnabled = (() => {
     return false;
   };
 })();
+
+/** Checks if value is inside given collection. Useful for type-safety. */
+export const isMemberOf = <T extends string>(
+  /** Set/Map/Array/Object */
+  collection: Set<T> | readonly T[] | Record<T, any> | Map<T, any>,
+  /** value to look for */
+  value: string,
+): value is T => {
+  return collection instanceof Set || collection instanceof Map
+    ? collection.has(value as T)
+    : "includes" in collection
+    ? collection.includes(value as T)
+    : collection.hasOwnProperty(value);
+};

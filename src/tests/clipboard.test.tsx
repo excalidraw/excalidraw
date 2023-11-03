@@ -1,11 +1,6 @@
 import { vi } from "vitest";
 import ReactDOM from "react-dom";
-import {
-  render,
-  waitFor,
-  GlobalTestState,
-  createPasteEvent,
-} from "./test-utils";
+import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import { Excalidraw } from "../packages/excalidraw/index";
 import { KEYS } from "../keys";
@@ -16,7 +11,7 @@ import {
 import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
-import { copyToClipboard } from "../clipboard";
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
 const { h } = window;
 
@@ -37,7 +32,9 @@ vi.mock("../keys.ts", async (importOriginal) => {
 
 const sendPasteEvent = (text: string) => {
   const clipboardEvent = createPasteEvent({
-    "text/plain": text,
+    types: {
+      "text/plain": text,
+    },
   });
   document.dispatchEvent(clipboardEvent);
 };
@@ -86,7 +83,10 @@ beforeEach(async () => {
 describe("general paste behavior", () => {
   it("should randomize seed on paste", async () => {
     const rectangle = API.createElement({ type: "rectangle" });
-    const clipboardJSON = (await copyToClipboard([rectangle], null))!;
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rectangle],
+      files: null,
+    });
     pasteWithCtrlCmdV(clipboardJSON);
 
     await waitFor(() => {
@@ -97,7 +97,10 @@ describe("general paste behavior", () => {
 
   it("should retain seed on shift-paste", async () => {
     const rectangle = API.createElement({ type: "rectangle" });
-    const clipboardJSON = (await copyToClipboard([rectangle], null))!;
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rectangle],
+      files: null,
+    });
 
     // assert we don't randomize seed on shift-paste
     pasteWithCtrlCmdShiftV(clipboardJSON);
