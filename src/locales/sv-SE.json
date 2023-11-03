@@ -242,7 +242,8 @@
     "embeddable": "Bädda in (web)",
     "laser": "Laserpekare",
     "hand": "Hand (panoreringsverktyg)",
-    "extraTools": "Fler verktyg"
+    "extraTools": "Fler verktyg",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -501,5 +502,12 @@
         "description": "Inläsning av en extern ritning kommer <bold>ersätta ditt befintliga innehåll</bold>.<br></br>Du kan säkerhetskopiera din ritning först genom att använda ett av alternativen nedan."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
