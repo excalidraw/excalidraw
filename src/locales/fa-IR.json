@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "دست (ابزار پانینگ)",
-    "extraTools": "ابزارهای بیشتر"
+    "extraTools": "ابزارهای بیشتر",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -501,5 +502,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
