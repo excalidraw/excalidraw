@@ -242,7 +242,8 @@
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
-    "extraTools": "Więcej narzędzi"
+    "extraTools": "Więcej narzędzi",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -501,5 +502,12 @@
         "description": "Wczytanie zewnętrznego pliku <bold>nadpisze istniejącą zawartość</bold>.<br></br>Możesz najpierw utworzyć kopię zapasową swojego rysunku, używając jednej z poniższych opcji."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
