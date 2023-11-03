@@ -242,7 +242,8 @@
     "embeddable": "Nettinnbygging",
     "laser": "",
     "hand": "Hånd (panoreringsverktøy)",
-    "extraTools": "Flere verktøy"
+    "extraTools": "Flere verktøy",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
@@ -501,5 +502,12 @@
         "description": "Lasting av ekstern tegning vil <bold>erstatte ditt eksisterende innhold</bold>.<br></br>Du kan sikkerhetskopiere tegningen din først ved å bruke en av valgene nedenfor."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
