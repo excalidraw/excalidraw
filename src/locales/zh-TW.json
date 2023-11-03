@@ -242,7 +242,8 @@
     "embeddable": "嵌入網站",
     "laser": "雷射筆",
     "hand": "手形（平移工具）",
-    "extraTools": "更多工具"
+    "extraTools": "更多工具",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -501,5 +502,12 @@
         "description": "載入外部繪圖將<bold>取代您目前的內容</bold>。<br></br>可先使用下方的選項備份您的繪圖。"
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
