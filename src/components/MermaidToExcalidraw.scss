@@ -23,9 +23,14 @@ $verticalBreakpoint: 860px;
 
       .Modal__content {
         height: 100%;
+        max-height: 750px;
 
         @media screen and (max-width: $verticalBreakpoint) {
-          height: auto !important;
+          height: auto;
+          // When vertical, we want the height to span whole viewport.
+          // This is also important for the children not to overflow the
+          // modal/viewport (for some reason).
+          max-height: 100%;
         }
 
         .Island {
