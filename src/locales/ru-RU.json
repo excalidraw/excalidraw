@@ -243,7 +243,7 @@
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Из Mermaid в Excalidraw"
   },
   "headings": {
     "canvasActions": "Операции холста",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Из Mermaid в Excalidraw",
+    "button": "Вставить",
+    "description": "В настоящее время поддерживаются только <flowchartLink>Блок-схемы</flowchartLink> и <sequenceLink>Диаграммы последовательности</sequenceLink>. Другие типы будут выведены как изображение в Excalidraw.",
+    "syntax": "Синтаксис Mermaid",
+    "preview": "Предпросмотр"
   }
 }
