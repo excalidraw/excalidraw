@@ -242,7 +242,8 @@
     "embeddable": "",
     "laser": "",
     "hand": "Tangan (alat panning)",
-    "extraTools": "Alat-alat lain"
+    "extraTools": "Alat-alat lain",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -501,5 +502,12 @@
         "description": "Memuat dari file yang akan <bold>menggantikan konten Anda sekarang</bold>.<br></br>Anda dapat mencadangkan gambar anda dulu menggunakan opsi-opsi ini."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
