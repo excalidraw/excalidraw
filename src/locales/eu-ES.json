@@ -242,7 +242,8 @@
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "hand": "Eskua (panoratze tresna)",
-    "extraTools": "Tresna gehiago"
+    "extraTools": "Tresna gehiago",
+    "mermaidToExcalidraw": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -501,5 +502,12 @@
         "description": "Kanpoko irudi bat kargatzeak <bold>lehendik duzun edukia ordezkatuko du</bold>.<br></br>. Zure marrazkiaren babeskopia egin dezakezu lehenik beheko aukeretako bat erabiliz."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
