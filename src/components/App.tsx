@@ -40,7 +40,7 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { ActionResult } from "../actions/types";
+import { Action, ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
@@ -601,7 +601,9 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
-        actionManager: this.actionManager,
+        registerAction: (action: Action) => {
+          this.actionManager.registerAction(action);
+        },
         addSubtype: this.addSubtype,
         refresh: this.refresh,
         setToast: this.setToast,
@@ -649,11 +651,7 @@ class App extends React.Component<AppProps, AppState> {
         this.refresh();
       }
     };
-    const prep = prepareSubtype(record, subtypePrepFn, subtypeLoadedCb);
-    if (prep.actions) {
-      this.actionManager.registerAll(prep.actions);
-    }
-    return prep;
+    return prepareSubtype(record, subtypePrepFn, subtypeLoadedCb);
   }
 
   private onWindowMessage(event: MessageEvent) {

@@ -634,7 +634,7 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
-  actionManager: InstanceType<typeof App>["actionManager"];
+  registerAction: (action: Action) => void;
   addSubtype: (
     record: SubtypeRecord,
     subtypePrepFn: SubtypePrepFn,

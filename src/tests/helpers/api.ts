@@ -22,7 +22,6 @@ import {
   checkRefreshOnSubtypeLoad,
   prepareSubtype,
   selectSubtype,
-  subtypeActionPredicate,
 } from "../../element/subtypes";
 import {
   maybeGetSubtypeProps,
@@ -42,13 +41,6 @@ const readFile = util.promisify(fs.readFile);
 const { h } = window;
 
 export class API {
-  constructor() {
-    h.app.actionManager.registerActionPredicate(subtypeActionPredicate);
-    if (true) {
-      // Call `prepareSubtype()` here for `@excalidraw/excalidraw`-specific subtypes
-    }
-  }
-
   static addSubtype = (record: SubtypeRecord, subtypePrepFn: SubtypePrepFn) => {
     const subtypeLoadedCb: SubtypeLoadedCb = (hasSubtype) => {
       if (checkRefreshOnSubtypeLoad(hasSubtype, h.elements)) {

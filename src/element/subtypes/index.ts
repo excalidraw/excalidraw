@@ -484,6 +484,9 @@ export const useSubtype = (
       const prep = api.addSubtype(record, subtypePrepFn);
       if (prep) {
         addSubtypeMethods(record.subtype, prep.methods);
+        if (prep.actions) {
+          prep.actions.forEach((action) => api.registerAction(action));
+        }
       }
     }
   }, [api, record, subtypePrepFn]);
