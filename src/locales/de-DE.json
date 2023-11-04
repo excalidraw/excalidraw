@@ -243,7 +243,7 @@
     "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid zu Excalidraw"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid zu Excalidraw",
+    "button": "Einfügen",
+    "description": "Derzeit werden nur <flowchartLink>Flussdiagramme</flowchartLink> und <sequenceLink>Sequenzdiagramme</sequenceLink> unterstützt. Die anderen Typen werden als Bild in Excalidraw dargestellt.",
+    "syntax": "Mermaid-Syntax",
+    "preview": "Vorschau"
   }
 }
