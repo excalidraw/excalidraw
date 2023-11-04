@@ -506,7 +506,7 @@
   "mermaid": {
     "title": "Mermaid do Excalidraw",
     "button": "Vložiť",
-    "description": "",
+    "description": "Aktuálne sú podporované iba <flowchartLink>vývojové</flowchartLink> a <sequenceLink>sekvenčné</sequenceLink> diagramy. Ostatné typy budú v Excalidraw vykreslené ako obrázky.",
     "syntax": "Mermaid syntax",
     "preview": "Ukážka"
   }
