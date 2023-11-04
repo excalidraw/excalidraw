@@ -506,7 +506,7 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前仅支持 <flowchartLink>流程图</flowchartLink> 和 <sequenceLink>序列图</sequenceLink> 。其他类型在 Excalidraw 中将以图像呈现。",
+    "description": "目前仅支持<flowchartLink>流程图</flowchartLink>和<sequenceLink>序列图</sequenceLink>。其他类型在 Excalidraw 中将以图像呈现。",
     "syntax": "Mermaid 语法",
     "preview": "预览"
   }
