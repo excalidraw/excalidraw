@@ -23,7 +23,11 @@ const sidebars = {
       },
       items: ["introduction/development", "introduction/contributing"],
     },
-    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
+    {
+      type: "category",
+      label: "Codebase",
+      items: ["codebase/json-schema", "codebase/frames"],
+    },
     {
       type: "category",
       label: "@excalidraw/excalidraw",
@@ -81,12 +85,8 @@ const sidebars = {
                 "@excalidraw/excalidraw/api/utils/restore",
               ],
             },
-            {
-              type: "category",
-              label: "Constants",
-              link: { type: "doc", id: "@excalidraw/excalidraw/api/constants" },
-              items: [],
-            },
+            "@excalidraw/excalidraw/api/constants",
+            "@excalidraw/excalidraw/api/excalidraw-element-skeleton",
           ],
         },
         "@excalidraw/excalidraw/faq",

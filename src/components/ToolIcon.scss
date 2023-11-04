@@ -97,10 +97,6 @@
       }
     }
 
-    // &:hover {
-    //   background-color: var(--button-gray-2);
-    // }
-
     &:active {
       background-color: var(--button-gray-3);
     }
@@ -110,7 +106,6 @@
     }
 
     &--hide {
-      // visibility: hidden;
       display: none !important;
     }
   }
@@ -165,10 +160,24 @@
       width: var(--lg-button-size);
       height: var(--lg-button-size);
 
+      @media screen and (max-width: 450px) {
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+      @media screen and (max-width: 379px) {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
       svg {
         width: var(--lg-icon-size);
         height: var(--lg-icon-size);
       }
+    }
+
+    .ToolIcon__LaserPointer .ToolIcon__icon {
+      width: var(--default-button-size);
+      height: var(--default-button-size);
     }
   }
 }

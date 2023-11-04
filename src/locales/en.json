@@ -164,6 +164,7 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
+    "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
     "clear": "Clear",
@@ -202,6 +203,7 @@
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
+    "failedToFetchImage": "Failed to fetch image.",
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
@@ -216,7 +218,10 @@
     "libraryElementTypeError": {
       "embeddable": "Embeddable elements cannot be added to the library.",
       "image": "Support for adding images to the library coming soon!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
+    "asyncPasteFailedOnParse": "Couldn't paste.",
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
   },
   "toolBar": {
     "selection": "Selection",
@@ -235,8 +240,10 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "embeddable": "Web Embed",
+    "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
-    "extraTools": "More tools"
+    "extraTools": "More tools",
+    "mermaidToExcalidraw": "Mermaid to Excalidraw"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -264,7 +271,8 @@
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
-    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page."
+    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -494,5 +502,12 @@
         "description": "Loading external drawing will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first by using one of the options below."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid to Excalidraw",
+    "button": "Insert",
+    "description": "Currently only <flowchartLink>Flowcharts</flowchartLink> and <sequenceLink>Sequence Diagrams</sequenceLink> are supported. The other types will be rendered as image in Excalidraw.",
+    "syntax": "Mermaid Syntax",
+    "preview": "Preview"
   }
 }
