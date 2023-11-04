@@ -18,6 +18,7 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
 } from "./element/types";
+import { Action } from "./actions/types";
 import { SHAPES } from "./shapes";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
@@ -608,7 +609,7 @@ export type ExcalidrawImperativeAPI = {
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
-  actionManager: InstanceType<typeof App>["actionManager"];
+  registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
