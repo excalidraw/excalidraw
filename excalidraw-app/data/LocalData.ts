@@ -6,7 +6,7 @@
  *
  * - DataState refers to full state of the app: appState, elements, images,
  *   though some state is saved separately (collab username, library) for one
- *   reason or another. We also save different data to different sotrage
+ *   reason or another. We also save different data to different storage
  *   (localStorage, indexedDB).
  */
 
