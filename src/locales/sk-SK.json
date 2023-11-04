@@ -219,9 +219,9 @@
       "embeddable": "Zapustené prvky nie je možné pridať do knižnice.",
       "image": "Podpora pre pridávanie obrázkov do knižnice bude dostupná už čoskoro!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Vloženie sa nepodarilo (nebolo možné prečítať obsah schránky).",
+    "asyncPasteFailedOnParse": "Vloženie sa nepodarilo.",
+    "copyToSystemClipboardFailed": "Kopírovanie do schránky sa nepodarilo."
   },
   "toolBar": {
     "selection": "Výber",
@@ -243,7 +243,7 @@
     "laser": "Laserový ukazovateľ",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid do Excalidraw"
   },
   "headings": {
     "canvasActions": "Akcie plátna",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "Mermaid do Excalidraw",
+    "button": "Vložiť",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Mermaid syntax",
+    "preview": "Ukážka"
   }
 }
