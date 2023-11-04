@@ -36,9 +36,7 @@ type MobileMenuProps = {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: () => void;
-  interactiveCanvas: HTMLCanvasElement | null;
 
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -58,8 +56,7 @@ export const MobileMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  interactiveCanvas,
-  onImageAction,
+
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
@@ -85,14 +82,8 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
-                      interactiveCanvas={interactiveCanvas}
                       activeTool={appState.activeTool}
                       app={app}
-                      onImageAction={({ pointerType }) => {
-                        onImageAction({
-                          insertOnCanvasDirectly: pointerType !== "mouse",
-                        });
-                      }}
                     />
                   </Stack.Row>
                 </Island>

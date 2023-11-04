@@ -13,6 +13,7 @@ import {
   MaybeTransformHandleType,
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
+import { Bounds } from "./bounds";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -87,7 +88,7 @@ export const getElementWithTransformHandleType = (
 };
 
 export const getTransformHandleTypeFromCoords = (
-  [x1, y1, x2, y2]: readonly [number, number, number, number],
+  [x1, y1, x2, y2]: Bounds,
   scenePointerX: number,
   scenePointerY: number,
   zoom: Zoom,

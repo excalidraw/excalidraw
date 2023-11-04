@@ -39,6 +39,8 @@ import {
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
 import { assertNever, getFontString } from "../utils";
+import { getSizeFromPoints } from "../points";
+import { randomId } from "../random";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -159,7 +161,7 @@ export type ExcalidrawElementSkeleton =
     } & Partial<ExcalidrawImageElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
-  width: 300,
+  width: 100,
   height: 0,
 };
 
@@ -357,6 +359,48 @@ const bindLinearElementToElement = (
       );
     }
   }
+
+  // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
+  const endPointIndex = linearElement.points.length - 1;
+  const delta = 0.5;
+  const newPoints = JSON.parse(JSON.stringify(linearElement.points));
+  // left to right so shift the arrow towards right
+  if (
+    linearElement.points[endPointIndex][0] >
+    linearElement.points[endPointIndex - 1][0]
+  ) {
+    newPoints[0][0] = delta;
+    newPoints[endPointIndex][0] -= delta;
+  }
+
+  // right to left so shift the arrow towards left
+  if (
+    linearElement.points[endPointIndex][0] <
+    linearElement.points[endPointIndex - 1][0]
+  ) {
+    newPoints[0][0] = -delta;
+    newPoints[endPointIndex][0] += delta;
+  }
+  // top to bottom so shift the arrow towards top
+  if (
+    linearElement.points[endPointIndex][1] >
+    linearElement.points[endPointIndex - 1][1]
+  ) {
+    newPoints[0][1] = delta;
+    newPoints[endPointIndex][1] -= delta;
+  }
+
+  // bottom to top so shift the arrow towards bottom
+  if (
+    linearElement.points[endPointIndex][1] <
+    linearElement.points[endPointIndex - 1][1]
+  ) {
+    newPoints[0][1] = -delta;
+    newPoints[endPointIndex][1] += delta;
+  }
+
+  Object.assign(linearElement, { points: newPoints });
+
   return {
     linearElement,
     startBoundElement,
@@ -384,18 +428,28 @@ class ElementStore {
 }
 
 export const convertToExcalidrawElements = (
-  elements: ExcalidrawElementSkeleton[] | null,
+  elementsSkeleton: ExcalidrawElementSkeleton[] | null,
+  opts?: { regenerateIds: boolean },
 ) => {
-  if (!elements) {
+  if (!elementsSkeleton) {
     return [];
   }
+  const elements: ExcalidrawElementSkeleton[] = JSON.parse(
+    JSON.stringify(elementsSkeleton),
+  );
 
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
+  const oldToNewElementIdMap = new Map<string, string>();
 
   // Create individual elements
   for (const element of elements) {
     let excalidrawElement: ExcalidrawElement;
+    const originalId = element.id;
+    if (opts?.regenerateIds !== false) {
+      Object.assign(element, { id: randomId() });
+    }
+
     switch (element.type) {
       case "rectangle":
       case "ellipse":
@@ -444,6 +498,11 @@ export const convertToExcalidrawElements = (
           ],
           ...element,
         });
+
+        Object.assign(
+          excalidrawElement,
+          getSizeFromPoints(excalidrawElement.points),
+        );
         break;
       }
       case "text": {
@@ -499,6 +558,9 @@ export const convertToExcalidrawElements = (
     } else {
       elementStore.add(excalidrawElement);
       elementsWithIds.set(excalidrawElement.id, element);
+      if (originalId) {
+        oldToNewElementIdMap.set(originalId, excalidrawElement.id);
+      }
     }
   }
 
@@ -524,6 +586,18 @@ export const convertToExcalidrawElements = (
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
               element.type === "arrow" ? element?.end : undefined;
+            if (originalStart && originalStart.id) {
+              const newStartId = oldToNewElementIdMap.get(originalStart.id);
+              if (newStartId) {
+                Object.assign(originalStart, { id: newStartId });
+              }
+            }
+            if (originalEnd && originalEnd.id) {
+              const newEndId = oldToNewElementIdMap.get(originalEnd.id);
+              if (newEndId) {
+                Object.assign(originalEnd, { id: newEndId });
+              }
+            }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
                 container as ExcalidrawArrowElement,
@@ -539,13 +613,23 @@ export const convertToExcalidrawElements = (
         } else {
           switch (element.type) {
             case "arrow": {
+              const { start, end } = element;
+              if (start && start.id) {
+                const newStartId = oldToNewElementIdMap.get(start.id);
+                Object.assign(start, { id: newStartId });
+              }
+              if (end && end.id) {
+                const newEndId = oldToNewElementIdMap.get(end.id);
+                Object.assign(end, { id: newEndId });
+              }
               const { linearElement, startBoundElement, endBoundElement } =
                 bindLinearElementToElement(
                   excalidrawElement as ExcalidrawArrowElement,
-                  element.start,
-                  element.end,
+                  start,
+                  end,
                   elementStore,
                 );
+
               elementStore.add(linearElement);
               elementStore.add(startBoundElement);
               elementStore.add(endBoundElement);

@@ -28,6 +28,7 @@ const embeddedLinkCache = new Map<string, EmbeddedLink>();
 
 const RE_YOUTUBE =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
@@ -47,6 +48,9 @@ const RE_VALTOWN =
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
+const RE_GIPHY =
+  /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -59,6 +63,7 @@ const ALLOWED_DOMAINS = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
+  "giphy.com",
 ]);
 
 const createSrcDoc = (body: string) => {
@@ -306,6 +311,10 @@ export const extractSrc = (htmlString: string): string => {
   const gistMatch = htmlString.match(RE_GH_GIST_EMBED);
   if (gistMatch && gistMatch.length === 2) {
     return gistMatch[1];
+  }
+
+  if (RE_GIPHY.test(htmlString)) {
+    return `https://giphy.com/embed/${RE_GIPHY.exec(htmlString)![1]}`;
   }
 
   const match = htmlString.match(RE_GENERIC_EMBED);

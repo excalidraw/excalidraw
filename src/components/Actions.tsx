@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement, PointerType } from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "../components/App";
 import {
@@ -11,7 +11,6 @@ import {
   hasBackground,
   hasStrokeStyle,
   hasStrokeWidth,
-  hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
 import { AppClassProperties, UIAppState, Zoom } from "../types";
@@ -21,7 +20,7 @@ import { ToolButton } from "./ToolButton";
 import { SubtypeShapeActions, SubtypeToggles } from "./Subtypes";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement } from "../element/typeChecks";
+import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
@@ -67,7 +66,8 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    hasBackground(appState.activeTool.type) ||
+    (hasBackground(appState.activeTool.type) &&
+      !isTransparent(appState.currentItemBackgroundColor)) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
@@ -125,14 +125,15 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
-      {(hasText(appState.activeTool.type) ||
-        targetElements.some((element) => hasText(element.type))) && (
+      {(appState.activeTool.type === "text" ||
+        targetElements.some(isTextElement)) && (
         <>
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}
 
-          {suppportsHorizontalAlign(targetElements) &&
+          {(appState.activeTool.type === "text" ||
+            suppportsHorizontalAlign(targetElements)) &&
             renderAction("changeTextAlign")}
         </>
       )}
@@ -215,15 +216,11 @@ export const SelectedShapeActions = ({
 };
 
 export const ShapesSwitcher = ({
-  interactiveCanvas,
   activeTool,
-  onImageAction,
   appState,
   app,
 }: {
-  interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
-  onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: UIAppState;
   app: AppClassProperties;
 }) => {
@@ -265,9 +262,13 @@ export const ShapesSwitcher = ({
               if (appState.activeTool.type !== value) {
                 trackEvent("toolbar", value, "ui");
               }
-              app.setActiveTool({ type: value });
               if (value === "image") {
-                onImageAction({ pointerType });
+                app.setActiveTool({
+                  type: value,
+                  insertOnCanvasDirectly: pointerType !== "mouse",
+                });
+              } else {
+                app.setActiveTool({ type: value });
               }
             }}
           />

@@ -1493,6 +1493,7 @@ const createMathActions = () => {
               : element;
             return isMathElement(el) && el.customData?.mathOnly;
           },
+          true,
           null,
         );
         if (mathOnly === null) {
@@ -1554,6 +1555,7 @@ const createMathActions = () => {
             ? getMathProps.ensureMathProps(el.customData).mathOnly
             : null;
         },
+        true,
         getMathProps.getMathOnly(appState),
       );
       return (
