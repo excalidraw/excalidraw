@@ -16,6 +16,7 @@ import {
   SendToBackIcon,
 } from "../components/icons";
 import { isDarwin } from "../constants";
+import { Button } from "../components/Button";
 
 export const actionSendBackward = register({
   name: "sendBackward",
@@ -34,14 +35,13 @@ export const actionSendBackward = register({
     !event.shiftKey &&
     event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
+    <Button
+      onSelect={() => updateData(null)}
       className="zIndexButton"
-      onClick={() => updateData(null)}
       title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
     >
       {SendBackwardIcon}
-    </button>
+    </Button>
   ),
 });
 
@@ -62,14 +62,13 @@ export const actionBringForward = register({
     !event.shiftKey &&
     event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
+    <Button
+      onSelect={() => updateData(null)}
       className="zIndexButton"
-      onClick={() => updateData(null)}
       title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
     >
       {BringForwardIcon}
-    </button>
+    </Button>
   ),
 });
 
@@ -93,10 +92,9 @@ export const actionSendToBack = register({
         event.shiftKey &&
         event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
+    <Button
+      onSelect={() => updateData(null)}
       className="zIndexButton"
-      onClick={() => updateData(null)}
       title={`${t("labels.sendToBack")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+[")
@@ -104,7 +102,7 @@ export const actionSendToBack = register({
       }`}
     >
       {SendToBackIcon}
-    </button>
+    </Button>
   ),
 });
 
@@ -129,10 +127,9 @@ export const actionBringToFront = register({
         event.shiftKey &&
         event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
-      type="button"
+    <Button
+      onSelect={() => updateData(null)}
       className="zIndexButton"
-      onClick={(event) => updateData(null)}
       title={`${t("labels.bringToFront")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+]")
@@ -140,6 +137,6 @@ export const actionBringToFront = register({
       }`}
     >
       {BringToFrontIcon}
-    </button>
+    </Button>
   ),
 });

@@ -16,6 +16,7 @@ import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { jotaiScope } from "../jotai";
+import { Button } from "./Button";
 
 export type DialogSize = number | "small" | "regular" | "wide" | undefined;
 
@@ -113,14 +114,14 @@ export const Dialog = (props: DialogProps) => {
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
         )}
-        <button
+        <Button
+          onSelect={onClose}
           className="Dialog__close"
-          onClick={onClose}
           title={t("buttons.close")}
           aria-label={t("buttons.close")}
         >
           {device.isMobile ? back : CloseIcon}
-        </button>
+        </Button>
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>
