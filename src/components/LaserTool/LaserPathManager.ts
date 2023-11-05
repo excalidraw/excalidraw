@@ -7,11 +7,15 @@ import { get } from "idb-keyval";
 
 // decay time in milliseconds
 const DECAY_TIME = 1000;
-const getDecayTime = () => (window as any).ExcalidrawAutomate?.LASERPOINTER?.DECAY_TIME??DECAY_TIME; //zsviczian
+const getDecayTime = () =>
+  (window as any).ExcalidrawAutomate?.LASERPOINTER?.DECAY_TIME ?? DECAY_TIME; //zsviczian
 // length of line in points before it starts decaying
 const DECAY_LENGTH = 50;
-const getDecayLength = () => (window as any).ExcalidrawAutomate?.LASERPOINTER?.DECAY_LENGTH??DECAY_LENGTH; //zsviczian
-const getColor = () => (window as any).ExcalidrawAutomate?.LASERPOINTER?.COLOR??"red"; //zsviczian
+const getDecayLength = () =>
+  (window as any).ExcalidrawAutomate?.LASERPOINTER?.DECAY_LENGTH ??
+  DECAY_LENGTH; //zsviczian
+const getColor = () =>
+  (window as any).ExcalidrawAutomate?.LASERPOINTER?.COLOR ?? "red"; //zsviczian
 
 const average = (a: number, b: number) => (a + b) / 2;
 function getSvgPathFromStroke(points: number[][], closed = true) {
@@ -274,7 +278,9 @@ export class LaserPathManager {
       state.finishedPaths = state.finishedPaths.filter((path) => {
         const lastPoint = path.originalPoints[path.originalPoints.length - 1];
 
-        return !(lastPoint && lastPoint[2] < performance.now() - getDecayTime()); //zsviczian
+        return !(
+          lastPoint && lastPoint[2] < performance.now() - getDecayTime()
+        ); //zsviczian
       });
 
       let paths = state.finishedPaths.map((path) => this.draw(path)).join(" ");

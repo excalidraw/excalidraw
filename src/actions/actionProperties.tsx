@@ -452,7 +452,8 @@ export const actionChangeStrokeWidth = register({
       <ButtonIconSelect
         group="stroke-width"
         options={[
-          { //zsviczian
+          {
+            //zsviczian
             value: 0.5,
             text: t("labels.extraThin"),
             icon: StrokeWidthThinIcon,

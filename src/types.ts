@@ -314,8 +314,8 @@ export type AppState = {
   currentStrokeOptions?: any; //zsviczian
   resetCustomPen?: any; //zsviczian
   gridColor: { Bold: string; Regular: string; MajorGridFrequency?: number }; //zsviczian
-  dynamicStyle: {[x: string]: string;}; //zsviczian
-  frameColor: {stroke: string; fill: string}; //zsviczian
+  dynamicStyle: { [x: string]: string }; //zsviczian
+  frameColor: { stroke: string; fill: string }; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 

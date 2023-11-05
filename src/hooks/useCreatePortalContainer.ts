@@ -5,7 +5,7 @@ import { useUIAppState } from "../context/ui-appState";
 export const useCreatePortalContainer = (opts?: {
   className?: string;
   parentSelector?: string;
-  style?: {[x: string]: string;}; //zsviczian - Obsidian Dynamic Style
+  style?: { [x: string]: string }; //zsviczian - Obsidian Dynamic Style
 }) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
@@ -23,7 +23,8 @@ export const useCreatePortalContainer = (opts?: {
       div.classList.toggle("excalidraw--mobile", device.isMobile);
       div.classList.toggle("excalidraw--mobile", isMobileRef.current);
       div.classList.toggle("theme--dark", theme === "dark");
-      if(opts?.style) { //zsviczian
+      if (opts?.style) {
+        //zsviczian
         const style = opts.style;
         const styleString = Object.keys(style)
           .map((property) => `${property}: ${style[property]}`)

@@ -1219,7 +1219,20 @@ class App extends React.Component<AppProps, AppState> {
         editingElement: this.state.editingElement,
         pendingImageElementId: this.state.pendingImageElementId,
       });
-    
+
+    const shouldBlockPointerEvents =
+      !(
+        this.state.editingElement && isLinearElement(this.state.editingElement)
+      ) &&
+      (this.state.selectionElement ||
+        this.state.draggingElement ||
+        this.state.resizingElement ||
+        (this.state.activeTool.type === "laser" &&
+          // technically we can just test on this once we make it more safe
+          this.state.cursorButton === "down") ||
+        (this.state.editingElement &&
+          !isTextElement(this.state.editingElement)));
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1229,19 +1242,15 @@ class App extends React.Component<AppProps, AppState> {
             (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
               this.state.trayModeEnabled), //zsviczian
         })}
-        style={{...{//zsviczian added dynamicStyle
-          ["--ui-pointerEvents" as any]:
-            this.state.selectionElement ||
-            this.state.draggingElement ||
-            this.state.resizingElement ||
-            (this.state.activeTool.type === "laser" &&
-              // technically we can just test on this once we make it more safe
-              this.state.cursorButton === "down") ||
-            (this.state.editingElement &&
-              !isTextElement(this.state.editingElement))
+        style={{
+          ...{
+            //zsviczian added dynamicStyle
+            ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
               ? POINTER_EVENTS.disabled
               : POINTER_EVENTS.enabled,
-        }, ...this.state.dynamicStyle,}} //zsviczian
+          },
+          ...this.state.dynamicStyle,
+        }} //zsviczian
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}
