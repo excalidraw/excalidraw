@@ -9,3 +9,4 @@
 !src/
 !tsconfig.json
 !yarn.lock
+!launcher.py
