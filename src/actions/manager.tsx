@@ -29,7 +29,7 @@ const trackAction = (
           trackEvent(
             action.trackEvent.category,
             action.trackEvent.action || action.name,
-            `${source} (${app.device.isMobile ? "mobile" : "desktop"})`,
+            `${source} (${app.device.editor.isMobile ? "mobile" : "desktop"})`,
           );
         }
       }

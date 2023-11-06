@@ -119,7 +119,7 @@ export const Dialog = (props: DialogProps) => {
           title={t("buttons.close")}
           aria-label={t("buttons.close")}
         >
-          {device.isMobile ? back : CloseIcon}
+          {device.editor.isMobile ? back : CloseIcon}
         </button>
         <div className="Dialog__content">{props.children}</div>
       </Island>

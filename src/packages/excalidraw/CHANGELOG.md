@@ -19,6 +19,10 @@ Please add the latest change on the top under the correct section.
 - Regenerate ids by default when using transform api and also update bindings by 0.5px to avoid possible overlapping [#7195](https://github.com/excalidraw/excalidraw/pull/7195)
 - Add `selected` prop for `MainMenu.Item` and `MainMenu.ItemCustom` components to indicate active state. [#7078](https://github.com/excalidraw/excalidraw/pull/7078)
 
+#### BREAKING CHANGES
+
+- [`useDevice`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils#usedevice) hook's return value was changed to differentiate between `editor` and `viewport` breakpoints. [#7243](https://github.com/excalidraw/excalidraw/pull/7243)
+
 ## 0.16.1 (2023-09-21)
 
 ## Excalidraw Library

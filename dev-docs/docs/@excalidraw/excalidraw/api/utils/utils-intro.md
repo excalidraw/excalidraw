@@ -299,7 +299,7 @@ Open the `main menu` in the below example to view the footer.
 ```jsx live noInline
 const MobileFooter = ({}) => {
   const device = useDevice();
-  if (device.isMobile) {
+  if (device.editor.isMobile) {
     return (
       <Footer>
         <button
@@ -335,7 +335,6 @@ The `device` has the following `attributes`
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `isSmScreen` | `boolean` | Set to `true` when the device small screen is small (Width < `640px` ) |
 | `isMobile` | `boolean` | Set to `true` when the device is `mobile` |
 | `isTouchScreen` | `boolean` | Set to `true` for `touch` devices |
 | `canDeviceFitSidebar` | `boolean` | Implies whether there is enough space to fit the `sidebar` |
