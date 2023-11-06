@@ -1662,7 +1662,37 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private refreshDeviceState = () => {
+  private isMobileBreakpoint = (width: number, height: number) => {
+    return (
+      width < MQ_MAX_WIDTH_PORTRAIT ||
+      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+    );
+  };
+
+  private refreshViewportBreakpoints = () => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
+      document.body;
+
+    const prevViewportState = this.device.viewport;
+
+    const nextViewportState = updateObject(prevViewportState, {
+      isLandscape: viewportWidth > viewportHeight,
+      isMobile: this.isMobileBreakpoint(viewportWidth, viewportHeight),
+    });
+
+    if (prevViewportState !== nextViewportState) {
+      this.device = { ...this.device, viewport: nextViewportState };
+      return true;
+    }
+    return false;
+  };
+
+  private refreshEditorBreakpoints = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
       return;
@@ -1670,31 +1700,24 @@ class App extends React.Component<AppProps, AppState> {
 
     const { width: editorWidth, height: editorHeight } =
       container.getBoundingClientRect();
-    const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
-      document.body;
 
     const sidebarBreakpoint =
       this.props.UIOptions.dockedSidebarBreakpoint != null
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
 
-    const isMobile = (width: number, height: number) => {
-      return (
-        width < MQ_MAX_WIDTH_PORTRAIT ||
-        (width < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
-      );
-    };
+    const prevEditorState = this.device.editor;
 
-    this.device = updateObject(this.device, {
-      viewport: {
-        isLandscape: viewportWidth > editorHeight,
-        isMobile: isMobile(viewportWidth, viewportHeight),
-      },
-      editor: {
-        isMobile: isMobile(editorWidth, editorHeight),
-        canFitSidebar: editorWidth > sidebarBreakpoint,
-      },
+    const nextEditorState = updateObject(prevEditorState, {
+      isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
+      canFitSidebar: editorWidth > sidebarBreakpoint,
     });
+
+    if (prevEditorState !== nextEditorState) {
+      this.device = { ...this.device, editor: nextEditorState };
+      return true;
+    }
+    return false;
   };
 
   public async componentDidMount() {
@@ -1741,16 +1764,13 @@ class App extends React.Component<AppProps, AppState> {
       // in mobile breakpoint (0 width/height), making everything fail
       !isTestEnv()
     ) {
-      this.refreshDeviceState();
+      this.refreshViewportBreakpoints();
+      this.refreshEditorBreakpoints();
     }
 
     if (supportsResizeObserver && this.excalidrawContainerRef.current) {
       this.resizeObserver = new ResizeObserver(() => {
-        // recompute device dimensions state
-        // ---------------------------------------------------------------------
-        this.refreshDeviceState();
-        // refresh offsets
-        // ---------------------------------------------------------------------
+        this.refreshEditorBreakpoints();
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
@@ -1798,11 +1818,12 @@ class App extends React.Component<AppProps, AppState> {
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => ShapeCache.delete(element));
-    this.setState({});
+    this.refreshViewportBreakpoints();
+    this.updateDOMRect();
     if (!supportsResizeObserver) {
-      this.refreshDeviceState();
-      this.updateDOMRect();
+      this.refreshEditorBreakpoints();
     }
+    this.setState({});
   });
 
   private removeEventListeners() {
@@ -1942,7 +1963,7 @@ class App extends React.Component<AppProps, AppState> {
       prevProps.UIOptions.dockedSidebarBreakpoint !==
       this.props.UIOptions.dockedSidebarBreakpoint
     ) {
-      this.refreshDeviceState();
+      this.refreshEditorBreakpoints();
     }
 
     if (

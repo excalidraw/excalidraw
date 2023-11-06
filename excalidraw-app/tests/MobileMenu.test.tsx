@@ -17,8 +17,10 @@ describe("Test MobileMenu", () => {
 
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
-    //@ts-ignore
-    h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
+    // @ts-ignore
+    h.app.refreshViewportBreakpoints();
+    // @ts-ignore
+    h.app.refreshEditorBreakpoints();
   });
 
   afterAll(() => {
@@ -30,7 +32,7 @@ describe("Test MobileMenu", () => {
       {
         "editor": {
           "canFitSidebar": false,
-          "isMobile": false,
+          "isMobile": true,
         },
         "isTouchScreen": false,
         "viewport": {
