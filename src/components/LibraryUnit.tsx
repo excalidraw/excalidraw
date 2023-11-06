@@ -47,7 +47,7 @@ export const LibraryUnit = memo(
     }, [svg]);
 
     const [isHovered, setIsHovered] = useState(false);
-    const isMobile = useDevice().isMobile;
+    const isMobile = useDevice().editor.isMobile;
     const adder = isPending && (
       <div className="library-unit__adder">{PlusIcon}</div>
     );

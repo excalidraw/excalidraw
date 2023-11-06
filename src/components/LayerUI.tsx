@@ -246,7 +246,7 @@ const LayerUI = ({
                       >
                         <HintViewer
                           appState={appState}
-                          isMobile={device.isMobile}
+                          isMobile={device.editor.isMobile}
                           device={device}
                           app={app}
                         />
@@ -314,7 +314,7 @@ const LayerUI = ({
             )}
           >
             <UserList collaborators={appState.collaborators} />
-            {renderTopRightUI?.(device.isMobile, appState)}
+            {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
@@ -335,7 +335,7 @@ const LayerUI = ({
           trackEvent(
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${device.isMobile ? "mobile" : "desktop"})`,
+            `(${device.editor.isMobile ? "mobile" : "desktop"})`,
           );
         }}
       />
@@ -363,7 +363,7 @@ const LayerUI = ({
             trackEvent(
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${device.isMobile ? "mobile" : "desktop"})`,
+              `button (${device.editor.isMobile ? "mobile" : "desktop"})`,
             );
           }
         }}
@@ -380,7 +380,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && !device.isMobile && (
+      {eyeDropperState && !device.editor.isMobile && (
         <EyeDropper
           colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
@@ -450,7 +450,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && (
+      {device.editor.isMobile && (
         <MobileMenu
           app={app}
           appState={appState}
@@ -469,14 +469,14 @@ const LayerUI = ({
           renderWelcomeScreen={renderWelcomeScreen}
         />
       )}
-      {!device.isMobile && (
+      {!device.editor.isMobile && (
         <>
           <div
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
               isSidebarDocked &&
-              device.canDeviceFitSidebar
+              device.editor.canFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
             }

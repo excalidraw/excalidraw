@@ -220,8 +220,6 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 
 // breakpoints
 // -----------------------------------------------------------------------------
-// sm screen
-export const MQ_SM_MAX_WIDTH = 640;
 // md screen
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;

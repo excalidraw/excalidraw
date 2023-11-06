@@ -21,7 +21,7 @@ const WelcomeScreenMenuItemContent = ({
     <>
       <div className="welcome-screen-menu-item__icon">{icon}</div>
       <div className="welcome-screen-menu-item__text">{children}</div>
-      {shortcut && !device.isMobile && (
+      {shortcut && !device.editor.isMobile && (
         <div className="welcome-screen-menu-item__shortcut">{shortcut}</div>
       )}
     </>

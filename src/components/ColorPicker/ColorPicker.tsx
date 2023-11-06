@@ -80,7 +80,7 @@ const ColorPickerPopupContent = ({
   );
 
   const { container } = useExcalidrawContainer();
-  const { isMobile, isLandscape } = useDevice();
+  const device = useDevice();
 
   const colorInputJSX = (
     <div>
@@ -136,8 +136,16 @@ const ColorPickerPopupContent = ({
           updateData({ openPopup: null });
           setActiveColorPickerSection(null);
         }}
-        side={isMobile && !isLandscape ? "bottom" : "right"}
-        align={isMobile && !isLandscape ? "center" : "start"}
+        side={
+          device.editor.isMobile && !device.viewport.isLandscape
+            ? "bottom"
+            : "right"
+        }
+        align={
+          device.editor.isMobile && !device.viewport.isLandscape
+            ? "center"
+            : "start"
+        }
         alignOffset={-16}
         sideOffset={20}
         style={{

@@ -34,7 +34,7 @@ Open the `Menu` in the below playground and you will see the `custom footer` ren
 ```jsx live noInline
 const MobileFooter = ({}) => {
   const device = useDevice();
-  if (device.isMobile) {
+  if (device.editor.isMobile) {
     return (
       <Footer>
         <button
