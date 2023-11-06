@@ -28,10 +28,15 @@ describe("Test MobileMenu", () => {
   it("should set device correctly", () => {
     expect(h.app.device).toMatchInlineSnapshot(`
       {
-        "canDeviceFitSidebar": false,
-        "isLandscape": true,
-        "isMobile": true,
+        "editor": {
+          "canFitSidebar": false,
+          "isMobile": false,
+        },
         "isTouchScreen": false,
+        "viewport": {
+          "isLandscape": false,
+          "isMobile": true,
+        },
       }
     `);
   });

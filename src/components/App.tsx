@@ -380,10 +380,15 @@ const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
 const deviceContextInitialValue = {
-  isMobile: false,
+  viewport: {
+    isMobile: false,
+    isLandscape: false,
+  },
+  editor: {
+    isMobile: false,
+    canFitSidebar: false,
+  },
   isTouchScreen: false,
-  canDeviceFitSidebar: false,
-  isLandscape: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -1178,7 +1183,7 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": this.state.viewModeEnabled,
-          "excalidraw--mobile": this.device.isMobile,
+          "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
           ["--ui-pointerEvents" as any]:
@@ -1656,17 +1661,32 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private refreshDeviceState = (container: HTMLDivElement) => {
-    const { width, height } = container.getBoundingClientRect();
+    const { width: editorWidth, height: editorHeight } =
+      container.getBoundingClientRect();
+    const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
+      document.body;
+
     const sidebarBreakpoint =
       this.props.UIOptions.dockedSidebarBreakpoint != null
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
-    this.device = updateObject(this.device, {
-      isLandscape: width > height,
-      isMobile:
+
+    const isMobile = (width: number, height: number) => {
+      return (
         width < MQ_MAX_WIDTH_PORTRAIT ||
-        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
-      canDeviceFitSidebar: width > sidebarBreakpoint,
+        (width < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+      );
+    };
+
+    this.device = updateObject(this.device, {
+      viewport: {
+        isLandscape: viewportWidth > editorHeight,
+        isMobile: isMobile(viewportWidth, viewportHeight),
+      },
+      editor: {
+        isMobile: isMobile(editorWidth, editorHeight),
+        canFitSidebar: editorWidth > sidebarBreakpoint,
+      },
     });
   };
 
@@ -1741,11 +1761,19 @@ class App extends React.Component<AppProps, AppState> {
             : MQ_RIGHT_SIDEBAR_MIN_WIDTH
         }px)`,
       );
+      const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
+        document.body;
       const handler = () => {
         this.excalidrawContainerRef.current!.getBoundingClientRect();
         this.device = updateObject(this.device, {
-          isMobile: mdScreenQuery.matches,
-          canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
+          viewport: {
+            isMobile: mdScreenQuery.matches,
+            isLandscape: viewportWidth > viewportHeight,
+          },
+          editor: {
+            isMobile: mdScreenQuery.matches,
+            canFitSidebar: canDeviceFitSidebarMediaQuery.matches,
+          },
         });
       };
       mdScreenQuery.addListener(handler);
@@ -2403,7 +2431,7 @@ class App extends React.Component<AppProps, AppState> {
         // from library, not when pasting from clipboard. Alas.
         openSidebar:
           this.state.openSidebar &&
-          this.device.canDeviceFitSidebar &&
+          this.device.editor.canFitSidebar &&
           jotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
@@ -2617,7 +2645,7 @@ class App extends React.Component<AppProps, AppState> {
       !isPlainPaste &&
       textElements.length > 1 &&
       PLAIN_PASTE_TOAST_SHOWN === false &&
-      !this.device.isMobile
+      !this.device.editor.isMobile
     ) {
       this.setToast({
         message: t("toast.pasteAsSingleElement", {
@@ -2651,7 +2679,7 @@ class App extends React.Component<AppProps, AppState> {
       trackEvent(
         "toolbar",
         "toggleLock",
-        `${source} (${this.device.isMobile ? "mobile" : "desktop"})`,
+        `${source} (${this.device.editor.isMobile ? "mobile" : "desktop"})`,
       );
     }
     this.setState((prevState) => {
@@ -3146,7 +3174,9 @@ class App extends React.Component<AppProps, AppState> {
             trackEvent(
               "toolbar",
               shape,
-              `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
+              `keyboard (${
+                this.device.editor.isMobile ? "mobile" : "desktop"
+              })`,
             );
           }
           this.setActiveTool({ type: shape });
@@ -3880,7 +3910,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.device.isMobile,
+          this.device.editor.isMobile,
         )
       );
     });
@@ -3912,7 +3942,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.device.isMobile,
+      this.device.editor.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUpEvent!,
@@ -3922,7 +3952,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.device.isMobile,
+      this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       let url = this.hitLinkElement.link;
@@ -4784,7 +4814,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
-    if (this.device.isMobile && clicklength < 300) {
+    if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,

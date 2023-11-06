@@ -299,7 +299,7 @@ Open the `main menu` in the below example to view the footer.
 ```jsx live noInline
 const MobileFooter = ({}) => {
   const device = useDevice();
-  if (device.isMobile) {
+  if (device.editor.isMobile) {
     return (
       <Footer>
         <button
