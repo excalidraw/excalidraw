@@ -219,9 +219,9 @@
       "embeddable": "Inbäddbara element kan inte läggas till i biblioteket.",
       "image": "Stöd för att lägga till bilder till biblioteket kommer snart!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Kunde inte klistra in (kunde inte läsa från urklipp).",
+    "asyncPasteFailedOnParse": "Kunde inte klistra in.",
+    "copyToSystemClipboardFailed": "Kunde inte kopiera till urklipp."
   },
   "toolBar": {
     "selection": "Markering",
@@ -243,7 +243,7 @@
     "laser": "Laserpekare",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid till Excalidraw"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid till Excalidraw",
+    "button": "Infoga",
+    "description": "För närvarande stöds endast <flowchartLink>Flowcharts</flowchartLink> och <sequenceLink>sekvensdiagram</sequenceLink> . De andra typerna kommer att återges som bild i Excalidraw.",
+    "syntax": "Mermaid-syntax",
+    "preview": "Förhandsgranska"
   }
 }
