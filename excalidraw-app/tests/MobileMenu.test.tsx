@@ -31,7 +31,6 @@ describe("Test MobileMenu", () => {
         "canDeviceFitSidebar": false,
         "isLandscape": true,
         "isMobile": true,
-        "isSmScreen": false,
         "isTouchScreen": false,
       }
     `);

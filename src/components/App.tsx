@@ -74,7 +74,6 @@ import {
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
-  MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
   ROUNDNESS,
   SCROLL_TIMEOUT,
@@ -381,7 +380,6 @@ const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
 
 const deviceContextInitialValue = {
-  isSmScreen: false,
   isMobile: false,
   isTouchScreen: false,
   canDeviceFitSidebar: false,
@@ -1665,7 +1663,6 @@ class App extends React.Component<AppProps, AppState> {
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     this.device = updateObject(this.device, {
       isLandscape: width > height,
-      isSmScreen: width < MQ_SM_MAX_WIDTH,
       isMobile:
         width < MQ_MAX_WIDTH_PORTRAIT ||
         (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE),
@@ -1735,9 +1732,6 @@ class App extends React.Component<AppProps, AppState> {
       const mdScreenQuery = window.matchMedia(
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
-      const smScreenQuery = window.matchMedia(
-        `(max-width: ${MQ_SM_MAX_WIDTH}px)`,
-      );
       const canDeviceFitSidebarMediaQuery = window.matchMedia(
         `(min-width: ${
           // NOTE this won't update if a different breakpoint is supplied
@@ -1750,7 +1744,6 @@ class App extends React.Component<AppProps, AppState> {
       const handler = () => {
         this.excalidrawContainerRef.current!.getBoundingClientRect();
         this.device = updateObject(this.device, {
-          isSmScreen: smScreenQuery.matches,
           isMobile: mdScreenQuery.matches,
           canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
         });

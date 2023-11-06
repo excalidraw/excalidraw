@@ -335,7 +335,6 @@ The `device` has the following `attributes`
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `isSmScreen` | `boolean` | Set to `true` when the device small screen is small (Width < `640px` ) |
 | `isMobile` | `boolean` | Set to `true` when the device is `mobile` |
 | `isTouchScreen` | `boolean` | Set to `true` for `touch` devices |
 | `canDeviceFitSidebar` | `boolean` | Implies whether there is enough space to fit the `sidebar` |
