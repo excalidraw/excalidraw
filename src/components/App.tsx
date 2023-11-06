@@ -439,6 +439,9 @@ export const useExcalidrawSetAppState = () =>
 export const useExcalidrawActionManager = () =>
   useContext(ExcalidrawActionManagerContext);
 
+const supportsResizeObserver =
+  typeof window !== "undefined" && "ResizeObserver" in window;
+
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let isHoldingSpace: boolean = false;
@@ -475,7 +478,6 @@ class App extends React.Component<AppProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   device: Device = deviceContextInitialValue;
-  detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
@@ -1660,7 +1662,12 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private refreshDeviceState = (container: HTMLDivElement) => {
+  private refreshDeviceState = () => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+
     const { width: editorWidth, height: editorHeight } =
       container.getBoundingClientRect();
     const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
@@ -1729,56 +1736,24 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      this.excalidrawContainerRef.current &&
       // bounding rects don't work in tests so updating
       // the state on init would result in making the test enviro run
       // in mobile breakpoint (0 width/height), making everything fail
       !isTestEnv()
     ) {
-      this.refreshDeviceState(this.excalidrawContainerRef.current);
+      this.refreshDeviceState();
     }
 
-    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
+    if (supportsResizeObserver && this.excalidrawContainerRef.current) {
       this.resizeObserver = new ResizeObserver(() => {
         // recompute device dimensions state
         // ---------------------------------------------------------------------
-        this.refreshDeviceState(this.excalidrawContainerRef.current!);
+        this.refreshDeviceState();
         // refresh offsets
         // ---------------------------------------------------------------------
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
-    } else if (window.matchMedia) {
-      const mdScreenQuery = window.matchMedia(
-        `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
-      );
-      const canDeviceFitSidebarMediaQuery = window.matchMedia(
-        `(min-width: ${
-          // NOTE this won't update if a different breakpoint is supplied
-          // after mount
-          this.props.UIOptions.dockedSidebarBreakpoint != null
-            ? this.props.UIOptions.dockedSidebarBreakpoint
-            : MQ_RIGHT_SIDEBAR_MIN_WIDTH
-        }px)`,
-      );
-      const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
-        document.body;
-      const handler = () => {
-        this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.device = updateObject(this.device, {
-          viewport: {
-            isMobile: mdScreenQuery.matches,
-            isLandscape: viewportWidth > viewportHeight,
-          },
-          editor: {
-            isMobile: mdScreenQuery.matches,
-            canFitSidebar: canDeviceFitSidebarMediaQuery.matches,
-          },
-        });
-      };
-      mdScreenQuery.addListener(handler);
-      this.detachIsMobileMqHandler = () =>
-        mdScreenQuery.removeListener(handler);
     }
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -1824,6 +1799,10 @@ class App extends React.Component<AppProps, AppState> {
       .getElementsIncludingDeleted()
       .forEach((element) => ShapeCache.delete(element));
     this.setState({});
+    if (!supportsResizeObserver) {
+      this.refreshDeviceState();
+      this.updateDOMRect();
+    }
   });
 
   private removeEventListeners() {
@@ -1876,7 +1855,6 @@ class App extends React.Component<AppProps, AppState> {
       false,
     );
 
-    this.detachIsMobileMqHandler?.();
     window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
@@ -1961,11 +1939,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      this.excalidrawContainerRef.current &&
       prevProps.UIOptions.dockedSidebarBreakpoint !==
-        this.props.UIOptions.dockedSidebarBreakpoint
+      this.props.UIOptions.dockedSidebarBreakpoint
     ) {
-      this.refreshDeviceState(this.excalidrawContainerRef.current);
+      this.refreshDeviceState();
     }
 
     if (
