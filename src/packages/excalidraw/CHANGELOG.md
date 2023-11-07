@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
-- Export []`getCommonBounds`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils#getcommonbounds) helper from the package [#7247](https://github.com/excalidraw/excalidraw/pull/7247).
+- Export [`getCommonBounds`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils#getcommonbounds) helper from the package [#7247](https://github.com/excalidraw/excalidraw/pull/7247).
 
 - Support frames via programmatic API [#7205](https://github.com/excalidraw/excalidraw/pull/7205).
 
