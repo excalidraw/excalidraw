@@ -382,3 +382,26 @@ function App() {
   );
 }
 ```
+
+### getCommonBounds
+
+This util can be used to get the common bounds of the passed elements.
+
+**_Signature_**
+
+```ts
+getCommonBounds(
+  elements: ExcalidrawElement[]
+): readonly [
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+]
+```
+
+**_How to use_**
+
+```js
+import { getCommonBounds } from "@excalidraw/excalidraw";
+```
