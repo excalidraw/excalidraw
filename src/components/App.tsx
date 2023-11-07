@@ -603,7 +603,7 @@ class App extends React.Component<AppProps, AppState> {
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
       } else {
-         console.error("excalidrawAPI should be a function!");
+        console.error("excalidrawAPI should be a function!");
       }
       readyPromise.resolve(api);
     }

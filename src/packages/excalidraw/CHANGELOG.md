@@ -15,6 +15,12 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Support `excalidrawAPI` prop for accessing the Excalidraw API [#7251](https://github.com/excalidraw/excalidraw/pull/7251).
+
+#### BREAKING CHANGE
+
+- `Ref` is not supported anymore so if you are using ref, you will need to migrate to `excalidrawAPI` prop
+
 - Export [`getCommonBounds`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils#getcommonbounds) helper from the package [#7247](https://github.com/excalidraw/excalidraw/pull/7247).
 
 - Support frames via programmatic API [#7205](https://github.com/excalidraw/excalidraw/pull/7205).
