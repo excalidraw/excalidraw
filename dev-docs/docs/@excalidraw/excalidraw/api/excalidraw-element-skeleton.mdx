@@ -427,3 +427,45 @@ convertToExcalidrawElements([
 ```
 
 ![image](https://github.com/excalidraw/excalidraw/assets/11256141/a8b047c8-2eed-4aea-82a2-e1e6bbddb8d4)
+
+### Frames
+
+To start creating frames programmatically, you need to pass `type`, `children` and rest of attributes are optional.
+
+```ts
+{
+  type: "frame";
+  children: readonly ExcalidrawElement["id"][];
+  name?: string;
+ } & Partial<ExcalidrawFrameElement>);
+```
+
+```ts
+convertToExcalidrawElements([
+  {
+    "type": "rectangle",
+    "x": 10,
+    "y": 10,
+    "strokeWidth": 2,
+    "id": "1"
+  },
+  {
+    "type": "diamond",
+    "x": 120,
+    "y": 20,
+    "backgroundColor": "#fff3bf",
+    "strokeWidth": 2,
+    "label": {
+      "text": "HELLO EXCALIDRAW",
+      "strokeColor": "#099268",
+      "fontSize": 30
+    },
+    "id": "2"
+  },
+  {
+    "type": "frame",
+    "children": ["1", "2"],
+    "name": "My frame"
+  }]
+}
+```
