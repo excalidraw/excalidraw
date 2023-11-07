@@ -1,4 +1,4 @@
-import { act, fireEvent, render } from "./test-utils";
+import { act, fireEvent, render, waitFor } from "./test-utils";
 import { Excalidraw } from "../packages/excalidraw/index";
 import React from "react";
 import { expect, vi } from "vitest";
@@ -111,7 +111,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
   it("should open mermaid popup when active tool is mermaid", async () => {
     const dialog = document.querySelector(".dialog-mermaid")!;
-
+    await waitFor(() => dialog.querySelector("canvas"));
     expect(dialog.outerHTML).toMatchSnapshot();
   });
 
