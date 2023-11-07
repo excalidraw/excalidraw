@@ -33,14 +33,16 @@
       color: var(--color-gray-40);
     }
 
-    @include isMobile {
-      top: 1.25rem;
-      right: 1.25rem;
-    }
-
     svg {
       width: 1.5rem;
       height: 1.5rem;
+    }
+  }
+
+  .Dialog--fullscreen {
+    .Dialog__close {
+      top: 1.25rem;
+      right: 1.25rem;
     }
   }
 }
