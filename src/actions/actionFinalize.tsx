@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
-import { updateActiveTool, resetCursor } from "../utils";
+import { updateActiveTool } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
@@ -15,6 +15,7 @@ import {
 } from "../element/binding";
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import { AppState } from "../types";
+import { resetCursor } from "../cursor";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -90,7 +91,9 @@ export const actionFinalize = register({
         }
       }
       if (isInvisiblySmallElement(multiPointElement)) {
-        newElements = newElements.slice(0, -1);
+        newElements = newElements.filter(
+          (el) => el.id !== multiPointElement.id,
+        );
       }
 
       // If the multi point line closes the loop,

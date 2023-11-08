@@ -3,8 +3,9 @@ import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t, useI18n } from "../../i18n";
 import { useDevice, useExcalidrawActionManager } from "../App";
 import { useTunnels } from "../../context/tunnels";
-import { ExcalLogo, HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { HelpIcon, LoadIcon, usersIcon } from "../icons";
 import { useUIAppState } from "../../context/ui-appState";
+import { ExcalidrawLogo } from "../ExcalidrawLogo";
 
 const WelcomeScreenMenuItemContent = ({
   icon,
@@ -20,7 +21,7 @@ const WelcomeScreenMenuItemContent = ({
     <>
       <div className="welcome-screen-menu-item__icon">{icon}</div>
       <div className="welcome-screen-menu-item__text">{children}</div>
-      {shortcut && !device.isMobile && (
+      {shortcut && !device.editor.isMobile && (
         <div className="welcome-screen-menu-item__shortcut">{shortcut}</div>
       )}
     </>
@@ -109,7 +110,7 @@ Center.displayName = "Center";
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="welcome-screen-center__logo virgil welcome-screen-decor">
-      {children || <>{ExcalLogo} Excalidraw</>}
+      {children || <ExcalidrawLogo withText />}
     </div>
   );
 };

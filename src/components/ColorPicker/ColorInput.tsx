@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getColor } from "./ColorPicker";
 import { useAtom } from "jotai";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import {
+  ColorPickerType,
+  activeColorPickerSectionAtom,
+} from "./colorPickerUtils";
 import { eyeDropperIcon } from "../icons";
 import { jotaiScope } from "../../jotai";
 import { KEYS } from "../../keys";
@@ -15,9 +18,15 @@ interface ColorInputProps {
   color: string;
   onChange: (color: string) => void;
   label: string;
+  colorPickerType: ColorPickerType;
 }
 
-export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
+export const ColorInput = ({
+  color,
+  onChange,
+  label,
+  colorPickerType,
+}: ColorInputProps) => {
   const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
   const [activeSection, setActiveColorPickerSection] = useAtom(
@@ -89,7 +98,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
         }}
       />
       {/* TODO reenable on mobile with a better UX */}
-      {!device.isMobile && (
+      {!device.editor.isMobile && (
         <>
           <div
             style={{
@@ -110,6 +119,7 @@ export const ColorInput = ({ color, onChange, label }: ColorInputProps) => {
                   : {
                       keepOpenOnAlt: false,
                       onSelect: (color) => onChange(color),
+                      colorPickerType,
                     },
               )
             }

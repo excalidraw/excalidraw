@@ -109,8 +109,12 @@
     "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
+      "editEmbed": "Link bearbeiten & einbetten",
       "create": "Link erstellen",
-      "label": "Link"
+      "createEmbed": "Link erstellen & einbetten",
+      "label": "Link",
+      "labelEmbed": "Verlinken & einbetten",
+      "empty": "Kein Link festgelegt"
     },
     "lineEditor": {
       "edit": "Linie bearbeiten",
@@ -160,13 +164,16 @@
     "darkMode": "Dunkles Design",
     "lightMode": "Helles Design",
     "zenMode": "Zen-Modus",
+    "objectsSnapMode": "Einrasten an Objekten",
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
     "clear": "Löschen",
     "remove": "Entfernen",
+    "embed": "Einbettung umschalten",
     "publishLibrary": "Veröffentlichen",
     "submit": "Absenden",
-    "confirm": "Bestätigen"
+    "confirm": "Bestätigen",
+    "embeddableInteractionButton": "Klicken, um zu interagieren"
   },
   "alerts": {
     "clearReset": "Dies wird die ganze Zeichenfläche löschen. Bist du dir sicher?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Das Bild konnte nicht eingefügt werden. Versuche es später erneut...",
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
+    "failedToFetchImage": "Bild konnte nicht abgerufen werden.",
     "invalidSVGString": "Ungültige SVG.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
@@ -206,6 +214,10 @@
       "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
       "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du <link>diesen Schritten</link> folgen.",
       "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Einbettbare Elemente können der Bibliothek nicht hinzugefügt werden.",
+      "image": "Unterstützung für das Hinzufügen von Bildern in die Bibliothek kommt bald!"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer",
     "frame": "Rahmenwerkzeug",
+    "embeddable": "Web-Einbettung",
+    "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge"
   },
@@ -237,6 +251,7 @@
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
+    "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
     "text_selected": "Doppelklicken oder Eingabetaste drücken, um Text zu bearbeiten",
     "text_editing": "Drücke Escape oder CtrlOrCmd+Eingabetaste, um die Bearbeitung abzuschließen",
     "linearElementMulti": "Zum Beenden auf den letzten Punkt klicken oder Escape oder Eingabe drücken",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Zum Hinzufügen Eingabetaste drücken",
     "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden",
     "eraserRevert": "Halte Alt gedrückt, um die zum Löschen markierten Elemente zurückzusetzen",
-    "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\"."
+    "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
+    "disableSnapping": "Halte CtrlOrCmd gedrückt, um das Einrasten zu deaktivieren"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
     "selection": "Auswahl",
-    "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen"
+    "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
+    "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
+    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird"
   },
   "colors": {
     "transparent": "Transparent",
@@ -449,5 +467,36 @@
     "shades": "Schattierungen",
     "hexCode": "Hex-Code",
     "noShades": "Keine Schattierungen für diese Farbe verfügbar"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Als Bild exportieren",
+        "button": "Als Bild exportieren",
+        "description": "Exportiere die Zeichnungsdaten als ein Bild, von dem Du später importieren kannst."
+      },
+      "saveToDisk": {
+        "title": "Auf Festplatte speichern",
+        "button": "Auf Festplatte speichern",
+        "description": "Exportiere die Zeichnungsdaten in eine Datei, von der Du später importieren kannst."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Export nach Excalidraw+",
+        "description": "Speichere die Szene in deinem Excalidraw+-Arbeitsbereich."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Aus Datei laden",
+        "button": "Aus Datei laden",
+        "description": "Das Laden aus einer Datei wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
+      },
+      "shareableLink": {
+        "title": "Aus Link laden",
+        "button": "Meinen Inhalt ersetzen",
+        "description": "Das Laden einer externen Zeichnung wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
+      }
+    }
   }
 }

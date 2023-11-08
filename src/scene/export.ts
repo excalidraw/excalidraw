@@ -1,6 +1,10 @@
 import rough from "roughjs/bin/rough";
 import { NonDeletedExcalidrawElement } from "../element/types";
-import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
+import {
+  Bounds,
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
 import { distance, isOnlyExportingSingleFrame } from "../utils";
 import { AppState, BinaryFiles } from "../types";
@@ -13,7 +17,7 @@ import {
 } from "../element/image";
 import Scene from "./Scene";
 
-export const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
+const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -221,7 +225,7 @@ export const exportToSvg = async (
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
-): [number, number, number, number] => {
+): Bounds => {
   // we should decide if we are exporting the whole canvas
   // if so, we are not clipping elements in the frame
   // and therefore, we should not do anything special
