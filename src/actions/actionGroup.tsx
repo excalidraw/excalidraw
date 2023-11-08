@@ -190,12 +190,18 @@ export const actionUngroup = register({
 
     let nextElements = [...elements];
 
+    const frameIds: {
+      [id: string]: true;
+    } = {};
     const selectedElements = app.scene.getSelectedElements(appState);
-    const frames = selectedElements
-      .filter((element) => element.frameId)
-      .map((element) =>
-        app.scene.getElement(element.frameId!),
-      ) as ExcalidrawFrameElement[];
+    for (const element of selectedElements) {
+      if (element.frameId) {
+        frameIds[element.frameId] = true;
+      }
+    }
+    const frames = Object.keys(frameIds)
+      .map((eid) => app.scene.getElement(eid))
+      .filter((element) => element != null) as ExcalidrawFrameElement[];
 
     const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
     nextElements = nextElements.map((element) => {
