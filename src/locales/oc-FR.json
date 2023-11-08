@@ -106,7 +106,7 @@
     "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
-    "createContainerFromText": "",
+    "createContainerFromText": "Envelopar lo tèxte dins un contenedor",
     "link": {
       "edit": "Modificar lo ligam",
       "editEmbed": "Modificar lo ligam e l’integracion",
@@ -128,8 +128,8 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Gardar la barra laterala dobèrta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Seleccionar totes los elements del quadre",
+    "removeAllElementsFromFrame": "Tirar totes los elements d’al quadre",
     "eyeDropper": "Prendre la color a partir d’un canabàs"
   },
   "library": {
@@ -164,12 +164,12 @@
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
     "zenMode": "Mòde escur",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Ancorar als objèctes",
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
     "clear": "Escafar",
     "remove": "Tirar",
-    "embed": "",
+    "embed": "Alternar l’integracion",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
@@ -243,7 +243,7 @@
     "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -385,7 +385,7 @@
       "withBackground": "Rèireplan",
       "onlySelected": "Seleccion sonque",
       "darkMode": "Mòde escur",
-      "embedScene": "",
+      "embedScene": "Embarcar la scèna",
       "scale": "Escala",
       "padding": "Espaçament"
     },
@@ -504,10 +504,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "De Mermaid cap a Excalidraw",
+    "button": "Inserir",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Sintaxi Mermaid",
+    "preview": "Apercebut"
   }
 }
