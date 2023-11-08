@@ -1273,7 +1273,7 @@ export const renderElementToSvg = (
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx}`);
+          text.setAttribute("y", `${(i + 0.75) * lineHeightPx}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
