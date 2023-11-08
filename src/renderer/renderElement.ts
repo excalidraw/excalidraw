@@ -589,11 +589,7 @@ export const renderElement = (
 ) => {
   switch (element.type) {
     case "frame": {
-      if (
-        !renderConfig.isExporting &&
-        appState.frameRendering.enabled &&
-        appState.frameRendering.outline
-      ) {
+      if (appState.frameRendering.enabled && appState.frameRendering.outline) {
         context.save();
         context.translate(
           element.x + appState.scrollX,
@@ -601,7 +597,7 @@ export const renderElement = (
         );
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.lineWidth = 2 / appState.zoom.value;
+        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
 
         if (FRAME_STYLE.radius && context.roundRect) {
@@ -841,10 +837,13 @@ const maybeWrapNodesInFrameClipPath = (
   element: NonDeletedExcalidrawElement,
   root: SVGElement,
   nodes: SVGElement[],
-  exportedFrameId?: string | null,
+  frameRendering: AppState["frameRendering"],
 ) => {
+  if (!frameRendering.enabled || !frameRendering.clip) {
+    return null;
+  }
   const frame = getContainingFrame(element);
-  if (frame && frame.id === exportedFrameId) {
+  if (frame) {
     const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
     g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
     nodes.forEach((node) => g.appendChild(node));
@@ -861,9 +860,11 @@ export const renderElementToSvg = (
   files: BinaryFiles,
   offsetX: number,
   offsetY: number,
-  exportWithDarkMode?: boolean,
-  exportingFrameId?: string | null,
-  renderEmbeddables?: boolean,
+  renderConfig: {
+    exportWithDarkMode: boolean;
+    renderEmbeddables: boolean;
+    frameRendering: AppState["frameRendering"];
+  },
 ) => {
   const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -931,7 +932,7 @@ export const renderElementToSvg = (
         element,
         root,
         [node],
-        exportingFrameId,
+        renderConfig.frameRendering,
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
@@ -968,9 +969,7 @@ export const renderElementToSvg = (
         files,
         label.x + offset.x - element.x,
         label.y + offset.y - element.y,
-        exportWithDarkMode,
-        exportingFrameId,
-        renderEmbeddables,
+        renderConfig,
       );
 
       // render embeddable element + iframe
@@ -999,7 +998,10 @@ export const renderElementToSvg = (
       // if rendering embeddables explicitly disabled or
       // embedding documents via srcdoc (which doesn't seem to work for SVGs)
       // replace with a link instead
-      if (renderEmbeddables === false || embedLink?.type === "document") {
+      if (
+        renderConfig.renderEmbeddables === false ||
+        embedLink?.type === "document"
+      ) {
         const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
         anchorTag.setAttribute("href", normalizeLink(element.link || ""));
         anchorTag.setAttribute("target", "_blank");
@@ -1119,7 +1121,7 @@ export const renderElementToSvg = (
         element,
         root,
         [group, maskPath],
-        exportingFrameId,
+        renderConfig.frameRendering,
       );
       if (g) {
         root.appendChild(g);
@@ -1158,7 +1160,7 @@ export const renderElementToSvg = (
         element,
         root,
         [node],
-        exportingFrameId,
+        renderConfig.frameRendering,
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
@@ -1191,7 +1193,10 @@ export const renderElementToSvg = (
         use.setAttribute("href", `#${symbolId}`);
 
         // in dark theme, revert the image color filter
-        if (exportWithDarkMode && fileData.mimeType !== MIME_TYPES.svg) {
+        if (
+          renderConfig.exportWithDarkMode &&
+          fileData.mimeType !== MIME_TYPES.svg
+        ) {
           use.setAttribute("filter", IMAGE_INVERT_FILTER);
         }
 
@@ -1227,7 +1232,7 @@ export const renderElementToSvg = (
           element,
           root,
           [g],
-          exportingFrameId,
+          renderConfig.frameRendering,
         );
         clipG ? root.appendChild(clipG) : root.appendChild(g);
       }
@@ -1235,6 +1240,31 @@ export const renderElementToSvg = (
     }
     // frames are not rendered and only acts as a container
     case "frame": {
+      if (
+        renderConfig.frameRendering.enabled &&
+        renderConfig.frameRendering.outline
+      ) {
+        const rect = document.createElementNS(SVG_NS, "rect");
+
+        rect.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
+        );
+
+        rect.setAttribute("width", `${element.width}px`);
+        rect.setAttribute("height", `${element.height}px`);
+        // Rounded corners
+        rect.setAttribute("rx", FRAME_STYLE.radius.toString());
+        rect.setAttribute("ry", FRAME_STYLE.radius.toString());
+
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
+        rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
+
+        root.appendChild(rect);
+      }
       break;
     }
     default: {
@@ -1288,7 +1318,7 @@ export const renderElementToSvg = (
           element,
           root,
           [node],
-          exportingFrameId,
+          renderConfig.frameRendering,
         );
 
         g ? root.appendChild(g) : root.appendChild(node);

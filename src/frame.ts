@@ -213,6 +213,34 @@ export const getFrameChildren = (
   frameId: string,
 ) => allElements.filter((element) => element.frameId === frameId);
 
+export const getFrameElements = (
+  allElements: ExcalidrawElementsIncludingDeleted,
+): ExcalidrawFrameElement[] => {
+  return allElements.filter((element) =>
+    isFrameElement(element),
+  ) as ExcalidrawFrameElement[];
+};
+
+/**
+ * Returns ExcalidrawFrameElements and non-frame-children elements.
+ *
+ * Considers children as root elements if they point to a frame parent
+ * non-existing in the elements set.
+ *
+ * Considers non-frame bound elements (container or arrow labels) as root.
+ */
+export const getRootElements = (
+  allElements: ExcalidrawElementsIncludingDeleted,
+) => {
+  const frameElements = arrayToMap(getFrameElements(allElements));
+  return allElements.filter(
+    (element) =>
+      frameElements.has(element.id) ||
+      !element.frameId ||
+      !frameElements.has(element.frameId),
+  );
+};
+
 export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameElement,

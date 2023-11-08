@@ -87,7 +87,7 @@ import {
   ZOOM_STEP,
   POINTER_EVENTS,
 } from "../constants";
-import { exportCanvas, loadFromBlob } from "../data";
+import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -1048,7 +1048,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const FRAME_NAME_GAP = 20;
       const FRAME_NAME_EDIT_PADDING = 6;
 
       const reset = () => {
@@ -1093,7 +1092,7 @@ class App extends React.Component<AppProps, AppState> {
               boxShadow: "inset 0 0 0 1px var(--color-primary)",
               fontFamily: "Assistant",
               fontSize: "14px",
-              transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
+              transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
               maxWidth: `${
@@ -1120,17 +1119,23 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
-            top: `${y1 - FRAME_NAME_GAP - this.state.offsetTop}px`,
-            left: `${
-              x1 -
-              this.state.offsetLeft -
-              (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
+            // Positioning from bottom so that we don't to either
+            // calculate text height or adjust using transform (which)
+            // messes up input position when editing the frame name.
+            // This makes the positioning deterministic and we can calculate
+            // the same position when rendering to canvas / svg.
+            bottom: `${
+              this.state.height +
+              FRAME_STYLE.nameOffsetY -
+              y1 +
+              this.state.offsetTop
             }px`,
+            left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
             fontSize: "14px",
             color: isDarkTheme
-              ? "var(--color-gray-60)"
-              : "var(--color-gray-50)",
+              ? FRAME_STYLE.nameColorDarkTheme
+              : FRAME_STYLE.nameColorLightTheme,
             width: "max-content",
             maxWidth: `${f.width}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
@@ -1364,7 +1369,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: ExportedElements,
+    opts: { exportingFrame: ExcalidrawFrameElement | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -1376,6 +1382,7 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: this.state.exportBackground,
         name: this.state.name,
         viewBackgroundColor: this.state.viewBackgroundColor,
+        exportingFrame: opts.exportingFrame,
       },
     )
       .catch(muteFSAbortError)
