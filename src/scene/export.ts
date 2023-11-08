@@ -19,6 +19,18 @@ import Scene from "./Scene";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
+const createScene = (
+  elements: readonly NonDeletedExcalidrawElement[],
+): Scene | null => {
+  if (!elements || Scene.getScene(elements[0])) {
+    return null;
+  }
+  const scene = new Scene();
+  scene.replaceAllElements(elements);
+  elements?.forEach((el) => Scene.mapElementToScene(el, scene));
+  return scene;
+};
+
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -42,6 +54,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
 ) => {
+  const scene = createScene(elements);
   const [minX, minY, width, height] = getCanvasSize(elements, exportPadding);
 
   const { canvas, scale = 1 } = createCanvas(width, height);
@@ -80,6 +93,7 @@ export const exportToCanvas = async (
     },
   });
 
+  scene?.destroy();
   return canvas;
 };
 
@@ -106,6 +120,7 @@ export const exportToSvg = async (
     exportScale = 1,
     exportEmbedScene,
   } = appState;
+  const scene = createScene(elements);
   let metadata = "";
   if (exportEmbedScene) {
     try {
@@ -218,6 +233,7 @@ export const exportToSvg = async (
     renderEmbeddables: opts?.renderEmbeddables,
   });
 
+  scene?.destroy();
   return svgRoot;
 };
 
