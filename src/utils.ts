@@ -938,3 +938,5 @@ export const isMemberOf = <T extends string>(
     ? collection.includes(value as T)
     : collection.hasOwnProperty(value);
 };
+
+export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));

@@ -40,7 +40,7 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, getFontString } from "../utils";
+import { assertNever, cloneJSON, getFontString } from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 
@@ -368,7 +368,8 @@ const bindLinearElementToElement = (
   // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
   const endPointIndex = linearElement.points.length - 1;
   const delta = 0.5;
-  const newPoints = JSON.parse(JSON.stringify(linearElement.points));
+
+  const newPoints = cloneJSON(linearElement.points) as [number, number][];
   // left to right so shift the arrow towards right
   if (
     linearElement.points[endPointIndex][0] >
@@ -439,9 +440,7 @@ export const convertToExcalidrawElements = (
   if (!elementsSkeleton) {
     return [];
   }
-  const elements: ExcalidrawElementSkeleton[] = JSON.parse(
-    JSON.stringify(elementsSkeleton),
-  );
+  const elements = cloneJSON(elementsSkeleton);
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
   const oldToNewElementIdMap = new Map<string, string>();
