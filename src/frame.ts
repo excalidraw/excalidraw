@@ -201,14 +201,14 @@ export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
   for (const element of elements) {
     const frameId = isFrameElement(element) ? element.id : element.frameId;
     if (frameId && !frameElementsMap.has(frameId)) {
-      frameElementsMap.set(frameId, getFrameElements(elements, frameId));
+      frameElementsMap.set(frameId, getFrameChildren(elements, frameId));
     }
   }
 
   return frameElementsMap;
 };
 
-export const getFrameElements = (
+export const getFrameChildren = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frameId: string,
 ) => allElements.filter((element) => element.frameId === frameId);
@@ -218,7 +218,7 @@ export const getElementsInResizingFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ): ExcalidrawElement[] => {
-  const prevElementsInFrame = getFrameElements(allElements, frame.id);
+  const prevElementsInFrame = getFrameChildren(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
   const elementsCompletelyInFrame = new Set([
@@ -449,7 +449,7 @@ export const removeAllElementsFromFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
-  const elementsInFrame = getFrameElements(allElements, frame.id);
+  const elementsInFrame = getFrameChildren(allElements, frame.id);
   return removeElementsFromFrame(allElements, elementsInFrame, appState);
 };
 

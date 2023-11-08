@@ -317,7 +317,7 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import {
-  getFrameElements,
+  getFrameChildren,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   addElementsToFrame,
@@ -5330,7 +5330,7 @@ class App extends React.Component<AppProps, AppState> {
 
                 // if hitElement is frame, deselect all of its elements if they are selected
                 if (hitElement.type === "frame") {
-                  getFrameElements(
+                  getFrameChildren(
                     previouslySelectedElements,
                     hitElement.id,
                   ).forEach((element) => {
@@ -8194,7 +8194,7 @@ class App extends React.Component<AppProps, AppState> {
     >();
 
     selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameElements(
+      const elementsInFrame = getFrameChildren(
         this.scene.getNonDeletedElements(),
         frame.id,
       );
@@ -8264,7 +8264,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
-        const elementsInFrame = getFrameElements(
+        const elementsInFrame = getFrameChildren(
           this.scene.getNonDeletedElements(),
           frame.id,
         );
