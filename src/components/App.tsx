@@ -1048,11 +1048,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const { x: x2 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x + f.width, sceneY: f.y + f.height },
-        this.state,
-      );
-
       const FRAME_NAME_GAP = 20;
       const FRAME_NAME_EDIT_PADDING = 6;
 
@@ -1101,10 +1096,9 @@ class App extends React.Component<AppProps, AppState> {
               transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
-              maxWidth: `${Math.min(
-                x2 - x1 - FRAME_NAME_EDIT_PADDING,
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING,
-              )}px`,
+              maxWidth: `${
+                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+              }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
             dir="auto"
@@ -1138,7 +1132,7 @@ class App extends React.Component<AppProps, AppState> {
               ? "var(--color-gray-60)"
               : "var(--color-gray-50)",
             width: "max-content",
-            maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
+            maxWidth: `${f.width}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
