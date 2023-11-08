@@ -39,10 +39,10 @@ You can use this prop when you want to access some [Excalidraw APIs](https://git
 | [resetCursor](#resetcursor) | `function` | This API can be used to reset to default mouse cursor on the canvas |
 | [toggleMenu](#togglemenu) | `function` | Toggles specific menus on/off |
 
-:::info
-The `Ref` support has been removed in v0.17.0 so if you are using refs, please update the integration to use the `excalidrawAPI`. 
+:::info The `Ref` support has been removed in v0.17.0 so if you are using refs, please update the integration to use the `excalidrawAPI`.
 
 Additionally `ready` and `readyPromise` from the API have been discontinued. These APIs were found to be superfluous, and as part of the effort to streamline the APIs and maintain simplicity, they were removed in version v0.17.0.
+
 :::
 
 ## updateScene
@@ -344,14 +344,25 @@ This API can be used to get the files present in the scene. It may contain files
 
 This API has the below signature. It sets the `tool` passed in param as the active tool.
 
-<pre>
-  (tool: <br /> &#123; type:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/shapes.tsx#L15">
-    SHAPES
-  </a>
-  [number]["value"]&#124; "eraser" &#125; &#124;
-  <br /> &#123; type: "custom"; customType: string &#125;) => void
-</pre>
+```ts
+(
+  tool: (
+    | (
+        | { type: Exclude<ToolType, "image"> }
+        | {
+            type: Extract<ToolType, "image">;
+            insertOnCanvasDirectly?: boolean;
+          }
+      )
+    | { type: "custom"; customType: string }
+  ) & { locked?: boolean },
+) => {};
+```
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |  
+| `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L91) | `selection` | The tool type which should be set as active tool. When setting `image` as active tool, the insertion onto canvas when using image tool is disabled by default, so you can enable it by setting `insertOnCanvasDirectly` to `true` |
+| `locked` | `boolean` | `false` | Indicates whether the the active tool should be locked. It behaves the same way when using the `lock` tool in the editor interface|
 
 ## setCursor
 
