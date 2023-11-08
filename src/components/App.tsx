@@ -240,7 +240,6 @@ import {
   isInputLike,
   isToolIcon,
   isWritableElement,
-  resolvablePromise,
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
@@ -572,10 +571,7 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer = new Renderer(this.scene);
 
     if (excalidrawAPI) {
-      const readyPromise = resolvablePromise<ExcalidrawImperativeAPI>();
       const api: ExcalidrawImperativeAPI = {
-        ready: true,
-        readyPromise,
         updateScene: this.updateScene,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
@@ -605,7 +601,6 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         console.error("excalidrawAPI should be a function!");
       }
-      readyPromise.resolve(api);
     }
 
     this.excalidrawContainerValue = {
