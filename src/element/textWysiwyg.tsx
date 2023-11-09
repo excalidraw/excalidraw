@@ -144,7 +144,6 @@ export const textWysiwyg = ({
     const appState = app.state;
     const updatedTextElement =
       Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
-
     if (!updatedTextElement) {
       return;
     }
@@ -295,6 +294,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
+
       mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
@@ -353,6 +353,8 @@ export const textWysiwyg = ({
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
+        fontWeight: app.state.currentItemFontWeight,
+        fontStyle: app.state.currentItemFontStyle,
       });
       if (container) {
         const wrappedText = wrapText(
@@ -529,7 +531,6 @@ export const textWysiwyg = ({
     }
     let text = editable.value;
     const container = getContainerElement(updateElement);
-
     if (container) {
       text = updateElement.text;
       if (editable.value.trim()) {

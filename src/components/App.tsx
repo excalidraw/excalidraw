@@ -1098,6 +1098,7 @@ class App extends React.Component<AppProps, AppState> {
               boxShadow: "inset 0 0 0 1px var(--color-primary)",
               fontFamily: "Assistant",
               fontSize: "14px",
+              fontWeight: "normal",
               transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
@@ -1134,6 +1135,7 @@ class App extends React.Component<AppProps, AppState> {
             }px`,
             zIndex: 2,
             fontSize: "14px",
+            fontWeight: "normal",
             color: isDarkTheme
               ? "var(--color-gray-60)"
               : "var(--color-gray-50)",
@@ -1601,6 +1603,7 @@ class App extends React.Component<AppProps, AppState> {
     let initialData = null;
     try {
       initialData = (await this.props.initialData) || null;
+
       if (initialData?.libraryItems) {
         this.library
           .updateLibrary({
@@ -1622,6 +1625,7 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
     const scene = restore(initialData, null, null, { repairBindings: true });
+
     scene.appState = {
       ...scene.appState,
       theme: this.props.theme || scene.appState.theme,
@@ -2568,6 +2572,7 @@ class App extends React.Component<AppProps, AppState> {
       text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
+      fontWeight: this.state.currentItemFontWeight,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
@@ -3677,6 +3682,8 @@ class App extends React.Component<AppProps, AppState> {
     const lineHeight =
       existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
     const fontSize = this.state.currentItemFontSize;
+    const fontWeight = this.state.currentItemFontWeight;
+    const fontStyle = this.state.currentItemFontStyle;
 
     if (
       !existingTextElement &&
@@ -3687,6 +3694,8 @@ class App extends React.Component<AppProps, AppState> {
       const fontString = {
         fontSize,
         fontFamily,
+        fontWeight,
+        fontStyle,
       };
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
@@ -3731,6 +3740,7 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           text: "",
           fontSize,
+          fontWeight,
           fontFamily,
           textAlign: parentCenterPosition
             ? "center"

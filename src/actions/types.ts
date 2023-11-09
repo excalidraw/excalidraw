@@ -109,6 +109,8 @@ export type ActionName =
   | "exportWithDarkMode"
   | "toggleTheme"
   | "increaseFontSize"
+  | "changeFontWeight"
+  | "changeFontStyle"
   | "decreaseFontSize"
   | "unbindText"
   | "hyperlink"

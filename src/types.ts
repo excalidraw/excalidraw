@@ -17,6 +17,8 @@ import {
   StrokeRoundness,
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
+  FontWeightValues,
+  FontStyleValues,
 } from "./element/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
 import { LinearElementEditor } from "./element/linearElementEditor";
@@ -224,6 +226,8 @@ export type AppState = {
   currentItemRoughness: number;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
+  currentItemFontWeight: FontWeightValues;
+  currentItemFontStyle: FontStyleValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;

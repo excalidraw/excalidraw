@@ -45,11 +45,20 @@ import {
   TextAlignCenterIcon,
   TextAlignRightIcon,
   FillZigZagIcon,
+  FontFamilyNotoIcon,
+  TextFontWeightNormal,
+  TextFontWeightBold,
+  TextFontWeightThin,
+  TextFontStyleItalic,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_FONT_STYLE,
+  DEFAULT_FONT_WEIGHT,
   FONT_FAMILY,
+  FONT_STYLE,
+  FONT_WEIGHT,
   ROUNDNESS,
   STROKE_WIDTH,
   VERTICAL_ALIGN,
@@ -76,6 +85,8 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  FontStyleValues,
+  FontWeightValues,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
@@ -753,6 +764,24 @@ export const actionChangeFontFamily = register({
         icon: FontFamilyCodeIcon,
         testId: "font-family-code",
       },
+      {
+        value: FONT_FAMILY["Noto Sans"],
+        text: t("labels.notoSans"),
+        icon: FontFamilyNotoIcon,
+        testId: "font-family-noto-sans",
+      },
+      {
+        value: FONT_FAMILY["Noto Serif"],
+        text: t("labels.notoSerif"),
+        icon: FontFamilyNotoIcon,
+        testId: "font-family-noto-serif",
+      },
+      {
+        value: FONT_FAMILY["Noto Sans Mono"],
+        text: t("labels.notoMono"),
+        icon: FontFamilyNotoIcon,
+        testId: "font-family-noto-serif",
+      },
     ];
 
     return (
@@ -780,6 +809,169 @@ export const actionChangeFontFamily = register({
               hasSelection
                 ? null
                 : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeFontWeight = register({
+  name: "changeFontWeight",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              {
+                fontWeight: value,
+                lineHeight: getDefaultLineHeight(value),
+              },
+            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            return newElement;
+          }
+
+          return oldElement;
+        },
+        true,
+      ),
+      appState: {
+        ...appState,
+        currentItemFontWeight: value,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <legend>{t("labels.fontWeight")}</legend>
+        <ButtonIconSelect<FontWeightValues | false>
+          group="font-weight"
+          options={[
+            {
+              value: FONT_WEIGHT.thin,
+              text: t("labels.thin"),
+              icon: TextFontWeightThin,
+              testId: "font-weight-thin",
+            },
+            {
+              value: FONT_WEIGHT.normal,
+              text: t("labels.normal"),
+              icon: TextFontWeightNormal,
+              testId: "font-weight-normal",
+            },
+            {
+              value: FONT_WEIGHT.bold,
+              text: t("labels.bold"),
+              icon: TextFontWeightBold,
+              testId: "font-weight-bold",
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontWeight;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.fontWeight;
+              }
+              return null;
+            },
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontWeight || DEFAULT_FONT_WEIGHT,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeFontStyle = register({
+  name: "changeFontStyle",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (oldElement) => {
+          if (isTextElement(oldElement)) {
+            const newElement: ExcalidrawTextElement = newElementWith(
+              oldElement,
+              {
+                fontStyle: value,
+              },
+            );
+            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            return newElement;
+          }
+
+          return oldElement;
+        },
+        true,
+      ),
+      appState: {
+        ...appState,
+        currentItemFontStyle: value,
+      },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <legend>{t("labels.fontStyle")}</legend>
+        <ButtonIconSelect<FontStyleValues | false>
+          group="font-style"
+          options={[
+            {
+              value: FONT_STYLE.normal,
+              text: t("labels.normal"),
+              icon: TextFontWeightThin,
+              testId: "font-style-normal",
+            },
+            {
+              value: FONT_STYLE.italic,
+              text: t("labels.italic"),
+              icon: TextFontStyleItalic,
+              testId: "font-style-italic",
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontStyle;
+              }
+              const boundTextElement = getBoundTextElement(element);
+              if (boundTextElement) {
+                return boundTextElement.fontStyle;
+              }
+              return null;
+            },
+            (element) =>
+              isTextElement(element) || getBoundTextElement(element) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontStyle || DEFAULT_FONT_STYLE,
           )}
           onChange={(value) => updateData(value)}
         />

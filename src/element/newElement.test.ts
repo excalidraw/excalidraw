@@ -74,6 +74,8 @@ describe("duplicating single elements", () => {
       fillStyle: "hachure",
       strokeWidth: 1,
       strokeStyle: "solid",
+      fontWeight: "bold",
+      fontStyle: "normal",
       roundness: null,
       roughness: 1,
       opacity: 100,

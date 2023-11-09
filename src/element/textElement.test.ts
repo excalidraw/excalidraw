@@ -14,7 +14,7 @@ import {
 import { ExcalidrawTextElementWithContainer, FontString } from "./types";
 
 describe("Test wrapText", () => {
-  const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
+  const font = "normal 20px Cascadia, width: Segoe UI Emoji" as FontString;
 
   it("shouldn't add new lines for trailing spaces", () => {
     const text = "Hello whats up     ";
