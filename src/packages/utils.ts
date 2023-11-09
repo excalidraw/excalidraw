@@ -165,6 +165,7 @@ export const exportToSvg = async ({
   files = {},
   exportPadding,
   renderEmbeddables,
+  exportingFrame,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
@@ -181,6 +182,7 @@ export const exportToSvg = async ({
   };
 
   return _exportToSvg(restoredElements, exportAppState, files, {
+    exportingFrame,
     renderEmbeddables,
   });
 };
