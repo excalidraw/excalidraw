@@ -106,7 +106,9 @@ const addFrameLabelsAsTextElements = (
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
         fontFamily: 4,
-        fontSize: 14,
+        fontSize: FRAME_STYLE.nameFontSize,
+        lineHeight:
+          FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
         strokeColor: opts.exportWithDarkMode
           ? FRAME_STYLE.nameColorDarkTheme
           : FRAME_STYLE.nameColorLightTheme,

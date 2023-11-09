@@ -125,6 +125,8 @@ export const FRAME_STYLE = {
   nameOffsetY: 3,
   nameColorLightTheme: "#999999",
   nameColorDarkTheme: "#7a7a7a",
+  nameFontSize: 14,
+  nameLineHeight: 1.25,
 };
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";

@@ -20,7 +20,13 @@ import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
 import { StaticCanvasRenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isTestEnv,
+} from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import {
@@ -898,6 +904,13 @@ export const renderElementToSvg = (
     root = anchorTag;
   }
 
+  const addToRoot = (node: SVGElement, element: ExcalidrawElement) => {
+    if (isTestEnv()) {
+      node.setAttribute("data-id", element.id);
+    }
+    root.appendChild(node);
+  };
+
   const opacity =
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
 
@@ -935,7 +948,7 @@ export const renderElementToSvg = (
         renderConfig.frameRendering,
       );
 
-      g ? root.appendChild(g) : root.appendChild(node);
+      addToRoot(g || node, element);
       break;
     }
     case "embeddable": {
@@ -958,7 +971,7 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      root.appendChild(node);
+      addToRoot(node, element);
 
       const label: ExcalidrawElement =
         createPlaceholderEmbeddableLabel(element);
@@ -1035,8 +1048,7 @@ export const renderElementToSvg = (
 
         embeddableNode.appendChild(foreignObject);
       }
-
-      root.appendChild(embeddableNode);
+      addToRoot(embeddableNode, element);
       break;
     }
     case "line":
@@ -1124,9 +1136,10 @@ export const renderElementToSvg = (
         renderConfig.frameRendering,
       );
       if (g) {
+        addToRoot(g, element);
         root.appendChild(g);
       } else {
-        root.appendChild(group);
+        addToRoot(group, element);
         root.append(maskPath);
       }
       break;
@@ -1163,7 +1176,7 @@ export const renderElementToSvg = (
         renderConfig.frameRendering,
       );
 
-      g ? root.appendChild(g) : root.appendChild(node);
+      addToRoot(g || node, element);
       break;
     }
     case "image": {
@@ -1234,7 +1247,7 @@ export const renderElementToSvg = (
           [g],
           renderConfig.frameRendering,
         );
-        clipG ? root.appendChild(clipG) : root.appendChild(g);
+        addToRoot(clipG || g, element);
       }
       break;
     }
@@ -1263,7 +1276,7 @@ export const renderElementToSvg = (
         rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
         rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
 
-        root.appendChild(rect);
+        addToRoot(rect, element);
       }
       break;
     }
@@ -1321,7 +1334,7 @@ export const renderElementToSvg = (
           renderConfig.frameRendering,
         );
 
-        g ? root.appendChild(g) : root.appendChild(node);
+        addToRoot(g || node, element);
       } else {
         // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);

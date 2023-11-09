@@ -1132,10 +1132,11 @@ class App extends React.Component<AppProps, AppState> {
             }px`,
             left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
-            fontSize: "14px",
+            fontSize: FRAME_STYLE.nameFontSize,
             color: isDarkTheme
               ? FRAME_STYLE.nameColorDarkTheme
               : FRAME_STYLE.nameColorLightTheme,
+            lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
             maxWidth: `${f.width}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
