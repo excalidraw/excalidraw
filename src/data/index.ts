@@ -3,11 +3,19 @@ import {
   copyTextToSystemClipboard,
 } from "../clipboard";
 import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import { getNonDeletedElements, isFrameElement } from "../element";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { t } from "../i18n";
+import { elementsOverlappingBBox } from "../packages/withinBounds";
+import { isSomeElementSelected, getSelectedElements } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
 import { AppState, BinaryFiles } from "../types";
+import { cloneJSON } from "../utils";
 import { canvasToBlob } from "./blob";
 import { fileSave, FileSystemHandle } from "./filesystem";
 import { serializeAsJSON } from "./json";
@@ -15,9 +23,61 @@ import { serializeAsJSON } from "./json";
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
 
+export type ExportedElements = readonly NonDeletedExcalidrawElement[] & {
+  _brand: "exportedElements";
+};
+
+export const prepareElementsForExport = (
+  elements: readonly ExcalidrawElement[],
+  { selectedElementIds }: Pick<AppState, "selectedElementIds">,
+  exportSelectionOnly: boolean,
+) => {
+  elements = getNonDeletedElements(elements);
+
+  const isExportingSelection =
+    exportSelectionOnly &&
+    isSomeElementSelected(elements, { selectedElementIds });
+
+  let exportingFrame: ExcalidrawFrameElement | null = null;
+  let exportedElements = isExportingSelection
+    ? getSelectedElements(
+        elements,
+        { selectedElementIds },
+        {
+          includeBoundTextElement: true,
+        },
+      )
+    : elements;
+
+  if (isExportingSelection) {
+    if (exportedElements.length === 1 && isFrameElement(exportedElements[0])) {
+      exportingFrame = exportedElements[0];
+      exportedElements = elementsOverlappingBBox({
+        elements,
+        bounds: exportingFrame,
+        type: "overlap",
+      });
+    } else if (exportedElements.length > 1) {
+      exportedElements = getSelectedElements(
+        elements,
+        { selectedElementIds },
+        {
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        },
+      );
+    }
+  }
+
+  return {
+    exportingFrame,
+    exportedElements: cloneJSON(exportedElements) as ExportedElements,
+  };
+};
+
 export const exportCanvas = async (
   type: Omit<ExportType, "backend">,
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: ExportedElements,
   appState: AppState,
   files: BinaryFiles,
   {
@@ -26,12 +86,14 @@ export const exportCanvas = async (
     viewBackgroundColor,
     name,
     fileHandle = null,
+    exportingFrame = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     name: string;
     fileHandle?: FileSystemHandle | null;
+    exportingFrame: ExcalidrawFrameElement | null;
   },
 ) => {
   if (elements.length === 0) {
@@ -49,6 +111,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
+      { exportingFrame },
     );
     if (type === "svg") {
       return await fileSave(
@@ -70,6 +133,7 @@ export const exportCanvas = async (
     exportBackground,
     viewBackgroundColor,
     exportPadding,
+    exportingFrame,
   });
 
   if (type === "png") {

@@ -25,7 +25,7 @@ import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
   bindElementsToFramesAfterDuplication,
-  getFrameElements,
+  getFrameChildren,
 } from "../frame";
 import {
   excludeElementsInFramesFromSelection,
@@ -155,7 +155,7 @@ const duplicateElements = (
             groupId,
           ).flatMap((element) =>
             isFrameElement(element)
-              ? [...getFrameElements(elements, element.id), element]
+              ? [...getFrameChildren(elements, element.id), element]
               : [element],
           );
 
@@ -181,7 +181,7 @@ const duplicateElements = (
           continue;
         }
         if (isElementAFrame) {
-          const elementsInFrame = getFrameElements(sortedElements, element.id);
+          const elementsInFrame = getFrameChildren(sortedElements, element.id);
 
           elementsWithClones.push(
             ...markAsProcessed([
