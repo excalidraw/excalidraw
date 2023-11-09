@@ -29,6 +29,10 @@ Please add the latest change on the top under the correct section.
 
 - [`useDevice`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils#usedevice) hook's return value was changed to differentiate between `editor` and `viewport` breakpoints. [#7243](https://github.com/excalidraw/excalidraw/pull/7243)
 
+### Build
+
+- Support Preact [#7255](https://github.com/excalidraw/excalidraw/pull/7255). The host needs to set `window.IS_PREACT` to `true` before importing Excalidraw if using Preact and the integration would work. `index.html` is a good place to set the variable.
+
 ## 0.16.1 (2023-09-21)
 
 ## Excalidraw Library
