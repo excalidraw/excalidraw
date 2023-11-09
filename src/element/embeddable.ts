@@ -200,7 +200,7 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   return { link, aspectRatio, type };
 };
 
-export const isEmbeddableOrFrameLabel = (
+export const isEmbeddableOrLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
   if (isEmbeddableElement(element)) {

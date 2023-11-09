@@ -9,8 +9,8 @@ import {
   readSystemClipboard,
 } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
-import { exportCanvas } from "../data/index";
-import { getNonDeletedElements, isTextElement } from "../element";
+import { exportCanvas, prepareElementsForExport } from "../data/index";
+import { isTextElement } from "../element";
 import { t } from "../i18n";
 import { isFirefox } from "../constants";
 
@@ -122,20 +122,23 @@ export const actionCopyAsSvg = register({
         commitToHistory: false,
       };
     }
-    const selectedElements = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeBoundTextElement: true,
-      includeElementsInFrames: true,
-    });
+
+    const { exportedElements, exportingFrame } = prepareElementsForExport(
+      elements,
+      appState,
+      true,
+    );
+
     try {
       await exportCanvas(
         "clipboard-svg",
-        selectedElements.length
-          ? selectedElements
-          : getNonDeletedElements(elements),
+        exportedElements,
         appState,
         app.files,
-        appState,
+        {
+          ...appState,
+          exportingFrame,
+        },
       );
       return {
         commitToHistory: false,
@@ -171,16 +174,17 @@ export const actionCopyAsPng = register({
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     });
+
+    const { exportedElements, exportingFrame } = prepareElementsForExport(
+      elements,
+      appState,
+      true,
+    );
     try {
-      await exportCanvas(
-        "clipboard",
-        selectedElements.length
-          ? selectedElements
-          : getNonDeletedElements(elements),
-        appState,
-        app.files,
-        appState,
-      );
+      await exportCanvas("clipboard", exportedElements, appState, app.files, {
+        ...appState,
+        exportingFrame,
+      });
       return {
         appState: {
           ...appState,

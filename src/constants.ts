@@ -105,6 +105,7 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
+  Assistant: 4,
 };
 
 export const THEME = {
@@ -114,13 +115,18 @@ export const THEME = {
 
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
-  strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
+  strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
   strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
   fillStyle: "solid" as ExcalidrawElement["fillStyle"],
   roughness: 0 as ExcalidrawElement["roughness"],
   roundness: null as ExcalidrawElement["roundness"],
   backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
   radius: 8,
+  nameOffsetY: 3,
+  nameColorLightTheme: "#999999",
+  nameColorDarkTheme: "#7a7a7a",
+  nameFontSize: 14,
+  nameLineHeight: 1.25,
 };
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";

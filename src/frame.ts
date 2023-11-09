@@ -201,24 +201,52 @@ export const groupByFrames = (elements: readonly ExcalidrawElement[]) => {
   for (const element of elements) {
     const frameId = isFrameElement(element) ? element.id : element.frameId;
     if (frameId && !frameElementsMap.has(frameId)) {
-      frameElementsMap.set(frameId, getFrameElements(elements, frameId));
+      frameElementsMap.set(frameId, getFrameChildren(elements, frameId));
     }
   }
 
   return frameElementsMap;
 };
 
-export const getFrameElements = (
+export const getFrameChildren = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frameId: string,
 ) => allElements.filter((element) => element.frameId === frameId);
+
+export const getFrameElements = (
+  allElements: ExcalidrawElementsIncludingDeleted,
+): ExcalidrawFrameElement[] => {
+  return allElements.filter((element) =>
+    isFrameElement(element),
+  ) as ExcalidrawFrameElement[];
+};
+
+/**
+ * Returns ExcalidrawFrameElements and non-frame-children elements.
+ *
+ * Considers children as root elements if they point to a frame parent
+ * non-existing in the elements set.
+ *
+ * Considers non-frame bound elements (container or arrow labels) as root.
+ */
+export const getRootElements = (
+  allElements: ExcalidrawElementsIncludingDeleted,
+) => {
+  const frameElements = arrayToMap(getFrameElements(allElements));
+  return allElements.filter(
+    (element) =>
+      frameElements.has(element.id) ||
+      !element.frameId ||
+      !frameElements.has(element.frameId),
+  );
+};
 
 export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ): ExcalidrawElement[] => {
-  const prevElementsInFrame = getFrameElements(allElements, frame.id);
+  const prevElementsInFrame = getFrameChildren(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
   const elementsCompletelyInFrame = new Set([
@@ -449,7 +477,7 @@ export const removeAllElementsFromFrame = (
   frame: ExcalidrawFrameElement,
   appState: AppState,
 ) => {
-  const elementsInFrame = getFrameElements(allElements, frame.id);
+  const elementsInFrame = getFrameChildren(allElements, frame.id);
   return removeElementsFromFrame(allElements, elementsInFrame, appState);
 };
 

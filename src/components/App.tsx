@@ -87,7 +87,7 @@ import {
   ZOOM_STEP,
   POINTER_EVENTS,
 } from "../constants";
-import { exportCanvas, loadFromBlob } from "../data";
+import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -317,7 +317,7 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import {
-  getFrameElements,
+  getFrameChildren,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   addElementsToFrame,
@@ -1048,12 +1048,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const { x: x2 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x + f.width, sceneY: f.y + f.height },
-        this.state,
-      );
-
-      const FRAME_NAME_GAP = 20;
       const FRAME_NAME_EDIT_PADDING = 6;
 
       const reset = () => {
@@ -1098,13 +1092,12 @@ class App extends React.Component<AppProps, AppState> {
               boxShadow: "inset 0 0 0 1px var(--color-primary)",
               fontFamily: "Assistant",
               fontSize: "14px",
-              transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
+              transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
-              maxWidth: `${Math.min(
-                x2 - x1 - FRAME_NAME_EDIT_PADDING,
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING,
-              )}px`,
+              maxWidth: `${
+                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+              }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
             dir="auto"
@@ -1126,19 +1119,26 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
-            top: `${y1 - FRAME_NAME_GAP - this.state.offsetTop}px`,
-            left: `${
-              x1 -
-              this.state.offsetLeft -
-              (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
+            // Positioning from bottom so that we don't to either
+            // calculate text height or adjust using transform (which)
+            // messes up input position when editing the frame name.
+            // This makes the positioning deterministic and we can calculate
+            // the same position when rendering to canvas / svg.
+            bottom: `${
+              this.state.height +
+              FRAME_STYLE.nameOffsetY -
+              y1 +
+              this.state.offsetTop
             }px`,
+            left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
-            fontSize: "14px",
+            fontSize: FRAME_STYLE.nameFontSize,
             color: isDarkTheme
-              ? "var(--color-gray-60)"
-              : "var(--color-gray-50)",
+              ? FRAME_STYLE.nameColorDarkTheme
+              : FRAME_STYLE.nameColorLightTheme,
+            lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
-            maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
+            maxWidth: `${f.width}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
@@ -1370,7 +1370,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: ExportedElements,
+    opts: { exportingFrame: ExcalidrawFrameElement | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -1382,6 +1383,7 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: this.state.exportBackground,
         name: this.state.name,
         viewBackgroundColor: this.state.viewBackgroundColor,
+        exportingFrame: opts.exportingFrame,
       },
     )
       .catch(muteFSAbortError)
@@ -5330,7 +5332,7 @@ class App extends React.Component<AppProps, AppState> {
 
                 // if hitElement is frame, deselect all of its elements if they are selected
                 if (hitElement.type === "frame") {
-                  getFrameElements(
+                  getFrameChildren(
                     previouslySelectedElements,
                     hitElement.id,
                   ).forEach((element) => {
@@ -8194,7 +8196,7 @@ class App extends React.Component<AppProps, AppState> {
     >();
 
     selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameElements(
+      const elementsInFrame = getFrameChildren(
         this.scene.getNonDeletedElements(),
         frame.id,
       );
@@ -8264,7 +8266,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
-        const elementsInFrame = getFrameElements(
+        const elementsInFrame = getFrameChildren(
           this.scene.getNonDeletedElements(),
           frame.id,
         );

@@ -8,6 +8,7 @@ import {
 } from "../../excalidraw-app/collab/reconciliation";
 import { randomInteger } from "../../src/random";
 import { AppState } from "../../src/types";
+import { cloneJSON } from "../../src/utils";
 
 type Id = string;
 type ElementLike = {
@@ -93,8 +94,6 @@ const cleanElements = (elements: ReconciledElements) => {
   });
 };
 
-const cloneDeep = (data: any) => JSON.parse(JSON.stringify(data));
-
 const test = <U extends `${string}:${"L" | "R"}`>(
   local: (Id | ElementLike)[],
   remote: (Id | ElementLike)[],
@@ -115,15 +114,15 @@ const test = <U extends `${string}:${"L" | "R"}`>(
     "remote reconciliation",
   );
 
-  const __local = cleanElements(cloneDeep(_remote));
-  const __remote = addParents(cleanElements(cloneDeep(remoteReconciled)));
+  const __local = cleanElements(cloneJSON(_remote) as ReconciledElements);
+  const __remote = addParents(cleanElements(cloneJSON(remoteReconciled)));
   if (bidirectional) {
     try {
       expect(
         cleanElements(
           reconcileElements(
-            cloneDeep(__local),
-            cloneDeep(__remote),
+            cloneJSON(__local),
+            cloneJSON(__remote),
             {} as AppState,
           ),
         ),

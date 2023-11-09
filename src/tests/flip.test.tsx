@@ -27,6 +27,7 @@ import * as blob from "../data/blob";
 import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
+import { cloneJSON } from "../utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -206,16 +207,14 @@ const checkElementsBoundingBox = async (
 };
 
 const checkHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0];
   await checkElementsBoundingBox(originalElement, newElement, toleranceInPx);
 };
 
 const checkTwoPointsLineHorizontalFlip = async () => {
-  const originalElement = JSON.parse(
-    JSON.stringify(h.elements[0]),
-  ) as ExcalidrawLinearElement;
+  const originalElement = cloneJSON(h.elements[0]) as ExcalidrawLinearElement;
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
@@ -239,9 +238,7 @@ const checkTwoPointsLineHorizontalFlip = async () => {
 };
 
 const checkTwoPointsLineVerticalFlip = async () => {
-  const originalElement = JSON.parse(
-    JSON.stringify(h.elements[0]),
-  ) as ExcalidrawLinearElement;
+  const originalElement = cloneJSON(h.elements[0]) as ExcalidrawLinearElement;
   h.app.actionManager.executeAction(actionFlipVertical);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
@@ -268,7 +265,7 @@ const checkRotatedHorizontalFlip = async (
   expectedAngle: number,
   toleranceInPx: number = 0.00001,
 ) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
   h.app.actionManager.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0];
   await waitFor(() => {
@@ -281,7 +278,7 @@ const checkRotatedVerticalFlip = async (
   expectedAngle: number,
   toleranceInPx: number = 0.00001,
 ) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
   h.app.actionManager.executeAction(actionFlipVertical);
   const newElement = h.elements[0];
   await waitFor(() => {
@@ -291,7 +288,7 @@ const checkRotatedVerticalFlip = async (
 };
 
 const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
 
   h.app.actionManager.executeAction(actionFlipVertical);
 
@@ -300,7 +297,7 @@ const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
 };
 
 const checkVerticalHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
-  const originalElement = JSON.parse(JSON.stringify(h.elements[0]));
+  const originalElement = cloneJSON(h.elements[0]);
 
   h.app.actionManager.executeAction(actionFlipHorizontal);
   h.app.actionManager.executeAction(actionFlipVertical);

@@ -161,7 +161,10 @@ const LayerUI = ({
   };
 
   const renderImageExportDialog = () => {
-    if (!UIOptions.canvasActions.saveAsImage) {
+    if (
+      !UIOptions.canvasActions.saveAsImage ||
+      appState.openDialog !== "imageExport"
+    ) {
       return null;
     }
 
