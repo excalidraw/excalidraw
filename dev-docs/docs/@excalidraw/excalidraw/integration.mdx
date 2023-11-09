@@ -34,18 +34,43 @@ function App() {
 
 Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
 
-The following workflow shows one way how to render Excalidraw on Next.js. We'll add more detailed and alternative Next.js examples, soon.
+Here are two ways on how you can render **Excalidraw** on **Next.js**.
+
+1. Importing Excalidraw once **client** is rendered.
 
 ```jsx showLineNumbers
 import { useState, useEffect } from "react";
 export default function App() {
   const [Excalidraw, setExcalidraw] = useState(null);
   useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) => setExcalidraw(comp.Excalidraw));
+    import("@excalidraw/excalidraw").then((comp) =>
+      setExcalidraw(comp.Excalidraw),
+    );
   }, []);
   return <>{Excalidraw && <Excalidraw />}</>;
 }
 ```
+
+Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-5xb3d)
+
+2. Using **Next.js Dynamic** import.
+
+Since Excalidraw doesn't server side rendering so you can also use `dynamic import` to render by setting `ssr` to `false`. However one drawback is the `Refs` don't work with dynamic import in Next.js. We are working on overcoming this and have a better API.
+
+```jsx showLineNumbers
+import dynamic from "next/dynamic";
+const Excalidraw = dynamic(
+  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
+  {
+    ssr: false,
+  },
+);
+export default function App() {
+  return <Excalidraw />;
+}
+```
+
+Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-dynamic-k8yjq2).
 
 The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 
