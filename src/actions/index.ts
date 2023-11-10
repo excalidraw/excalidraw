@@ -44,7 +44,6 @@ export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
 export {
   actionToggleCanvasMenu,
   actionToggleEditMenu,
-  actionFullScreen,
   actionShortcuts,
 } from "./actionMenu";
 

@@ -3,7 +3,6 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
-import { allowFullScreen, exitFullScreen, isFullScreen } from "../utils";
 import { KEYS } from "../keys";
 
 export const actionToggleCanvasMenu = register({
@@ -50,23 +49,6 @@ export const actionToggleEditMenu = register({
       selected={appState.openMenu === "shape"}
     />
   ),
-});
-
-export const actionFullScreen = register({
-  name: "toggleFullScreen",
-  viewMode: true,
-  trackEvent: { category: "canvas", predicate: (appState) => !isFullScreen() },
-  perform: () => {
-    if (!isFullScreen()) {
-      allowFullScreen();
-    }
-    if (isFullScreen()) {
-      exitFullScreen();
-    }
-    return {
-      commitToHistory: false,
-    };
-  },
 });
 
 export const actionShortcuts = register({
