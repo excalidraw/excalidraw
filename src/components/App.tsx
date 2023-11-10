@@ -240,7 +240,6 @@ import {
   isInputLike,
   isToolIcon,
   isWritableElement,
-  resolvablePromise,
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
@@ -540,7 +539,7 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
     const {
-      excalidrawRef,
+      excalidrawAPI,
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
@@ -571,14 +570,8 @@ class App extends React.Component<AppProps, AppState> {
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
 
-    if (excalidrawRef) {
-      const readyPromise =
-        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
-        resolvablePromise<ExcalidrawImperativeAPI>();
-
+    if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
-        ready: true,
-        readyPromise,
         updateScene: this.updateScene,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
@@ -603,12 +596,11 @@ class App extends React.Component<AppProps, AppState> {
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
       } as const;
-      if (typeof excalidrawRef === "function") {
-        excalidrawRef(api);
+      if (typeof excalidrawAPI === "function") {
+        excalidrawAPI(api);
       } else {
-        excalidrawRef.current = api;
+        console.error("excalidrawAPI should be a function!");
       }
-      readyPromise.resolve(api);
     }
 
     this.excalidrawContainerValue = {

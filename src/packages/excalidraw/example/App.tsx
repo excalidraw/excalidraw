@@ -665,7 +665,9 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw
-            ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
+            excalidrawAPI={(api: ExcalidrawImperativeAPI) =>
+              setExcalidrawAPI(api)
+            }
             initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) => {
               console.info("Elements :", elements, "State : ", state);
