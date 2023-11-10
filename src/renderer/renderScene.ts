@@ -77,11 +77,7 @@ import {
   isEmbeddableOrFrameLabel,
   createPlaceholderEmbeddableLabel,
 } from "../element/embeddable";
-import {
-  elementOverlapsWithFrame,
-  getTargetFrame,
-  isElementInFrame,
-} from "../frame";
+import { getTargetFrame, isElementInFrame } from "../frame";
 import "canvas-roundrect-polyfill";
 
 export const DEFAULT_SPACING = 2;
@@ -944,22 +940,6 @@ const _renderStaticScene = ({
       normalizedHeight / appState.zoom.value,
     );
   }
-
-  const groupsToBeAddedToFrame = new Set<string>();
-
-  visibleElements.forEach((element) => {
-    if (
-      element.groupIds.length > 0 &&
-      appState.frameToHighlight &&
-      appState.selectedElementIds[element.id] &&
-      (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
-        element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
-    ) {
-      element.groupIds.forEach((groupId) =>
-        groupsToBeAddedToFrame.add(groupId),
-      );
-    }
-  });
 
   // Paint visible elements
   visibleElements
