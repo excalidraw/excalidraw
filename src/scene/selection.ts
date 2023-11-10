@@ -8,7 +8,7 @@ import { isBoundToContainer } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
   getContainingFrame,
-  getFrameElements,
+  getFrameChildren,
 } from "../frame";
 import { isShallowEqual } from "../utils";
 import { isElementInViewport } from "../element/sizeHelpers";
@@ -191,7 +191,7 @@ export const getSelectedElements = (
     const elementsToInclude: ExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       if (element.type === "frame") {
-        getFrameElements(elements, element.id).forEach((e) =>
+        getFrameChildren(elements, element.id).forEach((e) =>
           elementsToInclude.push(e),
         );
       }

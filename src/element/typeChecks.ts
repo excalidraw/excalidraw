@@ -1,6 +1,7 @@
 import { ROUNDNESS } from "../constants";
 import { AppState } from "../types";
 import { MarkNonNullable } from "../utility-types";
+import { assertNever } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -140,17 +141,32 @@ export const isTextBindableContainer = (
   );
 };
 
-export const isExcalidrawElement = (element: any): boolean => {
-  return (
-    element?.type === "text" ||
-    element?.type === "diamond" ||
-    element?.type === "rectangle" ||
-    element?.type === "embeddable" ||
-    element?.type === "ellipse" ||
-    element?.type === "arrow" ||
-    element?.type === "freedraw" ||
-    element?.type === "line"
-  );
+export const isExcalidrawElement = (
+  element: any,
+): element is ExcalidrawElement => {
+  const type: ExcalidrawElement["type"] | undefined = element?.type;
+  if (!type) {
+    return false;
+  }
+  switch (type) {
+    case "text":
+    case "diamond":
+    case "rectangle":
+    case "embeddable":
+    case "ellipse":
+    case "arrow":
+    case "freedraw":
+    case "line":
+    case "frame":
+    case "image":
+    case "selection": {
+      return true;
+    }
+    default: {
+      assertNever(type, null);
+      return false;
+    }
+  }
 };
 
 export const hasBoundTextElement = (
