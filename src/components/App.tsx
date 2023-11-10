@@ -1173,6 +1173,19 @@ class App extends React.Component<AppProps, AppState> {
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
+    const shouldBlockPointerEvents =
+      !(
+        this.state.editingElement && isLinearElement(this.state.editingElement)
+      ) &&
+      (this.state.selectionElement ||
+        this.state.draggingElement ||
+        this.state.resizingElement ||
+        (this.state.activeTool.type === "laser" &&
+          // technically we can just test on this once we make it more safe
+          this.state.cursorButton === "down") ||
+        (this.state.editingElement &&
+          !isTextElement(this.state.editingElement)));
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1180,17 +1193,9 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
-          ["--ui-pointerEvents" as any]:
-            this.state.selectionElement ||
-            this.state.draggingElement ||
-            this.state.resizingElement ||
-            (this.state.activeTool.type === "laser" &&
-              // technically we can just test on this once we make it more safe
-              this.state.cursorButton === "down") ||
-            (this.state.editingElement &&
-              !isTextElement(this.state.editingElement))
-              ? POINTER_EVENTS.disabled
-              : POINTER_EVENTS.enabled,
+          ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
+            ? POINTER_EVENTS.disabled
+            : POINTER_EVENTS.enabled,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
