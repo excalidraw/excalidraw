@@ -1,4 +1,4 @@
-if (window.IS_PREACT === "true") {
+if (process.env.IS_PREACT === "true") {
   if (process.env.NODE_ENV === "production") {
     module.exports = require("./dist/excalidraw-with-preact.production.min.js");
   } else {
