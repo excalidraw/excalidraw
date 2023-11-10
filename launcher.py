@@ -19,6 +19,9 @@
 # export REACT_APP_CDN_MATOMO_TRACKER_URL=//cdn.matomo.cloud/excalidraw.matomo.cloud/matomo.js
 # export REACT_APP_MATOMO_SITE_ID=1
 # export REACT_APP_PLUS_APP=https://app.excalidraw.com
+# alswl's fork version env
+# export REACT_APP_HTTP_STORAGE_BACKEND_URL=http://127.0.0.1:8081/api/v2
+# export REACT_APP_STORAGE_BACKEND=http
 #
 # 3. launch nginx, python launcher.py /usr/share/nginx/html
 
@@ -64,6 +67,10 @@ envs = [
     "REACT_APP_CDN_MATOMO_TRACKER_URL",
     "REACT_APP_MATOMO_SITE_ID",
     "REACT_APP_PLUS_APP",
+
+    # alswl's fork version env
+    "REACT_APP_STORAGE_BACKEND",
+    "REACT_APP_HTTP_STORAGE_BACKEND_URL",
 ]
 
 
