@@ -593,8 +593,9 @@ export const isElementInFrame = (
   element: ExcalidrawElement,
   allElements: ExcalidrawElementsIncludingDeleted,
   appState: StaticCanvasAppState,
+  targetFrame?: ExcalidrawFrameElement,
 ) => {
-  const frame = getTargetFrame(element, appState);
+  const frame = targetFrame ?? getTargetFrame(element, appState);
   const _element = isTextElement(element)
     ? getContainerElement(element) || element
     : element;

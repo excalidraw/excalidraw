@@ -357,6 +357,36 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
+const getContiguousElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: StaticCanvasAppState,
+) => {
+  const contiguousElementsArray: ExcalidrawElement[][] = [];
+
+  let previousFrameId: string | null | undefined = null;
+  const contiguousElements: ExcalidrawElement[] = [];
+  for (const element of elements) {
+    const frameId = element.frameId || appState.frameToHighlight?.id;
+
+    if (previousFrameId !== frameId) {
+      if (contiguousElements.length > 0) {
+        contiguousElementsArray.push([...contiguousElements]);
+        contiguousElements.length = 0;
+      }
+
+      previousFrameId = frameId;
+    }
+
+    contiguousElements.push(element);
+  }
+
+  if (contiguousElements.length > 0) {
+    contiguousElementsArray.push([...contiguousElements]);
+  }
+
+  return contiguousElementsArray;
+};
+
 const frameClip = (
   frame: ExcalidrawFrameElement,
   context: CanvasRenderingContext2D,
@@ -941,86 +971,69 @@ const _renderStaticScene = ({
     );
   }
 
-  // Paint visible elements
-  visibleElements
-    .filter((el) => !isEmbeddableOrLabel(el))
-    .forEach((element) => {
+  // Paint visible elements with embeddables on top
+  const visibleNonEmbeddableOrLabelElements = visibleElements.filter(
+    (el) => !isEmbeddableOrLabel(el),
+  );
+
+  const visibleEmbeddableOrLabelElements = visibleElements.filter((el) =>
+    isEmbeddableOrLabel(el),
+  );
+
+  const contiguousElementsArray = [
+    ...getContiguousElements(visibleNonEmbeddableOrLabelElements, appState),
+    ...getContiguousElements(visibleEmbeddableOrLabelElements, appState),
+  ];
+
+  const renderContiguousElements = (
+    contiguousElements: ExcalidrawElement[],
+  ) => {
+    for (const element of contiguousElements) {
       try {
-        const frameId = element.frameId || appState.frameToHighlight?.id;
+        renderElement(element, rc, context, renderConfig, appState);
 
         if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
+          isEmbeddableElement(element) &&
+          (isExporting || !element.validated) &&
+          element.width &&
+          element.height
         ) {
-          context.save();
-
-          const frame = getTargetFrame(element, appState);
-
-          // TODO do we need to check isElementInFrame here?
-          if (frame && isElementInFrame(element, elements, appState)) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(element, rc, context, renderConfig, appState);
-          context.restore();
-        } else {
-          renderElement(element, rc, context, renderConfig, appState);
+          const label = createPlaceholderEmbeddableLabel(element);
+          renderElement(label, rc, context, renderConfig, appState);
         }
+
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
         }
       } catch (error: any) {
         console.error(error);
       }
-    });
+    }
+  };
 
-  // render embeddables on top
-  visibleElements
-    .filter((el) => isEmbeddableOrLabel(el))
-    .forEach((element) => {
-      try {
-        const render = () => {
-          renderElement(element, rc, context, renderConfig, appState);
+  for (const contiguousElements of contiguousElementsArray) {
+    const firstElement = contiguousElements[0];
 
-          if (
-            isEmbeddableElement(element) &&
-            (isExporting || !element.validated) &&
-            element.width &&
-            element.height
-          ) {
-            const label = createPlaceholderEmbeddableLabel(element);
-            renderElement(label, rc, context, renderConfig, appState);
-          }
-          if (!isExporting) {
-            renderLinkIcon(element, context, appState);
-          }
-        };
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
+    if (firstElement) {
+      context.save();
+      const frameId = firstElement.frameId || appState.frameToHighlight?.id;
 
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
+      if (
+        frameId &&
+        appState.frameRendering.enabled &&
+        appState.frameRendering.clip
+      ) {
+        const frame = getTargetFrame(firstElement, appState);
 
-          const frame = getTargetFrame(element, appState);
-
-          if (frame && isElementInFrame(element, elements, appState)) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          render();
-          context.restore();
-        } else {
-          render();
+        if (frame && isElementInFrame(firstElement, elements, appState)) {
+          frameClip(frame, context, renderConfig, appState);
         }
-      } catch (error: any) {
-        console.error(error);
       }
-    });
+
+      renderContiguousElements(contiguousElements);
+      context.restore();
+    }
+  }
 };
 
 /** throttled to animation framerate */
