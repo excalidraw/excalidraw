@@ -64,6 +64,7 @@ const ALLOWED_DOMAINS = new Set([
   "stackblitz.com",
   "val.town",
   "giphy.com",
+  "dddice.com",
 ]);
 
 const createSrcDoc = (body: string) => {
