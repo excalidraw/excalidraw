@@ -497,6 +497,11 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element | null;
   renderMermaid?: boolean; //zsviczian
+  onContextMenu?: ( //zsviczian
+    element: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    onClose: (callback?: () => void) => void,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {
