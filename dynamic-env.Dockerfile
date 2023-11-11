@@ -1,27 +1,53 @@
 FROM node:14-alpine AS build
 
+ARG CHINA_MIRROR=false
+
+# enable china mirror
+RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
+    echo "Enable China Alpine Mirror" && \
+    sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories; \
+    fi
+
+RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
+    echo "Enable China NPM Mirror" && \
+    npm install -g cnpm --registry=https://registry.npmmirror.com; \
+    npm config set registry https://registry.npmmirror.com; \
+    fi
+    
 WORKDIR /opt/node_app
 
 COPY package.json yarn.lock ./
-# china mirror
-RUN yarn config set registry https://registry.npm.taobao.org
+
 RUN yarn --ignore-optional --network-timeout 600000
 
 ARG NODE_ENV=production
 
 COPY . .
+# disable webpack env loader, use dynamic env
 RUN sed -i 's/process.env/window._env_/g' $(grep 'process.env' -R -l src)
 RUN yarn build:app:docker
 
 FROM nginx:1.21-alpine
 
-# china mirror
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+ARG CHINA_MIRROR=false
+
+# enable china mirror
+RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
+    echo "Enable China Alpine Mirror" && \
+    sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories; \
+    fi
+
 RUN apk update && apk add sed bash python3 py3-pip
-# china mirror
-RUN pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple
+
+# enable china mirror
+RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
+    echo "Enable China NPM Mirror" && \
+    pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple; \
+    fi
+    
 RUN pip3 install beautifulsoup4
 
+# env from upstream .env.production
 ENV REACT_APP_BACKEND_V2_GET_URL=https://json.excalidraw.com/api/v2/
 ENV REACT_APP_BACKEND_V2_POST_URL=https://json.excalidraw.com/api/v2/post/
 ENV REACT_APP_LIBRARY_URL=https://libraries.excalidraw.com
