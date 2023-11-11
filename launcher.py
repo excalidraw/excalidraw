@@ -46,7 +46,7 @@ default_envs = {
     "EXAMPLE": "false",
 }
 
-envs = [
+embed_envs = [
     # embed
     "NODE_ENV",
     "PUBLIC_URL",
@@ -54,23 +54,6 @@ envs = [
     "PKG_VERSION",
     "ANALYZER",
     "EXAMPLE",
-    # react app
-    "REACT_APP_BACKEND_V2_GET_URL",
-    "REACT_APP_BACKEND_V2_POST_URL",
-    "REACT_APP_LIBRARY_URL",
-    "REACT_APP_LIBRARY_BACKEND",
-    "REACT_APP_PORTAL_URL",
-    "REACT_APP_WS_SERVER_URL",
-    "REACT_APP_FIREBASE_CONFIG",
-    "REACT_APP_GOOGLE_ANALYTICS_ID",
-    "REACT_APP_MATOMO_URL",
-    "REACT_APP_CDN_MATOMO_TRACKER_URL",
-    "REACT_APP_MATOMO_SITE_ID",
-    "REACT_APP_PLUS_APP",
-
-    # alswl's fork version env
-    "REACT_APP_STORAGE_BACKEND",
-    "REACT_APP_HTTP_STORAGE_BACKEND_URL",
 ]
 
 
@@ -81,17 +64,24 @@ def get_env_or_default(name: str):
     return v
 
 
+def get_envs():
+    envs = [key for key, value in os.environ.items()]
+    react_apps = [key for key in envs if key.startswith("REACT_APP_")]
+    return react_apps + embed_envs
+
+
 def gen_dot_env(root: str):
     # gen .env in root
+
     with open(os.path.join(root, ".env"), "w") as f:
-        for name in envs:
+        for name in get_envs():
             val = get_env_or_default(name)
             f.write(f"{name}={val}\n")
 
 
 def gen_env_js(root: str):
     code = "window._env_ = {"
-    for name in envs:
+    for name in get_envs():
         val = get_env_or_default(name)
         code += f"{name}: '{val}',"
     code += "}"
@@ -177,7 +167,6 @@ def main():
         sys.exit(1)
 
     # gen .env
-    # gen_dot_env(root)
     code = gen_env_js(root)
     patch_index_html(root, code)
     patch_service_worker(root)
