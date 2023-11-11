@@ -15,6 +15,7 @@ import { distance, getFontString } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
+  FONT_FAMILY,
   FRAME_STYLE,
   SVG_NS,
   THEME_FILTER,
@@ -105,7 +106,7 @@ const addFrameLabelsAsTextElements = (
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: 4,
+        fontFamily: FONT_FAMILY.Assistant,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
