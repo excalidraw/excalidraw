@@ -3,7 +3,7 @@ name: Publish Docker Tag
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   publish-docker:
