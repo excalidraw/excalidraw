@@ -24,7 +24,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import type App from "./components/App";
-import type { ResolvablePromise, throttleRAF } from "./utils";
+import type { throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
@@ -35,7 +35,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
-import { Merge, ForwardRef, ValueOf } from "./utility-types";
+import { Merge, ValueOf } from "./utility-types";
 import { ColorPaletteCustom } from "./colors";
 
 export type Point = Readonly<RoughPoint>;
@@ -391,15 +391,6 @@ export type LibraryItemsSource =
   | Promise<LibraryItems_anyVersion | Blob>;
 // -----------------------------------------------------------------------------
 
-// NOTE ready/readyPromise props are optional for host apps' sake (our own
-// implem guarantees existence)
-export type ExcalidrawAPIRefValue =
-  | ExcalidrawImperativeAPI
-  | {
-      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready?: false;
-    };
-
 export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,
   {
@@ -419,7 +410,7 @@ export interface ExcalidrawProps {
     | ExcalidrawInitialDataState
     | null
     | Promise<ExcalidrawInitialDataState | null>;
-  excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
+  excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -691,8 +682,6 @@ export type ExcalidrawImperativeAPI = {
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
   updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
-  readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-  ready: true;
   id: string;
   setLocalFont: (showOnPanel: boolean) => void; //zsviczian
   selectElements: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
@@ -736,11 +725,15 @@ export type ExcalidrawImperativeAPI = {
 };
 
 export type Device = Readonly<{
-  isSmScreen: boolean;
-  isMobile: boolean;
+  viewport: {
+    isMobile: boolean;
+    isLandscape: boolean;
+  };
+  editor: {
+    isMobile: boolean;
+    canFitSidebar: boolean;
+  };
   isTouchScreen: boolean;
-  canDeviceFitSidebar: boolean;
-  isLandscape: boolean;
 }>;
 
 type FrameNameBounds = {

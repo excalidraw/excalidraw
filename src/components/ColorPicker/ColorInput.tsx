@@ -129,7 +129,7 @@ export const ColorInput = ({
         }}
       />
       {/* TODO reenable on mobile with a better UX */}
-      {!device.isMobile && (
+      {!device.editor.isMobile && (
         <>
           <div
             style={{

@@ -173,14 +173,18 @@ export const withExcalidrawDimensions = async (
 ) => {
   mockBoundingClientRect(dimensions);
   // @ts-ignore
-  window.h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
+  h.app.refreshViewportBreakpoints();
+  // @ts-ignore
+  h.app.refreshEditorBreakpoints();
   window.h.app.refresh();
 
   await cb();
 
   restoreOriginalGetBoundingClientRect();
   // @ts-ignore
-  window.h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
+  h.app.refreshViewportBreakpoints();
+  // @ts-ignore
+  h.app.refreshEditorBreakpoints();
   window.h.app.refresh();
 };
 

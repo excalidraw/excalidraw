@@ -50,8 +50,8 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
-  const { dynamicStyle } = useExcalidrawAppState(); //zsviczian
-  const device = useDevice();
+  const { dynamicStyle } = useExcalidrawAppState(); //zsviczian  
+  const isFullscreen = useDevice().viewport.isMobile;
 
   useEffect(() => {
     if (!islandNode) {
@@ -103,7 +103,9 @@ export const Dialog = (props: DialogProps) => {
 
   return (
     <Modal
-      className={clsx("Dialog", props.className)}
+      className={clsx("Dialog", props.className, {
+        "Dialog--fullscreen": isFullscreen,
+      })}
       labelledBy="dialog-title"
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
@@ -122,7 +124,7 @@ export const Dialog = (props: DialogProps) => {
           title={t("buttons.close")}
           aria-label={t("buttons.close")}
         >
-          {device.isMobile ? back : CloseIcon}
+          {isFullscreen ? back : CloseIcon}
         </button>
         <div className="Dialog__content">{props.children}</div>
       </Island>

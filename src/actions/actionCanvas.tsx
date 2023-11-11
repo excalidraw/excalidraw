@@ -464,7 +464,8 @@ export const actionToggleHandTool = register({
       commitToHistory: true,
     };
   },
-  keyTest: (event) => event.key === KEYS.H,
+  keyTest: (event) =>
+    !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });
 
 export const actionToggleLaserPointer = register({

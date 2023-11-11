@@ -6,13 +6,14 @@ import type {
 } from "../element/types";
 import {
   isArrowElement,
+  isExcalidrawElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
 import { isValueInRange, rotatePoint } from "../math";
 import type { Point } from "../types";
-import { Bounds } from "../element/bounds";
+import { Bounds, getElementBounds } from "../element/bounds";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
@@ -146,7 +147,7 @@ export const elementsOverlappingBBox = ({
   errorMargin = 0,
 }: {
   elements: Elements;
-  bounds: Bounds;
+  bounds: Bounds | ExcalidrawElement;
   /** safety offset. Defaults to 0. */
   errorMargin?: number;
   /**
@@ -156,6 +157,9 @@ export const elementsOverlappingBBox = ({
    **/
   type: "overlap" | "contain" | "inside";
 }) => {
+  if (isExcalidrawElement(bounds)) {
+    bounds = getElementBounds(bounds);
+  }
   const adjustedBBox: Bounds = [
     bounds[0] - errorMargin,
     bounds[1] - errorMargin,
