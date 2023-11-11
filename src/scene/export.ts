@@ -96,12 +96,16 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: Pick<AppState, "exportWithDarkMode">,
+  opts: Pick<AppState, "exportWithDarkMode" | "frameRendering">,
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   let frameIdx = 0;
   for (const element of elements) {
-    if (isFrameElement(element)) {
+    if (
+      isFrameElement(element) &&
+      opts.frameRendering?.name &&
+      opts.frameRendering?.enabled
+    ) {
       frameIdx++;
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
@@ -270,6 +274,12 @@ export const exportToSvg = async (
   } else {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode: appState.exportWithDarkMode ?? false,
+      frameRendering: appState.frameRendering ?? {
+        enabled: true,
+        outline: true,
+        name: true,
+        clip: true,
+      },
     });
   }
 
