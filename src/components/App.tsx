@@ -75,7 +75,6 @@ import {
   MQ_MAX_WIDTH_LANDSCAPE,
   MQ_MAX_WIDTH_PORTRAIT,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
-  MQ_SM_MAX_WIDTH,
   POINTER_BUTTON,
   ROUNDNESS,
   SCROLL_TIMEOUT,
@@ -89,7 +88,7 @@ import {
   ZOOM_STEP,
   POINTER_EVENTS,
 } from "../constants";
-import { exportCanvas, loadFromBlob } from "../data";
+import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -243,7 +242,6 @@ import {
   isInputLike,
   isToolIcon,
   isWritableElement,
-  resolvablePromise,
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
@@ -321,7 +319,7 @@ import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
 import {
-  getFrameElements,
+  getFrameChildren,
   isCursorInFrame,
   bindElementsToFramesAfterDuplication,
   addElementsToFrame,
@@ -390,11 +388,15 @@ const AppPropsContext = React.createContext<AppProps>(null!);
 export let showFourthFont: boolean = false; //zsviczian
 
 const deviceContextInitialValue = {
-  isSmScreen: false,
-  isMobile: false,
+  viewport: {
+    isMobile: false,
+    isLandscape: false,
+  },
+  editor: {
+    isMobile: false,
+    canFitSidebar: false,
+  },
   isTouchScreen: false,
-  canDeviceFitSidebar: false,
-  isLandscape: false,
 };
 const DeviceContext = React.createContext<Device>(deviceContextInitialValue);
 DeviceContext.displayName = "DeviceContext";
@@ -445,6 +447,9 @@ export const useExcalidrawSetAppState = () =>
 export const useExcalidrawActionManager = () =>
   useContext(ExcalidrawActionManagerContext);
 
+const supportsResizeObserver =
+  typeof window !== "undefined" && "ResizeObserver" in window;
+
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let isHoldingSpace: boolean = false;
@@ -481,7 +486,6 @@ class App extends React.Component<AppProps, AppState> {
   unmounted: boolean = false;
   actionManager: ActionManager;
   device: Device = deviceContextInitialValue;
-  detachIsMobileMqHandler?: () => void;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
@@ -545,7 +549,7 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
     const {
-      excalidrawRef,
+      excalidrawAPI,
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
@@ -578,14 +582,8 @@ class App extends React.Component<AppProps, AppState> {
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
 
-    if (excalidrawRef) {
-      const readyPromise =
-        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
-        resolvablePromise<ExcalidrawImperativeAPI>();
-
+    if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
-        ready: true,
-        readyPromise,
         updateScene: this.updateScene,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
@@ -621,12 +619,11 @@ class App extends React.Component<AppProps, AppState> {
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
       } as const;
-      if (typeof excalidrawRef === "function") {
-        excalidrawRef(api);
+      if (typeof excalidrawAPI === "function") {
+        excalidrawAPI(api);
       } else {
-        excalidrawRef.current = api;
+        console.error("excalidrawAPI should be a function!");
       }
-      readyPromise.resolve(api);
     }
 
     this.excalidrawContainerValue = {
@@ -1084,12 +1081,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const { x: x2 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x + f.width, sceneY: f.y + f.height },
-        this.state,
-      );
-
-      const FRAME_NAME_GAP = 20;
       const FRAME_NAME_EDIT_PADDING = 6;
 
       const reset = () => {
@@ -1137,13 +1128,12 @@ class App extends React.Component<AppProps, AppState> {
               boxShadow: "inset 0 0 0 2px var(--color-on-primary-container)", //zsviczian (change to container)
               fontFamily: "Assistant",
               fontSize: "14px",
-              transform: `translateY(-${FRAME_NAME_EDIT_PADDING}px)`,
+              transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
-              maxWidth: `${Math.min(
-                x2 - x1 - FRAME_NAME_EDIT_PADDING,
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING,
-              )}px`,
+              maxWidth: `${
+                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+              }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
             dir="auto"
@@ -1165,19 +1155,26 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
-            top: `${y1 - FRAME_NAME_GAP - this.state.offsetTop}px`,
-            left: `${
-              x1 -
-              this.state.offsetLeft -
-              (this.state.editingFrame === f.id ? FRAME_NAME_EDIT_PADDING : 0)
+            // Positioning from bottom so that we don't to either
+            // calculate text height or adjust using transform (which)
+            // messes up input position when editing the frame name.
+            // This makes the positioning deterministic and we can calculate
+            // the same position when rendering to canvas / svg.
+            bottom: `${
+              this.state.height +
+              FRAME_STYLE.nameOffsetY -
+              y1 +
+              this.state.offsetTop
             }px`,
+            left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
-            fontSize: "14px",
+            fontSize: FRAME_STYLE.nameFontSize,
             color: isDarkTheme
-              ? "var(--color-gray-60)"
-              : "var(--color-gray-50)",
+              ? FRAME_STYLE.nameColorDarkTheme
+              : FRAME_STYLE.nameColorLightTheme,
+            lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
-            maxWidth: `${x2 - x1 + FRAME_NAME_EDIT_PADDING * 2}px`,
+            maxWidth: `${f.width}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
@@ -1237,20 +1234,19 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": this.state.viewModeEnabled,
-          "excalidraw--mobile":
-            this.device.isMobile ||
+          "excalidraw--mobile": 
+            this.device.editor.isMobile ||
             (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
               this.state.trayModeEnabled), //zsviczian
         })}
         style={{
-          ...{
-            //zsviczian added dynamicStyle
+          ...{ //zsviczian
             ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
               ? POINTER_EVENTS.disabled
               : POINTER_EVENTS.enabled,
-          },
-          ...this.state.dynamicStyle,
-        }} //zsviczian
+          }, //zsviczian
+          ...this.state.dynamicStyle, //zsviczian
+        }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
         tabIndex={0}
@@ -1428,7 +1424,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
-    elements: readonly NonDeletedExcalidrawElement[],
+    elements: ExportedElements,
+    opts: { exportingFrame: ExcalidrawFrameElement | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -1440,6 +1437,7 @@ class App extends React.Component<AppProps, AppState> {
         exportBackground: this.state.exportBackground,
         name: this.state.name,
         viewBackgroundColor: this.state.viewBackgroundColor,
+        exportingFrame: opts.exportingFrame,
       },
     )
       .catch(muteFSAbortError)
@@ -1720,22 +1718,64 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private refreshDeviceState = (container: HTMLDivElement) => {
-    const { width, height } = container.getBoundingClientRect();
+  private isMobileBreakpoint = (width: number, height: number) => {
+    return (
+      width !== 0 && //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
+      this.allowMobileMode && //zsviczian
+      (width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE))
+    );
+  };
+
+  private refreshViewportBreakpoints = () => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
+      document.body;
+
+    const prevViewportState = this.device.viewport;
+
+    const nextViewportState = updateObject(prevViewportState, {
+      isLandscape: viewportWidth > viewportHeight,
+      isMobile: this.isMobileBreakpoint(viewportWidth, viewportHeight),
+    });
+
+    if (prevViewportState !== nextViewportState) {
+      this.device = { ...this.device, viewport: nextViewportState };
+      return true;
+    }
+    return false;
+  };
+
+  private refreshEditorBreakpoints = () => {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const { width: editorWidth, height: editorHeight } =
+      container.getBoundingClientRect();
+
     const sidebarBreakpoint =
       this.props.UIOptions.dockedSidebarBreakpoint != null
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
-    this.device = updateObject(this.device, {
-      isLandscape: width > height,
-      isSmScreen: width < MQ_SM_MAX_WIDTH,
-      isMobile:
-        width !== 0 && //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
-        this.allowMobileMode && //zsviczian
-        (width < MQ_MAX_WIDTH_PORTRAIT ||
-          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)),
-      canDeviceFitSidebar: width > sidebarBreakpoint,
+
+    const prevEditorState = this.device.editor;
+
+    const nextEditorState = updateObject(prevEditorState, {
+      isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
+      canFitSidebar: editorWidth > sidebarBreakpoint,
     });
+
+    if (prevEditorState !== nextEditorState) {
+      this.device = { ...this.device, editor: nextEditorState };
+      return true;
+    }
+    return false;
   };
 
   public async componentDidMount() {
@@ -1777,52 +1817,21 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      this.excalidrawContainerRef.current &&
       // bounding rects don't work in tests so updating
       // the state on init would result in making the test enviro run
       // in mobile breakpoint (0 width/height), making everything fail
       !isTestEnv()
     ) {
-      this.refreshDeviceState(this.excalidrawContainerRef.current);
+      this.refreshViewportBreakpoints();
+      this.refreshEditorBreakpoints();
     }
 
-    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
+    if (supportsResizeObserver && this.excalidrawContainerRef.current) {
       this.resizeObserver = new ResizeObserver(() => {
-        // recompute device dimensions state
-        // ---------------------------------------------------------------------
-        this.refreshDeviceState(this.excalidrawContainerRef.current!);
-        // refresh offsets
-        // ---------------------------------------------------------------------
+        this.refreshEditorBreakpoints();
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
-    } else if (window.matchMedia) {
-      const mdScreenQuery = window.matchMedia(
-        `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
-      );
-      const smScreenQuery = window.matchMedia(
-        `(max-width: ${MQ_SM_MAX_WIDTH}px)`,
-      );
-      const canDeviceFitSidebarMediaQuery = window.matchMedia(
-        `(min-width: ${
-          // NOTE this won't update if a different breakpoint is supplied
-          // after mount
-          this.props.UIOptions.dockedSidebarBreakpoint != null
-            ? this.props.UIOptions.dockedSidebarBreakpoint
-            : MQ_RIGHT_SIDEBAR_MIN_WIDTH
-        }px)`,
-      );
-      const handler = () => {
-        this.excalidrawContainerRef.current!.getBoundingClientRect();
-        this.device = updateObject(this.device, {
-          isSmScreen: smScreenQuery.matches,
-          isMobile: mdScreenQuery.matches && this.allowMobileMode, //zsviczian
-          canDeviceFitSidebar: canDeviceFitSidebarMediaQuery.matches,
-        });
-      };
-      mdScreenQuery.addListener(handler);
-      this.detachIsMobileMqHandler = () =>
-        mdScreenQuery.removeListener(handler);
     }
 
     const searchParams = new URLSearchParams(window.location.search.slice(1));
@@ -1867,6 +1876,11 @@ class App extends React.Component<AppProps, AppState> {
     this.scene
       .getElementsIncludingDeleted()
       .forEach((element) => ShapeCache.delete(element));
+    this.refreshViewportBreakpoints();
+    this.updateDOMRect();
+    if (!supportsResizeObserver) {
+      this.refreshEditorBreakpoints();
+    }
     this.setState({});
   });
 
@@ -1920,7 +1934,6 @@ class App extends React.Component<AppProps, AppState> {
       false,
     );
 
-    this.detachIsMobileMqHandler?.();
     window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
 
@@ -2005,11 +2018,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      this.excalidrawContainerRef.current &&
       prevProps.UIOptions.dockedSidebarBreakpoint !==
-        this.props.UIOptions.dockedSidebarBreakpoint
+      this.props.UIOptions.dockedSidebarBreakpoint
     ) {
-      this.refreshDeviceState(this.excalidrawContainerRef.current);
+      this.refreshEditorBreakpoints();
     }
 
     if (
@@ -2479,7 +2491,7 @@ class App extends React.Component<AppProps, AppState> {
         // from library, not when pasting from clipboard. Alas.
         openSidebar:
           this.state.openSidebar &&
-          this.device.canDeviceFitSidebar &&
+          this.device.editor.canFitSidebar &&
           jotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
@@ -2695,7 +2707,7 @@ class App extends React.Component<AppProps, AppState> {
       !isPlainPaste &&
       textElements.length > 1 &&
       PLAIN_PASTE_TOAST_SHOWN === false &&
-      !this.device.isMobile
+      !this.device.editor.isMobile
     ) {
       this.setToast({
         message: t("toast.pasteAsSingleElement", {
@@ -2729,7 +2741,7 @@ class App extends React.Component<AppProps, AppState> {
       trackEvent(
         "toolbar",
         "toggleLock",
-        `${source} (${this.device.isMobile ? "mobile" : "desktop"})`,
+        `${source} (${this.device.editor.isMobile ? "mobile" : "desktop"})`,
       );
     }
     this.setState((prevState) => {
@@ -3025,21 +3037,22 @@ class App extends React.Component<AppProps, AppState> {
   //zsviczian https://github.com/zsviczian/excalibrain/issues/9
   public setMobileModeAllowed: ExcalidrawImperativeAPI["setMobileModeAllowed"] =
     (allow: boolean) => {
-      const { width, height } =
+      const { width: editorWidth, height: editorHeight } =
         this.excalidrawContainerRef.current!.getBoundingClientRect();
       this.allowMobileMode = allow;
+      const prevEditorState = this.device.editor;
+      let nextEditorState;
       if (allow) {
-        this.device = updateObject(this.device, {
-          isMobile:
-            width < MQ_MAX_WIDTH_PORTRAIT ||
-            (height < MQ_MAX_HEIGHT_LANDSCAPE &&
-              width < MQ_MAX_WIDTH_LANDSCAPE),
+        nextEditorState = updateObject(prevEditorState, {
+          isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
         });
       } else {
-        this.device = updateObject(this.device, {
-          isMobile: false,
+        nextEditorState = updateObject(prevEditorState, { 
+          isMobile: false, //must test this
         });
       }
+      if (prevEditorState !== nextEditorState) {
+        this.device = { ...this.device, editor: nextEditorState };
       this.forceUpdate();
     };
 
@@ -3390,7 +3403,9 @@ class App extends React.Component<AppProps, AppState> {
             trackEvent(
               "toolbar",
               shape,
-              `keyboard (${this.device.isMobile ? "mobile" : "desktop"})`,
+              `keyboard (${
+                this.device.editor.isMobile ? "mobile" : "desktop"
+              })`,
             );
           }
           this.setActiveTool({ type: shape });
@@ -4170,7 +4185,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.state,
           [scenePointer.x, scenePointer.y],
-          this.device.isMobile,
+          this.device.editor.isMobile,
         )
       );
     });
@@ -4202,7 +4217,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
-      this.device.isMobile,
+      this.device.editor.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUpEvent!,
@@ -4212,7 +4227,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
-      this.device.isMobile,
+      this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       let url = this.hitLinkElement.link;
@@ -5085,7 +5100,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
-    if (this.device.isMobile && clicklength < 300) {
+    if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
@@ -5603,7 +5618,7 @@ class App extends React.Component<AppProps, AppState> {
 
                 // if hitElement is frame, deselect all of its elements if they are selected
                 if (hitElement.type === "frame") {
-                  getFrameElements(
+                  getFrameChildren(
                     previouslySelectedElements,
                     hitElement.id,
                   ).forEach((element) => {
@@ -8525,7 +8540,7 @@ class App extends React.Component<AppProps, AppState> {
     >();
 
     selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameElements(
+      const elementsInFrame = getFrameChildren(
         this.scene.getNonDeletedElements(),
         frame.id,
       );
@@ -8595,7 +8610,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
-        const elementsInFrame = getFrameElements(
+        const elementsInFrame = getFrameChildren(
           this.scene.getNonDeletedElements(),
           frame.id,
         );

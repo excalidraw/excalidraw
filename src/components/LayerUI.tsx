@@ -161,7 +161,10 @@ const LayerUI = ({
   };
 
   const renderImageExportDialog = () => {
-    if (!UIOptions.canvasActions.saveAsImage) {
+    if (
+      !UIOptions.canvasActions.saveAsImage ||
+      appState.openDialog !== "imageExport"
+    ) {
       return null;
     }
 
@@ -250,7 +253,7 @@ const LayerUI = ({
                         <HintViewer
                           appState={appState}
                           isMobile={
-                            device.isMobile ||
+                            device.editor.isMobile ||
                             (!(
                               appState.viewModeEnabled ||
                               appState.zenModeEnabled
@@ -325,7 +328,7 @@ const LayerUI = ({
           >
             <UserList collaborators={appState.collaborators} />
             {!appState.viewModeEnabled && //zsviczian
-              renderTopRightUI?.(device.isMobile, appState)}
+              renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
@@ -339,7 +342,7 @@ const LayerUI = ({
   };
 
   const isTrayModeOrMobile =
-    device.isMobile ||
+    device.editor.isMobile ||
     (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
       appState.trayModeEnabled); //zsviczian
   const renderSidebars = () => {
@@ -350,7 +353,7 @@ const LayerUI = ({
           trackEvent(
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${device.isMobile ? "mobile" : "desktop"})`,
+            `(${device.editor.isMobile ? "mobile" : "desktop"})`,
           );
         }}
       />
@@ -378,7 +381,7 @@ const LayerUI = ({
             trackEvent(
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${device.isMobile ? "mobile" : "desktop"})`,
+              `button (${device.editor.isMobile ? "mobile" : "desktop"})`,
             );
           }
         }}
@@ -395,7 +398,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && ( //!device.isMobile && //zsviczian
+      {eyeDropperState && ( //!device.editor.isMobile && //zsviczian
         <EyeDropper
           colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
@@ -492,7 +495,7 @@ const LayerUI = ({
             style={
               appState.openSidebar &&
               isSidebarDocked &&
-              device.canDeviceFitSidebar
+              device.editor.canFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
             }

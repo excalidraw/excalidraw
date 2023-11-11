@@ -64,6 +64,7 @@ const ALLOWED_DOMAINS = new Set([
   "stackblitz.com",
   "val.town",
   "giphy.com",
+  "dddice.com",
 ]);
 
 const createSrcDoc = (body: string) => {
@@ -200,7 +201,7 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   return { link, aspectRatio, type };
 };
 
-export const isEmbeddableOrFrameLabel = (
+export const isEmbeddableOrLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
   if (isEmbeddableElement(element)) {

@@ -4,7 +4,11 @@ import {
 } from "../scene/export";
 import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  NonDeleted,
+} from "../element/types";
 import { restore } from "../data/restore";
 import { MIME_TYPES } from "../constants";
 import { encodePngMetadata } from "../data/image";
@@ -14,24 +18,6 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "../clipboard";
-import Scene from "../scene/Scene";
-import { duplicateElements } from "../element/newElement";
-
-// getContainerElement and getBoundTextElement and potentially other helpers
-// depend on `Scene` which will not be available when these pure utils are
-// called outside initialized Excalidraw editor instance or even if called
-// from inside Excalidraw if the elements were never cached by Scene (e.g.
-// for library elements).
-//
-// As such, before passing the elements down, we need to initialize a custom
-// Scene instance and assign them to it.
-//
-// FIXME This is a super hacky workaround and we'll need to rewrite this soon.
-const passElementsSafely = (elements: readonly ExcalidrawElement[]) => {
-  const scene = new Scene();
-  scene.replaceAllElements(duplicateElements(elements));
-  return scene.getNonDeletedElements();
-};
 
 export { MIME_TYPES };
 
@@ -40,6 +26,7 @@ type ExportOpts = {
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
+  exportingFrame?: ExcalidrawFrameElement | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -53,6 +40,7 @@ export const exportToCanvas = ({
   maxWidthOrHeight,
   getDimensions,
   exportPadding,
+  exportingFrame,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -63,10 +51,10 @@ export const exportToCanvas = ({
   );
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
-    passElementsSafely(restoredElements),
+    restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor },
+    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -135,10 +123,8 @@ export const exportToBlob = async (
     };
   }
 
-  const canvas = await exportToCanvas({
-    ...opts,
-    elements: passElementsSafely(opts.elements),
-  });
+  const canvas = await exportToCanvas(opts);
+
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
   return new Promise((resolve, reject) => {
@@ -179,6 +165,7 @@ export const exportToSvg = async ({
   files = {},
   exportPadding,
   renderEmbeddables,
+  exportingFrame,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
@@ -194,20 +181,10 @@ export const exportToSvg = async ({
     exportPadding,
   };
 
-  return _exportToSvg(
-    passElementsSafely(restoredElements),
-    exportAppState,
-    files,
-    {
-      renderEmbeddables,
-      // NOTE as long as we're using the Scene hack, we need to ensure
-      // we pass the original, uncloned elements when serializing
-      // so that we keep ids stable. Hence adding the serializeAsJSON helper
-      // support into the downstream exportToSvg function.
-      serializeAsJSON: () =>
-        serializeAsJSON(restoredElements, exportAppState, files || {}, "local"),
-    },
-  );
+  return _exportToSvg(restoredElements, exportAppState, files, {
+    exportingFrame,
+    renderEmbeddables,
+  });
 };
 
 export const exportToClipboard = async (
