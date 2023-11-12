@@ -111,7 +111,11 @@ export const getDefaultAppState = (): Omit<
     resetCustomPen: null, //zsviczian
     gridColor: { Bold: "#cccccc", Regular: "#e5e5e5" }, //zsviczian
     dynamicStyle: {}, //zsviczian
-    frameColor: { stroke: "#bbb", fill: "rgba(0, 0, 200, 0.04)" }, //zsviczian
+    frameColor: {
+      stroke: "#bbb",
+      fill: "rgba(0, 0, 200, 0.04)",
+      nameColor: "#999999",
+    }, //zsviczian
     invertBindingBehaviour: false, //zsviczian
     selectedLinearElement: null,
     snapLines: [],

@@ -229,7 +229,6 @@ export const ShapesSwitcher = ({
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
-  const mermaidToolSelected = activeTool.type === "mermaid";
 
   return (
     <>

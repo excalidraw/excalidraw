@@ -1455,12 +1455,14 @@ export const renderSceneToSvg = (
     exportWithDarkMode,
     renderEmbeddables,
     frameRendering,
+    frameColor, //zsviczian
   }: {
     offsetX?: number;
     offsetY?: number;
     exportWithDarkMode: boolean;
     renderEmbeddables: boolean;
     frameRendering: AppState["frameRendering"];
+    frameColor?: AppState["frameColor"]; //zsviczian
   },
 ) => {
   if (!svgRoot) {
@@ -1471,6 +1473,7 @@ export const renderSceneToSvg = (
     exportWithDarkMode,
     renderEmbeddables,
     frameRendering,
+    frameColor, //zsviczian
   };
   // render elements
   elements

@@ -315,7 +315,7 @@ export type AppState = {
   resetCustomPen?: any; //zsviczian
   gridColor: { Bold: string; Regular: string; MajorGridFrequency?: number }; //zsviczian
   dynamicStyle: { [x: string]: string }; //zsviczian
-  frameColor: { stroke: string; fill: string }; //zsviczian
+  frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
 
@@ -488,7 +488,8 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element | null;
   renderMermaid?: boolean; //zsviczian
-  onContextMenu?: ( //zsviczian
+  onContextMenu?: (
+    //zsviczian
     element: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
     onClose: (callback?: () => void) => void,

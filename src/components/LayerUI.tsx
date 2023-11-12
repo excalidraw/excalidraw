@@ -488,7 +488,7 @@ const LayerUI = ({
         />
       )}
 
-      {!isTrayModeOrMobile && ( //zsviczian changed from !device.isMobile
+      {!isTrayModeOrMobile && ( //zsviczian changed from !device.editor.isMobile
         <>
           <div
             className="layer-ui__wrapper"

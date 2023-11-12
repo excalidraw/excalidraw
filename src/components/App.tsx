@@ -1169,9 +1169,11 @@ class App extends React.Component<AppProps, AppState> {
             left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
             fontSize: FRAME_STYLE.nameFontSize,
-            color: isDarkTheme
-              ? FRAME_STYLE.nameColorDarkTheme
-              : FRAME_STYLE.nameColorLightTheme,
+            color:
+              this.state.frameColor?.nameColor ??
+              (isDarkTheme //zsviczian
+                ? FRAME_STYLE.nameColorDarkTheme
+                : FRAME_STYLE.nameColorLightTheme),
             lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
             maxWidth: `${f.width}px`,
@@ -1234,13 +1236,14 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": this.state.viewModeEnabled,
-          "excalidraw--mobile": 
+          "excalidraw--mobile":
             this.device.editor.isMobile ||
             (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
               this.state.trayModeEnabled), //zsviczian
         })}
         style={{
-          ...{ //zsviczian
+          ...{
+            //zsviczian
             ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
               ? POINTER_EVENTS.disabled
               : POINTER_EVENTS.enabled,
@@ -3047,13 +3050,14 @@ class App extends React.Component<AppProps, AppState> {
           isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
         });
       } else {
-        nextEditorState = updateObject(prevEditorState, { 
+        nextEditorState = updateObject(prevEditorState, {
           isMobile: false, //must test this
         });
       }
       if (prevEditorState !== nextEditorState) {
         this.device = { ...this.device, editor: nextEditorState };
-      this.forceUpdate();
+        this.forceUpdate();
+      }
     };
 
   //zsviczian
@@ -6174,6 +6178,14 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       locked: false,
       ...FRAME_STYLE,
+      ...(this.state.frameColor
+        ? {
+            //zsviczian
+            customData: {
+              frameColor: this.state.frameColor,
+            },
+          }
+        : {}),
     });
 
     this.scene.replaceAllElements([

@@ -80,7 +80,7 @@ export const MobileMenu = ({
                 <Island
                   padding={1}
                   className={`App-toolbar${
-                    device.isMobile ? " App-toolbar--mobile" : "" //zsviczian
+                    device.editor.isMobile ? " App-toolbar--mobile" : "" //zsviczian
                   }`}
                 >
                   {heading}

@@ -612,10 +612,16 @@ export const renderElement = (
           element.x + appState.scrollX,
           element.y + appState.scrollY,
         );
-        context.fillStyle = appState.frameColor.fill;
+        context.fillStyle =
+          element.customData?.frameColor?.fill ??
+          appState?.frameColor?.fill ??
+          "rgba(0, 0, 200, 0.04)"; //zsviczian
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = appState?.frameColor?.stroke ?? FRAME_STYLE.strokeColor; //zsviczian
+        context.strokeStyle =
+          element.customData?.frameColor?.stroke ??
+          appState?.frameColor?.stroke ??
+          FRAME_STYLE.strokeColor; //zsviczian
 
         if (FRAME_STYLE.radius && context.roundRect) {
           context.beginPath();
@@ -881,6 +887,7 @@ export const renderElementToSvg = (
     exportWithDarkMode: boolean;
     renderEmbeddables: boolean;
     frameRendering: AppState["frameRendering"];
+    frameColor?: AppState["frameColor"]; //zsviczian
   },
 ) => {
   const offset = { x: offsetX, y: offsetY };
@@ -1301,8 +1308,18 @@ export const renderElementToSvg = (
         rect.setAttribute("ry", FRAME_STYLE.radius.toString());
 
         rect.setAttribute("fill", "none");
-        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
-        rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
+        rect.setAttribute(
+          "stroke",
+          element.customData?.frameColor?.stroke ??
+            renderConfig.frameColor?.stroke ??
+            FRAME_STYLE.strokeColor,
+        ); //zsviczian
+        rect.setAttribute(
+          "stroke-width",
+          element.customData?.frameColor?.fill ??
+            renderConfig.frameColor?.fill ??
+            FRAME_STYLE.strokeWidth.toString(),
+        ); //zsviczian
 
         addToRoot(rect, element);
       }

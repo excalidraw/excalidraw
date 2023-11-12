@@ -50,7 +50,7 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
-  const { dynamicStyle } = useExcalidrawAppState(); //zsviczian  
+  const { dynamicStyle } = useExcalidrawAppState(); //zsviczian
   const isFullscreen = useDevice().viewport.isMobile;
 
   useEffect(() => {

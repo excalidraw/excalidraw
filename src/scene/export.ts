@@ -15,6 +15,7 @@ import { distance, getFontString } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
+  FONT_FAMILY,
   FRAME_STYLE,
   SVG_NS,
   THEME_FILTER,
@@ -34,7 +35,7 @@ import Scene from "./Scene";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
-const createScene = (
+/*const createScene = (
   //zsviczian
   elements: readonly NonDeletedExcalidrawElement[],
 ): Scene | null => {
@@ -45,7 +46,7 @@ const createScene = (
   scene.replaceAllElements(elements);
   elements?.forEach((el) => Scene.mapElementToScene(el, scene));
   return scene;
-};
+};*/
 
 // getContainerElement and getBoundTextElement and potentially other helpers
 // depend on `Scene` which will not be available when these pure utils are
@@ -108,23 +109,29 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: Pick<AppState, "exportWithDarkMode">,
+  opts: Pick<AppState, "exportWithDarkMode" | "frameRendering">, //zsviczian
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   let frameIdx = 0;
   for (const element of elements) {
-    if (isFrameElement(element)) {
+    if ( //zsviczian
+      isFrameElement(element) &&
+      opts.frameRendering?.name &&
+      opts.frameRendering?.enabled
+    ) {
       frameIdx++;
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: 4,
+        fontFamily: FONT_FAMILY.Assistant,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-        strokeColor: opts.exportWithDarkMode
-          ? FRAME_STYLE.nameColorDarkTheme
-          : FRAME_STYLE.nameColorLightTheme,
+        strokeColor:
+          element.customData?.frameColor?.nameColor ?? //zsviczian
+          (opts.exportWithDarkMode
+            ? FRAME_STYLE.nameColorDarkTheme
+            : FRAME_STYLE.nameColorLightTheme),
         text: element.name || `Frame ${frameIdx}`,
         rawText: element.name || `Frame ${frameIdx}`, //zsviczian
       });
@@ -252,6 +259,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
     frameRendering?: AppState["frameRendering"];
+    frameColor?: AppState["frameColor"]; //zsviczian
   },
   files: BinaryFiles | null,
   opts?: {
@@ -283,7 +291,13 @@ export const exportToSvg = async (
   } else {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode: appState.exportWithDarkMode ?? false,
-    });
+      frameRendering: appState.frameRendering ?? {
+        enabled: true,
+        outline: true,
+        name: true,
+        clip: true,
+      },
+    }); //zsviczian
   }
 
   let metadata = "";
@@ -403,6 +417,7 @@ export const exportToSvg = async (
       exportingFrame ?? null,
       appState.frameRendering ?? null,
     ),
+    frameColor: appState.frameColor, //zsviczian
   });
 
   tempScene.destroy();

@@ -9,7 +9,11 @@ import {
 } from "../actions/shortcuts";
 import { Action } from "../actions/types";
 import { ActionManager } from "../actions/manager";
-import { useAppProps, useExcalidrawAppState, useExcalidrawElements } from "./App";
+import {
+  useAppProps,
+  useExcalidrawAppState,
+  useExcalidrawElements,
+} from "./App";
 import React from "react";
 
 export type ContextMenuItem = typeof CONTEXT_MENU_SEPARATOR | Action;
@@ -66,7 +70,10 @@ export const ContextMenu = React.memo(
           className="context-menu"
           onContextMenu={(event) => event.preventDefault()}
         >
-          {onContextMenu && onContextMenu?.(elements, appState, onClose) /*zsviczian*/}
+          {
+            onContextMenu &&
+              onContextMenu?.(elements, appState, onClose) /*zsviczian*/
+          }
           {filteredItems.map((item, idx) => {
             if (item === CONTEXT_MENU_SEPARATOR) {
               if (
