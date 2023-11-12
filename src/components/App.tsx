@@ -2716,7 +2716,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePenMode = (force?: boolean) => {
+  togglePenMode = (force: boolean | null) => {
     this.setState((prevState) => {
       return {
         penMode: force ?? !prevState.penMode,
