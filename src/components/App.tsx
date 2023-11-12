@@ -2717,6 +2717,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   togglePenMode = (force?: boolean) => {
+    //input onChange calls togglePenMode with event as argument
+    force = typeof force === "boolean" ? force : undefined;
     this.setState((prevState) => {
       return {
         penMode: force ?? !prevState.penMode,
