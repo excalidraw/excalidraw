@@ -11,7 +11,7 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { distance, getFontString } from "../utils";
+import { cloneJSON, distance, getFontString } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -52,8 +52,9 @@ const __createSceneForElementsHack__ = (
   // we can't duplicate elements to regenerate ids because we need the
   // orig ids when embedding. So we do another hack of not mapping element
   // ids to Scene instances so that we don't override the editor elements
-  // mapping
-  scene.replaceAllElements(elements, false);
+  // mapping.
+  // We still need to clone the objects themselves to regen references.
+  scene.replaceAllElements(cloneJSON(elements), false);
   return scene;
 };
 
