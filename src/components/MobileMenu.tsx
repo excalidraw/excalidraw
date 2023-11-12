@@ -35,7 +35,7 @@ type MobileMenuProps = {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
-  onPenModeToggle: () => void;
+  onPenModeToggle: AppClassProperties["togglePenMode"];
 
   renderTopRightUI?: (
     isMobile: boolean,
@@ -94,7 +94,7 @@ export const MobileMenu = ({
                   )}
                   <PenModeButton
                     checked={appState.penMode}
-                    onChange={onPenModeToggle}
+                    onChange={() => onPenModeToggle(null)}
                     title={t("toolBar.penMode")}
                     isMobile
                     penDetected={appState.penDetected}

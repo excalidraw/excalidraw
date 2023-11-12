@@ -66,7 +66,7 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
-  onPenModeToggle: () => void;
+  onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
@@ -258,7 +258,7 @@ const LayerUI = ({
                           <PenModeButton
                             zenModeEnabled={appState.zenModeEnabled}
                             checked={appState.penMode}
-                            onChange={onPenModeToggle}
+                            onChange={() => onPenModeToggle(null)}
                             title={t("toolBar.penMode")}
                             penDetected={appState.penDetected}
                           />
