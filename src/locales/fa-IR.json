@@ -384,7 +384,7 @@
     "label": {
       "withBackground": "پس زمینه",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "حالت تیره",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -398,9 +398,9 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "کپی در کلیپ‌بورد"
     }
   },
   "encrypted": {
@@ -508,6 +508,6 @@
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "پیش‌نمایش"
   }
 }
