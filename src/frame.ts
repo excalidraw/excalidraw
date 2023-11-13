@@ -370,7 +370,7 @@ export const getContainingFrame = (
 // --------------------------- Frame Operations -------------------------------
 
 /**
- * Retains (or repairs for target frame) the ordering invriant where children
+ * Retains (or repairs for target frame) the ordering invariant where children
  * elements come right before the parent frame:
  * [el, el, child, child, frame, el]
  */
@@ -437,25 +437,14 @@ export const removeElementsFromFrame = (
     ExcalidrawElement
   >();
 
-  const toRemoveElementsByFrame = new Map<
-    ExcalidrawFrameElement["id"],
-    ExcalidrawElement[]
-  >();
-
   for (const element of elementsToRemove) {
     if (element.frameId) {
       _elementsToRemove.set(element.id, element);
 
-      const arr = toRemoveElementsByFrame.get(element.frameId) || [];
-      arr.push(element);
-
       const boundTextElement = getBoundTextElement(element);
       if (boundTextElement) {
         _elementsToRemove.set(boundTextElement.id, boundTextElement);
-        arr.push(boundTextElement);
       }
-
-      toRemoveElementsByFrame.set(element.frameId, arr);
     }
   }
 
