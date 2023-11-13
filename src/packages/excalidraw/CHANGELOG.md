@@ -31,7 +31,9 @@ Please add the latest change on the top under the correct section.
 
 ### Build
 
-- Support Preact [#7255](https://github.com/excalidraw/excalidraw/pull/7255). The host needs to set `process.env.IS_PREACT` to `true` before importing Excalidraw if using Preact and the integration would work. When using vite, you will have to make sure the variable process.env.IS_PREACT is available at runtime since Vite removes it by default, so you can update the vite config to ensure its available
+- Support Preact [#7255](https://github.com/excalidraw/excalidraw/pull/7255). The host needs to set `process.env.IS_PREACT` to `true`
+
+When using vite, you will have to make sure the variable process.env.IS_PREACT is available at runtime since Vite removes it by default, so you can update the vite config to ensure its available
 
 ```json
 define: {
