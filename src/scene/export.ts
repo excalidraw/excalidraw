@@ -11,10 +11,11 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { distance, getFontString } from "../utils";
+import { cloneJSON, distance, getFontString } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
+  FONT_FAMILY,
   FRAME_STYLE,
   SVG_NS,
   THEME_FILTER,
@@ -51,8 +52,9 @@ const __createSceneForElementsHack__ = (
   // we can't duplicate elements to regenerate ids because we need the
   // orig ids when embedding. So we do another hack of not mapping element
   // ids to Scene instances so that we don't override the editor elements
-  // mapping
-  scene.replaceAllElements(elements, false);
+  // mapping.
+  // We still need to clone the objects themselves to regen references.
+  scene.replaceAllElements(cloneJSON(elements), false);
   return scene;
 };
 
@@ -105,7 +107,7 @@ const addFrameLabelsAsTextElements = (
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: 4,
+        fontFamily: FONT_FAMILY.Assistant,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
@@ -139,6 +141,36 @@ const getFrameRenderingConfig = (
   };
 };
 
+const prepareElementsForRender = ({
+  elements,
+  exportingFrame,
+  frameRendering,
+  exportWithDarkMode,
+}: {
+  elements: readonly ExcalidrawElement[];
+  exportingFrame: ExcalidrawFrameElement | null | undefined;
+  frameRendering: AppState["frameRendering"];
+  exportWithDarkMode: AppState["exportWithDarkMode"];
+}) => {
+  let nextElements: readonly ExcalidrawElement[];
+
+  if (exportingFrame) {
+    nextElements = elementsOverlappingBBox({
+      elements,
+      bounds: exportingFrame,
+      type: "overlap",
+    });
+  } else if (frameRendering.enabled && frameRendering.name) {
+    nextElements = addFrameLabelsAsTextElements(elements, {
+      exportWithDarkMode,
+    });
+  } else {
+    nextElements = elements;
+  }
+
+  return nextElements;
+};
+
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -167,21 +199,24 @@ export const exportToCanvas = async (
   const tempScene = __createSceneForElementsHack__(elements);
   elements = tempScene.getNonDeletedElements();
 
-  let nextElements: ExcalidrawElement[];
+  const frameRendering = getFrameRenderingConfig(
+    exportingFrame ?? null,
+    appState.frameRendering ?? null,
+  );
+
+  const elementsForRender = prepareElementsForRender({
+    elements,
+    exportingFrame,
+    exportWithDarkMode: appState.exportWithDarkMode,
+    frameRendering,
+  });
 
   if (exportingFrame) {
     exportPadding = 0;
-    nextElements = elementsOverlappingBBox({
-      elements,
-      bounds: exportingFrame,
-      type: "overlap",
-    });
-  } else {
-    nextElements = addFrameLabelsAsTextElements(elements, appState);
   }
 
   const [minX, minY, width, height] = getCanvasSize(
-    exportingFrame ? [exportingFrame] : getRootElements(nextElements),
+    exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
     exportPadding,
   );
 
@@ -191,7 +226,7 @@ export const exportToCanvas = async (
 
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),
-    fileIds: getInitializedImageElements(nextElements).map(
+    fileIds: getInitializedImageElements(elementsForRender).map(
       (element) => element.fileId,
     ),
     files,
@@ -200,15 +235,12 @@ export const exportToCanvas = async (
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
-    elements: nextElements,
-    visibleElements: nextElements,
+    elements: elementsForRender,
+    visibleElements: elementsForRender,
     scale,
     appState: {
       ...appState,
-      frameRendering: getFrameRenderingConfig(
-        exportingFrame ?? null,
-        appState.frameRendering ?? null,
-      ),
+      frameRendering,
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
       scrollX: -minX + exportPadding,
       scrollY: -minY + exportPadding,
@@ -248,8 +280,14 @@ export const exportToSvg = async (
   const tempScene = __createSceneForElementsHack__(elements);
   elements = tempScene.getNonDeletedElements();
 
+  const frameRendering = getFrameRenderingConfig(
+    opts?.exportingFrame ?? null,
+    appState.frameRendering ?? null,
+  );
+
   let {
     exportPadding = DEFAULT_EXPORT_PADDING,
+    exportWithDarkMode = false,
     viewBackgroundColor,
     exportScale = 1,
     exportEmbedScene,
@@ -257,19 +295,15 @@ export const exportToSvg = async (
 
   const { exportingFrame = null } = opts || {};
 
-  let nextElements: ExcalidrawElement[] = [];
+  const elementsForRender = prepareElementsForRender({
+    elements,
+    exportingFrame,
+    exportWithDarkMode,
+    frameRendering,
+  });
 
   if (exportingFrame) {
     exportPadding = 0;
-    nextElements = elementsOverlappingBBox({
-      elements,
-      bounds: exportingFrame,
-      type: "overlap",
-    });
-  } else {
-    nextElements = addFrameLabelsAsTextElements(elements, {
-      exportWithDarkMode: appState.exportWithDarkMode ?? false,
-    });
   }
 
   let metadata = "";
@@ -293,7 +327,7 @@ export const exportToSvg = async (
   }
 
   const [minX, minY, width, height] = getCanvasSize(
-    exportingFrame ? [exportingFrame] : getRootElements(nextElements),
+    exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
     exportPadding,
   );
 
@@ -304,7 +338,7 @@ export const exportToSvg = async (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
-  if (appState.exportWithDarkMode) {
+  if (exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
@@ -379,15 +413,12 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(nextElements, rsvg, svgRoot, files || {}, {
+  renderSceneToSvg(elementsForRender, rsvg, svgRoot, files || {}, {
     offsetX,
     offsetY,
-    exportWithDarkMode: appState.exportWithDarkMode ?? false,
+    exportWithDarkMode,
     renderEmbeddables: opts?.renderEmbeddables ?? false,
-    frameRendering: getFrameRenderingConfig(
-      exportingFrame ?? null,
-      appState.frameRendering ?? null,
-    ),
+    frameRendering,
   });
 
   tempScene.destroy();

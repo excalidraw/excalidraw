@@ -17,15 +17,12 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import {
-  ExcalidrawElement,
-  ExcalidrawFrameElement,
-  ExcalidrawTextElement,
-} from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
+  getFrameElements,
   groupByFrames,
   removeElementsFromFrame,
   replaceAllElementsInFrame,
@@ -190,19 +187,6 @@ export const actionUngroup = register({
 
     let nextElements = [...elements];
 
-    const frameIds: {
-      [id: string]: true;
-    } = {};
-    const selectedElements = app.scene.getSelectedElements(appState);
-    for (const element of selectedElements) {
-      if (element.frameId) {
-        frameIds[element.frameId] = true;
-      }
-    }
-    const frames = Object.keys(frameIds)
-      .map((eid) => app.scene.getElement(eid))
-      .filter((element) => element != null) as ExcalidrawFrameElement[];
-
     const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
     nextElements = nextElements.map((element) => {
       if (isBoundToContainer(element)) {
@@ -227,7 +211,19 @@ export const actionUngroup = register({
       null,
     );
 
-    frames.forEach((frame) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
+
+    const selectedElementFrameIds = new Set(
+      selectedElements
+        .filter((element) => element.frameId)
+        .map((element) => element.frameId!),
+    );
+
+    const targetFrames = getFrameElements(elements).filter((frame) =>
+      selectedElementFrameIds.has(frame.id),
+    );
+
+    targetFrames.forEach((frame) => {
       if (frame) {
         nextElements = replaceAllElementsInFrame(
           nextElements,

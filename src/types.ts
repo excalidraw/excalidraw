@@ -23,7 +23,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { SuggestedBinding } from "./element/binding";
 import { ImportedDataState } from "./data/types";
 import type App from "./components/App";
-import type { ResolvablePromise, throttleRAF } from "./utils";
+import type { throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
@@ -34,7 +34,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
-import { Merge, ForwardRef, ValueOf } from "./utility-types";
+import { Merge, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -362,15 +362,6 @@ export type LibraryItemsSource =
   | Promise<LibraryItems_anyVersion | Blob>;
 // -----------------------------------------------------------------------------
 
-// NOTE ready/readyPromise props are optional for host apps' sake (our own
-// implem guarantees existence)
-export type ExcalidrawAPIRefValue =
-  | ExcalidrawImperativeAPI
-  | {
-      readyPromise?: ResolvablePromise<ExcalidrawImperativeAPI>;
-      ready?: false;
-    };
-
 export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,
   {
@@ -390,7 +381,7 @@ export interface ExcalidrawProps {
     | ExcalidrawInitialDataState
     | null
     | Promise<ExcalidrawInitialDataState | null>;
-  excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
+  excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -630,8 +621,6 @@ export type ExcalidrawImperativeAPI = {
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
-  readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
-  ready: true;
   id: string;
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];

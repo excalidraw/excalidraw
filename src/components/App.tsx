@@ -240,7 +240,6 @@ import {
   isInputLike,
   isToolIcon,
   isWritableElement,
-  resolvablePromise,
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
@@ -540,7 +539,7 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
     const defaultAppState = getDefaultAppState();
     const {
-      excalidrawRef,
+      excalidrawAPI,
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
@@ -571,14 +570,8 @@ class App extends React.Component<AppProps, AppState> {
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
 
-    if (excalidrawRef) {
-      const readyPromise =
-        ("current" in excalidrawRef && excalidrawRef.current?.readyPromise) ||
-        resolvablePromise<ExcalidrawImperativeAPI>();
-
+    if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
-        ready: true,
-        readyPromise,
         updateScene: this.updateScene,
         updateLibrary: this.library.updateLibrary,
         addFiles: this.addFiles,
@@ -603,12 +596,11 @@ class App extends React.Component<AppProps, AppState> {
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
       } as const;
-      if (typeof excalidrawRef === "function") {
-        excalidrawRef(api);
+      if (typeof excalidrawAPI === "function") {
+        excalidrawAPI(api);
       } else {
-        excalidrawRef.current = api;
+        console.error("excalidrawAPI should be a function!");
       }
-      readyPromise.resolve(api);
     }
 
     this.excalidrawContainerValue = {
@@ -1181,6 +1173,19 @@ class App extends React.Component<AppProps, AppState> {
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
+    const shouldBlockPointerEvents =
+      !(
+        this.state.editingElement && isLinearElement(this.state.editingElement)
+      ) &&
+      (this.state.selectionElement ||
+        this.state.draggingElement ||
+        this.state.resizingElement ||
+        (this.state.activeTool.type === "laser" &&
+          // technically we can just test on this once we make it more safe
+          this.state.cursorButton === "down") ||
+        (this.state.editingElement &&
+          !isTextElement(this.state.editingElement)));
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1188,17 +1193,9 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
-          ["--ui-pointerEvents" as any]:
-            this.state.selectionElement ||
-            this.state.draggingElement ||
-            this.state.resizingElement ||
-            (this.state.activeTool.type === "laser" &&
-              // technically we can just test on this once we make it more safe
-              this.state.cursorButton === "down") ||
-            (this.state.editingElement &&
-              !isTextElement(this.state.editingElement))
-              ? POINTER_EVENTS.disabled
-              : POINTER_EVENTS.enabled,
+          ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
+            ? POINTER_EVENTS.disabled
+            : POINTER_EVENTS.enabled,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -2719,7 +2716,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePenMode = (force?: boolean) => {
+  togglePenMode = (force: boolean | null) => {
     this.setState((prevState) => {
       return {
         penMode: force ?? !prevState.penMode,
