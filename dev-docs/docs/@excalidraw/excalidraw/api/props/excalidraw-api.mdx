@@ -38,6 +38,9 @@ You can use this prop when you want to access some [Excalidraw APIs](https://git
 | [setCursor](#setcursor) | `function` | This API can be used to set customise the mouse cursor on the canvas |
 | [resetCursor](#resetcursor) | `function` | This API can be used to reset to default mouse cursor on the canvas |
 | [toggleMenu](#togglemenu) | `function` | Toggles specific menus on/off |
+| [onChange](#onChange) | `function` | Subscribes to change events |
+| [onPointerDown](#onPointerDown) | `function` | Subscribes to `pointerdown` events |
+| [onPointerUp](#onPointerUp) | `function` | Subscribes to `pointerup` events |
 
 :::info The `Ref` support has been removed in v0.17.0 so if you are using refs, please update the integration to use the `excalidrawAPI`.
 
@@ -360,9 +363,9 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 ```
 
 | Name | Type | Default | Description |
-| --- | --- | --- | --- |  
+| --- | --- | --- | --- |
 | `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L91) | `selection` | The tool type which should be set as active tool. When setting `image` as active tool, the insertion onto canvas when using image tool is disabled by default, so you can enable it by setting `insertOnCanvasDirectly` to `true` |
-| `locked` | `boolean` | `false` | Indicates whether the the active tool should be locked. It behaves the same way when using the `lock` tool in the editor interface|
+| `locked` | `boolean` | `false` | Indicates whether the the active tool should be locked. It behaves the same way when using the `lock` tool in the editor interface |
 
 ## setCursor
 
@@ -389,3 +392,51 @@ This API is especially useful when you render a custom [`<Sidebar/>`](/docs/@exc
 ```
 
 This API can be used to reset to default mouse cursor.
+
+## onChange
+
+```tsx
+(
+  callback: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+  ) => void
+) => () => void
+```
+
+Subscribes to change events, similar to [`props.onChange`](/docs/@excalidraw/excalidraw/api/props#onchange).
+
+Returns an unsubscribe function.
+
+## onPointerDown
+
+```tsx
+(
+  callback: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+    event: React.PointerEvent<HTMLElement>,
+  ) => void,
+) => () => void
+```
+
+Subscribes to canvas `pointerdown` events.
+
+Returns an unsubscribe function.
+
+## onPointerUp
+
+```tsx
+(
+  callback: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+    event: PointerEvent,
+  ) => void,
+) => () => void
+```
+
+Subscribes to canvas `pointerup` events.
+
+Returns an unsubscribe function.
