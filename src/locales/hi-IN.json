@@ -243,7 +243,7 @@
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसकाने का औज़ार)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "मर्मेड से एक्सकाली में"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -504,8 +504,8 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "मर्मेड से एक्सकाली में",
+    "button": "अंदर डाले",
     "description": "",
     "syntax": "",
     "preview": ""
