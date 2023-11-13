@@ -3291,7 +3291,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  // we pruposefuly widen tyhe `tool` type so this helper can be called with
+  // We purposely widen the `tool` type so this helper can be called with
   // any tool without having to type check it
   private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
     return (
