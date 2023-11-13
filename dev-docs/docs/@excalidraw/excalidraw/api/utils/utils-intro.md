@@ -331,13 +331,15 @@ const App = () => (
 render(<App />);
 ```
 
-The `device` has the following `attributes`
+The `device` has the following `attributes`, some grouped into `viewport` and `editor` objects, per context.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `isMobile` | `boolean` | Set to `true` when the device is `mobile` |
-| `isTouchScreen` | `boolean` | Set to `true` for `touch` devices |
-| `canDeviceFitSidebar` | `boolean` | Implies whether there is enough space to fit the `sidebar` |
+| `viewport.isMobile` | `boolean` | Set to `true` when viewport is in `mobile` breakpoint |
+| `viewport.isLandscape` | `boolean` | Set to `true` when the viewport is in `landscape` mode |
+| `editor.canFitSidebar` | `boolean` | Set to `true` if there's enough space to fit the `sidebar` |
+| `editor.isMobile` | `boolean` | Set to `true` when editor container is in `mobile` breakpoint |
+| `isTouchScreen` | `boolean` | Set to `true` for `touch` when touch event detected |
 
 ### i18n
 
