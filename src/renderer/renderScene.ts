@@ -363,18 +363,36 @@ const getContiguousElements = (
 ) => {
   const contiguousElementsArray: ExcalidrawElement[][] = [];
 
-  let previousFrameId: string | null | undefined = null;
+  let previousFrame: ExcalidrawFrameElement | null = null;
   const contiguousElements: ExcalidrawElement[] = [];
-  for (const element of elements) {
-    const frameId = element.frameId || appState.frameToHighlight?.id;
 
-    if (previousFrameId !== frameId) {
+  const isNewContiguous = (
+    element: ExcalidrawElement,
+    targetFrame: ExcalidrawFrameElement | null,
+  ) => {
+    return (
+      // element going to be added to some frame or not in any frame
+      !element.frameId ||
+      // element in frame but is either going to be put to a different frame / removed
+      (element.frameId &&
+        appState.selectedElementIds[element.id] &&
+        appState.selectedElementsAreBeingDragged &&
+        (!targetFrame ||
+          isElementInFrame(element, elements, appState, targetFrame))) ||
+      // element in a different frame from previous element
+      element.frameId !== previousFrame?.id
+    );
+  };
+
+  for (const element of elements) {
+    const targetFrame = getTargetFrame(element, appState);
+    if (isNewContiguous(element, targetFrame)) {
       if (contiguousElements.length > 0) {
         contiguousElementsArray.push([...contiguousElements]);
         contiguousElements.length = 0;
       }
 
-      previousFrameId = frameId;
+      previousFrame = targetFrame;
     }
 
     contiguousElements.push(element);
@@ -925,6 +943,38 @@ const _renderInteractiveScene = ({
   };
 };
 
+const renderContiguousElements = (
+  rc: StaticSceneRenderConfig["rc"],
+  appState: StaticSceneRenderConfig["appState"],
+  renderConfig: StaticSceneRenderConfig["renderConfig"],
+  context: CanvasRenderingContext2D,
+  contiguousElements: ExcalidrawElement[],
+) => {
+  const { isExporting } = renderConfig;
+
+  for (const element of contiguousElements) {
+    try {
+      renderElement(element, rc, context, renderConfig, appState);
+
+      if (
+        isEmbeddableElement(element) &&
+        (isExporting || !element.validated) &&
+        element.width &&
+        element.height
+      ) {
+        const label = createPlaceholderEmbeddableLabel(element);
+        renderElement(label, rc, context, renderConfig, appState);
+      }
+
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState);
+      }
+    } catch (error: any) {
+      console.error(error);
+    }
+  }
+};
+
 const _renderStaticScene = ({
   canvas,
   rc,
@@ -985,32 +1035,6 @@ const _renderStaticScene = ({
     ...getContiguousElements(visibleEmbeddableOrLabelElements, appState),
   ];
 
-  const renderContiguousElements = (
-    contiguousElements: ExcalidrawElement[],
-  ) => {
-    for (const element of contiguousElements) {
-      try {
-        renderElement(element, rc, context, renderConfig, appState);
-
-        if (
-          isEmbeddableElement(element) &&
-          (isExporting || !element.validated) &&
-          element.width &&
-          element.height
-        ) {
-          const label = createPlaceholderEmbeddableLabel(element);
-          renderElement(label, rc, context, renderConfig, appState);
-        }
-
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState);
-        }
-      } catch (error: any) {
-        console.error(error);
-      }
-    }
-  };
-
   for (const contiguousElements of contiguousElementsArray) {
     const firstElement = contiguousElements[0];
 
@@ -1030,7 +1054,13 @@ const _renderStaticScene = ({
         }
       }
 
-      renderContiguousElements(contiguousElements);
+      renderContiguousElements(
+        rc,
+        appState,
+        renderConfig,
+        context,
+        contiguousElements,
+      );
       context.restore();
     }
   }
