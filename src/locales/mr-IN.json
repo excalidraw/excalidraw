@@ -219,9 +219,9 @@
       "embeddable": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "चिटकवता नाही जमले ( सिस्टम च्या क्लिप्बॉर्ड पासून वाचणे नाही जमले).",
+    "asyncPasteFailedOnParse": "चिटकवता नाही जमले.",
+    "copyToSystemClipboardFailed": "क्लिपबोर्ड वर प्रतिलिपि करणे नाही जमले."
   },
   "toolBar": {
     "selection": "निवड",
