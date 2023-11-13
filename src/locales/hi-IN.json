@@ -219,9 +219,9 @@
       "embeddable": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "चिपकाया नहीं जा सका (सिस्टम क्लिपबोर्ड से पढ़ा नहीं जा सका).",
+    "asyncPasteFailedOnParse": "चिपकाया नहीं जा सका.",
+    "copyToSystemClipboardFailed": "क्लिपबोर्ड पर प्रतिलिपि नहीं बनाई जा सकी."
   },
   "toolBar": {
     "selection": "चयन",
@@ -506,8 +506,8 @@
   "mermaid": {
     "title": "मर्मेड से एक्सकाली में",
     "button": "अंदर डाले",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "description": "फिलहाल केवल <flowchartLink>बहाव चित्र</flowchartLink> और <sequenceLink> अनुक्रम चित्र </sequenceLink> कर सकते हैं. अन्य चित्र प्रकार एक्सकाली प्रतिमा जैसे चित्रित किए जायेंगे.",
+    "syntax": "मर्मेड संरचना नियम",
+    "preview": "पूर्वावलोकन"
   }
 }
