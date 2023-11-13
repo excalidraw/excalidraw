@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 #### BREAKING CHANGE
 
+- Added support for disabling `image` tool (also disabling image insertion in general, though keeps support for importing from `.excalidraw` files) [#6320](https://github.com/excalidraw/excalidraw/pull/6320).
+
 - The `Ref` support has been removed in v0.17.0 so if you are using refs, please update the integration to use the [`excalidrawAPI`](http://localhost:3003/docs/@excalidraw/excalidraw/api/props/excalidraw-api)
 
 - Additionally `ready` and `readyPromise` from the API have been discontinued. These APIs were found to be superfluous, and as part of the effort to streamline the APIs and maintain simplicity, they were removed in version v0.17.0.
