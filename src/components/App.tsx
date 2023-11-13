@@ -4740,9 +4740,13 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+
+      const frame = this.getTopLayerFrameAtSceneCoords({ x, y });
+
       mutateElement(pendingImageElement, {
         x,
         y,
+        frameId: frame ? frame.id : null,
       });
     } else if (this.state.activeTool.type === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
@@ -5609,9 +5613,11 @@ class App extends React.Component<AppProps, AppState> {
   private createImageElement = ({
     sceneX,
     sceneY,
+    addToFrameUnderCursor = true,
   }: {
     sceneX: number;
     sceneY: number;
+    addToFrameUnderCursor?: boolean;
   }) => {
     const [gridX, gridY] = getGridPoint(
       sceneX,
@@ -5621,10 +5627,12 @@ class App extends React.Component<AppProps, AppState> {
         : this.state.gridSize,
     );
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: gridX,
-      y: gridY,
-    });
+    const topLayerFrame = addToFrameUnderCursor
+      ? this.getTopLayerFrameAtSceneCoords({
+          x: gridX,
+          y: gridY,
+        })
+      : null;
 
     const element = newImageElement({
       type: "image",
@@ -7554,6 +7562,7 @@ class App extends React.Component<AppProps, AppState> {
       const imageElement = this.createImageElement({
         sceneX: x,
         sceneY: y,
+        addToFrameUnderCursor: false,
       });
 
       if (insertOnCanvasDirectly) {
