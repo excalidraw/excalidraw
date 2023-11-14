@@ -209,6 +209,7 @@
     "importLibraryError": "Impossible de cargar la bibliotèca",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
