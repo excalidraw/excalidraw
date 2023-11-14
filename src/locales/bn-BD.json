@@ -209,6 +209,7 @@
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
