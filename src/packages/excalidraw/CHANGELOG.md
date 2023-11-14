@@ -11,23 +11,25 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
-## Unreleased
+## 0.17.0 (2023-11-14)
 
 ### Features
 
 - Added support for disabling `image` tool (also disabling image insertion in general, though keeps support for importing from `.excalidraw` files) [#6320](https://github.com/excalidraw/excalidraw/pull/6320).
 
-For disabling `image` you need to set 👇
+  For disabling `image` you need to set 👇
 
-```
-UIOptions.tools = {
-  image: false
-}
-```
+  ```
+  UIOptions.tools = {
+    image: false
+  }
+  ```
 
 - Support `excalidrawAPI` prop for accessing the Excalidraw API [#7251](https://github.com/excalidraw/excalidraw/pull/7251).
 
 - Export [`getCommonBounds`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/utils#getcommonbounds) helper from the package [#7247](https://github.com/excalidraw/excalidraw/pull/7247).
+
+- Support frames via programmatic API [#7205](https://github.com/excalidraw/excalidraw/pull/7205).
 
 - Export `elementsOverlappingBBox`, `isElementInsideBBox`, `elementPartiallyOverlapsWithOrContainsBBox` helpers for filtering/checking if elements within bounds. [#6727](https://github.com/excalidraw/excalidraw/pull/6727)
 
@@ -55,13 +57,133 @@ UIOptions.tools = {
 
 - Support Preact [#7255](https://github.com/excalidraw/excalidraw/pull/7255). The host needs to set `process.env.IS_PREACT` to `true`
 
-When using vite, you will have to make sure the variable process.env.IS_PREACT is available at runtime since Vite removes it by default, so you can update the vite config to ensure its available
+  When using `vite` or any build tools, you will have to make sure the `process` is accessible as we are accessing `process.env.IS_PREACT` to decide whether to use the `preact` build.
 
-```js
-define: {
-  "process.env.IS_PREACT": process.env.IS_PREACT,
-}
-```
+  Since `Vite` removes env variables by default, you can update the Vite config to ensure its available :point_down:
+
+  ```
+  define: {
+    "process.env.IS_PREACT": process.env.IS_PREACT,
+  },
+  ```
+
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Allow D&D dice app domain for embeds [#7263](https://github.com/excalidraw/excalidraw/pull/7263)
+
+- Remove full screen shortcut [#7222](https://github.com/excalidraw/excalidraw/pull/7222)
+
+- Make adaptive-roughness less aggressive [#7250](https://github.com/excalidraw/excalidraw/pull/7250)
+
+- Render frames on export [#7210](https://github.com/excalidraw/excalidraw/pull/7210)
+
+- Support mermaid flowchart and sequence diagrams to excalidraw diagrams 🥳 [#6920](https://github.com/excalidraw/excalidraw/pull/6920)
+
+- Support frames via programmatic API [#7205](https://github.com/excalidraw/excalidraw/pull/7205)
+
+- Make clipboard more robust and reintroduce contextmenu actions [#7198](https://github.com/excalidraw/excalidraw/pull/7198)
+
+- Support giphy.com embed domain [#7192](https://github.com/excalidraw/excalidraw/pull/7192)
+
+- Renderer tweaks [#6698](https://github.com/excalidraw/excalidraw/pull/6698)
+
+- Closing of "Save to.." Dialog on Save To Disk [#7168](https://github.com/excalidraw/excalidraw/pull/7168)
+
+- Added Copy/Paste from Google Docs [#7136](https://github.com/excalidraw/excalidraw/pull/7136)
+
+- Remove bound-arrows from frames [#7157](https://github.com/excalidraw/excalidraw/pull/7157)
+
+- New dark mode theme & light theme tweaks [#7104](https://github.com/excalidraw/excalidraw/pull/7104)
+
+- Better laser cursor for dark mode [#7132](https://github.com/excalidraw/excalidraw/pull/7132)
+
+- Laser pointer improvements [#7128](https://github.com/excalidraw/excalidraw/pull/7128)
+
+- Initial Laser Pointer MVP [#6739](https://github.com/excalidraw/excalidraw/pull/6739)
+
+- Export `iconFillColor()` [#6996](https://github.com/excalidraw/excalidraw/pull/6996)
+
+- Element alignments - snapping [#6256](https://github.com/excalidraw/excalidraw/pull/6256)
+
+### Fixes
+
+- Image insertion bugs [#7278](https://github.com/excalidraw/excalidraw/pull/7278)
+
+- ExportToSvg to honor frameRendering also for name not only for frame itself [#7270](https://github.com/excalidraw/excalidraw/pull/7270)
+
+- Can't toggle penMode off due to missing typecheck in togglePenMode [#7273](https://github.com/excalidraw/excalidraw/pull/7273)
+
+- Replace hard coded font family with const value in addFrameLabelsAsTextElements [#7269](https://github.com/excalidraw/excalidraw/pull/7269)
+
+- Perf issue when ungrouping elements within frame [#7265](https://github.com/excalidraw/excalidraw/pull/7265)
+
+- Fixes the shortcut collision between "toggleHandTool" and "distributeHorizontally" [#7189](https://github.com/excalidraw/excalidraw/pull/7189)
+
+- Allow pointer events when editing a linear element [#7238](https://github.com/excalidraw/excalidraw/pull/7238)
+
+- Make modal use viewport breakpoints [#7246](https://github.com/excalidraw/excalidraw/pull/7246)
+
+- Align input `:hover`/`:focus` with spec [#7225](https://github.com/excalidraw/excalidraw/pull/7225)
+
+- Dialog remounting on className updates [#7224](https://github.com/excalidraw/excalidraw/pull/7224)
+
+- Don't update label position when dragging labelled arrows [#6891](https://github.com/excalidraw/excalidraw/pull/6891)
+
+- Frame add/remove/z-index ordering changes [#7194](https://github.com/excalidraw/excalidraw/pull/7194)
+
+- Element relative position when dragging multiple elements on grid [#7107](https://github.com/excalidraw/excalidraw/pull/7107)
+
+- Freedraw non-solid bg hitbox not working [#7193](https://github.com/excalidraw/excalidraw/pull/7193)
+
+- Actions panel ux improvement [#6850](https://github.com/excalidraw/excalidraw/pull/6850)
+
+- Better fill rendering with latest RoughJS [#7031](https://github.com/excalidraw/excalidraw/pull/7031)
+
+- Fix for Strange Symbol Appearing on Canvas after Deleting Grouped Graphics (Issue #7116) [#7170](https://github.com/excalidraw/excalidraw/pull/7170)
+
+- Attempt to fix flake in wysiwyg tests [#7173](https://github.com/excalidraw/excalidraw/pull/7173)
+
+- Ensure `ClipboardItem` created in the same tick to fix safari [#7066](https://github.com/excalidraw/excalidraw/pull/7066)
+
+- Wysiwyg left in undefined state on reload [#7123](https://github.com/excalidraw/excalidraw/pull/7123)
+
+- Ensure relative z-index of elements added to frame is retained [#7134](https://github.com/excalidraw/excalidraw/pull/7134)
+
+- Memoize static canvas on `props.renderConfig` [#7131](https://github.com/excalidraw/excalidraw/pull/7131)
+
+- Regression from #6739 preventing redirect link in view mode [#7120](https://github.com/excalidraw/excalidraw/pull/7120)
+
+- Update links to excalidraw-app [#7072](https://github.com/excalidraw/excalidraw/pull/7072)
+
+- Ensure we do not stop laser update prematurely [#7100](https://github.com/excalidraw/excalidraw/pull/7100)
+
+- Remove invisible elements safely [#7083](https://github.com/excalidraw/excalidraw/pull/7083)
+
+- Icon size in manifest [#7073](https://github.com/excalidraw/excalidraw/pull/7073)
+
+- Elements being dropped/duplicated when added to frame [#7057](https://github.com/excalidraw/excalidraw/pull/7057)
+
+- Frame name not editable on dbl-click [#7037](https://github.com/excalidraw/excalidraw/pull/7037)
+
+- Polyfill `Element.replaceChildren` [#7034](https://github.com/excalidraw/excalidraw/pull/7034)
+
+### Refactor
+
+- DRY out tool typing [#7086](https://github.com/excalidraw/excalidraw/pull/7086)
+
+- Refactor event globals to differentiate from `lastPointerUp` [#7084](https://github.com/excalidraw/excalidraw/pull/7084)
+
+- DRY out and simplify setting active tool from toolbar [#7079](https://github.com/excalidraw/excalidraw/pull/7079)
+
+### Performance
+
+- Improve element in frame check [#7124](https://github.com/excalidraw/excalidraw/pull/7124)
+
+---
 
 ## 0.16.1 (2023-09-21)
 
