@@ -47,7 +47,7 @@ Please add the latest change on the top under the correct section.
 
 When using vite, you will have to make sure the variable process.env.IS_PREACT is available at runtime since Vite removes it by default, so you can update the vite config to ensure its available
 
-```json
+```js
 define: {
   "process.env.IS_PREACT": process.env.IS_PREACT,
 }
