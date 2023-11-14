@@ -139,7 +139,15 @@ const config = {
       },
     }),
   themes: ["@docusaurus/theme-live-codeblock"],
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "docusaurus2-dotenv",
+      {
+        systemvars: true,
+      },
+    ],
+  ],
 };
 
 module.exports = config;
