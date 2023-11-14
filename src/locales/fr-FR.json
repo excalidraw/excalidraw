@@ -209,6 +209,7 @@
     "importLibraryError": "Impossible de charger la bibliothèque",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
     "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "On dirait que vous utilisez le navigateur Brave avec l'option <bold>Bloquer agressivement le fichage</bold> activée.",
       "line2": "Cela pourrait entraîner des problèmes avec les <bold>Éléments Textuels</bold> dans vos dessins.",
