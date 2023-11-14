@@ -209,6 +209,7 @@
     "importLibraryError": "Kütüphane yüklenemedi",
     "collabSaveFailed": "Backend veritabanına kaydedilemedi. Eğer problem devam ederse, çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
     "collabSaveFailed_sizeExceeded": "Backend veritabanına kaydedilemedi; tuval çok büyük. Çalışmanızı korumak için dosyayı yerel olarak kaydetmelisiniz.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
