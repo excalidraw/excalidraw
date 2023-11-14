@@ -209,6 +209,7 @@
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
+    "imageToolNotSupported": "Slike so onemogočene.",
     "brave_measure_text_error": {
       "line1": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo <bold>Agresivno blokiranje prstnih odtisov</bold>.",
       "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
