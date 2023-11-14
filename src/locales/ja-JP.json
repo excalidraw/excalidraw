@@ -209,6 +209,7 @@
     "importLibraryError": "ライブラリを読み込めませんでした。",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "<bold>Aggressly Block Fingerprinting</bold> の設定が有効なBraveブラウザを使用しているようです。",
       "line2": "これにより、図面の <bold>テキスト要素</bold> が壊れる可能性があります。",
