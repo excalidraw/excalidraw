@@ -335,23 +335,23 @@ render(<App />);
 
 The `device` has the following `attributes`, some grouped into `viewport` and `editor` objects, per context.
 
-| Name                   | Type      | Description                                                   |
-|------------------------|-----------|---------------------------------------------------------------|
-| `viewport.isMobile`    | `boolean` | Set to `true` when viewport is in `mobile` breakpoint         |
-| `viewport.isLandscape` | `boolean` | Set to `true` when the viewport is in `landscape` mode        |
-| `editor.canFitSidebar` | `boolean` | Set to `true` if there's enough space to fit the `sidebar`    |
-| `editor.isMobile`      | `boolean` | Set to `true` when editor container is in `mobile` breakpoint |
-| `isTouchScreen`        | `boolean` | Set to `true` for `touch` when touch event detected           |
+| Name | Type | Description |
+| --- | --- | --- |
+| `viewport.isMobile` | `boolean` | Set to `true` when viewport is in `mobile` breakpoint |
+| `viewport.isLandscape` | `boolean` | Set to `true` when the viewport is in `landscape` mode |
+| `editor.canFitSidebar` | `boolean` | Set to `true` if there's enough space to fit the `sidebar` |
+| `editor.isMobile` | `boolean` | Set to `true` when editor container is in `mobile` breakpoint |
+| `isTouchScreen` | `boolean` | Set to `true` for `touch` when touch event detected |
 
 ### i18n
 
 To help with localization, we export the following.
 
-| name          | type                                                                                            |
-|---------------|-------------------------------------------------------------------------------------------------|
-| `defaultLang` | `string`                                                                                        |
-| `languages`   | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15)            |
-| `useI18n`     | [`() => { langCode, t }`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
+| name | type |
+| --- | --- |
+| `defaultLang` | `string` |
+| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
+| `useI18n` | [`() => { langCode, t }`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
 
 ```js
 import { defaultLang, languages, useI18n } from "@excalidraw/excalidraw";
