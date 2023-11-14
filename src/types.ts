@@ -471,7 +471,7 @@ export type ExportOpts = {
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
 // excalidraw package index.tsx.
-type CanvasActions = Partial<{
+export type CanvasActions = Partial<{
   changeViewBackgroundColor: boolean;
   clearCanvas: boolean;
   export: false | ExportOpts;
@@ -481,9 +481,12 @@ type CanvasActions = Partial<{
   saveAsImage: boolean;
 }>;
 
-type UIOptions = Partial<{
+export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
+  tools: {
+    image: boolean;
+  };
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;

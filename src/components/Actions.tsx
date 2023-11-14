@@ -13,7 +13,7 @@ import {
   hasStrokeWidth,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppClassProperties, UIAppState, Zoom } from "../types";
+import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
@@ -218,10 +218,12 @@ export const ShapesSwitcher = ({
   activeTool,
   appState,
   app,
+  UIOptions,
 }: {
   activeTool: UIAppState["activeTool"];
   appState: UIAppState;
   app: AppClassProperties;
+  UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
 
@@ -232,6 +234,14 @@ export const ShapesSwitcher = ({
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
+        if (
+          UIOptions.tools?.[
+            value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
+          ] === false
+        ) {
+          return null;
+        }
+
         const label = t(`toolBar.${value}`);
         const letter =
           key && capitalizeString(typeof key === "string" ? key : key[0]);

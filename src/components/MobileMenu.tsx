@@ -1,6 +1,7 @@
 import React from "react";
 import {
   AppClassProperties,
+  AppProps,
   AppState,
   Device,
   ExcalidrawProps,
@@ -45,6 +46,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen: boolean;
+  UIOptions: AppProps["UIOptions"];
   app: AppClassProperties;
 };
 
@@ -62,6 +64,7 @@ export const MobileMenu = ({
   renderSidebars,
   device,
   renderWelcomeScreen,
+  UIOptions,
   app,
 }: MobileMenuProps) => {
   const {
@@ -83,6 +86,7 @@ export const MobileMenu = ({
                     <ShapesSwitcher
                       appState={appState}
                       activeTool={appState.activeTool}
+                      UIOptions={UIOptions}
                       app={app}
                     />
                   </Stack.Row>

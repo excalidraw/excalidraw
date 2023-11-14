@@ -98,6 +98,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
+  const [disableImageTool, setDisableImageTool] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
   const [commentIcons, setCommentIcons] = useState<{ [id: string]: Comment }>(
     {},
@@ -609,6 +610,16 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           <label>
             <input
               type="checkbox"
+              checked={disableImageTool === true}
+              onChange={() => {
+                setDisableImageTool(!disableImageTool);
+              }}
+            />
+            Disable Image Tool
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={isCollaborating}
               onChange={() => {
                 if (!isCollaborating) {
@@ -686,6 +697,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               canvasActions: {
                 loadScene: false,
               },
+              tools: { image: !disableImageTool },
             }}
             renderTopRightUI={renderTopRightUI}
             onLinkOpen={onLinkOpen}
