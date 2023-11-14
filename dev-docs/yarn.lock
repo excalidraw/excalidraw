@@ -1718,10 +1718,10 @@
     url-loader "^4.1.1"
     webpack "^5.73.0"
 
-"@excalidraw/excalidraw@0.16.1-7248-caa89f0":
-  version "0.16.1-7248-caa89f0"
-  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.16.1-7248-caa89f0.tgz#02430f9e01a393b73224b962ddd378594cae6c79"
-  integrity sha512-iaFdjmRK4sUydBJGXBX/CvMRyQAXKks+6hqK1SZEUTXnSloDcmrlC+eGfXKAH9Oh86ILu8dI8/ttmTs+fhMjVA==
+"@excalidraw/excalidraw@0.17.0-7284-25ea35d":
+  version "0.17.0-7284-25ea35d"
+  resolved "https://registry.yarnpkg.com/@excalidraw/excalidraw/-/excalidraw-0.17.0-7284-25ea35d.tgz#dd42ccc757e81d064f55bb0cac96c344fb557358"
+  integrity sha512-VVe0bdnmsZeIcbfoK2DgJefWmCmyQDFRvssCfxP3l2g/W8/6uKiKG+WNylu1D9dGveMfg1Io7XG2/PGRyD8OrQ==
 
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
