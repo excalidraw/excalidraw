@@ -128,8 +128,8 @@
     "test:coverage:watch": "vitest --coverage --watch",
     "test:ui": "yarn test --ui --coverage.enabled=true",
     "autorelease": "node scripts/autorelease.js",
-    "prerelease": "node scripts/prerelease.js",
+    "prerelease:excalidraw": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
-    "release": "node scripts/release.js"
+    "release:excalidraw": "node scripts/release.js"
   }
 }
