@@ -53,7 +53,7 @@ const sidebars = {
               },
               items: [
                 "@excalidraw/excalidraw/api/props/initialdata",
-                "@excalidraw/excalidraw/api/props/ref",
+                "@excalidraw/excalidraw/api/props/excalidraw-api",
                 "@excalidraw/excalidraw/api/props/render-props",
                 "@excalidraw/excalidraw/api/props/ui-options",
               ],

@@ -129,7 +129,7 @@ if (contents.type === MIME_TYPES.excalidraw) {
 
 <pre>
 loadSceneOrLibraryFromBlob(<br/>&nbsp;
-  blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,
+  blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,<br/>&nbsp;
   localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,<br/>&nbsp;
   localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
   fileHandle?: FileSystemHandle | null<br/>
@@ -164,9 +164,9 @@ import { isLinearElement } from "@excalidraw/excalidraw";
 
 **Signature**
 
-```tsx
+<pre>
 isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
-```
+</pre>
 
 ### getNonDeletedElements
 
@@ -195,8 +195,10 @@ import { mergeLibraryItems } from "@excalidraw/excalidraw";
 **_Signature_**
 
 <pre>
-mergeLibraryItems(localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>,<br/>&nbsp;
- otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a>) => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>
+mergeLibraryItems(<br/>&nbsp;
+  localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>,<br/>&nbsp;
+  otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a><br/>
+): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>
 </pre>
 
 ### parseLibraryTokensFromUrl
@@ -331,13 +333,15 @@ const App = () => (
 render(<App />);
 ```
 
-The `device` has the following `attributes`
+The `device` has the following `attributes`, some grouped into `viewport` and `editor` objects, per context.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `isMobile` | `boolean` | Set to `true` when the device is `mobile` |
-| `isTouchScreen` | `boolean` | Set to `true` for `touch` devices |
-| `canDeviceFitSidebar` | `boolean` | Implies whether there is enough space to fit the `sidebar` |
+| `viewport.isMobile` | `boolean` | Set to `true` when viewport is in `mobile` breakpoint |
+| `viewport.isLandscape` | `boolean` | Set to `true` when the viewport is in `landscape` mode |
+| `editor.canFitSidebar` | `boolean` | Set to `true` if there's enough space to fit the `sidebar` |
+| `editor.isMobile` | `boolean` | Set to `true` when editor container is in `mobile` breakpoint |
+| `isTouchScreen` | `boolean` | Set to `true` for `touch` when touch event detected |
 
 ### i18n
 
@@ -381,4 +385,95 @@ function App() {
     </div>
   );
 }
+```
+
+### getCommonBounds
+
+This util can be used to get the common bounds of the passed elements.
+
+**_Signature_**
+
+```ts
+getCommonBounds(
+  elements: readonly ExcalidrawElement[]
+): readonly [
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+]
+```
+
+**_How to use_**
+
+```js
+import { getCommonBounds } from "@excalidraw/excalidraw";
+```
+
+### elementsOverlappingBBox
+
+To filter `elements` that are inside, overlap, or contain the `bounds` rectangle.
+
+The bounds check is approximate and does not precisely follow the element's shape. You can also supply `errorMargin` which effectively makes the `bounds` larger by that amount.
+
+This API has 3 `type`s of operation: `overlap`, `contain`, and `inside`:
+
+- `overlap` - filters elements that are overlapping or inside bounds.
+- `contain` - filters elements that are inside bounds or bounds inside elements.
+- `inside` - filters elements that are inside bounds.
+
+**_Signature_**
+
+<pre>
+elementsOverlappingBBox(<br/>&nbsp;
+  elements: readonly NonDeletedExcalidrawElement[];<br/>&nbsp;
+  bounds: <a href="https://github.com/excalidraw/excalidraw/blob/9c425224c789d083bf16e0597ce4a429b9ee008e/src/element/bounds.ts#L37-L42">Bounds</a> | ExcalidrawElement;<br/>&nbsp;
+  errorMargin?: number;<br/>&nbsp;
+  type: "overlap" | "contain" | "inside";<br/>
+): NonDeletedExcalidrawElement[];
+</pre>
+
+**_How to use_**
+
+```js
+import { elementsOverlappingBBox } from "@excalidraw/excalidraw";
+```
+
+### isElementInsideBBox
+
+Lower-level API than `elementsOverlappingBBox` to check if a single `element` is inside `bounds`. If `eitherDirection=true`, returns `true` if `element` is fully inside `bounds` rectangle, or vice versa. When `false`, it returns `true` only for the former case.
+
+**_Signature_**
+
+<pre>
+isElementInsideBBox(<br/>&nbsp;
+  element: NonDeletedExcalidrawElement,<br/>&nbsp;
+  bounds: <a href="https://github.com/excalidraw/excalidraw/blob/9c425224c789d083bf16e0597ce4a429b9ee008e/src/element/bounds.ts#L37-L42">Bounds</a>,<br/>&nbsp;
+  eitherDirection = false,<br/>
+): boolean
+</pre>
+
+**_How to use_**
+
+```js
+import { isElementInsideBBox } from "@excalidraw/excalidraw";
+```
+
+### elementPartiallyOverlapsWithOrContainsBBox
+
+Checks if `element` is overlapping the `bounds` rectangle, or is fully inside.
+
+**_Signature_**
+
+<pre>
+elementPartiallyOverlapsWithOrContainsBBox(<br/>&nbsp;
+  element: NonDeletedExcalidrawElement,<br/>&nbsp;
+  bounds: <a href="https://github.com/excalidraw/excalidraw/blob/9c425224c789d083bf16e0597ce4a429b9ee008e/src/element/bounds.ts#L37-L42">Bounds</a>,<br/>
+): boolean
+</pre>
+
+**_How to use_**
+
+```js
+import { elementPartiallyOverlapsWithOrContainsBBox } from "@excalidraw/excalidraw";
 ```
