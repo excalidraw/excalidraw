@@ -395,7 +395,7 @@ This util can be used to get the common bounds of the passed elements.
 
 ```ts
 getCommonBounds(
-  elements: ExcalidrawElement[]
+  elements: readonly ExcalidrawElement[]
 ): readonly [
   minX: number,
   minY: number,
@@ -412,7 +412,7 @@ import { getCommonBounds } from "@excalidraw/excalidraw";
 
 ### elementsOverlappingBBox
 
-To filter `elements` that ar inside, overlap, or contain the `bounds` rectangle.
+To filter `elements` that are inside, overlap, or contain the `bounds` rectangle.
 
 The bounds check is approximate and does not precisely follow the element's shape. You can also supply `errorMargin` which effectively makes the `bounds` larger by that amount.
 
