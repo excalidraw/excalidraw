@@ -1,11 +1,11 @@
 # Props
 
-All `props` are *optional*.
+All `props` are _optional_.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) |  `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
-| [`ref`](/docs/@excalidraw/excalidraw/api/props/ref) | `object` | _ | `Ref` to be passed to Excalidraw |
+| [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) | `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
+| [`excalidrawAPI`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) | `function` | _ | Callback triggered with the excalidraw api once rendered |
 | [`isCollaborating`](#iscollaborating) | `boolean` | _ | This indicates if the app is in `collaboration` mode |
 | [`onChange`](#onchange) | `function` | _ | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw `elements` and the current `app state`. |
 | [`onPointerUpdate`](#onpointerupdate) | `function` | _ | Callback triggered when mouse pointer is updated. |
@@ -37,7 +37,7 @@ Beyond attributes that Excalidraw elements already support, you can store `custo
 
 You can use this to add any extra information you need to keep track of.
 
-You can add `customData` to elements when passing them as [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata), or using [`updateScene`](/docs/@excalidraw/excalidraw/api/props/ref#updatescene) / [`updateLibrary`](/docs/@excalidraw/excalidraw/api/props/ref#updatelibrary) afterwards.
+You can add `customData` to elements when passing them as [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata), or using [`updateScene`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api#updatescene) / [`updateLibrary`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api#updatelibrary) afterwards.
 
 ```js showLineNumbers
 {
@@ -93,8 +93,16 @@ This callback is triggered when mouse pointer is updated.
 
 This prop if passed will be triggered on pointer down events and has the below signature.
 
+
 <pre>
-(activeTool: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L115"> AppState["activeTool"]</a>, pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L424">PointerDownState</a>) => void
+(activeTool:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L115">
+    {" "}
+    AppState["activeTool"]
+  </a>
+  , pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L424">
+    PointerDownState
+  </a>) => void
 </pre>
 
 ### onScrollChange
@@ -110,7 +118,11 @@ This prop if passed will be triggered when canvas is scrolled and has the below 
 This callback is triggered if passed when something is pasted into the scene. You can use this callback in case you want to do something additional when the paste event occurs.
 
 <pre>
-(data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L18">ClipboardData</a>, event: ClipboardEvent &#124; null) => boolean
+  (data:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L18">
+    ClipboardData
+  </a>
+  , event: ClipboardEvent &#124; null) => boolean
 </pre>
 
 This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
@@ -136,8 +148,11 @@ It is invoked with empty items when user clears the library. You can use this ca
 This prop if passed will be triggered when clicked on `link`. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
 
 <pre>
-(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>, 
- event: CustomEvent&lt;&#123; nativeEvent: MouseEvent }&gt;) => void
+  (element:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+    ExcalidrawElement
+  </a>
+  , event: CustomEvent&lt;&#123; nativeEvent: MouseEvent }&gt;) => void
 </pre>
 
 Example:
@@ -180,30 +195,30 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 
 ### viewModeEnabled
 
-This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over *intialData.appState.viewModeEnabled*, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over _intialData.appState.viewModeEnabled_, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### zenModeEnabled
 
-This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over *intialData.appState.zenModeEnabled*, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop indicates whether the app is in `zen mode`. When supplied, the value takes precedence over _intialData.appState.zenModeEnabled_, the `zen mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### gridModeEnabled
 
-This prop indicates whether the shows the grid. When supplied, the value takes precedence over *intialData.appState.gridModeEnabled*, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+This prop indicates whether the shows the grid. When supplied, the value takes precedence over _intialData.appState.gridModeEnabled_, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
 
 ### libraryReturnUrl
 
 If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com).  
-Defaults to *window.location.origin + window.location.pathname*. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
+Defaults to _window.location.origin + window.location.pathname_. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
 
 ### theme
 
-This prop controls Excalidraw's theme. When supplied, the value takes precedence over *intialData.appState.theme*, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless *UIOptions.canvasActions.toggleTheme* is set to `true`, in which case the `theme` prop will control Excalidraw's default theme with ability to allow theme switching (you must take care of updating the `theme` prop when you detect a change to `appState.theme` from the [onChange](#onchange) callback).
+This prop controls Excalidraw's theme. When supplied, the value takes precedence over _intialData.appState.theme_, the theme will be fully controlled by the host app, and users won't be able to toggle it from within the app unless _UIOptions.canvasActions.toggleTheme_ is set to `true`, in which case the `theme` prop will control Excalidraw's default theme with ability to allow theme switching (you must take care of updating the `theme` prop when you detect a change to `appState.theme` from the [onChange](#onchange) callback).
 
 You can use [`THEME`](/docs/@excalidraw/excalidraw/api/utils#theme) to specify the theme.
 
 ### name
 
-This prop sets the `name` of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over *intialData.appState.name*, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
+This prop sets the `name` of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over _intialData.appState.name_, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
 
 
 ### detectScroll
