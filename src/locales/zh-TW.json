@@ -209,7 +209,7 @@
     "importLibraryError": "無法載入資料庫",
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
     "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "圖片已停用",
     "brave_measure_text_error": {
       "line1": "看起來您開啟了 Brave 瀏覽器的 <bold>Aggressively Block Fingerprinting</bold> 設定。",
       "line2": "這可能造成您畫布中 <bold>文字元素</bold> 的異常。",
