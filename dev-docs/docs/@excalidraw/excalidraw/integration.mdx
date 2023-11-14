@@ -30,32 +30,17 @@ function App() {
 }
 ```
 
-### Rendering Excalidraw only on client
+### Next.js
 
 Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
 
 Here are two ways on how you can render **Excalidraw** on **Next.js**.
 
-1. Importing Excalidraw once **client** is rendered.
 
-```jsx showLineNumbers
-import { useState, useEffect } from "react";
-export default function App() {
-  const [Excalidraw, setExcalidraw] = useState(null);
-  useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) =>
-      setExcalidraw(comp.Excalidraw),
-    );
-  }, []);
-  return <>{Excalidraw && <Excalidraw />}</>;
-}
-```
 
-Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-5xb3d)
+1. Using **Next.js Dynamic** import [Recommended].
 
-2. Using **Next.js Dynamic** import.
-
-Since Excalidraw doesn't server side rendering so you can also use `dynamic import` to render by setting `ssr` to `false`. However one drawback is the `Refs` don't work with dynamic import in Next.js. We are working on overcoming this and have a better API.
+Since Excalidraw doesn't support server side rendering so you can also use `dynamic import` to render by setting `ssr` to `false`.
 
 ```jsx showLineNumbers
 import dynamic from "next/dynamic";
@@ -72,7 +57,46 @@ export default function App() {
 
 Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-dynamic-k8yjq2).
 
+
+2. Importing Excalidraw once **client** is rendered.
+
+```jsx showLineNumbers
+import { useState, useEffect } from "react";
+export default function App() {
+  const [Excalidraw, setExcalidraw] = useState(null);
+  useEffect(() => {
+    import("@excalidraw/excalidraw").then((comp) =>
+      setExcalidraw(comp.Excalidraw),
+    );
+  }, []);
+  return <>{Excalidraw && <Excalidraw />}</>;
+}
+```
+
+Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-5xb3d)
+
 The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
+
+### Preact
+
+Since we support `umd` build ships with `react/jsx-runtime` and `react-dom/client` inlined with the package. This conflicts with `Preact` and hence the build doesn't work directly with `Preact`.
+
+However we have shipped a separate build for `Preact` so if you are using `Preact` you need to set `process.env.IS_PREACT` to `true` to use the `Preact` build.
+
+Once the above `env` variable is set, you will be able to use the package in `Preact` as well.
+
+:::info
+
+When using `vite` or any build tools, you will have to make sure the `process` is accessible as we are accessing `process.env.IS_PREACT` to decide whether to use `preact` build.
+
+Since Vite removes env variables by default, you can update the vite config to ensure its available :point_down:
+
+```
+ define: {
+    "process.env.IS_PREACT": process.env.IS_PREACT,
+  },
+```
+::: 
 
 ## Browser
 

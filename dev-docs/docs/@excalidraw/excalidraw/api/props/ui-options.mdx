@@ -1,6 +1,6 @@
 # UIOptions
 
-This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions), [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint) and [`welcomeScreen`](#welcmescreen).
+This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions), [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint) [`welcomeScreen`](#welcmescreen) and [`tools`](#tools).
 
 <pre>
   &#123;
@@ -70,3 +70,12 @@ function App() {
   );
 }
 ```
+
+## tools
+
+This `prop ` controls the visibility of the tools in the editor.
+Currently you can control the visibility of `image` tool via this prop.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| image | boolean | true | Decides whether `image` tool should be visible.

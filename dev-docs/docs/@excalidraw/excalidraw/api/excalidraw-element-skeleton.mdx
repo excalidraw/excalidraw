@@ -10,13 +10,17 @@ The [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/
 
 **_Signature_**
 
-<pre>
-  convertToExcalidrawElements(elements:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133">
-    ExcalidrawElementSkeleton
-  </a>
-  )
-</pre>
+```ts
+convertToExcalidrawElements(
+  elements: ExcalidrawElementSkeleton,
+  opts?: { regenerateIds: boolean }
+): ExcalidrawElement[]
+```
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `elements` | [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L137) |  | The Excalidraw element Skeleton which needs to be converted to Excalidraw elements. |
+| `opts` | `{ regenerateIds: boolean }` | ` {regenerateIds: true}` | By default `id` will be regenerated for all the elements irrespective of whether you pass the `id` so if you don't want the ids to regenerated, you can set this attribute to `false`. |
 
 **_How to use_**
 
@@ -24,13 +28,13 @@ The [`ExcalidrawElementSkeleton`](https://github.com/excalidraw/excalidraw/blob/
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 ```
 
-This function converts the Excalidraw Element Skeleton to excalidraw elements which could be then rendered on the canvas. Hence calling this function is necessary before passing it to APIs like [`initialData`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/initialdata), [`updateScene`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/ref#updatescene) if you are using the Skeleton API
+This function converts the Excalidraw Element Skeleton to excalidraw elements which could be then rendered on the canvas. Hence calling this function is necessary before passing it to APIs like [`initialData`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/initialdata), [`updateScene`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#updatescene) if you are using the Skeleton API
 
 ## Supported Features
 
 ### Rectangle, Ellipse, and Diamond
 
-To create these shapes you need to pass its `type` and `x` and `y` coordinates for position. The rest of the attributes are optional_.
+To create these shapes you need to pass its `type` and `x` and `y` coordinates for position. The rest of the attributes are optional\_.
 
 For the Skeleton API to work, `convertToExcalidrawElements` needs to be called before passing it to Excalidraw Component via initialData, updateScene or any such API.
 
@@ -427,3 +431,45 @@ convertToExcalidrawElements([
 ```
 
 ![image](https://github.com/excalidraw/excalidraw/assets/11256141/a8b047c8-2eed-4aea-82a2-e1e6bbddb8d4)
+
+### Frames
+
+To create a frame, you need to pass `type`, `children` (list of Excalidraw element ids). The rest of the attributes are optional.
+
+```ts
+{
+  type: "frame";
+  children: readonly ExcalidrawElement["id"][];
+  name?: string;
+ } & Partial<ExcalidrawFrameElement>);
+```
+
+```ts
+convertToExcalidrawElements([
+  {
+    "type": "rectangle",
+    "x": 10,
+    "y": 10,
+    "strokeWidth": 2,
+    "id": "1"
+  },
+  {
+    "type": "diamond",
+    "x": 120,
+    "y": 20,
+    "backgroundColor": "#fff3bf",
+    "strokeWidth": 2,
+    "label": {
+      "text": "HELLO EXCALIDRAW",
+      "strokeColor": "#099268",
+      "fontSize": 30
+    },
+    "id": "2"
+  },
+  {
+    "type": "frame",
+    "children": ["1", "2"],
+    "name": "My frame"
+  }]
+}
+```
