@@ -697,7 +697,6 @@ const ExcalidrawWrapper = () => {
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
-          tools: { image: false },
           canvasActions: {
             toggleTheme: true,
             export: {
