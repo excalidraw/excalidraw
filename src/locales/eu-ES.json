@@ -209,6 +209,7 @@
     "importLibraryError": "Ezin izan da liburutegia kargatu",
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "Brave arakatzailea erabiltzen ari zarela dirudi <bold>Blokeatu hatz-markak erasokorki</bold> ezarpena gaituta.",
       "line2": "Honek zure marrazkietako <bold>Testu-elementuak</bold> hautsi ditzake.",
