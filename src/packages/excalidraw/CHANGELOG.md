@@ -17,6 +17,14 @@ Please add the latest change on the top under the correct section.
 
 - Added support for disabling `image` tool (also disabling image insertion in general, though keeps support for importing from `.excalidraw` files) [#6320](https://github.com/excalidraw/excalidraw/pull/6320).
 
+For disabling `image` you need to set 👇
+
+```
+UIOptions.tools = {
+  image: false
+}
+```
+
 - Support `excalidrawAPI` prop for accessing the Excalidraw API [#7251](https://github.com/excalidraw/excalidraw/pull/7251).
 
 #### BREAKING CHANGE
