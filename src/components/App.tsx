@@ -7405,7 +7405,7 @@ class App extends React.Component<AppProps, AppState> {
     // generate image id (by default the file digest) before any
     // resizing/compression takes place to keep it more portable
     const fileId = await ((this.props.generateIdForFile?.(
-      imageFile,
+      imageFile, _imageElement.id
     ) as Promise<FileId>) || generateIdFromFile(imageFile));
 
     if (!fileId) {

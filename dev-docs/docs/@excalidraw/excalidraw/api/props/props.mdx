@@ -136,7 +136,7 @@ It is invoked with empty items when user clears the library. You can use this ca
 This prop if passed will be triggered when clicked on `link`. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
 
 <pre>
-(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>, 
+(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>,
  event: CustomEvent&lt;&#123; nativeEvent: MouseEvent }&gt;) => void
 </pre>
 
@@ -192,7 +192,7 @@ This prop indicates whether the shows the grid. When supplied, the value takes p
 
 ### libraryReturnUrl
 
-If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com).  
+If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com).
 Defaults to *window.location.origin + window.location.pathname*. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
 
 ### theme
@@ -225,7 +225,7 @@ This prop indicates whether to `focus` the Excalidraw component on page load. De
 Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
 
 ```tsx
-(file: File) => string | Promise<string>
+(file: File, elementId: string) => string | Promise<string>
 ```
 
 ### validateEmbeddable

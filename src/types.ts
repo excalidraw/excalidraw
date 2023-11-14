@@ -413,7 +413,7 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
-  generateIdForFile?: (file: File) => string | Promise<string>;
+  generateIdForFile?: (file: File, elementId: string) => string | Promise<string>;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
