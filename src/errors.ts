@@ -16,3 +16,19 @@ export class AbortError extends DOMException {
     super(message, "AbortError");
   }
 }
+
+type ImageSceneDataErrorCode =
+  | "IMAGE_NOT_CONTAINS_SCENE_DATA"
+  | "IMAGE_SCENE_DATA_ERROR";
+
+export class ImageSceneDataError extends Error {
+  public code;
+  constructor(
+    message = "Image Scene Data Error",
+    code: ImageSceneDataErrorCode = "IMAGE_SCENE_DATA_ERROR",
+  ) {
+    super(message);
+    this.name = "EncodingError";
+    this.code = code;
+  }
+}

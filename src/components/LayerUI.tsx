@@ -280,6 +280,7 @@ const LayerUI = ({
                           <ShapesSwitcher
                             appState={appState}
                             activeTool={appState.activeTool}
+                            UIOptions={UIOptions}
                             app={app}
                           />
                         </Stack.Row>
@@ -470,6 +471,7 @@ const LayerUI = ({
           renderSidebars={renderSidebars}
           device={device}
           renderWelcomeScreen={renderWelcomeScreen}
+          UIOptions={UIOptions}
         />
       )}
       {!device.editor.isMobile && (
