@@ -209,6 +209,7 @@
     "importLibraryError": "Couldn't load library",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
     "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work.",
+    "imageToolNotSupported": "Images are disabled.",
     "brave_measure_text_error": {
       "line1": "Looks like you are using Brave browser with the <bold>Aggressively Block Fingerprinting</bold> setting enabled.",
       "line2": "This could result in breaking the <bold>Text Elements</bold> in your drawings.",
