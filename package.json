@@ -52,6 +52,7 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "qrcode.react": "3.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "roughjs": "4.6.4",
