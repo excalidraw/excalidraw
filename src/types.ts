@@ -436,6 +436,14 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  activeTool?:
+    | {
+        type: ToolType;
+      }
+    | {
+        type: "custom";
+        customType: string;
+      };
 }
 
 export type SceneData = {

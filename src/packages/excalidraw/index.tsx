@@ -44,6 +44,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     children,
     validateEmbeddable,
     renderEmbeddable,
+    activeTool,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -122,6 +123,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onScrollChange={onScrollChange}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
+          activeTool={activeTool}
         >
           {children}
         </App>
