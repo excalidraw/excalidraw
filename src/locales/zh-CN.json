@@ -209,7 +209,7 @@
     "importLibraryError": "无法加载素材库",
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
     "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
-    "imageToolNotSupported": "图片已禁用。",
+    "imageToolNotSupported": "图片已被禁用。",
     "brave_measure_text_error": {
       "line1": "您似乎正在使用 Brave 浏览器并启用了<bold>积极阻止指纹识别</bold>的设置。",
       "line2": "这可能会破坏绘图中的 <bold>文本元素</bold>。",
