@@ -15,6 +15,9 @@ export default defineConfig({
     // open the browser
     open: true,
   },
+  // We need to specift the envDir since now there are no
+  //more located in parallel with the vite.config.ts file but in parent dir
+  envDir: "../",
   build: {
     outDir: "build",
     rollupOptions: {
