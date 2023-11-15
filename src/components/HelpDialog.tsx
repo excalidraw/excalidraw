@@ -165,6 +165,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[KEYS.E, KEYS["0"]]}
             />
             <Shortcut label={t("toolBar.frame")} shortcuts={[KEYS.F]} />
+            <Shortcut label={t("toolBar.laser")} shortcuts={[KEYS.K]} />
             <Shortcut
               label={t("labels.eyeDropper")}
               shortcuts={[KEYS.I, "Shift+S", "Shift+G"]}
@@ -253,10 +254,13 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("helpDialog.movePageLeftRight")}
               shortcuts={["Shift+PgUp/PgDn"]}
             />
-            <Shortcut label={t("buttons.fullScreen")} shortcuts={["F"]} />
             <Shortcut
               label={t("buttons.zenMode")}
               shortcuts={[getShortcutKey("Alt+Z")]}
+            />
+            <Shortcut
+              label={t("buttons.objectsSnapMode")}
+              shortcuts={[getShortcutKey("Alt+S")]}
             />
             <Shortcut
               label={t("labels.showGrid")}

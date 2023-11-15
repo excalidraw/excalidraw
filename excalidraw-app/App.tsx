@@ -571,6 +571,7 @@ const ExcalidrawWrapper = () => {
       LocalData.save(elements, appState, files, () => {
         if (excalidrawAPI) {
           let didChange = false;
+
           const elements = excalidrawAPI
             .getSceneElementsIncludingDeleted()
             .map((element) => {
@@ -607,7 +608,7 @@ const ExcalidrawWrapper = () => {
     canvas: HTMLCanvasElement,
   ) => {
     if (exportedElements.length === 0) {
-      return window.alert(t("alerts.cannotExportEmptyCanvas"));
+      throw new Error(t("alerts.cannotExportEmptyCanvas"));
     }
     if (canvas) {
       try {
@@ -623,7 +624,7 @@ const ExcalidrawWrapper = () => {
         );
 
         if (errorMessage) {
-          setErrorMessage(errorMessage);
+          throw new Error(errorMessage);
         }
 
         if (url) {
@@ -633,7 +634,7 @@ const ExcalidrawWrapper = () => {
         if (error.name !== "AbortError") {
           const { width, height } = canvas;
           console.error(error, { width, height });
-          setErrorMessage(error.message);
+          throw new Error(error.message);
         }
       }
     }
@@ -690,7 +691,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        ref={excalidrawRefCallback}
+        excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
@@ -711,6 +712,11 @@ const ExcalidrawWrapper = () => {
                         appState: {
                           errorMessage: error.message,
                         },
+                      });
+                    }}
+                    onSuccess={() => {
+                      excalidrawAPI?.updateScene({
+                        appState: { openDialog: null },
                       });
                     }}
                   />

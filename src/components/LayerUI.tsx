@@ -55,28 +55,28 @@ import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
+import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
   appState: UIAppState;
   files: BinaryFiles;
   canvas: HTMLCanvasElement;
-  interactiveCanvas: HTMLCanvasElement | null;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
-  onPenModeToggle: () => void;
+  onPenModeToggle: AppClassProperties["togglePenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   UIOptions: AppProps["UIOptions"];
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   onExportImage: AppClassProperties["onExportImage"];
   renderWelcomeScreen: boolean;
   children?: React.ReactNode;
   app: AppClassProperties;
+  isCollaborating: boolean;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -121,7 +121,6 @@ const LayerUI = ({
   setAppState,
   elements,
   canvas,
-  interactiveCanvas,
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
@@ -129,11 +128,11 @@ const LayerUI = ({
   renderTopRightUI,
   renderCustomStats,
   UIOptions,
-  onImageAction,
   onExportImage,
   renderWelcomeScreen,
   children,
   app,
+  isCollaborating,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -162,7 +161,10 @@ const LayerUI = ({
   };
 
   const renderImageExportDialog = () => {
-    if (!UIOptions.canvasActions.saveAsImage) {
+    if (
+      !UIOptions.canvasActions.saveAsImage ||
+      appState.openDialog !== "imageExport"
+    ) {
       return null;
     }
 
@@ -247,7 +249,7 @@ const LayerUI = ({
                       >
                         <HintViewer
                           appState={appState}
-                          isMobile={device.isMobile}
+                          isMobile={device.editor.isMobile}
                           device={device}
                           app={app}
                         />
@@ -256,7 +258,7 @@ const LayerUI = ({
                           <PenModeButton
                             zenModeEnabled={appState.zenModeEnabled}
                             checked={appState.penMode}
-                            onChange={onPenModeToggle}
+                            onChange={() => onPenModeToggle(null)}
                             title={t("toolBar.penMode")}
                             penDetected={appState.penDetected}
                           />
@@ -277,17 +279,30 @@ const LayerUI = ({
 
                           <ShapesSwitcher
                             appState={appState}
-                            interactiveCanvas={interactiveCanvas}
                             activeTool={appState.activeTool}
-                            setAppState={setAppState}
-                            onImageAction={({ pointerType }) => {
-                              onImageAction({
-                                insertOnCanvasDirectly: pointerType !== "mouse",
-                              });
-                            }}
+                            UIOptions={UIOptions}
+                            app={app}
                           />
                         </Stack.Row>
                       </Island>
+                      {isCollaborating && (
+                        <Island
+                          style={{
+                            marginLeft: 8,
+                            alignSelf: "center",
+                            height: "fit-content",
+                          }}
+                        >
+                          <LaserPointerButton
+                            title={t("toolBar.laser")}
+                            checked={appState.activeTool.type === "laser"}
+                            onChange={() =>
+                              app.setActiveTool({ type: "laser" })
+                            }
+                            isMobile
+                          />
+                        </Island>
+                      )}
                     </Stack.Row>
                   </Stack.Col>
                 </div>
@@ -303,7 +318,7 @@ const LayerUI = ({
             )}
           >
             <UserList collaborators={appState.collaborators} />
-            {renderTopRightUI?.(device.isMobile, appState)}
+            {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
@@ -324,7 +339,7 @@ const LayerUI = ({
           trackEvent(
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${device.isMobile ? "mobile" : "desktop"})`,
+            `(${device.editor.isMobile ? "mobile" : "desktop"})`,
           );
         }}
       />
@@ -352,7 +367,7 @@ const LayerUI = ({
             trackEvent(
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
-              `button (${device.isMobile ? "mobile" : "desktop"})`,
+              `button (${device.editor.isMobile ? "mobile" : "desktop"})`,
             );
           }
         }}
@@ -369,7 +384,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && !device.isMobile && (
+      {eyeDropperState && !device.editor.isMobile && (
         <EyeDropper
           colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
@@ -439,7 +454,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.isMobile && (
+      {device.editor.isMobile && (
         <MobileMenu
           app={app}
           appState={appState}
@@ -451,23 +466,22 @@ const LayerUI = ({
           onLockToggle={onLockToggle}
           onHandToolToggle={onHandToolToggle}
           onPenModeToggle={onPenModeToggle}
-          interactiveCanvas={interactiveCanvas}
-          onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
           renderWelcomeScreen={renderWelcomeScreen}
+          UIOptions={UIOptions}
         />
       )}
-      {!device.isMobile && (
+      {!device.editor.isMobile && (
         <>
           <div
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
               isSidebarDocked &&
-              device.canDeviceFitSidebar
+              device.editor.canFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
             }
@@ -539,18 +553,8 @@ const areEqual = (prevProps: LayerUIProps, nextProps: LayerUIProps) => {
     return false;
   }
 
-  const {
-    canvas: _pC,
-    interactiveCanvas: _pIC,
-    appState: prevAppState,
-    ...prev
-  } = prevProps;
-  const {
-    canvas: _nC,
-    interactiveCanvas: _nIC,
-    appState: nextAppState,
-    ...next
-  } = nextProps;
+  const { canvas: _pC, appState: prevAppState, ...prev } = prevProps;
+  const { canvas: _nC, appState: nextAppState, ...next } = nextProps;
 
   return (
     isShallowEqual(

@@ -109,8 +109,12 @@
     "createContainerFromText": "텍스트를 컨테이너에 담기",
     "link": {
       "edit": "링크 수정하기",
+      "editEmbed": "링크 & 임베드 수정하기",
       "create": "링크 만들기",
-      "label": "링크"
+      "createEmbed": "링크 & 임베드 만들기",
+      "label": "링크",
+      "labelEmbed": "링크 & 임베드",
+      "empty": "링크를 지정하지 않았습니다"
     },
     "lineEditor": {
       "edit": "선 수정하기",
@@ -160,13 +164,16 @@
     "darkMode": "다크 모드",
     "lightMode": "밝은 모드",
     "zenMode": "젠 모드",
+    "objectsSnapMode": "다른 요소들에 정렬시키기",
     "exitZenMode": "젠 모드 종료하기",
     "cancel": "취소",
     "clear": "지우기",
     "remove": "삭제",
+    "embed": "임베딩 토글",
     "publishLibrary": "게시하기",
     "submit": "제출",
-    "confirm": "확인"
+    "confirm": "확인",
+    "embeddableInteractionButton": "클릭하여 상호작용"
   },
   "alerts": {
     "clearReset": "모든 작업 내용이 초기화됩니다. 계속하시겠습니까?",
@@ -196,6 +203,7 @@
     "imageInsertError": "이미지를 삽입할 수 없습니다. 나중에 다시 시도 하십시오",
     "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{maxSize}} 입니다.",
     "svgImageInsertError": "SVG 이미지를 삽입하지 못했습니다. SVG 문법이 유효하지 않은 것 같습니다.",
+    "failedToFetchImage": "이미지를 가져오는데 실패했습니다.",
     "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
@@ -206,6 +214,10 @@
       "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
       "line3": "저희는 해당 기능을 비활성화하는 것을 강력히 권장 드립니다. 비활성화 방법에 대해서는 <link>이 게시글</link>을 참고해주세요.",
       "line4": "만약 이 설정을 껐음에도 텍스트 요소들이 올바르게 표시되지 않는다면, 저희 Github에 <issueLink>이슈</issueLink>를 올려주시거나 <discordLink>Discord</discordLink>로 알려주세요."
+    },
+    "libraryElementTypeError": {
+      "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
+      "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
     "frame": "프레임 도구",
+    "embeddable": "웹 임베드",
+    "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구"
   },
@@ -237,6 +251,7 @@
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
+    "embeddable": "클릭 및 드래그하여 웹사이트 임베드 만들기",
     "text_selected": "더블 클릭 또는 ENTER를 눌러서 텍스트 수정",
     "text_editing": "ESC나 CtrlOrCmd+ENTER를 눌러서 수정을 종료하기",
     "linearElementMulti": "마지막 지점을 클릭하거나 Esc 또는 Enter 키를 눌러 완료하세요.",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Enter 키를 눌러서 텍스트 추가하기",
     "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
     "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기",
-    "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요."
+    "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요.",
+    "disableSnapping": "CtrlOrCmd 키를 눌러서 다른 요소와의 정렬 무시하기"
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "{filename} 로 저장되었습니다",
     "canvas": "캔버스",
     "selection": "선택한 요소",
-    "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요."
+    "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요.",
+    "unableToEmbed": "이 URL의 임베딩이 허용되지 않았습니다. GitHub에 이슈를 남겨서 이 URL이 화이트리스트에 등재될 수 있도록 요청하세요",
+    "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 텍스트를 그대로 붙여 넣어 주세요"
   },
   "colors": {
     "transparent": "투명",
@@ -444,10 +462,41 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "많이 쓰이는 사용자 색상들",
+    "mostUsedCustomColors": "가장 많이 사용된 색상들",
     "colors": "색상",
     "shades": "색조",
     "hexCode": "Hex 코드",
     "noShades": "사용할 수 있는 색조가 없음"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "이미지로 내보내기",
+        "button": "이미지로 내보내기",
+        "description": "나중에 다시 불러올 수 있도록 화면 데이터를 이미지로 내보냅니다."
+      },
+      "saveToDisk": {
+        "title": "디스크에 저장",
+        "button": "디스크에 저장",
+        "description": "나중에 다시 불러올 수 있도록 화면 데이터를 내보냅니다."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Excalidraw+로 내보내기",
+        "description": "화면을 당신의 Excalidraw+ 작업 공간으로 저장합니다."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "파일에서 불러오기",
+        "button": "파일에서 불러오기",
+        "description": "파일을 불러오면 <bold>현재 작성된 데이터를 덮어쓰게 됩니다</bold>.<br></br>다음 옵션 중 하나를 선택하여 작업물을 백업해 둘 수 있습니다."
+      },
+      "shareableLink": {
+        "title": "주소에서 불러오기",
+        "button": "컨텐츠를 덮어쓰기",
+        "description": "외부 작업물을 불러오면 <bold>현재 작성된 데이터를 덮어쓰게 됩니다</bold>.<br></br>다음 옵션 중 하나를 선택하여 작업물을 백업해 둘 수 있습니다."
+      }
+    }
   }
 }

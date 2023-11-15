@@ -13,7 +13,7 @@ import clsx from "clsx";
 import { Theme } from "../element/types";
 import { THEME } from "../constants";
 
-const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
+export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 
 const handlerColor = (theme: Theme) =>
   theme === THEME.LIGHT ? oc.white : "#1e1e1e";
@@ -1652,4 +1652,39 @@ export const frameToolIcon = createIcon(
     <path d="M17 4l0 16"></path>
   </g>,
   tablerIconProps,
+);
+
+export const mermaidLogoIcon = createIcon(
+  <path
+    fill="currentColor"
+    d="M407.48,111.18C335.587,108.103 269.573,152.338 245.08,220C220.587,152.338 154.573,108.103 82.68,111.18C80.285,168.229 107.577,222.632 154.74,254.82C178.908,271.419 193.35,298.951 193.27,328.27L193.27,379.13L296.9,379.13L296.9,328.27C296.816,298.953 311.255,271.42 335.42,254.82C382.596,222.644 409.892,168.233 407.48,111.18Z"
+  />,
+);
+
+export const ArrowRightIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path d="M4.16602 10H15.8327" />
+    <path d="M12.5 13.3333L15.8333 10" />
+    <path d="M12.5 6.66666L15.8333 9.99999" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
+export const laserPointerToolIcon = createIcon(
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.25"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    transform="rotate(90 10 10)"
+  >
+    <path
+      clipRule="evenodd"
+      d="m9.644 13.69 7.774-7.773a2.357 2.357 0 0 0-3.334-3.334l-7.773 7.774L8 12l1.643 1.69Z"
+    />
+    <path d="m13.25 3.417 3.333 3.333M10 10l2-2M5 15l3-3M2.156 17.894l1-1M5.453 19.029l-.144-1.407M2.377 11.887l.866 1.118M8.354 17.273l-1.194-.758M.953 14.652l1.408.13" />
+  </g>,
+
+  20,
 );

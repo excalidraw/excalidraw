@@ -109,8 +109,12 @@
     "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
+      "editEmbed": "Modifica collegamento e incorpora",
       "create": "Crea link",
-      "label": "Link"
+      "createEmbed": "Crea collegamento e incorpora",
+      "label": "Link",
+      "labelEmbed": "Collega & incorpora",
+      "empty": "Nessun collegamento impostato"
     },
     "lineEditor": {
       "edit": "Modifica linea",
@@ -124,9 +128,9 @@
     },
     "statusPublished": "Pubblicato",
     "sidebarLock": "Mantieni aperta la barra laterale",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Seleziona tutti gli elementi nel riquadro",
+    "removeAllElementsFromFrame": "Rimuovi tutti gli elementi dal riquadro",
+    "eyeDropper": "Scegli il colore della tela"
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -160,13 +164,16 @@
     "darkMode": "Tema scuro",
     "lightMode": "Tema chiaro",
     "zenMode": "Modalità Zen",
+    "objectsSnapMode": "Aggancia agli oggetti",
     "exitZenMode": "Uscire dalla modalità zen",
     "cancel": "Annulla",
     "clear": "Cancella",
     "remove": "Rimuovi",
+    "embed": "Attiva/disattiva incorporamento",
     "publishLibrary": "Pubblica",
     "submit": "Invia",
-    "confirm": "Conferma"
+    "confirm": "Conferma",
+    "embeddableInteractionButton": "Clicca per interagire"
   },
   "alerts": {
     "clearReset": "Questa azione cancellerà l'intera tela. Sei sicuro?",
@@ -196,6 +203,7 @@
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
@@ -206,6 +214,10 @@
       "line2": "Ciò potrebbe causare la rottura degli <bold>Elementi di testo</bold> nei tuoi disegni.",
       "line3": "Consigliamo vivamente di disabilitare questa impostazione. Puoi seguire <link>questi passaggi</link> su come farlo.",
       "line4": "Se la disattivazione di questa impostazione non risolve la visualizzazione degli elementi di testo, apri un <issueLink>problema</issueLink> sul nostro GitHub o scrivici su <discordLink>Discord</discordLink>"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
+      "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
     }
   },
   "toolBar": {
@@ -223,7 +235,9 @@
     "penMode": "Modalità penna - previene il tocco",
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
-    "frame": "",
+    "frame": "Strumento riquadro",
+    "embeddable": "Incorporamento Web",
+    "laser": "Puntatore laser",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti"
   },
@@ -237,6 +251,7 @@
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
+    "embeddable": "Fare click e trascina per creare un incorporamento web",
     "text_selected": "Fai doppio click o premi INVIO per modificare il testo",
     "text_editing": "Premi ESC o CtrlOCmd+INVIO per completare le modifiche",
     "linearElementMulti": "Clicca sull'ultimo punto o premi Esc o Invio per finire",
@@ -252,7 +267,8 @@
     "bindTextToElement": "Premi invio per aggiungere il testo",
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
     "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
-    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\"."
+    "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\".",
+    "disableSnapping": "Tieni premuto Ctrl o Cmd per disabilitare lo snap"
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -367,7 +383,7 @@
       "darkMode": "Tema scuro",
       "embedScene": "Includi scena",
       "scale": "Scala",
-      "padding": ""
+      "padding": "Rientro"
     },
     "tooltip": {
       "embedScene": "I dati della scena saranno salvati nel file PNG/SVG esportato in modo che la scena possa essere ripristinata da esso.\nQuesto aumenterà la dimensione del file esportato."
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
     "selection": "selezione",
-    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente"
+    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
+    "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
+    "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine"
   },
   "colors": {
     "transparent": "Trasparente",
@@ -449,5 +467,36 @@
     "shades": "Sfumature",
     "hexCode": "Codice esadecimale",
     "noShades": "Nessuna sfumatura disponibile per questo colore"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "Esporta come immagine",
+        "button": "Esporta come immagine",
+        "description": "Esporta i dati della scena come immagine, che potrai importare in seguito."
+      },
+      "saveToDisk": {
+        "title": "Salva su disco",
+        "button": "Salva su disco",
+        "description": "Esporta i dati della scena su file, che potrai importare in seguito."
+      },
+      "excalidrawPlus": {
+        "title": "Excalidraw+",
+        "button": "Esporta su Excalidraw+",
+        "description": "Salva la scena sul tuo spazio di lavoro Excalidraw+."
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "Carica da file",
+        "button": "Carica da file",
+        "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
+      },
+      "shareableLink": {
+        "title": "Carica da link",
+        "button": "Sostituisci il mio contenuto",
+        "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
+      }
+    }
   }
 }

@@ -8,9 +8,10 @@ import { isBoundToContainer } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
   getContainingFrame,
-  getFrameElements,
+  getFrameChildren,
 } from "../frame";
 import { isShallowEqual } from "../utils";
+import { isElementInViewport } from "../element/sizeHelpers";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.
@@ -87,6 +88,26 @@ export const getElementsWithinSelection = (
   });
 
   return elementsInSelection;
+};
+
+export const getVisibleAndNonSelectedElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedElementsSet = new Set(
+    selectedElements.map((element) => element.id),
+  );
+  return elements.filter((element) => {
+    const isVisible = isElementInViewport(
+      element,
+      appState.width,
+      appState.height,
+      appState,
+    );
+
+    return !selectedElementsSet.has(element.id) && isVisible;
+  });
 };
 
 // FIXME move this into the editor instance to keep utility methods stateless
@@ -170,7 +191,7 @@ export const getSelectedElements = (
     const elementsToInclude: ExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       if (element.type === "frame") {
-        getFrameElements(elements, element.id).forEach((e) =>
+        getFrameChildren(elements, element.id).forEach((e) =>
           elementsToInclude.push(e),
         );
       }

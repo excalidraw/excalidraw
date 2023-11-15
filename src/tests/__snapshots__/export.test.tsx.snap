@@ -14,8 +14,12 @@ exports[`export > exporting svg containing transformed images > svg export outpu
         font-family: \\"Cascadia\\";
         src: url(\\"https://excalidraw.com/Cascadia.woff2\\");
       }
+      @font-face {
+        font-family: \\"Assistant\\";
+        src: url(\\"https://excalidraw.com/Assistant-Regular.woff2\\");
+      }
     </style>
     
   </defs>
-  <g transform=\\"translate(30.710678118654755 30.710678118654755) rotate(315 50 50)\\"><use href=\\"#image-file_A\\" width=\\"100\\" height=\\"100\\" opacity=\\"1\\"></use></g><g transform=\\"translate(130.71067811865476 30.710678118654755) rotate(45 25 25)\\"><use href=\\"#image-file_A\\" width=\\"50\\" height=\\"50\\" opacity=\\"1\\" transform=\\"scale(-1, 1) translate(-50 0)\\"></use></g><g transform=\\"translate(30.710678118654755 130.71067811865476) rotate(45 50 50)\\"><use href=\\"#image-file_A\\" width=\\"100\\" height=\\"100\\" opacity=\\"1\\" transform=\\"scale(1, -1) translate(0 -100)\\"></use></g><g transform=\\"translate(130.71067811865476 130.71067811865476) rotate(315 25 25)\\"><use href=\\"#image-file_A\\" width=\\"50\\" height=\\"50\\" opacity=\\"1\\" transform=\\"scale(-1, -1) translate(-50 -50)\\"></use></g></svg>"
+  <g transform=\\"translate(30.710678118654755 30.710678118654755) rotate(315 50 50)\\" data-id=\\"id1\\"><use href=\\"#image-file_A\\" width=\\"100\\" height=\\"100\\" opacity=\\"1\\"></use></g><g transform=\\"translate(130.71067811865476 30.710678118654755) rotate(45 25 25)\\" data-id=\\"id2\\"><use href=\\"#image-file_A\\" width=\\"50\\" height=\\"50\\" opacity=\\"1\\" transform=\\"scale(-1, 1) translate(-50 0)\\"></use></g><g transform=\\"translate(30.710678118654755 130.71067811865476) rotate(45 50 50)\\" data-id=\\"id3\\"><use href=\\"#image-file_A\\" width=\\"100\\" height=\\"100\\" opacity=\\"1\\" transform=\\"scale(1, -1) translate(0 -100)\\"></use></g><g transform=\\"translate(130.71067811865476 130.71067811865476) rotate(315 25 25)\\" data-id=\\"id4\\"><use href=\\"#image-file_A\\" width=\\"50\\" height=\\"50\\" opacity=\\"1\\" transform=\\"scale(-1, -1) translate(-50 -50)\\"></use></g></svg>"
 `;
