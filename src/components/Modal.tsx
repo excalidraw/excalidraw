@@ -7,6 +7,7 @@ import { KEYS } from "../keys";
 import { AppState } from "../types";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
+//@ts-ignore
 export const Modal: React.FC<{
   className?: string;
   children: React.ReactNode;
