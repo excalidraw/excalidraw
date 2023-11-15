@@ -209,7 +209,7 @@
     "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Dodawanie obrazów jest wyłączone.",
     "brave_measure_text_error": {
       "line1": "Wygląda na to, że używasz przeglądarki Brave z włączonym ustawieniem <bold>Agressively Block Fingerprinting</bold>.",
       "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
