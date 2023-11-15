@@ -47,7 +47,7 @@
     "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true VITE_APP_DISABLE_TRACKING=true vite build",
     "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
     "build:version": "node ./scripts/build-version.js",
-    "build": "yarn build:app && yarn build:version",
+    "build": "yarn && yarn build:app && yarn build:version",
     "start": "yarn && vite",
     "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "build:preview": "yarn build && vite preview --port 5000"
