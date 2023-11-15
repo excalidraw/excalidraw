@@ -231,10 +231,7 @@ export const QrModal = ({
   if (activeRoomLink) {
     return (
       <>
-        <h3 className="RoomDialog__active__header">
-          {t("labels.liveCollaboration")}
-        </h3>
-        <div className="RoomDialog__active__linkRow">
+        <div className="RoomDialog__active__linkRow" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <QRCodeSVG value={activeRoomLink} />
         </div>
         <div className="RoomDialog__active__actions">
@@ -289,7 +286,6 @@ const RoomDialog = (props: RoomModalProps) => {
   return (
     <Dialog size="small" onCloseRequest={props.handleClose} title={false}>
       <div className="RoomDialog">
-        {/* <RoomModal {...props} /> */}
         {QrOpen? <QrModal {...props} /> : <RoomModal {...props} setQrOpen={()=>setQrOpen(true)} />}
       </div>
     </Dialog>
