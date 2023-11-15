@@ -56,6 +56,7 @@ import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
+import { SearchTool } from "./SearchUI";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -77,6 +78,9 @@ interface LayerUIProps {
   children?: React.ReactNode;
   app: AppClassProperties;
   isCollaborating: boolean;
+  onSearchToggle: () => void;
+  onSearchQueryChange: (query: string) => void;
+  onSearchGoResult: (index: number) => void;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -133,6 +137,9 @@ const LayerUI = ({
   children,
   app,
   isCollaborating,
+  onSearchToggle,
+  onSearchQueryChange,
+  onSearchGoResult,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -282,6 +289,15 @@ const LayerUI = ({
                             activeTool={appState.activeTool}
                             UIOptions={UIOptions}
                             app={app}
+                          />
+
+                          <SearchTool
+                            checked={appState.searchTool.activated}
+                            searchToolData={appState.searchTool}
+                            onChange={onSearchToggle}
+                            onQueryChange={onSearchQueryChange}
+                            onGoResult={onSearchGoResult}
+                            title={t("toolBar.search")}
                           />
                         </Stack.Row>
                       </Island>

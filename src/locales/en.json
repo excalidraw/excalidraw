@@ -244,7 +244,12 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw"
+    "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "search": "Toogle On/Off Search Tool",
+    "searchPlaceholder": "Type to search...",
+    "searchSwitch": "Turn search tool on/off",
+    "searchGoPrev": "Go prev result",
+    "searchGoNext": "Go next result"
   },
   "headings": {
     "canvasActions": "Canvas actions",

@@ -1247,6 +1247,9 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           app={this}
                           isCollaborating={this.props.isCollaborating}
+                          onSearchToggle={this.toggleSearch}
+                          onSearchQueryChange={this.changeSearchQuery}
+                          onSearchGoResult={this.scrollToSearchResult}
                         >
                           {this.props.children}
                           {this.state.openDialog === "mermaid" && (
@@ -2697,6 +2700,48 @@ class App extends React.Component<AppProps, AppState> {
               : prevState.activeTool,
           ),
           locked: !prevState.activeTool.locked,
+        },
+      };
+    });
+  };
+
+  toggleSearch = (source: "keyboard" | "ui" = "ui") => {
+    if (!this.state.activeTool.locked) {
+      trackEvent(
+        "toolbar",
+        "toggleSearch",
+        `${source} (${this.device.editor.isMobile ? "mobile" : "desktop"})`,
+      );
+    }
+    this.setState((prevState) => {
+      return {
+        searchTool: {
+          ...prevState.searchTool,
+          activated: !prevState.searchTool.activated,
+        },
+      };
+    });
+  };
+
+  changeSearchQuery = (query: string) => {
+    // TODO: real change of search goes here
+    this.setState((prevState) => {
+      return {
+        searchTool: {
+          ...prevState.searchTool,
+          query,
+        },
+      };
+    });
+  };
+
+  scrollToSearchResult = (index: number) => {
+    // TODO: do real scroll to search result here
+    this.setState((prevState) => {
+      return {
+        searchTool: {
+          ...prevState.searchTool,
+          resultsPos: index,
         },
       };
     });

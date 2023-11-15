@@ -296,6 +296,15 @@ export type AppState = {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
+  searchTool: {
+    activated: boolean;
+    query: string;
+    resultsPos: number;
+    results: {
+      id: string;
+      searchableText: string;
+    }[];
+  };
 };
 
 export type UIAppState = Omit<

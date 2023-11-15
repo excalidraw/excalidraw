@@ -1688,3 +1688,36 @@ export const laserPointerToolIcon = createIcon(
 
   20,
 );
+
+export const searchToolIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+    />
+  </g>,
+  tablerIconProps,
+);
+
+export const chevronLeftIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15.75 19.5L8.25 12l7.5-7.5"
+    />
+  </g>,
+  tablerIconProps,
+);
+
+export const chevronRightIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8.25 4.5l7.5 7.5-7.5 7.5"
+    />
+  </g>,
+  tablerIconProps,
+);
