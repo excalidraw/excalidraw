@@ -1,7 +1,7 @@
 import {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  NonDeleted,
+    NonDeletedExcalidrawElement,
+NonDeleted,
   ExcalidrawFrameElement,
 } from "../element/types";
 import {
@@ -15,6 +15,7 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
+import { textSearch } from "../search";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -235,6 +236,9 @@ class Scene {
     mapElementIds = true,
   ) {
     this.elements = nextElements;
+
+    textSearch.replaceAllElements(nextElements);
+
     const nextFrames: ExcalidrawFrameElement[] = [];
     this.elementsMap.clear();
     nextElements.forEach((element) => {
@@ -306,6 +310,7 @@ class Scene {
       element,
       ...this.elements.slice(index),
     ];
+
     this.replaceAllElements(nextElements);
   }
 
