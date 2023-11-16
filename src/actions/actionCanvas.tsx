@@ -265,7 +265,21 @@ export const zoomToFit = ({
       30.0,
     ) as NormalizedZoomValue;
 
-    scrollX = (appState.width / 2) * (1 / newZoomValue) - centerX;
+    let appStateWidth = appState.width;
+
+    if (appState.openSidebar) {
+      const sidebarDOMElem = document.querySelector(
+        ".sidebar",
+      ) as HTMLElement | null;
+      const sidebarWidth = sidebarDOMElem?.offsetWidth ?? 0;
+      const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+
+      appStateWidth = !isRTL
+        ? appState.width - sidebarWidth
+        : appState.width + sidebarWidth;
+    }
+
+    scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
   } else {
     newZoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
