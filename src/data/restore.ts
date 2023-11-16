@@ -297,6 +297,7 @@ const restoreElement = (
     case "embeddable":
       return restoreElementWithProperties(element, {
         validated: null,
+        scale: [1, 1],
       });
     case "frame":
       return restoreElementWithProperties(element, {

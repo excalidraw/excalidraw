@@ -140,6 +140,7 @@ export const newEmbeddableElement = (
   return {
     ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
     validated: opts.validated,
+    scale: [1, 1],
   };
 };
 

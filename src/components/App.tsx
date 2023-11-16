@@ -868,6 +868,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
 
+          // Modify the scale based on el.scale property
+          const [xScale, yScale] = el.scale;
+          const scaledTransform = `scale(${scale * xScale}, ${scale * yScale})`;
+
           return (
             <div
               key={el.id}
@@ -878,7 +882,7 @@ class App extends React.Component<AppProps, AppState> {
                 transform: isVisible
                   ? `translate(${x - this.state.offsetLeft}px, ${
                       y - this.state.offsetTop
-                    }px) scale(${scale})`
+                    }px) ${scaledTransform}`
                   : "none",
                 display: isVisible ? "block" : "none",
                 opacity: el.opacity / 100,
@@ -907,8 +911,8 @@ class App extends React.Component<AppProps, AppState> {
                 }}*/
                 className="excalidraw__embeddable-container__inner"
                 style={{
-                  width: isVisible ? `${el.width}px` : 0,
-                  height: isVisible ? `${el.height}px` : 0,
+                  width: isVisible ? `${el.width / xScale}px` : 0,
+                  height: isVisible ? `${el.height / yScale}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
                   pointerEvents: isActive
                     ? POINTER_EVENTS.enabled
