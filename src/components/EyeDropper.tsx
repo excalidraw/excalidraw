@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { rgbToHex } from "../colors";
 import { EVENT } from "../constants";
@@ -29,7 +29,7 @@ export type EyeDropperProperties = {
 };
 
 export const activeEyeDropperAtom = atom<null | EyeDropperProperties>(null);
-//@ts-ignore
+
 export const EyeDropper: React.FC<{
   onCancel: () => void;
   onSelect: EyeDropperProperties["onSelect"];

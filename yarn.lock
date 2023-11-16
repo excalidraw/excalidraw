@@ -2320,42 +2320,17 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/react-dom@18.0.6":
+"@types/react-dom@18.0.6", "@types/react-dom@<18.0.0":
   version "18.0.6"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.6.tgz#36652900024842b74607a17786b6662dd1e103a1"
   integrity sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==
   dependencies:
     "@types/react" "*"
 
-"@types/react-dom@<18.0.0":
-  version "17.0.19"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-17.0.19.tgz#36feef3aa35d045cacd5ed60fe0eef5272f19492"
-  integrity sha512-PiYG40pnQRdPHnlf7tZnp0aQ6q9tspYr72vD61saO6zFCybLfMqwUCN0va1/P+86DXn18ZWeW30Bk7xlC5eEAQ==
-  dependencies:
-    "@types/react" "^17"
-
-"@types/react@*":
-  version "18.2.22"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.22.tgz#abe778a1c95a07fa70df40a52d7300a40b949ccb"
-  integrity sha512-60fLTOLqzarLED2O3UQImc/lsNRgG0jE/a1mPW9KjMemY0LMITWEsbS4VvZ4p6rorEHd5YKxxmMKSDK505GHpA==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
-
-"@types/react@18.0.15":
+"@types/react@*", "@types/react@18.0.15":
   version "18.0.15"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.15.tgz#d355644c26832dc27f3e6cbf0c4f4603fc4ab7fe"
   integrity sha512-iz3BtLuIYH1uWdsv6wXYdhozhqj20oD4/Hk2DNXIn1kFsmp9x8d9QB6FnPhfkbhd2PgEONt9Q1x/ebkwjfFLow==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
-
-"@types/react@^17":
-  version "17.0.57"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.57.tgz#341152f222222075caf020ae6e0e68b9b835404c"
-  integrity sha512-e4msYpu5QDxzNrXDHunU/VPyv2M1XemGG/p7kfCjUiPtlLDCWLGQfgAMng6YyisWYxZ09mYdQlmMnyS0NfZdEg==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"

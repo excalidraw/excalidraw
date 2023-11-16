@@ -1,13 +1,11 @@
 import "./Modal.scss";
 
-import React from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
 import { AppState } from "../types";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
-//@ts-ignore
 export const Modal: React.FC<{
   className?: string;
   children: React.ReactNode;

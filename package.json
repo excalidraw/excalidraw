@@ -3,6 +3,10 @@
     "react": "^17.0.2 || ^18.2.0",
     "react-dom": "^17.0.2 || ^18.2.0"
   },
+  "resolutions": {
+    "@types/react": "18.0.15",
+    "@types/react-dom": "18.0.6"
+  },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
     "@excalidraw/laser-pointer": "1.2.0",
