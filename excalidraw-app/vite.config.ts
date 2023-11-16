@@ -15,7 +15,7 @@ export default defineConfig({
     // open the browser
     open: true,
   },
-  // We need to specift the envDir since now there are no
+  // We need to specify the envDir since now there are no
   //more located in parallel with the vite.config.ts file but in parent dir
   envDir: "../",
   build: {
@@ -28,7 +28,7 @@ export default defineConfig({
         // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
         manualChunks(id) {
           if (
-            id.includes("../src/locales") &&
+            id.includes("src/locales") &&
             id.match(/en.json|percentages.json/) === null
           ) {
             const index = id.indexOf("locales/");
