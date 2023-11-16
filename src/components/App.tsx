@@ -375,6 +375,7 @@ import {
   setCursorForShape,
 } from "../cursor";
 import { Emitter } from "../emitter";
+import { textSearch } from "../search";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2705,6 +2706,22 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private doTextSearch = (query: string) => {
+    // in default turn on fuzzy search, guess everyone like it
+    const results = textSearch.search(query, {
+      fuzzy: textSearch.DEFAULT_FUZZY,
+    });
+    this.setState((prevState) => {
+      return {
+        searchTool: {
+          ...prevState.searchTool,
+          results,
+          resultsPos: 0,
+        },
+      };
+    });
+  };
+
   toggleSearch = (source: "keyboard" | "ui" = "ui") => {
     if (!this.state.activeTool.locked) {
       trackEvent(
@@ -2723,8 +2740,10 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  changeSearchQuery = (query: string) => {
-    // TODO: real change of search goes here
+  changeSearchQuery = debounce((query: string) => {
+    // simple trick prevent search to block UI change
+    setTimeout(() => this.doTextSearch(query), 0);
+
     this.setState((prevState) => {
       return {
         searchTool: {
@@ -2733,7 +2752,7 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     });
-  };
+  }, textSearch.DEFAULT_DEBOUNCE_TIME);
 
   scrollToSearchResult = (index: number) => {
     // TODO: do real scroll to search result here

@@ -108,12 +108,7 @@ export const getDefaultAppState = (): Omit<
     searchTool: {
       activated: false,
       query: "",
-      results: [
-        // TODO: remove this UI test code
-        { id: "1", searchableText: "1" },
-        { id: "2", searchableText: "2" },
-        { id: "3", searchableText: "3" },
-      ],
+      results: [],
       resultsPos: 0,
     },
   };

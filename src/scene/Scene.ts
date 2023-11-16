@@ -1,7 +1,7 @@
 import {
   ExcalidrawElement,
-    NonDeletedExcalidrawElement,
-NonDeleted,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
   ExcalidrawFrameElement,
 } from "../element/types";
 import {
@@ -16,6 +16,7 @@ import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
 import { textSearch } from "../search";
+import { debounce } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -58,6 +59,13 @@ const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
   }
   return false;
 };
+
+const textSearchReplaceAllElements = debounce(
+  (elems: readonly ExcalidrawElement[]) => {
+    textSearch.replaceAllElements(elems);
+  },
+  textSearch.DEFAULT_DEBOUNCE_TIME,
+);
 
 class Scene {
   // ---------------------------------------------------------------------------
@@ -237,7 +245,7 @@ class Scene {
   ) {
     this.elements = nextElements;
 
-    textSearch.replaceAllElements(nextElements);
+    textSearchReplaceAllElements(nextElements);
 
     const nextFrames: ExcalidrawFrameElement[] = [];
     this.elementsMap.clear();

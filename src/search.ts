@@ -31,7 +31,11 @@ function getSearchableRecord(elem: ExcalidrawElement) {
 }
 
 export const textSearch = {
-  search: (query: Query, searchOptions?: SearchOptions) => _miniSearch.search(query, searchOptions),
+  DEFAULT_DEBOUNCE_TIME: 300,
+  DEFAULT_FUZZY: 0.2,
+
+  search: (query: Query, searchOptions?: SearchOptions) =>
+    _miniSearch.search(query, searchOptions),
 
   resetSearch: () => {
     _miniSearch.removeAll();

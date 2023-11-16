@@ -35,6 +35,7 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
 import { Merge, ValueOf } from "./utility-types";
+import { SearchResult } from "minisearch";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -300,10 +301,7 @@ export type AppState = {
     activated: boolean;
     query: string;
     resultsPos: number;
-    results: {
-      id: string;
-      searchableText: string;
-    }[];
+    results: SearchResult[];
   };
 };
 
