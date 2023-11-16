@@ -71,6 +71,31 @@ const StaticCanvas = (props: StaticCanvasProps) => {
     );
   });
 
+  useEffect(() => {
+    if (props.canvas) {
+      renderStaticScene(
+        {
+          canvas: props.canvas,
+          rc: props.rc,
+          scale: props.scale,
+          elements: props.elements,
+          visibleElements: props.visibleElements,
+          appState: props.appState,
+          renderConfig: props.renderConfig,
+        },
+        isRenderThrottlingEnabled(),
+      );
+    }
+  }, [
+    props.appState,
+    props.canvas,
+    props.elements,
+    props.rc,
+    props.renderConfig,
+    props.scale,
+    props.visibleElements,
+  ]);
+
   return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
 };
 
@@ -96,6 +121,7 @@ const getRelevantAppStateProps = (
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
+  searchTool: appState.searchTool,
 });
 
 const areEqual = (

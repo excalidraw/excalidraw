@@ -1,4 +1,4 @@
-import MiniSearch, { Query, SearchOptions } from "minisearch";
+import MiniSearch, { Query, SearchOptions, SearchResult } from "minisearch";
 
 import { ExcalidrawElement } from "./element/types";
 
@@ -33,6 +33,58 @@ function getSearchableRecord(elem: ExcalidrawElement) {
 export const textSearch = {
   DEFAULT_DEBOUNCE_TIME: 300,
   DEFAULT_FUZZY: 0.2,
+
+  getSearchMatchKeys: (results: SearchResult[], elemId: string) => {
+    const match = results.find((r) => r.id === elemId);
+    return match ? Object.keys(match.match) : [];
+  },
+
+  isEqualMatchKeys: (keys1: string[], keys2: string[]) => {
+    return JSON.stringify(keys1.sort()) === JSON.stringify(keys2.sort());
+  },
+
+  _highlightTextInCanvasContextWithKey: (
+    text: string,
+    context: CanvasRenderingContext2D,
+    xOffset: number,
+    yOffset: number,
+    key: string,
+  ) => {
+    let start = 0;
+    let pos = text.indexOf(key, start);
+    const oldFillStyle = context.fillStyle;
+    context.fillStyle = "yellow"; // TODO: what's this look alike in dark theme?
+    while (pos >= 0) {
+      const startX =
+        xOffset + context.measureText(text.substring(0, pos)).width;
+      const endX =
+        xOffset +
+        context.measureText(text.substring(0, pos + key.length)).width;
+      context.fillRect(startX, yOffset - 20, endX - startX, 25);
+
+      start = pos + key.length;
+      pos = text.indexOf(key, start);
+    }
+    context.fillStyle = oldFillStyle;
+  },
+
+  highlightTextInCanvasContext: (
+    text: string,
+    context: CanvasRenderingContext2D,
+    xOffset: number,
+    yOffset: number,
+    searchMatchKeys: string[],
+  ) => {
+    searchMatchKeys.forEach((key) =>
+      textSearch._highlightTextInCanvasContextWithKey(
+        text,
+        context,
+        xOffset,
+        yOffset,
+        key,
+      ),
+    );
+  },
 
   search: (query: Query, searchOptions?: SearchOptions) =>
     _miniSearch.search(query, searchOptions),

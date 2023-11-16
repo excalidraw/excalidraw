@@ -61,6 +61,7 @@ import {
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
 import { ShapeCache } from "../scene/ShapeCache";
+import { textSearch } from "../search";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -103,6 +104,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
   containingFrameOpacity: number;
+  searchMatchKeys: string[];
 }
 
 const cappedElementCanvasSize = (
@@ -220,6 +222,10 @@ const generateElementCanvas = (
     canvasOffsetY,
     boundTextElementVersion: getBoundTextElement(element)?.version || null,
     containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
+    searchMatchKeys: textSearch.getSearchMatchKeys(
+      appState.searchTool.results,
+      element.id,
+    ),
   };
 };
 
@@ -340,6 +346,11 @@ const drawElementOnCanvas = (
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
+        const searchMatchKeys = textSearch.getSearchMatchKeys(
+          appState.searchTool.results,
+          element.id,
+        );
+
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
 
@@ -355,11 +366,16 @@ const drawElementOnCanvas = (
         );
         const verticalOffset = element.height - element.baseline;
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
+          const x = horizontalOffset;
+          const y = (index + 1) * lineHeightPx - verticalOffset;
+          textSearch.highlightTextInCanvasContext(
             lines[index],
-            horizontalOffset,
-            (index + 1) * lineHeightPx - verticalOffset,
+            context,
+            x,
+            y,
+            searchMatchKeys,
           );
+          context.fillText(lines[index], x, y);
         }
         context.restore();
         if (shouldTemporarilyAttach) {
@@ -389,6 +405,17 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
+  const currentSearchMatchKeys = textSearch.getSearchMatchKeys(
+    appState.searchTool.results,
+    element.id,
+  );
+  const shouldRegenerateBecauseSearch =
+    !prevElementWithCanvas ||
+    (prevElementWithCanvas &&
+      !textSearch.isEqualMatchKeys(
+        prevElementWithCanvas.searchMatchKeys,
+        currentSearchMatchKeys,
+      ));
   const boundTextElementVersion = getBoundTextElement(element)?.version || null;
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
@@ -397,7 +424,8 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    shouldRegenerateBecauseSearch
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,

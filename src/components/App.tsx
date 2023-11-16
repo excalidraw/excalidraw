@@ -2709,7 +2709,7 @@ class App extends React.Component<AppProps, AppState> {
   private doTextSearch = (query: string) => {
     // in default turn on fuzzy search, guess everyone like it
     const results = textSearch.search(query, {
-      fuzzy: textSearch.DEFAULT_FUZZY,
+      prefix: true,
     });
     this.setState((prevState) => {
       return {
@@ -2755,7 +2755,12 @@ class App extends React.Component<AppProps, AppState> {
   }, textSearch.DEFAULT_DEBOUNCE_TIME);
 
   scrollToSearchResult = (index: number) => {
-    // TODO: do real scroll to search result here
+    const targetElementId = this.state.searchTool.results[index].id;
+    const targetElement = this.scene.getElement(targetElementId);
+    // same simple trick prevent search to block UI change
+    if (targetElement) {
+      setTimeout(() => this.scrollToContent(targetElement, { animate: true }));
+    }
     this.setState((prevState) => {
       return {
         searchTool: {
