@@ -8064,13 +8064,13 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const selectedElements = this.scene.getSelectedElements(this.state);
-    const isHittignCommonBoundBox =
+    const isHittingCommonBoundBox =
       this.isHittingCommonBoundingBoxOfSelectedElements(
         { x, y },
         selectedElements,
       );
 
-    const type = element || isHittignCommonBoundBox ? "element" : "canvas";
+    const type = element || isHittingCommonBoundBox ? "element" : "canvas";
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
