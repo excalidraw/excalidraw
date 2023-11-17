@@ -8317,39 +8317,6 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
-        const elementsInFrame = getFrameChildren(
-          this.scene.getNonDeletedElements(),
-          frame.id,
-        );
-
-        // keep elements' positions relative to their frames on frames resizing
-        if (transformHandleType) {
-          if (transformHandleType.includes("w")) {
-            elementsInFrame.forEach((element) => {
-              mutateElement(element, {
-                x:
-                  frame.x +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.x || 0),
-                y:
-                  frame.y +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.y || 0),
-              });
-            });
-          }
-          if (transformHandleType.includes("n")) {
-            elementsInFrame.forEach((element) => {
-              mutateElement(element, {
-                x:
-                  frame.x +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.x || 0),
-                y:
-                  frame.y +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.y || 0),
-              });
-            });
-          }
-        }
-
         getElementsInResizingFrame(
           this.scene.getNonDeletedElements(),
           frame,
