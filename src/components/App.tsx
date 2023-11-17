@@ -8299,7 +8299,12 @@ class App extends React.Component<AppProps, AppState> {
       transformElements(
         pointerDownState,
         transformHandleType,
-        selectedElements,
+        selectedFrames.length > 1
+          ? this.scene.getSelectedElements({
+              selectedElementIds: this.state.selectedElementIds,
+              includeElementsInFrames: true,
+            })
+          : selectedElements,
         pointerDownState.resize.arrowDirection,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
@@ -8315,51 +8320,57 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
 
-      const elementsToHighlight = new Set<ExcalidrawElement>();
-      selectedFrames.forEach((frame) => {
-        const elementsInFrame = getFrameChildren(
-          this.scene.getNonDeletedElements(),
-          frame.id,
-        );
+      if (selectedFrames.length === 1) {
+        const elementsToHighlight = new Set<ExcalidrawElement>();
+        selectedFrames.forEach((frame) => {
+          const elementsInFrame = getFrameChildren(
+            this.scene.getNonDeletedElements(),
+            frame.id,
+          );
 
-        // keep elements' positions relative to their frames on frames resizing
-        if (transformHandleType) {
-          if (transformHandleType.includes("w")) {
-            elementsInFrame.forEach((element) => {
-              mutateElement(element, {
-                x:
-                  frame.x +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.x || 0),
-                y:
-                  frame.y +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.y || 0),
+          // keep elements' positions relative to their frames on frames resizing
+          if (transformHandleType) {
+            if (transformHandleType.includes("w")) {
+              elementsInFrame.forEach((element) => {
+                mutateElement(element, {
+                  x:
+                    frame.x +
+                    (frameElementsOffsetsMap.get(frame.id + element.id)?.x ||
+                      0),
+                  y:
+                    frame.y +
+                    (frameElementsOffsetsMap.get(frame.id + element.id)?.y ||
+                      0),
+                });
               });
-            });
-          }
-          if (transformHandleType.includes("n")) {
-            elementsInFrame.forEach((element) => {
-              mutateElement(element, {
-                x:
-                  frame.x +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.x || 0),
-                y:
-                  frame.y +
-                  (frameElementsOffsetsMap.get(frame.id + element.id)?.y || 0),
+            }
+            if (transformHandleType.includes("n")) {
+              elementsInFrame.forEach((element) => {
+                mutateElement(element, {
+                  x:
+                    frame.x +
+                    (frameElementsOffsetsMap.get(frame.id + element.id)?.x ||
+                      0),
+                  y:
+                    frame.y +
+                    (frameElementsOffsetsMap.get(frame.id + element.id)?.y ||
+                      0),
+                });
               });
-            });
+            }
           }
-        }
 
-        getElementsInResizingFrame(
-          this.scene.getNonDeletedElements(),
-          frame,
-          this.state,
-        ).forEach((element) => elementsToHighlight.add(element));
-      });
+          getElementsInResizingFrame(
+            this.scene.getNonDeletedElements(),
+            frame,
+            this.state,
+          ).forEach((element) => elementsToHighlight.add(element));
+        });
 
-      this.setState({
-        elementsToHighlight: [...elementsToHighlight],
-      });
+        this.setState({
+          elementsToHighlight: [...elementsToHighlight],
+        });
+      }
 
       return true;
     }
