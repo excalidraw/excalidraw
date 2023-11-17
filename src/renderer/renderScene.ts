@@ -71,6 +71,7 @@ import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
   isFrameElement,
+  isFreeDrawElement,
   isLinearElement,
 } from "../element/typeChecks";
 import {
@@ -78,7 +79,7 @@ import {
   createPlaceholderEmbeddableLabel,
 } from "../element/embeddable";
 import {
-  elementsAreInFrameBounds,
+  elementsAreInBounds,
   getTargetFrame,
   isElementInFrame,
 } from "../frame";
@@ -981,6 +982,7 @@ const _renderStaticScene = ({
     }
   };
 
+  const processedGroupIds = new Map<string, boolean>();
   for (const element of visibleElementsToRender) {
     const frameId = element.frameId || appState.frameToHighlight?.id;
 
@@ -994,8 +996,17 @@ const _renderStaticScene = ({
       // only clip elements that are not completely in the target frame
       if (
         targetFrame &&
-        !elementsAreInFrameBounds([element], targetFrame) &&
-        isElementInFrame(element, elements, appState)
+        !elementsAreInBounds(
+          [element],
+          targetFrame,
+          isFreeDrawElement(element)
+            ? element.strokeWidth * 8
+            : element.roughness * (isLinearElement(element) ? 8 : 4),
+        ) &&
+        isElementInFrame(element, elements, appState, {
+          targetFrame,
+          processedGroupIds,
+        })
       ) {
         context.save();
         frameClip(targetFrame, context, renderConfig, appState);
@@ -1112,7 +1123,7 @@ const renderTransformHandles = (
 
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
+  appState: InteractiveCanvasAppState | StaticCanvasAppState,
   elementProperties: {
     angle: number;
     elementX1: number;
@@ -1277,6 +1288,23 @@ const renderFrameHighlight = (
   context.restore();
 };
 
+const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
+  const [elementX1, elementY1, elementX2, elementY2] =
+    getCommonBounds(elements);
+  return {
+    angle: 0,
+    elementX1,
+    elementX2,
+    elementY1,
+    elementY2,
+    selectionColors: ["rgb(0,118,255)"],
+    dashed: false,
+    cx: elementX1 + (elementX2 - elementX1) / 2,
+    cy: elementY1 + (elementY2 - elementY1) / 2,
+    activeEmbeddable: false,
+  };
+};
+
 const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -1290,37 +1318,28 @@ const renderElementsBoxHighlight = (
     (element) => element.groupIds.length > 0,
   );
 
-  const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
-    const [elementX1, elementY1, elementX2, elementY2] =
-      getCommonBounds(elements);
-    return {
-      angle: 0,
-      elementX1,
-      elementX2,
-      elementY1,
-      elementY2,
-      selectionColors: ["rgb(0,118,255)"],
-      dashed: false,
-      cx: elementX1 + (elementX2 - elementX1) / 2,
-      cy: elementY1 + (elementY2 - elementY1) / 2,
-      activeEmbeddable: false,
-    };
-  };
+  const processedGroupIds = new Set<string>();
 
   const getSelectionForGroupId = (groupId: GroupId) => {
-    const groupElements = getElementsInGroup(elements, groupId);
-    return getSelectionFromElements(groupElements);
+    if (!processedGroupIds.has(groupId)) {
+      const groupElements = getElementsInGroup(elements, groupId);
+      processedGroupIds.add(groupId);
+      return getSelectionFromElements(groupElements);
+    }
+
+    return null;
   };
 
   Object.entries(selectGroupsFromGivenElements(elementsInGroups, appState))
     .filter(([id, isSelected]) => isSelected)
     .map(([id, isSelected]) => id)
     .map((groupId) => getSelectionForGroupId(groupId))
+    .filter((selection) => selection)
     .concat(
       individualElements.map((element) => getSelectionFromElements([element])),
     )
     .forEach((selection) =>
-      renderSelectionBorder(context, appState, selection),
+      renderSelectionBorder(context, appState, selection!),
     );
 };
 
