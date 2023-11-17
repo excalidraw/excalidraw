@@ -13,6 +13,7 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
+  isEmbeddableElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -529,7 +530,8 @@ const drawElementFromCanvas = (
 
     if (
       "scale" in elementWithCanvas.element &&
-      !isPendingImageElement(element, renderConfig)
+      !isPendingImageElement(element, renderConfig) &&
+      !isEmbeddableElement(element)
     ) {
       context.scale(
         elementWithCanvas.element.scale[0],
