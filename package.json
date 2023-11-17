@@ -22,7 +22,7 @@
     "@braintree/sanitize-url": "6.0.2",
     "@zsviczian/mermaid-to-excalidraw": "0.1.2-obsidian-2",
     "@excalidraw/laser-pointer": "1.2.0",
-    "@excalidraw/random-username": "1.0.0",
+    "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-tabs": "1.0.2",
     "@sentry/browser": "6.2.5",
@@ -96,7 +96,7 @@
     "vitest-canvas-mock": "0.3.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.0.0 - 20.x.x"
   },
   "homepage": ".",
   "name": "excalidraw",
@@ -128,8 +128,8 @@
     "test:coverage:watch": "vitest --coverage --watch",
     "test:ui": "yarn test --ui --coverage.enabled=true",
     "autorelease": "node scripts/autorelease.js",
-    "prerelease": "node scripts/prerelease.js",
+    "prerelease:excalidraw": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
-    "release": "node scripts/release.js"
+    "release:excalidraw": "node scripts/release.js"
   }
 }

@@ -225,6 +225,9 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     toggleTheme: null,
     saveAsImage: true,
   },
+  tools: {
+    image: true,
+  },
 };
 
 // breakpoints

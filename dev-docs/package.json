@@ -18,7 +18,7 @@
     "@docusaurus/core": "2.2.0",
     "@docusaurus/preset-classic": "2.2.0",
     "@docusaurus/theme-live-codeblock": "2.2.0",
-    "@excalidraw/excalidraw": "0.15.2-eb020d0",
+    "@excalidraw/excalidraw": "0.17.0",
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.2.1",
     "docusaurus-plugin-sass": "0.2.3",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.0.0-rc.1",
     "@tsconfig/docusaurus": "^1.0.5",
+    "docusaurus2-dotenv": "1.4.0",
     "typescript": "^4.7.4"
   },
   "browserslist": {
