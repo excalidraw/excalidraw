@@ -927,7 +927,7 @@ class App extends React.Component<AppProps, AppState> {
                 <div
                   className="excalidraw__embeddable__outer"
                   style={{
-                    padding: `${el.strokeWidth}px`,
+                    padding: `${el.strokeWidth/el.scale[0]}px`,
                   }}
                 >
                   {this.props.renderEmbeddable?.(el, this.state) ?? (
