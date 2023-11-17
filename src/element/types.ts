@@ -95,6 +95,7 @@ export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
      * may not have access to host-app supplied url validator during restore.
      */
     validated: boolean | null;
+    scale: [number, number];
   }>;
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
