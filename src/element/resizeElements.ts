@@ -587,13 +587,20 @@ export const resizeSingleElement = (
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
-    if (isEmbeddableElement(element) && shouldMaintainAspectRatio) {
-      const scale: [number, number] = [
-        eleNewWidth / (stateAtResizeStart.width / stateAtResizeStart.scale[0]),
-        eleNewHeight /
-          (stateAtResizeStart.height / stateAtResizeStart.scale[1]),
-      ];
-      mutateElement(element, { scale });
+    if (isEmbeddableElement(element)) {
+      if (shouldMaintainAspectRatio) {
+        const scale: [number, number] = [
+          Math.abs(
+            eleNewWidth /
+              (stateAtResizeStart.width / stateAtResizeStart.scale[0]),
+          ),
+          Math.abs(
+            eleNewHeight /
+              (stateAtResizeStart.height / stateAtResizeStart.scale[1]),
+          ),
+        ];
+        mutateElement(element, { scale });
+      }
     } else {
       mutateElement(element, {
         scale: [
