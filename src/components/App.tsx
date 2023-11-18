@@ -351,6 +351,7 @@ import {
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { ImageSceneDataError } from "../errors";
 import {
   getSnapLinesAtPointer,
   snapDraggedElements,
@@ -2299,6 +2300,11 @@ class App extends React.Component<AppProps, AppState> {
 
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
+        if (!this.isToolSupported("image")) {
+          this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+          return;
+        }
+
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -2504,7 +2510,8 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     if (
       !isPlainPaste &&
-      mixedContent.some((node) => node.type === "imageUrl")
+      mixedContent.some((node) => node.type === "imageUrl") &&
+      this.isToolSupported("image")
     ) {
       const imageURLs = mixedContent
         .filter((node) => node.type === "imageUrl")
@@ -2744,7 +2751,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  togglePenMode = (force?: boolean) => {
+  togglePenMode = (force: boolean | null) => {
     this.setState((prevState) => {
       return {
         penMode: force ?? !prevState.penMode,
@@ -3312,6 +3319,16 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  // We purposely widen the `tool` type so this helper can be called with
+  // any tool without having to type check it
+  private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
+    return (
+      this.props.UIOptions.tools?.[
+        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
+      ] !== false
+    );
+  };
+
   setActiveTool = (
     tool: (
       | (
@@ -3324,6 +3341,13 @@ class App extends React.Component<AppProps, AppState> {
       | { type: "custom"; customType: string }
     ) & { locked?: boolean },
   ) => {
+    if (!this.isToolSupported(tool.type)) {
+      console.warn(
+        `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
+      );
+      return;
+    }
+
     const nextActiveTool = updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
@@ -4769,9 +4793,13 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+
+      const frame = this.getTopLayerFrameAtSceneCoords({ x, y });
+
       mutateElement(pendingImageElement, {
         x,
         y,
+        frameId: frame ? frame.id : null,
       });
     } else if (this.state.activeTool.type === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
@@ -5638,9 +5666,11 @@ class App extends React.Component<AppProps, AppState> {
   private createImageElement = ({
     sceneX,
     sceneY,
+    addToFrameUnderCursor = true,
   }: {
     sceneX: number;
     sceneY: number;
+    addToFrameUnderCursor?: boolean;
   }) => {
     const [gridX, gridY] = getGridPoint(
       sceneX,
@@ -5650,10 +5680,12 @@ class App extends React.Component<AppProps, AppState> {
         : this.state.gridSize,
     );
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: gridX,
-      y: gridY,
-    });
+    const topLayerFrame = addToFrameUnderCursor
+      ? this.getTopLayerFrameAtSceneCoords({
+          x: gridX,
+          y: gridY,
+        })
+      : null;
 
     const element = newImageElement({
       type: "image",
@@ -7503,6 +7535,13 @@ class App extends React.Component<AppProps, AppState> {
     imageFile: File,
     showCursorImagePreview?: boolean,
   ) => {
+    // we should be handling all cases upstream, but in case we forget to handle
+    // a future case, let's throw here
+    if (!this.isToolSupported("image")) {
+      this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+      return;
+    }
+
     this.scene.addNewElement(imageElement);
 
     try {
@@ -7586,6 +7625,7 @@ class App extends React.Component<AppProps, AppState> {
       const imageElement = this.createImageElement({
         sceneX: x,
         sceneY: y,
+        addToFrameUnderCursor: false,
       });
 
       if (insertOnCanvasDirectly) {
@@ -7886,7 +7926,10 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     try {
-      if (isSupportedImageFile(file)) {
+      // if image tool not supported, don't show an error here and let it fall
+      // through so we still support importing scene data from images. If no
+      // scene data encoded, we'll show an error then
+      if (isSupportedImageFile(file) && this.isToolSupported("image")) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
@@ -8014,6 +8057,17 @@ class App extends React.Component<AppProps, AppState> {
           });
       }
     } catch (error: any) {
+      if (
+        error instanceof ImageSceneDataError &&
+        error.code === "IMAGE_NOT_CONTAINS_SCENE_DATA" &&
+        !this.isToolSupported("image")
+      ) {
+        this.setState({
+          isLoading: false,
+          errorMessage: t("errors.imageToolNotSupported"),
+        });
+        return;
+      }
       this.setState({ isLoading: false, errorMessage: error.message });
     }
   };

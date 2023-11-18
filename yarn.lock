@@ -1602,10 +1602,10 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/prettier-config/-/prettier-config-1.0.2.tgz#b7c061c99cee2f78b9ca470ea1fbd602683bba65"
   integrity sha512-rFIq8+A8WvkEzBsF++Rw6gzxE+hU3ZNkdg8foI+Upz2y/rOC/gUpWJaggPbCkoH3nlREVU59axQjZ1+F6ePRGg==
 
-"@excalidraw/random-username@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@excalidraw/random-username/-/random-username-1.0.0.tgz#6d5293148aee6cd08dcdfcadc0c91276572f4499"
-  integrity sha512-pd4VapWahQ7PIyThGq32+C+JUS73mf3RSdC7BmQiXzhQsCTU4RHc8y9jBi+pb1CFV0iJXvjJRXnVdLCbTj3+HA==
+"@excalidraw/random-username@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@excalidraw/random-username/-/random-username-1.1.0.tgz#6f388d6a9708cf655b8c9c6aa3fa569ee71ecf0f"
+  integrity sha512-nULYsQxkWHnbmHvcs+efMkJ4/9TtvNyFeLyHdeGxW0zHs6P+jYVqcRff9A6Vq9w9JXeDRnRh2VKvTtS19GW2qA==
 
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
