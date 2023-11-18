@@ -86,6 +86,7 @@ import {
   YOUTUBE_STATES,
   ZOOM_STEP,
   POINTER_EVENTS,
+  TRANSLATE_CANVAS_AMOUNT,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -3071,7 +3072,32 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (this.state.viewModeEnabled) {
+      if (this.state.viewModeEnabled && isArrowKey(event.key)) {
+        if (event.key === KEYS.ARROW_LEFT) {
+          this.translateCanvas({
+            scrollX:
+              this.state.scrollX -
+              TRANSLATE_CANVAS_AMOUNT / this.state.zoom.value,
+          });
+        } else if (event.key === KEYS.ARROW_RIGHT) {
+          this.translateCanvas({
+            scrollX:
+              this.state.scrollX +
+              TRANSLATE_CANVAS_AMOUNT / this.state.zoom.value,
+          });
+        } else if (event.key === KEYS.ARROW_UP) {
+          this.translateCanvas({
+            scrollY:
+              this.state.scrollY -
+              TRANSLATE_CANVAS_AMOUNT / this.state.zoom.value,
+          });
+        } else if (event.key === KEYS.ARROW_DOWN) {
+          this.translateCanvas({
+            scrollY:
+              this.state.scrollY +
+              TRANSLATE_CANVAS_AMOUNT / this.state.zoom.value,
+          });
+        }
         return;
       }
 
