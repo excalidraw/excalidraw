@@ -37,7 +37,7 @@ describe("regression tests", () => {
     const el23: ExcalidrawElement[] = [el2, el3];
     const el123: ExcalidrawElement[] = [el1, el2, el3];
     // Set up the custom Action enablers
-    const enableName = "custom" as Action["name"];
+    const enableName = "custom.enable";
     const enableAction: Action = {
       name: enableName,
       perform: (): ActionResult => {

@@ -1395,7 +1395,7 @@ const enableActionChangeMathProps = (
 const createMathActions = () => {
   const mathActions: Action[] = [];
   const actionUseTexTrue: Action = {
-    name: "useTexTrue",
+    name: "custom.useTexTrue",
     perform: (elements, appState) => {
       const mathOnly = getMathProps.getMathOnly(appState);
       const customData = appState.customData ?? {};
@@ -1414,7 +1414,7 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionUseTexFalse: Action = {
-    name: "useTexFalse",
+    name: "custom.useTexFalse",
     perform: (elements, appState) => {
       const mathOnly = getMathProps.getMathOnly(appState);
       const customData = appState.customData ?? {};
@@ -1433,7 +1433,7 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionResetUseTex: Action = {
-    name: "resetUseTex",
+    name: "custom.resetUseTex",
     perform: (elements, appState) => {
       const useTex = getMathProps.getUseTex(appState);
       const modElements = changeProperty(
@@ -1481,7 +1481,7 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionChangeMathOnly: Action = {
-    name: "changeMathOnly",
+    name: "custom.changeMathOnly",
     perform: (elements, appState, mathOnly: boolean | null) => {
       if (mathOnly === null) {
         mathOnly = getFormValue(

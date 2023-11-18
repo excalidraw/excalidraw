@@ -2,6 +2,7 @@ import React from "react";
 import {
   Action,
   UpdaterFn,
+  ActionName,
   ActionResult,
   PanelComponentProps,
   ActionSource,
@@ -40,7 +41,7 @@ const trackAction = (
 };
 
 export class ActionManager {
-  actions = {} as Record<Action["name"], Action>;
+  actions = {} as Record<ActionName, Action>;
   actionPredicates = [] as ActionPredicateFn[];
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
@@ -92,7 +93,7 @@ export class ActionManager {
 
     const actions: Action[] = [];
     for (const key in this.actions) {
-      const action = this.actions[key];
+      const action = this.actions[key as ActionName];
       if (filter(action, elements, appState, data)) {
         actions.push(action);
       }
@@ -167,7 +168,7 @@ export class ActionManager {
   /**
    * @param data additional data sent to the PanelComponent
    */
-  renderAction = (name: Action["name"], data?: PanelComponentProps["data"]) => {
+  renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
 
     if (

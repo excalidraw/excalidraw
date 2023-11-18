@@ -81,7 +81,7 @@ const test1: SubtypeRecord = {
 };
 
 const testAction: Action = {
-  name: TEST_ACTION,
+  name: `custom.${TEST_ACTION}`,
   trackEvent: false,
   perform: (elements, appState) => {
     return {

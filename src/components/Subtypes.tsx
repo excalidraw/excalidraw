@@ -28,7 +28,7 @@ export const SubtypeButton = (
   const keyTest: Action["keyTest"] =
     key !== undefined ? (event) => event.code === `Key${key}` : undefined;
   const subtypeAction: Action = {
-    name: subtype,
+    name: `custom.${subtype}`,
     trackEvent: false,
     predicate: (...rest) => rest[4]?.subtype === subtype,
     perform: (elements, appState) => {
@@ -147,7 +147,7 @@ export const SubtypeToggles = () => {
     <>
       {getSubtypeNames().map((subtype) =>
         am.renderAction(
-          subtype,
+          `custom.${subtype}`,
           hasAlwaysEnabledActions(subtype) ? { onContextMenu } : {},
         ),
       )}

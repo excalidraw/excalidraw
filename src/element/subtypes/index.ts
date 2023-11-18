@@ -28,7 +28,7 @@ let parentTypeMap: readonly {
 }[] = [];
 let subtypeActionMap: readonly {
   subtype: Subtype;
-  actions: readonly SubtypeActionName[];
+  actions: readonly ActionName[];
 }[] = [];
 let disabledActionMap: readonly {
   subtype: Subtype;
@@ -91,7 +91,7 @@ const isDisabledActionName = (s: any): s is DisabledActionName =>
 // by `subtype` (if `isAdded` is false)?
 const isForSubtype = (
   subtype: ExcalidrawElement["subtype"],
-  actionName: ActionName | SubtypeActionName,
+  actionName: ActionName,
   isAdded: boolean,
 ) => {
   const actions = isAdded ? subtypeActionMap : disabledActionMap;
@@ -371,7 +371,12 @@ export const prepareSubtype = (
   if (record.actionNames) {
     subtypeActionMap = [
       ...subtypeActionMap,
-      { subtype, actions: record.actionNames },
+      {
+        subtype,
+        actions: record.actionNames.map(
+          (actionName) => `custom.${actionName}` as ActionName,
+        ),
+      },
     ];
   }
   if (record.disabledNames) {
@@ -383,7 +388,12 @@ export const prepareSubtype = (
   if (record.alwaysEnabledNames) {
     alwaysEnabledMap = [
       ...alwaysEnabledMap,
-      { subtype, actions: record.alwaysEnabledNames },
+      {
+        subtype,
+        actions: record.alwaysEnabledNames.map(
+          (actionName) => `custom.${actionName}` as ActionName,
+        ),
+      },
     ];
   }
   if (record.shortcutMap) {
