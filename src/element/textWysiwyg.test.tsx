@@ -1173,7 +1173,7 @@ describe("textWysiwyg", () => {
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
+        "Online\nwhitebo\nard\ncollabo\nration\nmade\neasy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
