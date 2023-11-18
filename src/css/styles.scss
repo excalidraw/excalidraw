@@ -195,7 +195,7 @@
   .buttonList label:focus-within,
   input:focus-visible {
     outline: transparent;
-    box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
   .buttonList {
@@ -280,6 +280,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px;
+
+    .dropdown-menu--mobile {
+      bottom: 55px;
+      top: auto;
+    }
   }
 
   .App-mobile-menu {
@@ -537,13 +542,13 @@
 
     &:not(:focus) {
       &:hover {
-        background-color: var(--input-hover-bg-color);
+        border-color: var(--color-brand-hover);
       }
     }
 
     &:focus {
       outline: none;
-      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+      border-color: var(--color-brand-hover);
     }
   }
 
@@ -592,6 +597,8 @@
     background-color: var(--island-bg-color);
 
     .ToolIcon__icon {
+      width: 2rem;
+      height: 2rem;
       border-radius: 0;
     }
 
@@ -601,8 +608,8 @@
   }
 
   .App-toolbar--mobile {
-    overflow-x: auto;
-    max-width: 90vw;
+    overflow: visible;
+    max-width: 98vw;
 
     .ToolIcon__keybinding {
       display: none;

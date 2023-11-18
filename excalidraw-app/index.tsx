@@ -694,7 +694,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        ref={excalidrawRefCallback}
+        excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}

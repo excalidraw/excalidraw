@@ -170,13 +170,15 @@ export const newEmbeddableElement = (
 };
 
 export const newFrameElement = (
-  opts: ElementConstructorOpts,
+  opts: {
+    name?: string;
+  } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFrameElement> => {
   const frameElement = newElementWith(
     {
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
       type: "frame",
-      name: null,
+      name: opts?.name || null,
     },
     {},
   );

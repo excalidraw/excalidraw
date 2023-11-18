@@ -1065,7 +1065,7 @@ const renderMathElement = function (element, context) {
   context.restore();
 } as SubtypeMethods["render"];
 
-const renderSvgMathElement = function (svgRoot, root, element, opt) {
+const renderSvgMathElement = function (svgRoot, addToRoot, element, opt) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
 
@@ -1102,7 +1102,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     const cachedDiv = svgRoot.ownerDocument!.createElement("div");
     cachedDiv.innerHTML = svgCache[key];
     node.appendChild(cachedDiv.firstElementChild!);
-    root.appendChild(node);
+    addToRoot(node, element);
     return;
   }
 
@@ -1209,7 +1209,7 @@ const renderSvgMathElement = function (svgRoot, root, element, opt) {
     svgCache[key] = tempSvg.outerHTML;
   }
   node.appendChild(tempSvg);
-  root.appendChild(node);
+  addToRoot(node, element);
 } as SubtypeMethods["renderSvg"];
 
 const wrapMathElement = function (element, containerWidth, next) {

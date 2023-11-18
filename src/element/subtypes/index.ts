@@ -247,7 +247,7 @@ export type SubtypeMethods = {
   ) => void;
   renderSvg: (
     svgRoot: SVGElement,
-    root: SVGElement,
+    addToRoot: (node: SVGElement, element: ExcalidrawElement) => void,
     element: NonDeleted<ExcalidrawElement>,
     opt?: { offsetX?: number; offsetY?: number },
   ) => void;

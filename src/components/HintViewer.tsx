@@ -22,7 +22,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
-  if (appState.openSidebar && !device.canDeviceFitSidebar) {
+  if (appState.openSidebar && !device.editor.canFitSidebar) {
     return null;
   }
 
