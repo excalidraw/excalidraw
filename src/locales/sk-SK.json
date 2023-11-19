@@ -209,7 +209,7 @@
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
     "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Obrázky sú vypnuté.",
     "brave_measure_text_error": {
       "line1": "Vyzerá to, že používate prehliadač Brave so zapnutým nastavením pre <bold>agresívne blokovanie</bold>.",
       "line2": "To môže spôsobiť nesprávne zobrazenie <bold>textových prvkov</bold> vo vašej kresbe.",
