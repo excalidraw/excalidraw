@@ -194,7 +194,7 @@
     "cannotRestoreFromImage": "Scene kunne ikke gendannes fra denne billedfil",
     "invalidSceneUrl": "Kunne ikke importere scene fra den angivne URL. Det er enten misdannet eller indeholder ikke gyldige Excalidraw JSON data.",
     "resetLibrary": "Dette vil rydde hele lærredet. Er du sikker?",
-    "removeItemsFromsLibrary": "",
+    "removeItemsFromsLibrary": "Slet {{count}} vare(r) fra biblioteket?",
     "invalidEncryptionKey": "",
     "collabOfflineWarning": ""
   },
