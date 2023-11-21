@@ -86,7 +86,6 @@ import {
   useHandleLibrary,
 } from "../src/data/library";
 import { AppMainMenu } from "./components/AppMainMenu";
-import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
 import { atom, Provider, useAtom, useAtomValue } from "jotai";
 import { useAtomWithInitialValue } from "../src/jotai";
@@ -700,11 +699,6 @@ const ExcalidrawWrapper = () => {
               renderCustomUI: (elements, appState, files) => {
                 return (
                   <div/>
-                      });
-                    }}
-                    onSuccess={() => {
-                      excalidrawAPI?.updateScene({
-                        appState: { openDialog: null },
                 );
               },
             },
@@ -732,10 +726,6 @@ const ExcalidrawWrapper = () => {
         <AppMainMenu
           setCollabDialogShown={setCollabDialogShown}
           isCollaborating={isCollaborating}
-          isCollabEnabled={!isCollabDisabled}
-        />
-        <AppWelcomeScreen
-          setCollabDialogShown={setCollabDialogShown}
           isCollabEnabled={!isCollabDisabled}
         />
         <OverwriteConfirmDialog>
