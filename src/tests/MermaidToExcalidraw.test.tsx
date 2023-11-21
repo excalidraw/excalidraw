@@ -102,7 +102,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
       <Excalidraw
         initialData={{
           appState: {
-            openDialog: { name: "mermaid" },
+            openDialog: { name: "ai", tab: "mermaid" },
           },
         }}
       />,
@@ -157,7 +157,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
           class="mermaid-error"
           data-testid="mermaid-error"
         >
-          Error! 
+          Error!
           <p>
             ERROR
           </p>

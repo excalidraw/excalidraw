@@ -180,30 +180,31 @@ const MermaidToExcalidraw = () => {
   };
 
   return (
-    <Dialog
-      className="dialog-mermaid"
-      onCloseRequest={onClose}
-      size={1200}
-      title={
-        <>
-          <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
-          <span className="dialog-mermaid-desc">
-            <Trans
-              i18nKey="mermaid.description"
-              flowchartLink={(el) => (
-                <a href="https://mermaid.js.org/syntax/flowchart.html">{el}</a>
-              )}
-              sequenceLink={(el) => (
-                <a href="https://mermaid.js.org/syntax/sequenceDiagram.html">
-                  {el}
-                </a>
-              )}
-            />
-            <br />
-          </span>
-        </>
-      }
-    >
+    // <Dialog
+    //   className="dialog-mermaid"
+    //   onCloseRequest={onClose}
+    //   size={1200}
+    //   title={
+    //     <>
+    //       <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
+    //       <span className="dialog-mermaid-desc">
+    //         <Trans
+    //           i18nKey="mermaid.description"
+    //           flowchartLink={(el) => (
+    //             <a href="https://mermaid.js.org/syntax/flowchart.html">{el}</a>
+    //           )}
+    //           sequenceLink={(el) => (
+    //             <a href="https://mermaid.js.org/syntax/sequenceDiagram.html">
+    //               {el}
+    //             </a>
+    //           )}
+    //         />
+    //         <br />
+    //       </span>
+    //     </>
+    //   }
+    // >
+    <div>
       <div className="dialog-mermaid-body">
         <div className="dialog-mermaid-panels">
           <div className="dialog-mermaid-panels-text">
@@ -237,7 +238,8 @@ const MermaidToExcalidraw = () => {
           </Button>
         </div>
       </div>
-    </Dialog>
+    </div>
+    // </Dialog>
   );
 };
 export default MermaidToExcalidraw;

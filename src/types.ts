@@ -246,14 +246,20 @@ export interface AppState {
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
     | null
-    | { name: "imageExport" | "help" | "jsonExport" | "mermaid" }
+    | { name: "imageExport" | "help" | "jsonExport" }
     | {
         name: "magicSettings";
         source:
           | "tool" // when magicframe tool is selected
           | "generation" // when magicframe generate button is clicked
           | "settings"; // when AI settings dialog is explicitly invoked
-      };
+      }
+    // TODO barnabasmolnar/hal-9000-tabs ˇˇ
+    // probably rethink this
+    // would be cleaner to have
+    // { name: "imageExport" } | { name: "help" } | ... { name: "ai", tab: string }
+    // not sure yet how much of a refactor/breaking change that would be
+    | { name: "ai"; tab: string };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *

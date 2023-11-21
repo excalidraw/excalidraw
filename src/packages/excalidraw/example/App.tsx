@@ -76,6 +76,8 @@ const {
   MainMenu,
   LiveCollaborationTrigger,
   convertToExcalidrawElements,
+  DefaultSidebar,
+  AIDialog,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
@@ -681,7 +683,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             }
             initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) => {
-              console.info("Elements :", elements, "State : ", state);
+              // console.info("Elements :", elements, "State : ", state);
             }}
             onPointerUpdate={(payload: {
               pointer: { x: number; y: number };
@@ -737,6 +739,14 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               Toggle Custom Sidebar
             </Sidebar.Trigger>
             {renderMenu()}
+            <AIDialog>
+              <AIDialog.TabTriggers>
+                <AIDialog.TabTrigger tab="mermaid">Mermaid</AIDialog.TabTrigger>
+                <AIDialog.TabTrigger tab="example">example</AIDialog.TabTrigger>
+              </AIDialog.TabTriggers>
+              <AIDialog.Tab tab="example">example content</AIDialog.Tab>
+              <AIDialog.Tab tab="mermaid">MERMAID AGAIN?! WTF?!</AIDialog.Tab>
+            </AIDialog>
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
