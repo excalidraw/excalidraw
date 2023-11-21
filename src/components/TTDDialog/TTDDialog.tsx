@@ -2,22 +2,25 @@ import * as RadixTabs from "@radix-ui/react-tabs";
 import { Dialog } from "../Dialog";
 import { useApp } from "../App";
 import MermaidToExcalidraw from "../MermaidToExcalidraw";
-import AIDialogTabs from "./AIDialogTabs";
+import TTDDialogTabs from "./TTDDialogTabs";
 import { useTunnels } from "../../context/tunnels";
 import { ReactNode } from "react";
 import { useUIAppState } from "../../context/ui-appState";
 import { withInternalFallback } from "../hoc/withInternalFallback";
-import { AIDialogTabTriggers } from "./AIDialogTabTriggers";
-import { AIDialogTabTrigger } from "./AIDialogTabTrigger";
-import { AIDialogTab } from "./AIDialogTab";
+import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
+import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
+import { TTDDialogTab } from "./TTDDialogTab";
 
-export const AIDialog = Object.assign(
+/**
+ * Text to diagram (TTD) dialog
+ */
+export const TTDDialog = Object.assign(
   withInternalFallback(
-    "AIDialog",
+    "TTDDialog",
     ({ children, ...rest }: { children?: ReactNode; __fallback?: boolean }) => {
       const app = useApp();
       const appState = useUIAppState();
-      const { AIDialogTabTriggersTunnel } = useTunnels();
+      const { TDDDialogTabTriggersTunnel } = useTunnels();
 
       if (
         typeof appState.openDialog === "string" ||
@@ -28,7 +31,7 @@ export const AIDialog = Object.assign(
 
       return (
         <Dialog
-          className="ai-dialog"
+          className="ttd-dialog"
           onCloseRequest={() => {
             console.log("close");
             app.setOpenDialog(null);
@@ -37,21 +40,21 @@ export const AIDialog = Object.assign(
           title=""
           {...rest}
         >
-          <AIDialogTabs>
-            <AIDialogTabTriggersTunnel.Out />
+          <TTDDialogTabs>
+            <TDDDialogTabTriggersTunnel.Out />
             {rest.__fallback && "mermaid csoda"}
-            <RadixTabs.Content className="ai-dialog-content" value="mermaid">
+            <RadixTabs.Content className="ttd-dialog-content" value="mermaid">
               <MermaidToExcalidraw />
             </RadixTabs.Content>
             {children}
-          </AIDialogTabs>
+          </TTDDialogTabs>
         </Dialog>
       );
     },
   ),
   {
-    TabTriggers: AIDialogTabTriggers,
-    TabTrigger: AIDialogTabTrigger,
-    Tab: AIDialogTab,
+    TabTriggers: TTDDialogTabTriggers,
+    TabTrigger: TTDDialogTabTrigger,
+    Tab: TTDDialogTab,
   },
 );

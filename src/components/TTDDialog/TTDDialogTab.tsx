@@ -1,6 +1,6 @@
 import * as RadixTabs from "@radix-ui/react-tabs";
 
-export const AIDialogTab = ({
+export const TTDDialogTab = ({
   tab,
   children,
   ...rest
@@ -14,4 +14,4 @@ export const AIDialogTab = ({
     </RadixTabs.Content>
   );
 };
-AIDialogTab.displayName = "AIDialogTab";
+TTDDialogTab.displayName = "TTDDialogTab";

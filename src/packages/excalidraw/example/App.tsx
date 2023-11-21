@@ -76,8 +76,7 @@ const {
   MainMenu,
   LiveCollaborationTrigger,
   convertToExcalidrawElements,
-  DefaultSidebar,
-  AIDialog,
+  TTDDialog,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
@@ -739,14 +738,18 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               Toggle Custom Sidebar
             </Sidebar.Trigger>
             {renderMenu()}
-            <AIDialog>
-              <AIDialog.TabTriggers>
-                <AIDialog.TabTrigger tab="mermaid">Mermaid</AIDialog.TabTrigger>
-                <AIDialog.TabTrigger tab="example">example</AIDialog.TabTrigger>
-              </AIDialog.TabTriggers>
-              <AIDialog.Tab tab="example">example content</AIDialog.Tab>
-              <AIDialog.Tab tab="mermaid">MERMAID AGAIN?! WTF?!</AIDialog.Tab>
-            </AIDialog>
+            <TTDDialog>
+              <TTDDialog.TabTriggers>
+                <TTDDialog.TabTrigger tab="mermaid">
+                  Mermaid
+                </TTDDialog.TabTrigger>
+                <TTDDialog.TabTrigger tab="example">
+                  example
+                </TTDDialog.TabTrigger>
+              </TTDDialog.TabTriggers>
+              <TTDDialog.Tab tab="example">example content</TTDDialog.Tab>
+              <TTDDialog.Tab tab="mermaid">MERMAID AGAIN?! WTF?!</TTDDialog.Tab>
+            </TTDDialog>
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}

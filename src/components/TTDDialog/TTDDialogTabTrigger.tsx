@@ -1,6 +1,6 @@
 import * as RadixTabs from "@radix-ui/react-tabs";
 
-export const AIDialogTabTrigger = ({
+export const TTDDialogTabTrigger = ({
   children,
   tab,
   onSelect,
@@ -14,7 +14,7 @@ export const AIDialogTabTrigger = ({
     <RadixTabs.Trigger value={tab} asChild onSelect={onSelect}>
       <button
         type={"button"}
-        className={`excalidraw-button ai-dialog-tab-trigger`}
+        className={`excalidraw-button ttd-dialog-tab-trigger`}
         {...rest}
       >
         {children}
@@ -22,4 +22,4 @@ export const AIDialogTabTrigger = ({
     </RadixTabs.Trigger>
   );
 };
-AIDialogTabTrigger.displayName = "AIDialogTabTrigger";
+TTDDialogTabTrigger.displayName = "TTDDialogTabTrigger";

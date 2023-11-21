@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { useUIAppState } from "../../context/ui-appState";
 import { useExcalidrawSetAppState } from "../App";
 
-const AIDialogTabs = ({ children, ...rest }: { children: ReactNode }) => {
+const TTDDialogTabs = ({ children, ...rest }: { children: ReactNode }) => {
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
@@ -15,7 +15,7 @@ const AIDialogTabs = ({ children, ...rest }: { children: ReactNode }) => {
 
   return (
     <RadixTabs.Root
-      className="ai-dialog-tabs-root"
+      className="ttd-dialog-tabs-root"
       value={appState.openDialog.tab}
       onValueChange={(tab) =>
         setAppState((state) => ({
@@ -31,6 +31,6 @@ const AIDialogTabs = ({ children, ...rest }: { children: ReactNode }) => {
   );
 };
 
-AIDialogTabs.displayName = "AIDialogTabs";
+TTDDialogTabs.displayName = "TTDDialogTabs";
 
-export default AIDialogTabs;
+export default TTDDialogTabs;
