@@ -29,7 +29,7 @@ const MainMenu = Object.assign(
       const device = useDevice();
       const appState = useUIAppState();
       const setAppState = useExcalidrawSetAppState();
-      const onClickOutside = device.isMobile
+      const onClickOutside = device.editor.isMobile
         ? undefined
         : () => setAppState({ openMenu: null });
 
@@ -43,6 +43,7 @@ const MainMenu = Object.assign(
                 });
               }}
               data-testid="main-menu-trigger"
+              className="main-menu-trigger"
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
@@ -53,7 +54,7 @@ const MainMenu = Object.assign(
               })}
             >
               {children}
-              {device.isMobile && appState.collaborators.size > 0 && (
+              {device.editor.isMobile && appState.collaborators.size > 0 && (
                 <fieldset className="UserList-Wrapper">
                   <legend>{t("labels.collaborators")}</legend>
                   <UserList

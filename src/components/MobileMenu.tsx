@@ -1,6 +1,7 @@
 import React from "react";
 import {
   AppClassProperties,
+  AppProps,
   AppState,
   Device,
   ExcalidrawProps,
@@ -35,10 +36,8 @@ type MobileMenuProps = {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onHandToolToggle: () => void;
-  onPenModeToggle: () => void;
-  interactiveCanvas: HTMLCanvasElement | null;
+  onPenModeToggle: AppClassProperties["togglePenMode"];
 
-  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -47,6 +46,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   device: Device;
   renderWelcomeScreen: boolean;
+  UIOptions: AppProps["UIOptions"];
   app: AppClassProperties;
 };
 
@@ -58,13 +58,13 @@ export const MobileMenu = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
-  interactiveCanvas,
-  onImageAction,
+
   renderTopRightUI,
   renderCustomStats,
   renderSidebars,
   device,
   renderWelcomeScreen,
+  UIOptions,
   app,
 }: MobileMenuProps) => {
   const {
@@ -85,14 +85,9 @@ export const MobileMenu = ({
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
                       appState={appState}
-                      interactiveCanvas={interactiveCanvas}
                       activeTool={appState.activeTool}
-                      setAppState={setAppState}
-                      onImageAction={({ pointerType }) => {
-                        onImageAction({
-                          insertOnCanvasDirectly: pointerType !== "mouse",
-                        });
-                      }}
+                      UIOptions={UIOptions}
+                      app={app}
                     />
                   </Stack.Row>
                 </Island>
@@ -103,7 +98,7 @@ export const MobileMenu = ({
                   )}
                   <PenModeButton
                     checked={appState.penMode}
-                    onChange={onPenModeToggle}
+                    onChange={() => onPenModeToggle(null)}
                     title={t("toolBar.penMode")}
                     isMobile
                     penDetected={appState.penDetected}

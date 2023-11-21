@@ -6,6 +6,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   FileId,
+  ExcalidrawFrameElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
@@ -94,6 +95,7 @@ export class API {
     angle?: number;
     id?: string;
     isDeleted?: boolean;
+    frameId?: ExcalidrawElement["id"] | null;
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
@@ -135,6 +137,8 @@ export class API {
     ? ExcalidrawTextElement
     : T extends "image"
     ? ExcalidrawImageElement
+    : T extends "frame"
+    ? ExcalidrawFrameElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -151,12 +155,12 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
-      | "frameId"
       | "link"
       | "updated"
     > = {
       x,
       y,
+      frameId: rest.frameId ?? null,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:

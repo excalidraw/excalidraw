@@ -1,13 +1,9 @@
-import oc from "open-color";
 import { COLOR_PALETTE } from "./colors";
 import {
-  CURSOR_TYPE,
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
   isDarwin,
-  MIME_TYPES,
-  THEME,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import {
@@ -15,10 +11,8 @@ import {
   FontString,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { AppState, DataURL, LastActiveTool, Zoom } from "./types";
+import { ActiveTool, AppState, ToolType, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
-import { SHAPES } from "./shapes";
-import { isEraserActive, isHandToolActive } from "./appState";
 import { ResolutionType } from "./utility-types";
 import React from "react";
 
@@ -369,23 +363,21 @@ export const distance = (x: number, y: number) => Math.abs(x - y);
 
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
-  data: (
+  data: ((
     | {
-        type:
-          | typeof SHAPES[number]["value"]
-          | "eraser"
-          | "hand"
-          | "frame"
-          | "embeddable";
+        type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { lastActiveToolBeforeEraser?: LastActiveTool },
+  ) & { locked?: boolean }) & {
+    lastActiveToolBeforeEraser?: ActiveTool | null;
+  },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
     return {
       ...appState.activeTool,
       type: "custom",
       customType: data.customType,
+      locked: data.locked ?? appState.activeTool.locked,
     };
   }
 
@@ -397,85 +389,8 @@ export const updateActiveTool = (
         : data.lastActiveToolBeforeEraser,
     type: data.type,
     customType: null,
+    locked: data.locked ?? appState.activeTool.locked,
   };
-};
-
-export const resetCursor = (interactiveCanvas: HTMLCanvasElement | null) => {
-  if (interactiveCanvas) {
-    interactiveCanvas.style.cursor = "";
-  }
-};
-
-export const setCursor = (
-  interactiveCanvas: HTMLCanvasElement | null,
-  cursor: string,
-) => {
-  if (interactiveCanvas) {
-    interactiveCanvas.style.cursor = cursor;
-  }
-};
-
-let eraserCanvasCache: any;
-let previewDataURL: string;
-export const setEraserCursor = (
-  interactiveCanvas: HTMLCanvasElement | null,
-  theme: AppState["theme"],
-) => {
-  const cursorImageSizePx = 20;
-
-  const drawCanvas = () => {
-    const isDarkTheme = theme === THEME.DARK;
-    eraserCanvasCache = document.createElement("canvas");
-    eraserCanvasCache.theme = theme;
-    eraserCanvasCache.height = cursorImageSizePx;
-    eraserCanvasCache.width = cursorImageSizePx;
-    const context = eraserCanvasCache.getContext("2d")!;
-    context.lineWidth = 1;
-    context.beginPath();
-    context.arc(
-      eraserCanvasCache.width / 2,
-      eraserCanvasCache.height / 2,
-      5,
-      0,
-      2 * Math.PI,
-    );
-    context.fillStyle = isDarkTheme ? oc.black : oc.white;
-    context.fill();
-    context.strokeStyle = isDarkTheme ? oc.white : oc.black;
-    context.stroke();
-    previewDataURL = eraserCanvasCache.toDataURL(MIME_TYPES.svg) as DataURL;
-  };
-  if (!eraserCanvasCache || eraserCanvasCache.theme !== theme) {
-    drawCanvas();
-  }
-
-  setCursor(
-    interactiveCanvas,
-    `url(${previewDataURL}) ${cursorImageSizePx / 2} ${
-      cursorImageSizePx / 2
-    }, auto`,
-  );
-};
-
-export const setCursorForShape = (
-  interactiveCanvas: HTMLCanvasElement | null,
-  appState: Pick<AppState, "activeTool" | "theme">,
-) => {
-  if (!interactiveCanvas) {
-    return;
-  }
-  if (appState.activeTool.type === "selection") {
-    resetCursor(interactiveCanvas);
-  } else if (isHandToolActive(appState)) {
-    interactiveCanvas.style.cursor = CURSOR_TYPE.GRAB;
-  } else if (isEraserActive(appState)) {
-    setEraserCursor(interactiveCanvas, appState.theme);
-    // do nothing if image tool is selected which suggests there's
-    // a image-preview set as the cursor
-    // Ignore custom type as well and let host decide
-  } else if (!["image", "custom"].includes(appState.activeTool.type)) {
-    interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
-  }
 };
 
 export const isFullScreen = () =>
@@ -919,11 +834,18 @@ export const isOnlyExportingSingleFrame = (
   );
 };
 
+/**
+ * supply `null` as message if non-never value is valid, you just need to
+ * typecheck against it
+ */
 export const assertNever = (
   value: never,
-  message: string,
+  message: string | null,
   softAssert?: boolean,
 ): never => {
+  if (!message) {
+    return value;
+  }
   if (softAssert) {
     console.error(message);
     return value;
@@ -1002,3 +924,19 @@ export const isRenderThrottlingEnabled = (() => {
     return false;
   };
 })();
+
+/** Checks if value is inside given collection. Useful for type-safety. */
+export const isMemberOf = <T extends string>(
+  /** Set/Map/Array/Object */
+  collection: Set<T> | readonly T[] | Record<T, any> | Map<T, any>,
+  /** value to look for */
+  value: string,
+): value is T => {
+  return collection instanceof Set || collection instanceof Map
+    ? collection.has(value as T)
+    : "includes" in collection
+    ? collection.includes(value as T)
+    : collection.hasOwnProperty(value);
+};
+
+export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));

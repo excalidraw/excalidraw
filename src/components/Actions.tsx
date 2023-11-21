@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement, PointerType } from "../element/types";
+import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "../components/App";
 import {
@@ -11,21 +11,15 @@ import {
   hasBackground,
   hasStrokeStyle,
   hasStrokeWidth,
-  hasText,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { UIAppState, Zoom } from "../types";
-import {
-  capitalizeString,
-  isTransparent,
-  updateActiveTool,
-  setCursorForShape,
-} from "../utils";
+import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement } from "../element/typeChecks";
+import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
@@ -36,7 +30,13 @@ import {
 
 import "./Actions.scss";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { EmbedIcon, extraToolsIcon, frameToolIcon } from "./icons";
+import {
+  EmbedIcon,
+  extraToolsIcon,
+  frameToolIcon,
+  mermaidLogoIcon,
+  laserPointerToolIcon,
+} from "./icons";
 import { KEYS } from "../keys";
 
 export const SelectedShapeActions = ({
@@ -66,7 +66,8 @@ export const SelectedShapeActions = ({
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   const showFillIcons =
-    hasBackground(appState.activeTool.type) ||
+    (hasBackground(appState.activeTool.type) &&
+      !isTransparent(appState.currentItemBackgroundColor)) ||
     targetElements.some(
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
@@ -123,14 +124,15 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
-      {(hasText(appState.activeTool.type) ||
-        targetElements.some((element) => hasText(element.type))) && (
+      {(appState.activeTool.type === "text" ||
+        targetElements.some(isTextElement)) && (
         <>
           {renderAction("changeFontSize")}
 
           {renderAction("changeFontFamily")}
 
-          {suppportsHorizontalAlign(targetElements) &&
+          {(appState.activeTool.type === "text" ||
+            suppportsHorizontalAlign(targetElements)) &&
             renderAction("changeTextAlign")}
         </>
       )}
@@ -200,8 +202,8 @@ export const SelectedShapeActions = ({
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!device.isMobile && renderAction("duplicateSelection")}
-            {!device.isMobile && renderAction("deleteSelectedElements")}
+            {!device.editor.isMobile && renderAction("duplicateSelection")}
+            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
@@ -213,23 +215,33 @@ export const SelectedShapeActions = ({
 };
 
 export const ShapesSwitcher = ({
-  interactiveCanvas,
   activeTool,
-  setAppState,
-  onImageAction,
   appState,
+  app,
+  UIOptions,
 }: {
-  interactiveCanvas: HTMLCanvasElement | null;
   activeTool: UIAppState["activeTool"];
-  setAppState: React.Component<any, UIAppState>["setState"];
-  onImageAction: (data: { pointerType: PointerType | null }) => void;
   appState: UIAppState;
+  app: AppClassProperties;
+  UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
-  const device = useDevice();
+
+  const frameToolSelected = activeTool.type === "frame";
+  const laserToolSelected = activeTool.type === "laser";
+  const embeddableToolSelected = activeTool.type === "embeddable";
+
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
+        if (
+          UIOptions.tools?.[
+            value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
+          ] === false
+        ) {
+          return null;
+        }
+
         const label = t(`toolBar.${value}`);
         const letter =
           key && capitalizeString(typeof key === "string" ? key : key[0]);
@@ -251,155 +263,83 @@ export const ShapesSwitcher = ({
             data-testid={`toolbar-${value}`}
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
+                app.togglePenMode(true);
               }
             }}
             onChange={({ pointerType }) => {
               if (appState.activeTool.type !== value) {
                 trackEvent("toolbar", value, "ui");
               }
-              const nextActiveTool = updateActiveTool(appState, {
-                type: value,
-              });
-              setAppState({
-                activeTool: nextActiveTool,
-                activeEmbeddable: null,
-                multiElement: null,
-                selectedElementIds: {},
-              });
-              setCursorForShape(interactiveCanvas, {
-                ...appState,
-                activeTool: nextActiveTool,
-              });
               if (value === "image") {
-                onImageAction({ pointerType });
+                app.setActiveTool({
+                  type: value,
+                  insertOnCanvasDirectly: pointerType !== "mouse",
+                });
+              } else {
+                app.setActiveTool({ type: value });
               }
             }}
           />
         );
       })}
       <div className="App-toolbar__divider" />
-      {/* TEMP HACK because dropdown doesn't work well inside mobile toolbar */}
-      {device.isMobile ? (
-        <>
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
+
+      <DropdownMenu open={isExtraToolsMenuOpen}>
+        <DropdownMenu.Trigger
+          className={clsx("App-toolbar__extra-tools-trigger", {
+            "App-toolbar__extra-tools-trigger--selected":
+              frameToolSelected ||
+              embeddableToolSelected ||
+              // in collab we're already highlighting the laser button
+              // outside toolbar, so let's not highlight extra-tools button
+              // on top of it
+              (laserToolSelected && !app.props.isCollaborating),
+          })}
+          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
+          title={t("toolBar.extraTools")}
+        >
+          {extraToolsIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
+          onSelect={() => setIsExtraToolsMenuOpen(false)}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "frame" })}
             icon={frameToolIcon}
-            checked={activeTool.type === "frame"}
-            name="editor-current-shape"
-            title={`${capitalizeString(
-              t("toolBar.frame"),
-            )} — ${KEYS.F.toLocaleUpperCase()}`}
-            keyBindingLabel={KEYS.F.toLocaleUpperCase()}
-            aria-label={capitalizeString(t("toolBar.frame"))}
-            aria-keyshortcuts={KEYS.F.toLocaleUpperCase()}
-            data-testid={`toolbar-frame`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "frame", "ui");
-              const nextActiveTool = updateActiveTool(appState, {
-                type: "frame",
-              });
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-                activeEmbeddable: null,
-              });
-            }}
-          />
-          <ToolButton
-            className={clsx("Shape", { fillable: false })}
-            type="radio"
+            shortcut={KEYS.F.toLocaleUpperCase()}
+            data-testid="toolbar-frame"
+            selected={frameToolSelected}
+          >
+            {t("toolBar.frame")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "embeddable" })}
             icon={EmbedIcon}
-            checked={activeTool.type === "embeddable"}
-            name="editor-current-shape"
-            title={capitalizeString(t("toolBar.embeddable"))}
-            aria-label={capitalizeString(t("toolBar.embeddable"))}
-            data-testid={`toolbar-embeddable`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                setAppState({
-                  penDetected: true,
-                  penMode: true,
-                });
-              }
-            }}
-            onChange={({ pointerType }) => {
-              trackEvent("toolbar", "embeddable", "ui");
-              const nextActiveTool = updateActiveTool(appState, {
-                type: "embeddable",
-              });
-              setAppState({
-                activeTool: nextActiveTool,
-                multiElement: null,
-                selectedElementIds: {},
-                activeEmbeddable: null,
-              });
-            }}
-          />
-        </>
-      ) : (
-        <DropdownMenu open={isExtraToolsMenuOpen}>
-          <DropdownMenu.Trigger
-            className="App-toolbar__extra-tools-trigger"
-            onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
-            title={t("toolBar.extraTools")}
+            data-testid="toolbar-embeddable"
+            selected={embeddableToolSelected}
           >
-            {extraToolsIcon}
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content
-            onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-            onSelect={() => setIsExtraToolsMenuOpen(false)}
-            className="App-toolbar__extra-tools-dropdown"
+            {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "laser" })}
+            icon={laserPointerToolIcon}
+            data-testid="toolbar-laser"
+            selected={laserToolSelected}
+            shortcut={KEYS.K.toLocaleUpperCase()}
           >
-            <DropdownMenu.Item
-              onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "frame",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
-              }}
-              icon={frameToolIcon}
-              shortcut={KEYS.F.toLocaleUpperCase()}
-              data-testid="toolbar-frame"
-            >
-              {t("toolBar.frame")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => {
-                const nextActiveTool = updateActiveTool(appState, {
-                  type: "embeddable",
-                });
-                setAppState({
-                  activeTool: nextActiveTool,
-                  multiElement: null,
-                  selectedElementIds: {},
-                });
-              }}
-              icon={EmbedIcon}
-              data-testid="toolbar-embeddable"
-            >
-              {t("toolBar.embeddable")}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu>
-      )}
+            {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setOpenDialog("mermaid")}
+            icon={mermaidLogoIcon}
+            data-testid="toolbar-embeddable"
+          >
+            {t("toolBar.mermaidToExcalidraw")}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
     </>
   );
 };

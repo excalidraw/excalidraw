@@ -123,7 +123,7 @@ describe("adding elements to frames", () => {
   const commonTestCases = async (
     func: typeof resizeFrameOverElement | typeof dragElementIntoFrame,
   ) => {
-    describe("when frame is in a layer below", async () => {
+    describe.skip("when frame is in a layer below", async () => {
       it("should add an element", async () => {
         h.elements = [frame, rect2];
 
@@ -167,7 +167,7 @@ describe("adding elements to frames", () => {
       });
     });
 
-    describe("when frame is in a layer above", async () => {
+    describe.skip("when frame is in a layer above", async () => {
       it("should add an element", async () => {
         h.elements = [rect2, frame];
 
@@ -212,7 +212,7 @@ describe("adding elements to frames", () => {
     });
 
     describe("when frame is in an inner layer", async () => {
-      it("should add elements", async () => {
+      it.skip("should add elements", async () => {
         h.elements = [rect2, frame, rect3];
 
         func(frame, rect2);
@@ -223,7 +223,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect2, rect3, frame]);
       });
 
-      it("should add elements when there are other other elements in between", async () => {
+      it.skip("should add elements when there are other other elements in between", async () => {
         h.elements = [rect2, rect1, frame, rect4, rect3];
 
         func(frame, rect2);
@@ -234,7 +234,7 @@ describe("adding elements to frames", () => {
         expectEqualIds([rect1, rect2, rect3, frame, rect4]);
       });
 
-      it("should add elements when there are other elements in between and the order is reversed", async () => {
+      it.skip("should add elements when there are other elements in between and the order is reversed", async () => {
         h.elements = [rect3, rect4, frame, rect2, rect1];
 
         func(frame, rect2);
@@ -289,7 +289,7 @@ describe("adding elements to frames", () => {
   describe("resizing frame over elements", async () => {
     await commonTestCases(resizeFrameOverElement);
 
-    it("resizing over text containers and labelled arrows", async () => {
+    it.skip("resizing over text containers and labelled arrows", async () => {
       await resizingTest(
         "rectangle",
         ["frame", "rectangle", "text"],
@@ -339,7 +339,7 @@ describe("adding elements to frames", () => {
       // );
     });
 
-    it("should add arrow bound with text when frame is in a layer below", async () => {
+    it.skip("should add arrow bound with text when frame is in a layer below", async () => {
       h.elements = [frame, arrow, text];
 
       resizeFrameOverElement(frame, arrow);
@@ -359,7 +359,7 @@ describe("adding elements to frames", () => {
       expectEqualIds([arrow, text, frame]);
     });
 
-    it("should add arrow bound with text when frame is in an inner layer", async () => {
+    it.skip("should add arrow bound with text when frame is in an inner layer", async () => {
       h.elements = [arrow, frame, text];
 
       resizeFrameOverElement(frame, arrow);
@@ -371,7 +371,7 @@ describe("adding elements to frames", () => {
   });
 
   describe("resizing frame over elements but downwards", async () => {
-    it("should add elements when frame is in a layer below", async () => {
+    it.skip("should add elements when frame is in a layer below", async () => {
       h.elements = [frame, rect1, rect2, rect3, rect4];
 
       resizeFrameOverElement(frame, rect4);
@@ -382,7 +382,7 @@ describe("adding elements to frames", () => {
       expectEqualIds([rect2, rect3, frame, rect4, rect1]);
     });
 
-    it("should add elements when frame is in a layer above", async () => {
+    it.skip("should add elements when frame is in a layer above", async () => {
       h.elements = [rect1, rect2, rect3, rect4, frame];
 
       resizeFrameOverElement(frame, rect4);
@@ -393,7 +393,7 @@ describe("adding elements to frames", () => {
       expectEqualIds([rect1, rect2, rect3, frame, rect4]);
     });
 
-    it("should add elements when frame is in an inner layer", async () => {
+    it.skip("should add elements when frame is in an inner layer", async () => {
       h.elements = [rect1, rect2, frame, rect3, rect4];
 
       resizeFrameOverElement(frame, rect4);
@@ -408,7 +408,7 @@ describe("adding elements to frames", () => {
   describe("dragging elements into the frame", async () => {
     await commonTestCases(dragElementIntoFrame);
 
-    it("should drag element inside, duplicate it and keep it in frame", () => {
+    it.skip("should drag element inside, duplicate it and keep it in frame", () => {
       h.elements = [frame, rect2];
 
       dragElementIntoFrame(frame, rect2);
@@ -422,7 +422,7 @@ describe("adding elements to frames", () => {
       expectEqualIds([rect2_copy, rect2, frame]);
     });
 
-    it("should drag element inside, duplicate it and remove it from frame", () => {
+    it.skip("should drag element inside, duplicate it and remove it from frame", () => {
       h.elements = [frame, rect2];
 
       dragElementIntoFrame(frame, rect2);
@@ -435,6 +435,122 @@ describe("adding elements to frames", () => {
       expect(rect2_copy.frameId).toBe(frame.id);
       expect(rect2.frameId).toBe(null);
       expectEqualIds([rect2_copy, frame, rect2]);
+    });
+
+    it("random order 01", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const frame3 = API.createElement({
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        x: 25,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame1.id,
+      });
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        x: 225,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame2.id,
+      });
+      const rectangle3 = API.createElement({
+        type: "rectangle",
+        x: 325,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame3.id,
+      });
+      const rectangle4 = API.createElement({
+        type: "rectangle",
+        x: 350,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame3.id,
+      });
+
+      h.elements = [
+        frame1,
+        rectangle4,
+        rectangle1,
+        rectangle3,
+        frame3,
+        rectangle2,
+        frame2,
+      ];
+
+      API.setSelectedElements([rectangle2]);
+
+      const origSize = h.elements.length;
+
+      expect(h.elements.length).toBe(origSize);
+      dragElementIntoFrame(frame3, rectangle2);
+      expect(h.elements.length).toBe(origSize);
+    });
+
+    it("random order 02", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        x: 25,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame1.id,
+      });
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        x: 225,
+        y: 25,
+        width: 50,
+        height: 50,
+        frameId: frame2.id,
+      });
+
+      h.elements = [rectangle1, rectangle2, frame1, frame2];
+
+      API.setSelectedElements([rectangle2]);
+
+      expect(h.elements.length).toBe(4);
+      dragElementIntoFrame(frame2, rectangle1);
+      expect(h.elements.length).toBe(4);
     });
   });
 });

@@ -1,10 +1,11 @@
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
-import { getFrameElements } from "../frame";
+import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
 import { AppClassProperties, AppState } from "../types";
-import { setCursorForShape, updateActiveTool } from "../utils";
+import { updateActiveTool } from "../utils";
+import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 
 const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
@@ -20,7 +21,7 @@ export const actionSelectAllElementsInFrame = register({
     const selectedFrame = app.scene.getSelectedElements(appState)[0];
 
     if (selectedFrame && selectedFrame.type === "frame") {
-      const elementsInFrame = getFrameElements(
+      const elementsInFrame = getFrameChildren(
         getNonDeletedElements(elements),
         selectedFrame.id,
       ).filter((element) => !(element.type === "text" && element.containerId));
