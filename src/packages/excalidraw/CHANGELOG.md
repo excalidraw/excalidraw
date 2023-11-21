@@ -11,6 +11,17 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Features
+
+- Support for multiplayer undo / redo [#7348](https://github.com/excalidraw/excalidraw/pull/7348).
+
+### Breaking Changes
+
+- Renamed required `updatedScene` parameter from `commitToHistory` into `commitToStore` [#7348](https://github.com/excalidraw/excalidraw/pull/7348).
+- Updates of `elements` or `appState` performed through [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/components/App.tsx#L282) without `commitToStore` set to `true` require a new parameter `skipSnapshotUpdate` to be set to `true`, if the given update should be locally undo-able with the next user action. In other cases such a parameter shouldn't be needed, i.e. as in during multiplayer collab updates, which shouldn't should not be locally undoable.
+
 ## 0.17.0 (2023-11-14)
 
 ### Features

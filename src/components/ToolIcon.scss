@@ -77,8 +77,8 @@
   }
 
   .ToolIcon_type_button,
-  .Modal .ToolIcon_type_button,
-  .ToolIcon_type_button {
+  .Modal .ToolIcon_type_button
+  {
     padding: 0;
     border: none;
     margin: 0;
@@ -99,6 +99,22 @@
 
     &:active {
       background-color: var(--button-gray-3);
+    }
+
+    &:disabled {
+      cursor: default;
+  
+      &:active,
+      &:focus-visible,
+      &:hover {
+        background-color: initial;
+        border: none;
+        box-shadow: none;
+      }
+  
+      svg {
+        color: var(--color-disabled);
+      }
     }
 
     &--show {

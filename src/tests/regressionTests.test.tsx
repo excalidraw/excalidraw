@@ -35,7 +35,7 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history.getSnapshotForTest()).toMatchSnapshot(`[${name}] history`);
+  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
@@ -372,7 +372,7 @@ describe("regression tests", () => {
   });
 
   it("noop interaction after undo shouldn't create history entry", () => {
-    expect(API.getStateHistory().length).toBe(1);
+    expect(API.getUndoStack().length).toBe(0);
 
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -386,35 +386,35 @@ describe("regression tests", () => {
 
     const secondElementEndPoint = mouse.getPosition();
 
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(2);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.Z);
     });
 
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getUndoStack().length).toBe(1);
 
     // clicking an element shouldn't add to history
     mouse.restorePosition(...firstElementEndPoint);
     mouse.click();
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getUndoStack().length).toBe(1);
 
     Keyboard.withModifierKeys({ shift: true, ctrl: true }, () => {
       Keyboard.keyPress(KEYS.Z);
     });
 
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(2);
 
-    // clicking an element shouldn't add to history
+    // clicking an element should add to history
     mouse.click();
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(3);
 
     const firstSelectedElementId = API.getSelectedElement().id;
 
     // same for clicking the element just redo-ed
     mouse.restorePosition(...secondElementEndPoint);
     mouse.click();
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(4);
 
     expect(API.getSelectedElement().id).not.toEqual(firstSelectedElementId);
   });

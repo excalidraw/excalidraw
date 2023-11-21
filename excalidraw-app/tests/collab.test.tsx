@@ -64,7 +64,7 @@ vi.mock("socket.io-client", () => {
 });
 
 describe("collaboration", () => {
-  it("creating room should reset deleted elements", async () => {
+  it("creating room should reset deleted elements while keeping store snapshot in sync", async () => {
     await render(<ExcalidrawApp />);
     // To update the scene with deleted elements before starting collab
     updateSceneData({
@@ -76,26 +76,43 @@ describe("collaboration", () => {
           isDeleted: true,
         }),
       ],
+      commitToStore: true,
     });
     await waitFor(() => {
+      expect(API.getUndoStack().length).toBe(1);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: "A" }),
         expect.objectContaining({ id: "B", isDeleted: true }),
       ]);
-      expect(API.getStateHistory().length).toBe(1);
+      expect(Array.from(h.store.snapshot.elements.values())).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: "B", isDeleted: true }),
+      ]);
     });
     window.collab.startCollaboration(null);
     await waitFor(() => {
+      expect(API.getUndoStack().length).toBe(1);
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
-      expect(API.getStateHistory().length).toBe(1);
+      // We never delete from the local store as it is used for correct diff calculation
+      expect(Array.from(h.store.snapshot.elements.values())).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: "B", isDeleted: true }),
+      ]);
     });
 
     const undoAction = createUndoAction(h.history);
     // noop
     h.app.actionManager.executeAction(undoAction);
+
+    // As it was introduced #2270, undo is a noop here, but we might want to re-enable it,
+    // since inability to undo your own deletions could be a bigger upsetting factor here
     await waitFor(() => {
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
       expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
-      expect(API.getStateHistory().length).toBe(1);
+      expect(Array.from(h.store.snapshot.elements.values())).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: "B", isDeleted: true }),
+      ]);
     });
   });
 });

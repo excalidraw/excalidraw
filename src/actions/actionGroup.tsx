@@ -27,6 +27,7 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
+import { StoreAction } from "./types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -69,7 +70,7 @@ export const actionGroup = register({
     });
     if (selectedElements.length < 2) {
       // nothing to group
-      return { appState, elements, commitToHistory: false };
+      return { appState, elements, storeAction: StoreAction.NONE };
     }
     // if everything is already grouped into 1 group, there is nothing to do
     const selectedGroupIds = getSelectedGroupIds(appState);
@@ -89,7 +90,7 @@ export const actionGroup = register({
       ]);
       if (combinedSet.size === elementIdsInGroup.size) {
         // no incremental ids in the selected ids
-        return { appState, elements, commitToHistory: false };
+        return { appState, elements, storeAction: StoreAction.NONE };
       }
     }
 
@@ -155,7 +156,7 @@ export const actionGroup = register({
         ),
       },
       elements: nextElements,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   contextItemLabel: "labels.group",
@@ -182,7 +183,7 @@ export const actionUngroup = register({
   perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
     if (groupIds.length === 0) {
-      return { appState, elements, commitToHistory: false };
+      return { appState, elements, storeAction: StoreAction.NONE, };
     }
 
     let nextElements = [...elements];
@@ -250,7 +251,7 @@ export const actionUngroup = register({
     return {
       appState: { ...appState, ...updateAppState },
       elements: nextElements,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

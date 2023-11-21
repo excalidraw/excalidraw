@@ -1,7 +1,13 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
+import {
+  CURSOR_TYPE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  THEME,
+  ZOOM_STEP,
+} from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
@@ -22,6 +28,7 @@ import {
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { Bounds } from "../element/bounds";
 import { setCursor } from "../cursor";
+import { StoreAction } from "./types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -35,7 +42,9 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      commitToHistory: !!value.viewBackgroundColor,
+      storeAction: !!value.viewBackgroundColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => {
@@ -88,7 +97,7 @@ export const actionClearCanvas = register({
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });
@@ -110,16 +119,17 @@ export const actionZoomIn = register({
           appState,
         ),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       className="zoom-in-button zoom-button"
       icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
+      disabled={appState.zoom.value >= MAX_ZOOM}
       onClick={() => {
         updateData(null);
       }}
@@ -147,16 +157,17 @@ export const actionZoomOut = register({
           appState,
         ),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       className="zoom-out-button zoom-button"
       icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
+      disabled={appState.zoom.value <= MIN_ZOOM}
       onClick={() => {
         updateData(null);
       }}
@@ -184,7 +195,7 @@ export const actionResetZoom = register({
           appState,
         ),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -261,8 +272,8 @@ export const zoomToFit = ({
 
     // Apply clamping to newZoomValue to be between 10% and 3000%
     newZoomValue = Math.min(
-      Math.max(newZoomValue, 0.1),
-      30.0,
+      Math.max(newZoomValue, MIN_ZOOM),
+      MAX_ZOOM,
     ) as NormalizedZoomValue;
 
     let appStateWidth = appState.width;
@@ -307,7 +318,7 @@ export const zoomToFit = ({
       scrollY,
       zoom: { value: newZoomValue },
     },
-    commitToHistory: false,
+    storeAction: StoreAction.NONE,
   };
 };
 
@@ -377,7 +388,7 @@ export const actionToggleTheme = register({
         theme:
           value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
@@ -414,7 +425,7 @@ export const actionToggleEraserTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) => event.key === KEYS.E,
@@ -449,7 +460,7 @@ export const actionToggleHandTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

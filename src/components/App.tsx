@@ -41,6 +41,7 @@ import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { Action, ActionResult } from "../actions/types";
+import { ActionResult, StoreAction } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
@@ -194,7 +195,7 @@ import {
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
 } from "../groups";
-import History from "../history";
+import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 import {
   CODES,
@@ -268,6 +269,7 @@ import {
   muteFSAbortError,
   isTestEnv,
   easeOut,
+  isShallowEqual,
   arrayToMap,
 } from "../utils";
 import {
@@ -400,6 +402,7 @@ import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { fixFractionalIndices } from "../fractionalIndex";
+import { Store } from "../store";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -514,6 +517,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
+  private store: Store;
   private history: History;
   private excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -597,6 +601,9 @@ class App extends React.Component<AppProps, AppState> {
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
 
+    this.store = new Store();
+    this.history = new History();
+
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
@@ -604,6 +611,10 @@ class App extends React.Component<AppProps, AppState> {
         addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+        store: {
+          clear: this.store.clear,
+          listen: this.store.listen,
+        },
         history: {
           clear: this.resetHistory,
         },
@@ -643,8 +654,14 @@ class App extends React.Component<AppProps, AppState> {
       onSceneUpdated: this.onSceneUpdated,
     });
     this.history = new History();
-    this.actionManager.registerAll(actions);
 
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => this.scene.getElementsIncludingDeleted(),
+      this,
+    );
+    this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
   }
@@ -1915,15 +1932,16 @@ class App extends React.Component<AppProps, AppState> {
           if (shouldUpdateStrokeColor) {
             this.syncActionResult({
               appState: { ...this.state, currentItemStrokeColor: color },
-              commitToHistory: true,
+              storeAction: StoreAction.CAPTURE,
             });
           } else {
             this.syncActionResult({
               appState: { ...this.state, currentItemBackgroundColor: color },
-              commitToHistory: true,
+              storeAction: StoreAction.CAPTURE,
             });
           }
         } else {
+          // TODO_UNDO: test if we didn't regress here - shouldn't this commit to store?
           this.updateScene({
             elements: this.scene.getElementsIncludingDeleted().map((el) => {
               if (this.state.selectedElementIds[el.id]) {
@@ -1959,8 +1977,11 @@ class App extends React.Component<AppProps, AppState> {
           }
         });
         this.scene.replaceAllElements(actionResult.elements);
-        if (actionResult.commitToHistory) {
-          this.history.resumeRecording();
+
+        if (actionResult.storeAction === StoreAction.UPDATE) {
+          this.store.scheduleSnapshotUpdate();
+        } else if (actionResult.storeAction === StoreAction.CAPTURE) {
+          this.store.resumeCapturing();
         }
       }
 
@@ -1972,8 +1993,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (actionResult.appState || editingElement || this.state.contextMenu) {
-        if (actionResult.commitToHistory) {
-          this.history.resumeRecording();
+        if (actionResult.storeAction === StoreAction.UPDATE) {
+          this.store.scheduleSnapshotUpdate();
+        } else if (actionResult.storeAction === StoreAction.CAPTURE) {
+          this.store.resumeCapturing();
         }
 
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
@@ -2007,34 +2030,24 @@ class App extends React.Component<AppProps, AppState> {
           editingElement = null;
         }
 
-        this.setState(
-          (state) => {
-            // using Object.assign instead of spread to fool TS 4.2.2+ into
-            // regarding the resulting type as not containing undefined
-            // (which the following expression will never contain)
-            return Object.assign(actionResult.appState || {}, {
-              // NOTE this will prevent opening context menu using an action
-              // or programmatically from the host, so it will need to be
-              // rewritten later
-              contextMenu: null,
-              editingElement,
-              viewModeEnabled,
-              zenModeEnabled,
-              gridSize,
-              theme,
-              name,
-              errorMessage,
-            });
-          },
-          () => {
-            if (actionResult.syncHistory) {
-              this.history.setCurrentState(
-                this.state,
-                this.scene.getElementsIncludingDeleted(),
-              );
-            }
-          },
-        );
+        this.setState((state) => {
+          // using Object.assign instead of spread to fool TS 4.2.2+ into
+          // regarding the resulting type as not containing undefined
+          // (which the following expression will never contain)
+          return Object.assign(actionResult.appState || {}, {
+            // NOTE this will prevent opening context menu using an action
+            // or programmatically from the host, so it will need to be
+            // rewritten later
+            contextMenu: null,
+            editingElement,
+            viewModeEnabled,
+            zenModeEnabled,
+            gridSize,
+            theme,
+            name,
+            errorMessage,
+          });
+        });
       }
     },
   );
@@ -2058,6 +2071,10 @@ class App extends React.Component<AppProps, AppState> {
     this.history.clear();
   };
 
+  private resetStore = () => {
+    this.store.clear();
+  };
+
   /**
    * Resets scene & history.
    * ! Do not use to clear scene user action !
@@ -2070,6 +2087,7 @@ class App extends React.Component<AppProps, AppState> {
         isLoading: opts?.resetLoadingState ? false : state.isLoading,
         theme: this.state.theme,
       }));
+      this.resetStore();
       this.resetHistory();
     },
   );
@@ -2154,10 +2172,11 @@ class App extends React.Component<AppProps, AppState> {
     // seems faster even in browsers that do fire the loadingdone event.
     this.fonts.loadFontsForElements(scene.elements);
 
+    this.resetStore();
     this.resetHistory();
     this.syncActionResult({
       ...scene,
-      commitToHistory: true,
+      storeAction: StoreAction.UPDATE, // TODO_UNDO: double-check for regression
     });
   };
 
@@ -2247,8 +2266,16 @@ class App extends React.Component<AppProps, AppState> {
           configurable: true,
           value: this.history,
         },
+        store: {
+          configurable: true,
+          value: this.store,
+        },
       });
     }
+
+    this.store.listen((...args) => {
+      this.history.record(...args);
+    });
 
     this.scene.addCallback(this.onSceneUpdated);
     this.addEventListeners();
@@ -2305,6 +2332,7 @@ class App extends React.Component<AppProps, AppState> {
     this.library.destroy();
     this.laserPathManager.destroy();
     this.onChangeEmitter.destroy();
+    this.store.destroy();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
@@ -2554,7 +2582,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
-      // defer so that the commitToHistory flag isn't reset via current update
+      // defer so that the storeAction flag isn't reset via current update
       setTimeout(() => {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
@@ -2598,7 +2626,11 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     }
-    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
+
+    this.store.capture(
+      arrayToMap(this.scene.getElementsIncludingDeleted()),
+      this.state,
+    );
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -2936,7 +2968,7 @@ class App extends React.Component<AppProps, AppState> {
       this.files = { ...this.files, ...opts.files };
     }
 
-    this.history.resumeRecording();
+    this.store.resumeCapturing();
 
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(newElements);
@@ -3177,7 +3209,7 @@ class App extends React.Component<AppProps, AppState> {
       PLAIN_PASTE_TOAST_SHOWN = true;
     }
 
-    this.history.resumeRecording();
+    this.store.resumeCapturing();
   }
 
   setAppState: React.Component<any, AppState>["setState"] = (
@@ -3438,10 +3470,33 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      commitToHistory?: SceneData["commitToHistory"];
+      commitToStore?: SceneData["commitToStore"];
+      skipSnapshotUpdate?: SceneData["skipSnapshotUpdate"];
     }) => {
-      if (sceneData.commitToHistory) {
-        this.history.resumeRecording();
+      if (
+        !sceneData.skipSnapshotUpdate &&
+        (sceneData.elements || sceneData.appState)
+      ) {
+        this.store.scheduleSnapshotUpdate();
+
+        if (sceneData.commitToStore) {
+          this.store.resumeCapturing();
+        }
+
+        // We need to filter out yet uncomitted local elements
+        // Once we will be exchanging just store increments and updating changes this won't be necessary
+        const localElements = this.scene.getElementsIncludingDeleted();
+        const nextElements = this.store.ignoreUncomittedElements(
+          arrayToMap(localElements),
+          arrayToMap(sceneData.elements || localElements), // Here we expect all next elements
+        );
+
+        const nextAppState: AppState = {
+          ...this.state,
+          ...(sceneData.appState || {}), // Here we expect just partial appState
+        };
+
+        this.store.capture(nextElements, nextAppState);
       }
 
       if (sceneData.appState) {
@@ -3650,7 +3705,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.editingLinearElement.elementId !==
                   selectedElements[0].id
               ) {
-                this.history.resumeRecording();
+                this.store.resumeCapturing();
                 this.setState({
                   editingLinearElement: new LinearElementEditor(
                     selectedElement,
@@ -4042,7 +4097,7 @@ class App extends React.Component<AppProps, AppState> {
           ]);
         }
         if (!isDeleted || isExistingElement) {
-          this.history.resumeRecording();
+          this.store.resumeCapturing();
         }
 
         this.setState({
@@ -4334,7 +4389,7 @@ class App extends React.Component<AppProps, AppState> {
         (!this.state.editingLinearElement ||
           this.state.editingLinearElement.elementId !== selectedElements[0].id)
       ) {
-        this.history.resumeRecording();
+        this.store.resumeCapturing();
         this.setState({
           editingLinearElement: new LinearElementEditor(
             selectedElements[0],
@@ -5154,6 +5209,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
+        skipSnapshotUpdate: true, // TODO_UNDO: test if we didn't regress here
       });
       return;
     }
@@ -5754,7 +5810,7 @@ class App extends React.Component<AppProps, AppState> {
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this.state,
-            this.history,
+            this.store,
             pointerDownState.origin,
             linearElementEditor,
           );
@@ -7307,7 +7363,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (isLinearElement(draggingElement)) {
         if (draggingElement!.points.length > 1) {
-          this.history.resumeRecording();
+          this.store.resumeCapturing();
         }
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
@@ -7542,7 +7598,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (resizingElement) {
-        this.history.resumeRecording();
+        this.store.resumeCapturing();
       }
 
       if (resizingElement && isInvisiblySmallElement(resizingElement)) {
@@ -7843,9 +7899,13 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         activeTool.type !== "selection" ||
-        isSomeElementSelected(this.scene.getNonDeletedElements(), this.state)
+        isSomeElementSelected(this.scene.getNonDeletedElements(), this.state) ||
+        !isShallowEqual(
+          this.state.previousSelectedElementIds,
+          this.state.selectedElementIds,
+        )
       ) {
-        this.history.resumeRecording();
+        this.store.resumeCapturing();
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
@@ -7951,7 +8011,7 @@ class App extends React.Component<AppProps, AppState> {
       return ele;
     });
 
-    this.history.resumeRecording();
+    this.store.resumeCapturing();
     this.scene.replaceAllElements(elements);
   };
 
@@ -8499,7 +8559,7 @@ class App extends React.Component<AppProps, AppState> {
                 isLoading: false,
               },
               replaceFiles: true,
-              commitToHistory: true,
+              storeAction: StoreAction.CAPTURE,
             });
             return;
           } catch (error: any) {
@@ -8585,15 +8645,21 @@ class App extends React.Component<AppProps, AppState> {
         fileHandle,
       );
       if (ret.type === MIME_TYPES.excalidraw) {
+        // First we need to delete existing elements, so they get recorded in the undo stack
+        const deletedExistingElements = this.scene
+          .getNonDeletedElements()
+          .map((element) => newElementWith(element, { isDeleted: true }));
+
         this.setState({ isLoading: true });
         this.syncActionResult({
           ...ret.data,
+          elements: deletedExistingElements.concat(ret.data.elements),
           appState: {
             ...(ret.data.appState || this.state),
             isLoading: false,
           },
           replaceFiles: true,
-          commitToHistory: true,
+          storeAction: StoreAction.CAPTURE,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
@@ -9209,6 +9275,7 @@ declare global {
       setState: React.Component<any, AppState>["setState"];
       app: InstanceType<typeof App>;
       history: History;
+      store: Store;
     };
   }
 }

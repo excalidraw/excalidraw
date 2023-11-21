@@ -6,6 +6,7 @@ import { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import { StoreAction } from "./types";
 
 export const actionSelectAll = register({
   name: "selectAll",
@@ -46,7 +47,7 @@ export const actionSelectAll = register({
             ? new LinearElementEditor(elements[0], app.scene)
             : null,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   contextItemLabel: "labels.selectAll",

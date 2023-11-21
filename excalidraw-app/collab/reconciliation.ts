@@ -19,7 +19,7 @@ const shouldDiscardRemoteElement = (
     // local element is being edited
     (local.id === localAppState.editingElement?.id ||
       local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.draggingElement?.id ||
+      local.id === localAppState.draggingElement?.id || // Is this still valid? As draggingElement is selection element, which is never part of the elements array
       // local element is newer
       local.version > remote.version ||
       // resolve conflicting edits deterministically by taking the one with

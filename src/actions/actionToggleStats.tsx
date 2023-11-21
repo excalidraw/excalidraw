@@ -1,5 +1,6 @@
 import { register } from "./register";
 import { CODES, KEYS } from "../keys";
+import { StoreAction } from "./types";
 
 export const actionToggleStats = register({
   name: "stats",
@@ -11,7 +12,7 @@ export const actionToggleStats = register({
         ...appState,
         showStats: !this.checked!(appState),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.showStats,

@@ -1,5 +1,6 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
+import { StoreAction } from "./types";
 
 export const actionToggleObjectsSnapMode = register({
   name: "objectsSnapMode",
@@ -15,7 +16,7 @@ export const actionToggleObjectsSnapMode = register({
         objectsSnapModeEnabled: !this.checked!(appState),
         gridSize: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.objectsSnapModeEnabled,

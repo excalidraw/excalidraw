@@ -13,6 +13,7 @@ import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
+import { StoreAction } from "./types";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
@@ -109,7 +110,7 @@ export const actionDeleteSelected = register({
             ...nextAppState,
             editingLinearElement: null,
           },
-          commitToHistory: false,
+          storeAction: StoreAction.UPDATE,
         };
       }
 
@@ -141,7 +142,7 @@ export const actionDeleteSelected = register({
                 : [0],
           },
         },
-        commitToHistory: true,
+        storeAction: StoreAction.CAPTURE,
       };
     }
     let { elements: nextElements, appState: nextAppState } =
@@ -161,10 +162,12 @@ export const actionDeleteSelected = register({
         multiElement: null,
         activeEmbeddable: null,
       },
-      commitToHistory: isSomeElementSelected(
+      storeAction: isSomeElementSelected(
         getNonDeletedElements(elements),
         appState,
-      ),
+      )
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   contextItemLabel: "labels.delete",

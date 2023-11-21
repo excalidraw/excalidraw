@@ -13,6 +13,7 @@ import {
   unbindLinearElements,
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
+import { StoreAction } from "./types";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -25,7 +26,7 @@ export const actionFlipHorizontal = register({
         app,
       ),
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
@@ -43,7 +44,7 @@ export const actionFlipVertical = register({
         app,
       ),
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

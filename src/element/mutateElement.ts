@@ -106,24 +106,27 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
+  forceUpdate: boolean = false,
 ): TElement => {
-  let didChange = false;
-  for (const key in updates) {
-    const value = (updates as any)[key];
-    if (typeof value !== "undefined") {
-      if (
-        (element as any)[key] === value &&
-        // if object, always update because its attrs could have changed
-        (typeof value !== "object" || value === null)
-      ) {
-        continue;
+  if (!forceUpdate) {
+    let didChange = false;
+    for (const key in updates) {
+      const value = (updates as any)[key];
+      if (typeof value !== "undefined") {
+        if (
+          (element as any)[key] === value &&
+          // if object, always update because its attrs could have changed
+          (typeof value !== "object" || value === null)
+        ) {
+          continue;
+        }
+        didChange = true;
       }
-      didChange = true;
     }
-  }
 
-  if (!didChange) {
-    return element;
+    if (!didChange) {
+      return element;
+    }
   }
 
   return {
