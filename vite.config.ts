@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     port: Number(envVars.VITE_APP_PORT || 3000),
     // open the browser
-    open: true,
+    open: false,
   },
   build: {
     outDir: "build",
