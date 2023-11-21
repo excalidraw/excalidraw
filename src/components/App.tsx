@@ -953,9 +953,9 @@ class App extends React.Component<AppProps, AppState> {
                 )}
                 <div
                   className="excalidraw__embeddable__outer"
-                  style={{
-                    padding: `${el.strokeWidth / el.scale[0]}px`,
-                  }}
+                  /*style={{
+                    padding: `${el.strokeWidth / el.scale[0]}px`, //zsviczian MDEmbeddable round border cutoff issue
+                  }}*/
                 >
                   {this.props.renderEmbeddable?.(el, this.state) ??
                     (isWebview ? (
