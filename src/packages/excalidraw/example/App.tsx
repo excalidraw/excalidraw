@@ -746,9 +746,12 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
                 <TTDDialog.TabTrigger tab="example">
                   example
                 </TTDDialog.TabTrigger>
+                <TTDDialog.TabTrigger tab="another">
+                  yet another tab yo
+                </TTDDialog.TabTrigger>
               </TTDDialog.TabTriggers>
               <TTDDialog.Tab tab="example">example content</TTDDialog.Tab>
-              <TTDDialog.Tab tab="mermaid">MERMAID AGAIN?! WTF?!</TTDDialog.Tab>
+              <TTDDialog.Tab tab="another">another tab!</TTDDialog.Tab>
             </TTDDialog>
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}

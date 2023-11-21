@@ -2,16 +2,23 @@
 
 $verticalBreakpoint: 860px;
 
+// TODO barnabasmolnar/hal-9000-tabs
+// don't forget to double check styles and see what we can remove
+// and what needs to be added to the TDDDialog instead
+
 .excalidraw {
   .dialog-mermaid {
     &-title {
-      margin-bottom: 5px;
-      margin-top: 2px;
+      margin-block: 0.25rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding-inline: 2.5rem;
     }
     &-desc {
       font-size: 15px;
       font-style: italic;
       font-weight: 500;
+      margin-bottom: 1.5rem;
     }
 
     .Modal__content .Island {

@@ -1,4 +1,3 @@
-import * as RadixTabs from "@radix-ui/react-tabs";
 import { Dialog } from "../Dialog";
 import { useApp } from "../App";
 import MermaidToExcalidraw from "../MermaidToExcalidraw";
@@ -10,6 +9,8 @@ import { withInternalFallback } from "../hoc/withInternalFallback";
 import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
 import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
 import { TTDDialogTab } from "./TTDDialogTab";
+import "./TTDDialog.scss";
+import { t } from "../../i18n";
 
 /**
  * Text to diagram (TTD) dialog
@@ -33,7 +34,6 @@ export const TTDDialog = Object.assign(
         <Dialog
           className="ttd-dialog"
           onCloseRequest={() => {
-            console.log("close");
             app.setOpenDialog(null);
           }}
           size={1200}
@@ -42,10 +42,12 @@ export const TTDDialog = Object.assign(
         >
           <TTDDialogTabs>
             <TDDDialogTabTriggersTunnel.Out />
-            {rest.__fallback && "mermaid csoda"}
-            <RadixTabs.Content className="ttd-dialog-content" value="mermaid">
+            {rest.__fallback && (
+              <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
+            )}
+            <TTDDialogTab className="ttd-dialog-content" tab="mermaid">
               <MermaidToExcalidraw />
-            </RadixTabs.Content>
+            </TTDDialogTab>
             {children}
           </TTDDialogTabs>
         </Dialog>
