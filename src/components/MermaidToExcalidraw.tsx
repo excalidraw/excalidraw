@@ -169,6 +169,21 @@ const MermaidToExcalidraw = () => {
     onClose();
   };
 
+  const textRef = useRef(text);
+
+  // slightly hacky but really quite simple
+  // essentially, we want to save the text to LS when the component unmounts
+  useEffect(() => {
+    textRef.current = text;
+  }, [text]);
+  useEffect(() => {
+    return () => {
+      if (textRef.current) {
+        saveMermaidDataToStorage(textRef.current);
+      }
+    };
+  }, []);
+
   return (
     <>
       <div className="dialog-mermaid-desc">
