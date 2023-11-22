@@ -8238,27 +8238,8 @@ class App extends React.Component<AppProps, AppState> {
       event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
-    const frameElementsOffsetsMap = new Map<
-      string,
-      {
-        x: number;
-        y: number;
-      }
-    >();
-
-    selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameChildren(
-        this.scene.getNonDeletedElements(),
-        frame.id,
-      );
-
-      elementsInFrame.forEach((element) => {
-        frameElementsOffsetsMap.set(frame.id + element.id, {
-          x: element.x - frame.x,
-          y: element.y - frame.y,
-        });
-      });
-    });
+    const resizingSingleFrameOnly =
+      selectedElements.length === 1 && selectedFrames.length === 1;
 
     // check needed for avoiding flickering when a key gets pressed
     // during dragging
@@ -8299,12 +8280,12 @@ class App extends React.Component<AppProps, AppState> {
       transformElements(
         pointerDownState,
         transformHandleType,
-        selectedFrames.length > 1
-          ? this.scene.getSelectedElements({
+        resizingSingleFrameOnly
+          ? selectedElements
+          : this.scene.getSelectedElements({
               selectedElementIds: this.state.selectedElementIds,
               includeElementsInFrames: true,
-            })
-          : selectedElements,
+            }),
         pointerDownState.resize.arrowDirection,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
@@ -8320,49 +8301,14 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
 
-      if (selectedFrames.length === 1) {
+      // only need to highlight elements in a single resizing frame
+      if (resizingSingleFrameOnly) {
         const elementsToHighlight = new Set<ExcalidrawElement>();
-        selectedFrames.forEach((frame) => {
-          const elementsInFrame = getFrameChildren(
-            this.scene.getNonDeletedElements(),
-            frame.id,
-          );
 
-          // keep elements' positions relative to their frames on frames resizing
-          if (transformHandleType) {
-            if (transformHandleType.includes("w")) {
-              elementsInFrame.forEach((element) => {
-                mutateElement(element, {
-                  x:
-                    frame.x +
-                    (frameElementsOffsetsMap.get(frame.id + element.id)?.x ||
-                      0),
-                  y:
-                    frame.y +
-                    (frameElementsOffsetsMap.get(frame.id + element.id)?.y ||
-                      0),
-                });
-              });
-            }
-            if (transformHandleType.includes("n")) {
-              elementsInFrame.forEach((element) => {
-                mutateElement(element, {
-                  x:
-                    frame.x +
-                    (frameElementsOffsetsMap.get(frame.id + element.id)?.x ||
-                      0),
-                  y:
-                    frame.y +
-                    (frameElementsOffsetsMap.get(frame.id + element.id)?.y ||
-                      0),
-                });
-              });
-            }
-          }
-
+        selectedFrames.forEach((selectedFrame) => {
           getElementsInResizingFrame(
             this.scene.getNonDeletedElements(),
-            frame,
+            selectedFrame,
             this.state,
           ).forEach((element) => elementsToHighlight.add(element));
         });
