@@ -11,6 +11,10 @@ import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
 import { TTDDialogTab } from "./TTDDialogTab";
 import "./TTDDialog.scss";
 import { t } from "../../i18n";
+import { TTDDialogInput } from "./TTDDialogInput";
+import { TTDDialogOutput } from "./TTDDialogOutput";
+import { TTDDialogPanel } from "./TTDDialogPanel";
+import { TTDDialogPanels } from "./TTDDialogPanels";
 
 /**
  * Text to diagram (TTD) dialog
@@ -58,5 +62,9 @@ export const TTDDialog = Object.assign(
     TabTriggers: TTDDialogTabTriggers,
     TabTrigger: TTDDialogTabTrigger,
     Tab: TTDDialogTab,
+    Input: TTDDialogInput,
+    Output: TTDDialogOutput,
+    Panels: TTDDialogPanels,
+    Panel: TTDDialogPanel,
   },
 );

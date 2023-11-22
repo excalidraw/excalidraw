@@ -1,16 +1,15 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 import { BinaryFiles } from "../types";
 import { useApp } from "./App";
-import { Button } from "./Button";
 import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../constants";
 import {
+  TTDDialog,
   convertToExcalidrawElements,
   exportToCanvas,
 } from "../packages/excalidraw/index";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { canvasToBlob } from "../data/blob";
 import { ArrowRightIcon } from "./icons";
-import Spinner from "./Spinner";
 import "./MermaidToExcalidraw.scss";
 
 import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
@@ -43,14 +42,6 @@ const importMermaidDataFromStorage = () => {
   }
 
   return null;
-};
-
-const ErrorComp = ({ error }: { error: string }) => {
-  return (
-    <div data-testid="mermaid-error" className="mermaid-error">
-      Error! <p>{error}</p>
-    </div>
-  );
 };
 
 const MermaidToExcalidraw = () => {
@@ -193,39 +184,28 @@ const MermaidToExcalidraw = () => {
           )}
         />
       </div>
-      <div className="dialog-mermaid-body">
-        <div className="dialog-mermaid-panels">
-          <div className="dialog-mermaid-panels-text">
-            <label>{t("mermaid.syntax")}</label>
-
-            <textarea
-              onChange={(event) => setText(event.target.value)}
-              value={text}
-            />
-          </div>
-          <div className="dialog-mermaid-panels-preview">
-            <label>{t("mermaid.preview")}</label>
-            <div className="dialog-mermaid-panels-preview-wrapper">
-              {error && <ErrorComp error={error} />}
-              {mermaidToExcalidrawLib.loaded ? (
-                <div
-                  ref={canvasRef}
-                  style={{ opacity: error ? "0.15" : 1 }}
-                  className="dialog-mermaid-panels-preview-canvas-container"
-                />
-              ) : (
-                <Spinner size="2rem" />
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="dialog-mermaid-buttons">
-          <Button className="dialog-mermaid-insert" onSelect={onSelect}>
-            {t("mermaid.button")}
-            <span>{ArrowRightIcon}</span>
-          </Button>
-        </div>
-      </div>
+      <TTDDialog.Panels>
+        <TTDDialog.Panel label={t("mermaid.syntax")}>
+          <TTDDialog.Input
+            input={text}
+            onChange={(event) => setText(event.target.value)}
+          />
+        </TTDDialog.Panel>
+        <TTDDialog.Panel
+          label={t("mermaid.preview")}
+          panelAction={{
+            action: onSelect,
+            label: t("mermaid.button"),
+            icon: ArrowRightIcon,
+          }}
+        >
+          <TTDDialog.Output
+            canvasRef={canvasRef}
+            loaded={mermaidToExcalidrawLib.loaded}
+            errorMessage={error}
+          />
+        </TTDDialog.Panel>
+      </TTDDialog.Panels>
     </>
   );
 };
