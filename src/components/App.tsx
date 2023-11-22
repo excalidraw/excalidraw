@@ -6601,9 +6601,9 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {
-          const selectedELements = this.scene.getSelectedElements(this.state);
+          const selectedElements = this.scene.getSelectedElements(this.state);
           // set selectedLinearElement to null if there is more than one element selected since we don't want to show linear element handles
-          if (selectedELements.length > 1) {
+          if (selectedElements.length > 1) {
             this.setState({ selectedLinearElement: null });
           }
         } else {
@@ -7007,10 +7007,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.elementId !== hitElement?.id &&
         isLinearElement(hitElement)
       ) {
-        const selectedELements = this.scene.getSelectedElements(this.state);
+        const selectedElements = this.scene.getSelectedElements(this.state);
         // set selectedLinearElement when no other element selected except
         // the one we've hit
-        if (selectedELements.length === 1) {
+        if (selectedElements.length === 1) {
           this.setState({
             selectedLinearElement: new LinearElementEditor(
               hitElement,
