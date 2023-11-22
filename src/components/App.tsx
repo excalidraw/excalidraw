@@ -40,7 +40,7 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { ActionResult } from "../actions/types";
+import { Action, ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
@@ -565,6 +565,12 @@ class App extends React.Component<AppProps, AppState> {
     this.id = nanoid();
 
     this.library = new Library(this);
+    this.actionManager = new ActionManager(
+      this.syncActionResult,
+      () => this.state,
+      () => this.scene.getElementsIncludingDeleted(),
+      this,
+    );
     this.scene = new Scene();
 
     this.canvas = document.createElement("canvas");
@@ -585,6 +591,9 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
+        registerAction: (action: Action) => {
+          this.actionManager.registerAction(action);
+        },
         refresh: this.refresh,
         setToast: this.setToast,
         id: this.id,
@@ -614,12 +623,6 @@ class App extends React.Component<AppProps, AppState> {
       onSceneUpdated: this.onSceneUpdated,
     });
     this.history = new History();
-    this.actionManager = new ActionManager(
-      this.syncActionResult,
-      () => this.state,
-      () => this.scene.getElementsIncludingDeleted(),
-      this,
-    );
     this.actionManager.registerAll(actions);
 
     this.actionManager.registerAction(createUndoAction(this.history));
