@@ -8301,21 +8301,18 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
 
-      // only need to highlight elements in a single resizing frame
+      // highlight frame children ONLY when resizing a single frame
       if (resizingSingleFrameOnly) {
-        const elementsToHighlight = new Set<ExcalidrawElement>();
-
-        selectedFrames.forEach((selectedFrame) => {
-          getElementsInResizingFrame(
-            this.scene.getNonDeletedElements(),
-            selectedFrame,
-            this.state,
-          ).forEach((element) => elementsToHighlight.add(element));
-        });
-
-        this.setState({
-          elementsToHighlight: [...elementsToHighlight],
-        });
+        const selectedFrame = selectedFrames[0];
+        if (selectedFrame) {
+          this.setState({
+            elementsToHighlight: getElementsInResizingFrame(
+              this.scene.getNonDeletedElements(),
+              selectedFrame,
+              this.state,
+            ),
+          });
+        }
       }
 
       return true;
