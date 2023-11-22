@@ -1137,7 +1137,10 @@ class App extends React.Component<AppProps, AppState> {
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
-            cursor: CURSOR_TYPE.MOVE,
+            cursor:
+              !f.locked && this.state.activeTool.type === "selection"
+                ? CURSOR_TYPE.MOVE
+                : this.interactiveCanvas?.style.cursor,
             pointerEvents: this.state.viewModeEnabled
               ? POINTER_EVENTS.disabled
               : POINTER_EVENTS.enabled,
