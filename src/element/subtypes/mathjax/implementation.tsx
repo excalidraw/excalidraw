@@ -26,7 +26,7 @@ import Scene from "../../../scene/Scene";
 
 // Imports for actions
 import { t, registerAuxLangData } from "../../../i18n";
-import { Action } from "../../../actions/types";
+import { Action, makeCustomActionName } from "../../../actions/types";
 import { AppState } from "../../../types";
 import {
   changeProperty,
@@ -1395,7 +1395,7 @@ const enableActionChangeMathProps = (
 const createMathActions = () => {
   const mathActions: Action[] = [];
   const actionUseTexTrue: Action = {
-    name: "custom.useTexTrue",
+    name: makeCustomActionName("useTexTrue"),
     perform: (elements, appState) => {
       const mathOnly = getMathProps.getMathOnly(appState);
       const customData = appState.customData ?? {};
@@ -1414,7 +1414,7 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionUseTexFalse: Action = {
-    name: "custom.useTexFalse",
+    name: makeCustomActionName("useTexFalse"),
     perform: (elements, appState) => {
       const mathOnly = getMathProps.getMathOnly(appState);
       const customData = appState.customData ?? {};
@@ -1433,7 +1433,7 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionResetUseTex: Action = {
-    name: "custom.resetUseTex",
+    name: makeCustomActionName("resetUseTex"),
     perform: (elements, appState) => {
       const useTex = getMathProps.getUseTex(appState);
       const modElements = changeProperty(
@@ -1481,7 +1481,7 @@ const createMathActions = () => {
     trackEvent: false,
   };
   const actionChangeMathOnly: Action = {
-    name: "custom.changeMathOnly",
+    name: makeCustomActionName("changeMathOnly"),
     perform: (elements, appState, mathOnly: boolean | null) => {
       if (mathOnly === null) {
         mathOnly = getFormValue(
