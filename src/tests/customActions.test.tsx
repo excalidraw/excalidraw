@@ -4,11 +4,16 @@ import { API } from "./helpers/api";
 import { render } from "./test-utils";
 import { Excalidraw } from "../packages/excalidraw/index";
 import {
-  CustomShortcutName,
   getShortcutFromShortcutName,
   registerCustomShortcuts,
 } from "../actions/shortcuts";
-import { Action, ActionPredicateFn, ActionResult } from "../actions/types";
+import {
+  Action,
+  ActionPredicateFn,
+  ActionResult,
+  CustomActionName,
+  makeCustomActionName,
+} from "../actions/types";
 import {
   actionChangeFontFamily,
   actionChangeFontSize,
@@ -19,11 +24,14 @@ const { h } = window;
 
 describe("regression tests", () => {
   it("should retrieve custom shortcuts", () => {
-    const shortcuts: Record<CustomShortcutName, string[]> = {
-      test: [getShortcutKey("CtrlOrCmd+1"), getShortcutKey("CtrlOrCmd+2")],
-    };
+    const shortcutName = makeCustomActionName("test");
+    const shortcuts: Record<CustomActionName, string[]> = {};
+    shortcuts[shortcutName] = [
+      getShortcutKey("CtrlOrCmd+1"),
+      getShortcutKey("CtrlOrCmd+2"),
+    ];
     registerCustomShortcuts(shortcuts);
-    expect(getShortcutFromShortcutName("test")).toBe("Ctrl+1");
+    expect(getShortcutFromShortcutName(shortcutName)).toBe("Ctrl+1");
   });
 
   it("should apply universal action predicates", async () => {

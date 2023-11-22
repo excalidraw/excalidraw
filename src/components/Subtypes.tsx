@@ -1,6 +1,6 @@
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { t } from "../i18n";
-import { Action } from "../actions/types";
+import { Action, makeCustomActionName } from "../actions/types";
 import clsx from "clsx";
 import {
   Subtype,
@@ -29,7 +29,7 @@ export const SubtypeButton = (
   const keyTest: Action["keyTest"] =
     key !== undefined ? (event) => event.code === `Key${key}` : undefined;
   const subtypeAction: Action = {
-    name: `custom.${subtype}`,
+    name: makeCustomActionName(subtype),
     trackEvent: false,
     predicate: (...rest) => rest[4]?.subtype === subtype,
     perform: (elements, appState) => {
@@ -159,7 +159,7 @@ export const SubtypeToggles = () => {
       >
         {getSubtypeNames().map((subtype) =>
           am.renderAction(
-            `custom.${subtype}`,
+            makeCustomActionName(subtype),
             hasAlwaysEnabledActions(subtype) ? { onContextMenu } : {},
           ),
         )}

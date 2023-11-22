@@ -2,11 +2,12 @@ import { isDarwin } from "../constants";
 import { t } from "../i18n";
 import { SubtypeOf } from "../utility-types";
 import { getShortcutKey } from "../utils";
-import { ActionName } from "./types";
+import { ActionName, CustomActionName } from "./types";
 
 export type ShortcutName =
   | SubtypeOf<
       ActionName,
+      | CustomActionName
       | "toggleTheme"
       | "loadScene"
       | "clearCanvas"
@@ -39,6 +40,15 @@ export type ShortcutName =
     >
   | "saveScene"
   | "imageExport";
+
+export const registerCustomShortcuts = (
+  shortcuts: Record<CustomActionName, string[]>,
+) => {
+  for (const key in shortcuts) {
+    const shortcut = key as CustomActionName;
+    shortcutMap[shortcut] = shortcuts[shortcut];
+  }
+};
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
@@ -85,23 +95,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   toggleElementLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
 };
 
-export type CustomShortcutName = string;
-
-let customShortcutMap: Record<CustomShortcutName, string[]> = {};
-
-export const registerCustomShortcuts = (
-  shortcuts: Record<CustomShortcutName, string[]>,
-) => {
-  customShortcutMap = { ...customShortcutMap, ...shortcuts };
-};
-
-export const getShortcutFromShortcutName = (
-  name: ShortcutName | CustomShortcutName,
-) => {
-  const shortcuts =
-    name in customShortcutMap
-      ? customShortcutMap[name as CustomShortcutName]
-      : shortcutMap[name as ShortcutName];
+export const getShortcutFromShortcutName = (name: ShortcutName) => {
+  const shortcuts = shortcutMap[name];
   // if multiple shortcuts available, take the first one
   return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";
 };

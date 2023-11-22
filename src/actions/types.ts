@@ -44,8 +44,11 @@ export type ActionPredicateFn = (
 export type UpdaterFn = (res: ActionResult) => void;
 export type ActionFilterFn = (action: Action) => void;
 
+export const makeCustomActionName = (name: string) =>
+  `custom.${name}` as CustomActionName;
+export type CustomActionName = `custom.${string}`;
 export type ActionName =
-  | `custom.${string}`
+  | CustomActionName
   | "copy"
   | "cut"
   | "paste"

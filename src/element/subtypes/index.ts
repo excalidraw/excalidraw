@@ -5,11 +5,14 @@ import { getSelectedElements } from "../../scene";
 import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { registerAuxLangData } from "../../i18n";
 
-import { Action, ActionName, ActionPredicateFn } from "../../actions/types";
 import {
-  CustomShortcutName,
-  registerCustomShortcuts,
-} from "../../actions/shortcuts";
+  Action,
+  ActionName,
+  ActionPredicateFn,
+  CustomActionName,
+  makeCustomActionName,
+} from "../../actions/types";
+import { registerCustomShortcuts } from "../../actions/shortcuts";
 import { register } from "../../actions/register";
 import { hasBoundTextElement, isTextElement } from "../typeChecks";
 import {
@@ -44,7 +47,7 @@ export type SubtypeRecord = Readonly<{
   parents: readonly ExcalidrawElement["type"][];
   actionNames?: readonly SubtypeActionName[];
   disabledNames?: readonly DisabledActionName[];
-  shortcutMap?: Record<CustomShortcutName, string[]>;
+  shortcutMap?: Record<string, string[]>;
   alwaysEnabledNames?: readonly SubtypeActionName[];
 }>;
 
@@ -373,8 +376,8 @@ export const prepareSubtype = (
       ...subtypeActionMap,
       {
         subtype,
-        actions: record.actionNames.map(
-          (actionName) => `custom.${actionName}` as ActionName,
+        actions: record.actionNames.map((actionName) =>
+          makeCustomActionName(actionName),
         ),
       },
     ];
@@ -390,14 +393,19 @@ export const prepareSubtype = (
       ...alwaysEnabledMap,
       {
         subtype,
-        actions: record.alwaysEnabledNames.map(
-          (actionName) => `custom.${actionName}` as ActionName,
+        actions: record.alwaysEnabledNames.map((actionName) =>
+          makeCustomActionName(actionName),
         ),
       },
     ];
   }
-  if (record.shortcutMap) {
-    registerCustomShortcuts(record.shortcutMap);
+  const customShortcutMap = record.shortcutMap;
+  if (customShortcutMap) {
+    const shortcutMap: Record<CustomActionName, string[]> = {};
+    for (const key in customShortcutMap) {
+      shortcutMap[makeCustomActionName(key)] = customShortcutMap[key];
+    }
+    registerCustomShortcuts(shortcutMap);
   }
 
   // Prepare the subtype

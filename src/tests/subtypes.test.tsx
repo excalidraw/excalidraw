@@ -32,7 +32,7 @@ import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { Action, ActionName } from "../actions/types";
+import { Action, ActionName, makeCustomActionName } from "../actions/types";
 import { AppState } from "../types";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionChangeSloppiness } from "../actions";
@@ -81,7 +81,7 @@ const test1: SubtypeRecord = {
 };
 
 const testAction: Action = {
-  name: `custom.${TEST_ACTION}`,
+  name: makeCustomActionName(TEST_ACTION),
   trackEvent: false,
   perform: (elements, appState) => {
     return {
@@ -338,7 +338,9 @@ describe("subtypes", () => {
     expect(test3Methods?.clean).toBeUndefined();
   });
   it("should register custom shortcuts", async () => {
-    expect(getShortcutFromShortcutName("testShortcut")).toBe("Shift+T");
+    expect(
+      getShortcutFromShortcutName(makeCustomActionName("testShortcut")),
+    ).toBe("Shift+T");
   });
   it("should correctly validate", async () => {
     test1.parents.forEach((p) => {
