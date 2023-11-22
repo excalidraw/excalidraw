@@ -17,6 +17,7 @@ import {
   useExcalidrawSetAppState,
 } from "./App";
 import { ContextMenuItems } from "./ContextMenu";
+import { Island } from "./Island";
 
 export const SubtypeButton = (
   subtype: Subtype,
@@ -145,12 +146,20 @@ export const SubtypeToggles = () => {
 
   return (
     <>
-      {getSubtypeNames().map((subtype) =>
-        am.renderAction(
-          `custom.${subtype}`,
-          hasAlwaysEnabledActions(subtype) ? { onContextMenu } : {},
-        ),
-      )}
+      <Island
+        style={{
+          marginLeft: 8,
+          alignSelf: "center",
+          height: "fit-content",
+        }}
+      >
+        {getSubtypeNames().map((subtype) =>
+          am.renderAction(
+            `custom.${subtype}`,
+            hasAlwaysEnabledActions(subtype) ? { onContextMenu } : {},
+          ),
+        )}
+      </Island>
     </>
   );
 };
