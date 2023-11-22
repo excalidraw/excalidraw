@@ -144,6 +144,10 @@ export const SubtypeToggles = () => {
     });
   };
 
+  // Only render if one or more subtypes are registered
+  if (getSubtypeNames().length === 0) {
+    return <></>;
+  }
   return (
     <>
       <Island
