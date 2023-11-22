@@ -28,8 +28,9 @@ export const actionToggleElementLock = register({
       elements: elements.map((element) => {
         if (
           !selectedElementsMap.has(element.id) &&
-          element.frameId &&
-          !selectedElementsMap.has(element.frameId)
+          (!element.frameId ||
+            // lock frame children if frame is selected
+            (element.frameId && !selectedElementsMap.has(element.frameId)))
         ) {
           return element;
         }
