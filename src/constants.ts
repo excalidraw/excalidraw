@@ -80,6 +80,7 @@ export enum EVENT {
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
   MESSAGE = "message",
+  FULLSCREENCHANGE = "fullscreenchange",
 }
 
 export const YOUTUBE_STATES = {
@@ -367,4 +368,10 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+} as const;
+
+export const EDITOR_LS_KEYS = {
+  OAI_API_KEY: "excalidraw-oai-api-key",
+  // legacy naming (non)scheme
+  PUBLISH_LIBRARY: "publish-library-data",
 } as const;

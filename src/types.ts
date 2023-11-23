@@ -18,6 +18,7 @@ import {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawFrameLikeElement,
+  ExcalidrawElementType,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -107,6 +108,8 @@ export type ToolType =
   | "embeddable"
   | "laser";
 
+export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
+
 export type ActiveTool =
   | {
       type: ToolType;
@@ -161,9 +164,6 @@ export type InteractiveCanvasAppState = Readonly<
     suggestedBindings: AppState["suggestedBindings"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
-    // App
-    openSidebar: AppState["openSidebar"];
-    showHyperlinkPopup: AppState["showHyperlinkPopup"];
     // Collaborators
     collaborators: AppState["collaborators"];
     // SnapLines
@@ -172,7 +172,7 @@ export type InteractiveCanvasAppState = Readonly<
   }
 >;
 
-export type AppState = {
+export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
     top: number;
@@ -244,7 +244,13 @@ export type AppState = {
   openMenu: "canvas" | "shape" | null;
   openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
-  openDialog: "imageExport" | "help" | "jsonExport" | "mermaid" | null;
+  openDialog:
+    | "imageExport"
+    | "help"
+    | "jsonExport"
+    | "mermaid"
+    | "magicSettings"
+    | null;
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -299,7 +305,7 @@ export type AppState = {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-};
+}
 
 export type UIAppState = Omit<
   AppState,
@@ -439,6 +445,7 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  aiEnabled?: boolean;
 }
 
 export type SceneData = {
@@ -507,6 +514,7 @@ export type AppProps = Merge<
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
     children?: React.ReactNode;
+    aiEnabled: boolean;
   }
 >;
 
@@ -540,6 +548,8 @@ export type AppClassProperties = {
   togglePenMode: App["togglePenMode"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
+  insertEmbeddableElement: App["insertEmbeddableElement"];
+  onMagicButtonSelect: App["onMagicButtonSelect"];
 };
 
 export type PointerDownState = Readonly<{
@@ -710,3 +720,5 @@ export type Primitive =
   | symbol
   | null
   | undefined;
+
+export type JSONValue = string | number | boolean | null | object;

@@ -36,6 +36,8 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
+  OpenAIIcon,
+  MagicIcon,
 } from "./icons";
 import { KEYS } from "../keys";
 
@@ -333,6 +335,9 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
+          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
+            Generate
+          </div>
           <DropdownMenu.Item
             onSelect={() => app.setOpenDialog("mermaid")}
             icon={mermaidLogoIcon}
@@ -340,6 +345,25 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>
+
+          {app.props.aiEnabled !== false && (
+            <>
+              <DropdownMenu.Item
+                onSelect={() => app.onMagicButtonSelect()}
+                icon={MagicIcon}
+                data-testid="toolbar-magicframe"
+              >
+                {t("toolBar.magicframe")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => app.setOpenDialog("magicSettings")}
+                icon={OpenAIIcon}
+                data-testid="toolbar-magicSettings"
+              >
+                {t("toolBar.magicSettings")}
+              </DropdownMenu.Item>
+            </>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
