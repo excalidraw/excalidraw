@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
     "copyText": "Copiar para Área de Transferência como texto",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Trazer para o primeiro plano",
     "sendToBack": "Enviar para o plano de fundo",
     "bringToFront": "Trazer para o primeiro plano",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Acrescentar/ Adicionar ligação para uma forma seleccionada",
     "eraser": "Borracha",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Mão (ferramenta de movimento da tela)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Ações da área de desenho",
