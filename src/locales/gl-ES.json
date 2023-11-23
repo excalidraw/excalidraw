@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar no portapapeis como PNG",
     "copyAsSvg": "Copiar no portapapeis como SVG",
     "copyText": "Copia no portapapeis como texto",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Traer cara adiante",
     "sendToBack": "Enviar cara atrás",
     "bringToFront": "Traer á fronte",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
     "eraser": "Goma de borrar",
     "frame": "",
+    "magicframe": "",
     "embeddable": "Inserir na web",
     "laser": "Punteiro láser",
     "hand": "Man (ferramenta de desprazamento)",
     "extraTools": "Máis ferramentas",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
