@@ -11,6 +11,8 @@
     "copyAsPng": "Kopier til utklippstavla som PNG",
     "copyAsSvg": "Kopier til utklippstavla som SVG",
     "copyText": "",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Flytt framover",
     "sendToBack": "Send heilt bak",
     "bringToFront": "Flytt heilt fram",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Legg til/ oppdater lenke til valt figur",
     "eraser": "Viskelêr",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
