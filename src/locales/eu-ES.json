@@ -11,6 +11,8 @@
     "copyAsPng": "Kopiatu arbelera PNG gisa",
     "copyAsSvg": "Kopiatu arbelera SVG gisa",
     "copyText": "Kopiatu arbelera testu gisa",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Ekarri aurrerago",
     "sendToBack": "Eraman atzera",
     "bringToFront": "Ekarri aurrera",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
+      "iframe": "",
       "image": "Laster egongo da irudiak liburutegian gehitzeko laguntza!"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
     "frame": "Marko tresna",
+    "magicframe": "",
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
