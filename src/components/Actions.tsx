@@ -40,6 +40,7 @@ import {
   MagicIcon,
 } from "./icons";
 import { KEYS } from "../keys";
+import { useTunnels } from "../context/tunnels";
 
 export const SelectedShapeActions = ({
   appState,
@@ -235,6 +236,8 @@ export const ShapesSwitcher = ({
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
+  const { TTDDialogTriggerTunnel } = useTunnels();
+
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -345,9 +348,9 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>
-
           {app.props.aiEnabled !== false && (
             <>
+              <TTDDialogTriggerTunnel.Out />
               <DropdownMenu.Item
                 onSelect={() => app.onMagicframeToolSelect()}
                 icon={MagicIcon}

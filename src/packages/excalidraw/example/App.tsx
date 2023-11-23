@@ -77,6 +77,7 @@ const {
   LiveCollaborationTrigger,
   convertToExcalidrawElements,
   TTDDialog,
+  TTDDialogTrigger,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
@@ -738,6 +739,11 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               Toggle Custom Sidebar
             </Sidebar.Trigger>
             {renderMenu()}
+            {excalidrawAPI && (
+              <TTDDialogTrigger icon={<span>😀</span>}>
+                Text to diagram
+              </TTDDialogTrigger>
+            )}
             <TTDDialog
               onTextSubmit={async (_) => {
                 console.info("submit");

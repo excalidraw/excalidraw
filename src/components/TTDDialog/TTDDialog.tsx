@@ -56,7 +56,7 @@ export const TTDDialogBase = withInternalFallback(
     __fallback?: boolean;
   }) => {
     const app = useApp();
-    const { TDDDialogTabTriggersTunnel } = useTunnels();
+    const { TTDDialogTabTriggersTunnel } = useTunnels();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);
 
@@ -103,7 +103,7 @@ export const TTDDialogBase = withInternalFallback(
         {...rest}
       >
         <TTDDialogTabs>
-          <TDDDialogTabTriggersTunnel.Out />
+          <TTDDialogTabTriggersTunnel.Out />
           {rest.__fallback && (
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
           )}
