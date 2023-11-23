@@ -11,6 +11,8 @@
     "copyAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyAsSvg": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ SVG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyText": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਪਾਠ ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "ਅੱਗੇ ਲਿਆਓ",
     "sendToBack": "ਸਭ ਤੋਂ ਪਿੱਛੇ ਭੇਜੋ",
     "bringToFront": "ਸਭ ਤੋਂ ਅੱਗੇ ਲਿਆਓ",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "",
     "eraser": "ਰਬੜ",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
