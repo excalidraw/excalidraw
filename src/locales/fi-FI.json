@@ -11,6 +11,8 @@
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
     "copyText": "Kopioi tekstinä",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
