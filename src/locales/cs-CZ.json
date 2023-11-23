@@ -11,6 +11,8 @@
     "copyAsPng": "Zkopírovat do schránky jako PNG",
     "copyAsSvg": "Zkopírovat do schránky jako SVG",
     "copyText": "Zkopírovat do schránky jako text",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Přenést blíž",
     "sendToBack": "Přenést do pozadí",
     "bringToFront": "Přenést do popředí",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Přidat/aktualizovat odkaz pro vybraný tvar",
     "eraser": "Guma",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Akce plátna",
