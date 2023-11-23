@@ -11,6 +11,8 @@
     "copyAsPng": "நகலகத்திற்கு PNG ஆக நகலெடு",
     "copyAsSvg": "நகலகத்திற்கு SVG ஆக நகலெடு",
     "copyText": "நகலகத்திற்கு உரையாக நகலெடு",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "முன்நோக்கி கொண்டுவா",
     "sendToBack": "பின்னே அனுப்பு",
     "bringToFront": "முன்னே கொண்டுவா",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "தேர்தெடுத்த வடிவத்திற்குத் தொடுப்பைச் சேர்/ புதுப்பி",
     "eraser": "அழிப்பி",
     "frame": "சட்டகம் கருவி",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "கித்தான் செயல்கள்",
