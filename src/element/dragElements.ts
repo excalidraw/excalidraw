@@ -11,7 +11,7 @@ import Scene from "../scene/Scene";
 import {
   isArrowElement,
   isBoundToContainer,
-  isFrameElement,
+  isFrameLikeElement,
 } from "./typeChecks";
 
 export const dragSelectedElements = (
@@ -33,7 +33,7 @@ export const dragSelectedElements = (
     selectedElements,
   );
   const frames = selectedElements
-    .filter((e) => isFrameElement(e))
+    .filter((e) => isFrameLikeElement(e))
     .map((f) => f.id);
 
   if (frames.length > 0) {

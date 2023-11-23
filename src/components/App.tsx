@@ -47,12 +47,15 @@ import {
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import { PastedMixedContent, parseClipboard } from "../clipboard";
+import {
+  PastedMixedContent,
+  copyTextToSystemClipboard,
+  parseClipboard,
+} from "../clipboard";
 import {
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-  DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
   ELEMENT_READY_TO_ERASE_OPACITY,
@@ -86,6 +89,8 @@ import {
   YOUTUBE_STATES,
   ZOOM_STEP,
   POINTER_EVENTS,
+  TOOL_TYPE,
+  EDITOR_LS_KEYS,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -139,6 +144,8 @@ import {
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
+  newMagicFrameElement,
+  newIframeElement,
 } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -146,13 +153,17 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
-  isFrameElement,
+  isFrameLikeElement,
   isImageElement,
   isEmbeddableElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
   isUsingAdaptiveRadius,
+  isFrameElement,
+  isIframeElement,
+  isIframeLikeElement,
+  isMagicFrameElement,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -167,8 +178,11 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
-  ExcalidrawFrameElement,
-  ExcalidrawEmbeddableElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawIframeLikeElement,
+  IframeData,
+  ExcalidrawIframeElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -256,6 +270,7 @@ import {
   easeOut,
 } from "../utils";
 import {
+  createSrcDoc,
   embeddableURLValidator,
   extractSrc,
   getEmbedLink,
@@ -328,6 +343,7 @@ import {
   elementOverlapsWithFrame,
   updateFrameMembershipOfSelectedElements,
   isElementInFrame,
+  getFrameLikeTitle,
 } from "../frame";
 import {
   excludeElementsInFramesFromSelection,
@@ -375,6 +391,13 @@ import {
   setCursorForShape,
 } from "../cursor";
 import { Emitter } from "../emitter";
+import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
+import { MagicCacheData, diagramToHTML } from "../data/magic";
+import { elementsOverlappingBBox, exportToBlob } from "../packages/utils";
+import { COLOR_PALETTE } from "../colors";
+import { ElementCanvasButton } from "./MagicButton";
+import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -480,11 +503,6 @@ class App extends React.Component<AppProps, AppState> {
   device: Device = deviceContextInitialValue;
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
-
-  public static defaultProps: Partial<AppProps> = {
-    // needed for tests to pass since we directly render App in many tests
-    UIOptions: DEFAULT_UI_OPTIONS,
-  };
 
   public scene: Scene;
   public renderer: Renderer;
@@ -692,22 +710,22 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private updateEmbeddableRef(
-    id: ExcalidrawEmbeddableElement["id"],
+  private cacheEmbeddableRef(
+    element: ExcalidrawIframeLikeElement,
     ref: HTMLIFrameElement | null,
   ) {
     if (ref) {
-      this.iFrameRefs.set(id, ref);
+      this.iFrameRefs.set(element.id, ref);
     }
   }
 
   private getHTMLIFrameElement(
-    id: ExcalidrawEmbeddableElement["id"],
+    element: ExcalidrawIframeLikeElement,
   ): HTMLIFrameElement | undefined {
-    return this.iFrameRefs.get(id);
+    return this.iFrameRefs.get(element.id);
   }
 
-  private handleEmbeddableCenterClick(element: ExcalidrawEmbeddableElement) {
+  private handleEmbeddableCenterClick(element: ExcalidrawIframeLikeElement) {
     if (
       this.state.activeEmbeddable?.element === element &&
       this.state.activeEmbeddable?.state === "active"
@@ -730,7 +748,11 @@ class App extends React.Component<AppProps, AppState> {
       });
     }, 100);
 
-    const iframe = this.getHTMLIFrameElement(element.id);
+    if (isIframeElement(element)) {
+      return;
+    }
+
+    const iframe = this.getHTMLIFrameElement(element);
 
     if (!iframe?.contentWindow) {
       return;
@@ -782,8 +804,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private isEmbeddableCenter(
-    el: ExcalidrawEmbeddableElement | null,
+  private isIframeLikeElementCenter(
+    el: ExcalidrawIframeLikeElement | null,
     event: React.PointerEvent<HTMLElement> | PointerEvent,
     sceneX: number,
     sceneY: number,
@@ -805,12 +827,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private updateEmbeddables = () => {
-    const embeddableElements = new Map<ExcalidrawElement["id"], true>();
+    const iframeLikes = new Set<ExcalidrawIframeLikeElement["id"]>();
 
     let updated = false;
     this.scene.getNonDeletedElements().filter((element) => {
       if (isEmbeddableElement(element)) {
-        embeddableElements.set(element.id, true);
+        iframeLikes.add(element.id);
         if (element.validated == null) {
           updated = true;
 
@@ -822,6 +844,8 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(element, { validated }, false);
           ShapeCache.delete(element);
         }
+      } else if (isIframeElement(element)) {
+        iframeLikes.add(element.id);
       }
       return false;
     });
@@ -832,7 +856,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // GC
     this.iFrameRefs.forEach((ref, id) => {
-      if (!embeddableElements.has(id)) {
+      if (!iframeLikes.has(id)) {
         this.iFrameRefs.delete(id);
       }
     });
@@ -846,8 +870,8 @@ class App extends React.Component<AppProps, AppState> {
     const embeddableElements = this.scene
       .getNonDeletedElements()
       .filter(
-        (el): el is NonDeleted<ExcalidrawEmbeddableElement> =>
-          isEmbeddableElement(el) && !!el.validated,
+        (el): el is NonDeleted<ExcalidrawIframeLikeElement> =>
+          (isEmbeddableElement(el) && !!el.validated) || isIframeElement(el),
       );
 
     return (
@@ -857,7 +881,150 @@ class App extends React.Component<AppProps, AppState> {
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
-          const embedLink = getEmbedLink(toValidURL(el.link || ""));
+
+          let src: IframeData | null;
+
+          if (isIframeElement(el)) {
+            src = null;
+
+            const data: MagicCacheData = (el.customData?.generationData ??
+              this.magicGenerations.get(el.id)) || {
+              status: "error",
+              message: "No generation data",
+              code: "ERR_NO_GENERATION_DATA",
+            };
+
+            if (data.status === "done") {
+              const html = data.html;
+              src = {
+                intrinsicSize: { w: el.width, h: el.height },
+                type: "document",
+                srcdoc: () => {
+                  return html;
+                },
+              } as const;
+            } else if (data.status === "pending") {
+              src = {
+                intrinsicSize: { w: el.width, h: el.height },
+                type: "document",
+                srcdoc: () => {
+                  return createSrcDoc(`
+                    <style>
+                      html, body {
+                        width: 100%;
+                        height: 100%;
+                        color: ${
+                          this.state.theme === "dark" ? "white" : "black"
+                        };
+                      }
+                      body {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                        gap: 1rem;
+                      }
+
+                      .Spinner {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-left: auto;
+                        margin-right: auto;
+                      }
+
+                      .Spinner svg {
+                        animation: rotate 1.6s linear infinite;
+                        transform-origin: center center;
+                        width: 40px;
+                        height: 40px;
+                      }
+
+                      .Spinner circle {
+                        stroke: currentColor;
+                        animation: dash 1.6s linear 0s infinite;
+                        stroke-linecap: round;
+                      }
+
+                      @keyframes rotate {
+                        100% {
+                          transform: rotate(360deg);
+                        }
+                      }
+
+                      @keyframes dash {
+                        0% {
+                          stroke-dasharray: 1, 300;
+                          stroke-dashoffset: 0;
+                        }
+                        50% {
+                          stroke-dasharray: 150, 300;
+                          stroke-dashoffset: -200;
+                        }
+                        100% {
+                          stroke-dasharray: 1, 300;
+                          stroke-dashoffset: -280;
+                        }
+                      }
+                    </style>
+                    <div class="Spinner">
+                      <svg
+                        viewBox="0 0 100 100"
+                      >
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="46"
+                          stroke-width="8"
+                          fill="none"
+                          stroke-miter-limit="10"
+                        />
+                      </svg>
+                    </div>
+                    <div>Generating...</div>
+                  `);
+                },
+              } as const;
+            } else {
+              let message: string;
+              if (data.code === "ERR_GENERATION_INTERRUPTED") {
+                message = "Generation was interrupted...";
+              } else {
+                message = data.message || "Generation failed";
+              }
+              src = {
+                intrinsicSize: { w: el.width, h: el.height },
+                type: "document",
+                srcdoc: () => {
+                  return createSrcDoc(`
+                    <style>
+                    html, body {
+                      height: 100%;
+                    }
+                      body {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        color: ${COLOR_PALETTE.red[3]};
+                      }
+                      h1, h3 {
+                        margin-top: 0;
+                        margin-bottom: 0.5rem;
+                      }
+                    </style>
+                    <h1>Error!</h1>
+                    <h3>${message}</h3>
+                  `);
+                },
+              } as const;
+            }
+          } else {
+            src = getEmbedLink(toValidURL(el.link || ""));
+          }
+
+          // console.log({ src });
+
           const isVisible = isElementInViewport(
             el,
             normalizedWidth,
@@ -929,19 +1096,19 @@ class App extends React.Component<AppProps, AppState> {
                     padding: `${el.strokeWidth}px`,
                   }}
                 >
-                  {this.props.renderEmbeddable?.(el, this.state) ?? (
+                  {(isEmbeddableElement(el)
+                    ? this.props.renderEmbeddable?.(el, this.state)
+                    : null) ?? (
                     <iframe
-                      ref={(ref) => this.updateEmbeddableRef(el.id, ref)}
+                      ref={(ref) => this.cacheEmbeddableRef(el, ref)}
                       className="excalidraw__embeddable"
                       srcDoc={
-                        embedLink?.type === "document"
-                          ? embedLink.srcdoc(this.state.theme)
+                        src?.type === "document"
+                          ? src.srcdoc(this.state.theme)
                           : undefined
                       }
                       src={
-                        embedLink?.type !== "document"
-                          ? embedLink?.link ?? ""
-                          : undefined
+                        src?.type !== "document" ? src?.link ?? "" : undefined
                       }
                       // https://stackoverflow.com/q/18470015
                       scrolling="no"
@@ -1020,7 +1187,15 @@ class App extends React.Component<AppProps, AppState> {
 
     const isDarkTheme = this.state.theme === "dark";
 
-    return this.scene.getNonDeletedFrames().map((f, index) => {
+    let frameIndex = 0;
+    let magicFrameIndex = 0;
+
+    return this.scene.getNonDeletedFramesLikes().map((f) => {
+      if (isFrameElement(f)) {
+        frameIndex++;
+      } else {
+        magicFrameIndex++;
+      }
       if (
         !isElementInViewport(
           f,
@@ -1056,8 +1231,13 @@ class App extends React.Component<AppProps, AppState> {
 
       let frameNameJSX;
 
+      const frameName = getFrameLikeTitle(
+        f,
+        isFrameElement(f) ? frameIndex : magicFrameIndex,
+      );
+
       if (f.id === this.state.editingFrame) {
-        const frameNameInEdit = f.name == null ? `Frame ${index + 1}` : f.name;
+        const frameNameInEdit = frameName;
 
         frameNameJSX = (
           <input
@@ -1103,10 +1283,7 @@ class App extends React.Component<AppProps, AppState> {
           />
         );
       } else {
-        frameNameJSX =
-          f.name == null || f.name.trim() === ""
-            ? `Frame ${index + 1}`
-            : f.name.trim();
+        frameNameJSX = frameName;
       }
 
       return (
@@ -1190,6 +1367,8 @@ class App extends React.Component<AppProps, AppState> {
         (this.state.editingElement &&
           !isTextElement(this.state.editingElement)));
 
+    const firstSelectedElement = selectedElements[0];
+
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
@@ -1250,6 +1429,10 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           app={this}
                           isCollaborating={this.props.isCollaborating}
+                          openAIKey={this.OPENAI_KEY}
+                          isOpenAIKeyPersisted={this.OPENAI_KEY_IS_PERSISTED}
+                          onOpenAIAPIKeyChange={this.onOpenAIKeyChange}
+                          onMagicSettingsConfirm={this.onMagicSettingsConfirm}
                         >
                           {this.props.children}
                           {this.state.openDialog === "mermaid" && (
@@ -1262,15 +1445,82 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-eye-dropper-container" />
                         <LaserToolOverlay manager={this.laserPathManager} />
                         {selectedElements.length === 1 &&
-                          !this.state.contextMenu &&
                           this.state.showHyperlinkPopup && (
                             <Hyperlink
-                              key={selectedElements[0].id}
-                              element={selectedElements[0]}
+                              key={firstSelectedElement.id}
+                              element={firstSelectedElement}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
                               setToast={this.setToast}
                             />
+                          )}
+                        {this.props.aiEnabled !== false &&
+                          selectedElements.length === 1 &&
+                          isMagicFrameElement(firstSelectedElement) && (
+                            <ElementCanvasButtons
+                              element={firstSelectedElement}
+                            >
+                              <ElementCanvasButton
+                                title={t("labels.convertToCode")}
+                                icon={MagicIcon}
+                                checked={false}
+                                onChange={() =>
+                                  this.onMagicFrameGenerate(
+                                    firstSelectedElement,
+                                  )
+                                }
+                              />
+                            </ElementCanvasButtons>
+                          )}
+                        {selectedElements.length === 1 &&
+                          isIframeElement(firstSelectedElement) &&
+                          firstSelectedElement.customData?.generationData
+                            ?.status === "done" && (
+                            <ElementCanvasButtons
+                              element={firstSelectedElement}
+                            >
+                              <ElementCanvasButton
+                                title={t("labels.copySource")}
+                                icon={copyIcon}
+                                checked={false}
+                                onChange={() =>
+                                  this.onIframeSrcCopy(firstSelectedElement)
+                                }
+                              />
+                              <ElementCanvasButton
+                                title="Enter fullscreen"
+                                icon={fullscreenIcon}
+                                checked={false}
+                                onChange={() => {
+                                  const iframe =
+                                    this.getHTMLIFrameElement(
+                                      firstSelectedElement,
+                                    );
+                                  if (iframe) {
+                                    try {
+                                      iframe.requestFullscreen();
+                                      this.setState({
+                                        activeEmbeddable: {
+                                          element: firstSelectedElement,
+                                          state: "active",
+                                        },
+                                        selectedElementIds: {
+                                          [firstSelectedElement.id]: true,
+                                        },
+                                        draggingElement: null,
+                                        selectionElement: null,
+                                      });
+                                    } catch (err: any) {
+                                      console.warn(err);
+                                      this.setState({
+                                        errorMessage:
+                                          "Couldn't enter fullscreen",
+                                      });
+                                    }
+                                  }
+                                }}
+                              />
+                            </ElementCanvasButtons>
                           )}
                         {this.state.toast !== null && (
                           <Toast
@@ -1372,7 +1622,7 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: ExcalidrawFrameElement | null },
+    opts: { exportingFrame: ExcalidrawFrameLikeElement | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -1399,6 +1649,250 @@ class App extends React.Component<AppProps, AppState> {
       isImageFileHandle(fileHandle)
     ) {
       this.setState({ fileHandle });
+    }
+  };
+
+  private magicGenerations = new Map<
+    ExcalidrawIframeElement["id"],
+    MagicCacheData
+  >();
+
+  private updateMagicGeneration = ({
+    frameElement,
+    data,
+  }: {
+    frameElement: ExcalidrawIframeElement;
+    data: MagicCacheData;
+  }) => {
+    if (data.status === "pending") {
+      // We don't wanna persist pending state to storage. It should be in-app
+      // state only.
+      // Thus reset so that we prefer local cache (if there was some
+      // generationData set previously)
+      mutateElement(
+        frameElement,
+        { customData: { generationData: undefined } },
+        false,
+      );
+    } else {
+      mutateElement(
+        frameElement,
+        { customData: { generationData: data } },
+        false,
+      );
+    }
+    this.magicGenerations.set(frameElement.id, data);
+    this.onSceneUpdated();
+  };
+
+  private getTextFromElements(elements: readonly ExcalidrawElement[]) {
+    const text = elements
+      .reduce((acc: string[], element) => {
+        if (isTextElement(element)) {
+          acc.push(element.text);
+        }
+        return acc;
+      }, [])
+      .join("\n\n");
+    return text;
+  }
+
+  private async onMagicFrameGenerate(magicFrame: ExcalidrawMagicFrameElement) {
+    if (!this.OPENAI_KEY) {
+      this.setState({
+        openDialog: "magicSettings",
+      });
+      return;
+    }
+
+    const magicFrameChildren = elementsOverlappingBBox({
+      elements: this.scene.getNonDeletedElements(),
+      bounds: magicFrame,
+      type: "overlap",
+    }).filter((el) => !isMagicFrameElement(el));
+
+    if (!magicFrameChildren.length) {
+      this.setState({ errorMessage: "Cannot generate from an empty frame" });
+      return;
+    }
+
+    const frameElement = this.insertIframeElement({
+      sceneX: magicFrame.x + magicFrame.width + 30,
+      sceneY: magicFrame.y,
+      width: magicFrame.width,
+      height: magicFrame.height,
+    });
+
+    if (!frameElement) {
+      return;
+    }
+
+    this.updateMagicGeneration({
+      frameElement,
+      data: { status: "pending" },
+    });
+
+    this.setState({
+      selectedElementIds: { [frameElement.id]: true },
+    });
+
+    const blob = await exportToBlob({
+      elements: this.scene.getNonDeletedElements(),
+      appState: {
+        ...this.state,
+        exportBackground: true,
+        viewBackgroundColor: this.state.viewBackgroundColor,
+      },
+      exportingFrame: magicFrame,
+      files: this.files,
+    });
+
+    const dataURL = await getDataURL(blob);
+
+    const textFromFrameChildren = this.getTextFromElements(magicFrameChildren);
+
+    const result = await diagramToHTML({
+      image: dataURL,
+      apiKey: this.OPENAI_KEY,
+      text: textFromFrameChildren,
+      theme: this.state.theme,
+    });
+
+    if (!result.ok) {
+      console.error(result.error);
+      this.updateMagicGeneration({
+        frameElement,
+        data: {
+          status: "error",
+          code: "ERR_OAI",
+          message: result.error?.message || "Unknown error during generation",
+        },
+      });
+      return;
+    }
+
+    if (result.choices[0].message.content == null) {
+      this.updateMagicGeneration({
+        frameElement,
+        data: {
+          status: "error",
+          code: "ERR_OAI",
+          message: "Nothing genereated :(",
+        },
+      });
+      return;
+    }
+
+    const message = result.choices[0].message.content;
+
+    const html = message.slice(
+      message.indexOf("<!DOCTYPE html>"),
+      message.indexOf("</html>") + "</html>".length,
+    );
+
+    this.updateMagicGeneration({
+      frameElement,
+      data: { status: "done", html },
+    });
+  }
+
+  private onIframeSrcCopy(element: ExcalidrawIframeElement) {
+    if (element.customData?.generationData?.status === "done") {
+      copyTextToSystemClipboard(element.customData.generationData.html);
+      this.setToast({
+        message: "copied to clipboard",
+        closable: false,
+        duration: 1500,
+      });
+    }
+  }
+
+  private OPENAI_KEY: string | null = EditorLocalStorage.get(
+    EDITOR_LS_KEYS.OAI_API_KEY,
+  );
+  private OPENAI_KEY_IS_PERSISTED: boolean =
+    EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
+
+  private onOpenAIKeyChange = (openAIKey: string, shouldPersist: boolean) => {
+    this.OPENAI_KEY = openAIKey || null;
+    if (shouldPersist) {
+      const didPersist = EditorLocalStorage.set(
+        EDITOR_LS_KEYS.OAI_API_KEY,
+        openAIKey,
+      );
+      this.OPENAI_KEY_IS_PERSISTED = didPersist;
+    } else {
+      this.OPENAI_KEY_IS_PERSISTED = false;
+    }
+  };
+
+  private onMagicSettingsConfirm = (apiKey: string, shouldPersist: boolean) => {
+    this.onOpenAIKeyChange(apiKey, shouldPersist);
+
+    if (apiKey) {
+      const selectedElements = this.scene.getSelectedElements({
+        selectedElementIds: this.state.selectedElementIds,
+      });
+      if (selectedElements.length) {
+        this.onMagicButtonSelect();
+      }
+    } else {
+      this.OPENAI_KEY = null;
+    }
+  };
+
+  public onMagicButtonSelect = () => {
+    if (!this.OPENAI_KEY) {
+      this.setState({
+        openDialog: "magicSettings",
+      });
+      return;
+    }
+
+    const selectedElements = this.scene.getSelectedElements({
+      selectedElementIds: this.state.selectedElementIds,
+    });
+
+    if (selectedElements.length === 0) {
+      this.setActiveTool({ type: TOOL_TYPE.magicframe });
+    } else {
+      if (selectedElements.some((el) => isFrameLikeElement(el))) {
+        this.setActiveTool({ type: TOOL_TYPE.magicframe });
+        return;
+      }
+
+      let frame: ExcalidrawMagicFrameElement | null = null;
+      if (
+        selectedElements.length === 1 &&
+        isMagicFrameElement(selectedElements[0])
+      ) {
+        frame = selectedElements[0];
+      } else {
+        const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
+        const padding = 50;
+
+        frame = newMagicFrameElement({
+          ...FRAME_STYLE,
+          x: minX - padding,
+          y: minY - padding,
+          width: maxX - minX + padding * 2,
+          height: maxY - minY + padding * 2,
+          opacity: 100,
+          locked: false,
+        });
+      }
+
+      this.scene.addNewElement(frame);
+
+      for (const child of selectedElements) {
+        mutateElement(child, { frameId: frame.id });
+      }
+
+      this.setState({
+        selectedElementIds: { [frame.id]: true },
+      });
+
+      this.onMagicFrameGenerate(frame);
     }
   };
 
@@ -1878,9 +2372,26 @@ class App extends React.Component<AppProps, AppState> {
       this.onGestureEnd as any,
       false,
     );
+    document.removeEventListener(
+      EVENT.FULLSCREENCHANGE,
+      this.onFullscreenChange,
+    );
 
     window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
   }
+
+  /** generally invoked only if fullscreen was invoked programmatically */
+  private onFullscreenChange = () => {
+    if (
+      // points to the iframe element we fullscreened
+      !document.fullscreenElement &&
+      this.state.activeEmbeddable?.state === "active"
+    ) {
+      this.setState({
+        activeEmbeddable: null,
+      });
+    }
+  };
 
   private addEventListeners() {
     this.removeEventListeners();
@@ -1927,6 +2438,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    document.addEventListener(EVENT.FULLSCREENCHANGE, this.onFullscreenChange);
     document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
     document.addEventListener(EVENT.CUT, this.onCut);
     if (this.props.detectScroll) {
@@ -3163,7 +3675,7 @@ class App extends React.Component<AppProps, AppState> {
             });
             event.preventDefault();
             return;
-          } else if (isFrameElement(selectedElement)) {
+          } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
               editingFrame: selectedElement.id,
             });
@@ -3873,7 +4385,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
-      if (isEmbeddableElement(hitElement)) {
+      if (isIframeLikeElement(hitElement)) {
         this.setState({
           activeEmbeddable: { element: hitElement, state: "active" },
         });
@@ -4011,9 +4523,9 @@ class App extends React.Component<AppProps, AppState> {
     y: number;
   }) => {
     const frames = this.scene
-      .getNonDeletedFrames()
-      .filter((frame) =>
-        isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
+      .getNonDeletedFramesLikes()
+      .filter((frame): frame is ExcalidrawFrameLikeElement =>
+        isCursorInFrame(sceneCoords, frame),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
@@ -4374,8 +4886,8 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           if (
             hitElement &&
-            isEmbeddableElement(hitElement) &&
-            this.isEmbeddableCenter(
+            isIframeLikeElement(hitElement) &&
+            this.isIframeLikeElementCenter(
               hitElement,
               event,
               scenePointerX,
@@ -4783,8 +5295,14 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
-    } else if (this.state.activeTool.type === "frame") {
-      this.createFrameElementOnPointerDown(pointerDownState);
+    } else if (
+      this.state.activeTool.type === TOOL_TYPE.frame ||
+      this.state.activeTool.type === TOOL_TYPE.magicframe
+    ) {
+      this.createFrameElementOnPointerDown(
+        pointerDownState,
+        this.state.activeTool.type,
+      );
     } else if (this.state.activeTool.type === "laser") {
       this.laserPathManager.startPath(
         pointerDownState.lastCoords.x,
@@ -4848,8 +5366,8 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer.y,
       );
       if (
-        isEmbeddableElement(hitElement) &&
-        this.isEmbeddableCenter(
+        isIframeLikeElement(hitElement) &&
+        this.isIframeLikeElementCenter(
           hitElement,
           event,
           scenePointer.x,
@@ -4878,7 +5396,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       if (
         clicklength < 300 &&
-        this.hitLinkElement.type === "embeddable" &&
+        isIframeLikeElement(this.hitLinkElement) &&
         !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
           scenePointer.x,
           scenePointer.y,
@@ -5358,8 +5876,9 @@ class App extends React.Component<AppProps, AppState> {
                   element && previouslySelectedElements.push(element);
                 });
 
-                // if hitElement is frame, deselect all of its elements if they are selected
-                if (hitElement.type === "frame") {
+                // if hitElement is frame-like, deselect all of its elements
+                // if they are selected
+                if (isFrameLikeElement(hitElement)) {
                   getFrameChildren(
                     previouslySelectedElements,
                     hitElement.id,
@@ -5389,7 +5908,7 @@ class App extends React.Component<AppProps, AppState> {
                           gid,
                         ),
                       )
-                      .filter((element) => element.type === "frame")
+                      .filter((element) => isFrameLikeElement(element))
                       .map((frame) => frame.id),
                   );
 
@@ -5582,8 +6101,52 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  public insertIframeElement = ({
+    sceneX,
+    sceneY,
+    width,
+    height,
+  }: {
+    sceneX: number;
+    sceneY: number;
+    width: number;
+    height: number;
+  }) => {
+    const [gridX, gridY] = getGridPoint(
+      sceneX,
+      sceneY,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.state.gridSize,
+    );
+
+    const element = newIframeElement({
+      type: "iframe",
+      x: gridX,
+      y: gridY,
+      strokeColor: "transparent",
+      backgroundColor: "transparent",
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      roundness: this.getCurrentItemRoundness("iframe"),
+      opacity: this.state.currentItemOpacity,
+      locked: false,
+      width,
+      height,
+    });
+
+    this.scene.replaceAllElements([
+      ...this.scene.getElementsIncludingDeleted(),
+      element,
+    ]);
+
+    return element;
+  };
+
   //create rectangle element with youtube top left on nearest grid point width / hight 640/360
-  private insertEmbeddableElement = ({
+  public insertEmbeddableElement = ({
     sceneX,
     sceneY,
     link,
@@ -5623,8 +6186,8 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness("embeddable"),
       opacity: this.state.currentItemOpacity,
       locked: false,
-      width: embedLink.aspectRatio.w,
-      height: embedLink.aspectRatio.h,
+      width: embedLink.intrinsicSize.w,
+      height: embedLink.intrinsicSize.h,
       link,
       validated: null,
     });
@@ -5812,6 +6375,7 @@ class App extends React.Component<AppProps, AppState> {
       | "rectangle"
       | "diamond"
       | "ellipse"
+      | "iframe"
       | "embeddable",
   ) {
     return this.state.currentItemRoundness === "round"
@@ -5886,6 +6450,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private createFrameElementOnPointerDown = (
     pointerDownState: PointerDownState,
+    type: Extract<ToolType, "frame" | "magicframe">,
   ): void => {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
@@ -5895,13 +6460,18 @@ class App extends React.Component<AppProps, AppState> {
         : this.state.gridSize,
     );
 
-    const frame = newFrameElement({
+    const constructorOpts = {
       x: gridX,
       y: gridY,
       opacity: this.state.currentItemOpacity,
       locked: false,
       ...FRAME_STYLE,
-    });
+    } as const;
+
+    const frame =
+      type === TOOL_TYPE.magicframe
+        ? newMagicFrameElement(constructorOpts)
+        : newFrameElement(constructorOpts);
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
@@ -6171,7 +6741,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         const selectedElementsHasAFrame = selectedElements.find((e) =>
-          isFrameElement(e),
+          isFrameLikeElement(e),
         );
         const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
         this.setState({
@@ -6940,7 +7510,7 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (draggingElement.type === "frame") {
+        if (isFrameLikeElement(draggingElement)) {
           const elementsInsideFrame = getElementsInNewFrame(
             this.scene.getElementsIncludingDeleted(),
             draggingElement,
@@ -6983,9 +7553,9 @@ class App extends React.Component<AppProps, AppState> {
 
         const selectedFrames = this.scene
           .getSelectedElements(this.state)
-          .filter(
-            (element) => element.type === "frame",
-          ) as ExcalidrawFrameElement[];
+          .filter((element): element is ExcalidrawFrameLikeElement =>
+            isFrameLikeElement(element),
+          );
 
         for (const frame of selectedFrames) {
           nextElements = replaceAllElementsInFrame(
@@ -7301,8 +7871,8 @@ class App extends React.Component<AppProps, AppState> {
           this.lastPointerDownEvent.timeStamp <
           300 &&
         gesture.pointers.size <= 1 &&
-        isEmbeddableElement(hitElement) &&
-        this.isEmbeddableCenter(
+        isIframeLikeElement(hitElement) &&
+        this.isIframeLikeElementCenter(
           hitElement,
           this.lastPointerUpEvent,
           pointerDownState.origin.x,
@@ -8199,11 +8769,14 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeSuggestBindingForAll([draggingElement]);
 
       // highlight elements that are to be added to frames on frames creation
-      if (this.state.activeTool.type === "frame") {
+      if (
+        this.state.activeTool.type === TOOL_TYPE.frame ||
+        this.state.activeTool.type === TOOL_TYPE.magicframe
+      ) {
         this.setState({
           elementsToHighlight: getElementsInResizingFrame(
             this.scene.getNonDeletedElements(),
-            draggingElement as ExcalidrawFrameElement,
+            draggingElement as ExcalidrawFrameLikeElement,
             this.state,
           ),
         });
@@ -8217,8 +8790,9 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const selectedFrames = selectedElements.filter(
-      (element) => element.type === "frame",
-    ) as ExcalidrawFrameElement[];
+      (element): element is ExcalidrawFrameLikeElement =>
+        isFrameLikeElement(element),
+    );
 
     const transformHandleType = pointerDownState.resize.handleType;
 

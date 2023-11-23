@@ -8,7 +8,7 @@ import { Bounds, getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 import { InteractiveCanvasAppState, Zoom } from "../types";
 import { isTextElement } from ".";
-import { isFrameElement, isLinearElement } from "./typeChecks";
+import { isFrameLikeElement, isLinearElement } from "./typeChecks";
 import { DEFAULT_SPACING } from "../renderer/renderScene";
 
 export type TransformHandleDirection =
@@ -257,7 +257,7 @@ export const getTransformHandles = (
     }
   } else if (isTextElement(element)) {
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
-  } else if (isFrameElement(element)) {
+  } else if (isFrameLikeElement(element)) {
     omitSides = {
       rotation: true,
     };

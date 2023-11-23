@@ -9,7 +9,10 @@ import {
   EXPORT_DATA_TYPES,
   MIME_TYPES,
 } from "./constants";
-import { isInitializedImageElement } from "./element/typeChecks";
+import {
+  isFrameLikeElement,
+  isInitializedImageElement,
+} from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
@@ -124,7 +127,7 @@ export const serializeAsClipboardJSON = ({
   files: BinaryFiles | null;
 }) => {
   const framesToCopy = new Set(
-    elements.filter((element) => element.type === "frame"),
+    elements.filter((element) => isFrameLikeElement(element)),
   );
   let foundFile = false;
 

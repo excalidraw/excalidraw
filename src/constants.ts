@@ -80,6 +80,7 @@ export enum EVENT {
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
   MESSAGE = "message",
+  FULLSCREENCHANGE = "fullscreenchange",
 }
 
 export const YOUTUBE_STATES = {
@@ -344,4 +345,33 @@ export const DEFAULT_SIDEBAR = {
   defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;
 
-export const LIBRARY_DISABLED_TYPES = new Set(["embeddable", "image"] as const);
+export const LIBRARY_DISABLED_TYPES = new Set([
+  "iframe",
+  "embeddable",
+  "image",
+] as const);
+
+// use these constants to easily identify reference sites
+export const TOOL_TYPE = {
+  selection: "selection",
+  rectangle: "rectangle",
+  diamond: "diamond",
+  ellipse: "ellipse",
+  arrow: "arrow",
+  line: "line",
+  freedraw: "freedraw",
+  text: "text",
+  image: "image",
+  eraser: "eraser",
+  hand: "hand",
+  frame: "frame",
+  magicframe: "magicframe",
+  embeddable: "embeddable",
+  laser: "laser",
+} as const;
+
+export const EDITOR_LS_KEYS = {
+  OAI_API_KEY: "excalidraw-oai-api-key",
+  // legacy naming (non)scheme
+  PUBLISH_LIBRARY: "publish-library-data",
+} as const;

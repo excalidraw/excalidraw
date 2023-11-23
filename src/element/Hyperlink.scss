@@ -6,7 +6,7 @@
   justify-content: space-between;
   position: absolute;
   box-shadow: 0px 2px 4px 0 rgb(0 0 0 / 30%);
-  z-index: 100;
+  z-index: var(--zIndex-hyperlinkContainer);
   background: var(--island-bg-color);
   border-radius: var(--border-radius-md);
   box-sizing: border-box;

@@ -1,4 +1,4 @@
-import type { Point } from "../../types";
+import type { Point, ToolType } from "../../types";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -20,15 +20,14 @@ import {
   type TransformHandleDirection,
 } from "../../element/transformHandles";
 import { KEYS } from "../../keys";
-import { type ToolName } from "../queries/toolQueries";
 import { fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
 import {
-  isFrameElement,
   isLinearElement,
   isFreeDrawElement,
   isTextElement,
+  isFrameLikeElement,
 } from "../../element/typeChecks";
 import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { rotatePoint } from "../../math";
@@ -290,7 +289,7 @@ const transform = (
     ];
   } else {
     const [x1, y1, x2, y2] = getCommonBounds(elements);
-    const isFrameSelected = elements.some(isFrameElement);
+    const isFrameSelected = elements.some(isFrameLikeElement);
     const transformHandles = getTransformHandlesFromCoords(
       [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
       0,
@@ -345,7 +344,7 @@ const proxy = <T extends ExcalidrawElement>(
 };
 
 /** Tools that can be used to draw shapes */
-type DrawingToolName = Exclude<ToolName, "lock" | "selection" | "eraser">;
+type DrawingToolName = Exclude<ToolType, "lock" | "selection" | "eraser">;
 
 type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   ? ExcalidrawLinearElement
@@ -362,7 +361,7 @@ type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   : ExcalidrawElement;
 
 export class UI {
-  static clickTool = (toolName: ToolName) => {
+  static clickTool = (toolName: ToolType | "lock") => {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
   };
 

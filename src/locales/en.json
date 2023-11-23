@@ -11,6 +11,8 @@
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
     "copyText": "Copy to clipboard as text",
+    "copySource": "Copy source to clipboard",
+    "convertToCode": "Convert to code",
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Embeddable elements cannot be added to the library.",
+      "iframe": "IFrame elements cannot be added to the library.",
       "image": "Support for adding images to the library coming soon!"
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
@@ -240,11 +243,13 @@
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
+    "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw"
+    "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "magicSettings": "AI settings"
   },
   "headings": {
     "canvasActions": "Canvas actions",

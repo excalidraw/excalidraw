@@ -10,7 +10,7 @@ import { newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
-import { isBoundToContainer } from "../element/typeChecks";
+import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
 
@@ -20,7 +20,7 @@ const deleteSelectedElements = (
 ) => {
   const framesToBeDeleted = new Set(
     getSelectedElements(
-      elements.filter((el) => el.type === "frame"),
+      elements.filter((el) => isFrameLikeElement(el)),
       appState,
     ).map((el) => el.id),
   );

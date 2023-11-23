@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawElementType,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -68,6 +69,7 @@ export const AllowedExcalidrawActiveTools: Record<
   embeddable: true,
   hand: true,
   laser: false,
+  magicframe: false,
 };
 
 export type RestoredDataState = {
@@ -111,7 +113,7 @@ const restoreElementWithProperties = <
     // @ts-ignore TS complains here but type checks the call sites fine.
     keyof K
   > &
-    Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
+    Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> & {
     [PRECEDING_ELEMENT_KEY]?: string;
@@ -159,8 +161,9 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
-  if ("customData" in element) {
-    base.customData = element.customData;
+  if ("customData" in element || "customData" in extra) {
+    base.customData =
+      "customData" in extra ? extra.customData : element.customData;
   }
 
   if (PRECEDING_ELEMENT_KEY in element) {
@@ -273,7 +276,7 @@ const restoreElement = (
 
       return restoreElementWithProperties(element, {
         type:
-          (element.type as ExcalidrawElement["type"] | "draw") === "draw"
+          (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
         startBinding: repairBinding(element.startBinding),
@@ -289,15 +292,15 @@ const restoreElement = (
 
     // generic elements
     case "ellipse":
-      return restoreElementWithProperties(element, {});
     case "rectangle":
-      return restoreElementWithProperties(element, {});
     case "diamond":
+    case "iframe":
       return restoreElementWithProperties(element, {});
     case "embeddable":
       return restoreElementWithProperties(element, {
         validated: null,
       });
+    case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,

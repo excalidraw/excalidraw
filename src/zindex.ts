@@ -1,6 +1,6 @@
 import { bumpVersion } from "./element/mutateElement";
-import { isFrameElement } from "./element/typeChecks";
-import { ExcalidrawElement, ExcalidrawFrameElement } from "./element/types";
+import { isFrameLikeElement } from "./element/typeChecks";
+import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
@@ -107,7 +107,7 @@ const getTargetIndexAccountingForBinding = (
 
 const getContiguousFrameRangeElements = (
   allElements: readonly ExcalidrawElement[],
-  frameId: ExcalidrawFrameElement["id"],
+  frameId: ExcalidrawFrameLikeElement["id"],
 ) => {
   let rangeStart = -1;
   let rangeEnd = -1;
@@ -138,7 +138,7 @@ const getTargetIndex = (
    * Frame id if moving frame children.
    * If whole frame (including all children) is being moved, supply `null`.
    */
-  containingFrame: ExcalidrawFrameElement["id"] | null,
+  containingFrame: ExcalidrawFrameLikeElement["id"] | null,
 ) => {
   const sourceElement = elements[boundaryIndex];
 
@@ -189,7 +189,7 @@ const getTargetIndex = (
 
   if (
     !containingFrame &&
-    (nextElement.frameId || nextElement.type === "frame")
+    (nextElement.frameId || isFrameLikeElement(nextElement))
   ) {
     const frameElements = getContiguousFrameRangeElements(
       elements,
@@ -252,9 +252,9 @@ const shiftElementsByOne = (
     groupedIndices = groupedIndices.reverse();
   }
 
-  const selectedFrames = new Set<ExcalidrawFrameElement["id"]>(
+  const selectedFrames = new Set<ExcalidrawFrameLikeElement["id"]>(
     indicesToMove
-      .filter((idx) => elements[idx].type === "frame")
+      .filter((idx) => isFrameLikeElement(elements[idx]))
       .map((idx) => elements[idx].id),
   );
 
@@ -324,7 +324,7 @@ const shiftElementsToEnd = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
-  containingFrame: ExcalidrawFrameElement["id"] | null,
+  containingFrame: ExcalidrawFrameLikeElement["id"] | null,
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
@@ -413,7 +413,7 @@ function shiftElementsAccountingForFrames(
     elements: readonly ExcalidrawElement[],
     appState: AppState,
     direction: "left" | "right",
-    containingFrame: ExcalidrawFrameElement["id"] | null,
+    containingFrame: ExcalidrawFrameLikeElement["id"] | null,
     elementsToBeMoved?: readonly ExcalidrawElement[],
   ) => ExcalidrawElement[] | readonly ExcalidrawElement[],
 ) {
@@ -426,13 +426,13 @@ function shiftElementsAccountingForFrames(
 
   const frameAwareContiguousElementsToMove: {
     regularElements: ExcalidrawElement[];
-    frameChildren: Map<ExcalidrawFrameElement["id"], ExcalidrawElement[]>;
+    frameChildren: Map<ExcalidrawFrameLikeElement["id"], ExcalidrawElement[]>;
   } = { regularElements: [], frameChildren: new Map() };
 
-  const fullySelectedFrames = new Set<ExcalidrawFrameElement["id"]>();
+  const fullySelectedFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
 
   for (const element of allElements) {
-    if (elementsToMove.has(element.id) && isFrameElement(element)) {
+    if (elementsToMove.has(element.id) && isFrameLikeElement(element)) {
       fullySelectedFrames.add(element.id);
     }
   }
@@ -440,7 +440,7 @@ function shiftElementsAccountingForFrames(
   for (const element of allElements) {
     if (elementsToMove.has(element.id)) {
       if (
-        isFrameElement(element) ||
+        isFrameLikeElement(element) ||
         (element.frameId && fullySelectedFrames.has(element.frameId))
       ) {
         frameAwareContiguousElementsToMove.regularElements.push(element);

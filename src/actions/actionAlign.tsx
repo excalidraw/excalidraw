@@ -9,6 +9,7 @@ import {
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { getNonDeletedElements } from "../element";
+import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
@@ -28,7 +29,7 @@ const alignActionsPredicate = (
   return (
     selectedElements.length > 1 &&
     // TODO enable aligning frames when implemented properly
-    !selectedElements.some((el) => el.type === "frame")
+    !selectedElements.some((el) => isFrameLikeElement(el))
   );
 };
 

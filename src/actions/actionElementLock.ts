@@ -1,4 +1,5 @@
 import { newElementWith } from "../element/mutateElement";
+import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
@@ -51,7 +52,7 @@ export const actionToggleElementLock = register({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: false,
     });
-    if (selected.length === 1 && selected[0].type !== "frame") {
+    if (selected.length === 1 && !isFrameLikeElement(selected[0])) {
       return selected[0].locked
         ? "labels.elementLock.unlock"
         : "labels.elementLock.lock";
