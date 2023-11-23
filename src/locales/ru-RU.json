@@ -11,6 +11,8 @@
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
     "copyText": "Скопировать в буфер обмена как текст",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Переместить вперед",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "Не удалось вставить (невозможно прочитать из системного буфера обмена).",
@@ -240,11 +243,13 @@
     "link": "Добавить/обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
     "extraTools": "",
-    "mermaidToExcalidraw": "Из Mermaid в Excalidraw"
+    "mermaidToExcalidraw": "Из Mermaid в Excalidraw",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Операции холста",
