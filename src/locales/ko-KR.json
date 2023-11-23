@@ -11,6 +11,8 @@
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
     "copyText": "클립보드로 텍스트 복사",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
+      "iframe": "",
       "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
     },
     "asyncPasteFailedOnRead": "붙여넣는데 실패했습니다. (시스템 클립보드를 읽는데 실패했습니다)",
@@ -240,11 +243,13 @@
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
     "frame": "프레임 도구",
+    "magicframe": "",
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
-    "mermaidToExcalidraw": "Mermaid에서 불러오기"
+    "mermaidToExcalidraw": "Mermaid에서 불러오기",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "캔버스 동작",
