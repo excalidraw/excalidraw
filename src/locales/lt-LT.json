@@ -11,6 +11,8 @@
     "copyAsPng": "Kopijuoti į iškarpinę kaip PNG",
     "copyAsSvg": "Kopijuoti į iškarpinę kaip SVG",
     "copyText": "Kopijuoti į iškarpinę kaip tekstą",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Kelti priekio link",
     "sendToBack": "Nustumti į užnugarį",
     "bringToFront": "Iškelti į priekį",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Pridėti / Atnaujinti pasirinktos figūros nuorodą",
     "eraser": "Trintukas",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Veiksmai su drobe",
