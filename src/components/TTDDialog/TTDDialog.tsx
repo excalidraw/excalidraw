@@ -148,11 +148,14 @@ export const TTDDialogBase = withInternalFallback(
                         saveMermaidDataToStorage(mermaid);
 
                         setOnTextSubmitInProgess(false);
-                      } catch (error) {
+                      } catch (error: any) {
                         setOnTextSubmitInProgess(false);
-
-                        // TODO barnabasmolnar/hal-9000-tabs
-                        // error handling
+                        // Setting the error here again as onTextSubmit might
+                        // fail, which is outside of our control
+                        // if it's convertMermaidToExcalidraw that fails, then
+                        // the error is now set twice in quick succession
+                        // but that's probably fine, React should batch the updates
+                        setError(error.message);
                       }
                     },
                     label: "Generate",

@@ -747,8 +747,10 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
             <TTDDialog
               onTextSubmit={async (_) => {
                 console.info("submit");
-
-                return "dummy";
+                // sleep for 2s
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                throw new Error("error, go away now");
+                // return "dummy";
               }}
             />
           </Excalidraw>
