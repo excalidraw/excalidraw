@@ -11,6 +11,8 @@
     "copyAsPng": "Kopier til PNG",
     "copyAsSvg": "Kopier til utklippstavlen som SVG",
     "copyText": "Kopier til utklippstavlen som tekst",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Flytt framover",
     "sendToBack": "Send bakerst",
     "bringToFront": "Flytt forrest",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Innebygde elementer kan ikke legges til i biblioteket.",
+      "iframe": "",
       "image": "Støtte for å legge til bilder i biblioteket kommer snart!"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Legg til / oppdater link for en valgt figur",
     "eraser": "Viskelær",
     "frame": "Rammeverktøy",
+    "magicframe": "",
     "embeddable": "Nettinnbygging",
     "laser": "",
     "hand": "Hånd (panoreringsverktøy)",
     "extraTools": "Flere verktøy",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
