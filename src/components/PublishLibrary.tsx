@@ -8,6 +8,7 @@ import Trans from "./Trans";
 import { LibraryItems, LibraryItem, UIAppState } from "../types";
 import { exportToCanvas, exportToSvg } from "../packages/utils";
 import {
+  EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
   MIME_TYPES,
@@ -19,6 +20,7 @@ import { chunk } from "../utils";
 import DialogActionButton from "./DialogActionButton";
 import { CloseIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
 
 import "./PublishLibrary.scss";
 
@@ -30,34 +32,6 @@ interface PublishLibraryDataParams {
   twitterHandle: string;
   website: string;
 }
-
-const LOCAL_STORAGE_KEY_PUBLISH_LIBRARY = "publish-library-data";
-
-const savePublishLibDataToStorage = (data: PublishLibraryDataParams) => {
-  try {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_PUBLISH_LIBRARY,
-      JSON.stringify(data),
-    );
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
-};
-
-const importPublishLibDataFromStorage = () => {
-  try {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY_PUBLISH_LIBRARY);
-    if (data) {
-      return JSON.parse(data);
-    }
-  } catch (error: any) {
-    // Unable to access localStorage
-    console.error(error);
-  }
-
-  return null;
-};
 
 const generatePreviewImage = async (libraryItems: LibraryItems) => {
   const MAX_ITEMS_PER_ROW = 6;
@@ -255,7 +229,9 @@ const PublishLibrary = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const data = importPublishLibDataFromStorage();
+    const data = EditorLocalStorage.get<PublishLibraryDataParams>(
+      EDITOR_LS_KEYS.PUBLISH_LIBRARY,
+    );
     if (data) {
       setLibraryData(data);
     }
@@ -328,7 +304,7 @@ const PublishLibrary = ({
           if (response.ok) {
             return response.json().then(({ url }) => {
               // flush data from local storage
-              localStorage.removeItem(LOCAL_STORAGE_KEY_PUBLISH_LIBRARY);
+              EditorLocalStorage.delete(EDITOR_LS_KEYS.PUBLISH_LIBRARY);
               onSuccess({
                 url,
                 authorName: libraryData.authorName,
@@ -384,7 +360,7 @@ const PublishLibrary = ({
 
   const onDialogClose = useCallback(() => {
     updateItemsInStorage(clonedLibItems);
-    savePublishLibDataToStorage(libraryData);
+    EditorLocalStorage.set(EDITOR_LS_KEYS.PUBLISH_LIBRARY, libraryData);
     onClose();
   }, [clonedLibItems, onClose, updateItemsInStorage, libraryData]);
 
