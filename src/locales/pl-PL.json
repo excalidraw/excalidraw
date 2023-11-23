@@ -11,6 +11,8 @@
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
     "copyText": "Skopiuj do schowka jako tekst",
+    "copySource": "Skopiuj źródło do schowka",
+    "convertToCode": "Skonwertuj do kodu",
     "bringForward": "Przenieś wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
@@ -114,7 +116,7 @@
       "createEmbed": "Stwórz i osadź link",
       "label": "Łącze",
       "labelEmbed": "Podlinkuj i osadź",
-      "empty": "Brakujący link"
+      "empty": "Nie ustawiono linku"
     },
     "lineEditor": {
       "edit": "Edytuj linię",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementy osadzone nie mogą zostać dodane do biblioteki.",
+      "iframe": "Elementy IFrame nie mogą zostać dodane do biblioteki.",
       "image": "Dodawania obrazów do biblioteki nadejdzie wkrótce!"
     },
     "asyncPasteFailedOnRead": "Nie udało się wkleić (nie udało się odczytać ze schowka systemowego).",
@@ -240,11 +243,13 @@
     "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
     "frame": "Ramka",
+    "magicframe": "Wireframe do kodu",
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
-    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw"
+    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
+    "magicSettings": "Ustawienia AI"
   },
   "headings": {
     "canvasActions": "Narzędzia",
