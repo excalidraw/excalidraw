@@ -125,7 +125,7 @@ export const TTDDialogBase = withInternalFallback(
             <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
               <TTDDialogPanels>
                 <TTDDialogPanel
-                  label="Left"
+                  label="Text"
                   panelAction={{
                     action: async () => {
                       if (!onTextSubmit) {
@@ -166,7 +166,7 @@ export const TTDDialogBase = withInternalFallback(
                   <TTDDialogInput onChange={handleTextChange} input={text} />
                 </TTDDialogPanel>
                 <TTDDialogPanel
-                  label="Right"
+                  label="Preview"
                   panelAction={{
                     action: () => {
                       console.info("Panel action clicked");
