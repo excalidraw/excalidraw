@@ -13,7 +13,6 @@ type TunnelsContextValue = {
   DefaultSidebarTriggerTunnel: Tunnel;
   DefaultSidebarTabTriggersTunnel: Tunnel;
   OverwriteConfirmDialogTunnel: Tunnel;
-  TTDDialogTabTriggersTunnel: Tunnel;
   TTDDialogTriggerTunnel: Tunnel;
   jotaiScope: symbol;
 };
@@ -34,7 +33,6 @@ export const useInitializeTunnels = () => {
       DefaultSidebarTriggerTunnel: tunnel(),
       DefaultSidebarTabTriggersTunnel: tunnel(),
       OverwriteConfirmDialogTunnel: tunnel(),
-      TTDDialogTabTriggersTunnel: tunnel(),
       TTDDialogTriggerTunnel: tunnel(),
       jotaiScope: Symbol(),
     };

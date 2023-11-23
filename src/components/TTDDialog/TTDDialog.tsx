@@ -2,7 +2,6 @@ import { Dialog } from "../Dialog";
 import { useApp } from "../App";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import TTDDialogTabs from "./TTDDialogTabs";
-import { useTunnels } from "../../context/tunnels";
 import { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { useUIAppState } from "../../context/ui-appState";
 import { withInternalFallback } from "../hoc/withInternalFallback";
@@ -56,7 +55,6 @@ export const TTDDialogBase = withInternalFallback(
     __fallback?: boolean;
   }) => {
     const app = useApp();
-    const { TTDDialogTabTriggersTunnel } = useTunnels();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);
 
@@ -103,11 +101,9 @@ export const TTDDialogBase = withInternalFallback(
         {...rest}
       >
         <TTDDialogTabs>
-          <TTDDialogTabTriggersTunnel.Out />
-          {rest.__fallback && (
+          {rest.__fallback ? (
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
-          )}
-          {!rest.__fallback && (
+          ) : (
             <TTDDialogTabTriggers>
               <TTDDialogTabTrigger tab="text-to-diagram">
                 Text to Diagram
