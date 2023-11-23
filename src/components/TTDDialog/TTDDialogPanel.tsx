@@ -10,12 +10,14 @@ interface TTDDialogPanelProps {
     action: () => void;
     icon?: ReactNode;
   };
+  onTextSubmitInProgess?: boolean;
 }
 
 export const TTDDialogPanel = ({
   label,
   children,
   panelAction,
+  onTextSubmitInProgess,
 }: TTDDialogPanelProps) => {
   return (
     <div className="ttd-dialog-panel">
@@ -29,6 +31,7 @@ export const TTDDialogPanel = ({
         <Button
           className="ttd-dialog-panel-button"
           onSelect={panelAction ? panelAction.action : () => {}}
+          disabled={onTextSubmitInProgess}
         >
           {panelAction?.label}
           {panelAction?.icon && <span>{panelAction.icon}</span>}

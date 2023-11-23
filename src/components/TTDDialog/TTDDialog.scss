@@ -225,6 +225,12 @@ $verticalBreakpoint: 861px;
       &:active {
         background-color: var(--color-primary-darkest);
       }
+      // TODO barnabasmolnar/hal-9000-tabs
+      // proper disabled & loading state
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
       @media screen and (min-width: $verticalBreakpoint) {
         width: auto;

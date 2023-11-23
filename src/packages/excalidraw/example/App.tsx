@@ -532,8 +532,6 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
     );
   };
 
-  const someRandomDivRef = useRef<HTMLDivElement>(null);
-
   return (
     <div className="App" ref={appRef}>
       <h1>{appTitle}</h1>
@@ -740,55 +738,13 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               Toggle Custom Sidebar
             </Sidebar.Trigger>
             {renderMenu()}
-            <TTDDialog>
-              <TTDDialog.TabTriggers>
-                <TTDDialog.TabTrigger tab="mermaid">
-                  Mermaid
-                </TTDDialog.TabTrigger>
-                <TTDDialog.TabTrigger tab="example">
-                  example
-                </TTDDialog.TabTrigger>
-                <TTDDialog.TabTrigger tab="another">
-                  yet another tab yo
-                </TTDDialog.TabTrigger>
-              </TTDDialog.TabTriggers>
-              <TTDDialog.Tab tab="example">
-                <TTDDialog.Panels>
-                  <TTDDialog.Panel
-                    label="Left"
-                    panelAction={{
-                      action: () => {
-                        console.info("Panel action clicked");
-                      },
-                      label: "Panel action left",
-                      icon: <span>👋</span>,
-                    }}
-                  >
-                    <TTDDialog.Input
-                      onChange={console.info}
-                      input="Hello there!"
-                    />
-                  </TTDDialog.Panel>
-                  <TTDDialog.Panel
-                    label="Right"
-                    panelAction={{
-                      action: () => {
-                        console.info("Panel action clicked");
-                      },
-                      label: "Panel action right",
-                      icon: <span>👋</span>,
-                    }}
-                  >
-                    <TTDDialog.Output
-                      canvasRef={someRandomDivRef}
-                      errorMessage={null}
-                      loaded={false}
-                    />
-                  </TTDDialog.Panel>
-                </TTDDialog.Panels>
-              </TTDDialog.Tab>
-              <TTDDialog.Tab tab="another">another tab!</TTDDialog.Tab>
-            </TTDDialog>
+            <TTDDialog
+              onTextSubmit={async (_) => {
+                console.info("submit");
+
+                return "dummy";
+              }}
+            />
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}

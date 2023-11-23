@@ -1435,7 +1435,10 @@ class App extends React.Component<AppProps, AppState> {
                           onMagicSettingsConfirm={this.onMagicSettingsConfirm}
                         >
                           {this.props.children}
-                          <TTDDialog __fallback />
+                          {typeof this.state.openDialog !== "string" &&
+                            this.state.openDialog !== null && (
+                              <TTDDialog __fallback />
+                            )}
                         </LayerUI>
 
                         <div className="excalidraw-textEditorContainer" />
