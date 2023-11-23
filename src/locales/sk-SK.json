@@ -11,6 +11,8 @@
     "copyAsPng": "Kopírovať do schránky ako PNG",
     "copyAsSvg": "Kopírovať do schránky ako SVG",
     "copyText": "Kopírovať do schránky ako text",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Presunúť o úroveň dopredu",
     "sendToBack": "Presunúť dozadu",
     "bringToFront": "Presunúť dopredu",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Zapustené prvky nie je možné pridať do knižnice.",
+      "iframe": "",
       "image": "Podpora pre pridávanie obrázkov do knižnice bude dostupná už čoskoro!"
     },
     "asyncPasteFailedOnRead": "Vloženie sa nepodarilo (nebolo možné prečítať obsah schránky).",
@@ -240,11 +243,13 @@
     "link": "Pridať/ Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
     "frame": "Nástroj rám",
+    "magicframe": "",
     "embeddable": "Web Embed",
     "laser": "Laserový ukazovateľ",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje",
-    "mermaidToExcalidraw": "Mermaid do Excalidraw"
+    "mermaidToExcalidraw": "Mermaid do Excalidraw",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Akcie plátna",
