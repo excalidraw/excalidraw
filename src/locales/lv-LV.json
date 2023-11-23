@@ -11,6 +11,8 @@
     "copyAsPng": "Kopēt starpliktuvē kā PNG",
     "copyAsSvg": "Kopēt starpliktuvē kā SVG",
     "copyText": "Kopēt starpliktuvē kā tekstu",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Pārvietot vienu slāni augstāk",
     "sendToBack": "Pārvietot uz zemāko slāni",
     "bringToFront": "Pārvietot uz virsējo slāni",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Roka (panoramēšanas rīks)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
