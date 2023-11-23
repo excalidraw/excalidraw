@@ -225,11 +225,14 @@ $verticalBreakpoint: 861px;
       &:active {
         background-color: var(--color-primary-darkest);
       }
-      // TODO barnabasmolnar/hal-9000-tabs
-      // proper disabled & loading state
+
       &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+
+        &:hover {
+          background-color: var(--color-primary);
+        }
       }
 
       @media screen and (min-width: $verticalBreakpoint) {
@@ -242,9 +245,31 @@ $verticalBreakpoint: 861px;
       }
     }
 
-    span {
-      padding-left: 0.5rem;
-      display: flex;
+    position: relative;
+
+    div {
+      display: contents;
+
+      &.invisible {
+        visibility: hidden;
+      }
+
+      &.Spinner {
+        display: flex !important;
+        position: absolute;
+        inset: 0;
+
+        --spinner-color: white;
+
+        @at-root .excalidraw.theme--dark#{&} {
+          --spinner-color: var(--color-gray-100);
+        }
+      }
+
+      span {
+        padding-left: 0.5rem;
+        display: flex;
+      }
     }
   }
 }

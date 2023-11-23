@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Button } from "../Button";
 import clsx from "clsx";
+import Spinner from "../Spinner";
 
 interface TTDDialogPanelProps {
   label: string;
@@ -33,8 +34,11 @@ export const TTDDialogPanel = ({
           onSelect={panelAction ? panelAction.action : () => {}}
           disabled={onTextSubmitInProgess}
         >
-          {panelAction?.label}
-          {panelAction?.icon && <span>{panelAction.icon}</span>}
+          <div className={clsx({ invisible: onTextSubmitInProgess })}>
+            {panelAction?.label}
+            {panelAction?.icon && <span>{panelAction.icon}</span>}
+          </div>
+          {onTextSubmitInProgess && <Spinner />}
         </Button>
       </div>
     </div>
