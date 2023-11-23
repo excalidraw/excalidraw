@@ -232,6 +232,8 @@ export const selectGroupsFromGivenElements = (
     selectedGroupIds: {},
   };
 
+  const processedGroupIds = new Set<string>();
+
   for (const element of elements) {
     let groupIds = element.groupIds;
     if (appState.editingGroupId) {
@@ -242,10 +244,13 @@ export const selectGroupsFromGivenElements = (
     }
     if (groupIds.length > 0) {
       const groupId = groupIds[groupIds.length - 1];
-      nextAppState = {
-        ...nextAppState,
-        ...selectGroup(groupId, nextAppState, elements),
-      };
+      if (!processedGroupIds.has(groupId)) {
+        nextAppState = {
+          ...nextAppState,
+          ...selectGroup(groupId, nextAppState, elements),
+        };
+        processedGroupIds.add(groupId);
+      }
     }
   }
 

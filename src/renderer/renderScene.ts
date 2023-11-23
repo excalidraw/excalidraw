@@ -71,6 +71,7 @@ import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
   isFrameElement,
+  isFreeDrawElement,
   isLinearElement,
 } from "../element/typeChecks";
 import {
@@ -78,7 +79,7 @@ import {
   createPlaceholderEmbeddableLabel,
 } from "../element/embeddable";
 import {
-  elementOverlapsWithFrame,
+  elementsAreInBounds,
   getTargetFrame,
   isElementInFrame,
 } from "../frame";
@@ -945,102 +946,79 @@ const _renderStaticScene = ({
     );
   }
 
-  const groupsToBeAddedToFrame = new Set<string>();
+  // Paint visible elements with embeddables on top
+  const visibleNonEmbeddableOrLabelElements = visibleElements.filter(
+    (el) => !isEmbeddableOrLabel(el),
+  );
 
-  visibleElements.forEach((element) => {
-    if (
-      element.groupIds.length > 0 &&
-      appState.frameToHighlight &&
-      appState.selectedElementIds[element.id] &&
-      (elementOverlapsWithFrame(element, appState.frameToHighlight) ||
-        element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
-    ) {
-      element.groupIds.forEach((groupId) =>
-        groupsToBeAddedToFrame.add(groupId),
-      );
+  const visibleEmbeddableOrLabelElements = visibleElements.filter((el) =>
+    isEmbeddableOrLabel(el),
+  );
+
+  const visibleElementsToRender = [
+    ...visibleNonEmbeddableOrLabelElements,
+    ...visibleEmbeddableOrLabelElements,
+  ];
+
+  const _renderElement = (element: ExcalidrawElement) => {
+    try {
+      renderElement(element, rc, context, renderConfig, appState);
+
+      if (
+        isEmbeddableElement(element) &&
+        (isExporting || !element.validated) &&
+        element.width &&
+        element.height
+      ) {
+        const label = createPlaceholderEmbeddableLabel(element);
+        renderElement(label, rc, context, renderConfig, appState);
+      }
+
+      if (!isExporting) {
+        renderLinkIcon(element, context, appState);
+      }
+    } catch (error: any) {
+      console.error(error);
     }
-  });
+  };
 
-  // Paint visible elements
-  visibleElements
-    .filter((el) => !isEmbeddableOrLabel(el))
-    .forEach((element) => {
-      try {
-        const frameId = element.frameId || appState.frameToHighlight?.id;
+  const processedGroupIds = new Map<string, boolean>();
+  for (const element of visibleElementsToRender) {
+    const frameId = element.frameId || appState.frameToHighlight?.id;
 
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
-
-          const frame = getTargetFrame(element, appState);
-
-          // TODO do we need to check isElementInFrame here?
-          if (frame && isElementInFrame(element, elements, appState)) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(element, rc, context, renderConfig, appState);
-          context.restore();
-        } else {
-          renderElement(element, rc, context, renderConfig, appState);
-        }
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState);
-        }
-      } catch (error: any) {
-        console.error(error);
+    if (
+      frameId &&
+      appState.frameRendering.enabled &&
+      appState.frameRendering.clip
+    ) {
+      const targetFrame = getTargetFrame(element, appState);
+      // for perf:
+      // only clip elements that are not completely in the target frame
+      if (
+        targetFrame &&
+        !elementsAreInBounds(
+          [element],
+          targetFrame,
+          isFreeDrawElement(element)
+            ? element.strokeWidth * 8
+            : element.roughness * (isLinearElement(element) ? 8 : 4),
+        ) &&
+        isElementInFrame(element, elements, appState, {
+          targetFrame,
+          processedGroupIds,
+        })
+      ) {
+        context.save();
+        frameClip(targetFrame, context, renderConfig, appState);
+        _renderElement(element);
+        context.restore();
+      } else {
+        _renderElement(element);
       }
-    });
-
-  // render embeddables on top
-  visibleElements
-    .filter((el) => isEmbeddableOrLabel(el))
-    .forEach((element) => {
-      try {
-        const render = () => {
-          renderElement(element, rc, context, renderConfig, appState);
-
-          if (
-            isEmbeddableElement(element) &&
-            (isExporting || !element.validated) &&
-            element.width &&
-            element.height
-          ) {
-            const label = createPlaceholderEmbeddableLabel(element);
-            renderElement(label, rc, context, renderConfig, appState);
-          }
-          if (!isExporting) {
-            renderLinkIcon(element, context, appState);
-          }
-        };
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
-
-          const frame = getTargetFrame(element, appState);
-
-          if (frame && isElementInFrame(element, elements, appState)) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          render();
-          context.restore();
-        } else {
-          render();
-        }
-      } catch (error: any) {
-        console.error(error);
-      }
-    });
+    } else {
+      _renderElement(element);
+    }
+  }
 };
 
 /** throttled to animation framerate */
@@ -1145,7 +1123,7 @@ const renderTransformHandles = (
 
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
+  appState: InteractiveCanvasAppState | StaticCanvasAppState,
   elementProperties: {
     angle: number;
     elementX1: number;
@@ -1310,6 +1288,23 @@ const renderFrameHighlight = (
   context.restore();
 };
 
+const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
+  const [elementX1, elementY1, elementX2, elementY2] =
+    getCommonBounds(elements);
+  return {
+    angle: 0,
+    elementX1,
+    elementX2,
+    elementY1,
+    elementY2,
+    selectionColors: ["rgb(0,118,255)"],
+    dashed: false,
+    cx: elementX1 + (elementX2 - elementX1) / 2,
+    cy: elementY1 + (elementY2 - elementY1) / 2,
+    activeEmbeddable: false,
+  };
+};
+
 const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -1323,37 +1318,28 @@ const renderElementsBoxHighlight = (
     (element) => element.groupIds.length > 0,
   );
 
-  const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
-    const [elementX1, elementY1, elementX2, elementY2] =
-      getCommonBounds(elements);
-    return {
-      angle: 0,
-      elementX1,
-      elementX2,
-      elementY1,
-      elementY2,
-      selectionColors: ["rgb(0,118,255)"],
-      dashed: false,
-      cx: elementX1 + (elementX2 - elementX1) / 2,
-      cy: elementY1 + (elementY2 - elementY1) / 2,
-      activeEmbeddable: false,
-    };
-  };
+  const processedGroupIds = new Set<string>();
 
   const getSelectionForGroupId = (groupId: GroupId) => {
-    const groupElements = getElementsInGroup(elements, groupId);
-    return getSelectionFromElements(groupElements);
+    if (!processedGroupIds.has(groupId)) {
+      const groupElements = getElementsInGroup(elements, groupId);
+      processedGroupIds.add(groupId);
+      return getSelectionFromElements(groupElements);
+    }
+
+    return null;
   };
 
   Object.entries(selectGroupsFromGivenElements(elementsInGroups, appState))
     .filter(([id, isSelected]) => isSelected)
     .map(([id, isSelected]) => id)
     .map((groupId) => getSelectionForGroupId(groupId))
+    .filter((selection) => selection)
     .concat(
       individualElements.map((element) => getSelectionFromElements([element])),
     )
     .forEach((selection) =>
-      renderSelectionBorder(context, appState, selection),
+      renderSelectionBorder(context, appState, selection!),
     );
 };
 

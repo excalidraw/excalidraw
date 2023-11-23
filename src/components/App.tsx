@@ -6903,10 +6903,13 @@ class App extends React.Component<AppProps, AppState> {
               topLayerFrame &&
               !this.state.selectedElementIds[topLayerFrame.id]
             ) {
+              const processedGroupIds = new Map<string, boolean>();
               const elementsToAdd = selectedElements.filter(
                 (element) =>
                   element.frameId !== topLayerFrame.id &&
-                  isElementInFrame(element, nextElements, this.state),
+                  isElementInFrame(element, nextElements, this.state, {
+                    processedGroupIds,
+                  }),
               );
 
               if (this.state.editingGroupId) {
