@@ -11,6 +11,8 @@
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
     "copyText": "Копіювати в буфер обміну як текст",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Перемістити вперед",
     "sendToBack": "На задній план",
     "bringToFront": "На передній план",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Вбудовані елементи не можна додати в бібліотеку.",
+      "iframe": "",
       "image": "Підтримка додавання зображень в бібліотеку найближчим часом!"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Додати/Оновити посилання для вибраної форми",
     "eraser": "Очищувач",
     "frame": "Інструмент фрейму",
+    "magicframe": "",
     "embeddable": "Веб вкладення",
     "laser": "",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Дії з полотном",
