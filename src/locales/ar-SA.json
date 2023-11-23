@@ -11,6 +11,8 @@
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
     "copyText": "نسخ إلى الحافظة كنص",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "لا يمكن إضافة العناصر القابلة للتضمين في المكتبة.",
+      "iframe": "",
       "image": "سوف يتم دعم إضافة صور إلى المكتبة قريباً!"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
     "frame": "أداة الإطار",
+    "magicframe": "",
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من أﻷدوات",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
