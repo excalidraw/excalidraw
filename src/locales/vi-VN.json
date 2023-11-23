@@ -11,6 +11,8 @@
     "copyAsPng": "Sao chép vào bộ nhớ tạm dưới dạng PNG",
     "copyAsSvg": "Sao chép vào bộ nhớ tạm dưới dạng SVG",
     "copyText": "Sao chép vào bộ nhớ tạm dưới dạng chữ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Đưa ra trước",
     "sendToBack": "Hạ xuống dưới",
     "bringToFront": "Đưa ra đầu tiên",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Thêm/ Chỉnh sửa liên kết cho hình được chọn",
     "eraser": "Xóa",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Tay kéo",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Hành động canvas",
