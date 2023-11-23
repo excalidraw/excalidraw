@@ -11,6 +11,8 @@
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
     "copyText": "Copier dans le presse-papier en tant que texte",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Déplacer à l'arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Les éléments intégrés ne peuvent pas être ajoutés à la librairie.",
+      "iframe": "",
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
     },
     "asyncPasteFailedOnRead": "Impossible de coller (impossible de lire le presse-papiers système).",
@@ -240,11 +243,13 @@
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme",
     "frame": "Outil de cadre",
+    "magicframe": "",
     "embeddable": "Intégration Web",
     "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Actions du canevas",
