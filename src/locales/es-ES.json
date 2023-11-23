@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
     "copyText": "Copiar al portapapeles como texto",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "No se pudo pegar (no se pudo leer desde el portapapeles del sistema).",
@@ -240,11 +243,13 @@
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
     "eraser": "Borrar",
     "frame": "",
+    "magicframe": "",
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
     "hand": "Mano (herramienta de panoramización)",
     "extraTools": "Más herramientas",
-    "mermaidToExcalidraw": "Mermaid a Excalidraw"
+    "mermaidToExcalidraw": "Mermaid a Excalidraw",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
