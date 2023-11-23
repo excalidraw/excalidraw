@@ -7,6 +7,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { MarkNonNullable, ValueOf } from "../utility-types";
+import { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -97,6 +98,26 @@ export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
     validated: boolean | null;
   }>;
 
+export type ExcalidrawIframeElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "iframe";
+    // TODO move later to AI-specific frame
+    customData?: { generationData?: MagicCacheData };
+  }>;
+
+export type ExcalidrawIframeLikeElement =
+  | ExcalidrawIframeElement
+  | ExcalidrawEmbeddableElement;
+
+export type IframeData =
+  | {
+      intrinsicSize: { w: number; h: number };
+      warning?: string;
+    } & (
+      | { type: "video" | "generic"; link: string }
+      | { type: "document"; srcdoc: (theme: Theme) => string }
+    );
+
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
@@ -116,6 +137,15 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;
 };
+
+export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
+  type: "magicframe";
+  name: string | null;
+};
+
+export type ExcalidrawFrameLikeElement =
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement;
 
 /**
  * These are elements that don't have any additional properties.
@@ -138,6 +168,8 @@ export type ExcalidrawElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement
+  | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
@@ -170,8 +202,10 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement
+  | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement
-  | ExcalidrawFrameElement;
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
@@ -217,3 +251,5 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   }>;
 
 export type FileId = string & { _brand: "FileId" };
+
+export type ExcalidrawElementType = ExcalidrawElement["type"];

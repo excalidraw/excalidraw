@@ -4,12 +4,15 @@ import {
   useImperativeHandle,
   KeyboardEvent,
   useLayoutEffect,
+  useState,
 } from "react";
 import clsx from "clsx";
 
 import "./TextField.scss";
+import { Button } from "./Button";
+import { eyeIcon, eyeClosedIcon } from "./icons";
 
-export type TextFieldProps = {
+type TextFieldProps = {
   value?: string;
 
   onChange?: (value: string) => void;
@@ -22,6 +25,7 @@ export type TextFieldProps = {
 
   label?: string;
   placeholder?: string;
+  isPassword?: boolean;
 };
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -35,6 +39,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       readonly,
       selectOnRender,
       onKeyDown,
+      isPassword = false,
     },
     ref,
   ) => {
@@ -47,6 +52,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         innerRef.current?.select();
       }
     }, [selectOnRender]);
+
+    const [isVisible, setIsVisible] = useState<boolean>(true);
 
     return (
       <div
@@ -64,14 +71,22 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           })}
         >
           <input
+            type={isPassword && isVisible ? "password" : undefined}
             readOnly={readonly}
-            type="text"
             value={value}
             placeholder={placeholder}
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
           />
+          {isPassword && (
+            <Button
+              onSelect={() => setIsVisible(!isVisible)}
+              style={{ border: 0 }}
+            >
+              {isVisible ? eyeIcon : eyeClosedIcon}
+            </Button>
+          )}
         </div>
       </div>
     );
