@@ -11,6 +11,8 @@
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
     "copyText": "העתק ללוח כטקסט",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "שלח אחורה",
     "bringToFront": "העבר לחזית",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "הוספה/עדכון קישור של הצורה שנבחרה",
     "eraser": "מחק",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "יד (כלי הזזה)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "פעולות קנבאס",
