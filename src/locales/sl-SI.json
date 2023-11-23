@@ -11,6 +11,8 @@
     "copyAsPng": "Kopiraj v odložišče kot PNG",
     "copyAsSvg": "Kopiraj v odložišče kot SVG",
     "copyText": "Kopiraj v odložišče kot besedilo",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Postavi naprej",
     "sendToBack": "Pomakni v ozadje",
     "bringToFront": "Pomakni v ospredje",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Vdelani elementi ne morejo biti dodani v knjižnico.",
+      "iframe": "",
       "image": "Podpora za dodajanje slik v knjižnico prihaja kmalu!"
     },
     "asyncPasteFailedOnRead": "Ni bilo mogoče prilepiti (ni bilo mogoče brati iz sistemskega odložišča).",
@@ -240,11 +243,13 @@
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
+    "magicframe": "",
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
-    "mermaidToExcalidraw": "Mermaid v Excalidraw"
+    "mermaidToExcalidraw": "Mermaid v Excalidraw",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
