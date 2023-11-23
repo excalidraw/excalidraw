@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar al quichapapièrs coma PNG",
     "copyAsSvg": "Copiar al quichapapièrs coma SVG",
     "copyText": "Copiar al quichapapièrs coma tèxt",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "En avant",
     "sendToBack": "En arrièr",
     "bringToFront": "A l’endavant",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "Empegatge impossible (lectura impossibla a partir del quichapapièrs).",
@@ -240,11 +243,13 @@
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
     "frame": "Esplech quadre",
+    "magicframe": "",
     "embeddable": "Integracion Web",
     "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
-    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw"
+    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
