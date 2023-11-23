@@ -11,6 +11,8 @@
     "copyAsPng": "Nɣel ɣer tecfawit am PNG",
     "copyAsSvg": "Nɣel ɣer tecfawit am SVG",
     "copyText": "Nɣel ɣer tecfawit am uḍris",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Awi ɣer sdat",
     "sendToBack": "Awi s agilal",
     "bringToFront": "Err ɣer deffir",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
     "eraser": "Sfeḍ",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Afus (afecku n usmutti n tmuɣli)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
