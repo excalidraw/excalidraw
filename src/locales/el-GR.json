@@ -11,6 +11,8 @@
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
     "copyText": "Αντιγραφή στο πρόχειρο ως κείμενο",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Στο προσκήνιο",
     "sendToBack": "Ένα επίπεδο πίσω",
     "bringToFront": "Ένα επίπεδο μπροστά",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Προσθήκη/ Ενημέρωση συνδέσμου για ένα επιλεγμένο σχήμα",
     "eraser": "Γόμα",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",
