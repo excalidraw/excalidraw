@@ -11,6 +11,8 @@
     "copyAsPng": "Panoya PNG olarak kopyala",
     "copyAsSvg": "Panoya SVG olarak kopyala",
     "copyText": "Panoya metin olarak kopyala",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Bir öne getir",
     "sendToBack": "Arkaya gönder",
     "bringToFront": "En öne getir",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": "Resimleri kütüphaneye ekleme desteği yakında geliyor!"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Seçilen şekil için bağlantı Ekle/Güncelle",
     "eraser": "Silgi",
     "frame": "Çerçeve aracı",
+    "magicframe": "",
     "embeddable": "Web Yerleştirme",
     "laser": "Lazer işaretçisi",
     "hand": "",
     "extraTools": "Daha fazla araç",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Tuval eylemleri",
