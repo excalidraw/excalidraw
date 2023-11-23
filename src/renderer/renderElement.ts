@@ -594,7 +594,8 @@ export const renderElement = (
   appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
-    case "frame": {
+    case "frame":
+    case "magicframe": {
       if (appState.frameRendering.enabled && appState.frameRendering.outline) {
         context.save();
         context.translate(
@@ -1252,7 +1253,8 @@ export const renderElementToSvg = (
       break;
     }
     // frames are not rendered and only acts as a container
-    case "frame": {
+    case "frame":
+    case "magicframe": {
       if (
         renderConfig.frameRendering.enabled &&
         renderConfig.frameRendering.outline

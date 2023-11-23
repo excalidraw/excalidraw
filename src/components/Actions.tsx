@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ExcalidrawElementType } from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "../components/App";
 import {
@@ -79,7 +79,8 @@ export const SelectedShapeActions = ({
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
 
-  let commonSelectedType: string | null = targetElements[0]?.type || null;
+  let commonSelectedType: ExcalidrawElementType | null =
+    targetElements[0]?.type || null;
 
   for (const element of targetElements) {
     if (element.type !== commonSelectedType) {
@@ -94,7 +95,8 @@ export const SelectedShapeActions = ({
         {((hasStrokeColor(appState.activeTool.type) &&
           appState.activeTool.type !== "image" &&
           commonSelectedType !== "image" &&
-          commonSelectedType !== "frame") ||
+          commonSelectedType !== "frame" &&
+          commonSelectedType !== "magicframe") ||
           targetElements.some((element) => hasStrokeColor(element.type))) &&
           renderAction("changeStrokeColor")}
       </div>

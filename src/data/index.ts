@@ -3,10 +3,11 @@ import {
   copyTextToSystemClipboard,
 } from "../clipboard";
 import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
-import { getNonDeletedElements, isFrameElement } from "../element";
+import { getNonDeletedElements } from "../element";
+import { isFrameLikeElement } from "../element/typeChecks";
 import {
   ExcalidrawElement,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { t } from "../i18n";
@@ -38,7 +39,7 @@ export const prepareElementsForExport = (
     exportSelectionOnly &&
     isSomeElementSelected(elements, { selectedElementIds });
 
-  let exportingFrame: ExcalidrawFrameElement | null = null;
+  let exportingFrame: ExcalidrawFrameLikeElement | null = null;
   let exportedElements = isExportingSelection
     ? getSelectedElements(
         elements,
@@ -50,7 +51,10 @@ export const prepareElementsForExport = (
     : elements;
 
   if (isExportingSelection) {
-    if (exportedElements.length === 1 && isFrameElement(exportedElements[0])) {
+    if (
+      exportedElements.length === 1 &&
+      isFrameLikeElement(exportedElements[0])
+    ) {
       exportingFrame = exportedElements[0];
       exportedElements = elementsOverlappingBBox({
         elements,
@@ -93,7 +97,7 @@ export const exportCanvas = async (
     viewBackgroundColor: string;
     name: string;
     fileHandle?: FileSystemHandle | null;
-    exportingFrame: ExcalidrawFrameElement | null;
+    exportingFrame: ExcalidrawFrameLikeElement | null;
   },
 ) => {
   if (elements.length === 0) {

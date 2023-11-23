@@ -6,11 +6,7 @@ import {
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import {
-  FontFamilyValues,
-  FontString,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
+import { FontFamilyValues, FontString } from "./element/types";
 import { ActiveTool, AppState, ToolType, Zoom } from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { ResolutionType } from "./utility-types";
@@ -819,19 +815,6 @@ export const composeEventHandlers = <E>(
       return ourEventHandler?.(event);
     }
   };
-};
-
-export const isOnlyExportingSingleFrame = (
-  elements: readonly NonDeletedExcalidrawElement[],
-) => {
-  const frames = elements.filter((element) => element.type === "frame");
-
-  return (
-    frames.length === 1 &&
-    elements.every(
-      (element) => element.type === "frame" || element.frameId === frames[0].id,
-    )
-  );
 };
 
 /**

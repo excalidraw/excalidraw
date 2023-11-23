@@ -16,6 +16,8 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
   RoundnessType,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawElementType,
 } from "./types";
 
 export const isGenericElement = (
@@ -61,6 +63,15 @@ export const isFrameElement = (
   return element != null && element.type === "frame";
 };
 
+export const isFrameLikeElement = (
+  element: ExcalidrawElement | null,
+): element is ExcalidrawFrameLikeElement => {
+  return (
+    element != null &&
+    (element.type === "frame" || element.type === "magicframe")
+  );
+};
+
 export const isFreeDrawElement = (
   element?: ExcalidrawElement | null,
 ): element is ExcalidrawFreeDrawElement => {
@@ -68,7 +79,7 @@ export const isFreeDrawElement = (
 };
 
 export const isFreeDrawElementType = (
-  elementType: ExcalidrawElement["type"],
+  elementType: ExcalidrawElementType,
 ): boolean => {
   return elementType === "freedraw";
 };
@@ -123,6 +134,7 @@ export const isBindableElement = (
       element.type === "image" ||
       element.type === "embeddable" ||
       element.type === "frame" ||
+      element.type === "magicframe" ||
       (element.type === "text" && !element.containerId))
   );
 };
@@ -144,7 +156,7 @@ export const isTextBindableContainer = (
 export const isExcalidrawElement = (
   element: any,
 ): element is ExcalidrawElement => {
-  const type: ExcalidrawElement["type"] | undefined = element?.type;
+  const type: ExcalidrawElementType | undefined = element?.type;
   if (!type) {
     return false;
   }
@@ -158,6 +170,7 @@ export const isExcalidrawElement = (
     case "freedraw":
     case "line":
     case "frame":
+    case "magicframe":
     case "image":
     case "selection": {
       return true;

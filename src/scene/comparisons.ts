@@ -3,8 +3,9 @@ import {
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
+import { ToolType } from "../types";
 
-export const hasBackground = (type: string) =>
+export const hasBackground = (type: ToolType | "custom") =>
   type === "rectangle" ||
   type === "embeddable" ||
   type === "ellipse" ||
@@ -12,10 +13,10 @@ export const hasBackground = (type: string) =>
   type === "line" ||
   type === "freedraw";
 
-export const hasStrokeColor = (type: string) =>
-  type !== "image" && type !== "frame";
+export const hasStrokeColor = (type: ToolType | "custom") =>
+  type !== "image" && type !== "frame" && type !== "magicframe";
 
-export const hasStrokeWidth = (type: string) =>
+export const hasStrokeWidth = (type: ToolType | "custom") =>
   type === "rectangle" ||
   type === "embeddable" ||
   type === "ellipse" ||
@@ -24,7 +25,7 @@ export const hasStrokeWidth = (type: string) =>
   type === "arrow" ||
   type === "line";
 
-export const hasStrokeStyle = (type: string) =>
+export const hasStrokeStyle = (type: ToolType | "custom") =>
   type === "rectangle" ||
   type === "embeddable" ||
   type === "ellipse" ||
@@ -32,14 +33,15 @@ export const hasStrokeStyle = (type: string) =>
   type === "arrow" ||
   type === "line";
 
-export const canChangeRoundness = (type: string) =>
+export const canChangeRoundness = (type: ToolType | "custom") =>
   type === "rectangle" ||
   type === "embeddable" ||
   type === "arrow" ||
   type === "line" ||
   type === "diamond";
 
-export const canHaveArrowheads = (type: string) => type === "arrow";
+export const canHaveArrowheads = (type: ToolType | "custom") =>
+  type === "arrow";
 
 export const getElementAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],

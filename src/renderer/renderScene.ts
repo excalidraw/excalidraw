@@ -16,7 +16,7 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -70,7 +70,7 @@ import {
 import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
-  isFrameElement,
+  isFrameLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
 import {
@@ -362,7 +362,7 @@ const renderLinearElementPointHighlight = (
 };
 
 const frameClip = (
-  frame: ExcalidrawFrameElement,
+  frame: ExcalidrawFrameLikeElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -515,7 +515,7 @@ const _renderInteractiveScene = ({
   }
 
   const isFrameSelected = selectedElements.some((element) =>
-    isFrameElement(element),
+    isFrameLikeElement(element),
   );
 
   // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
@@ -1244,6 +1244,7 @@ const renderBindingHighlightForBindableElement = (
     case "image":
     case "embeddable":
     case "frame":
+    case "magicframe":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1284,7 +1285,7 @@ const renderBindingHighlightForBindableElement = (
 const renderFrameHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  frame: NonDeleted<ExcalidrawFrameElement>,
+  frame: NonDeleted<ExcalidrawFrameLikeElement>,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
   const width = x2 - x1;

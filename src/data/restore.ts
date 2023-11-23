@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawElementType,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -68,6 +69,7 @@ export const AllowedExcalidrawActiveTools: Record<
   embeddable: true,
   hand: true,
   laser: false,
+  magicframe: false,
 };
 
 export type RestoredDataState = {
@@ -273,7 +275,7 @@ const restoreElement = (
 
       return restoreElementWithProperties(element, {
         type:
-          (element.type as ExcalidrawElement["type"] | "draw") === "draw"
+          (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
         startBinding: repairBinding(element.startBinding),
@@ -299,6 +301,7 @@ const restoreElement = (
         validated: null,
       });
     case "frame":
+    case "magicframe":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
       });

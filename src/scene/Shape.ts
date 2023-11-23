@@ -373,6 +373,7 @@ export const _generateElementShape = (
       return shape;
     }
     case "frame":
+    case "magicframe":
     case "text":
     case "image": {
       const shape: ElementShapes[typeof element.type] = null;

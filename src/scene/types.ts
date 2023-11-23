@@ -105,4 +105,5 @@ export type ElementShapes = {
   text: null;
   image: null;
   frame: null;
+  magicframe: null;
 };

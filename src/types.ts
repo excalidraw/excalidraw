@@ -15,8 +15,9 @@ import {
   ExcalidrawImageElement,
   Theme,
   StrokeRoundness,
-  ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawFrameLikeElement,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -102,6 +103,7 @@ export type ToolType =
   | "eraser"
   | "hand"
   | "frame"
+  | "magicframe"
   | "embeddable"
   | "laser";
 
@@ -190,7 +192,7 @@ export type AppState = {
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
-  frameToHighlight: NonDeleted<ExcalidrawFrameElement> | null;
+  frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
     name: boolean;
@@ -681,12 +683,14 @@ type FrameNameBounds = {
 };
 
 export type FrameNameBoundsCache = {
-  get: (frameElement: ExcalidrawFrameElement) => FrameNameBounds | null;
+  get: (
+    frameElement: ExcalidrawFrameLikeElement | ExcalidrawMagicFrameElement,
+  ) => FrameNameBounds | null;
   _cache: Map<
     string,
     FrameNameBounds & {
       zoom: AppState["zoom"]["value"];
-      versionNonce: ExcalidrawFrameElement["versionNonce"];
+      versionNonce: ExcalidrawFrameLikeElement["versionNonce"];
     }
   >;
 };

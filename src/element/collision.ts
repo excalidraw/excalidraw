@@ -27,7 +27,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   StrokeRoundness,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
 } from "./types";
 
 import {
@@ -42,6 +42,7 @@ import { AppState } from "../types";
 import {
   hasBoundTextElement,
   isEmbeddableElement,
+  isFrameLikeElement,
   isImageElement,
 } from "./typeChecks";
 import { isTextElement } from ".";
@@ -186,7 +187,7 @@ export const isPointHittingElementBoundingBox = (
   // by its frame, whether it has been selected or not
   // this logic here is not ideal
   // TODO: refactor it later...
-  if (element.type === "frame") {
+  if (isFrameLikeElement(element)) {
     return hitTestPointAgainstElement({
       element,
       point: [x, y],
@@ -282,7 +283,8 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
         "This should not happen, we need to investigate why it does.",
       );
       return false;
-    case "frame": {
+    case "frame":
+    case "magicframe": {
       // check distance to frame element first
       if (
         args.check(
@@ -316,6 +318,7 @@ export const distanceToBindableElement = (
     case "text":
     case "embeddable":
     case "frame":
+    case "magicframe":
       return distanceToRectangle(element, point);
     case "diamond":
       return distanceToDiamond(element, point);
@@ -347,7 +350,7 @@ const distanceToRectangle = (
     | ExcalidrawFreeDrawElement
     | ExcalidrawImageElement
     | ExcalidrawEmbeddableElement
-    | ExcalidrawFrameElement,
+    | ExcalidrawFrameLikeElement,
   point: Point,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(element, point);
@@ -664,6 +667,7 @@ export const determineFocusDistance = (
     case "text":
     case "embeddable":
     case "frame":
+    case "magicframe":
       ret = c / (hwidth * (nabs + q * mabs));
       break;
     case "diamond":
@@ -702,6 +706,7 @@ export const determineFocusPoint = (
     case "diamond":
     case "embeddable":
     case "frame":
+    case "magicframe":
       point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
       break;
     case "ellipse":
@@ -754,6 +759,7 @@ const getSortedElementLineIntersections = (
     case "diamond":
     case "embeddable":
     case "frame":
+    case "magicframe":
       const corners = getCorners(element);
       intersections = corners
         .flatMap((point, i) => {
@@ -789,7 +795,7 @@ const getCorners = (
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement
     | ExcalidrawEmbeddableElement
-    | ExcalidrawFrameElement,
+    | ExcalidrawFrameLikeElement,
   scale: number = 1,
 ): GA.Point[] => {
   const hx = (scale * element.width) / 2;
@@ -800,6 +806,7 @@ const getCorners = (
     case "text":
     case "embeddable":
     case "frame":
+    case "magicframe":
       return [
         GA.point(hx, hy),
         GA.point(hx, -hy),
@@ -949,7 +956,7 @@ export const findFocusPointForRectangulars = (
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement
     | ExcalidrawEmbeddableElement
-    | ExcalidrawFrameElement,
+    | ExcalidrawFrameLikeElement,
   // Between -1 and 1 for how far away should the focus point be relative
   // to the size of the element. Sign determines orientation.
   relativeDistance: number,

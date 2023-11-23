@@ -117,6 +117,15 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   name: string | null;
 };
 
+export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
+  type: "magicframe";
+  name: string | null;
+};
+
+export type ExcalidrawFrameLikeElement =
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement;
+
 /**
  * These are elements that don't have any additional properties.
  */
@@ -138,6 +147,7 @@ export type ExcalidrawElement =
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement
   | ExcalidrawEmbeddableElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
@@ -171,7 +181,8 @@ export type ExcalidrawBindableElement =
   | ExcalidrawTextElement
   | ExcalidrawImageElement
   | ExcalidrawEmbeddableElement
-  | ExcalidrawFrameElement;
+  | ExcalidrawFrameElement
+  | ExcalidrawMagicFrameElement;
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
@@ -217,3 +228,5 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   }>;
 
 export type FileId = string & { _brand: "FileId" };
+
+export type ExcalidrawElementType = ExcalidrawElement["type"];

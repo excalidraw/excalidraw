@@ -86,6 +86,7 @@ import {
   YOUTUBE_STATES,
   ZOOM_STEP,
   POINTER_EVENTS,
+  TOOL_TYPE,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -139,6 +140,7 @@ import {
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
+  newMagicFrameElement,
 } from "../element/newElement";
 import {
   hasBoundTextElement,
@@ -146,13 +148,14 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
-  isFrameElement,
+  isFrameLikeElement,
   isImageElement,
   isEmbeddableElement,
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
   isUsingAdaptiveRadius,
+  isFrameElement,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -167,8 +170,8 @@ import {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
-  ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
+  ExcalidrawFrameLikeElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -328,6 +331,7 @@ import {
   elementOverlapsWithFrame,
   updateFrameMembershipOfSelectedElements,
   isElementInFrame,
+  getFrameLikeTitle,
 } from "../frame";
 import {
   excludeElementsInFramesFromSelection,
@@ -1020,7 +1024,15 @@ class App extends React.Component<AppProps, AppState> {
 
     const isDarkTheme = this.state.theme === "dark";
 
-    return this.scene.getNonDeletedFrames().map((f, index) => {
+    let frameIndex = 0;
+    let magicFrameIndex = 0;
+
+    return this.scene.getNonDeletedFramesLikes().map((f) => {
+      if (isFrameElement(f)) {
+        frameIndex++;
+      } else {
+        magicFrameIndex++;
+      }
       if (
         !isElementInViewport(
           f,
@@ -1056,8 +1068,13 @@ class App extends React.Component<AppProps, AppState> {
 
       let frameNameJSX;
 
+      const frameName = getFrameLikeTitle(
+        f,
+        isFrameElement(f) ? frameIndex : magicFrameIndex,
+      );
+
       if (f.id === this.state.editingFrame) {
-        const frameNameInEdit = f.name == null ? `Frame ${index + 1}` : f.name;
+        const frameNameInEdit = frameName;
 
         frameNameJSX = (
           <input
@@ -1103,10 +1120,7 @@ class App extends React.Component<AppProps, AppState> {
           />
         );
       } else {
-        frameNameJSX =
-          f.name == null || f.name.trim() === ""
-            ? `Frame ${index + 1}`
-            : f.name.trim();
+        frameNameJSX = frameName;
       }
 
       return (
@@ -1372,7 +1386,7 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: ExcalidrawFrameElement | null },
+    opts: { exportingFrame: ExcalidrawFrameLikeElement | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -3163,7 +3177,7 @@ class App extends React.Component<AppProps, AppState> {
             });
             event.preventDefault();
             return;
-          } else if (isFrameElement(selectedElement)) {
+          } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
               editingFrame: selectedElement.id,
             });
@@ -4011,9 +4025,9 @@ class App extends React.Component<AppProps, AppState> {
     y: number;
   }) => {
     const frames = this.scene
-      .getNonDeletedFrames()
-      .filter((frame) =>
-        isCursorInFrame(sceneCoords, frame as ExcalidrawFrameElement),
+      .getNonDeletedFramesLikes()
+      .filter((frame): frame is ExcalidrawFrameLikeElement =>
+        isCursorInFrame(sceneCoords, frame),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
@@ -4783,8 +4797,14 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
-    } else if (this.state.activeTool.type === "frame") {
-      this.createFrameElementOnPointerDown(pointerDownState);
+    } else if (
+      this.state.activeTool.type === TOOL_TYPE.frame ||
+      this.state.activeTool.type === TOOL_TYPE.magicframe
+    ) {
+      this.createFrameElementOnPointerDown(
+        pointerDownState,
+        this.state.activeTool.type,
+      );
     } else if (this.state.activeTool.type === "laser") {
       this.laserPathManager.startPath(
         pointerDownState.lastCoords.x,
@@ -5358,8 +5378,9 @@ class App extends React.Component<AppProps, AppState> {
                   element && previouslySelectedElements.push(element);
                 });
 
-                // if hitElement is frame, deselect all of its elements if they are selected
-                if (hitElement.type === "frame") {
+                // if hitElement is frame-like, deselect all of its elements
+                // if they are selected
+                if (isFrameLikeElement(hitElement)) {
                   getFrameChildren(
                     previouslySelectedElements,
                     hitElement.id,
@@ -5389,7 +5410,7 @@ class App extends React.Component<AppProps, AppState> {
                           gid,
                         ),
                       )
-                      .filter((element) => element.type === "frame")
+                      .filter((element) => isFrameLikeElement(element))
                       .map((frame) => frame.id),
                   );
 
@@ -5886,6 +5907,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private createFrameElementOnPointerDown = (
     pointerDownState: PointerDownState,
+    type: Extract<ToolType, "frame" | "magicframe">,
   ): void => {
     const [gridX, gridY] = getGridPoint(
       pointerDownState.origin.x,
@@ -5895,13 +5917,18 @@ class App extends React.Component<AppProps, AppState> {
         : this.state.gridSize,
     );
 
-    const frame = newFrameElement({
+    const constructorOpts = {
       x: gridX,
       y: gridY,
       opacity: this.state.currentItemOpacity,
       locked: false,
       ...FRAME_STYLE,
-    });
+    } as const;
+
+    const frame =
+      type === TOOL_TYPE.magicframe
+        ? newMagicFrameElement(constructorOpts)
+        : newFrameElement(constructorOpts);
 
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
@@ -6171,7 +6198,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         const selectedElementsHasAFrame = selectedElements.find((e) =>
-          isFrameElement(e),
+          isFrameLikeElement(e),
         );
         const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
         this.setState({
@@ -6940,7 +6967,7 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (draggingElement.type === "frame") {
+        if (isFrameLikeElement(draggingElement)) {
           const elementsInsideFrame = getElementsInNewFrame(
             this.scene.getElementsIncludingDeleted(),
             draggingElement,
@@ -6983,9 +7010,9 @@ class App extends React.Component<AppProps, AppState> {
 
         const selectedFrames = this.scene
           .getSelectedElements(this.state)
-          .filter(
-            (element) => element.type === "frame",
-          ) as ExcalidrawFrameElement[];
+          .filter((element): element is ExcalidrawFrameLikeElement =>
+            isFrameLikeElement(element),
+          );
 
         for (const frame of selectedFrames) {
           nextElements = replaceAllElementsInFrame(
@@ -8199,11 +8226,14 @@ class App extends React.Component<AppProps, AppState> {
       this.maybeSuggestBindingForAll([draggingElement]);
 
       // highlight elements that are to be added to frames on frames creation
-      if (this.state.activeTool.type === "frame") {
+      if (
+        this.state.activeTool.type === TOOL_TYPE.frame ||
+        this.state.activeTool.type === TOOL_TYPE.magicframe
+      ) {
         this.setState({
           elementsToHighlight: getElementsInResizingFrame(
             this.scene.getNonDeletedElements(),
-            draggingElement as ExcalidrawFrameElement,
+            draggingElement as ExcalidrawFrameLikeElement,
             this.state,
           ),
         });
@@ -8217,8 +8247,9 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const selectedFrames = selectedElements.filter(
-      (element) => element.type === "frame",
-    ) as ExcalidrawFrameElement[];
+      (element): element is ExcalidrawFrameLikeElement =>
+        isFrameLikeElement(element),
+    );
 
     const transformHandleType = pointerDownState.resize.handleType;
 
