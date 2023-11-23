@@ -11,6 +11,8 @@
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
     "copyText": "लेखन के रूप में पटल पर कॉपी करें",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "सामने लाएं",
     "sendToBack": "पीछे भेजें",
     "bringToFront": "सामने लाएँ",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "चिपकाया नहीं जा सका (सिस्टम क्लिपबोर्ड से पढ़ा नहीं जा सका).",
@@ -240,11 +243,13 @@
     "link": "",
     "eraser": "रबड़",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसकाने का औज़ार)",
     "extraTools": "",
-    "mermaidToExcalidraw": "मर्मेड से एक्सकाली में"
+    "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
