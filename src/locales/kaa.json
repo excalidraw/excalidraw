@@ -11,6 +11,8 @@
     "copyAsPng": "Almasıw buferine PNG retinde kóshirip alıw",
     "copyAsSvg": "",
     "copyText": "",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "",
     "eraser": "Óshirgish",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "",
