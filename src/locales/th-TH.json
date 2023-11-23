@@ -11,6 +11,8 @@
     "copyAsPng": "คัดลองไปยังคลิปบอร์ดเป็น PNG",
     "copyAsSvg": "คัดลองไปยังคลิปบอร์ดเป็น SVG",
     "copyText": "คัดลองไปยังคลิปบอร์ดเป็นข้อความ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "นำขึ้นข้างบน",
     "sendToBack": "ย้ายไปข้างล่าง",
     "bringToFront": "นำขึ้นข้างหน้า",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "การเพิ่มองค์ประกอบที่ฝังยังไม่สามารถเพิ่มเข้าไปในไลบลารีได้",
+      "iframe": "",
       "image": "การสนับสนุนสำหรับเพิ่มรูปภาพลงในไลบลารีจะมาในเร็ว ๆ นี้"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "",
     "eraser": "ยางลบ",
     "frame": "",
+    "magicframe": "",
     "embeddable": "ฝังเว็บ",
     "laser": "",
     "hand": "",
     "extraTools": "เครื่องมืออื่นๆ",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "",
