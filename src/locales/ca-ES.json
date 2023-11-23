@@ -11,6 +11,8 @@
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
     "copyText": "Copia al porta-retalls com a text",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
     "bringToFront": "Porta al davant",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "",
-    "mermaidToExcalidraw": "De Mermaid a Excalidraw"
+    "mermaidToExcalidraw": "De Mermaid a Excalidraw",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
