@@ -11,6 +11,8 @@
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer naar klembord als SVG",
     "copyText": "Kopieer naar klembord als tekst",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Ingesloten elementen kunnen niet worden toegevoegd aan de bibliotheek.",
+      "iframe": "",
       "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "frame": "",
+    "magicframe": "",
     "embeddable": "Web insluiten",
     "laser": "",
     "hand": "",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
