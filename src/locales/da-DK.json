@@ -11,6 +11,8 @@
     "copyAsPng": "Kopier til klippebord som PNG",
     "copyAsSvg": "Kopier til klippebord som SVG",
     "copyText": "Kopiér til udklipsholder som tekst",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Flyt fremad",
     "sendToBack": "Placer bagest",
     "bringToFront": "Placer forrest",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
@@ -240,11 +243,13 @@
     "link": "",
     "eraser": "Slet",
     "frame": "Rammeværktøj",
+    "magicframe": "",
     "embeddable": "Web-indlejring",
     "laser": "Lasermarkør",
     "hand": "Hånd (panorering værktøj)",
     "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "",
