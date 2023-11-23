@@ -15,6 +15,7 @@ import {
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
+  ExcalidrawIframeElement,
 } from "../element/types";
 import {
   arrayToMap,
@@ -141,6 +142,16 @@ export const newEmbeddableElement = (
   return {
     ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
     validated: opts.validated,
+  };
+};
+
+export const newIframeElement = (
+  opts: {
+    type: "iframe";
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawIframeElement> => {
+  return {
+    ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
   };
 };
 

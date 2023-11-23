@@ -18,7 +18,6 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
-  ExcalidrawEmbeddableElement,
   ExcalidrawDiamondElement,
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
@@ -28,6 +27,7 @@ import {
   ExcalidrawLinearElement,
   StrokeRoundness,
   ExcalidrawFrameLikeElement,
+  ExcalidrawIframeLikeElement,
 } from "./types";
 
 import {
@@ -41,8 +41,8 @@ import { Drawable } from "roughjs/bin/core";
 import { AppState } from "../types";
 import {
   hasBoundTextElement,
-  isEmbeddableElement,
   isFrameLikeElement,
+  isIframeLikeElement,
   isImageElement,
 } from "./typeChecks";
 import { isTextElement } from ".";
@@ -65,7 +65,7 @@ const isElementDraggableFromInside = (
   const isDraggableFromInside =
     !isTransparent(element.backgroundColor) ||
     hasBoundTextElement(element) ||
-    isEmbeddableElement(element);
+    isIframeLikeElement(element);
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
   }
@@ -256,6 +256,7 @@ type HitTestArgs = {
 const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
   switch (args.element.type) {
     case "rectangle":
+    case "iframe":
     case "embeddable":
     case "image":
     case "text":
@@ -316,6 +317,7 @@ export const distanceToBindableElement = (
     case "rectangle":
     case "image":
     case "text":
+    case "iframe":
     case "embeddable":
     case "frame":
     case "magicframe":
@@ -349,7 +351,7 @@ const distanceToRectangle = (
     | ExcalidrawTextElement
     | ExcalidrawFreeDrawElement
     | ExcalidrawImageElement
-    | ExcalidrawEmbeddableElement
+    | ExcalidrawIframeLikeElement
     | ExcalidrawFrameLikeElement,
   point: Point,
 ): number => {
@@ -665,6 +667,7 @@ export const determineFocusDistance = (
     case "rectangle":
     case "image":
     case "text":
+    case "iframe":
     case "embeddable":
     case "frame":
     case "magicframe":
@@ -704,6 +707,7 @@ export const determineFocusPoint = (
     case "image":
     case "text":
     case "diamond":
+    case "iframe":
     case "embeddable":
     case "frame":
     case "magicframe":
@@ -757,6 +761,7 @@ const getSortedElementLineIntersections = (
     case "image":
     case "text":
     case "diamond":
+    case "iframe":
     case "embeddable":
     case "frame":
     case "magicframe":
@@ -794,7 +799,7 @@ const getCorners = (
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement
-    | ExcalidrawEmbeddableElement
+    | ExcalidrawIframeLikeElement
     | ExcalidrawFrameLikeElement,
   scale: number = 1,
 ): GA.Point[] => {
@@ -804,6 +809,7 @@ const getCorners = (
     case "rectangle":
     case "image":
     case "text":
+    case "iframe":
     case "embeddable":
     case "frame":
     case "magicframe":
@@ -955,7 +961,7 @@ export const findFocusPointForRectangulars = (
     | ExcalidrawImageElement
     | ExcalidrawDiamondElement
     | ExcalidrawTextElement
-    | ExcalidrawEmbeddableElement
+    | ExcalidrawIframeLikeElement
     | ExcalidrawFrameLikeElement,
   // Between -1 and 1 for how far away should the focus point be relative
   // to the size of the element. Sign determines orientation.

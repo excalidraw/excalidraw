@@ -3887,7 +3887,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
-      if (isEmbeddableElement(hitElement)) {
+      if (isIframeLikeElement(hitElement)) {
         this.setState({
           activeEmbeddable: { element: hitElement, state: "active" },
         });
@@ -4388,8 +4388,8 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           if (
             hitElement &&
-            isEmbeddableElement(hitElement) &&
-            this.isEmbeddableCenter(
+            isIframeLikeElement(hitElement) &&
+            this.isIframeLikeElementCenter(
               hitElement,
               event,
               scenePointerX,
@@ -4868,8 +4868,8 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer.y,
       );
       if (
-        isEmbeddableElement(hitElement) &&
-        this.isEmbeddableCenter(
+        isIframeLikeElement(hitElement) &&
+        this.isIframeLikeElementCenter(
           hitElement,
           event,
           scenePointer.x,
@@ -4898,7 +4898,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       if (
         clicklength < 300 &&
-        this.hitLinkElement.type === "embeddable" &&
+        isIframeLikeElement(this.hitLinkElement) &&
         !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
           scenePointer.x,
           scenePointer.y,

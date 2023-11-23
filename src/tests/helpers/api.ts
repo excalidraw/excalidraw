@@ -22,6 +22,7 @@ import {
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
+  newIframeElement,
   newImageElement,
   newMagicFrameElement,
 } from "../../element/newElement";
@@ -205,6 +206,12 @@ export class API {
           type: "embeddable",
           ...base,
           validated: null,
+        });
+        break;
+      case "iframe":
+        element = newIframeElement({
+          type: "iframe",
+          ...base,
         });
         break;
       case "text":

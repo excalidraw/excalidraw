@@ -27,10 +27,10 @@ import {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
-  ExcalidrawEmbeddableElement,
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
+  ExcalidrawIframeLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawMagicFrameElement,
@@ -63,7 +63,12 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "magicframe" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -71,7 +76,12 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "magicframe" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
               }
           )
@@ -95,7 +105,12 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "magicframe" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -103,7 +118,12 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "magicframe" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
               }
           )
@@ -139,7 +159,7 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      ExcalidrawEmbeddableElement | ExcalidrawFreeDrawElement
+      ExcalidrawIframeLikeElement | ExcalidrawFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -563,6 +583,7 @@ export const convertToExcalidrawElements = (
         break;
       }
       case "freedraw":
+      case "iframe":
       case "embeddable": {
         excalidrawElement = element;
         break;
