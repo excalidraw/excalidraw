@@ -109,7 +109,7 @@ export const TTDDialogBase = withInternalFallback(
           )}
           {!rest.__fallback && (
             <TTDDialogTabTriggers>
-              <TTDDialogTabTrigger tab="tdd">
+              <TTDDialogTabTrigger tab="text-to-diagram">
                 Text to Diagram
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
@@ -122,7 +122,7 @@ export const TTDDialogBase = withInternalFallback(
             />
           </TTDDialogTab>
           {!rest.__fallback && (
-            <TTDDialogTab className="ttd-dialog-content" tab="tdd">
+            <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
               <TTDDialogPanels>
                 <TTDDialogPanel
                   label="Left"

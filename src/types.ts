@@ -254,12 +254,7 @@ export interface AppState {
           | "generation" // when magicframe generate button is clicked
           | "settings"; // when AI settings dialog is explicitly invoked
       }
-    // TODO barnabasmolnar/hal-9000-tabs ˇˇ
-    // probably rethink this
-    // would be cleaner to have
-    // { name: "imageExport" } | { name: "help" } | ... { name: "ai", tab: string }
-    // not sure yet how much of a refactor/breaking change that would be
-    | { name: "ai"; tab: string };
+    | { name: "ttd"; tab: string };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *

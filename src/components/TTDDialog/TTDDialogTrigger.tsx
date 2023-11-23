@@ -5,7 +5,6 @@ import { useExcalidrawSetAppState } from "../App";
 
 export const TTDDialogTrigger = ({
   children,
-
   icon,
 }: {
   children: ReactNode;
@@ -18,7 +17,7 @@ export const TTDDialogTrigger = ({
     <TTDDialogTriggerTunnel.In>
       <DropdownMenu.Item
         onSelect={() => {
-          setAppState({ openDialog: { name: "ai", tab: "tdd" } });
+          setAppState({ openDialog: { name: "ttd", tab: "text-to-diagram" } });
         }}
         icon={icon}
       >
