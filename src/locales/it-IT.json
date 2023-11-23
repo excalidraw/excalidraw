@@ -11,6 +11,8 @@
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
     "copyText": "Copia negli appunti come testo",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Porta avanti",
     "sendToBack": "Manda in fondo",
     "bringToFront": "Porta in cima",
@@ -218,6 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
+      "iframe": "",
       "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
     },
     "asyncPasteFailedOnRead": "Impossibile incollare (non è possibile leggere dagli appunti di sistema).",
@@ -240,11 +243,13 @@
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
+    "magicframe": "",
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
