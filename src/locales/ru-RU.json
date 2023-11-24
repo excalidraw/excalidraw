@@ -11,8 +11,8 @@
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
     "copyText": "Скопировать в буфер обмена как текст",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Копировать источник в буфер обмена",
+    "convertToCode": "Преобразовать в код",
     "bringForward": "Переместить вперед",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -220,7 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
-      "iframe": "",
+      "iframe": "Элементы IFrame не могут быть добавлены в библиотеку.",
       "image": ""
     },
     "asyncPasteFailedOnRead": "Не удалось вставить (невозможно прочитать из системного буфера обмена).",
@@ -249,7 +249,7 @@
     "hand": "Рука (перемещение холста)",
     "extraTools": "",
     "mermaidToExcalidraw": "Из Mermaid в Excalidraw",
-    "magicSettings": ""
+    "magicSettings": "Параметры AI"
   },
   "headings": {
     "canvasActions": "Операции холста",
