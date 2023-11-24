@@ -397,7 +397,6 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { TTDDialog } from "./TTDDialog/TTDDialog";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1435,10 +1434,6 @@ class App extends React.Component<AppProps, AppState> {
                           onMagicSettingsConfirm={this.onMagicSettingsConfirm}
                         >
                           {this.props.children}
-                          {typeof this.state.openDialog !== "string" &&
-                            this.state.openDialog !== null && (
-                              <TTDDialog __fallback />
-                            )}
                         </LayerUI>
 
                         <div className="excalidraw-textEditorContainer" />

@@ -8,7 +8,6 @@ import { withInternalFallback } from "../hoc/withInternalFallback";
 import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
 import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
 import { TTDDialogTab } from "./TTDDialogTab";
-import "./TTDDialog.scss";
 import { t } from "../../i18n";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
@@ -24,22 +23,26 @@ import { NonDeletedExcalidrawElement } from "../../element/types";
 import { BinaryFiles } from "../../types";
 import { ArrowRightIcon } from "../icons";
 
+import "./TTDDialog.scss";
+
+const MAX_PROMPT_LENGTH = 1000;
+
 type MermaidDefinition = string;
 
-export const TTDDialog = ({
-  onTextSubmit,
-  __fallback,
-}: {
-  onTextSubmit?(i: string): Promise<string>;
-  __fallback?: boolean | undefined;
-}) => {
+export const TTDDialog = (
+  props:
+    | {
+        onTextSubmit(value: string): Promise<MermaidDefinition>;
+      }
+    | { __fallback: true },
+) => {
   const appState = useUIAppState();
 
-  if (typeof appState.openDialog === "string" || appState.openDialog === null) {
+  if (appState.openDialog?.name !== "ttd") {
     return null;
   }
 
-  return <TTDDialogBase onTextSubmit={onTextSubmit} __fallback={__fallback} />;
+  return <TTDDialogBase {...props} tab={appState.openDialog.tab} />;
 };
 
 /**
@@ -48,22 +51,64 @@ export const TTDDialog = ({
 export const TTDDialogBase = withInternalFallback(
   "TTDDialogBase",
   ({
-    onTextSubmit,
+    tab,
     ...rest
   }: {
-    onTextSubmit?(i: string): Promise<MermaidDefinition>;
-    __fallback?: boolean;
-  }) => {
+    tab: string;
+  } & (
+    | {
+        onTextSubmit(value: string): Promise<MermaidDefinition>;
+      }
+    | { __fallback: true }
+  )) => {
     const app = useApp();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);
 
     const [text, setText] = useState("");
+
+    const prompt = text.trim();
+
     const handleTextChange: ChangeEventHandler<HTMLTextAreaElement> = (
       event,
     ) => {
       setText(event.target.value);
     };
+
+    const onGenerate = async () => {
+      if (prompt.length > MAX_PROMPT_LENGTH || "__fallback" in rest) {
+        return;
+      }
+
+      try {
+        setOnTextSubmitInProgess(true);
+
+        const mermaid = await rest.onTextSubmit(prompt);
+
+        await convertMermaidToExcalidraw({
+          canvasRef: someRandomDivRef,
+          data,
+          mermaidToExcalidrawLib,
+          setError,
+          text: mermaid,
+        });
+
+        saveMermaidDataToStorage(mermaid);
+
+        setOnTextSubmitInProgess(false);
+      } catch (error: any) {
+        setOnTextSubmitInProgess(false);
+        // Setting the error here again as onTextSubmit might
+        // fail, which is outside of our control
+        // if it's convertMermaidToExcalidraw that fails, then
+        // the error is now set twice in quick succession
+        // but that's probably fine, React should batch the updates
+        setError(error.message);
+      }
+    };
+
+    const refOnGenerate = useRef(onGenerate);
+    refOnGenerate.current = onGenerate;
 
     const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
       useState<MermaidToExcalidrawLibProps>({
@@ -99,14 +144,15 @@ export const TTDDialogBase = withInternalFallback(
         size={1200}
         title=""
         {...rest}
+        autofocus={false}
       >
-        <TTDDialogTabs>
-          {rest.__fallback ? (
+        <TTDDialogTabs tab={tab}>
+          {"__fallback" in rest && rest.__fallback ? (
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
           ) : (
             <TTDDialogTabTriggers>
               <TTDDialogTabTrigger tab="text-to-diagram">
-                Text to Diagram
+                {t("labels.textToDiagram")}
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
             </TTDDialogTabTriggers>
@@ -117,49 +163,52 @@ export const TTDDialogBase = withInternalFallback(
               mermaidToExcalidrawLib={mermaidToExcalidrawLib}
             />
           </TTDDialogTab>
-          {!rest.__fallback && (
+          {!("__fallback" in rest) && (
             <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
+              <div className="ttd-dialog-desc">
+                Currently we use Mermaid as a middle step, so you'll get best
+                results if you describe a diagram, workflow, flow chart, and
+                similar.
+              </div>
               <TTDDialogPanels>
                 <TTDDialogPanel
-                  label="Text"
+                  label={t("labels.prompt")}
                   panelAction={{
-                    action: async () => {
-                      if (!onTextSubmit) {
-                        return;
-                      }
-
-                      try {
-                        setOnTextSubmitInProgess(true);
-
-                        const mermaid = await onTextSubmit(text);
-
-                        await convertMermaidToExcalidraw({
-                          canvasRef: someRandomDivRef,
-                          data,
-                          mermaidToExcalidrawLib,
-                          setError,
-                          text: mermaid,
-                        });
-
-                        saveMermaidDataToStorage(mermaid);
-
-                        setOnTextSubmitInProgess(false);
-                      } catch (error: any) {
-                        setOnTextSubmitInProgess(false);
-                        // Setting the error here again as onTextSubmit might
-                        // fail, which is outside of our control
-                        // if it's convertMermaidToExcalidraw that fails, then
-                        // the error is now set twice in quick succession
-                        // but that's probably fine, React should batch the updates
-                        setError(error.message);
-                      }
-                    },
+                    action: onGenerate,
                     label: "Generate",
                     icon: ArrowRightIcon,
                   }}
                   onTextSubmitInProgess={onTextSubmitInProgess}
+                  panelActionDisabled={prompt.length > MAX_PROMPT_LENGTH}
+                  renderRight={() => {
+                    const ratio = prompt.length / MAX_PROMPT_LENGTH;
+                    if (ratio > 0.8) {
+                      return (
+                        <div
+                          style={{
+                            marginLeft: "auto",
+                            fontSize: 12,
+                            fontFamily: "monospace",
+                            color:
+                              ratio > 1 ? "var(--color-danger)" : undefined,
+                          }}
+                        >
+                          Length: {prompt.length}/{MAX_PROMPT_LENGTH}
+                        </div>
+                      );
+                    }
+
+                    return null;
+                  }}
                 >
-                  <TTDDialogInput onChange={handleTextChange} input={text} />
+                  <TTDDialogInput
+                    onChange={handleTextChange}
+                    input={text}
+                    placeholder={"Describe what you want to see..."}
+                    onKeyboardSubmit={() => {
+                      refOnGenerate.current();
+                    }}
+                  />
                 </TTDDialogPanel>
                 <TTDDialogPanel
                   label="Preview"

@@ -84,7 +84,7 @@ const MermaidToExcalidraw = ({
 
   return (
     <>
-      <div className="dialog-mermaid-desc">
+      <div className="ttd-dialog-desc">
         <Trans
           i18nKey="mermaid.description"
           flowchartLink={(el) => (
@@ -101,6 +101,7 @@ const MermaidToExcalidraw = ({
         <TTDDialogPanel label={t("mermaid.syntax")}>
           <TTDDialogInput
             input={text}
+            placeholder={"Write Mermaid diagram defintion here..."}
             onChange={(event) => setText(event.target.value)}
           />
         </TTDDialogPanel>

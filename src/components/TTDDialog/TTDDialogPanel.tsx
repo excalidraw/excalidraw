@@ -11,14 +11,18 @@ interface TTDDialogPanelProps {
     action: () => void;
     icon?: ReactNode;
   };
+  panelActionDisabled?: boolean;
   onTextSubmitInProgess?: boolean;
+  renderRight?: () => ReactNode;
 }
 
 export const TTDDialogPanel = ({
   label,
   children,
   panelAction,
+  panelActionDisabled = false,
   onTextSubmitInProgess,
+  renderRight,
 }: TTDDialogPanelProps) => {
   return (
     <div className="ttd-dialog-panel">
@@ -28,11 +32,12 @@ export const TTDDialogPanel = ({
         className={clsx("ttd-dialog-panel-button-container", {
           invisible: !panelAction,
         })}
+        style={{ display: "flex", alignItems: "center" }}
       >
         <Button
           className="ttd-dialog-panel-button"
           onSelect={panelAction ? panelAction.action : () => {}}
-          disabled={onTextSubmitInProgess}
+          disabled={panelActionDisabled || onTextSubmitInProgess}
         >
           <div className={clsx({ invisible: onTextSubmitInProgess })}>
             {panelAction?.label}
@@ -40,6 +45,7 @@ export const TTDDialogPanel = ({
           </div>
           {onTextSubmitInProgess && <Spinner />}
         </Button>
+        {renderRight?.()}
       </div>
     </div>
   );

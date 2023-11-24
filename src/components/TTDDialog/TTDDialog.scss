@@ -37,6 +37,13 @@ $verticalBreakpoint: 861px;
     }
   }
 
+  .ttd-dialog-desc {
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+
   .ttd-dialog-tabs-root {
     width: 100%;
     height: 100%;
@@ -188,6 +195,23 @@ $verticalBreakpoint: 861px;
     @media screen and (min-width: $verticalBreakpoint) {
       .ttd-dialog-panel-button-container:not(.invisible) {
         margin-bottom: 0.5rem !important;
+      }
+    }
+
+    textarea {
+      height: 100%;
+      resize: none;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--dialog-border-color);
+      white-space: pre-wrap;
+      padding: 0.85rem;
+      box-sizing: border-box;
+      width: 100%;
+      font-family: monospace;
+
+      @media screen and (max-width: $verticalBreakpoint) {
+        width: auto;
+        height: 10rem;
       }
     }
   }

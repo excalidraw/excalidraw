@@ -9,7 +9,7 @@ export const TTDDialogTab = ({
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <RadixTabs.Content {...rest} value={tab} className="ttd-dialog-content">
+    <RadixTabs.Content {...rest} value={tab}>
       {children}
     </RadixTabs.Content>
   );

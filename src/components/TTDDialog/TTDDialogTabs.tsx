@@ -1,29 +1,31 @@
 import * as RadixTabs from "@radix-ui/react-tabs";
 import { ReactNode } from "react";
-import { useUIAppState } from "../../context/ui-appState";
 import { useExcalidrawSetAppState } from "../App";
 
-const TTDDialogTabs = ({ children, ...rest }: { children: ReactNode }) => {
-  const appState = useUIAppState();
+const TTDDialogTabs = ({
+  children,
+  tab,
+  ...rest
+}: {
+  children: ReactNode;
+  tab: string;
+}) => {
   const setAppState = useExcalidrawSetAppState();
-
-  if (typeof appState.openDialog === "string" || appState.openDialog === null) {
-    return null;
-  }
-
-  const { name } = appState.openDialog;
 
   return (
     <RadixTabs.Root
       className="ttd-dialog-tabs-root"
-      value={appState.openDialog.tab}
-      onValueChange={(tab) =>
-        setAppState((state) => ({
-          ...state,
-          // @ts-ignore
-          openDialog: { ...state.openDialog, name, tab },
-        }))
-      }
+      value={tab}
+      onValueChange={(
+        // at least in test enviros, `tab` can be `undefined`
+        tab: string | undefined,
+      ) => {
+        if (tab) {
+          setAppState({
+            openDialog: { name: "ttd", tab },
+          });
+        }
+      }}
       {...rest}
     >
       {children}

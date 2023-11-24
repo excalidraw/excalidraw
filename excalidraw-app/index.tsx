@@ -25,6 +25,8 @@ import {
   Excalidraw,
   defaultLang,
   LiveCollaborationTrigger,
+  TTDDialog,
+  TTDDialogTrigger,
 } from "../src/packages/excalidraw/index";
 import {
   AppState,
@@ -773,6 +775,27 @@ const ExcalidrawWrapper = () => {
           )}
         </OverwriteConfirmDialog>
         <AppFooter />
+        <TTDDialog
+          onTextSubmit={async (input) => {
+            const response = await fetch(
+              `${
+                import.meta.env.VITE_APP_AI_BACKEND
+              }/v1/ai/text-to-diagram/generate`,
+              {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ prompt: input }),
+              },
+            );
+
+            const { generatedResponse } = await response.json();
+            return generatedResponse;
+          }}
+        />
+        <TTDDialogTrigger />
         {isCollaborating && isOffline && (
           <div className="collab-offline-warning">
             {t("alerts.collabOfflineWarning")}
