@@ -11,8 +11,8 @@
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
     "copyText": "Copiere în memoria temporară ca text",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiere sursă în memoria temporară",
+    "convertToCode": "Convertire în cod",
     "bringForward": "Aducere în plan apropiat",
     "sendToBack": "Trimitere în ultimul plan",
     "bringToFront": "Aducere în prim plan",
@@ -220,7 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementele încorporabile nu pot fi adăugate la bibliotecă.",
-      "iframe": "",
+      "iframe": "Elementele iFrame nu pot fi adăugate la bibliotecă.",
       "image": "În curând vor putea fi adăugate imagini în bibliotecă!"
     },
     "asyncPasteFailedOnRead": "Lipirea nu a putut fi efectuată (nu s-a putut citit din memoria temporară a sistemului).",
@@ -243,13 +243,13 @@
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
     "frame": "",
-    "magicframe": "",
+    "magicframe": "Structură-de-fire la cod",
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": "",
     "mermaidToExcalidraw": "Mermaid la Excalidraw",
-    "magicSettings": ""
+    "magicSettings": "Setări IA"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
