@@ -11,8 +11,8 @@
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
     "copyText": "लेखन के रूप में पटल पर कॉपी करें",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "स्त्रोत को प्रति-फलक पे प्रतिलिपित करे.",
+    "convertToCode": "सांकेतिक लिपि में परिवर्तित करे",
     "bringForward": "सामने लाएं",
     "sendToBack": "पीछे भेजें",
     "bringToFront": "सामने लाएँ",
@@ -220,7 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
-      "iframe": "",
+      "iframe": "आयफ़्रेम तत्व समूहकोष में जोडा नहीं जा सका.",
       "image": ""
     },
     "asyncPasteFailedOnRead": "चिपकाया नहीं जा सका (सिस्टम क्लिपबोर्ड से पढ़ा नहीं जा सका).",
@@ -243,7 +243,7 @@
     "link": "",
     "eraser": "रबड़",
     "frame": "",
-    "magicframe": "",
+    "magicframe": "तारिक ढाँचें को सांकेतिक लिपि में",
     "embeddable": "",
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसकाने का औज़ार)",
