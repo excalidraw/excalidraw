@@ -75,8 +75,14 @@ export const TTDDialogBase = withInternalFallback(
       setText(event.target.value);
     };
 
+    const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
+
     const onGenerate = async () => {
-      if (prompt.length > MAX_PROMPT_LENGTH || "__fallback" in rest) {
+      if (
+        prompt.length > MAX_PROMPT_LENGTH ||
+        onTextSubmitInProgess ||
+        "__fallback" in rest
+      ) {
         return;
       }
 
@@ -132,8 +138,6 @@ export const TTDDialogBase = withInternalFallback(
     }>({ elements: [], files: null });
 
     const [error, setError] = useState(null);
-
-    const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
 
     return (
       <Dialog
