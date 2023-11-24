@@ -2,28 +2,14 @@ import { useState } from "react";
 import { Dialog } from "./Dialog";
 import { TextField } from "./TextField";
 import { MagicIcon, OpenAIIcon } from "./icons";
-
-import "./MagicSettings.scss";
 import { FilledButton } from "./FilledButton";
 import { CheckboxItem } from "./CheckboxItem";
 import { KEYS } from "../keys";
 import { useUIAppState } from "../context/ui-appState";
+import { InlineIcon } from "./InlineIcon";
+import { Paragraph } from "./Paragraph";
 
-const InlineButton = ({ icon }: { icon: JSX.Element }) => {
-  return (
-    <span
-      style={{
-        width: "1em",
-        margin: "0 0.5ex 0 0.5ex",
-        display: "inline-block",
-        lineHeight: 0,
-        verticalAlign: "middle",
-      }}
-    >
-      {icon}
-    </span>
-  );
-};
+import "./MagicSettings.scss";
 
 export const MagicSettings = (props: {
   openAIKey: string | null;
@@ -70,18 +56,17 @@ export const MagicSettings = (props: {
       className="MagicSettings"
       autofocus={false}
     >
-      <p
+      <Paragraph
         style={{
           display: "inline-flex",
           alignItems: "center",
           marginBottom: 0,
         }}
       >
-        For the diagram-to-code feature we use{" "}
-        <InlineButton icon={OpenAIIcon} />
+        For the diagram-to-code feature we use <InlineIcon icon={OpenAIIcon} />
         OpenAI.
-      </p>
-      <p>
+      </Paragraph>
+      <Paragraph>
         While the OpenAI API is in beta, its use is strictly limited — as such
         we require you use your own API key. You can create an{" "}
         <a
@@ -100,11 +85,11 @@ export const MagicSettings = (props: {
           generate your own API key
         </a>
         .
-      </p>
-      <p>
+      </Paragraph>
+      <Paragraph>
         Your OpenAI key does not leave the browser, and you can also set your
         own limit in your OpenAI account dashboard if needed.
-      </p>
+      </Paragraph>
       <TextField
         isRedacted
         value={keyInputValue}
@@ -117,22 +102,22 @@ export const MagicSettings = (props: {
         selectOnRender
         onKeyDown={(event) => event.key === KEYS.ENTER && onConfirm()}
       />
-      <p>
+      <Paragraph>
         By default, your API token is not persisted anywhere so you'll need to
         insert it again after reload. But, you can persist locally in your
         browser below.
-      </p>
+      </Paragraph>
 
       <CheckboxItem checked={shouldPersist} onChange={setShouldPersist}>
         Persist API key in browser storage
       </CheckboxItem>
 
-      <p>
-        Once API key is set, you can use the <InlineButton icon={MagicIcon} />{" "}
+      <Paragraph>
+        Once API key is set, you can use the <InlineIcon icon={MagicIcon} />{" "}
         tool to wrap your elements in a frame that will then allow you to turn
         it into code. This dialog can be accessed using the <b>AI Settings</b>{" "}
-        <InlineButton icon={OpenAIIcon} />.
-      </p>
+        <InlineIcon icon={OpenAIIcon} />.
+      </Paragraph>
 
       <FilledButton
         className="MagicSettings__confirm"
