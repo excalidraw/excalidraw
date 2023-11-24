@@ -791,7 +791,17 @@ const ExcalidrawWrapper = () => {
               },
             );
 
-            const { generatedResponse } = await response.json();
+            const json = await response.json();
+
+            if (!response.ok) {
+              throw new Error(json.message || "Generation failed...");
+            }
+
+            const generatedResponse = json.generatedResponse;
+            if (!generatedResponse) {
+              throw new Error("Generation failed...");
+            }
+
             return generatedResponse;
           }}
         />
