@@ -121,7 +121,7 @@ export const Hyperlink = ({
           setToast({ message: embedLink.warning, closable: true });
         }
         const ar = embedLink
-          ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+          ? embedLink.intrinsicSize.w / embedLink.intrinsicSize.h
           : 1;
         const hasLinkChanged =
           embeddableLinkCache.get(element.id) !== element.link;
@@ -210,6 +210,7 @@ export const Hyperlink = ({
   };
   const { x, y } = getCoordsForPopover(element, appState);
   if (
+    appState.contextMenu ||
     appState.draggingElement ||
     appState.resizingElement ||
     appState.isRotating ||
