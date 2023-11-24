@@ -245,12 +245,15 @@ export interface AppState {
   openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
-    | "imageExport"
-    | "help"
-    | "jsonExport"
-    | "mermaid"
-    | "magicSettings"
-    | null;
+    | null
+    | { name: "imageExport" | "help" | "jsonExport" | "mermaid" }
+    | {
+        name: "magicSettings";
+        source:
+          | "tool" // when magicframe tool is selected
+          | "generation" // when magicframe generate button is clicked
+          | "settings"; // when AI settings dialog is explicitly invoked
+      };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -549,7 +552,7 @@ export type AppClassProperties = {
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
-  onMagicButtonSelect: App["onMagicButtonSelect"];
+  onMagicframeToolSelect: App["onMagicframeToolSelect"];
 };
 
 export type PointerDownState = Readonly<{

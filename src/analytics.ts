@@ -1,3 +1,7 @@
+// place here categories that you want to track. We want to track just a
+// small subset of categories at a given time.
+const ALLOWED_CATEGORIES_TO_TRACK = ["ai"] as string[];
+
 export const trackEvent = (
   category: string,
   action: string,
@@ -5,18 +9,22 @@ export const trackEvent = (
   value?: number,
 ) => {
   try {
-    // place here categories that you want to track as events
-    // KEEP IN MIND THE PRICING
-    const ALLOWED_CATEGORIES_TO_TRACK = [] as string[];
-    // Uncomment the next line to track locally
-    // console.log("Track Event", { category, action, label, value });
-
-    if (typeof window === "undefined" || import.meta.env.VITE_WORKER_ID) {
+    // prettier-ignore
+    if (
+      typeof window === "undefined"
+      || import.meta.env.VITE_WORKER_ID
+      // comment out to debug locally
+      || import.meta.env.PROD
+    ) {
       return;
     }
 
     if (!ALLOWED_CATEGORIES_TO_TRACK.includes(category)) {
       return;
+    }
+
+    if (!import.meta.env.PROD) {
+      console.info("trackEvent", { category, action, label, value });
     }
 
     if (window.sa_event) {

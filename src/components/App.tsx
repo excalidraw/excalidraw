@@ -1435,7 +1435,7 @@ class App extends React.Component<AppProps, AppState> {
                           onMagicSettingsConfirm={this.onMagicSettingsConfirm}
                         >
                           {this.props.children}
-                          {this.state.openDialog === "mermaid" && (
+                          {this.state.openDialog?.name === "mermaid" && (
                             <MermaidToExcalidraw />
                           )}
                         </LayerUI>
@@ -1467,6 +1467,7 @@ class App extends React.Component<AppProps, AppState> {
                                 onChange={() =>
                                   this.onMagicFrameGenerate(
                                     firstSelectedElement,
+                                    "button",
                                   )
                                 }
                               />
@@ -1697,11 +1698,15 @@ class App extends React.Component<AppProps, AppState> {
     return text;
   }
 
-  private async onMagicFrameGenerate(magicFrame: ExcalidrawMagicFrameElement) {
+  private async onMagicFrameGenerate(
+    magicFrame: ExcalidrawMagicFrameElement,
+    source: "button" | "upstream",
+  ) {
     if (!this.OPENAI_KEY) {
       this.setState({
-        openDialog: "magicSettings",
+        openDialog: { name: "magicSettings", source: "generation" },
       });
+      trackEvent("ai", "d2c-generate", "missing-key");
       return;
     }
 
@@ -1712,7 +1717,12 @@ class App extends React.Component<AppProps, AppState> {
     }).filter((el) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
-      this.setState({ errorMessage: "Cannot generate from an empty frame" });
+      if (source === "button") {
+        this.setState({ errorMessage: "Cannot generate from an empty frame" });
+        trackEvent("ai", "d2c-generate", "no-children");
+      } else {
+        this.setActiveTool({ type: "magicframe" });
+      }
       return;
     }
 
@@ -1751,6 +1761,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const textFromFrameChildren = this.getTextFromElements(magicFrameChildren);
 
+    trackEvent("ai", "d2c-generate", "generating");
+
     const result = await diagramToHTML({
       image: dataURL,
       apiKey: this.OPENAI_KEY,
@@ -1759,6 +1771,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (!result.ok) {
+      trackEvent("ai", "d2c-generate", "generating-failed");
       console.error(result.error);
       this.updateMagicGeneration({
         frameElement,
@@ -1770,6 +1783,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       return;
     }
+    trackEvent("ai", "d2c-generate", "generating-done");
 
     if (result.choices[0].message.content == null) {
       this.updateMagicGeneration({
@@ -1813,7 +1827,10 @@ class App extends React.Component<AppProps, AppState> {
   private OPENAI_KEY_IS_PERSISTED: boolean =
     EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
 
-  private onOpenAIKeyChange = (openAIKey: string, shouldPersist: boolean) => {
+  private onOpenAIKeyChange = (
+    openAIKey: string | null,
+    shouldPersist: boolean,
+  ) => {
     this.OPENAI_KEY = openAIKey || null;
     if (shouldPersist) {
       const didPersist = EditorLocalStorage.set(
@@ -1826,26 +1843,41 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private onMagicSettingsConfirm = (apiKey: string, shouldPersist: boolean) => {
-    this.onOpenAIKeyChange(apiKey, shouldPersist);
+  private onMagicSettingsConfirm = (
+    apiKey: string,
+    shouldPersist: boolean,
+    source: "tool" | "generation" | "settings",
+  ) => {
+    this.OPENAI_KEY = apiKey || null;
+    this.onOpenAIKeyChange(this.OPENAI_KEY, shouldPersist);
+
+    if (source === "settings") {
+      return;
+    }
+
+    const selectedElements = this.scene.getSelectedElements({
+      selectedElementIds: this.state.selectedElementIds,
+    });
 
     if (apiKey) {
-      const selectedElements = this.scene.getSelectedElements({
-        selectedElementIds: this.state.selectedElementIds,
-      });
       if (selectedElements.length) {
-        this.onMagicButtonSelect();
+        this.onMagicframeToolSelect();
+      } else {
+        this.setActiveTool({ type: "magicframe" });
       }
-    } else {
-      this.OPENAI_KEY = null;
+    } else if (!isMagicFrameElement(selectedElements[0])) {
+      // even if user didn't end up setting api key, let's pick the tool
+      // so they can draw up a frame and move forward
+      this.setActiveTool({ type: "magicframe" });
     }
   };
 
-  public onMagicButtonSelect = () => {
+  public onMagicframeToolSelect = () => {
     if (!this.OPENAI_KEY) {
       this.setState({
-        openDialog: "magicSettings",
+        openDialog: { name: "magicSettings", source: "tool" },
       });
+      trackEvent("ai", "d2c-tool", "missing-key");
       return;
     }
 
@@ -1855,19 +1887,33 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 0) {
       this.setActiveTool({ type: TOOL_TYPE.magicframe });
+      trackEvent("ai", "d2c-tool", "empty-selection");
     } else {
-      if (selectedElements.some((el) => isFrameLikeElement(el))) {
+      const selectedMagicFrame: ExcalidrawMagicFrameElement | false =
+        selectedElements.length === 1 &&
+        isMagicFrameElement(selectedElements[0]) &&
+        selectedElements[0];
+
+      // case: user selected elements containing frame-like(s) or are frame
+      // members, we don't want to wrap into another magicframe
+      // (unless the only selected element is a magic frame which we reuse)
+      if (
+        !selectedMagicFrame &&
+        selectedElements.some((el) => isFrameLikeElement(el) || el.frameId)
+      ) {
         this.setActiveTool({ type: TOOL_TYPE.magicframe });
         return;
       }
 
-      let frame: ExcalidrawMagicFrameElement | null = null;
-      if (
-        selectedElements.length === 1 &&
-        isMagicFrameElement(selectedElements[0])
-      ) {
-        frame = selectedElements[0];
+      trackEvent("ai", "d2c-tool", "existing-selection");
+
+      let frame: ExcalidrawMagicFrameElement;
+      if (selectedMagicFrame) {
+        // a single magicframe already selected -> use it
+        frame = selectedMagicFrame;
       } else {
+        // selected elements aren't wrapped in magic frame yet -> wrap now
+
         const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
         const padding = 50;
 
@@ -1880,19 +1926,19 @@ class App extends React.Component<AppProps, AppState> {
           opacity: 100,
           locked: false,
         });
+
+        this.scene.addNewElement(frame);
+
+        for (const child of selectedElements) {
+          mutateElement(child, { frameId: frame.id });
+        }
+
+        this.setState({
+          selectedElementIds: { [frame.id]: true },
+        });
       }
 
-      this.scene.addNewElement(frame);
-
-      for (const child of selectedElements) {
-        mutateElement(child, { frameId: frame.id });
-      }
-
-      this.setState({
-        selectedElementIds: { [frame.id]: true },
-      });
-
-      this.onMagicFrameGenerate(frame);
+      this.onMagicFrameGenerate(frame, "upstream");
     }
   };
 
@@ -3551,7 +3597,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.QUESTION_MARK) {
         this.setState({
-          openDialog: "help",
+          openDialog: { name: "help" },
         });
         return;
       } else if (
@@ -3560,7 +3606,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD]
       ) {
         event.preventDefault();
-        this.setState({ openDialog: "imageExport" });
+        this.setState({ openDialog: { name: "imageExport" } });
         return;
       }
 

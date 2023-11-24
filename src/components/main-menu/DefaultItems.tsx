@@ -107,7 +107,7 @@ export const SaveAsImage = () => {
     <DropdownMenuItem
       icon={ExportImageIcon}
       data-testid="image-export-button"
-      onSelect={() => setAppState({ openDialog: "imageExport" })}
+      onSelect={() => setAppState({ openDialog: { name: "imageExport" } })}
       shortcut={getShortcutFromShortcutName("imageExport")}
       aria-label={t("buttons.exportImage")}
     >
@@ -230,7 +230,7 @@ export const Export = () => {
     <DropdownMenuItem
       icon={ExportIcon}
       onSelect={() => {
-        setAppState({ openDialog: "jsonExport" });
+        setAppState({ openDialog: { name: "jsonExport" } });
       }}
       data-testid="json-export-button"
       aria-label={t("buttons.export")}

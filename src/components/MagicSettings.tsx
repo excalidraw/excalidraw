@@ -106,7 +106,7 @@ export const MagicSettings = (props: {
         own limit in your OpenAI account dashboard if needed.
       </p>
       <TextField
-        isPassword
+        isRedacted
         value={keyInputValue}
         placeholder="Paste your API key here"
         label="OpenAI API key"

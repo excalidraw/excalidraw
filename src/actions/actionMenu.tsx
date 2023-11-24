@@ -56,13 +56,18 @@ export const actionShortcuts = register({
   viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
-    if (appState.openDialog === "help") {
+    if (appState.openDialog?.name === "help") {
       focusContainer();
     }
     return {
       appState: {
         ...appState,
-        openDialog: appState.openDialog === "help" ? null : "help",
+        openDialog:
+          appState.openDialog?.name === "help"
+            ? null
+            : {
+                name: "help",
+              },
       },
       commitToHistory: false,
     };

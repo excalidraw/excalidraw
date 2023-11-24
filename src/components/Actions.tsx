@@ -339,7 +339,7 @@ export const ShapesSwitcher = ({
             Generate
           </div>
           <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog("mermaid")}
+            onSelect={() => app.setOpenDialog({ name: "mermaid" })}
             icon={mermaidLogoIcon}
             data-testid="toolbar-embeddable"
           >
@@ -349,14 +349,20 @@ export const ShapesSwitcher = ({
           {app.props.aiEnabled !== false && (
             <>
               <DropdownMenu.Item
-                onSelect={() => app.onMagicButtonSelect()}
+                onSelect={() => app.onMagicframeToolSelect()}
                 icon={MagicIcon}
                 data-testid="toolbar-magicframe"
               >
                 {t("toolBar.magicframe")}
               </DropdownMenu.Item>
               <DropdownMenu.Item
-                onSelect={() => app.setOpenDialog("magicSettings")}
+                onSelect={() => {
+                  trackEvent("ai", "d2c-settings", "settings");
+                  app.setOpenDialog({
+                    name: "magicSettings",
+                    source: "settings",
+                  });
+                }}
                 icon={OpenAIIcon}
                 data-testid="toolbar-magicSettings"
               >

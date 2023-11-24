@@ -533,6 +533,12 @@
     }
   }
 
+  input.is-redacted {
+    // we don't use type=password because browsers (chrome?) prompt
+    // you to save it which is annoying
+    -webkit-text-security: disc;
+  }
+
   input[type="text"],
   textarea:not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);
