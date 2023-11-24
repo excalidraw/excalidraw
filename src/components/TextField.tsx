@@ -25,7 +25,7 @@ type TextFieldProps = {
 
   label?: string;
   placeholder?: string;
-  isPassword?: boolean;
+  isRedacted?: boolean;
 };
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -39,7 +39,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       readonly,
       selectOnRender,
       onKeyDown,
-      isPassword = false,
+      isRedacted = false,
     },
     ref,
   ) => {
@@ -53,7 +53,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       }
     }, [selectOnRender]);
 
-    const [isVisible, setIsVisible] = useState<boolean>(true);
+    const [isTemporarilyUnredacted, setIsTemporarilyUnredacted] =
+      useState<boolean>(false);
 
     return (
       <div
@@ -71,7 +72,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           })}
         >
           <input
-            type={isPassword && isVisible ? "password" : undefined}
+            className={clsx({
+              "is-redacted": value && isRedacted && !isTemporarilyUnredacted,
+            })}
             readOnly={readonly}
             value={value}
             placeholder={placeholder}
@@ -79,12 +82,14 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
           />
-          {isPassword && (
+          {isRedacted && (
             <Button
-              onSelect={() => setIsVisible(!isVisible)}
-              style={{ border: 0 }}
+              onSelect={() =>
+                setIsTemporarilyUnredacted(!isTemporarilyUnredacted)
+              }
+              style={{ border: 0, userSelect: "none" }}
             >
-              {isVisible ? eyeIcon : eyeClosedIcon}
+              {isTemporarilyUnredacted ? eyeClosedIcon : eyeIcon}
             </Button>
           )}
         </div>
