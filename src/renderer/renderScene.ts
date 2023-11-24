@@ -16,7 +16,7 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -70,11 +70,12 @@ import {
 import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
-  isFrameElement,
+  isFrameLikeElement,
+  isIframeLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
 import {
-  isEmbeddableOrLabel,
+  isIframeLikeOrItsLabel,
   createPlaceholderEmbeddableLabel,
 } from "../element/embeddable";
 import {
@@ -363,7 +364,7 @@ const renderLinearElementPointHighlight = (
 };
 
 const frameClip = (
-  frame: ExcalidrawFrameElement,
+  frame: ExcalidrawFrameLikeElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -516,7 +517,7 @@ const _renderInteractiveScene = ({
   }
 
   const isFrameSelected = selectedElements.some((element) =>
-    isFrameElement(element),
+    isFrameLikeElement(element),
   );
 
   // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
@@ -965,7 +966,7 @@ const _renderStaticScene = ({
 
   // Paint visible elements
   visibleElements
-    .filter((el) => !isEmbeddableOrLabel(el))
+    .filter((el) => !isIframeLikeOrItsLabel(el))
     .forEach((element) => {
       try {
         const frameId = element.frameId || appState.frameToHighlight?.id;
@@ -998,15 +999,16 @@ const _renderStaticScene = ({
 
   // render embeddables on top
   visibleElements
-    .filter((el) => isEmbeddableOrLabel(el))
+    .filter((el) => isIframeLikeOrItsLabel(el))
     .forEach((element) => {
       try {
         const render = () => {
           renderElement(element, rc, context, renderConfig, appState);
 
           if (
-            isEmbeddableElement(element) &&
-            (isExporting || !element.validated) &&
+            isIframeLikeElement(element) &&
+            (isExporting ||
+              (isEmbeddableElement(element) && !element.validated)) &&
             element.width &&
             element.height
           ) {
@@ -1244,8 +1246,10 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "iframe":
     case "embeddable":
     case "frame":
+    case "magicframe":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1286,7 +1290,7 @@ const renderBindingHighlightForBindableElement = (
 const renderFrameHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  frame: NonDeleted<ExcalidrawFrameElement>,
+  frame: NonDeleted<ExcalidrawFrameLikeElement>,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
   const width = x2 - x1;
@@ -1477,7 +1481,7 @@ export const renderSceneToSvg = (
   };
   // render elements
   elements
-    .filter((el) => !isEmbeddableOrLabel(el))
+    .filter((el) => !isIframeLikeOrItsLabel(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
@@ -1498,7 +1502,7 @@ export const renderSceneToSvg = (
 
   // render embeddables on top
   elements
-    .filter((el) => isEmbeddableElement(el))
+    .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {

@@ -55,6 +55,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderEmbeddableMenu, //zsviczian
     renderMermaid, //zsviczian
     onContextMenu, //zsviczian
+    aiEnabled,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -144,6 +145,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderEmbeddableMenu={renderEmbeddableMenu} //zsviczian
           renderMermaid={renderMermaid} //zsviczian
           onContextMenu={onContextMenu} //zsviczian
+          aiEnabled={aiEnabled !== false}
         >
           {children}
         </App>

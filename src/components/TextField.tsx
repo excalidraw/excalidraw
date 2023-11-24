@@ -4,12 +4,15 @@ import {
   useImperativeHandle,
   KeyboardEvent,
   useLayoutEffect,
+  useState,
 } from "react";
 import clsx from "clsx";
 
 import "./TextField.scss";
+import { Button } from "./Button";
+import { eyeIcon, eyeClosedIcon } from "./icons";
 
-export type TextFieldProps = {
+type TextFieldProps = {
   value?: string;
 
   onChange?: (value: string) => void;
@@ -22,6 +25,7 @@ export type TextFieldProps = {
 
   label?: string;
   placeholder?: string;
+  isRedacted?: boolean;
 };
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -35,6 +39,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       readonly,
       selectOnRender,
       onKeyDown,
+      isRedacted = false,
     },
     ref,
   ) => {
@@ -47,6 +52,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         innerRef.current?.select();
       }
     }, [selectOnRender]);
+
+    const [isTemporarilyUnredacted, setIsTemporarilyUnredacted] =
+      useState<boolean>(false);
 
     return (
       <div
@@ -64,14 +72,26 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           })}
         >
           <input
+            className={clsx({
+              "is-redacted": value && isRedacted && !isTemporarilyUnredacted,
+            })}
             readOnly={readonly}
-            type="text"
             value={value}
             placeholder={placeholder}
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}
             onKeyDown={onKeyDown}
           />
+          {isRedacted && (
+            <Button
+              onSelect={() =>
+                setIsTemporarilyUnredacted(!isTemporarilyUnredacted)
+              }
+              style={{ border: 0, userSelect: "none" }}
+            >
+              {isTemporarilyUnredacted ? eyeClosedIcon : eyeIcon}
+            </Button>
+          )}
         </div>
       </div>
     );
