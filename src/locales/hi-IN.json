@@ -102,15 +102,15 @@
     "showStroke": "",
     "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
     "toggleTheme": "",
-    "personalLib": "",
-    "excalidrawLib": "",
+    "personalLib": "वैयक्तिक समूहकोष",
+    "excalidrawLib": "एक्सकेलीड्रॉ समूहकोष",
     "decreaseFontSize": "आकार घटाइऐ",
     "increaseFontSize": "फ़ॉन्ट आकार बढ़ाएँ",
-    "unbindText": "",
+    "unbindText": "लिपि को बंधमुक्त करें",
     "bindText": "लेखन को कोश से जोड़े",
     "createContainerFromText": "मूलपाठ कंटेनर में मोड के दिखाए",
     "link": {
-      "edit": "",
+      "edit": "कड़ी संपादित करे",
       "editEmbed": "",
       "create": "",
       "createEmbed": "",
@@ -249,7 +249,7 @@
     "hand": "हाथ ( खिसकाने का औज़ार)",
     "extraTools": "",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
-    "magicSettings": ""
+    "magicSettings": "कृतिम बुद्धिमत्ता सेटिंग्स"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
