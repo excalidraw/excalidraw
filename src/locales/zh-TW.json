@@ -11,8 +11,8 @@
     "copyAsPng": "以PNG格式儲存到剪貼板",
     "copyAsSvg": "以SVG格式複製到剪貼板",
     "copyText": "以文字格式複製至剪貼簿",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "複製來源至剪貼簿",
+    "convertToCode": "轉換為程式碼",
     "bringForward": "上移一層",
     "sendToBack": "移到最底層",
     "bringToFront": "置於最頂層",
@@ -220,7 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "可嵌入元素無法加入資料庫",
-      "iframe": "",
+      "iframe": "IFrame 元素無法加入資料庫",
       "image": "即將支援加入圖片至資料庫！"
     },
     "asyncPasteFailedOnRead": "無法貼上（無法由系統剪貼簿讀入）",
@@ -243,13 +243,13 @@
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦",
     "frame": "框架工具",
-    "magicframe": "",
+    "magicframe": "線框稿轉為程式碼",
     "embeddable": "嵌入網站",
     "laser": "雷射筆",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
-    "magicSettings": ""
+    "magicSettings": "AI 設定"
   },
   "headings": {
     "canvasActions": "canvas 動作",
