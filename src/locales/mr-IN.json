@@ -111,12 +111,12 @@
     "createContainerFromText": "मजकूर कंटेनर मधे मोडून दाखवा",
     "link": {
       "edit": "दुवा संपादन",
-      "editEmbed": "",
+      "editEmbed": "कड़ी सम्पादित करा आणि रुतवा",
       "create": "दुवा तयार करा",
-      "createEmbed": "",
+      "createEmbed": "नवीन कड़ी बनवा आणि रुतवा",
       "label": "दुवा",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "कड़ी आणि रूतवणे",
+      "empty": "कुठलिही कड़ी दिली नाही"
     },
     "lineEditor": {
       "edit": "रेघ संपादन",
@@ -130,8 +130,8 @@
     },
     "statusPublished": "प्रकाशित करा",
     "sidebarLock": "साइडबार उघडं ठेवा",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "चौकटीतले सर्व तत्वांचे चयन करा",
+    "removeAllElementsFromFrame": "चौकटीतून सर्व काढून टाका",
     "eyeDropper": "चित्रफलकातून रंग निवडा"
   },
   "library": {
@@ -171,11 +171,11 @@
     "cancel": "रद्द",
     "clear": "स्वछ",
     "remove": "हटवा",
-    "embed": "",
+    "embed": "रुतवणे उलटे करा",
     "publishLibrary": "प्रकाशित करा",
     "submit": "जमा करा",
     "confirm": "पुष्टि करा",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "संवादा साठी क्लिक करा"
   },
   "alerts": {
     "clearReset": "पटल स्वच्छ होणार, तुम्हाला खात्री आहे का?",
@@ -205,7 +205,7 @@
     "imageInsertError": "प्रतिमा आत घालता येत नाही. नंतर पुन्हा प्रयत्न करा...",
     "fileTooBig": "फाइल फार मोठी आहे. आकाराची कमाल परवानगी {{maxSize}} आहे.",
     "svgImageInsertError": "एस-वी-जी प्रतिमा आत घालवू शकलो नाही. एस-वी-जी-मार्क-अप यंत्र अयोग्य आहे.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "प्रतिमा आणणे नाही जमले.",
     "invalidSVGString": "अयोग्य एस-वी-जी.",
     "cannotResolveCollabServer": "कॉलेब-सर्वर हे पोहोचत नाही आहे. पान परत लोड करायचा प्रयत्न करावे.",
     "importLibraryError": "संग्रह प्रतिस्थापित नाही करता आला",
@@ -219,9 +219,9 @@
       "line4": "ही सेटिंग अक्षम करूनही पृष्ठ योग्यरित्या प्रदर्शित होत नसल्यास, आमच्या GitHub वर <issueLink>समस्या</issueLink> सबमिट करा, किव्हा <discordLink>डिस्कॉर्ड</discordLink> वर आम्हाला लिहा"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
+      "embeddable": "रुतलेले तत्व समूह कोषात जोडले जाऊ शकत नाही.",
       "iframe": "आयफ़्रेम तत्व समूहकोषात जोडला जाऊ शकत नाही.",
-      "image": ""
+      "image": "प्रतिमा समूह कोषात जोड़ायचे लवकरच येत आहेत!"
     },
     "asyncPasteFailedOnRead": "चिटकवता नाही जमले ( सिस्टम क्लिप्बॉर्ड पासून वाचणे नाही जमले).",
     "asyncPasteFailedOnParse": "चिटकवता नाही जमले.",
@@ -242,12 +242,12 @@
     "penMode": "पेन चा मोड - स्पर्श टाळा",
     "link": "निवडलेल्या आकारासाठी दुवा जोडा/बदल करा",
     "eraser": "खोड रबर",
-    "frame": "",
+    "frame": "चौकट यंत्र",
     "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
-    "embeddable": "",
+    "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
     "hand": "हात ( सरकवण्या चे उपकरण)",
-    "extraTools": "",
+    "extraTools": "आणिक यंत्रे",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
     "magicSettings": "कृतिम बुद्दिवत्ता सेटिंग्स"
   },
@@ -261,7 +261,7 @@
     "linearElement": "अनेक बिंदु साठी क्लिक करा, रेघे साठी ड्रैग करा",
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
-    "embeddable": "",
+    "embeddable": "वेबसाइट रुतोण्या साठी दाबून-खेचा (क्लिक-ड्रैग करा)",
     "text_selected": "लेखन संपादन साठी दुहेरी क्लिक करा किव्हा एंटर दाबा",
     "text_editing": "संपादन संपवायचं असल्यास एस्केप दाबा किव्हा कंट्रोल या कम्मांड बरोबार एंटर दाबा",
     "linearElementMulti": "शेवटच्या बिंदु वर क्लिक करा किव्हा एस्केप या एंटर दाबा",
@@ -386,27 +386,27 @@
     "removeItemsFromLib": "निवडलेले आयटम्स संग्रहातून काढा"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "प्रतिमा निर्यात करा",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "पार्श्वभूमि",
+      "onlySelected": "फक्त चयन केलेले",
+      "darkMode": "अंधारमय स्थिति",
+      "embedScene": "दृश्य रुतवा",
+      "scale": "क़िती पट",
+      "padding": "ग़ादी"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "दृश्य डेटा निर्यात केलेल्या पी-एन-जी किव्हा एस-वी-जी फ़ाईल मधे सुरक्षीत केला जाईल, त्याने दृश्य पुनः परत आणता येईल. निर्यात केलेली फ़ाईल चा आकार त्याने वाढेल."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पी-एन-जी स्वरूपात बाहेर ठेवा",
+      "exportToSvg": "एस-वी-जी स्वरूपात बाहेर ठेवा",
+      "copyPngToClipboard": "पी-एन-जी रूपे फळी वर कॉपी करा"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पीएनजी",
+      "exportToSvg": "एसविज़ी",
+      "copyPngToClipboard": "फळी वर कॉपी करा"
     }
   },
   "encrypted": {
@@ -438,8 +438,8 @@
     "canvas": "पटल",
     "selection": "निवड",
     "pasteAsSingleElement": "एक घटक म्हणून चिपकावण्या साठी {{shortcut}} वापरा,\nकिंवा विद्यमान मजकूर संपादकात चिपकवा",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "युआरेल रूतवणे प्रतिबंधित आहेत. आपली युआरेल श्वेतसूचित आणण्या साठी कृपया एक मुद्दा ग़िटहब वर उठवा",
+    "unrecognizedLinkFormat": "जी युआरेल तुम्हीं रतवली आहे, ती आपेक्षित प्रकारे नाही आहे. कृपया स्त्रोत साइट नी 'रूतवण्या साठी दिलेलि लिपि' चिपकावण्याचा प्रयास करा"
   },
   "colors": {
     "transparent": "पारदर्शक",
