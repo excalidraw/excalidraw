@@ -1706,6 +1706,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         openDialog: { name: "magicSettings", source: "generation" },
       });
+      trackEvent("ai", "d2c-generate", "missing-key");
       return;
     }
 
@@ -1718,6 +1719,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!magicFrameChildren.length) {
       if (source === "button") {
         this.setState({ errorMessage: "Cannot generate from an empty frame" });
+        trackEvent("ai", "d2c-generate", "no-children");
       } else {
         this.setActiveTool({ type: "magicframe" });
       }
@@ -1759,6 +1761,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const textFromFrameChildren = this.getTextFromElements(magicFrameChildren);
 
+    trackEvent("ai", "d2c-generate", "generating");
+
     const result = await diagramToHTML({
       image: dataURL,
       apiKey: this.OPENAI_KEY,
@@ -1767,6 +1771,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (!result.ok) {
+      trackEvent("ai", "d2c-generate", "generating-failed");
       console.error(result.error);
       this.updateMagicGeneration({
         frameElement,
@@ -1778,6 +1783,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       return;
     }
+    trackEvent("ai", "d2c-generate", "generating-done");
 
     if (result.choices[0].message.content == null) {
       this.updateMagicGeneration({
@@ -1871,6 +1877,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         openDialog: { name: "magicSettings", source: "tool" },
       });
+      trackEvent("ai", "d2c-tool", "missing-key");
       return;
     }
 
@@ -1880,6 +1887,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 0) {
       this.setActiveTool({ type: TOOL_TYPE.magicframe });
+      trackEvent("ai", "d2c-tool", "empty-selection");
     } else {
       const selectedMagicFrame: ExcalidrawMagicFrameElement | false =
         selectedElements.length === 1 &&
@@ -1896,6 +1904,8 @@ class App extends React.Component<AppProps, AppState> {
         this.setActiveTool({ type: TOOL_TYPE.magicframe });
         return;
       }
+
+      trackEvent("ai", "d2c-tool", "existing-selection");
 
       let frame: ExcalidrawMagicFrameElement;
       if (selectedMagicFrame) {

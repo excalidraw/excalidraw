@@ -549,10 +549,10 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
-  onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
-  onMagicButtonSelect: App["onMagicButtonSelect"];
+  onMagicframeToolSelect: App["onMagicframeToolSelect"];
 };
 
 export type PointerDownState = Readonly<{
