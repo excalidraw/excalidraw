@@ -27,9 +27,9 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
-  isEmbeddableElement,
   isFrameLikeElement,
   isFreeDrawElement,
+  isIframeLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -590,7 +590,7 @@ export const resizeSingleElement = (
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
-    if (isEmbeddableElement(element)) {
+    if (isIframeLikeElement(element)) { //zsviczian
       if (shouldMaintainAspectRatio) {
         const scale: [number, number] = [
           Math.abs(

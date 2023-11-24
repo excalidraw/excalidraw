@@ -155,6 +155,7 @@ export const newIframeElement = (
 ): NonDeleted<ExcalidrawIframeElement> => {
   return {
     ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
+    scale: [1, 1], //zsviczian
   };
 };
 

@@ -73,7 +73,7 @@ export const getEmbedLink = (
   }
 
   if (link.startsWith("data:text/html")) { //zsviczian
-    return { link, aspectRatio: { w: 550, h: 720 }, type: "generic" };
+    return { link, intrinsicSize: { w: 550, h: 720 }, type: "generic" };
   }
 
   if (embeddedLinkCache.has(link)) {

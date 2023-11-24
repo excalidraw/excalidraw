@@ -1070,7 +1070,7 @@ class App extends React.Component<AppProps, AppState> {
             !embedLink?.link?.startsWith?.("https://player.vimeo.com");
 
           // Modify the scale based on el.scale property
-          const [xScale, yScale] = el.scale;
+          const [xScale, yScale] = el.scale ?? [1,1]; //zsviczian
           const scaledTransform = `scale(${scale * xScale}, ${scale * yScale})`;
 
           return (
@@ -1133,7 +1133,7 @@ class App extends React.Component<AppProps, AppState> {
                 >
                   {(isEmbeddableElement(el)
                     ? this.props.renderEmbeddable?.(el, this.state)
-                    : null) ?? 
+                    : null) ?? (
                       isWebview ? ( //zsviczian
                       <webview
                         ref={(ref) =>
@@ -1167,7 +1167,7 @@ class App extends React.Component<AppProps, AppState> {
                       allowFullScreen={true}
                       sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads"
                     />
-                  )}
+                  ))}
                 </div>
               </div>
             </div>
