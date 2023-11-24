@@ -11,8 +11,8 @@
     "copyAsPng": "PNG रूपे फळी वर कॉपी करा",
     "copyAsSvg": "SVG रूपे फळी वर कॉपी करा",
     "copyText": "लिखित रूपे फळी वर कॉपी करा",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "स्त्रोत फळी वर कॉपी करा",
+    "convertToCode": "सांकेतिक लिपित रूपांतरित करा",
     "bringForward": "पुढे पुढे आणा",
     "sendToBack": "सर्वात मागे करा",
     "bringToFront": "सर्वात पुढे आणा",
@@ -220,7 +220,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
-      "iframe": "",
+      "iframe": "आयफ़्रेम तत्व समूहकोषात जोडला जाऊ शकत नाही.",
       "image": ""
     },
     "asyncPasteFailedOnRead": "चिटकवता नाही जमले ( सिस्टम क्लिप्बॉर्ड पासून वाचणे नाही जमले).",
@@ -243,13 +243,13 @@
     "link": "निवडलेल्या आकारासाठी दुवा जोडा/बदल करा",
     "eraser": "खोड रबर",
     "frame": "",
-    "magicframe": "",
+    "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
     "embeddable": "",
     "laser": "लेसर टॉर्च",
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": "",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
-    "magicSettings": ""
+    "magicSettings": "कृतिम बुद्दिवत्ता सेटिंग्स"
   },
   "headings": {
     "canvasActions": "पटल क्रिया",
