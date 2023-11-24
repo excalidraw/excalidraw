@@ -86,7 +86,11 @@ interface LayerUIProps {
   openAIKey: string | null;
   isOpenAIKeyPersisted: boolean;
   onOpenAIAPIKeyChange: (apiKey: string, shouldPersist: boolean) => void;
-  onMagicSettingsConfirm: (apiKey: string, shouldPersist: boolean) => void;
+  onMagicSettingsConfirm: (
+    apiKey: string,
+    shouldPersist: boolean,
+    source: "tool" | "generation" | "settings",
+  ) => void;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -177,7 +181,7 @@ const LayerUI = ({
   const renderImageExportDialog = () => {
     if (
       !UIOptions.canvasActions.saveAsImage ||
-      appState.openDialog !== "imageExport"
+      appState.openDialog?.name !== "imageExport"
     ) {
       return null;
     }
@@ -448,21 +452,26 @@ const LayerUI = ({
           }}
         />
       )}
-      {appState.openDialog === "help" && (
+      {appState.openDialog?.name === "help" && (
         <HelpDialog
           onClose={() => {
             setAppState({ openDialog: null });
           }}
         />
       )}
-      {appState.openDialog === "magicSettings" && (
+      {appState.openDialog?.name === "magicSettings" && (
         <MagicSettings
           openAIKey={openAIKey}
           isPersisted={isOpenAIKeyPersisted}
           onChange={onOpenAIAPIKeyChange}
           onConfirm={(apiKey, shouldPersist) => {
-            setAppState({ openDialog: null });
-            onMagicSettingsConfirm(apiKey, shouldPersist);
+            const source =
+              appState.openDialog?.name === "magicSettings"
+                ? appState.openDialog?.source
+                : "settings";
+            setAppState({ openDialog: null }, () => {
+              onMagicSettingsConfirm(apiKey, shouldPersist, source);
+            });
           }}
           onClose={() => {
             setAppState({ openDialog: null });
