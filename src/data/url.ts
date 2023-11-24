@@ -5,6 +5,9 @@ export const normalizeLink = (link: string) => {
   if (!link) {
     return link;
   }
+  if(link?.startsWith("data:text/html")) { //zsviczian
+    return link;
+  }
   return sanitizeUrl(link);
 };
 

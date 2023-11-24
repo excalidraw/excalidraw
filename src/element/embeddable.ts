@@ -76,6 +76,10 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
     return null;
   }
 
+  if (link.startsWith("data:text/html")) { //zsviczian
+    return { link, aspectRatio: { w: 550, h: 720 }, type: "generic" };
+  }
+
   if (embeddedLinkCache.has(link)) {
     return embeddedLinkCache.get(link)!;
   }
