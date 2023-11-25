@@ -13,7 +13,8 @@ interface TTDDialogPanelProps {
   };
   panelActionDisabled?: boolean;
   onTextSubmitInProgess?: boolean;
-  renderRight?: () => ReactNode;
+  renderTopRight?: () => ReactNode;
+  renderBottomRight?: () => ReactNode;
 }
 
 export const TTDDialogPanel = ({
@@ -22,11 +23,16 @@ export const TTDDialogPanel = ({
   panelAction,
   panelActionDisabled = false,
   onTextSubmitInProgess,
-  renderRight,
+  renderTopRight,
+  renderBottomRight,
 }: TTDDialogPanelProps) => {
   return (
     <div className="ttd-dialog-panel">
-      <label>{label}</label>
+      <div className="ttd-dialog-panel__header">
+        <label>{label}</label>
+        {renderTopRight?.()}
+      </div>
+
       {children}
       <div
         className={clsx("ttd-dialog-panel-button-container", {
@@ -45,7 +51,7 @@ export const TTDDialogPanel = ({
           </div>
           {onTextSubmitInProgess && <Spinner />}
         </Button>
-        {renderRight?.()}
+        {renderBottomRight?.()}
       </div>
     </div>
   );

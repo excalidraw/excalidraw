@@ -14,7 +14,7 @@ const resetPreview = ({
   setError,
 }: {
   canvasRef: React.RefObject<HTMLDivElement>;
-  setError: React.Dispatch<React.SetStateAction<null>>;
+  setError: (error: Error | null) => void;
 }) => {
   const canvasNode = canvasRef.current;
 
@@ -44,7 +44,7 @@ interface ConvertMermaidToExcalidrawFormatProps {
   canvasRef: React.RefObject<HTMLDivElement>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   text: string;
-  setError: React.Dispatch<React.SetStateAction<null>>;
+  setError: (error: Error | null) => void;
   data: React.MutableRefObject<{
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
@@ -98,14 +98,14 @@ export const convertMermaidToExcalidraw = async ({
     await canvasToBlob(canvas);
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
-  } catch (e: any) {
-    console.error(e);
+  } catch (err: any) {
+    console.error(err);
     parent.style.background = "var(--default-bg-color)";
     if (text) {
-      setError(e.message);
+      setError(err);
     }
 
-    throw e;
+    throw err;
   }
 };
 

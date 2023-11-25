@@ -24,15 +24,32 @@ import { BinaryFiles } from "../../types";
 import { ArrowRightIcon } from "../icons";
 
 import "./TTDDialog.scss";
+import { isFiniteNumber } from "../../utils";
+import { atom, useAtom } from "jotai";
 
+const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
 
-type MermaidDefinition = string;
+const rateLimitsAtom = atom<{
+  rateLimit: number;
+  rateLimitRemaining: number;
+} | null>(null);
+
+type OnTestSubmitRetValue = {
+  rateLimit?: number | null;
+  rateLimitRemaining?: number | null;
+} & (
+  | { generatedResponse: string | undefined; error?: null | undefined }
+  | {
+      error: Error;
+      generatedResponse?: null | undefined;
+    }
+);
 
 export const TTDDialog = (
   props:
     | {
-        onTextSubmit(value: string): Promise<MermaidDefinition>;
+        onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
       }
     | { __fallback: true },
 ) => {
@@ -57,7 +74,7 @@ export const TTDDialogBase = withInternalFallback(
     tab: string;
   } & (
     | {
-        onTextSubmit(value: string): Promise<MermaidDefinition>;
+        onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
       }
     | { __fallback: true }
   )) => {
@@ -76,40 +93,78 @@ export const TTDDialogBase = withInternalFallback(
     };
 
     const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
+    const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
 
     const onGenerate = async () => {
       if (
         prompt.length > MAX_PROMPT_LENGTH ||
+        prompt.length < MIN_PROMPT_LENGTH ||
         onTextSubmitInProgess ||
+        rateLimits?.rateLimitRemaining === 0 ||
+        // means this is not a text-to-diagram dialog (needed for TS only)
         "__fallback" in rest
       ) {
+        if (prompt.length < MIN_PROMPT_LENGTH) {
+          setError(
+            new Error(
+              `Prompt is too short (min ${MIN_PROMPT_LENGTH} characters)`,
+            ),
+          );
+        }
+        if (prompt.length > MAX_PROMPT_LENGTH) {
+          setError(
+            new Error(
+              `Prompt is too long (max ${MAX_PROMPT_LENGTH} characters)`,
+            ),
+          );
+        }
+
         return;
       }
 
       try {
         setOnTextSubmitInProgess(true);
 
-        const mermaid = await rest.onTextSubmit(prompt);
+        const { generatedResponse, error, rateLimit, rateLimitRemaining } =
+          await rest.onTextSubmit(prompt);
 
-        await convertMermaidToExcalidraw({
-          canvasRef: someRandomDivRef,
-          data,
-          mermaidToExcalidrawLib,
-          setError,
-          text: mermaid,
-        });
+        if (isFiniteNumber(rateLimit) && isFiniteNumber(rateLimitRemaining)) {
+          setRateLimits({ rateLimit, rateLimitRemaining });
+        }
 
-        saveMermaidDataToStorage(mermaid);
+        if (error) {
+          setError(error);
+          return;
+        }
+        if (!generatedResponse) {
+          setError(new Error("Generation failed"));
+          return;
+        }
 
-        setOnTextSubmitInProgess(false);
+        try {
+          await convertMermaidToExcalidraw({
+            canvasRef: someRandomDivRef,
+            data,
+            mermaidToExcalidrawLib,
+            setError,
+            text: generatedResponse,
+          });
+          saveMermaidDataToStorage(generatedResponse);
+        } catch (error: any) {
+          setError(
+            new Error(
+              "Generated an invalid diagram :(. You may also try a different prompt.",
+            ),
+          );
+        }
       } catch (error: any) {
+        let message: string | undefined = error.message;
+        if (!message || message === "Failed to fetch") {
+          message = "Request failed";
+        }
+        setError(new Error(message));
+      } finally {
         setOnTextSubmitInProgess(false);
-        // Setting the error here again as onTextSubmit might
-        // fail, which is outside of our control
-        // if it's convertMermaidToExcalidraw that fails, then
-        // the error is now set twice in quick succession
-        // but that's probably fine, React should batch the updates
-        setError(error.message);
       }
     };
 
@@ -137,7 +192,7 @@ export const TTDDialogBase = withInternalFallback(
       files: BinaryFiles | null;
     }>({ elements: [], files: null });
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);
 
     return (
       <Dialog
@@ -183,8 +238,31 @@ export const TTDDialogBase = withInternalFallback(
                     icon: ArrowRightIcon,
                   }}
                   onTextSubmitInProgess={onTextSubmitInProgess}
-                  panelActionDisabled={prompt.length > MAX_PROMPT_LENGTH}
-                  renderRight={() => {
+                  panelActionDisabled={
+                    prompt.length > MAX_PROMPT_LENGTH ||
+                    rateLimits?.rateLimitRemaining === 0
+                  }
+                  renderTopRight={() => {
+                    if (!rateLimits) {
+                      return null;
+                    }
+
+                    return (
+                      <div
+                        style={{
+                          fontSize: 12,
+                          marginLeft: "auto",
+                          color:
+                            rateLimits.rateLimitRemaining === 0
+                              ? "var(--color-danger)"
+                              : undefined,
+                        }}
+                      >
+                        {rateLimits.rateLimitRemaining} requests left today
+                      </div>
+                    );
+                  }}
+                  renderBottomRight={() => {
                     const ratio = prompt.length / MAX_PROMPT_LENGTH;
                     if (ratio > 0.8) {
                       return (
@@ -227,7 +305,7 @@ export const TTDDialogBase = withInternalFallback(
                 >
                   <TTDDialogOutput
                     canvasRef={someRandomDivRef}
-                    errorMessage={error}
+                    error={error}
                     loaded={mermaidToExcalidrawLib.loaded}
                   />
                 </TTDDialogPanel>

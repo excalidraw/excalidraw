@@ -175,12 +175,17 @@ $verticalBreakpoint: 861px;
     flex-direction: column;
     width: 100%;
 
-    label {
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 600;
-      margin-bottom: 4px;
-      margin-left: 4px;
+    &__header {
+      display: flex;
+      margin: 0px 4px 4px 4px;
+      align-items: center;
+      gap: 1rem;
+
+      label {
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+      }
     }
 
     &:first-child {

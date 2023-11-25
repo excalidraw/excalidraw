@@ -925,3 +925,7 @@ export const isMemberOf = <T extends string>(
 };
 
 export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
+
+export const isFiniteNumber = (value: any): value is number => {
+  return typeof value === "number" && Number.isFinite(value);
+};

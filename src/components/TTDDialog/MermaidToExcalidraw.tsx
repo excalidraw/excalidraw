@@ -42,7 +42,7 @@ const MermaidToExcalidraw = ({
 }) => {
   const [text, setText] = useState("");
   const deferredText = useDeferredValue(text.trim());
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
   const data = useRef<{
@@ -123,7 +123,7 @@ const MermaidToExcalidraw = ({
           <TTDDialogOutput
             canvasRef={canvasRef}
             loaded={mermaidToExcalidrawLib.loaded}
-            errorMessage={error}
+            error={error}
           />
         </TTDDialogPanel>
       </TTDDialogPanels>

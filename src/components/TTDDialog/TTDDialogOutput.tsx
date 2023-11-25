@@ -12,23 +12,23 @@ const ErrorComp = ({ error }: { error: string }) => {
 };
 
 interface TTDDialogOutputProps {
-  errorMessage: string | null;
+  error: Error | null;
   canvasRef: React.RefObject<HTMLDivElement>;
   loaded: boolean;
 }
 
 export const TTDDialogOutput = ({
-  errorMessage,
+  error,
   canvasRef,
   loaded,
 }: TTDDialogOutputProps) => {
   return (
     <div className="ttd-dialog-output-wrapper">
-      {errorMessage && <ErrorComp error={errorMessage} />}
+      {error && <ErrorComp error={error.message} />}
       {loaded ? (
         <div
           ref={canvasRef}
-          style={{ opacity: errorMessage ? "0.15" : 1 }}
+          style={{ opacity: error ? "0.15" : 1 }}
           className="ttd-dialog-output-canvas-container"
         />
       ) : (
