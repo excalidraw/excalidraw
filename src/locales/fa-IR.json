@@ -132,7 +132,9 @@
     "sidebarLock": "باز نگه داشتن سایدبار",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "انتخاب رنگ از کرباس"
+    "eyeDropper": "انتخاب رنگ از کرباس",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
