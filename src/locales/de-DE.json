@@ -132,7 +132,9 @@
     "sidebarLock": "Seitenleiste offen lassen",
     "selectAllElementsInFrame": "Alle Elemente im Rahmen auswählen",
     "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
-    "eyeDropper": "Farbe von der Zeichenfläche auswählen"
+    "eyeDropper": "Farbe von der Zeichenfläche auswählen",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
