@@ -132,7 +132,9 @@
     "sidebarLock": "שמור את סרגל הצד פתוח",
     "selectAllElementsInFrame": "בחר את כל האלמנטים במסגרת",
     "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
