@@ -132,7 +132,9 @@
     "sidebarLock": "লক",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
