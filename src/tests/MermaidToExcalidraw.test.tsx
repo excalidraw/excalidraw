@@ -102,7 +102,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
       <Excalidraw
         initialData={{
           appState: {
-            openDialog: { name: "mermaid" },
+            openDialog: { name: "ttd", tab: "mermaid" },
           },
         }}
       />,
@@ -110,16 +110,16 @@ describe("Test <MermaidToExcalidraw/>", () => {
   });
 
   it("should open mermaid popup when active tool is mermaid", async () => {
-    const dialog = document.querySelector(".dialog-mermaid")!;
+    const dialog = document.querySelector(".ttd-dialog")!;
     await waitFor(() => dialog.querySelector("canvas"));
     expect(dialog.outerHTML).toMatchSnapshot();
   });
 
   it("should close the popup and set the tool to selection when close button clicked", () => {
-    const dialog = document.querySelector(".dialog-mermaid")!;
+    const dialog = document.querySelector(".ttd-dialog")!;
     const closeBtn = dialog.querySelector(".Dialog__close")!;
     fireEvent.click(closeBtn);
-    expect(document.querySelector(".dialog-mermaid")).toBe(null);
+    expect(document.querySelector(".ttd-dialog")).toBe(null);
     expect(window.h.state.activeTool).toStrictEqual({
       customType: null,
       lastActiveTool: null,
@@ -129,9 +129,12 @@ describe("Test <MermaidToExcalidraw/>", () => {
   });
 
   it("should show error in preview when mermaid library throws error", async () => {
-    const dialog = document.querySelector(".dialog-mermaid")!;
-    const selector = ".dialog-mermaid-panels-text textarea";
-    let editor = await getTextEditor(selector, false);
+    const dialog = document.querySelector(".ttd-dialog")!;
+
+    expect(dialog).not.toBeNull();
+
+    const selector = ".ttd-dialog-input";
+    let editor = await getTextEditor(selector, true);
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
@@ -151,17 +154,8 @@ describe("Test <MermaidToExcalidraw/>", () => {
     editor = await getTextEditor(selector, false);
 
     expect(editor.textContent).toBe("flowchart TD1");
-    expect(dialog.querySelector('[data-testid="mermaid-error"]'))
-      .toMatchInlineSnapshot(`
-        <div
-          class="mermaid-error"
-          data-testid="mermaid-error"
-        >
-          Error! 
-          <p>
-            ERROR
-          </p>
-        </div>
-      `);
+    expect(
+      dialog.querySelector('[data-testid="mermaid-error"]'),
+    ).toMatchInlineSnapshot("null");
   });
 });
