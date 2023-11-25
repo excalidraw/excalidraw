@@ -132,7 +132,9 @@
     "sidebarLock": "Ponechat postranní panel otevřený",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "Vyberte barvu z plátna"
+    "eyeDropper": "Vyberte barvu z plátna",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
