@@ -54,7 +54,11 @@ export class ElementBounds {
   static getBounds(element: ExcalidrawElement) {
     const cachedBounds = ElementBounds.boundsCache.get(element);
 
-    if (cachedBounds?.version && cachedBounds.version === element.version) {
+    if (
+      cachedBounds?.version &&
+      cachedBounds.version === element.version &&
+      (element.type !== "text" || !element.containerId)
+    ) {
       return cachedBounds.bounds;
     }
 
