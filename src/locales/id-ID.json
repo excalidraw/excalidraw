@@ -132,7 +132,9 @@
     "sidebarLock": "Biarkan sidebar tetap terbuka",
     "selectAllElementsInFrame": "Pilih semua elemen di bingkai",
     "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
-    "eyeDropper": "Ambil warna dari kanvas"
+    "eyeDropper": "Ambil warna dari kanvas",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
