@@ -132,7 +132,9 @@
     "sidebarLock": "Giữ thanh bên luôn mở",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Chưa có món nào...",
