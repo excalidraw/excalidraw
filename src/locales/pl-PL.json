@@ -132,7 +132,9 @@
     "sidebarLock": "Panel boczny zawsze otwarty",
     "selectAllElementsInFrame": "Zaznacz wszystkie elementy w ramce",
     "removeAllElementsFromFrame": "Usuń wszystkie elementy z ramki",
-    "eyeDropper": "Wybierz kolor z płótna"
+    "eyeDropper": "Wybierz kolor z płótna",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
