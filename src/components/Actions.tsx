@@ -361,7 +361,7 @@ export const ShapesSwitcher = ({
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onSelect={() => {
-                  trackEvent("ai", "d2c-settings", "settings");
+                  trackEvent("ai", "open-settings", "d2c");
                   app.setOpenDialog({
                     name: "magicSettings",
                     source: "settings",

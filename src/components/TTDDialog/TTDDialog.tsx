@@ -26,6 +26,7 @@ import { ArrowRightIcon } from "../icons";
 import "./TTDDialog.scss";
 import { isFiniteNumber } from "../../utils";
 import { atom, useAtom } from "jotai";
+import { trackEvent } from "../../analytics";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
@@ -125,6 +126,8 @@ export const TTDDialogBase = withInternalFallback(
       try {
         setOnTextSubmitInProgess(true);
 
+        trackEvent("ai", "generate", "ttd");
+
         const { generatedResponse, error, rateLimit, rateLimitRemaining } =
           await rest.onTextSubmit(prompt);
 
@@ -149,8 +152,10 @@ export const TTDDialogBase = withInternalFallback(
             setError,
             text: generatedResponse,
           });
+          trackEvent("ai", "mermaid parse success", "ttd");
           saveMermaidDataToStorage(generatedResponse);
         } catch (error: any) {
+          trackEvent("ai", "mermaid parse failed", "ttd");
           setError(
             new Error(
               "Generated an invalid diagram :(. You may also try a different prompt.",

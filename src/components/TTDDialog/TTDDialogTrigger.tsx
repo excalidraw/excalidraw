@@ -4,6 +4,7 @@ import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import { useExcalidrawSetAppState } from "../App";
 import { brainIcon } from "../icons";
 import { t } from "../../i18n";
+import { trackEvent } from "../../analytics";
 
 export const TTDDialogTrigger = ({
   children,
@@ -19,6 +20,7 @@ export const TTDDialogTrigger = ({
     <TTDDialogTriggerTunnel.In>
       <DropdownMenu.Item
         onSelect={() => {
+          trackEvent("ai", "dialog open", "ttd");
           setAppState({ openDialog: { name: "ttd", tab: "text-to-diagram" } });
         }}
         icon={icon ?? brainIcon}
