@@ -254,6 +254,7 @@ export const TTDDialogBase = withInternalFallback(
 
                     return (
                       <div
+                        className="ttd-dialog-rate-limit"
                         style={{
                           fontSize: 12,
                           marginLeft: "auto",
