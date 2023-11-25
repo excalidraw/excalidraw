@@ -132,7 +132,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "Избери цвят от платното"
+    "eyeDropper": "Избери цвят от платното",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Няма добавени неща все още...",
