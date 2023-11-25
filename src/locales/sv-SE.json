@@ -132,7 +132,9 @@
     "sidebarLock": "Håll sidofältet öppet",
     "selectAllElementsInFrame": "Markera alla element i rutan",
     "removeAllElementsFromFrame": "Ta bort alla element från rutan",
-    "eyeDropper": "Välj färg från canvas"
+    "eyeDropper": "Välj färg från canvas",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
