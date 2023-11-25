@@ -132,7 +132,9 @@
     "sidebarLock": "Manter a barra lateral aberta",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
