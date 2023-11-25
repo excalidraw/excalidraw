@@ -132,7 +132,9 @@
     "sidebarLock": "Gardar la barra laterala dobèrta",
     "selectAllElementsInFrame": "Seleccionar totes los elements del quadre",
     "removeAllElementsFromFrame": "Tirar totes los elements d’al quadre",
-    "eyeDropper": "Prendre la color a partir d’un canabàs"
+    "eyeDropper": "Prendre la color a partir d’un canabàs",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
