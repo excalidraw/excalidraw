@@ -132,7 +132,9 @@
     "sidebarLock": "Zijbalk open houden",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
