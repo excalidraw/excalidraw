@@ -132,7 +132,9 @@
     "sidebarLock": "Mantendu alboko barra irekita",
     "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
     "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
-    "eyeDropper": "Aukeratu kolorea oihaletik"
+    "eyeDropper": "Aukeratu kolorea oihaletik",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
