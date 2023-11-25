@@ -13,7 +13,7 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isFrameLikeElement,
+  isIframeLikeElement,
   isMagicFrameElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
@@ -522,7 +522,7 @@ const drawElementFromCanvas = (
     if (
       "scale" in elementWithCanvas.element &&
       !isPendingImageElement(element, renderConfig) &&
-      !isFrameLikeElement(element)
+      !isIframeLikeElement(element)
     ) {
       context.scale(
         elementWithCanvas.element.scale[0],

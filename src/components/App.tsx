@@ -1039,7 +1039,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeEmbeddable?.state === "hover";
 
           // Modify the scale based on el.scale property
-          const [xScale, yScale] = el.scale;
+          const [xScale, yScale] = el.scale ?? [1, 1];
           const scaledTransform = `scale(${scale * xScale}, ${scale * yScale})`;
 
           return (
@@ -1056,10 +1056,9 @@ class App extends React.Component<AppProps, AppState> {
                   : "none",
                 display: isVisible ? "block" : "none",
                 opacity: el.opacity / 100,
-                ["--embeddable-radius" as string]: `${getCornerRadius(
-                  Math.min(el.width, el.height),
-                  el,
-                )}px`,
+                ["--embeddable-radius" as string]: `${
+                  getCornerRadius(Math.min(el.width, el.height), el) / xScale
+                }px`,
               }}
             >
               <div

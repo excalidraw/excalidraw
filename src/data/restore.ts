@@ -294,8 +294,11 @@ const restoreElement = (
     case "ellipse":
     case "rectangle":
     case "diamond":
-    case "iframe":
       return restoreElementWithProperties(element, {});
+    case "iframe":
+      return restoreElementWithProperties(element, {
+        scale: element.scale ?? [1, 1],
+      });
     case "embeddable":
       return restoreElementWithProperties(element, {
         validated: null,

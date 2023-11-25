@@ -104,6 +104,7 @@ export type ExcalidrawIframeElement = _ExcalidrawElementBase &
     type: "iframe";
     // TODO move later to AI-specific frame
     customData?: { generationData?: MagicCacheData };
+    scale: [number, number];
   }>;
 
 export type ExcalidrawIframeLikeElement =

@@ -27,6 +27,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isIframeLikeElement,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
@@ -586,7 +587,7 @@ export const resizeSingleElement = (
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
-    if (isFrameLikeElement(element)) {
+    if (isIframeLikeElement(element)) {
       if (shouldMaintainAspectRatio) {
         const scale: [number, number] = [
           Math.abs(
