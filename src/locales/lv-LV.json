@@ -132,7 +132,9 @@
     "sidebarLock": "Paturēt atvērtu sānjoslu",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Neviena vienība vēl nav pievienota...",
