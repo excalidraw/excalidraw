@@ -132,7 +132,9 @@
     "sidebarLock": "Mantieni aperta la barra laterale",
     "selectAllElementsInFrame": "Seleziona tutti gli elementi nel riquadro",
     "removeAllElementsFromFrame": "Rimuovi tutti gli elementi dal riquadro",
-    "eyeDropper": "Scegli il colore della tela"
+    "eyeDropper": "Scegli il colore della tela",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
