@@ -132,7 +132,9 @@
     "sidebarLock": "साइडबार खुला रखे.",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "चित्रफलक से रंग चुने"
+    "eyeDropper": "चित्रफलक से रंग चुने",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
