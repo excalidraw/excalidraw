@@ -132,7 +132,9 @@
     "sidebarLock": "사이드바 유지",
     "selectAllElementsInFrame": "프레임의 모든 요소 선택",
     "removeAllElementsFromFrame": "프레임의 모든 요소 삭제",
-    "eyeDropper": "캔버스에서 색상 고르기"
+    "eyeDropper": "캔버스에서 색상 고르기",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "추가된 아이템 없음",
