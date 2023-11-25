@@ -132,7 +132,9 @@
     "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
     "selectAllElementsInFrame": "تحديد جميع العناصر في الإطار",
     "removeAllElementsFromFrame": "إزالة جميع العناصر من الإطار",
-    "eyeDropper": "اختيار اللون من القماش"
+    "eyeDropper": "اختيار اللون من القماش",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
