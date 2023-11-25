@@ -132,7 +132,9 @@
     "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی",
     "selectAllElementsInFrame": "هەموو توخمەکانی ناو چوارچێوەکە دیاری بکە",
     "removeAllElementsFromFrame": "هەموو توخمەکانی ناو چوارچێوەکە لابەرە",
-    "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە"
+    "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
