@@ -132,7 +132,9 @@
     "sidebarLock": "Holde sidemenyen åpen",
     "selectAllElementsInFrame": "Velg alle elementene i rammen",
     "removeAllElementsFromFrame": "Fjern alle elementer fra rammen",
-    "eyeDropper": "Velg farge fra lerretet"
+    "eyeDropper": "Velg farge fra lerretet",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
