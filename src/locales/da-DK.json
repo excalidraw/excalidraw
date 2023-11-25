@@ -132,7 +132,9 @@
     "sidebarLock": "Hold sidepanel åben",
     "selectAllElementsInFrame": "Vælg alle elementer i rammen",
     "removeAllElementsFromFrame": "Fjern alle elementer fra ramme",
-    "eyeDropper": "Vælg farve fra lærred"
+    "eyeDropper": "Vælg farve fra lærred",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Ingen varer tilføjet endnu...",
