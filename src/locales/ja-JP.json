@@ -132,7 +132,9 @@
     "sidebarLock": "サイドバーを開いたままにする",
     "selectAllElementsInFrame": "フレーム内のすべての要素を選択",
     "removeAllElementsFromFrame": "フレーム内のすべての要素を削除",
-    "eyeDropper": "キャンバスから色を選択"
+    "eyeDropper": "キャンバスから色を選択",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
