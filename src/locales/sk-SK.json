@@ -132,7 +132,9 @@
     "sidebarLock": "Nechať bočný panel otvorený",
     "selectAllElementsInFrame": "Vybrať všetky prvky v ráme",
     "removeAllElementsFromFrame": "Odstrániť všetky prvky z rámu",
-    "eyeDropper": "Vybrať farbu z plátna"
+    "eyeDropper": "Vybrať farbu z plátna",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
