@@ -13,6 +13,7 @@ import { Point } from "../types";
 import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
+  isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -57,7 +58,9 @@ export class ElementBounds {
     if (
       cachedBounds?.version &&
       cachedBounds.version === element.version &&
-      (element.type !== "text" || !element.containerId)
+      // we don't invalidate cache when we update containers and not labels,
+      // which is causing problems down the line. Fix TBA.
+      !isBoundToContainer(element)
     ) {
       return cachedBounds.bounds;
     }
