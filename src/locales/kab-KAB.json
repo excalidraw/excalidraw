@@ -132,7 +132,9 @@
     "sidebarLock": "Eǧǧ afeggag n yidis yeldi",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
