@@ -6,7 +6,7 @@ import { getDefaultAppState } from "../appState";
 import { AppState, BinaryFiles } from "../types";
 import {
   ExcalidrawElement,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
   NonDeleted,
 } from "../element/types";
 import { restore } from "../data/restore";
@@ -26,7 +26,7 @@ type ExportOpts = {
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
-  exportingFrame?: ExcalidrawFrameElement | null;
+  exportingFrame?: ExcalidrawFrameLikeElement | null;
   getDimensions?: (
     width: number,
     height: number,

@@ -20,7 +20,7 @@ import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
 } from "../element/textElement";
-import { isBoundToContainer, isFrameElement } from "../element/typeChecks";
+import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
@@ -140,11 +140,11 @@ const duplicateElements = (
     }
 
     const boundTextElement = getBoundTextElement(element);
-    const isElementAFrame = isFrameElement(element);
+    const isElementAFrameLike = isFrameLikeElement(element);
 
     if (idsOfElementsToDuplicate.get(element.id)) {
       // if a group or a container/bound-text or frame, duplicate atomically
-      if (element.groupIds.length || boundTextElement || isElementAFrame) {
+      if (element.groupIds.length || boundTextElement || isElementAFrameLike) {
         const groupId = getSelectedGroupForElement(appState, element);
         if (groupId) {
           // TODO:
@@ -154,7 +154,7 @@ const duplicateElements = (
             sortedElements,
             groupId,
           ).flatMap((element) =>
-            isFrameElement(element)
+            isFrameLikeElement(element)
               ? [...getFrameChildren(elements, element.id), element]
               : [element],
           );
@@ -180,7 +180,7 @@ const duplicateElements = (
           );
           continue;
         }
-        if (isElementAFrame) {
+        if (isElementAFrameLike) {
           const elementsInFrame = getFrameChildren(sortedElements, element.id);
 
           elementsWithClones.push(

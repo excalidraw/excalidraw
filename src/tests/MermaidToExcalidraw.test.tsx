@@ -102,7 +102,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
       <Excalidraw
         initialData={{
           appState: {
-            openDialog: "mermaid",
+            openDialog: { name: "mermaid" },
           },
         }}
       />,

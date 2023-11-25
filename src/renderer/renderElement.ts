@@ -13,7 +13,8 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
-  isEmbeddableElement,
+  isFrameLikeElement,
+  isMagicFrameElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -273,6 +274,7 @@ const drawElementOnCanvas = (
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
+    case "iframe":
     case "embeddable":
     case "diamond":
     case "ellipse": {
@@ -520,7 +522,7 @@ const drawElementFromCanvas = (
     if (
       "scale" in elementWithCanvas.element &&
       !isPendingImageElement(element, renderConfig) &&
-      !isEmbeddableElement(element)
+      !isFrameLikeElement(element)
     ) {
       context.scale(
         elementWithCanvas.element.scale[0],
@@ -596,6 +598,7 @@ export const renderElement = (
   appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
+    case "magicframe":
     case "frame": {
       if (appState.frameRendering.enabled && appState.frameRendering.outline) {
         context.save();
@@ -607,6 +610,12 @@ export const renderElement = (
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
+
+        // TODO change later to only affect AI frames
+        if (isMagicFrameElement(element)) {
+          context.strokeStyle =
+            appState.theme === "light" ? "#7affd7" : "#1d8264";
+        }
 
         if (FRAME_STYLE.radius && context.roundRect) {
           context.beginPath();
@@ -668,6 +677,7 @@ export const renderElement = (
     case "arrow":
     case "image":
     case "text":
+    case "iframe":
     case "embeddable": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
@@ -953,6 +963,7 @@ export const renderElementToSvg = (
       addToRoot(g || node, element);
       break;
     }
+    case "iframe":
     case "embeddable": {
       // render placeholder rectangle
       const shape = ShapeCache.generateElementShape(element, true);
@@ -1256,7 +1267,8 @@ export const renderElementToSvg = (
       break;
     }
     // frames are not rendered and only acts as a container
-    case "frame": {
+    case "frame":
+    case "magicframe": {
       if (
         renderConfig.frameRendering.enabled &&
         renderConfig.frameRendering.outline
