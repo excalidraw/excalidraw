@@ -132,7 +132,9 @@
     "sidebarLock": "Obdrži stransko vrstico odprto",
     "selectAllElementsInFrame": "Izberi vse elemente v okvirju",
     "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
-    "eyeDropper": "Izberi barvo s platna"
+    "eyeDropper": "Izberi barvo s platna",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
