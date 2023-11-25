@@ -132,7 +132,9 @@
     "sidebarLock": "侧边栏常驻",
     "selectAllElementsInFrame": "选择画框中的所有元素",
     "removeAllElementsFromFrame": "分离出画框中的所有元素",
-    "eyeDropper": "从画布上取色"
+    "eyeDropper": "从画布上取色",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "尚未添加任何项目……",
