@@ -1088,9 +1088,8 @@ class App extends React.Component<AppProps, AppState> {
                 display: isVisible ? "block" : "none",
                 opacity: el.opacity / 100,
                 ["--embeddable-radius" as string]: `${getCornerRadius(
-                  Math.min(el.width, el.height),
-                  el,
-                )}px`,
+                  Math.min(el.width, el.height), el) / xScale //zsviczian
+                }px`,
               }}
             >
               <div
