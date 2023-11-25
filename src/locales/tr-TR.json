@@ -132,7 +132,9 @@
     "sidebarLock": "Kenar çubuğu açık kalsın",
     "selectAllElementsInFrame": "Çerçevedeki tüm bileşenleri seç",
     "removeAllElementsFromFrame": "Çerçevedeki tüm bileşenleri sil",
-    "eyeDropper": "Tuvalden renk seç"
+    "eyeDropper": "Tuvalden renk seç",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
