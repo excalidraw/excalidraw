@@ -132,7 +132,9 @@
     "sidebarLock": "Не закривати бокове меню",
     "selectAllElementsInFrame": "Обрати всі елементи у фреймі",
     "removeAllElementsFromFrame": "Видалити всі елементи з фрейму",
-    "eyeDropper": "Вибрати колір з полотна"
+    "eyeDropper": "Вибрати колір з полотна",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Тут поки пусто...",
