@@ -132,7 +132,9 @@
     "sidebarLock": "பக்கப்பட்டையைத் திறந்தே வை",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "கித்தானிலிருந்து நிறம் தேர்ந்தெடு"
+    "eyeDropper": "கித்தானிலிருந்து நிறம் தேர்ந்தெடு",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "இதுவரை உருப்படிகள் சேரக்கப்படவில்லை...",
