@@ -132,7 +132,9 @@
     "sidebarLock": "Κρατήστε την πλαϊνή μπάρα ανοιχτή",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
