@@ -63,9 +63,13 @@
       }
 
       &__text {
+        display: flex;
+        align-items: center;
+        width: 100%;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        gap: 0.75rem;
       }
 
       &__shortcut {

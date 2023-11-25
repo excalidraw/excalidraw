@@ -132,7 +132,9 @@
     "sidebarLock": "Keep sidebar open",
     "selectAllElementsInFrame": "Select all elements in frame",
     "removeAllElementsFromFrame": "Remove all elements from frame",
-    "eyeDropper": "Pick color from canvas"
+    "eyeDropper": "Pick color from canvas",
+    "textToDiagram": "Text to diagram",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "No items added yet...",

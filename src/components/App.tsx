@@ -381,7 +381,6 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
-import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import { LaserToolOverlay } from "./LaserTool/LaserTool";
 import { LaserPathManager } from "./LaserTool/LaserPathManager";
 import {
@@ -1435,9 +1434,6 @@ class App extends React.Component<AppProps, AppState> {
                           onMagicSettingsConfirm={this.onMagicSettingsConfirm}
                         >
                           {this.props.children}
-                          {this.state.openDialog?.name === "mermaid" && (
-                            <MermaidToExcalidraw />
-                          )}
                         </LayerUI>
 
                         <div className="excalidraw-textEditorContainer" />
@@ -1706,7 +1702,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         openDialog: { name: "magicSettings", source: "generation" },
       });
-      trackEvent("ai", "d2c-generate", "missing-key");
+      trackEvent("ai", "generate (missing key)", "d2c");
       return;
     }
 
@@ -1719,7 +1715,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!magicFrameChildren.length) {
       if (source === "button") {
         this.setState({ errorMessage: "Cannot generate from an empty frame" });
-        trackEvent("ai", "d2c-generate", "no-children");
+        trackEvent("ai", "generate (no-children)", "d2c");
       } else {
         this.setActiveTool({ type: "magicframe" });
       }
@@ -1761,7 +1757,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const textFromFrameChildren = this.getTextFromElements(magicFrameChildren);
 
-    trackEvent("ai", "d2c-generate", "generating");
+    trackEvent("ai", "generate (start)", "d2c");
 
     const result = await diagramToHTML({
       image: dataURL,
@@ -1771,7 +1767,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (!result.ok) {
-      trackEvent("ai", "d2c-generate", "generating-failed");
+      trackEvent("ai", "generate (failed)", "d2c");
       console.error(result.error);
       this.updateMagicGeneration({
         frameElement,
@@ -1783,7 +1779,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       return;
     }
-    trackEvent("ai", "d2c-generate", "generating-done");
+    trackEvent("ai", "generate (success)", "d2c");
 
     if (result.choices[0].message.content == null) {
       this.updateMagicGeneration({
@@ -1877,7 +1873,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         openDialog: { name: "magicSettings", source: "tool" },
       });
-      trackEvent("ai", "d2c-tool", "missing-key");
+      trackEvent("ai", "tool-select (missing key)", "d2c");
       return;
     }
 
@@ -1887,7 +1883,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (selectedElements.length === 0) {
       this.setActiveTool({ type: TOOL_TYPE.magicframe });
-      trackEvent("ai", "d2c-tool", "empty-selection");
+      trackEvent("ai", "tool-select (empty-selection)", "d2c");
     } else {
       const selectedMagicFrame: ExcalidrawMagicFrameElement | false =
         selectedElements.length === 1 &&
@@ -1905,7 +1901,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      trackEvent("ai", "d2c-tool", "existing-selection");
+      trackEvent("ai", "tool-select (existing selection)", "d2c");
 
       let frame: ExcalidrawMagicFrameElement;
       if (selectedMagicFrame) {

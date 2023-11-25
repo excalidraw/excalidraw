@@ -62,6 +62,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
 import { MagicSettings } from "./MagicSettings";
+import { TTDDialog } from "./TTDDialog/TTDDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -396,6 +397,7 @@ const LayerUI = ({
         {t("toolBar.library")}
       </DefaultSidebar.Trigger>
       <DefaultOverwriteConfirmDialog />
+      {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
       {/* ------------------------------------------------------------------ */}
 
       {appState.isLoading && <LoadingMessage delay={250} />}
