@@ -132,7 +132,9 @@
     "sidebarLock": "Păstrează deschisă bara laterală",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "Alegere culoare din pânză"
+    "eyeDropper": "Alegere culoare din pânză",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
