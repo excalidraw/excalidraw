@@ -132,7 +132,9 @@
     "sidebarLock": "Держать боковую панель открытой",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "Взять образец цвета с холста"
+    "eyeDropper": "Взять образец цвета с холста",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
