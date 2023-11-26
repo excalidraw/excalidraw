@@ -92,6 +92,7 @@ $verticalBreakpoint: 861px;
     padding: 0.85rem;
     box-sizing: border-box;
     font-family: monospace;
+    text-wrap: wrap !important; //zsviczian
 
     @media screen and (min-width: $verticalBreakpoint) {
       width: 100%;
