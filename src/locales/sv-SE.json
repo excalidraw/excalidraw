@@ -11,8 +11,8 @@
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
     "copyText": "Kopiera till urklipp som text",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Kopiera källa till urklipp",
+    "convertToCode": "Konvertera till kod",
     "bringForward": "Flytta framåt",
     "sendToBack": "Flytta underst",
     "bringToFront": "Flytta främst",
@@ -222,7 +222,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Inbäddbara element kan inte läggas till i biblioteket.",
-      "iframe": "",
+      "iframe": "IFrame-element kan inte läggas till i biblioteket.",
       "image": "Stöd för att lägga till bilder till biblioteket kommer snart!"
     },
     "asyncPasteFailedOnRead": "Kunde inte klistra in (kunde inte läsa från urklipp).",
@@ -245,13 +245,13 @@
     "link": "Lägg till / Uppdatera länk för en vald form",
     "eraser": "Radergummi",
     "frame": "Rutverktyg",
-    "magicframe": "",
+    "magicframe": "Trådram till kod",
     "embeddable": "Bädda in (web)",
     "laser": "Laserpekare",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
     "mermaidToExcalidraw": "Mermaid till Excalidraw",
-    "magicSettings": ""
+    "magicSettings": "AI-inställningar"
   },
   "headings": {
     "canvasActions": "Canvas-åtgärder",
