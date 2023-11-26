@@ -40,6 +40,7 @@ import {
   MagicIcon,
 } from "./icons";
 import { KEYS } from "../keys";
+import { useTunnels } from "../context/tunnels";
 
 export const SelectedShapeActions = ({
   appState,
@@ -236,6 +237,8 @@ export const ShapesSwitcher = ({
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
+  const { TTDDialogTriggerTunnel } = useTunnels();
+
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -339,9 +342,10 @@ export const ShapesSwitcher = ({
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
           </div>
+          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
           {renderMermaid && ( //zsviczian
             <DropdownMenu.Item
-              onSelect={() => app.setOpenDialog({ name: "mermaid" })}
+              onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
               icon={mermaidLogoIcon}
               data-testid="toolbar-embeddable"
             >
@@ -356,10 +360,11 @@ export const ShapesSwitcher = ({
                 data-testid="toolbar-magicframe"
               >
                 {t("toolBar.magicframe")}
+                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onSelect={() => {
-                  trackEvent("ai", "d2c-settings", "settings");
+                  trackEvent("ai", "open-settings", "d2c");
                   app.setOpenDialog({
                     name: "magicSettings",
                     source: "settings",

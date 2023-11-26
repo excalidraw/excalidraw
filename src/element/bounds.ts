@@ -13,6 +13,7 @@ import { Point } from "../types";
 import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
+  isBoundToContainer,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -54,7 +55,13 @@ export class ElementBounds {
   static getBounds(element: ExcalidrawElement) {
     const cachedBounds = ElementBounds.boundsCache.get(element);
 
-    if (cachedBounds?.version && cachedBounds.version === element.version) {
+    if (
+      cachedBounds?.version &&
+      cachedBounds.version === element.version &&
+      // we don't invalidate cache when we update containers and not labels,
+      // which is causing problems down the line. Fix TBA.
+      !isBoundToContainer(element)
+    ) {
       return cachedBounds.bounds;
     }
 
