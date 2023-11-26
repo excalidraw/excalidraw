@@ -1126,9 +1126,9 @@ class App extends React.Component<AppProps, AppState> {
                 )}
                 <div
                   className="excalidraw__embeddable__outer"
-                  /*style={{
-                    padding: `${el.strokeWidth / el.scale[0]}px`, //zsviczian MDEmbeddable round border cutoff issue
-                  }}*/
+                  style={{
+                    padding: `${el.strokeWidth / (4*el.scale[0])}px`, //zsviczian MDEmbeddable round border cutoff issue
+                  }}
                 >
                   {(isEmbeddableElement(el)
                     ? this.props.renderEmbeddable?.(el, this.state)
