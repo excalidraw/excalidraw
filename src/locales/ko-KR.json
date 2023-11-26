@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "프레임의 모든 요소 선택",
     "removeAllElementsFromFrame": "프레임의 모든 요소 삭제",
     "eyeDropper": "캔버스에서 색상 고르기",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "텍스트를 다이어그램으로",
+    "prompt": "프롬프트"
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -245,7 +245,7 @@
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
     "frame": "프레임 도구",
-    "magicframe": "와이어프레임을 코드로 변환",
+    "magicframe": "와이어프레임을 코드로",
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
