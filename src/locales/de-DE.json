@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "Alle Elemente im Rahmen auswählen",
     "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
     "eyeDropper": "Farbe von der Zeichenfläche auswählen",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Text zu Diagramm",
+    "prompt": "Eingabe"
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
