@@ -37,6 +37,32 @@ const DropdownMenuItem = ({
     </button>
   );
 };
+DropdownMenuItem.displayName = "DropdownMenuItem";
+
+export const DropDownMenuItemBadge = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        marginLeft: "auto",
+        padding: "1px 4px",
+        background: "pink",
+        borderRadius: 6,
+        fontSize: 11,
+        color: "black",
+        fontFamily: "monospace",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+DropDownMenuItemBadge.displayName = "DropdownMenuItemBadge";
+
+DropdownMenuItem.Badge = DropDownMenuItemBadge;
 
 export default DropdownMenuItem;
-DropdownMenuItem.displayName = "DropdownMenuItem";
