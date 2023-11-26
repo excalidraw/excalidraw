@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "选择画框中的所有元素",
     "removeAllElementsFromFrame": "分离出画框中的所有元素",
     "eyeDropper": "从画布上取色",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "文字至图表",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
