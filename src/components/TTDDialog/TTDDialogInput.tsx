@@ -45,7 +45,7 @@ export const TTDDialogInput = ({
       onChange={onChange}
       value={input}
       placeholder={placeholder}
-      autoFocus
+      //autoFocus //zsviczian - takes obsidian to full screen
       ref={ref}
     />
   );

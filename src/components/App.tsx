@@ -1758,6 +1758,11 @@ class App extends React.Component<AppProps, AppState> {
     source: "button" | "upstream",
   ) {
     if (!this.OPENAI_KEY) {
+      this.setToast({ //zsviczian
+        message: "You must first configure your OpenAI API key in plugin settings",
+        duration: 5000,
+      });
+      return;
       this.setState({
         openDialog: { name: "magicSettings", source: "generation" },
       });
@@ -1876,9 +1881,10 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private OPENAI_KEY: string | null = EditorLocalStorage.get(
-    EDITOR_LS_KEYS.OAI_API_KEY,
-  );
+  //zsviczian - ugly hack
+  //@ts-ignore
+  private OPENAI_KEY: string | null = window.ExcalidrawAutomate?.plugin?.settings?.openAIAPIToken;
+  
   private OPENAI_KEY_IS_PERSISTED: boolean =
     EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
 
@@ -1929,10 +1935,10 @@ class App extends React.Component<AppProps, AppState> {
 
   public onMagicframeToolSelect = () => {
     if (!this.OPENAI_KEY) {
-      this.setState({
-        openDialog: { name: "magicSettings", source: "tool" },
+      this.setToast({ //zsviczian
+        message: "You must first configure your OpenAI API key in plugin settings",
+        duration: 5000,
       });
-      trackEvent("ai", "tool-select (missing key)", "d2c");
       return;
     }
 

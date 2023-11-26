@@ -29,7 +29,7 @@ import { atom, useAtom } from "jotai";
 import { trackEvent } from "../../analytics";
 
 const MIN_PROMPT_LENGTH = 3;
-const MAX_PROMPT_LENGTH = 1000;
+const MAX_PROMPT_LENGTH = 40000; //zsviczian - was 1000
 
 const rateLimitsAtom = atom<{
   rateLimit: number;

@@ -362,7 +362,7 @@ export const ShapesSwitcher = ({
                 {t("toolBar.magicframe")}
                 <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
               </DropdownMenu.Item>
-              <DropdownMenu.Item
+              {/*<DropdownMenu.Item //zsviczian
                 onSelect={() => {
                   trackEvent("ai", "open-settings", "d2c");
                   app.setOpenDialog({
@@ -374,7 +374,7 @@ export const ShapesSwitcher = ({
                 data-testid="toolbar-magicSettings"
               >
                 {t("toolBar.magicSettings")}
-              </DropdownMenu.Item>
+              </DropdownMenu.Item>*/}
             </>
           )}
         </DropdownMenu.Content>
