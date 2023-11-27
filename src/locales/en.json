@@ -251,7 +251,8 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "magicSettings": "AI settings"
+    "magicSettings": "AI settings",
+    "textToExcalidraw": "Text to Excalidraw"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -517,5 +518,10 @@
     "description": "Currently only <flowchartLink>Flowcharts</flowchartLink> and <sequenceLink>Sequence Diagrams</sequenceLink> are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
+  },
+  "textToExcalidraw": {
+    "title": "Text to Excalidraw",
+    "description": "Test",
+    "button": "Insert"
   }
 }
