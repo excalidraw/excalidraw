@@ -3543,7 +3543,7 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
-      if(this.state.resizingElement && event.shiftKey) {
+      if (this.state.resizingElement && event.shiftKey) {
         event.stopPropagation();
         return;
       }
