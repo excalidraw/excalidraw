@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "Sélectionner tous les éléments du cadre",
     "removeAllElementsFromFrame": "Supprimer tous les éléments du cadre",
     "eyeDropper": "Choisir la couleur depuis la toile",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Texte vers Diagramme",
+    "prompt": "Consignes"
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
