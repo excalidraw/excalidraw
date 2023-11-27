@@ -150,11 +150,19 @@ export const TTDDialogBase = withInternalFallback(
             data,
             mermaidToExcalidrawLib,
             setError,
-            text: generatedResponse,
+            mermaidDefinition: generatedResponse,
           });
           trackEvent("ai", "mermaid parse success", "ttd");
           saveMermaidDataToStorage(generatedResponse);
         } catch (error: any) {
+          console.info(
+            `%cTTD mermaid render errror: ${error.message}`,
+            "color: red",
+          );
+          console.info(
+            `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render errror: ${error.message}`,
+            "color: yellow",
+          );
           trackEvent("ai", "mermaid parse failed", "ttd");
           setError(
             new Error(
