@@ -43,7 +43,7 @@ export interface MermaidToExcalidrawLibProps {
 interface ConvertMermaidToExcalidrawFormatProps {
   canvasRef: React.RefObject<HTMLDivElement>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
-  text: string;
+  mermaidDefinition: string;
   setError: (error: Error | null) => void;
   data: React.MutableRefObject<{
     elements: readonly NonDeletedExcalidrawElement[];
@@ -54,7 +54,7 @@ interface ConvertMermaidToExcalidrawFormatProps {
 export const convertMermaidToExcalidraw = async ({
   canvasRef,
   mermaidToExcalidrawLib,
-  text,
+  mermaidDefinition,
   setError,
   data,
 }: ConvertMermaidToExcalidrawFormatProps) => {
@@ -65,7 +65,7 @@ export const convertMermaidToExcalidraw = async ({
     return;
   }
 
-  if (!text) {
+  if (!mermaidDefinition) {
     resetPreview({ canvasRef, setError });
     return;
   }
@@ -73,9 +73,20 @@ export const convertMermaidToExcalidraw = async ({
   try {
     const api = await mermaidToExcalidrawLib.api;
 
-    const { elements, files } = await api.parseMermaidToExcalidraw(text, {
-      fontSize: DEFAULT_FONT_SIZE,
-    });
+    let ret;
+    try {
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
+        fontSize: DEFAULT_FONT_SIZE,
+      });
+    } catch (err: any) {
+      ret = await api.parseMermaidToExcalidraw(
+        mermaidDefinition.replace(/"/g, "'"),
+        {
+          fontSize: DEFAULT_FONT_SIZE,
+        },
+      );
+    }
+    const { elements, files } = ret;
     setError(null);
 
     data.current = {
@@ -101,7 +112,7 @@ export const convertMermaidToExcalidraw = async ({
   } catch (err: any) {
     console.error(err);
     parent.style.background = "var(--default-bg-color)";
-    if (text) {
+    if (mermaidDefinition) {
       setError(err);
     }
 

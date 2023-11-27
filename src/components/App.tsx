@@ -1700,7 +1700,11 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     if (!this.OPENAI_KEY) {
       this.setState({
-        openDialog: { name: "magicSettings", source: "generation" },
+        openDialog: {
+          name: "settings",
+          tab: "diagram-to-code",
+          source: "generation",
+        },
       });
       trackEvent("ai", "generate (missing key)", "d2c");
       return;
@@ -1871,7 +1875,11 @@ class App extends React.Component<AppProps, AppState> {
   public onMagicframeToolSelect = () => {
     if (!this.OPENAI_KEY) {
       this.setState({
-        openDialog: { name: "magicSettings", source: "tool" },
+        openDialog: {
+          name: "settings",
+          tab: "diagram-to-code",
+          source: "tool",
+        },
       });
       trackEvent("ai", "tool-select (missing key)", "d2c");
       return;
