@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "Markera alla element i rutan",
     "removeAllElementsFromFrame": "Ta bort alla element från rutan",
     "eyeDropper": "Välj färg från canvas",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Text till diagram",
+    "prompt": "Fråga"
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
