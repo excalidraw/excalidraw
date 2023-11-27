@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Alegere culoare din pânză",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Text la diagramă",
+    "prompt": "Solicitare"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
