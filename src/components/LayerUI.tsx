@@ -461,14 +461,14 @@ const LayerUI = ({
           }}
         />
       )}
-      {appState.openDialog?.name === "magicSettings" && (
+      {appState.openDialog?.name === "settings" && (
         <MagicSettings
           openAIKey={openAIKey}
           isPersisted={isOpenAIKeyPersisted}
           onChange={onOpenAIAPIKeyChange}
           onConfirm={(apiKey, shouldPersist) => {
             const source =
-              appState.openDialog?.name === "magicSettings"
+              appState.openDialog?.name === "settings"
                 ? appState.openDialog?.source
                 : "settings";
             setAppState({ openDialog: null }, () => {

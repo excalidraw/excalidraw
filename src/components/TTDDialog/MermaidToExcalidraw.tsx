@@ -63,7 +63,7 @@ const MermaidToExcalidraw = ({
       data,
       mermaidToExcalidrawLib,
       setError,
-      text: deferredText,
+      mermaidDefinition: deferredText,
     }).catch(() => {});
   }, [deferredText, mermaidToExcalidrawLib]);
 

@@ -18,8 +18,11 @@
     overflow: auto;
     padding: calc(var(--space-factor) * 10);
 
+    display: flex;
+    flex-direction: column;
+
     .Island {
-      padding: 2.5rem !important;
+      padding: 2.5rem;
     }
   }
 

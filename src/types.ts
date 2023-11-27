@@ -248,13 +248,14 @@ export interface AppState {
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
     | {
-        name: "magicSettings";
+        name: "settings";
         source:
           | "tool" // when magicframe tool is selected
           | "generation" // when magicframe generate button is clicked
           | "settings"; // when AI settings dialog is explicitly invoked
+        tab: "text-to-diagram" | "diagram-to-code";
       }
-    | { name: "ttd"; tab: string };
+    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
