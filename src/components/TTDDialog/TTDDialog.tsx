@@ -72,7 +72,7 @@ export const TTDDialogBase = withInternalFallback(
     tab,
     ...rest
   }: {
-    tab: string;
+    tab: "text-to-diagram" | "mermaid";
   } & (
     | {
         onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
@@ -206,17 +206,34 @@ export const TTDDialogBase = withInternalFallback(
           app.setOpenDialog(null);
         }}
         size={1200}
-        title=""
+        title={false}
         {...rest}
         autofocus={false}
       >
-        <TTDDialogTabs tab={tab}>
+        <TTDDialogTabs dialog="ttd" tab={tab}>
           {"__fallback" in rest && rest.__fallback ? (
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
           ) : (
             <TTDDialogTabTriggers>
               <TTDDialogTabTrigger tab="text-to-diagram">
-                {t("labels.textToDiagram")}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {t("labels.textToDiagram")}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "1px 6px",
+                      marginLeft: "10px",
+                      fontSize: 10,
+                      borderRadius: "12px",
+                      background: "pink",
+                      color: "#000",
+                    }}
+                  >
+                    AI Beta
+                  </div>
+                </div>
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
             </TTDDialogTabTriggers>
