@@ -652,6 +652,19 @@
       --button-bg: var(--color-surface-high);
     }
   }
+
+  .excalidraw__paragraph {
+    margin: 1rem 0;
+  }
+
+  .Modal__content {
+    .excalidraw__paragraph:first-child {
+      margin-top: 0;
+    }
+    .excalidraw__paragraph + .excalidraw__paragraph {
+      margin-top: 0rem;
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {
@@ -734,9 +747,5 @@
     font-weight: bold;
     letter-spacing: 0.6px;
     font-family: "Assistant";
-  }
-
-  .excalidraw__paragraph {
-    margin: 1rem 0;
   }
 }
