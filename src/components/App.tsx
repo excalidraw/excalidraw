@@ -3761,8 +3761,11 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (this.state.resizingElement && event.shiftKey) {
+        event.stopPropagation(); //zsviczian shift fires repeatedly causing slowdown when resizing sticky notes
+        return;
+      }
       // normalize `event.key` when CapsLock is pressed #2372
-
       if (
         "Proxy" in window &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
