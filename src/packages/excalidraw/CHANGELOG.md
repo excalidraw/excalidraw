@@ -11,6 +11,22 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Fixes
+
+- Umd build for browser since it was breaking in v0.17.0 [#7349](https://github.com/excalidraw/excalidraw/pull/7349). Also make sure that when using `Vite`, the `process.env.IS_PREACT` is set as `"true"` (string) and not a boolean.
+
+```
+define: {
+  "process.env.IS_PREACT": JSON.stringify("true"),
+}
+```
+
+### Breaking Changes
+
+- `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
+
 ## 0.17.0 (2023-11-14)
 
 ### Features
