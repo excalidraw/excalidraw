@@ -255,7 +255,7 @@ export interface AppState {
           | "settings"; // when AI settings dialog is explicitly invoked
         tab: "text-to-diagram" | "diagram-to-code";
       }
-    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" };
+    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" | "text-to-drawing" };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *

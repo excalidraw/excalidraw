@@ -13,7 +13,7 @@ export const TTDDialogTrigger = ({
 }: {
   children?: ReactNode;
   icon?: JSX.Element;
-  tab?: string;
+  tab?: "mermaid" | "text-to-diagram" | "text-to-drawing";
 }) => {
   const { TTDDialogTriggerTunnel } = useTunnels();
   const setAppState = useExcalidrawSetAppState();

@@ -49,7 +49,7 @@ const TTDDialogTabs = (
           });
         } else if (
           props.dialog === "ttd" &&
-          isMemberOf(["text-to-diagram", "mermaid"], tab)
+          isMemberOf(["text-to-diagram", "mermaid", "text-to-drawing"], tab)
         ) {
           setAppState({
             openDialog: { name: props.dialog, tab },

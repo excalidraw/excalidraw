@@ -91,7 +91,24 @@ export const TTDDialogBase = withInternalFallback(
                 </div>
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="text-to-drawing">
-                {t("labels.textToDrawing")}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {t("labels.textToDrawing")}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "1px 6px",
+                      marginLeft: "10px",
+                      fontSize: 10,
+                      borderRadius: "12px",
+                      background: "pink",
+                      color: "#000",
+                    }}
+                  >
+                    AI Beta
+                  </div>
+                </div>
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
             </TTDDialogTabTriggers>
