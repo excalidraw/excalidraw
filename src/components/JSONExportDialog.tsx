@@ -117,7 +117,7 @@ export const JSONExportDialog = ({
 
   return (
     <>
-      {appState.openDialog === "jsonExport" && (
+      {appState.openDialog?.name === "jsonExport" && (
         <Dialog onCloseRequest={handleClose} title={t("buttons.export")}>
           <JSONExportModal
             elements={elements}

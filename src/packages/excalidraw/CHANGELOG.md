@@ -17,6 +17,10 @@ Please add the latest change on the top under the correct section.
 
 - Umd build for browser since it was breaking in v0.17.0 [#7349](https://github.com/excalidraw/excalidraw/pull/7349).
 
+### Breaking Changes
+
+- `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
+
 ## 0.17.0 (2023-11-14)
 
 ### Features

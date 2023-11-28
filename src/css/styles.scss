@@ -5,9 +5,11 @@
   --zIndex-canvas: 1;
   --zIndex-interactiveCanvas: 2;
   --zIndex-wysiwyg: 3;
+  --zIndex-canvasButtons: 3;
   --zIndex-layerUI: 4;
   --zIndex-eyeDropperBackdrop: 5;
   --zIndex-eyeDropperPreview: 6;
+  --zIndex-hyperlinkContainer: 7;
 
   --zIndex-modal: 1000;
   --zIndex-popup: 1001;
@@ -37,6 +39,7 @@
 
   button {
     cursor: pointer;
+    user-select: none;
   }
 
   &:focus {
@@ -531,6 +534,12 @@
     }
   }
 
+  input.is-redacted {
+    // we don't use type=password because browsers (chrome?) prompt
+    // you to save it which is annoying
+    -webkit-text-security: disc;
+  }
+
   input[type="text"],
   textarea:not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);
@@ -641,6 +650,19 @@
     @at-root .excalidraw.theme--dark#{&} {
       --button-hover-bg: #363541;
       --button-bg: var(--color-surface-high);
+    }
+  }
+
+  .excalidraw__paragraph {
+    margin: 1rem 0;
+  }
+
+  .Modal__content {
+    .excalidraw__paragraph:first-child {
+      margin-top: 0;
+    }
+    .excalidraw__paragraph + .excalidraw__paragraph {
+      margin-top: 0rem;
     }
   }
 }
