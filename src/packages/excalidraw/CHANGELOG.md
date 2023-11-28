@@ -11,6 +11,12 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## Unreleased
+
+### Fixes
+
+- Umd build for browser since it was breaking in v0.17.0 [#7349](https://github.com/excalidraw/excalidraw/pull/7349).
+
 ## 0.17.0 (2023-11-14)
 
 ### Features
