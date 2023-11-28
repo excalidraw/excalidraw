@@ -7,8 +7,11 @@ const TTDDialogTabs = (
   props: {
     children: ReactNode;
   } & (
-    | { dialog: "ttd"; tab: "text-to-diagram" | "mermaid" }
-    | { dialog: "settings"; tab: "text-to-diagram" | "diagram-to-code" }
+    | { dialog: "ttd"; tab: "text-to-diagram" | "mermaid" | "text-to-drawing" }
+    | {
+        dialog: "settings";
+        tab: "text-to-diagram" | "diagram-to-code";
+      }
   ),
 ) => {
   const setAppState = useExcalidrawSetAppState();

@@ -134,7 +134,8 @@
     "removeAllElementsFromFrame": "Remove all elements from frame",
     "eyeDropper": "Pick color from canvas",
     "textToDiagram": "Text to diagram",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "textToDrawing": "Text to drawing"
   },
   "library": {
     "noItems": "No items added yet...",

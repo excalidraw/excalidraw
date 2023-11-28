@@ -8,8 +8,9 @@ import {
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppClassProperties, BinaryFiles } from "../../types";
 import { canvasToBlob } from "../../data/blob";
+import { atom } from "jotai";
 
-const resetPreview = ({
+export const resetPreview = ({
   canvasRef,
   setError,
 }: {
@@ -29,6 +30,26 @@ const resetPreview = ({
   setError(null);
   canvasNode.replaceChildren();
 };
+
+export type OnTestSubmitRetValue = {
+  rateLimit?: number | null;
+  rateLimitRemaining?: number | null;
+} & (
+  | {
+      generatedResponse: any | string | undefined;
+      error?: null | undefined;
+    }
+  | {
+      error: Error;
+      generatedResponse?: null | undefined;
+    }
+);
+export interface CommonDialogProps {
+  onTextSubmit(
+    value: string,
+    type: "text-to-diagram" | "text-to-drawing",
+  ): Promise<OnTestSubmitRetValue>;
+}
 
 export interface MermaidToExcalidrawLibProps {
   loaded: boolean;
@@ -137,14 +158,14 @@ export const insertToEditor = ({
   shouldSaveMermaidDataToStorage,
 }: {
   app: AppClassProperties;
-  data: React.MutableRefObject<{
+  data: {
     elements: readonly NonDeletedExcalidrawElement[];
     files: BinaryFiles | null;
-  }>;
+  };
   text?: string;
   shouldSaveMermaidDataToStorage?: boolean;
 }) => {
-  const { elements: newElements, files } = data.current;
+  const { elements: newElements, files } = data;
 
   if (!newElements.length) {
     return;
@@ -162,3 +183,11 @@ export const insertToEditor = ({
     saveMermaidDataToStorage(text);
   }
 };
+
+export const MIN_PROMPT_LENGTH = 3;
+export const MAX_PROMPT_LENGTH = 1000;
+
+export const rateLimitsAtom = atom<{
+  rateLimit: number;
+  rateLimitRemaining: number;
+} | null>(null);

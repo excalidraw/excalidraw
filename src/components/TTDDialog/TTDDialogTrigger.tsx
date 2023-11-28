@@ -9,9 +9,11 @@ import { trackEvent } from "../../analytics";
 export const TTDDialogTrigger = ({
   children,
   icon,
+  tab,
 }: {
   children?: ReactNode;
   icon?: JSX.Element;
+  tab?: string;
 }) => {
   const { TTDDialogTriggerTunnel } = useTunnels();
   const setAppState = useExcalidrawSetAppState();
@@ -21,7 +23,9 @@ export const TTDDialogTrigger = ({
       <DropdownMenu.Item
         onSelect={() => {
           trackEvent("ai", "dialog open", "ttd");
-          setAppState({ openDialog: { name: "ttd", tab: "text-to-diagram" } });
+          setAppState({
+            openDialog: { name: "ttd", tab: tab ?? "text-to-diagram" },
+          });
         }}
         icon={icon ?? brainIcon}
       >

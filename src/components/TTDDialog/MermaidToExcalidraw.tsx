@@ -111,7 +111,7 @@ const MermaidToExcalidraw = ({
             action: () => {
               insertToEditor({
                 app,
-                data,
+                data: data.current,
                 text,
                 shouldSaveMermaidDataToStorage: true,
               });

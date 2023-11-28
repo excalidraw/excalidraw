@@ -104,6 +104,7 @@ import { ShareableLinkDialog } from "../src/components/ShareableLinkDialog";
 import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../src/components/Trans";
+import { drawingIcon } from "../src/components/icons";
 
 polyfill();
 
@@ -776,12 +777,10 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter />
         <TTDDialog
-          onTextSubmit={async (input) => {
+          onTextSubmit={async (input, type) => {
             try {
               const response = await fetch(
-                `${
-                  import.meta.env.VITE_APP_AI_BACKEND
-                }/v1/ai/text-to-diagram/generate`,
+                `${import.meta.env.VITE_APP_AI_BACKEND}/v1/ai/${type}/generate`,
                 {
                   method: "POST",
                   headers: {
@@ -833,6 +832,9 @@ const ExcalidrawWrapper = () => {
           }}
         />
         <TTDDialogTrigger />
+        <TTDDialogTrigger tab="text-to-drawing" icon={drawingIcon}>
+          {t("labels.textToDrawing")}
+        </TTDDialogTrigger>
         {isCollaborating && isOffline && (
           <div className="collab-offline-warning">
             {t("alerts.collabOfflineWarning")}
