@@ -11,6 +11,7 @@ const outputFile = isProd
   : "excalidraw-with-preact.development";
 
 const preactWebpackConfig = {
+  ...config,
   entry: {
     [outputFile]: "./entry.js",
   },
@@ -30,4 +31,4 @@ const preactWebpackConfig = {
     },
   },
 };
-module.exports = merge(config, preactWebpackConfig);
+module.exports = preactWebpackConfig;
