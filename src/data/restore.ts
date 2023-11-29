@@ -43,7 +43,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
-import { generateConsistentFractionalIndex } from "../fractionalIndex";
+import { normalizeFractionalIndexing } from "../zindex";
 
 type RestoredAppState = Omit<
   AppState,
@@ -583,7 +583,7 @@ export const restore = (
   elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
 ): RestoredDataState => {
   return {
-    elements: generateConsistentFractionalIndex(
+    elements: normalizeFractionalIndexing(
       restoreElements(data?.elements, localElements, elementsConfig),
     ),
     appState: restoreAppState(data?.appState, localAppState || null),
