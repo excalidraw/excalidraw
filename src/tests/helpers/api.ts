@@ -100,6 +100,7 @@ export class API {
     id?: string;
     isDeleted?: boolean;
     frameId?: ExcalidrawElement["id"] | null;
+    fractionalIndex: ExcalidrawElement["fractionalIndex"];
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
@@ -167,6 +168,7 @@ export class API {
       x,
       y,
       frameId: rest.frameId ?? null,
+      fractionalIndex: rest.fractionalIndex ?? Infinity,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:

@@ -485,6 +485,99 @@ function shiftElementsAccountingForFrames(
   );
 }
 
+// fractional indexing
+// -----------------------------------------------------------------------------
+const FRACTIONAL_INDEX_FLOOR = 0;
+const FRACTIONAL_INDEX_CEILING = 1;
+
+const isFractionalIndexInValidRange = (index: number) => {
+  return index > FRACTIONAL_INDEX_FLOOR && index < FRACTIONAL_INDEX_CEILING;
+};
+
+const getFractionalIndex = (
+  element: ExcalidrawElement | undefined,
+  fallbackValue: number,
+) => {
+  return element && isFractionalIndexInValidRange(element.fractionalIndex)
+    ? element.fractionalIndex
+    : fallbackValue;
+};
+
+const isValidFractionalIndex = (
+  index: number,
+  predecessorElement: ExcalidrawElement | undefined,
+  successorElement: ExcalidrawElement | undefined,
+) => {
+  return (
+    isFractionalIndexInValidRange(index) &&
+    index > getFractionalIndex(predecessorElement, FRACTIONAL_INDEX_FLOOR) &&
+    index < getFractionalIndex(successorElement, FRACTIONAL_INDEX_CEILING)
+  );
+};
+
+const randomNumInBetween = (start: number, end: number) => {
+  return Math.random() * (end - start) + start;
+};
+
+export const generateFractionalIndex = ({
+  start = FRACTIONAL_INDEX_FLOOR,
+  end = FRACTIONAL_INDEX_CEILING,
+}: {
+  start?: number;
+  end?: number;
+}) => {
+  const nextTemp = randomNumInBetween(start, end);
+  return (
+    (randomNumInBetween(nextTemp, end) + randomNumInBetween(start, nextTemp)) /
+    2
+  );
+};
+
+/**
+ * normalize the fractional indicies of the elements in the given array such that
+ * a. all elements have a fraction index between floor and ceiling as defined above
+ * b. for every element, its fractional index is greater than its predecessor's and smaller than its successor's
+ */
+
+export const normalizeFractionalIndexing = (
+  allElements: readonly ExcalidrawElement[],
+) => {
+  let predecessor = -1;
+  let successor = 1;
+
+  const normalizedElements: ExcalidrawElement[] = [];
+
+  for (const element of allElements) {
+    const predecessorElement = allElements[predecessor];
+    const successorElement = allElements[successor];
+
+    if (
+      !isValidFractionalIndex(
+        element.fractionalIndex,
+        predecessorElement,
+        successorElement,
+      )
+    ) {
+      const nextFractionalIndex = generateFractionalIndex({
+        start: getFractionalIndex(predecessorElement, FRACTIONAL_INDEX_FLOOR),
+        end: getFractionalIndex(successorElement, FRACTIONAL_INDEX_CEILING),
+      });
+
+      normalizedElements.push({
+        ...element,
+        fractionalIndex: nextFractionalIndex,
+      });
+    } else {
+      normalizedElements.push(element);
+    }
+
+    predecessor++;
+    successor++;
+  }
+
+  return normalizedElements;
+};
+
 // public API
 // -----------------------------------------------------------------------------
 
@@ -492,25 +585,31 @@ export const moveOneLeft = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return shiftElementsByOne(allElements, appState, "left");
+  return normalizeFractionalIndexing(
+    shiftElementsByOne(allElements, appState, "left"),
+  );
 };
 
 export const moveOneRight = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return shiftElementsByOne(allElements, appState, "right");
+  return normalizeFractionalIndexing(
+    shiftElementsByOne(allElements, appState, "right"),
+  );
 };
 
 export const moveAllLeft = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return shiftElementsAccountingForFrames(
-    allElements,
-    appState,
-    "left",
-    shiftElementsToEnd,
+  return normalizeFractionalIndexing(
+    shiftElementsAccountingForFrames(
+      allElements,
+      appState,
+      "left",
+      shiftElementsToEnd,
+    ),
   );
 };
 
@@ -518,10 +617,12 @@ export const moveAllRight = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return shiftElementsAccountingForFrames(
-    allElements,
-    appState,
-    "right",
-    shiftElementsToEnd,
+  return normalizeFractionalIndexing(
+    shiftElementsAccountingForFrames(
+      allElements,
+      appState,
+      "right",
+      shiftElementsToEnd,
+    ),
   );
 };
