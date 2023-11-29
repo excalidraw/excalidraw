@@ -519,13 +519,13 @@ const randomNumInBetween = (start: number, end: number) => {
   return Math.random() * (end - start) + start;
 };
 
-export const generateFractionalIndex = ({
-  start = FRACTIONAL_INDEX_FLOOR,
-  end = FRACTIONAL_INDEX_CEILING,
-}: {
-  start?: number;
-  end?: number;
-}) => {
+export const generateFractionalIndex = (
+  predecessorElement: ExcalidrawElement | undefined,
+  successorElement: ExcalidrawElement | undefined,
+) => {
+  const start = getFractionalIndex(predecessorElement, FRACTIONAL_INDEX_FLOOR);
+  const end = getFractionalIndex(successorElement, FRACTIONAL_INDEX_CEILING);
+
   const nextTemp = randomNumInBetween(start, end);
   return (
     (randomNumInBetween(nextTemp, end) + randomNumInBetween(start, nextTemp)) /
@@ -534,11 +534,23 @@ export const generateFractionalIndex = ({
 };
 
 /**
+ *
+ */
+export const getNextFractionalIndexAt = (
+  index: number,
+  allElements: ExcalidrawElement[],
+) => {
+  const predecessor = allElements[index - 1];
+  const successor = allElements[index + 1];
+
+  return generateFractionalIndex(predecessor, successor);
+};
+
+/**
  * normalize the fractional indicies of the elements in the given array such that
  * a. all elements have a fraction index between floor and ceiling as defined above
  * b. for every element, its fractional index is greater than its predecessor's and smaller than its successor's
  */
-
 export const normalizeFractionalIndexing = (
   allElements: readonly ExcalidrawElement[],
 ) => {
@@ -558,10 +570,10 @@ export const normalizeFractionalIndexing = (
         successorElement,
       )
     ) {
-      const nextFractionalIndex = generateFractionalIndex({
-        start: getFractionalIndex(predecessorElement, FRACTIONAL_INDEX_FLOOR),
-        end: getFractionalIndex(successorElement, FRACTIONAL_INDEX_CEILING),
-      });
+      const nextFractionalIndex = generateFractionalIndex(
+        predecessorElement,
+        successorElement,
+      );
 
       normalizedElements.push({
         ...element,
