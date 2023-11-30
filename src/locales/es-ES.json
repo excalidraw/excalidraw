@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "Seleccionar todos los elementos en el marco",
     "removeAllElementsFromFrame": "Eliminar todos los elementos del marco",
     "eyeDropper": "Seleccionar un color del lienzo",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Texto a diagrama",
+    "prompt": "Sugerencia"
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
