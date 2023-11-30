@@ -133,8 +133,8 @@
     "selectAllElementsInFrame": "選取框架內的所有元素",
     "removeAllElementsFromFrame": "從框架內移除所有元素",
     "eyeDropper": "從畫布中選取顏色",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "文字轉圖表",
+    "prompt": "提示詞"
   },
   "library": {
     "noItems": "尚未加入任何物件...",
