@@ -4891,6 +4891,11 @@ form-data@^4.0.0:
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
+fractional-indexing@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fractional-indexing/-/fractional-indexing-3.2.0.tgz#1193e63d54ff4e0cbe0c79a9ed6cfbab25d91628"
+  integrity sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==
+
 fs-extra@^11.1.0:
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-11.1.1.tgz#da69f7c39f3b002378b0954bb6ae7efdc0876e2d"

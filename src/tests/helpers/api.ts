@@ -168,7 +168,7 @@ export class API {
       x,
       y,
       frameId: rest.frameId ?? null,
-      fractionalIndex: rest.fractionalIndex ?? Infinity,
+      fractionalIndex: rest.fractionalIndex ?? null,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:

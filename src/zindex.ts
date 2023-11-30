@@ -6,6 +6,7 @@ import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
 import { AppState } from "./types";
 import { arrayToMap, findIndex, findLastIndex } from "./utils";
+import { generateKeyBetween } from "fractional-indexing";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
   return element.frameId === frameId || element.id === frameId;
@@ -487,63 +488,76 @@ function shiftElementsAccountingForFrames(
 
 // fractional indexing
 // -----------------------------------------------------------------------------
-const FRACTIONAL_INDEX_FLOOR = 0;
-const FRACTIONAL_INDEX_CEILING = 1;
+type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
-const isFractionalIndexInValidRange = (index: number) => {
-  return index > FRACTIONAL_INDEX_FLOOR && index < FRACTIONAL_INDEX_CEILING;
-};
+const fractionalIndexCompare = {
+  isSmallerThan(indexA: string, indexB: string) {
+    return indexA < indexB;
+  },
 
-const getFractionalIndex = (
-  element: ExcalidrawElement | undefined,
-  fallbackValue: number,
-) => {
-  return element && isFractionalIndexInValidRange(element.fractionalIndex)
-    ? element.fractionalIndex
-    : fallbackValue;
+  isGreaterThan(indexA: string, indexB: string) {
+    return indexA > indexB;
+  },
 };
 
 const isValidFractionalIndex = (
-  index: number,
-  predecessorElement: ExcalidrawElement | undefined,
-  successorElement: ExcalidrawElement | undefined,
+  index: FractionalIndex,
+  predecessorFractionalIndex: FractionalIndex,
+  successorFractionalIndex: FractionalIndex,
 ) => {
-  return (
-    isFractionalIndexInValidRange(index) &&
-    index > getFractionalIndex(predecessorElement, FRACTIONAL_INDEX_FLOOR) &&
-    index < getFractionalIndex(successorElement, FRACTIONAL_INDEX_CEILING)
+  if (index) {
+    if (predecessorFractionalIndex) {
+      if (successorFractionalIndex) {
+        return (
+          fractionalIndexCompare.isGreaterThan(
+            index,
+            predecessorFractionalIndex,
+          ) &&
+          fractionalIndexCompare.isSmallerThan(index, successorFractionalIndex)
+        );
+      }
+      return fractionalIndexCompare.isGreaterThan(
+        index,
+        predecessorFractionalIndex,
+      );
+    }
+
+    if (successorFractionalIndex) {
+      return fractionalIndexCompare.isSmallerThan(
+        index,
+        successorFractionalIndex,
+      );
+    }
+
+    return index.length > 0;
+  }
+
+  return false;
+};
+
+const generateFractionalIndex = (
+  predecessorFractionalIndex: string | null,
+  successorFractionalIndex: string | null,
+) => {
+  if (predecessorFractionalIndex && successorFractionalIndex) {
+    if (predecessorFractionalIndex < successorFractionalIndex) {
+      return generateKeyBetween(
+        predecessorFractionalIndex,
+        successorFractionalIndex,
+      );
+    } else if (predecessorFractionalIndex > successorFractionalIndex) {
+      return generateKeyBetween(
+        successorFractionalIndex,
+        predecessorFractionalIndex,
+      );
+    }
+    return generateKeyBetween(predecessorFractionalIndex, null);
+  }
+
+  return generateKeyBetween(
+    predecessorFractionalIndex,
+    successorFractionalIndex,
   );
-};
-
-const randomNumInBetween = (start: number, end: number) => {
-  return Math.random() * (end - start) + start;
-};
-
-export const generateFractionalIndex = (
-  predecessorElement: ExcalidrawElement | undefined,
-  successorElement: ExcalidrawElement | undefined,
-) => {
-  const start = getFractionalIndex(predecessorElement, FRACTIONAL_INDEX_FLOOR);
-  const end = getFractionalIndex(successorElement, FRACTIONAL_INDEX_CEILING);
-
-  const nextTemp = randomNumInBetween(start, end);
-  return (
-    (randomNumInBetween(nextTemp, end) + randomNumInBetween(start, nextTemp)) /
-    2
-  );
-};
-
-/**
- *
- */
-export const getNextFractionalIndexAt = (
-  index: number,
-  allElements: ExcalidrawElement[],
-) => {
-  const predecessor = allElements[index - 1];
-  const successor = allElements[index + 1];
-
-  return generateFractionalIndex(predecessor, successor);
 };
 
 /**
@@ -557,37 +571,44 @@ export const normalizeFractionalIndexing = (
   let predecessor = -1;
   let successor = 1;
 
-  const normalizedElements: ExcalidrawElement[] = [];
+  const normalizedElementsMap = arrayToMap(allElements);
 
   for (const element of allElements) {
-    const predecessorElement = allElements[predecessor];
-    const successorElement = allElements[successor];
+    const predecessorFractionalIndex =
+      normalizedElementsMap.get(allElements[predecessor]?.id)
+        ?.fractionalIndex || null;
 
-    if (
-      !isValidFractionalIndex(
-        element.fractionalIndex,
-        predecessorElement,
-        successorElement,
-      )
-    ) {
-      const nextFractionalIndex = generateFractionalIndex(
-        predecessorElement,
-        successorElement,
-      );
+    const successorFractionalIndex =
+      normalizedElementsMap.get(allElements[successor]?.id)?.fractionalIndex ||
+      null;
 
-      normalizedElements.push({
-        ...element,
-        fractionalIndex: nextFractionalIndex,
-      });
-    } else {
-      normalizedElements.push(element);
+    try {
+      if (
+        !isValidFractionalIndex(
+          element.fractionalIndex,
+          predecessorFractionalIndex,
+          successorFractionalIndex,
+        )
+      ) {
+        const nextFractionalIndex = generateFractionalIndex(
+          predecessorFractionalIndex,
+          successorFractionalIndex,
+        );
+
+        normalizedElementsMap.set(element.id, {
+          ...element,
+          fractionalIndex: nextFractionalIndex,
+        });
+      }
+    } catch (e) {
+      console.error(e);
     }
 
     predecessor++;
     successor++;
   }
 
-  return normalizedElements;
+  return [...normalizedElementsMap.values()];
 };
 
 // public API
