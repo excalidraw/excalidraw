@@ -1,4 +1,4 @@
-import { bumpVersion } from "./element/mutateElement";
+import { bumpVersion, mutateElement } from "./element/mutateElement";
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
@@ -490,74 +490,75 @@ function shiftElementsAccountingForFrames(
 // -----------------------------------------------------------------------------
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
-const fractionalIndexCompare = {
-  isSmallerThan(indexA: string, indexB: string) {
-    return indexA < indexB;
-  },
-
-  isGreaterThan(indexA: string, indexB: string) {
-    return indexA > indexB;
-  },
-};
-
 const isValidFractionalIndex = (
   index: FractionalIndex,
-  predecessorFractionalIndex: FractionalIndex,
-  successorFractionalIndex: FractionalIndex,
+  predecessor: FractionalIndex,
+  successor: FractionalIndex,
 ) => {
   if (index) {
-    if (predecessorFractionalIndex) {
-      if (successorFractionalIndex) {
-        return (
-          fractionalIndexCompare.isGreaterThan(
-            index,
-            predecessorFractionalIndex,
-          ) &&
-          fractionalIndexCompare.isSmallerThan(index, successorFractionalIndex)
-        );
-      }
-      return fractionalIndexCompare.isGreaterThan(
-        index,
-        predecessorFractionalIndex,
-      );
+    if (!predecessor && !successor) {
+      return index.length > 0;
     }
 
-    if (successorFractionalIndex) {
-      return fractionalIndexCompare.isSmallerThan(
-        index,
-        successorFractionalIndex,
-      );
+    if (!predecessor) {
+      // first element
+      return index < successor!;
     }
 
-    return index.length > 0;
+    if (!successor) {
+      // last element
+      return predecessor! < index;
+    }
   }
 
   return false;
 };
 
 const generateFractionalIndex = (
-  predecessorFractionalIndex: string | null,
-  successorFractionalIndex: string | null,
+  index: FractionalIndex,
+  predecessor: FractionalIndex,
+  successor: FractionalIndex,
 ) => {
-  if (predecessorFractionalIndex && successorFractionalIndex) {
-    if (predecessorFractionalIndex < successorFractionalIndex) {
-      return generateKeyBetween(
-        predecessorFractionalIndex,
-        successorFractionalIndex,
-      );
-    } else if (predecessorFractionalIndex > successorFractionalIndex) {
-      return generateKeyBetween(
-        successorFractionalIndex,
-        predecessorFractionalIndex,
-      );
+  if (index) {
+    if (!predecessor && !successor) {
+      return index;
     }
-    return generateKeyBetween(predecessorFractionalIndex, null);
+
+    if (!predecessor) {
+      // first element in the array
+      return generateKeyBetween(null, successor);
+    }
+
+    if (!successor) {
+      // last element in the array
+      return generateKeyBetween(predecessor, null);
+    }
+
+    // both predecessor and successor exist
+    // insert after predecessor
+    return generateKeyBetween(predecessor, null);
   }
 
-  return generateKeyBetween(
-    predecessorFractionalIndex,
-    successorFractionalIndex,
-  );
+  return generateKeyBetween(null, null);
+};
+
+const compareStrings = (a: string, b: string) => {
+  return a < b ? -1 : 1;
+};
+
+export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
+  return allElements.sort((a, b) => {
+    if (a.fractionalIndex && b.fractionalIndex) {
+      if (a.fractionalIndex < b.fractionalIndex) {
+        return -1;
+      } else if (a.fractionalIndex > b.fractionalIndex) {
+        return 1;
+      }
+      return compareStrings(a.id, b.id);
+    }
+
+    return 0;
+  });
 };
 
 /**
@@ -568,47 +569,39 @@ const generateFractionalIndex = (
 export const normalizeFractionalIndexing = (
   allElements: readonly ExcalidrawElement[],
 ) => {
-  let predecessor = -1;
-  let successor = 1;
-
-  const normalizedElementsMap = arrayToMap(allElements);
+  let pre = -1;
+  let suc = 1;
 
   for (const element of allElements) {
-    const predecessorFractionalIndex =
-      normalizedElementsMap.get(allElements[predecessor]?.id)
-        ?.fractionalIndex || null;
+    const predecessor = allElements[pre]?.fractionalIndex || null;
+    const successor = allElements[suc]?.fractionalIndex || null;
 
-    const successorFractionalIndex =
-      normalizedElementsMap.get(allElements[successor]?.id)?.fractionalIndex ||
-      null;
-
-    try {
-      if (
-        !isValidFractionalIndex(
-          element.fractionalIndex,
-          predecessorFractionalIndex,
-          successorFractionalIndex,
-        )
-      ) {
+    if (
+      !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
+    ) {
+      try {
         const nextFractionalIndex = generateFractionalIndex(
-          predecessorFractionalIndex,
-          successorFractionalIndex,
+          element.fractionalIndex,
+          predecessor,
+          successor,
         );
 
-        normalizedElementsMap.set(element.id, {
-          ...element,
-          fractionalIndex: nextFractionalIndex,
-        });
+        mutateElement(
+          element,
+          {
+            fractionalIndex: nextFractionalIndex,
+          },
+          false,
+        );
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
     }
-
-    predecessor++;
-    successor++;
+    pre++;
+    suc++;
   }
 
-  return [...normalizedElementsMap.values()];
+  return allElements;
 };
 
 // public API
@@ -618,31 +611,25 @@ export const moveOneLeft = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return normalizeFractionalIndexing(
-    shiftElementsByOne(allElements, appState, "left"),
-  );
+  return shiftElementsByOne(allElements, appState, "left");
 };
 
 export const moveOneRight = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return normalizeFractionalIndexing(
-    shiftElementsByOne(allElements, appState, "right"),
-  );
+  return shiftElementsByOne(allElements, appState, "right");
 };
 
 export const moveAllLeft = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return normalizeFractionalIndexing(
-    shiftElementsAccountingForFrames(
-      allElements,
-      appState,
-      "left",
-      shiftElementsToEnd,
-    ),
+  return shiftElementsAccountingForFrames(
+    allElements,
+    appState,
+    "left",
+    shiftElementsToEnd,
   );
 };
 
@@ -650,12 +637,10 @@ export const moveAllRight = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  return normalizeFractionalIndexing(
-    shiftElementsAccountingForFrames(
-      allElements,
-      appState,
-      "right",
-      shiftElementsToEnd,
-    ),
+  return shiftElementsAccountingForFrames(
+    allElements,
+    appState,
+    "right",
+    shiftElementsToEnd,
   );
 };

@@ -11,6 +11,7 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
+import { normalizeFractionalIndexing } from "../zindex";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -231,10 +232,12 @@ class Scene {
     nextElements: readonly ExcalidrawElement[],
     mapElementIds = true,
   ) {
-    this.elements = nextElements;
+    const _nextElements = normalizeFractionalIndexing(nextElements);
+
+    this.elements = _nextElements;
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
     this.elementsMap.clear();
-    nextElements.forEach((element) => {
+    _nextElements.forEach((element) => {
       if (isFrameLikeElement(element)) {
         nextFrameLikes.push(element);
       }
