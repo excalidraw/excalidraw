@@ -1228,10 +1228,7 @@ class App extends React.Component<AppProps, AppState> {
       const FRAME_NAME_EDIT_PADDING = 6;
 
       const reset = () => {
-        if (f.name?.trim() === "") {
-          mutateElement(f, { name: null });
-        }
-
+        mutateElement(f, { name: f.name?.trim() || null });
         this.setState({ editingFrame: null });
       };
 
