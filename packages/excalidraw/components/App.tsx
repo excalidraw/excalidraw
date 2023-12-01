@@ -1254,6 +1254,7 @@ class App extends React.Component<AppProps, AppState> {
                 name: e.target.value,
               });
             }}
+            onFocus={(e) => e.target.select()}
             onBlur={() => reset()}
             onKeyDown={(event) => {
               // for some inexplicable reason, `onBlur` triggered on ESC
