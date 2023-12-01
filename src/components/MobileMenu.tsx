@@ -67,6 +67,35 @@ export const MobileMenu = ({
   UIOptions,
   app,
 }: MobileMenuProps) => {
+  const [isMenuHidden, setMenuHidden] = React.useState(false);
+
+  const toggleMenu = () => {
+    setMenuHidden(!isMenuHidden);
+  };
+
+  const rToolbar = () => {
+    if (isMenuHidden) {
+      return (
+        <div className="App-toolbar-content">
+          <MainMenuTunnel.Out />
+        </div>
+      );
+    }
+
+    return (
+      <div className="App-toolbar-content">
+        <MainMenuTunnel.Out />
+        {actionManager.renderAction("toggleEditMenu")}
+        {actionManager.renderAction("undo")}
+        {actionManager.renderAction("redo")}
+        {actionManager.renderAction(
+          appState.multiElement ? "finalize" : "duplicateSelection",
+        )}
+        {actionManager.renderAction("deleteSelectedElements")}
+      </div>
+    );
+  };
+
   const {
     WelcomeScreenCenterTunnel,
     MainMenuTunnel,
@@ -89,6 +118,7 @@ export const MobileMenu = ({
                       UIOptions={UIOptions}
                       app={app}
                     />
+                    <button onClick={toggleMenu}>Hide Menu</button>
                   </Stack.Row>
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
