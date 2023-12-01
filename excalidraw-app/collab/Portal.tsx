@@ -18,7 +18,7 @@ import throttle from "lodash.throttle";
 import { newElementWith } from "../../src/element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../src/data/encryption";
-import { PRECEDING_ELEMENT_KEY } from "../../src/constants";
+import { normalizeFractionalIndexing } from "../../src/zindex";
 
 class Portal {
   collab: TCollabClass;
@@ -150,11 +150,7 @@ class Portal {
               this.broadcastedElementVersions.get(element.id)!) &&
           isSyncableElement(element)
         ) {
-          acc.push({
-            ...element,
-            // z-index info for the reconciler
-            [PRECEDING_ELEMENT_KEY]: idx === 0 ? "^" : elements[idx - 1]?.id,
-          });
+          acc.push(element);
         }
         return acc;
       },
@@ -164,7 +160,7 @@ class Portal {
     const data: SocketUpdateDataSource[typeof updateType] = {
       type: updateType,
       payload: {
-        elements: syncableElements,
+        elements: normalizeFractionalIndexing(syncableElements),
       },
     };
 
