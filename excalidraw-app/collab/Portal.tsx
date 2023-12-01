@@ -18,7 +18,6 @@ import throttle from "lodash.throttle";
 import { newElementWith } from "../../src/element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../src/data/encryption";
-import { normalizeFractionalIndexing } from "../../src/zindex";
 
 class Portal {
   collab: TCollabClass;
@@ -160,7 +159,7 @@ class Portal {
     const data: SocketUpdateDataSource[typeof updateType] = {
       type: updateType,
       payload: {
-        elements: normalizeFractionalIndexing(syncableElements),
+        elements: syncableElements,
       },
     };
 

@@ -1,4 +1,4 @@
-import { bumpVersion, mutateElement } from "./element/mutateElement";
+import { bumpVersion } from "./element/mutateElement";
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
 import { getElementsInGroup } from "./groups";
@@ -6,7 +6,6 @@ import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
 import { AppState } from "./types";
 import { arrayToMap, findIndex, findLastIndex } from "./utils";
-import { generateKeyBetween } from "fractional-indexing";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
   return element.frameId === frameId || element.id === frameId;
@@ -485,124 +484,6 @@ function shiftElementsAccountingForFrames(
     frameAwareContiguousElementsToMove.regularElements,
   );
 }
-
-// fractional indexing
-// -----------------------------------------------------------------------------
-type FractionalIndex = ExcalidrawElement["fractionalIndex"];
-
-const isValidFractionalIndex = (
-  index: FractionalIndex,
-  predecessor: FractionalIndex,
-  successor: FractionalIndex,
-) => {
-  if (index) {
-    if (!predecessor && !successor) {
-      return index.length > 0;
-    }
-
-    if (!predecessor) {
-      // first element
-      return index < successor!;
-    }
-
-    if (!successor) {
-      // last element
-      return predecessor! < index;
-    }
-  }
-
-  return false;
-};
-
-const generateFractionalIndex = (
-  index: FractionalIndex,
-  predecessor: FractionalIndex,
-  successor: FractionalIndex,
-) => {
-  if (index) {
-    if (!predecessor && !successor) {
-      return index;
-    }
-
-    if (!predecessor) {
-      // first element in the array
-      return generateKeyBetween(null, successor);
-    }
-
-    if (!successor) {
-      // last element in the array
-      return generateKeyBetween(predecessor, null);
-    }
-
-    // both predecessor and successor exist
-    // insert after predecessor
-    return generateKeyBetween(predecessor, null);
-  }
-
-  return generateKeyBetween(null, null);
-};
-
-const compareStrings = (a: string, b: string) => {
-  return a < b ? -1 : 1;
-};
-
-export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
-  return allElements.sort((a, b) => {
-    if (a.fractionalIndex && b.fractionalIndex) {
-      if (a.fractionalIndex < b.fractionalIndex) {
-        return -1;
-      } else if (a.fractionalIndex > b.fractionalIndex) {
-        return 1;
-      }
-      return compareStrings(a.id, b.id);
-    }
-
-    return 0;
-  });
-};
-
-/**
- * normalize the fractional indicies of the elements in the given array such that
- * a. all elements have a fraction index between floor and ceiling as defined above
- * b. for every element, its fractional index is greater than its predecessor's and smaller than its successor's
- */
-export const normalizeFractionalIndexing = (
-  allElements: readonly ExcalidrawElement[],
-) => {
-  let pre = -1;
-  let suc = 1;
-
-  for (const element of allElements) {
-    const predecessor = allElements[pre]?.fractionalIndex || null;
-    const successor = allElements[suc]?.fractionalIndex || null;
-
-    if (
-      !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
-    ) {
-      try {
-        const nextFractionalIndex = generateFractionalIndex(
-          element.fractionalIndex,
-          predecessor,
-          successor,
-        );
-
-        mutateElement(
-          element,
-          {
-            fractionalIndex: nextFractionalIndex,
-          },
-          false,
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    pre++;
-    suc++;
-  }
-
-  return allElements;
-};
 
 // public API
 // -----------------------------------------------------------------------------

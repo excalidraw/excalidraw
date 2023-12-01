@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "../../src/element/types";
 import { AppState } from "../../src/types";
 import { arrayToMap, arrayToMapWithIndex } from "../../src/utils";
-import { orderByFractionalIndex } from "../../src/zindex";
+import { orderByFractionalIndex } from "../../src/fractionalIndex";
 
 export type ReconciledElements = readonly ExcalidrawElement[] & {
   _brand: "reconciledElements";
