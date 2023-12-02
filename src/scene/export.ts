@@ -1,7 +1,7 @@
 import rough from "roughjs/bin/rough";
 import {
   ExcalidrawElement,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
@@ -27,11 +27,16 @@ import {
   updateImageCache,
 } from "../element/image";
 import { elementsOverlappingBBox } from "../packages/withinBounds";
-import { getFrameElements, getRootElements } from "../frame";
-import { isFrameElement, newTextElement } from "../element";
+import {
+  getFrameLikeElements,
+  getFrameLikeTitle,
+  getRootElements,
+} from "../frame";
+import { newTextElement } from "../element";
 import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import Scene from "./Scene";
+import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -100,10 +105,15 @@ const addFrameLabelsAsTextElements = (
   opts: Pick<AppState, "exportWithDarkMode">,
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
-  let frameIdx = 0;
+  let frameIndex = 0;
+  let magicFrameIndex = 0;
   for (const element of elements) {
-    if (isFrameElement(element)) {
-      frameIdx++;
+    if (isFrameLikeElement(element)) {
+      if (isFrameElement(element)) {
+        frameIndex++;
+      } else {
+        magicFrameIndex++;
+      }
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
@@ -114,7 +124,10 @@ const addFrameLabelsAsTextElements = (
         strokeColor: opts.exportWithDarkMode
           ? FRAME_STYLE.nameColorDarkTheme
           : FRAME_STYLE.nameColorLightTheme,
-        text: element.name || `Frame ${frameIdx}`,
+        text: getFrameLikeTitle(
+          element,
+          isFrameElement(element) ? frameIndex : magicFrameIndex,
+        ),
       });
       textElement.y -= textElement.height;
 
@@ -129,7 +142,7 @@ const addFrameLabelsAsTextElements = (
 };
 
 const getFrameRenderingConfig = (
-  exportingFrame: ExcalidrawFrameElement | null,
+  exportingFrame: ExcalidrawFrameLikeElement | null,
   frameRendering: AppState["frameRendering"] | null,
 ): AppState["frameRendering"] => {
   frameRendering = frameRendering || getDefaultAppState().frameRendering;
@@ -148,7 +161,7 @@ const prepareElementsForRender = ({
   exportWithDarkMode,
 }: {
   elements: readonly ExcalidrawElement[];
-  exportingFrame: ExcalidrawFrameElement | null | undefined;
+  exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   exportWithDarkMode: AppState["exportWithDarkMode"];
 }) => {
@@ -184,7 +197,7 @@ export const exportToCanvas = async (
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    exportingFrame?: ExcalidrawFrameElement | null;
+    exportingFrame?: ExcalidrawFrameLikeElement | null;
   },
   createCanvas: (
     width: number,
@@ -274,7 +287,7 @@ export const exportToSvg = async (
   files: BinaryFiles | null,
   opts?: {
     renderEmbeddables?: boolean;
-    exportingFrame?: ExcalidrawFrameElement | null;
+    exportingFrame?: ExcalidrawFrameLikeElement | null;
   },
 ): Promise<SVGSVGElement> => {
   const tempScene = __createSceneForElementsHack__(elements);
@@ -360,7 +373,7 @@ export const exportToSvg = async (
   const offsetX = -minX + exportPadding;
   const offsetY = -minY + exportPadding;
 
-  const frameElements = getFrameElements(elements);
+  const frameElements = getFrameLikeElements(elements);
 
   let exportingFrameClipPath = "";
   for (const frame of frameElements) {

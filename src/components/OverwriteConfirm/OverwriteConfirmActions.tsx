@@ -47,7 +47,7 @@ export const ExportToImage = () => {
       actionLabel={t("overwriteConfirm.action.exportToImage.button")}
       onClick={() => {
         actionManager.executeAction(actionChangeExportEmbedScene, "ui", true);
-        setAppState({ openDialog: "imageExport" });
+        setAppState({ openDialog: { name: "imageExport" } });
       }}
     >
       {t("overwriteConfirm.action.exportToImage.description")}

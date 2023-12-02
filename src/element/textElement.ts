@@ -2,6 +2,7 @@ import { getSubtypeMethods, SubtypeMethods } from "./subtypes";
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
+  ExcalidrawElementType,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -886,7 +887,7 @@ const VALID_CONTAINER_TYPES = new Set([
 ]);
 
 export const isValidTextContainer = (element: {
-  type: ExcalidrawElement["type"];
+  type: ExcalidrawElementType;
 }) => VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (

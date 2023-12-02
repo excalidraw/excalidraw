@@ -4,6 +4,7 @@ import { Action, makeCustomActionName } from "../actions/types";
 import clsx from "clsx";
 import {
   Subtype,
+  SubtypeRecord,
   getSubtypeNames,
   hasAlwaysEnabledActions,
   isSubtypeAction,
@@ -21,7 +22,7 @@ import { Island } from "./Island";
 
 export const SubtypeButton = (
   subtype: Subtype,
-  parentType: ExcalidrawElement["type"],
+  parentType: SubtypeRecord["parents"][number],
   icon: ({ theme }: { theme: Theme }) => JSX.Element,
   key?: string,
 ) => {

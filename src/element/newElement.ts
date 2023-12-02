@@ -14,6 +14,8 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
   ExcalidrawEmbeddableElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawIframeElement,
 } from "../element/types";
 import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
@@ -169,6 +171,16 @@ export const newEmbeddableElement = (
   };
 };
 
+export const newIframeElement = (
+  opts: {
+    type: "iframe";
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawIframeElement> => {
+  return {
+    ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
+  };
+};
+
 export const newFrameElement = (
   opts: {
     name?: string;
@@ -178,6 +190,23 @@ export const newFrameElement = (
     {
       ..._newElementBase<ExcalidrawFrameElement>("frame", opts),
       type: "frame",
+      name: opts?.name || null,
+    },
+    {},
+  );
+
+  return frameElement;
+};
+
+export const newMagicFrameElement = (
+  opts: {
+    name?: string;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawMagicFrameElement> => {
+  const frameElement = newElementWith(
+    {
+      ..._newElementBase<ExcalidrawMagicFrameElement>("magicframe", opts),
+      type: "magicframe",
       name: opts?.name || null,
     },
     {},

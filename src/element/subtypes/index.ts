@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { ExcalidrawElement, ExcalidrawTextElement, NonDeleted } from "../types";
 import { getNonDeletedElements } from "../";
 import { getSelectedElements } from "../../scene";
-import { AppState, ExcalidrawImperativeAPI } from "../../types";
+import { AppState, ExcalidrawImperativeAPI, ToolType } from "../../types";
 import { registerAuxLangData } from "../../i18n";
 
 import {
@@ -44,7 +44,7 @@ let alwaysEnabledMap: readonly {
 
 export type SubtypeRecord = Readonly<{
   subtype: Subtype;
-  parents: readonly ExcalidrawElement["type"][];
+  parents: readonly (ExcalidrawElement["type"] & ToolType)[];
   actionNames?: readonly SubtypeActionName[];
   disabledNames?: readonly DisabledActionName[];
   shortcutMap?: Record<string, string[]>;
