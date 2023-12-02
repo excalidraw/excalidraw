@@ -65,11 +65,13 @@ const generateRoomId = async () => {
  */
 export const getCollabServer = async (): Promise<{
   url: string;
+  path: string;
   polling: boolean;
 }> => {
   if (import.meta.env.VITE_APP_WS_SERVER_URL) {
     return {
       url: import.meta.env.VITE_APP_WS_SERVER_URL,
+      path: import.meta.env.VITE_APP_WS_SERVER_PATH,
       polling: true,
     };
   }

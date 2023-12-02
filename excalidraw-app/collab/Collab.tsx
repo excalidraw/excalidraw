@@ -427,6 +427,9 @@ class Collab extends PureComponent<Props, CollabState> {
 
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {
+          ...(socketServerData.path
+            ? { path: `${socketServerData.path}/socket.io/` }
+            : {}),
           transports: socketServerData.polling
             ? ["websocket", "polling"]
             : ["websocket"],
