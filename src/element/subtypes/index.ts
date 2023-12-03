@@ -3,7 +3,7 @@ import { ExcalidrawElement, ExcalidrawTextElement, NonDeleted } from "../types";
 import { getNonDeletedElements } from "../";
 import { getSelectedElements } from "../../scene";
 import { AppState, ExcalidrawImperativeAPI, ToolType } from "../../types";
-import { registerAuxLangData } from "../../i18n";
+import { LangLdr, registerCustomLangData } from "../../i18n";
 
 import {
   Action,
@@ -331,10 +331,7 @@ export type SubtypeCheckFn = (element: ExcalidrawElement) => boolean;
 // Functions to prepare subtypes for use
 export type SubtypePrepFn = (
   addSubtypeAction: (action: Action) => void,
-  addLangData: (
-    fallbackLangData: Object,
-    setLanguageAux: (langCode: string) => Promise<Object | undefined>,
-  ) => void,
+  addLangData: (fallbackLangData: {}, setLanguageAux: LangLdr) => void,
   onSubtypeLoaded?: SubtypeLoadedCb,
 ) => {
   actions: Action[];
@@ -411,7 +408,7 @@ export const prepareSubtype = (
   // Prepare the subtype
   const { actions, methods } = subtypePrepFn(
     addSubtypeAction,
-    registerAuxLangData,
+    registerCustomLangData,
     onSubtypeLoaded,
   );
 

@@ -27,7 +27,7 @@ import {
 } from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
 import { SubtypeButton } from "../components/Subtypes";
-import { registerAuxLangData } from "../i18n";
+import { LangLdr, registerCustomLangData } from "../i18n";
 import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
@@ -46,17 +46,8 @@ const FONTSIZE = 20;
 const DBFONTSIZE = 40;
 const TRFONTSIZE = 60;
 
-const getLangData = async (langCode: string): Promise<Object | undefined> => {
-  try {
-    const condData = await import(
-      /* webpackChunkName: "locales/[request]" */ `./helpers/locales/${langCode}.json`
-    );
-    if (condData) {
-      return condData;
-    }
-  } catch (e) {}
-  return undefined;
-};
+const getLangData: LangLdr = (langCode) =>
+  import(`./helpers/locales/${langCode}.json`);
 
 const testSubtypeIcon = ({ theme }: { theme: Theme }) =>
   createIcon(
@@ -155,7 +146,7 @@ const prepareTest1Subtype = function (
   methods.clean = cleanTestElementUpdate;
 
   addLangData(fallbackLangData, getLangData);
-  registerAuxLangData(fallbackLangData, getLangData);
+  registerCustomLangData(fallbackLangData, getLangData);
 
   const actions = [testAction, test1Button];
   actions.forEach((action) => addSubtypeAction(action));
@@ -223,7 +214,7 @@ const prepareTest2Subtype = function (
   } as SubtypeMethods;
 
   addLangData(fallbackLangData, getLangData);
-  registerAuxLangData(fallbackLangData, getLangData);
+  registerCustomLangData(fallbackLangData, getLangData);
 
   const actions = [test2Button];
   actions.forEach((action) => addSubtypeAction(action));
@@ -241,7 +232,7 @@ const prepareTest3Subtype = function (
   const methods = {} as SubtypeMethods;
 
   addLangData(fallbackLangData, getLangData);
-  registerAuxLangData(fallbackLangData, getLangData);
+  registerCustomLangData(fallbackLangData, getLangData);
 
   const actions = [test3Button];
   actions.forEach((action) => addSubtypeAction(action));

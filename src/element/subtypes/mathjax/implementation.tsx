@@ -25,7 +25,7 @@ import { getElementAbsoluteCoords } from "../../../element/bounds";
 import Scene from "../../../scene/Scene";
 
 // Imports for actions
-import { t, registerAuxLangData } from "../../../i18n";
+import { LangLdr, registerCustomLangData, t } from "../../../i18n";
 import { Action, makeCustomActionName } from "../../../actions/types";
 import { AppState } from "../../../types";
 import {
@@ -1611,19 +1611,12 @@ export const prepareMathSubtype = function (
   methods.render = renderMathElement;
   methods.renderSvg = renderSvgMathElement;
   methods.wrapText = wrapMathElement;
-  const getLangData = async (langCode: string): Promise<Object | undefined> => {
-    try {
-      const condData = await import(
-        /* webpackChunkName: "locales/[request]" */ `./locales/${langCode}.json`
-      );
-      if (condData) {
-        return condData;
-      }
-    } catch (e) {}
-    return undefined;
-  };
+  const getLangData: LangLdr = (langCode) =>
+    import(
+      /* webpackChunkName: "locales/[request]" */ `./locales/${langCode}.json`
+    );
   addLangData(fallbackMathJaxLangData, getLangData);
-  registerAuxLangData(fallbackMathJaxLangData, getLangData);
+  registerCustomLangData(fallbackMathJaxLangData, getLangData);
 
   const actions = createMathActions();
   actions.forEach((action) => addSubtypeAction(action));

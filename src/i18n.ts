@@ -87,20 +87,15 @@ if (import.meta.env.DEV) {
 let currentLang: Language = defaultLang;
 let currentLangData = {};
 
-const auxCurrentLangData = Array<Object>();
-const auxFallbackLangData = Array<Object>();
-const auxSetLanguageFuncs =
-  Array<(langCode: string) => Promise<Object | undefined>>();
+let fallbackCustomLangData = {};
+const langLoaders: LangLdr[] = [];
+export type LangLdr = (langCode: string) => Promise<{}>;
 
-export const registerAuxLangData = (
-  fallbackLangData: Object,
-  setLanguageAux: (langCode: string) => Promise<Object | undefined>,
-) => {
-  if (auxFallbackLangData.includes(fallbackLangData)) {
-    return;
+export const registerCustomLangData = (fallbackLangData: {}, ldr: LangLdr) => {
+  if (!langLoaders.includes(ldr)) {
+    fallbackCustomLangData = { ...fallbackLangData, ...fallbackCustomLangData };
+    langLoaders.push(ldr);
   }
-  auxFallbackLangData.push(fallbackLangData);
-  auxSetLanguageFuncs.push(setLanguageAux);
 };
 
 export const setLanguage = async (lang: Language) => {
@@ -115,20 +110,17 @@ export const setLanguage = async (lang: Language) => {
       currentLangData = await import(
         /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
       );
-      // Empty the auxCurrentLangData array
-      while (auxCurrentLangData.length > 0) {
-        auxCurrentLangData.pop();
-      }
-      // Fill the auxCurrentLangData array with each locale file found in auxLangDataRoots for this language
-      auxSetLanguageFuncs.forEach(async (setLanguageFn) => {
-        const condData = await setLanguageFn(currentLang.code);
-        if (condData) {
-          auxCurrentLangData.push(condData);
-        }
-      });
     } catch (error: any) {
       console.error(`Failed to load language ${lang.code}:`, error.message);
       currentLangData = fallbackLangData;
+    }
+    const auxData = langLoaders.map((fn) => fn(currentLang.code));
+    while (auxData.length > 0) {
+      try {
+        currentLangData = { ...(await auxData.pop()), ...currentLangData };
+      } catch (error: any) {
+        console.error(`Error loading ${lang.code} extra data:`, error.message);
+      }
     }
   }
 
@@ -169,14 +161,8 @@ export const t = (
   let translation =
     findPartsForData(currentLangData, parts) ||
     findPartsForData(fallbackLangData, parts) ||
+    findPartsForData(fallbackCustomLangData, parts) ||
     fallback;
-  const auxData = Array<Object>().concat(
-    auxCurrentLangData,
-    auxFallbackLangData,
-  );
-  for (let i = 0; i < auxData.length; i++) {
-    translation = translation || findPartsForData(auxData[i], parts);
-  }
   if (translation === undefined) {
     const errorMessage = `Can't find translation for ${path}`;
     // in production, don't blow up the app on a missing translation key
