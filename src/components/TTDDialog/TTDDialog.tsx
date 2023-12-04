@@ -28,6 +28,7 @@ import { isFiniteNumber } from "../../utils";
 import { atom, useAtom } from "jotai";
 import { trackEvent } from "../../analytics";
 import { InlineIcon } from "../InlineIcon";
+import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
@@ -312,6 +313,7 @@ export const TTDDialogBase = withInternalFallback(
                       </div>
                     );
                   }}
+                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
                   renderBottomRight={() => {
                     if (typeof ttdGeneration?.generatedResponse === "string") {
                       return (
