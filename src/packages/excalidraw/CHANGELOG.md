@@ -17,7 +17,7 @@ Please add the latest change on the top under the correct section.
 
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
 
-## 0.17.1 (2023-11-28)
+## 0.17.2 (2023-12-04)
 
 ### Fixes
 
