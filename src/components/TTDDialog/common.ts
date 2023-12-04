@@ -1,6 +1,10 @@
 import { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
 import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FONT_SIZE,
+  EDITOR_LS_KEYS,
+} from "../../constants";
 import {
   convertToExcalidrawElements,
   exportToCanvas,
@@ -8,6 +12,7 @@ import {
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppClassProperties, BinaryFiles } from "../../types";
 import { canvasToBlob } from "../../data/blob";
+import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 
 const resetPreview = ({
   canvasRef,
@@ -110,7 +115,6 @@ export const convertMermaidToExcalidraw = async ({
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
   } catch (err: any) {
-    console.error(err);
     parent.style.background = "var(--default-bg-color)";
     if (mermaidDefinition) {
       setError(err);
@@ -120,14 +124,11 @@ export const convertMermaidToExcalidraw = async ({
   }
 };
 
-export const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
-export const saveMermaidDataToStorage = (data: string) => {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW, data);
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
+export const saveMermaidDataToStorage = (mermaidDefinition: string) => {
+  EditorLocalStorage.set(
+    EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW,
+    mermaidDefinition,
+  );
 };
 
 export const insertToEditor = ({

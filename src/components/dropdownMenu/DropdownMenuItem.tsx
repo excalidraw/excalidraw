@@ -49,12 +49,12 @@ export const DropDownMenuItemBadge = ({
       style={{
         display: "inline-flex",
         marginLeft: "auto",
-        padding: "1px 4px",
+        padding: "2px 4px",
         background: "pink",
         borderRadius: 6,
-        fontSize: 11,
+        fontSize: 9,
         color: "black",
-        fontFamily: "monospace",
+        fontFamily: "Cascadia, monospace",
       }}
     >
       {children}
