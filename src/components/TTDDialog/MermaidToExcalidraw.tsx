@@ -7,7 +7,6 @@ import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";
 import Trans from "../Trans";
 import {
-  LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW,
   MermaidToExcalidrawLibProps,
   convertMermaidToExcalidraw,
   insertToEditor,
@@ -17,30 +16,26 @@ import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
+import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { EDITOR_LS_KEYS } from "../../constants";
+import { debounce } from "../../utils";
+import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
 
-const importMermaidDataFromStorage = () => {
-  try {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW);
-    if (data) {
-      return data;
-    }
-  } catch (error: any) {
-    // Unable to access localStorage
-    console.error(error);
-  }
-
-  return null;
-};
+const debouncedSaveMermaidDefinition = debounce(saveMermaidDataToStorage, 300);
 
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
 }) => {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(
+    () =>
+      EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
+      MERMAID_EXAMPLE,
+  );
   const deferredText = useDeferredValue(text.trim());
   const [error, setError] = useState<Error | null>(null);
 
@@ -53,11 +48,6 @@ const MermaidToExcalidraw = ({
   const app = useApp();
 
   useEffect(() => {
-    const data = importMermaidDataFromStorage() || MERMAID_EXAMPLE;
-    setText(data);
-  }, []);
-
-  useEffect(() => {
     convertMermaidToExcalidraw({
       canvasRef,
       data,
@@ -65,22 +55,25 @@ const MermaidToExcalidraw = ({
       setError,
       mermaidDefinition: deferredText,
     }).catch(() => {});
+
+    debouncedSaveMermaidDefinition(deferredText);
   }, [deferredText, mermaidToExcalidrawLib]);
 
-  const textRef = useRef(text);
+  useEffect(
+    () => () => {
+      debouncedSaveMermaidDefinition.flush();
+    },
+    [],
+  );
 
-  // slightly hacky but really quite simple
-  // essentially, we want to save the text to LS when the component unmounts
-  useEffect(() => {
-    textRef.current = text;
-  }, [text]);
-  useEffect(() => {
-    return () => {
-      if (textRef.current) {
-        saveMermaidDataToStorage(textRef.current);
-      }
-    };
-  }, []);
+  const onInsertToEditor = () => {
+    insertToEditor({
+      app,
+      data,
+      text,
+      shouldSaveMermaidDataToStorage: true,
+    });
+  };
 
   return (
     <>
@@ -103,22 +96,21 @@ const MermaidToExcalidraw = ({
             input={text}
             placeholder={"Write Mermaid diagram defintion here..."}
             onChange={(event) => setText(event.target.value)}
+            onKeyboardSubmit={() => {
+              onInsertToEditor();
+            }}
           />
         </TTDDialogPanel>
         <TTDDialogPanel
           label={t("mermaid.preview")}
           panelAction={{
             action: () => {
-              insertToEditor({
-                app,
-                data,
-                text,
-                shouldSaveMermaidDataToStorage: true,
-              });
+              onInsertToEditor();
             },
             label: t("mermaid.button"),
             icon: ArrowRightIcon,
           }}
+          renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
         >
           <TTDDialogOutput
             canvasRef={canvasRef}
