@@ -89,7 +89,10 @@ export const getFontFamilyString = ({
         .filter(([name, value]) => name === fontFamilyString)
         .flatMap(([name, value]) => value)
         .join(", ");
-      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}, ${additional}`;
+      if (additional) {
+        return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}, ${additional}`;
+      }
+      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
     }
   }
   return WINDOWS_EMOJI_FALLBACK_FONT;
