@@ -1,5 +1,5 @@
 import { Dialog } from "../Dialog";
-import { useApp } from "../App";
+import { useApp, useExcalidrawSetAppState } from "../App";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import TTDDialogTabs from "./TTDDialogTabs";
 import { ChangeEventHandler, useEffect, useRef, useState } from "react";
@@ -27,6 +27,8 @@ import "./TTDDialog.scss";
 import { isFiniteNumber } from "../../utils";
 import { atom, useAtom } from "jotai";
 import { trackEvent } from "../../analytics";
+import { InlineIcon } from "../InlineIcon";
+import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
@@ -34,6 +36,11 @@ const MAX_PROMPT_LENGTH = 1000;
 const rateLimitsAtom = atom<{
   rateLimit: number;
   rateLimitRemaining: number;
+} | null>(null);
+
+const ttdGenerationAtom = atom<{
+  generatedResponse: string | null;
+  prompt: string | null;
 } | null>(null);
 
 type OnTestSubmitRetValue = {
@@ -80,10 +87,13 @@ export const TTDDialogBase = withInternalFallback(
     | { __fallback: true }
   )) => {
     const app = useApp();
+    const setAppState = useExcalidrawSetAppState();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);
 
-    const [text, setText] = useState("");
+    const [ttdGeneration, setTtdGeneration] = useAtom(ttdGenerationAtom);
+
+    const [text, setText] = useState(ttdGeneration?.prompt ?? "");
 
     const prompt = text.trim();
 
@@ -91,6 +101,10 @@ export const TTDDialogBase = withInternalFallback(
       event,
     ) => {
       setText(event.target.value);
+      setTtdGeneration((s) => ({
+        generatedResponse: s?.generatedResponse ?? null,
+        prompt: event.target.value,
+      }));
     };
 
     const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
@@ -131,6 +145,13 @@ export const TTDDialogBase = withInternalFallback(
         const { generatedResponse, error, rateLimit, rateLimitRemaining } =
           await rest.onTextSubmit(prompt);
 
+        if (typeof generatedResponse === "string") {
+          setTtdGeneration((s) => ({
+            generatedResponse,
+            prompt: s?.prompt ?? null,
+          }));
+        }
+
         if (isFiniteNumber(rateLimit) && isFiniteNumber(rateLimitRemaining)) {
           setRateLimits({ rateLimit, rateLimitRemaining });
         }
@@ -153,7 +174,6 @@ export const TTDDialogBase = withInternalFallback(
             mermaidDefinition: generatedResponse,
           });
           trackEvent("ai", "mermaid parse success", "ttd");
-          saveMermaidDataToStorage(generatedResponse);
         } catch (error: any) {
           console.info(
             `%cTTD mermaid render errror: ${error.message}`,
@@ -293,7 +313,32 @@ export const TTDDialogBase = withInternalFallback(
                       </div>
                     );
                   }}
+                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
                   renderBottomRight={() => {
+                    if (typeof ttdGeneration?.generatedResponse === "string") {
+                      return (
+                        <div
+                          className="excalidraw-link"
+                          style={{ marginLeft: "auto", fontSize: 14 }}
+                          onClick={() => {
+                            if (
+                              typeof ttdGeneration?.generatedResponse ===
+                              "string"
+                            ) {
+                              saveMermaidDataToStorage(
+                                ttdGeneration.generatedResponse,
+                              );
+                              setAppState({
+                                openDialog: { name: "ttd", tab: "mermaid" },
+                              });
+                            }
+                          }}
+                        >
+                          View as Mermaid
+                          <InlineIcon icon={ArrowRightIcon} />
+                        </div>
+                      );
+                    }
                     const ratio = prompt.length / MAX_PROMPT_LENGTH;
                     if (ratio > 0.8) {
                       return (
