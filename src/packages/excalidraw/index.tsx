@@ -56,6 +56,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderMermaid, //zsviczian
     onContextMenu, //zsviczian
     aiEnabled,
+    obsidianHostPlugin,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -146,6 +147,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderMermaid={renderMermaid} //zsviczian
           onContextMenu={onContextMenu} //zsviczian
           aiEnabled={aiEnabled !== false}
+          obsidianHostPlugin={obsidianHostPlugin} //zsviczian
         >
           {children}
         </App>

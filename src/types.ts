@@ -508,6 +508,7 @@ export interface ExcalidrawProps {
     onClose: (callback?: () => void) => void,
   ) => JSX.Element | null;
   aiEnabled?: boolean;
+  obsidianHostPlugin?: any; //zsviczian
 }
 
 export type SceneData = {

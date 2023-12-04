@@ -36,6 +36,7 @@ import {
   updateOriginalContainerCache,
 } from "./textWysiwyg";
 import { ExtractSetType } from "../utility-types";
+import { hostPlugin } from "../components/App";
 
 export const normalizeText = (text: string) => {
   return (
@@ -291,13 +292,44 @@ export const computeBoundTextPosition = (
   return { x, y };
 };
 
-// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
+//zsviczian
+type MeasureValue = {
+  fontSize: number;
+  baseline: number;
+  height: number;
+  width: number;
+};
+//zsviczian
+const createMeasureKey = (text: string, fontFamily: string): string => fontFamily + text;
+//zsviczian
+const measures: Map<string, MeasureValue> = new Map();
 
+let measureTextCacheTimeout: NodeJS.Timeout | null;
+
+const clearMeasureTextCache = () => {
+  measures.clear();
+  measureTextCacheTimeout = null;
+}
+
+// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
+  if(measureTextCacheTimeout) {
+    clearTimeout(measureTextCacheTimeout);
+    measureTextCacheTimeout = null;
+  }
+  measureTextCacheTimeout = setTimeout(clearMeasureTextCache, 300); //zsviczian
+  const fontFamily = font.split("px ")?.[2] //zsviczian
+  const key = createMeasureKey(text, fontFamily); //zsviczian
+  if (measures.has(key)) { //zsviczian
+    const newFontSize = parseFloat(font); //zsviczian
+    const {fontSize, baseline, height, width} = measures.get(key)!; //zsviczian
+    const ratio = newFontSize / fontSize; //zsviczian
+    return {baseline: Math.round(baseline * ratio), height: height * ratio, width: width * ratio}; //zsviczian
+  } //zsviczian
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
@@ -308,6 +340,8 @@ export const measureText = (
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
   const baseline = measureBaseline(text, font, lineHeight);
+  measures.set(key, {fontSize, baseline, height, width}); //zsviczian
+
   return { width, height, baseline };
 };
 
@@ -317,6 +351,9 @@ export const measureBaseline = (
   lineHeight: ExcalidrawTextElement["lineHeight"],
   wrapInContainer?: boolean,
 ) => {
+  //zsviczian - avoiding frequent dom event at the top level of the document
+  //addressess slow performance when scaling sticky notes in Obsidian popout windows
+  const textMeasureDiv = hostPlugin?.textMeasureDiv ?? document.body; //zsviczian
   const container = document.createElement("div");
   container.style.position = "absolute";
   container.style.whiteSpace = "pre";
@@ -333,7 +370,7 @@ export const measureBaseline = (
   container.innerText = text;
 
   // Baseline is important for positioning text on canvas
-  document.body.appendChild(container);
+  textMeasureDiv.appendChild(container); //zsviczian
 
   const span = document.createElement("span");
   span.style.display = "inline-block";
@@ -358,7 +395,7 @@ export const measureBaseline = (
       baseline -= domHeight - canvasHeight;
     }
   }
-  document.body.removeChild(container);
+  textMeasureDiv.removeChild(container); //zsviczian
   return baseline;
 };
 

@@ -482,6 +482,8 @@ let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
 
+export let hostPlugin: any; //zsviczian
+
 /**
  * Map of youtube embed video states
  */
@@ -575,6 +577,7 @@ class App extends React.Component<AppProps, AppState> {
       theme = defaultAppState.theme,
       name = defaultAppState.name,
       initState, //zsviczian
+      obsidianHostPlugin, //zsviczian
     } = props;
     this.state = {
       ...defaultAppState,
@@ -592,7 +595,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-
+    hostPlugin = obsidianHostPlugin; //zsviczian
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -908,6 +911,7 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           let src: IframeData | null;
+          const embedLink = getEmbedLink(toValidURL(el.link || "")); //zsviczian
 
           if (isIframeElement(el)) {
             src = null;
@@ -1045,11 +1049,10 @@ class App extends React.Component<AppProps, AppState> {
               } as const;
             }
           } else {
-            src = getEmbedLink(toValidURL(el.link || ""));
+            src = embedLink; //zsviczian getEmbedLink(toValidURL(el.link || ""));
           }
 
           // console.log({ src });
-          const embedLink = getEmbedLink(toValidURL(el.link || "")); //zsviczian
           const isVisible = isElementInViewport(
             el,
             normalizedWidth,
@@ -1063,7 +1066,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
           const isWebview = //zsviczian
-            !isIframeElement &&
+            !isIframeElement(el) &&
             this.props.renderWebview &&
             embedLink?.type !== "document" &&
             !embedLink?.link?.startsWith?.("https://player.vimeo.com");
@@ -1130,7 +1133,7 @@ class App extends React.Component<AppProps, AppState> {
                   }}
                 >
                   {(isEmbeddableElement(el)
-                    ? this.props.renderEmbeddable?.(el, this.state)
+                    ? this.props.renderEmbeddable?.(el, this.state) //zsviczian
                     : null) ?? (
                       isWebview ? ( //zsviczian
                       <webview
@@ -1882,8 +1885,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   //zsviczian - ugly hack
-  //@ts-ignore
-  private OPENAI_KEY: string | null = window.ExcalidrawAutomate?.plugin?.settings?.openAIAPIToken;
+  private OPENAI_KEY: string | null = hostPlugin?.settings?.openAIAPIToken;
   
   private OPENAI_KEY_IS_PERSISTED: boolean =
     EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
