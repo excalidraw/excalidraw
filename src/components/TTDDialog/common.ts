@@ -115,7 +115,6 @@ export const convertMermaidToExcalidraw = async ({
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
   } catch (err: any) {
-    console.error(err);
     parent.style.background = "var(--default-bg-color)";
     if (mermaidDefinition) {
       setError(err);
