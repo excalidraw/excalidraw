@@ -658,8 +658,8 @@ export const getFrameLikeTitle = (
   frameIdx: number,
 ) => {
   const existingName = element.name?.trim();
-  if (existingName) {
-    return existingName;
+  if (existingName || existingName === "") {
+    return element.name!;
   }
   // TODO name frames AI only is specific to AI frames
   return isFrameElement(element) ? `Frame ${frameIdx}` : `AI Frame ${frameIdx}`;
