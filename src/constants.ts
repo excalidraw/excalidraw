@@ -109,6 +109,21 @@ export const FONT_FAMILY = {
   Assistant: 4,
 };
 
+/**
+ * As a supplement to the original fonts, Virgil fonts only provide some character fonts,
+ * which cannot meet the needs of Chinese and other handwritten fonts.
+ * Users can add additional font supplements here. For example, when the user selects handwriting,
+ * Virgil and XinYeNianTi will take effect at the same time.
+ * ```
+ * export const FONT_FAMILY_ADDITIONAL = {
+ *   Virgil: ["XinYeNianTi"],
+ * };
+ * ```
+ */
+export const FONT_FAMILY_ADDITIONAL = {
+  // Virgil: ["XinYeNianTi"],
+};
+
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",

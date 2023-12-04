@@ -3,6 +3,7 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  FONT_FAMILY_ADDITIONAL,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -84,7 +85,11 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+      const additional = Object.entries(FONT_FAMILY_ADDITIONAL)
+        .filter(([name, value]) => name === fontFamilyString)
+        .flatMap(([name, value]) => value)
+        .join(", ");
+      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}, ${additional}`;
     }
   }
   return WINDOWS_EMOJI_FALLBACK_FONT;
