@@ -315,11 +315,11 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
-    const nextElements = [
+    const nextElements = normalizeFractionalIndicies([
       ...this.elements.slice(0, index),
       ...elements,
       ...this.elements.slice(index),
-    ];
+    ]);
 
     this.replaceAllElements(nextElements);
   }
@@ -328,7 +328,9 @@ class Scene {
     if (element.frameId) {
       this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
     } else {
-      this.replaceAllElements([...this.elements, element]);
+      this.replaceAllElements(
+        normalizeFractionalIndicies([...this.elements, element]),
+      );
     }
   };
 
