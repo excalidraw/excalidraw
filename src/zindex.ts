@@ -1,6 +1,7 @@
 import { bumpVersion } from "./element/mutateElement";
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
+import { fixFractionalIndices } from "./fractionalIndex";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
@@ -312,12 +313,7 @@ const shiftElementsByOne = (
           ];
   });
 
-  return elements.map((element) => {
-    if (targetElementsMap[element.id]) {
-      return bumpVersion(element);
-    }
-    return element;
-  });
+  return fixFractionalIndices(elements, targetElementsMap);
 };
 
 const shiftElementsToEnd = (
@@ -390,19 +386,22 @@ const shiftElementsToEnd = (
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
 
-  return direction === "left"
-    ? [
-        ...leadingElements,
-        ...targetElements,
-        ...displacedElements,
-        ...trailingElements,
-      ]
-    : [
-        ...leadingElements,
-        ...displacedElements,
-        ...targetElements,
-        ...trailingElements,
-      ];
+  return fixFractionalIndices(
+    direction === "left"
+      ? [
+          ...leadingElements,
+          ...targetElements,
+          ...displacedElements,
+          ...trailingElements,
+        ]
+      : [
+          ...leadingElements,
+          ...displacedElements,
+          ...targetElements,
+          ...trailingElements,
+        ],
+    targetElementsMap,
+  );
 };
 
 function shiftElementsAccountingForFrames(

@@ -1,6 +1,6 @@
 import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
-import { generateKeyBetween } from "fractional-indexing";
+import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
@@ -26,6 +26,80 @@ const isValidFractionalIndex = (
   }
 
   return false;
+};
+
+const getContiguousMovedIndices = (
+  elements: readonly ExcalidrawElement[],
+  movedElementsMap: Record<string, ExcalidrawElement>,
+) => {
+  const result: number[][] = [];
+  const contiguous: number[] = [];
+
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    if (movedElementsMap[element.id]) {
+      if (contiguous.length) {
+        if (contiguous[contiguous.length - 1] + 1 === i) {
+          contiguous.push(i);
+        } else {
+          result.push(contiguous.slice());
+          contiguous.length = 0;
+          contiguous.push(i);
+        }
+      } else {
+        contiguous.push(i);
+      }
+    }
+  }
+
+  if (contiguous.length > 0) {
+    result.push(contiguous.slice());
+  }
+
+  return result;
+};
+
+export const fixFractionalIndices = (
+  elements: readonly ExcalidrawElement[],
+  movedElementsMap: Record<string, ExcalidrawElement>,
+) => {
+  const fixedElements = elements.slice();
+  const contiguousMovedIndices = getContiguousMovedIndices(
+    fixedElements,
+    movedElementsMap,
+  );
+
+  for (const movedIndices of contiguousMovedIndices) {
+    try {
+      const predecessor =
+        fixedElements[movedIndices[0] - 1]?.fractionalIndex || null;
+      const successor =
+        fixedElements[movedIndices[movedIndices.length - 1] + 1]
+          ?.fractionalIndex || null;
+
+      const newKeys = generateNKeysBetween(
+        predecessor,
+        successor,
+        movedIndices.length,
+      );
+
+      for (let i = 0; i < movedIndices.length; i++) {
+        const element = fixedElements[movedIndices[i]];
+
+        mutateElement(
+          element,
+          {
+            fractionalIndex: newKeys[i],
+          },
+          false,
+        );
+      }
+    } catch (e) {
+      console.error("error generating fractional indices", e);
+    }
+  }
+
+  return fixedElements;
 };
 
 const generateFractionalIndex = (

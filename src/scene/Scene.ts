@@ -328,7 +328,9 @@ class Scene {
     if (element.frameId) {
       this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
     } else {
-      this.replaceAllElements([...this.elements, element]);
+      this.replaceAllElements(
+        normalizeFractionalIndicies([...this.elements, element]),
+      );
     }
   };
 
