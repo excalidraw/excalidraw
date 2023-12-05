@@ -30,14 +30,14 @@ const isValidFractionalIndex = (
 
 const getContiguousMovedIndices = (
   elements: readonly ExcalidrawElement[],
-  movedElementsMap: Record<string, ExcalidrawElement>,
+  movedElementsMap: Map<string, ExcalidrawElement>,
 ) => {
   const result: number[][] = [];
   const contiguous: number[] = [];
 
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
-    if (movedElementsMap[element.id]) {
+    if (movedElementsMap.has(element.id)) {
       if (contiguous.length) {
         if (contiguous[contiguous.length - 1] + 1 === i) {
           contiguous.push(i);
@@ -59,9 +59,22 @@ const getContiguousMovedIndices = (
   return result;
 };
 
+export const generateFractionalIndexBetween = (
+  predecessor: FractionalIndex,
+  successor: FractionalIndex,
+) => {
+  if (predecessor && successor) {
+    if (predecessor < successor) {
+      return generateKeyBetween(predecessor, successor);
+    }
+    return null;
+  }
+  return generateKeyBetween(predecessor, successor);
+};
+
 export const fixFractionalIndices = (
   elements: readonly ExcalidrawElement[],
-  movedElementsMap: Record<string, ExcalidrawElement>,
+  movedElementsMap: Map<string, ExcalidrawElement>,
 ) => {
   const fixedElements = elements.slice();
   const contiguousMovedIndices = getContiguousMovedIndices(
@@ -95,7 +108,7 @@ export const fixFractionalIndices = (
         );
       }
     } catch (e) {
-      console.error("error generating fractional indices", e);
+      console.error("error fixing fractional indices", e);
     }
   }
 
@@ -164,6 +177,8 @@ export const normalizeFractionalIndicies = (
   let pre = -1;
   let suc = 1;
 
+  const normalized: ExcalidrawElement[] = [];
+
   for (const element of allElements) {
     const predecessor = allElements[pre]?.fractionalIndex || null;
     const successor = allElements[suc]?.fractionalIndex || null;
@@ -178,20 +193,20 @@ export const normalizeFractionalIndicies = (
           successor,
         );
 
-        mutateElement(
-          element,
-          {
-            fractionalIndex: nextFractionalIndex,
-          },
-          false,
-        );
+        normalized.push({
+          ...element,
+          fractionalIndex: nextFractionalIndex,
+        });
       } catch (e) {
         console.error("normalizing fractional index", e);
+        normalized.push(element);
       }
+    } else {
+      normalized.push(element);
     }
     pre++;
     suc++;
   }
 
-  return allElements;
+  return normalized;
 };

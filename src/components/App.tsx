@@ -268,6 +268,7 @@ import {
   muteFSAbortError,
   isTestEnv,
   easeOut,
+  arrayToMap,
 } from "../utils";
 import {
   createSrcDoc,
@@ -2921,7 +2922,7 @@ class App extends React.Component<AppProps, AppState> {
       ...newElements,
     ];
 
-    this.scene.replaceAllElements(nextElements);
+    this.scene.replaceAllElements(nextElements, arrayToMap(newElements));
 
     newElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
@@ -3147,10 +3148,10 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getElementIndex(frameId),
       );
     } else {
-      this.scene.replaceAllElements([
-        ...this.scene.getElementsIncludingDeleted(),
-        ...textElements,
-      ]);
+      this.scene.replaceAllElements(
+        [...this.scene.getElementsIncludingDeleted(), ...textElements],
+        arrayToMap(textElements),
+      );
     }
 
     this.setState({
@@ -6137,10 +6138,10 @@ class App extends React.Component<AppProps, AppState> {
       height,
     });
 
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      element,
-    ]);
+    this.scene.replaceAllElements(
+      [...this.scene.getElementsIncludingDeleted(), element],
+      arrayToMap([element]),
+    );
 
     return element;
   };
@@ -6192,10 +6193,10 @@ class App extends React.Component<AppProps, AppState> {
       validated: null,
     });
 
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      element,
-    ]);
+    this.scene.replaceAllElements(
+      [...this.scene.getElementsIncludingDeleted(), element],
+      arrayToMap([element]),
+    );
 
     return element;
   };
@@ -6473,10 +6474,10 @@ class App extends React.Component<AppProps, AppState> {
         ? newMagicFrameElement(constructorOpts)
         : newFrameElement(constructorOpts);
 
-    this.scene.replaceAllElements([
-      ...this.scene.getElementsIncludingDeleted(),
-      frame,
-    ]);
+    this.scene.replaceAllElements(
+      [...this.scene.getElementsIncludingDeleted(), frame],
+      arrayToMap([frame]),
+    );
 
     this.setState({
       multiElement: null,

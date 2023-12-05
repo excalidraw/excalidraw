@@ -11,7 +11,8 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
-import { normalizeFractionalIndicies } from "../fractionalIndex";
+import { fixFractionalIndices } from "../fractionalIndex";
+import { arrayToMap } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -230,9 +231,14 @@ class Scene {
 
   replaceAllElements(
     nextElements: readonly ExcalidrawElement[],
-    mapElementIds = true,
+    mapOfIndicesToFix?: Map<string, ExcalidrawElement>,
   ) {
-    const _nextElements = normalizeFractionalIndicies(nextElements);
+    let _nextElements;
+    if (mapOfIndicesToFix) {
+      _nextElements = fixFractionalIndices(nextElements, mapOfIndicesToFix);
+    } else {
+      _nextElements = nextElements;
+    }
 
     this.elements = _nextElements;
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
@@ -306,7 +312,7 @@ class Scene {
       element,
       ...this.elements.slice(index),
     ];
-    this.replaceAllElements(nextElements);
+    this.replaceAllElements(nextElements, arrayToMap([element]));
   }
 
   insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
@@ -321,14 +327,17 @@ class Scene {
       ...this.elements.slice(index),
     ];
 
-    this.replaceAllElements(nextElements);
+    this.replaceAllElements(nextElements, arrayToMap(elements));
   }
 
   addNewElement = (element: ExcalidrawElement) => {
     if (element.frameId) {
       this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
     } else {
-      this.replaceAllElements([...this.elements, element]);
+      this.replaceAllElements(
+        [...this.elements, element],
+        arrayToMap([element]),
+      );
     }
   };
 

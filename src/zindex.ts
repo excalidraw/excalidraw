@@ -235,9 +235,9 @@ const getTargetElementsMap = <T extends ExcalidrawElement>(
 ) => {
   return indices.reduce((acc, index) => {
     const element = elements[index];
-    acc[element.id] = element;
+    acc.set(element.id, element);
     return acc;
-  }, {} as Record<string, ExcalidrawElement>);
+  }, new Map<string, ExcalidrawElement>());
 };
 
 const shiftElementsByOne = (
