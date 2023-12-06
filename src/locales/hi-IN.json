@@ -38,8 +38,12 @@
     "arrowhead_none": "कोई भी नहीं",
     "arrowhead_arrow": "तीर",
     "arrowhead_bar": "बार",
-    "arrowhead_dot": "बिंदु",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "त्रिकोण",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "मर्मेड से एक्सकाली में",
     "button": "अंदर डाले",
-    "description": "फिलहाल केवल <flowchartLink>बहाव चित्र</flowchartLink> और <sequenceLink> अनुक्रम चित्र </sequenceLink> कर सकते हैं. अन्य चित्र प्रकार एक्सकाली प्रतिमा जैसे चित्रित किए जायेंगे.",
+    "description": "",
     "syntax": "मर्मेड संरचना नियम",
     "preview": "पूर्वावलोकन"
   }
