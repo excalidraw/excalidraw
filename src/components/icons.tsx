@@ -83,6 +83,7 @@ export const PlusPromoIcon = createIcon(
   tablerIconProps,
 );
 
+
 // tabler-icons: book
 export const LibraryIcon = createIcon(
   <g strokeWidth="1.5">
