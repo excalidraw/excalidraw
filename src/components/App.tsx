@@ -399,6 +399,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import { fixFractionalIndices } from "../fractionalIndex";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -6845,6 +6846,7 @@ class App extends React.Component<AppProps, AppState> {
                 })
                 .map((element) => element.id),
             );
+            const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
             const elements = this.scene.getElementsIncludingDeleted();
 
@@ -6860,6 +6862,10 @@ class App extends React.Component<AppProps, AppState> {
                   this.state.editingGroupId,
                   groupIdMap,
                   element,
+                );
+                duplicatedElementsMap.set(
+                  duplicatedElement.id,
+                  duplicatedElement,
                 );
                 const origElement = pointerDownState.originalElements.get(
                   element.id,
@@ -6883,7 +6889,10 @@ class App extends React.Component<AppProps, AppState> {
                 nextElements.push(element);
               }
             }
-            const nextSceneElements = [...nextElements, ...elementsToAppend];
+            const nextSceneElements = fixFractionalIndices(
+              [...nextElements, ...elementsToAppend],
+              duplicatedElementsMap,
+            );
             bindTextToShapeAfterDuplication(
               nextElements,
               elementsToAppend,

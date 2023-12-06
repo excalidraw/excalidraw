@@ -31,6 +31,7 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
+import { fixFractionalIndices } from "../fractionalIndex";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -85,6 +86,7 @@ const duplicateElements = (
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
+  const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
   const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
@@ -96,6 +98,7 @@ const duplicateElements = (
         y: element.y + GRID_SIZE / 2,
       },
     );
+    duplicatedElementsMap.set(newElement.id, newElement);
     oldIdToDuplicatedId.set(element.id, newElement.id);
     oldElements.push(element);
     newElements.push(newElement);
@@ -234,7 +237,10 @@ const duplicateElements = (
 
   // step (3)
 
-  const finalElements = finalElementsReversed.reverse();
+  const finalElements = fixFractionalIndices(
+    finalElementsReversed.reverse(),
+    duplicatedElementsMap,
+  );
 
   // ---------------------------------------------------------------------------
 
