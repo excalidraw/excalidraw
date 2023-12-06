@@ -21,7 +21,7 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
-- Add support for building on vite [#7394] (https://github.com/excalidraw/excalidraw/pull/7394) to make sure that the correct build file is use when building for production or Preact on vite.
+- Add support for building on vite [#7394] (https://github.com/excalidraw/excalidraw/pull/7394) to make sure that the correct excalidraw file is used.
 
 - Umd build for browser since it was breaking in v0.17.0 [#7349](https://github.com/excalidraw/excalidraw/pull/7349). Also make sure that when using `Vite`, the `process.env.IS_PREACT` is set as `"true"` (string) and not a boolean.
 
