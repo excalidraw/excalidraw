@@ -38,8 +38,12 @@
     "arrowhead_none": "Нет",
     "arrowhead_arrow": "Cтрелка",
     "arrowhead_bar": "Черта",
-    "arrowhead_dot": "Точка",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Треугольник",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "addWatermark": "Добавить «Создано в Excalidraw»",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "В настоящее время поддерживаются только <flowchartLink>Блок-схемы</flowchartLink> и <sequenceLink>Диаграммы последовательности</sequenceLink>. Другие типы будут выведены как изображение в Excalidraw.",
+    "description": "",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр"
   }
