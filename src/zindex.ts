@@ -379,9 +379,7 @@ const shiftElementsToEnd = (
     }
   }
 
-  const targetElements = Object.values(targetElementsMap).map((element) => {
-    return bumpVersion(element);
-  });
+  const targetElements = Array.from(targetElementsMap.values());
 
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);

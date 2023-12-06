@@ -76,19 +76,18 @@ export const fixFractionalIndices = (
   elements: readonly ExcalidrawElement[],
   movedElementsMap: Map<string, ExcalidrawElement>,
 ) => {
-  const fixedElements = elements.slice();
   const contiguousMovedIndices = getContiguousMovedIndices(
-    fixedElements,
+    elements,
     movedElementsMap,
   );
 
   for (const movedIndices of contiguousMovedIndices) {
     try {
       const predecessor =
-        fixedElements[movedIndices[0] - 1]?.fractionalIndex || null;
+        elements[movedIndices[0] - 1]?.fractionalIndex || null;
       const successor =
-        fixedElements[movedIndices[movedIndices.length - 1] + 1]
-          ?.fractionalIndex || null;
+        elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
+        null;
 
       const newKeys = generateNKeysBetween(
         predecessor,
@@ -97,7 +96,7 @@ export const fixFractionalIndices = (
       );
 
       for (let i = 0; i < movedIndices.length; i++) {
-        const element = fixedElements[movedIndices[i]];
+        const element = elements[movedIndices[i]];
 
         mutateElement(
           element,
@@ -112,7 +111,7 @@ export const fixFractionalIndices = (
     }
   }
 
-  return fixedElements;
+  return elements as ExcalidrawElement[];
 };
 
 const generateFractionalIndex = (
