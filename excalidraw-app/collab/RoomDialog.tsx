@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import { QRCodeSVG } from "qrcode.react";
 
 import { copyTextToSystemClipboard } from "../../src/clipboard";
 import { trackEvent } from "../../src/analytics";
@@ -37,6 +38,11 @@ const getShareIcon = () => {
   return share;
 };
 
+export type QrModalProps = {
+  handleClose: () => void;
+  activeRoomLink: string;
+};
+
 export type RoomModalProps = {
   handleClose: () => void;
   activeRoomLink: string;
@@ -55,7 +61,8 @@ export const RoomModal = ({
   username,
   onUsernameChange,
   handleClose,
-}: RoomModalProps) => {
+  setQrOpen
+}: RoomModalProps & { setQrOpen: () => void;}) => {
   const { t } = useI18n();
   const [justCopied, setJustCopied] = useState(false);
   const timerRef = useRef<number>(0);
@@ -145,6 +152,11 @@ export const RoomModal = ({
               {tablerCheckIcon} copied
             </Popover.Content>
           </Popover.Root>
+          <FilledButton
+                size="large"
+                label="QR"
+                onClick={setQrOpen}
+              />
         </div>
         <div className="RoomDialog__active__description">
           <p>
@@ -206,11 +218,75 @@ export const RoomModal = ({
   );
 };
 
+export const QrModal = ({
+  activeRoomLink,
+  onRoomCreate,
+  onRoomDestroy,
+  setErrorMessage,
+  username,
+  onUsernameChange,
+  handleClose,
+}: RoomModalProps) => {
+  const { t } = useI18n();
+  if (activeRoomLink) {
+    return (
+      <>
+        <div className="RoomDialog__active__linkRow" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <QRCodeSVG value={activeRoomLink} />
+        </div>
+        <div className="RoomDialog__active__actions">
+          <FilledButton
+            size="large"
+            variant="outlined"
+            color="danger"
+            label={t("roomDialog.button_stopSession")}
+            startIcon={playerStopFilledIcon}
+            onClick={() => {
+              trackEvent("share", "room closed");
+              onRoomDestroy();
+            }}
+          />
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="RoomDialog__inactive__illustration">
+        <CollabImage />
+      </div>
+      <div className="RoomDialog__inactive__header">
+        {t("labels.liveCollaboration")}
+      </div>
+
+      <div className="RoomDialog__inactive__description">
+        <strong>{t("roomDialog.desc_intro")}</strong>
+        {t("roomDialog.desc_privacy")}
+      </div>
+
+      <div className="RoomDialog__inactive__start_session">
+        <FilledButton
+          size="large"
+          label={t("roomDialog.button_startSession")}
+          startIcon={playerPlayIcon}
+          onClick={() => {
+            trackEvent("share", "room creation", `ui (${getFrame()})`);
+            onRoomCreate();
+          }}
+        />
+      </div>
+    </>
+  );
+};
+
 const RoomDialog = (props: RoomModalProps) => {
+  const [QrOpen, setQrOpen] = useState(false)
+
   return (
     <Dialog size="small" onCloseRequest={props.handleClose} title={false}>
       <div className="RoomDialog">
-        <RoomModal {...props} />
+        {QrOpen? <QrModal {...props} /> : <RoomModal {...props} setQrOpen={()=>setQrOpen(true)} />}
       </div>
     </Dialog>
   );
