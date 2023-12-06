@@ -7,7 +7,7 @@ import checker from "vite-plugin-checker";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
-
+console.log(typeof envVars.VITE_APP_COLLAPSE_OVERLAY, "HEYYYYY");
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {

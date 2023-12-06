@@ -69,7 +69,7 @@
     "react-dom": "18.2.0",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "4.4.2",
+    "vite": "4.4.12",
     "vite-plugin-checker": "0.6.1",
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-pwa": "0.16.4",
@@ -78,7 +78,7 @@
     "vitest-canvas-mock": "0.3.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.0.0 - 20.x.x"
   },
   "homepage": ".",
   "name": "excalidraw",
@@ -98,7 +98,7 @@
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
-    "start:app": "yarn --cwd ./excalidraw-app start",
+    "start": "yarn --cwd ./excalidraw-app start",
     "start:app:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
     "test:app": "vitest --config vitest.config.ts",

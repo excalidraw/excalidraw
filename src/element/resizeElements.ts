@@ -27,7 +27,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
-  isFrameElement,
+  isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
   isLinearElement,
@@ -163,7 +163,7 @@ const rotateSingleElement = (
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   let angle: number;
-  if (isFrameElement(element)) {
+  if (isFrameLikeElement(element)) {
     angle = 0;
   } else {
     angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
@@ -900,7 +900,7 @@ const rotateMultipleElements = (
   }
 
   elements
-    .filter((element) => element.type !== "frame")
+    .filter((element) => !isFrameLikeElement(element))
     .forEach((element) => {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
       const cx = (x1 + x2) / 2;
