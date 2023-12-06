@@ -45,6 +45,10 @@ import {
   TextAlignCenterIcon,
   TextAlignRightIcon,
   FillZigZagIcon,
+  ArrowheadTriangleOutlineIcon,
+  ArrowheadDotOutlineIcon,
+  ArrowheadDiamondIcon,
+  ArrowheadDiamondOutlineIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -1132,10 +1136,38 @@ export const actionChangeArrowhead = register({
                 icon: <ArrowheadDotIcon flip={isRTL} />,
               },
               {
+                value: "dot_outline",
+                text: t("labels.arrowhead_dot_outline"),
+                keyBinding: null,
+                icon: <ArrowheadDotOutlineIcon flip={isRTL} />,
+                showInPicker: false,
+              },
+              {
                 value: "triangle",
                 text: t("labels.arrowhead_triangle"),
                 icon: <ArrowheadTriangleIcon flip={isRTL} />,
                 keyBinding: "t",
+              },
+              {
+                value: "triangle_outline",
+                text: t("labels.arrowhead_triangle_outline"),
+                icon: <ArrowheadTriangleOutlineIcon flip={isRTL} />,
+                keyBinding: null,
+                showInPicker: false,
+              },
+              {
+                value: "diamond",
+                text: t("labels.arrowhead_diamond"),
+                icon: <ArrowheadDiamondIcon flip={isRTL} />,
+                keyBinding: null,
+                showInPicker: false,
+              },
+              {
+                value: "diamond_outline",
+                text: t("labels.arrowhead_diamond_outline"),
+                icon: <ArrowheadDiamondOutlineIcon flip={isRTL} />,
+                keyBinding: null,
+                showInPicker: false,
               },
             ]}
             value={getFormValue<Arrowhead | null>(
