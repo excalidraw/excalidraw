@@ -1616,6 +1616,8 @@ class App extends React.Component<AppProps, AppState> {
                             imageCache: this.imageCache,
                             isExporting: false,
                             renderGrid: true,
+                            canvasBackgroundColor:
+                              this.state.viewBackgroundColor,
                           }}
                         />
                         <InteractiveCanvas
@@ -1767,7 +1769,11 @@ class App extends React.Component<AppProps, AppState> {
       });
       return;
       this.setState({
-        openDialog: { name: "magicSettings", source: "generation" },
+        openDialog: {
+          name: "settings",
+          tab: "diagram-to-code",
+          source: "generation",
+        },
       });
       trackEvent("ai", "generate (missing key)", "d2c");
       return;

@@ -21,7 +21,7 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
-import { StaticCanvasRenderConfig } from "../scene/types";
+import { SVGRenderConfig, StaticCanvasRenderConfig } from "../scene/types";
 import {
   distance,
   getFontString,
@@ -657,7 +657,7 @@ export const renderElement = (
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
-      ShapeCache.generateElementShape(element);
+      ShapeCache.generateElementShape(element, null);
 
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -699,7 +699,7 @@ export const renderElement = (
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
-      ShapeCache.generateElementShape(element, renderConfig.isExporting);
+      ShapeCache.generateElementShape(element, renderConfig);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -895,12 +895,7 @@ export const renderElementToSvg = (
   files: BinaryFiles,
   offsetX: number,
   offsetY: number,
-  renderConfig: {
-    exportWithDarkMode: boolean;
-    renderEmbeddables: boolean;
-    frameRendering: AppState["frameRendering"];
-    frameColor?: AppState["frameColor"]; //zsviczian
-  },
+  renderConfig: SVGRenderConfig,
 ) => {
   const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -953,7 +948,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      const shape = ShapeCache.generateElementShape(element);
+      const shape = ShapeCache.generateElementShape(element, null);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         shape,
@@ -984,7 +979,7 @@ export const renderElementToSvg = (
     case "iframe":
     case "embeddable": {
       // render placeholder rectangle
-      const shape = ShapeCache.generateElementShape(element, true);
+      const shape = ShapeCache.generateElementShape(element, renderConfig);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         shape,
@@ -1135,7 +1130,7 @@ export const renderElementToSvg = (
       }
       group.setAttribute("stroke-linecap", "round");
 
-      const shapes = ShapeCache.generateElementShape(element);
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
       shapes.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
@@ -1178,7 +1173,10 @@ export const renderElementToSvg = (
       break;
     }
     case "freedraw": {
-      const backgroundFillShape = ShapeCache.generateElementShape(element);
+      const backgroundFillShape = ShapeCache.generateElementShape(
+        element,
+        renderConfig,
+      );
       const node = backgroundFillShape
         ? roughSVGDrawWithPrecision(
             rsvg,

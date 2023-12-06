@@ -93,7 +93,7 @@ Since Vite removes env variables by default, you can update the vite config to e
 
 ```
  define: {
-    "process.env.IS_PREACT": process.env.IS_PREACT,
+    "process.env.IS_PREACT": JSON.stringify("true"),
   },
 ```
 ::: 

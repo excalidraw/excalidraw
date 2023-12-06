@@ -30,6 +30,7 @@ import { roundRect } from "./roundRect";
 import {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
+  SVGRenderConfig,
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
@@ -1453,32 +1454,12 @@ export const renderSceneToSvg = (
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   files: BinaryFiles,
-  {
-    offsetX = 0,
-    offsetY = 0,
-    exportWithDarkMode,
-    renderEmbeddables,
-    frameRendering,
-    frameColor, //zsviczian
-  }: {
-    offsetX?: number;
-    offsetY?: number;
-    exportWithDarkMode: boolean;
-    renderEmbeddables: boolean;
-    frameRendering: AppState["frameRendering"];
-    frameColor?: AppState["frameColor"]; //zsviczian
-  },
+  renderConfig: SVGRenderConfig,
 ) => {
   if (!svgRoot) {
     return;
   }
 
-  const renderConfig = {
-    exportWithDarkMode,
-    renderEmbeddables,
-    frameRendering,
-    frameColor, //zsviczian
-  };
   // render elements
   elements
     .filter((el) => !isIframeLikeOrItsLabel(el))
@@ -1490,8 +1471,8 @@ export const renderSceneToSvg = (
             rsvg,
             svgRoot,
             files,
-            element.x + offsetX,
-            element.y + offsetY,
+            element.x + renderConfig.offsetX,
+            element.y + renderConfig.offsetY,
             renderConfig,
           );
         } catch (error: any) {
@@ -1511,8 +1492,8 @@ export const renderSceneToSvg = (
             rsvg,
             svgRoot,
             files,
-            element.x + offsetX,
-            element.y + offsetY,
+            element.x + renderConfig.offsetX,
+            element.y + renderConfig.offsetY,
             renderConfig,
           );
         } catch (error: any) {

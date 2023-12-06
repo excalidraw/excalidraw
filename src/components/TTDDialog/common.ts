@@ -1,6 +1,10 @@
 import { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
 import { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
-import { DEFAULT_EXPORT_PADDING, DEFAULT_FONT_SIZE } from "../../constants";
+import { 
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FONT_SIZE,
+  EDITOR_LS_KEYS,
+} from "../../constants";
 import {
   convertToExcalidrawElements,
   exportToCanvas,
@@ -8,6 +12,7 @@ import {
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppClassProperties, BinaryFiles } from "../../types";
 import { canvasToBlob } from "../../data/blob";
+import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 
 const resetPreview = ({
   canvasRef,
@@ -43,7 +48,7 @@ export interface MermaidToExcalidrawLibProps {
 interface ConvertMermaidToExcalidrawFormatProps {
   canvasRef: React.RefObject<HTMLDivElement>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
-  text: string;
+  mermaidDefinition: string;
   setError: (error: Error | null) => void;
   data: React.MutableRefObject<{
     elements: readonly NonDeletedExcalidrawElement[];
@@ -54,7 +59,7 @@ interface ConvertMermaidToExcalidrawFormatProps {
 export const convertMermaidToExcalidraw = async ({
   canvasRef,
   mermaidToExcalidrawLib,
-  text,
+  mermaidDefinition,
   setError,
   data,
 }: ConvertMermaidToExcalidrawFormatProps) => {
@@ -65,7 +70,7 @@ export const convertMermaidToExcalidraw = async ({
     return;
   }
 
-  if (!text) {
+  if (!mermaidDefinition) {
     resetPreview({ canvasRef, setError });
     return;
   }
@@ -73,9 +78,20 @@ export const convertMermaidToExcalidraw = async ({
   try {
     const api = await mermaidToExcalidrawLib.api;
 
-    const { elements, files } = await api.parseMermaidToExcalidraw(text, {
-      fontSize: DEFAULT_FONT_SIZE,
-    });
+    let ret;
+    try {
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
+        fontSize: DEFAULT_FONT_SIZE,
+      });
+    } catch (err: any) {
+      ret = await api.parseMermaidToExcalidraw(
+        mermaidDefinition.replace(/"/g, "'"),
+        {
+          fontSize: DEFAULT_FONT_SIZE,
+        },
+      );
+    }
+    const { elements, files } = ret;
     setError(null);
 
     data.current = {
@@ -83,7 +99,7 @@ export const convertMermaidToExcalidraw = async ({
         //zsviczian add customData to new mermaid image element
         elements.map((el) => {
           if (el.type === "image") {
-            el.customData = { mermaidText: text };
+            el.customData = { mermaidText: mermaidDefinition };
           }
           return el;
         }),
@@ -106,9 +122,8 @@ export const convertMermaidToExcalidraw = async ({
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
   } catch (err: any) {
-    //console.error(err); //zsviczian - threw too many errors with mermaid
     parent.style.background = "var(--default-bg-color)";
-    if (text) {
+    if (mermaidDefinition) {
       setError(err);
     }
 
@@ -116,14 +131,11 @@ export const convertMermaidToExcalidraw = async ({
   }
 };
 
-export const LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW = "mermaid-to-excalidraw";
-export const saveMermaidDataToStorage = (data: string) => {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW, data);
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
+export const saveMermaidDataToStorage = (mermaidDefinition: string) => {
+  EditorLocalStorage.set(
+    EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW,
+    mermaidDefinition,
+  );
 };
 
 export const insertToEditor = ({

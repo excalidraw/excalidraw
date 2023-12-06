@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.17.0-obsidian-3",
+  "version": "0.17.1-obsidian-1",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
