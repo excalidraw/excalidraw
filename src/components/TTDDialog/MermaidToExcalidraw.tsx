@@ -95,6 +95,9 @@ const MermaidToExcalidraw = ({
               {el}
             </a>
           )}
+          classLink={(el) => (
+            <a href="https://mermaid.js.org/syntax/classDiagram.html">{el}</a>
+          )}
         />
       </div>
       <TTDDialogPanels>
