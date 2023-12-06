@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Insertar",
-    "description": "",
+    "description": "Actualmente sólo <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Secuencia, </sequenceLink> y <classLink>Class </classLink>Diagramas son soportados. Los otros tipos se renderizarán como imagen en Excalidraw.",
     "syntax": "Sintaxis Mermaid",
     "preview": "Vista previa"
   }
