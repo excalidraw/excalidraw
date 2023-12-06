@@ -38,8 +38,12 @@
     "arrowhead_none": "Niciunul",
     "arrowhead_arrow": "Săgeată",
     "arrowhead_bar": "Bară",
-    "arrowhead_dot": "Bulină",
+    "arrowhead_circle": "Cerc",
+    "arrowhead_circle_outline": "Cerc (contur)",
     "arrowhead_triangle": "Triunghi",
+    "arrowhead_triangle_outline": "Triunghi (contur)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (contur)",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid la Excalidraw",
     "button": "Introducere",
-    "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink> și <sequenceLink>Diagramele de secvență</sequenceLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "description": "",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare"
   }
