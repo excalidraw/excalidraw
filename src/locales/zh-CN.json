@@ -38,8 +38,12 @@
     "arrowhead_none": "无",
     "arrowhead_arrow": "箭头",
     "arrowhead_bar": "条状",
-    "arrowhead_dot": "圆点",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "三角箭头",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前仅支持<flowchartLink>流程图</flowchartLink>和<sequenceLink>序列图</sequenceLink>。其他类型在 Excalidraw 中将以图像呈现。",
+    "description": "",
     "syntax": "Mermaid 语法",
     "preview": "预览"
   }
