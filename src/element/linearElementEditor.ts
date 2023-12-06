@@ -1444,7 +1444,7 @@ export class LinearElementEditor {
       x2 = maxX + element.x;
       y2 = maxY + element.y;
     } else {
-      const shape = ShapeCache.generateElementShape(element);
+      const shape = ShapeCache.generateElementShape(element, null);
 
       // first element is always the curve
       const ops = getCurvePathOps(shape[0]);

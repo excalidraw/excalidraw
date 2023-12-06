@@ -1281,7 +1281,7 @@ export const ArrowheadArrowIcon = React.memo(
     ),
 );
 
-export const ArrowheadDotIcon = React.memo(
+export const ArrowheadCircleIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
@@ -1290,6 +1290,22 @@ export const ArrowheadDotIcon = React.memo(
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
       >
         <path d="M32 10L6 10" strokeWidth={2} />
+        <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadCircleOutlineIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        strokeWidth={2}
+      >
+        <path d="M26 10L6 10" />
         <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
       </g>,
       { width: 40, height: 20 },
@@ -1321,6 +1337,58 @@ export const ArrowheadTriangleIcon = React.memo(
       >
         <path d="M32 10L6 10" strokeWidth={2} />
         <path d="M27.5 5.5L34.5 10L27.5 14.5L27.5 5.5" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadTriangleOutlineIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        strokeWidth={2}
+        strokeLinejoin="round"
+      >
+        <path d="M6,9.5H27" />
+        <path d="M27,5L34,10L27,14Z" fill="none" />
+      </g>,
+
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadDiamondIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="currentColor"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M6,9.5H20" />
+        <path d="M27,5L34,10L27,14L20,9.5Z" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadDiamondOutlineIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M6,9.5H20" />
+        <path d="M27,5L34,10L27,14L20,9.5Z" />
       </g>,
       { width: 40, height: 20 },
     ),

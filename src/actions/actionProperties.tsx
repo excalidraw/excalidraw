@@ -15,7 +15,7 @@ import { IconPicker } from "../components/IconPicker";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
-  ArrowheadDotIcon,
+  ArrowheadCircleIcon,
   ArrowheadTriangleIcon,
   ArrowheadNoneIcon,
   StrokeStyleDashedIcon,
@@ -45,6 +45,10 @@ import {
   TextAlignCenterIcon,
   TextAlignRightIcon,
   FillZigZagIcon,
+  ArrowheadTriangleOutlineIcon,
+  ArrowheadCircleOutlineIcon,
+  ArrowheadDiamondIcon,
+  ArrowheadDiamondOutlineIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -1013,6 +1017,77 @@ export const actionChangeRoundness = register({
   },
 });
 
+const getArrowheadOptions = (flip: boolean) => {
+  return [
+    {
+      value: null,
+      text: t("labels.arrowhead_none"),
+      keyBinding: "q",
+      icon: ArrowheadNoneIcon,
+    },
+    {
+      value: "arrow",
+      text: t("labels.arrowhead_arrow"),
+      keyBinding: "w",
+      icon: <ArrowheadArrowIcon flip={flip} />,
+    },
+    {
+      value: "bar",
+      text: t("labels.arrowhead_bar"),
+      keyBinding: "e",
+      icon: <ArrowheadBarIcon flip={flip} />,
+    },
+    {
+      value: "dot",
+      text: t("labels.arrowhead_circle"),
+      keyBinding: null,
+      icon: <ArrowheadCircleIcon flip={flip} />,
+      showInPicker: false,
+    },
+    {
+      value: "circle",
+      text: t("labels.arrowhead_circle"),
+      keyBinding: "r",
+      icon: <ArrowheadCircleIcon flip={flip} />,
+      showInPicker: false,
+    },
+    {
+      value: "circle_outline",
+      text: t("labels.arrowhead_circle_outline"),
+      keyBinding: null,
+      icon: <ArrowheadCircleOutlineIcon flip={flip} />,
+      showInPicker: false,
+    },
+    {
+      value: "triangle",
+      text: t("labels.arrowhead_triangle"),
+      icon: <ArrowheadTriangleIcon flip={flip} />,
+      keyBinding: "t",
+    },
+    {
+      value: "triangle_outline",
+      text: t("labels.arrowhead_triangle_outline"),
+      icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
+      keyBinding: null,
+      showInPicker: false,
+    },
+    {
+      value: "diamond",
+      text: t("labels.arrowhead_diamond"),
+      icon: <ArrowheadDiamondIcon flip={flip} />,
+      keyBinding: null,
+      showInPicker: false,
+    },
+    {
+      value: "diamond_outline",
+      text: t("labels.arrowhead_diamond_outline"),
+      icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
+      keyBinding: null,
+      showInPicker: false,
+    },
+  ] as const;
+};
+
 export const actionChangeArrowhead = register({
   name: "changeArrowhead",
   trackEvent: false,
@@ -1059,38 +1134,7 @@ export const actionChangeArrowhead = register({
         <div className="iconSelectList buttonList">
           <IconPicker
             label="arrowhead_start"
-            options={[
-              {
-                value: null,
-                text: t("labels.arrowhead_none"),
-                icon: ArrowheadNoneIcon,
-                keyBinding: "q",
-              },
-              {
-                value: "arrow",
-                text: t("labels.arrowhead_arrow"),
-                icon: <ArrowheadArrowIcon flip={!isRTL} />,
-                keyBinding: "w",
-              },
-              {
-                value: "bar",
-                text: t("labels.arrowhead_bar"),
-                icon: <ArrowheadBarIcon flip={!isRTL} />,
-                keyBinding: "e",
-              },
-              {
-                value: "dot",
-                text: t("labels.arrowhead_dot"),
-                icon: <ArrowheadDotIcon flip={!isRTL} />,
-                keyBinding: "r",
-              },
-              {
-                value: "triangle",
-                text: t("labels.arrowhead_triangle"),
-                icon: <ArrowheadTriangleIcon flip={!isRTL} />,
-                keyBinding: "t",
-              },
-            ]}
+            options={getArrowheadOptions(!isRTL)}
             value={getFormValue<Arrowhead | null>(
               elements,
               appState,
@@ -1106,38 +1150,7 @@ export const actionChangeArrowhead = register({
           <IconPicker
             label="arrowhead_end"
             group="arrowheads"
-            options={[
-              {
-                value: null,
-                text: t("labels.arrowhead_none"),
-                keyBinding: "q",
-                icon: ArrowheadNoneIcon,
-              },
-              {
-                value: "arrow",
-                text: t("labels.arrowhead_arrow"),
-                keyBinding: "w",
-                icon: <ArrowheadArrowIcon flip={isRTL} />,
-              },
-              {
-                value: "bar",
-                text: t("labels.arrowhead_bar"),
-                keyBinding: "e",
-                icon: <ArrowheadBarIcon flip={isRTL} />,
-              },
-              {
-                value: "dot",
-                text: t("labels.arrowhead_dot"),
-                keyBinding: "r",
-                icon: <ArrowheadDotIcon flip={isRTL} />,
-              },
-              {
-                value: "triangle",
-                text: t("labels.arrowhead_triangle"),
-                icon: <ArrowheadTriangleIcon flip={isRTL} />,
-                keyBinding: "t",
-              },
-            ]}
+            options={getArrowheadOptions(!!isRTL)}
             value={getFormValue<Arrowhead | null>(
               elements,
               appState,

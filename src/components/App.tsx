@@ -1556,6 +1556,8 @@ class App extends React.Component<AppProps, AppState> {
                             imageCache: this.imageCache,
                             isExporting: false,
                             renderGrid: true,
+                            canvasBackgroundColor:
+                              this.state.viewBackgroundColor,
                           }}
                         />
                         <InteractiveCanvas

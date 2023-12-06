@@ -7,6 +7,8 @@ import {
 import { elementWithCanvasCache } from "../renderer/renderElement";
 import { _generateElementShape } from "./Shape";
 import { ElementShape, ElementShapes } from "./types";
+import { COLOR_PALETTE } from "../colors";
+import { AppState } from "../types";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -46,10 +48,15 @@ export class ShapeCache {
     T extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
   >(
     element: T,
-    isExporting = false,
+    renderConfig: {
+      isExporting: boolean;
+      canvasBackgroundColor: AppState["viewBackgroundColor"];
+    } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
-    const cachedShape = isExporting ? undefined : ShapeCache.get(element);
+    const cachedShape = renderConfig?.isExporting
+      ? undefined
+      : ShapeCache.get(element);
 
     // `null` indicates no rc shape applicable for this element type,
     // but it's considered a valid cache value (= do not regenerate)
@@ -62,7 +69,10 @@ export class ShapeCache {
     const shape = _generateElementShape(
       element,
       ShapeCache.rg,
-      isExporting,
+      renderConfig || {
+        isExporting: false,
+        canvasBackgroundColor: COLOR_PALETTE.white,
+      },
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]
       : Drawable | null;

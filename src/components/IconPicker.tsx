@@ -15,7 +15,12 @@ function Picker<T>({
 }: {
   label: string;
   value: T;
-  options: { value: T; text: string; icon: JSX.Element; keyBinding: string }[];
+  options: {
+    value: T;
+    text: string;
+    icon: JSX.Element;
+    keyBinding: string | null;
+  }[];
   onChange: (value: T) => void;
   onClose: () => void;
 }) {
@@ -110,9 +115,11 @@ function Picker<T>({
               (event.currentTarget as HTMLButtonElement).focus();
               onChange(option.value);
             }}
-            title={`${option.text} — ${option.keyBinding.toUpperCase()}`}
+            title={`${option.text} ${
+              option.keyBinding && `— ${option.keyBinding.toUpperCase()}`
+            }`}
             aria-label={option.text || "none"}
-            aria-keyshortcuts={option.keyBinding}
+            aria-keyshortcuts={option.keyBinding || undefined}
             key={option.text}
             ref={(el) => {
               if (el && i === 0) {
@@ -127,7 +134,9 @@ function Picker<T>({
             }}
           >
             {option.icon}
-            <span className="picker-keybinding">{option.keyBinding}</span>
+            {option.keyBinding && (
+              <span className="picker-keybinding">{option.keyBinding}</span>
+            )}
           </button>
         ))}
       </div>
@@ -144,7 +153,13 @@ export function IconPicker<T>({
 }: {
   label: string;
   value: T;
-  options: { value: T; text: string; icon: JSX.Element; keyBinding: string }[];
+  options: readonly {
+    value: T;
+    text: string;
+    icon: JSX.Element;
+    keyBinding: string | null;
+    showInPicker?: boolean;
+  }[];
   onChange: (value: T) => void;
   group?: string;
 }) {
@@ -173,7 +188,7 @@ export function IconPicker<T>({
               {...(isRTL ? { right: 5.5 } : { left: -5.5 })}
             >
               <Picker
-                options={options}
+                options={options.filter((opt) => opt.showInPicker !== false)}
                 value={value}
                 label={label}
                 onChange={onChange}
