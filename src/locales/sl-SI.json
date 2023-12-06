@@ -38,12 +38,12 @@
     "arrowhead_none": "Brez",
     "arrowhead_arrow": "Puščica",
     "arrowhead_bar": "Palica",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Krog",
+    "arrowhead_circle_outline": "Krog (oris)",
     "arrowhead_triangle": "Trikotnik",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Trikotnik (oris)",
+    "arrowhead_diamond": "Diamant",
+    "arrowhead_diamond_outline": "Diamant (oris)",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid v Excalidraw",
     "button": "Vstavi",
-    "description": "",
+    "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink>, <sequenceLink>diagrami zaporedij</sequenceLink> in <classLink>Razredni diagrami</classLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled"
   }
