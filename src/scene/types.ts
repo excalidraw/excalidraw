@@ -6,11 +6,13 @@ import {
 } from "../element/types";
 import {
   AppClassProperties,
+  AppState,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
 
 export type StaticCanvasRenderConfig = {
+  canvasBackgroundColor: AppState["viewBackgroundColor"];
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
@@ -18,6 +20,16 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+};
+
+export type SVGRenderConfig = {
+  offsetX: number;
+  offsetY: number;
+  isExporting: boolean;
+  exportWithDarkMode: boolean;
+  renderEmbeddables: boolean;
+  frameRendering: AppState["frameRendering"];
+  canvasBackgroundColor: AppState["viewBackgroundColor"];
 };
 
 export type InteractiveCanvasRenderConfig = {
