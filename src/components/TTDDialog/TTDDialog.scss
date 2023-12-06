@@ -298,4 +298,18 @@ $verticalBreakpoint: 861px;
       }
     }
   }
+
+  .ttd-dialog-submit-shortcut {
+    margin-inline-start: 0.5rem;
+    font-size: 0.625rem;
+    opacity: 0.6;
+    display: flex;
+    gap: 0.125rem;
+
+    &__key {
+      border: 1px solid gray;
+      padding: 2px 3px;
+      border-radius: 4px;
+    }
+  }
 }

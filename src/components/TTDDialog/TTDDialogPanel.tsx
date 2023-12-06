@@ -14,6 +14,7 @@ interface TTDDialogPanelProps {
   panelActionDisabled?: boolean;
   onTextSubmitInProgess?: boolean;
   renderTopRight?: () => ReactNode;
+  renderSubmitShortcut?: () => ReactNode;
   renderBottomRight?: () => ReactNode;
 }
 
@@ -24,6 +25,7 @@ export const TTDDialogPanel = ({
   panelActionDisabled = false,
   onTextSubmitInProgess,
   renderTopRight,
+  renderSubmitShortcut,
   renderBottomRight,
 }: TTDDialogPanelProps) => {
   return (
@@ -51,6 +53,9 @@ export const TTDDialogPanel = ({
           </div>
           {onTextSubmitInProgess && <Spinner />}
         </Button>
+        {!panelActionDisabled &&
+          !onTextSubmitInProgess &&
+          renderSubmitShortcut?.()}
         {renderBottomRight?.()}
       </div>
     </div>

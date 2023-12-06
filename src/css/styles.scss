@@ -53,13 +53,19 @@
   //    component (e.g. if you select text in a sidebar)
   user-select: none;
 
+  .excalidraw-link,
   a {
     font-weight: 500;
     text-decoration: none;
     color: var(--link-color);
+    user-select: none;
+    cursor: pointer;
 
     &:hover {
       text-decoration: underline;
+    }
+    &:active {
+      text-decoration: none;
     }
   }
 
