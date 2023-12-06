@@ -38,8 +38,12 @@
     "arrowhead_none": "Inga",
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Stolpe",
-    "arrowhead_dot": "Punkt",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Triangel",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid till Excalidraw",
     "button": "Infoga",
-    "description": "För närvarande stöds endast <flowchartLink>Flowcharts</flowchartLink> och <sequenceLink>sekvensdiagram</sequenceLink> . De andra typerna kommer att återges som bild i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska"
   }
