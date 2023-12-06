@@ -38,8 +38,12 @@
     "arrowhead_none": "無",
     "arrowhead_arrow": "箭頭",
     "arrowhead_bar": "條狀箭頭",
-    "arrowhead_dot": "點箭頭",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "三角形",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "字型大小",
     "fontFamily": "字體集",
     "addWatermark": "加上 \"Made with Excalidraw\" 浮水印",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前僅支援 <flowchartLink>Flowcharts</flowchartLink> 及 <sequenceLink>Sequence Diagrams</sequenceLink>。其餘檔案類型在 Excalidraw 將會以圖像呈現。",
+    "description": "",
     "syntax": "Mermaid 語法",
     "preview": "預覽"
   }
