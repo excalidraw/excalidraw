@@ -38,8 +38,12 @@
     "arrowhead_none": "कुठलाहि नाही",
     "arrowhead_arrow": "बाण",
     "arrowhead_bar": "दांडुक",
-    "arrowhead_dot": "ठिपका",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "त्रिकोण",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "अक्षर आकार",
     "fontFamily": "अक्षर समूह",
     "addWatermark": "\"एक्सकेलीड्रॉ ने बनवलेलं\" जोडा",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "मर्मेड पासून एक्सकाली मधे",
     "button": "शिरवा",
-    "description": "सध्या फक्त <flowchartLink> प्रवाह चित्र (फ़्लो चार्ट) </flowchartLink> आणि <sequenceLink> क्रम चित्र ( सिकवेंस ड़ायग्राम) </sequenceLink> करता येतात. बाक़ीचे चित्र प्रकार एक्सकाली चित्र पद्धति नी चित्रित होतील.",
+    "description": "",
     "syntax": "मर्मेड संरचना नियम",
     "preview": "पूर्वावलोकन"
   }
