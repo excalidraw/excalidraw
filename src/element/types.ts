@@ -226,13 +226,13 @@ export type PointBinding = {
 export type Arrowhead =
   | "arrow"
   | "bar"
-  | "dot"
-  | "dot_outline"
+  | "dot" // legacy. Do not use for new elements.
+  | "circle"
+  | "circle_outline"
   | "triangle"
   | "triangle_outline"
   | "diamond"
-  | "diamond_outline"
-  | "crowfoot";
+  | "diamond_outline";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{

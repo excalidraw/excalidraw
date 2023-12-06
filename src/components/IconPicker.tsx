@@ -153,7 +153,7 @@ export function IconPicker<T>({
 }: {
   label: string;
   value: T;
-  options: {
+  options: readonly {
     value: T;
     text: string;
     icon: JSX.Element;

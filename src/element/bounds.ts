@@ -589,7 +589,11 @@ export const getArrowheadPoints = (
   const xs = x2 - nx * minSize;
   const ys = y2 - ny * minSize;
 
-  if (arrowhead === "dot" || arrowhead === "dot_outline") {
+  if (
+    arrowhead === "dot" ||
+    arrowhead === "circle" ||
+    arrowhead === "circle_outline"
+  ) {
     const r =
       Math.floor(Math.hypot(ys - y2, xs - x2) + element.strokeWidth) - 2;
     return [x2, y2, r];

@@ -1281,7 +1281,7 @@ export const ArrowheadArrowIcon = React.memo(
     ),
 );
 
-export const ArrowheadDotIcon = React.memo(
+export const ArrowheadCircleIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
@@ -1296,7 +1296,7 @@ export const ArrowheadDotIcon = React.memo(
     ),
 );
 
-export const ArrowheadDotOutlineIcon = React.memo(
+export const ArrowheadCircleOutlineIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g

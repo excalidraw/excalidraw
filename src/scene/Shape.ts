@@ -167,7 +167,8 @@ const getArrowheadShapes = (
 
   switch (arrowhead) {
     case "dot":
-    case "dot_outline": {
+    case "circle":
+    case "circle_outline": {
       const [x, y, r] = arrowheadPoints;
 
       // always use solid stroke for arrowhead
@@ -177,7 +178,7 @@ const getArrowheadShapes = (
         generator.circle(x, y, r, {
           ...options,
           fill:
-            arrowhead === "dot_outline"
+            arrowhead === "circle_outline"
               ? canvasBackgroundColor
               : element.strokeColor,
 
