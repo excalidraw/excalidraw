@@ -223,7 +223,16 @@ export type PointBinding = {
   gap: number;
 };
 
-export type Arrowhead = "arrow" | "bar" | "dot" | "triangle";
+export type Arrowhead =
+  | "arrow"
+  | "bar"
+  | "dot" // legacy. Do not use for new elements.
+  | "circle"
+  | "circle_outline"
+  | "triangle"
+  | "triangle_outline"
+  | "diamond"
+  | "diamond_outline";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
