@@ -53,13 +53,19 @@
   //    component (e.g. if you select text in a sidebar)
   user-select: none;
 
+  .excalidraw-link,
   a {
     font-weight: 500;
     text-decoration: none;
     color: var(--link-color);
+    user-select: none;
+    cursor: pointer;
 
     &:hover {
       text-decoration: underline;
+    }
+    &:active {
+      text-decoration: none;
     }
   }
 
@@ -662,6 +668,19 @@
       --button-bg: var(--color-surface-high);
     }
   }
+
+  .excalidraw__paragraph {
+    margin: 1rem 0;
+  }
+
+  .Modal__content {
+    .excalidraw__paragraph:first-child {
+      margin-top: 0;
+    }
+    .excalidraw__paragraph + .excalidraw__paragraph {
+      margin-top: 0rem;
+    }
+  }
 }
 
 .ErrorSplash.excalidraw {
@@ -749,9 +768,5 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .excalidraw__paragraph {
-    margin: 1rem 0;
   }
 }

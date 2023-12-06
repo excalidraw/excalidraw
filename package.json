@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
-    "@zsviczian/mermaid-to-excalidraw": "0.1.2-obsidian-3",
+    "@zsviczian/mermaid-to-excalidraw": "0.2.0-obsidian-1",
     "@excalidraw/laser-pointer": "1.2.0",
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",
@@ -87,7 +87,7 @@
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "4.4.2",
+    "vite": "4.4.12",
     "vite-plugin-checker": "0.6.1",
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-pwa": "0.16.4",

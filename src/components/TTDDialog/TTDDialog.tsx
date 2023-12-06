@@ -1,5 +1,5 @@
 import { Dialog } from "../Dialog";
-import { useApp, useAppProps } from "../App";
+import { useApp, useAppProps, useExcalidrawSetAppState } from "../App";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import TTDDialogTabs from "./TTDDialogTabs";
 import { ChangeEventHandler, useEffect, useRef, useState } from "react";
@@ -27,6 +27,8 @@ import "./TTDDialog.scss";
 import { isFiniteNumber } from "../../utils";
 import { atom, useAtom } from "jotai";
 import { trackEvent } from "../../analytics";
+import { InlineIcon } from "../InlineIcon";
+import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 40000; //zsviczian - was 1000
@@ -34,6 +36,11 @@ const MAX_PROMPT_LENGTH = 40000; //zsviczian - was 1000
 const rateLimitsAtom = atom<{
   rateLimit: number;
   rateLimitRemaining: number;
+} | null>(null);
+
+const ttdGenerationAtom = atom<{
+  generatedResponse: string | null;
+  prompt: string | null;
 } | null>(null);
 
 type OnTestSubmitRetValue = {
@@ -72,7 +79,7 @@ export const TTDDialogBase = withInternalFallback(
     tab,
     ...rest
   }: {
-    tab: string;
+    tab: "text-to-diagram" | "mermaid";
   } & (
     | {
         onTextSubmit(value: string): Promise<OnTestSubmitRetValue>;
@@ -82,10 +89,13 @@ export const TTDDialogBase = withInternalFallback(
     const app = useApp();
     const appState = useUIAppState();//zsviczian
     const appProps = useAppProps();//zsviczian
+    const setAppState = useExcalidrawSetAppState();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);
 
-    const [text, setText] = useState("");
+    const [ttdGeneration, setTtdGeneration] = useAtom(ttdGenerationAtom);
+
+    const [text, setText] = useState(ttdGeneration?.prompt ?? "");
 
     const prompt = text.trim();
 
@@ -93,6 +103,10 @@ export const TTDDialogBase = withInternalFallback(
       event,
     ) => {
       setText(event.target.value);
+      setTtdGeneration((s) => ({
+        generatedResponse: s?.generatedResponse ?? null,
+        prompt: event.target.value,
+      }));
     };
 
     const [onTextSubmitInProgess, setOnTextSubmitInProgess] = useState(false);
@@ -133,6 +147,13 @@ export const TTDDialogBase = withInternalFallback(
         const { generatedResponse, error, rateLimit, rateLimitRemaining } =
           await rest.onTextSubmit(prompt);
 
+        if (typeof generatedResponse === "string") {
+          setTtdGeneration((s) => ({
+            generatedResponse,
+            prompt: s?.prompt ?? null,
+          }));
+        }
+
         if (isFiniteNumber(rateLimit) && isFiniteNumber(rateLimitRemaining)) {
           setRateLimits({ rateLimit, rateLimitRemaining });
         }
@@ -152,11 +173,18 @@ export const TTDDialogBase = withInternalFallback(
             data,
             mermaidToExcalidrawLib,
             setError,
-            text: generatedResponse,
+            mermaidDefinition: generatedResponse,
           });
           trackEvent("ai", "mermaid parse success", "ttd");
-          saveMermaidDataToStorage(generatedResponse);
         } catch (error: any) {
+          console.info(
+            `%cTTD mermaid render errror: ${error.message}`,
+            "color: red",
+          );
+          console.info(
+            `>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nTTD mermaid definition render errror: ${error.message}`,
+            "color: yellow",
+          );
           trackEvent("ai", "mermaid parse failed", "ttd");
           setError(
             new Error(
@@ -208,17 +236,34 @@ export const TTDDialogBase = withInternalFallback(
           app.setOpenDialog(null);
         }}
         size={1200}
-        title=""
+        title={false}
         {...rest}
         autofocus={false}
       >
-        <TTDDialogTabs tab={tab}>
+        <TTDDialogTabs dialog="ttd" tab={tab}>
           {"__fallback" in rest && rest.__fallback ? (
             <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
           ) : (
             <TTDDialogTabTriggers>
               <TTDDialogTabTrigger tab="text-to-diagram">
-                {t("labels.textToDiagram")}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {t("labels.textToDiagram")}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "1px 6px",
+                      marginLeft: "10px",
+                      fontSize: 10,
+                      borderRadius: "12px",
+                      background: "pink",
+                      color: "#000",
+                    }}
+                  >
+                    AI Beta
+                  </div>
+                </div>
               </TTDDialogTabTrigger>
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
             </TTDDialogTabTriggers>
@@ -272,7 +317,32 @@ export const TTDDialogBase = withInternalFallback(
                       </div>
                     );
                   }}
+                  renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
                   renderBottomRight={() => {
+                    if (typeof ttdGeneration?.generatedResponse === "string") {
+                      return (
+                        <div
+                          className="excalidraw-link"
+                          style={{ marginLeft: "auto", fontSize: 14 }}
+                          onClick={() => {
+                            if (
+                              typeof ttdGeneration?.generatedResponse ===
+                              "string"
+                            ) {
+                              saveMermaidDataToStorage(
+                                ttdGeneration.generatedResponse,
+                              );
+                              setAppState({
+                                openDialog: { name: "ttd", tab: "mermaid" },
+                              });
+                            }
+                          }}
+                        >
+                          View as Mermaid
+                          <InlineIcon icon={ArrowRightIcon} />
+                        </div>
+                      );
+                    }
                     const ratio = prompt.length / MAX_PROMPT_LENGTH;
                     if (ratio > 0.8) {
                       return (

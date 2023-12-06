@@ -281,6 +281,7 @@ export const exportToCanvas = async (
       theme: appState.exportWithDarkMode ? "dark" : "light",
     },
     renderConfig: {
+      canvasBackgroundColor: viewBackgroundColor,
       imageCache,
       renderGrid: false,
       isExporting: true,
@@ -450,10 +451,12 @@ export const exportToSvg = async (
   renderSceneToSvg(elementsForRender, rsvg, svgRoot, files || {}, {
     offsetX,
     offsetY,
+    isExporting: true,
     exportWithDarkMode,
     renderEmbeddables: opts?.renderEmbeddables ?? false,
     frameRendering,
     frameColor: appState.frameColor, //zsviczian
+    canvasBackgroundColor: viewBackgroundColor,
   });
 
   tempScene.destroy();

@@ -7,7 +7,6 @@ import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";
 import Trans from "../Trans";
 import {
-  LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW,
   MermaidToExcalidrawLibProps,
   convertMermaidToExcalidraw,
   insertToEditor,
@@ -20,23 +19,15 @@ import { TTDDialogOutput } from "./TTDDialogOutput";
 import { MermaidOptions, parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw";
 import { DEFAULT_FONT_SIZE } from "../../constants";
 import { convertToExcalidrawElements } from "../../data/transform";
+import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { EDITOR_LS_KEYS } from "../../constants";
+import { debounce } from "../../utils";
+import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
 
-const importMermaidDataFromStorage = () => {
-  try {
-    const data = localStorage.getItem(LOCAL_STORAGE_KEY_MERMAID_TO_EXCALIDRAW);
-    if (data) {
-      return data;
-    }
-  } catch (error: any) {
-    // Unable to access localStorage
-    console.error(error);
-  }
-
-  return null;
-};
+const debouncedSaveMermaidDefinition = debounce(saveMermaidDataToStorage, 300);
 
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
@@ -45,7 +36,11 @@ const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   selectedElements: readonly NonDeletedExcalidrawElement[]; //zsviczian
 }) => {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(
+    () =>
+      EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
+      MERMAID_EXAMPLE,
+  );
   const deferredText = useDeferredValue(text.trim());
   const [loading, setLoading] = useState(true); //zsviczian
   const [error, setError] = useState<Error | null>(null);
@@ -62,36 +57,34 @@ const MermaidToExcalidraw = ({
     const selectedMermaidImage = selectedElements.filter(
       (el) => el.type === "image" && el.customData?.mermaidText,
     )[0]; //zsviczian
-    const data = selectedMermaidImage
-      ? selectedMermaidImage.customData?.mermaidText
-      : importMermaidDataFromStorage() || MERMAID_EXAMPLE;
-    setText(data);
-  }, [selectedElements]); //zsviczian
-
-  useEffect(() => {
     convertMermaidToExcalidraw({
       canvasRef,
       data,
       mermaidToExcalidrawLib,
       setError,
-      text: deferredText,
+      mermaidDefinition: selectedMermaidImage
+        ? selectedMermaidImage.customData?.mermaidText
+        : deferredText, //zsviczian
     }).catch(() => {});
-  }, [deferredText, mermaidToExcalidrawLib]);
 
-  const textRef = useRef(text);
+    debouncedSaveMermaidDefinition(deferredText);
+  }, [deferredText, mermaidToExcalidrawLib, selectedElements]); //zsviczian
 
-  // slightly hacky but really quite simple
-  // essentially, we want to save the text to LS when the component unmounts
-  useEffect(() => {
-    textRef.current = text;
-  }, [text]);
-  useEffect(() => {
-    return () => {
-      if (textRef.current) {
-        saveMermaidDataToStorage(textRef.current);
-      }
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      debouncedSaveMermaidDefinition.flush();
+    },
+    [],
+  );
+
+  const onInsertToEditor = () => {
+    insertToEditor({
+      app,
+      data,
+      text,
+      shouldSaveMermaidDataToStorage: true,
+    });
+  };
 
   return (
     <>
@@ -106,6 +99,9 @@ const MermaidToExcalidraw = ({
               {el}
             </a>
           )}
+          classLink={(el) => (
+            <a href="https://mermaid.js.org/syntax/classDiagram.html">{el}</a>
+          )}
         />
       </div>
       <TTDDialogPanels>
@@ -114,22 +110,21 @@ const MermaidToExcalidraw = ({
             input={text}
             placeholder={"Write Mermaid diagram defintion here..."}
             onChange={(event) => setText(event.target.value)}
+            onKeyboardSubmit={() => {
+              onInsertToEditor();
+            }}
           />
         </TTDDialogPanel>
         <TTDDialogPanel
           label={t("mermaid.preview")}
           panelAction={{
             action: () => {
-              insertToEditor({
-                app,
-                data,
-                text,
-                shouldSaveMermaidDataToStorage: true,
-              });
+              onInsertToEditor();
             },
             label: t("mermaid.button"),
             icon: ArrowRightIcon,
           }}
+          renderSubmitShortcut={() => <TTDDialogSubmitShortcut />}
         >
           <TTDDialogOutput
             canvasRef={canvasRef}

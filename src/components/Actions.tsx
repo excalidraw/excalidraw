@@ -366,8 +366,9 @@ export const ShapesSwitcher = ({
                 onSelect={() => {
                   trackEvent("ai", "open-settings", "d2c");
                   app.setOpenDialog({
-                    name: "magicSettings",
+                    name: "settings",
                     source: "settings",
+                    tab: "diagram-to-code",
                   });
                 }}
                 icon={OpenAIIcon}
