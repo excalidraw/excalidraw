@@ -11,7 +11,10 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
-import { fixFractionalIndices } from "../fractionalIndex";
+import {
+  fixFractionalIndices,
+  validateFractionalIndicies,
+} from "../fractionalIndex";
 import { arrayToMap } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
@@ -238,6 +241,12 @@ class Scene {
       _nextElements = fixFractionalIndices(nextElements, mapOfIndicesToFix);
     } else {
       _nextElements = nextElements;
+    }
+
+    if (import.meta.env.DEV) {
+      if (!validateFractionalIndicies(_nextElements)) {
+        console.error("fractional indices consistency has been compromised");
+      }
     }
 
     this.elements = _nextElements;

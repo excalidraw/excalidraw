@@ -1,6 +1,9 @@
 import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
-import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
+import {
+  generateKeyBetween,
+  generateNJitteredKeysBetween,
+} from "fractional-indexing-jittered";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
@@ -10,18 +13,22 @@ const isValidFractionalIndex = (
   successor: FractionalIndex,
 ) => {
   if (index) {
+    if (predecessor && successor) {
+      return predecessor < index && index < successor;
+    }
+
+    if (successor && !predecessor) {
+      // first element
+      return index < successor;
+    }
+
+    if (predecessor && !successor) {
+      // last element
+      return predecessor < index;
+    }
+
     if (!predecessor && !successor) {
       return index.length > 0;
-    }
-
-    if (!predecessor) {
-      // first element
-      return index < successor!;
-    }
-
-    if (!successor) {
-      // last element
-      return predecessor! < index;
     }
   }
 
@@ -89,7 +96,7 @@ export const fixFractionalIndices = (
         elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
         null;
 
-      const newKeys = generateNKeysBetween(
+      const newKeys = generateNJitteredKeysBetween(
         predecessor,
         successor,
         movedIndices.length,
@@ -114,36 +121,6 @@ export const fixFractionalIndices = (
   return elements as ExcalidrawElement[];
 };
 
-const generateFractionalIndex = (
-  index: FractionalIndex,
-  predecessor: FractionalIndex,
-  successor: FractionalIndex,
-) => {
-  if (index) {
-    if (!predecessor && !successor) {
-      return index;
-    }
-
-    if (!predecessor) {
-      // first element in the array
-      // insert before successor
-      return generateKeyBetween(null, successor);
-    }
-
-    if (!successor) {
-      // last element in the array
-      // insert after predecessor
-      return generateKeyBetween(predecessor, null);
-    }
-
-    // both predecessor and successor exist
-    // insert after predecessor
-    return generateKeyBetween(predecessor, null);
-  }
-
-  return generateKeyBetween(null, null);
-};
-
 const compareStrings = (a: string, b: string) => {
   return a < b ? -1 : 1;
 };
@@ -163,6 +140,36 @@ export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
   });
 };
 
+const restoreFractionalIndex = (
+  index: FractionalIndex,
+  predecessor: FractionalIndex,
+  successor: FractionalIndex,
+) => {
+  if (index) {
+    if (!predecessor && !successor) {
+      return index;
+    }
+
+    if (successor && !predecessor) {
+      // first element in the array
+      // insert before successor
+      return generateKeyBetween(null, successor);
+    }
+
+    if (predecessor && !successor) {
+      // last element in the array
+      // insert after predecessor
+      return generateKeyBetween(predecessor, null);
+    }
+
+    // both predecessor and successor exist
+    // insert after predecessor
+    return generateKeyBetween(predecessor, null);
+  }
+
+  return generateKeyBetween(null, null);
+};
+
 /**
  * normalize the fractional indicies of the elements in the given array such that
  * every element in the array has a fractional index smaller than its successor's
@@ -170,7 +177,7 @@ export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
  * note that this function is not pure, it mutates elements whose fractional indicies
  * need updating
  */
-export const normalizeFractionalIndicies = (
+export const restoreFractionalIndicies = (
   allElements: readonly ExcalidrawElement[],
 ) => {
   let pre = -1;
@@ -186,7 +193,7 @@ export const normalizeFractionalIndicies = (
       !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
     ) {
       try {
-        const nextFractionalIndex = generateFractionalIndex(
+        const nextFractionalIndex = restoreFractionalIndex(
           element.fractionalIndex,
           predecessor,
           successor,
@@ -197,7 +204,6 @@ export const normalizeFractionalIndicies = (
           fractionalIndex: nextFractionalIndex,
         });
       } catch (e) {
-        console.error("normalizing fractional index", e);
         normalized.push(element);
       }
     } else {
@@ -208,4 +214,35 @@ export const normalizeFractionalIndicies = (
   }
 
   return normalized;
+};
+
+export const validateFractionalIndicies = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    const successor = elements[i + 1];
+
+    if (successor) {
+      if (element.fractionalIndex && successor.fractionalIndex) {
+        if (element.fractionalIndex >= successor.fractionalIndex) {
+          console.log(
+            "this is the case",
+            element.fractionalIndex,
+            successor.fractionalIndex,
+          );
+          return false;
+        }
+      } else {
+        console.log(
+          "this is the other case",
+          element.fractionalIndex,
+          successor.fractionalIndex,
+        );
+        return false;
+      }
+    }
+  }
+
+  return true;
 };
