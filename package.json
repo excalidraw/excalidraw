@@ -87,7 +87,7 @@
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "4.4.2",
+    "vite": "4.4.12",
     "vite-plugin-checker": "0.6.1",
     "vite-plugin-ejs": "1.6.4",
     "vite-plugin-pwa": "0.16.4",
