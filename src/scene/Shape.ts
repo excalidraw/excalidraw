@@ -169,13 +169,13 @@ const getArrowheadShapes = (
     case "dot":
     case "circle":
     case "circle_outline": {
-      const [x, y, r] = arrowheadPoints;
+      const [x, y, diameter] = arrowheadPoints;
 
       // always use solid stroke for arrowhead
       delete options.strokeLineDash;
 
       return [
-        generator.circle(x, y, r, {
+        generator.circle(x, y, diameter, {
           ...options,
           fill:
             arrowhead === "circle_outline"

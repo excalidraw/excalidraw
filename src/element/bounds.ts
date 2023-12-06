@@ -594,9 +594,8 @@ export const getArrowheadPoints = (
     arrowhead === "circle" ||
     arrowhead === "circle_outline"
   ) {
-    const r =
-      Math.floor(Math.hypot(ys - y2, xs - x2) + element.strokeWidth) - 2;
-    return [x2, y2, r];
+    const diameter = Math.hypot(ys - y2, xs - x2) + element.strokeWidth - 2;
+    return [x2, y2, diameter];
   }
 
   const angle = getArrowheadAngle(arrowhead);
