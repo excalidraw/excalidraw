@@ -3763,7 +3763,7 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
-      if (this.state.resizingElement && event.shiftKey) {
+      if (this.state.activeTool.type === "selection"  && this.state.resizingElement && (event.shiftKey || event.altKey)) {
         event.stopPropagation(); //zsviczian shift fires repeatedly causing slowdown when resizing sticky notes
         return;
       }
