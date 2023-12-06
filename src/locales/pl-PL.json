@@ -38,8 +38,12 @@
     "arrowhead_none": "Brak",
     "arrowhead_arrow": "Strzałka",
     "arrowhead_bar": "Kreska",
-    "arrowhead_dot": "Kropka",
+    "arrowhead_circle": "Okrąg",
+    "arrowhead_circle_outline": "Okrąg (obrys)",
     "arrowhead_triangle": "Trójkąt",
+    "arrowhead_triangle_outline": "Trójkąt (obrys)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (obrys)",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Konwertuj diagram Mermaid do Excalidraw",
     "button": "Wstaw",
-    "description": "Obecnie jedynie <flowchartLink>proste grafy</flowchartLink> i <sequenceLink>sekwencje</sequenceLink> są wspierane. Pozostałe typy diagramów będą wyświetlane jako obrazy w Excalidraw.",
+    "description": "",
     "syntax": "Składnia diagramów Mermaid",
     "preview": "Podgląd"
   }
