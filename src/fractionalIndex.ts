@@ -1,7 +1,7 @@
 import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import {
-  generateKeyBetween,
+  generateJitteredKeyBetween,
   generateNJitteredKeysBetween,
 } from "fractional-indexing-jittered";
 
@@ -64,19 +64,6 @@ const getContiguousMovedIndices = (
   }
 
   return result;
-};
-
-export const generateFractionalIndexBetween = (
-  predecessor: FractionalIndex,
-  successor: FractionalIndex,
-) => {
-  if (predecessor && successor) {
-    if (predecessor < successor) {
-      return generateKeyBetween(predecessor, successor);
-    }
-    return null;
-  }
-  return generateKeyBetween(predecessor, successor);
 };
 
 export const fixFractionalIndices = (
@@ -153,29 +140,31 @@ const restoreFractionalIndex = (
     if (successor && !predecessor) {
       // first element in the array
       // insert before successor
-      return generateKeyBetween(null, successor);
+      return generateJitteredKeyBetween(null, successor);
     }
 
     if (predecessor && !successor) {
       // last element in the array
       // insert after predecessor
-      return generateKeyBetween(predecessor, null);
+      return generateJitteredKeyBetween(predecessor, null);
     }
 
     // both predecessor and successor exist
     // insert after predecessor
-    return generateKeyBetween(predecessor, null);
+    return generateJitteredKeyBetween(predecessor, null);
   }
 
-  return generateKeyBetween(null, null);
+  return generateJitteredKeyBetween(null, null);
 };
 
 /**
- * normalize the fractional indicies of the elements in the given array such that
+ * restore the fractional indicies of the elements in the given array such that
  * every element in the array has a fractional index smaller than its successor's
  *
- * note that this function is not pure, it mutates elements whose fractional indicies
- * need updating
+ * neighboring indices might be updated as well
+ *
+ * only use this function when restoring or as a fallback to guarantee fractional
+ * indices consistency
  */
 export const restoreFractionalIndicies = (
   allElements: readonly ExcalidrawElement[],
