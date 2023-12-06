@@ -38,8 +38,12 @@
     "arrowhead_none": "Žiadne",
     "arrowhead_arrow": "Šípka",
     "arrowhead_bar": "Čiara",
-    "arrowhead_dot": "Bod",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Trojuholník",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "addWatermark": "Pridať \"Vytvorené s Excalidraw\"",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid do Excalidraw",
     "button": "Vložiť",
-    "description": "Aktuálne sú podporované iba <flowchartLink>vývojové</flowchartLink> a <sequenceLink>sekvenčné</sequenceLink> diagramy. Ostatné typy budú v Excalidraw vykreslené ako obrázky.",
+    "description": "",
     "syntax": "Mermaid syntax",
     "preview": "Ukážka"
   }
