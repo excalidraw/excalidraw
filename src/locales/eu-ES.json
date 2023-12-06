@@ -38,8 +38,12 @@
     "arrowhead_none": "Bat ere ez",
     "arrowhead_arrow": "Gezia",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Puntua",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Hirukia",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "",
     "button": "Txertatu",
-    "description": "Momentuz <flowchartLink>FlowchartLink</flowchartLink> eta <sequenceLink>Sekuentzia Diagramak</sequenceLink> soilik onartzen dira. Beste motak irudi gisa errendatuko dira Excalidrawn.",
+    "description": "",
     "syntax": "",
     "preview": "Aurrebista"
   }
