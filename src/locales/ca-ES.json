@@ -38,8 +38,12 @@
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Fletxa",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Punt",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "De Mermaid a Excalidraw",
     "button": "Insereix",
-    "description": "Ara per ara, només s'admeten <flowchartLink>diagrames de flux</flowchartLink> i <sequenceLink>diagrames de seqüència</sequenceLink>. Els altres tipus es renderitzaran com a imatge a l'Excalidraw.",
+    "description": "",
     "syntax": "Sintaxi de Mermaid",
     "preview": "Previsualització"
   }
