@@ -3545,8 +3545,11 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (this.state.resizingElement && event.shiftKey) {
+        event.stopPropagation();
+        return;
+      }
       // normalize `event.key` when CapsLock is pressed #2372
-
       if (
         "Proxy" in window &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
