@@ -1,9 +1,11 @@
 import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import {
-  generateJitteredKeyBetween,
+  generateKeyBetween,
+  generateNKeysBetween,
   generateNJitteredKeysBetween,
 } from "fractional-indexing-jittered";
+import { ENV } from "./constants";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
@@ -83,11 +85,21 @@ export const fixFractionalIndices = (
         elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
         null;
 
-      const newKeys = generateNJitteredKeysBetween(
-        predecessor,
-        successor,
-        movedIndices.length,
-      );
+      let newKeys = [];
+
+      if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+        newKeys = generateNKeysBetween(
+          predecessor,
+          successor,
+          movedIndices.length,
+        );
+      } else {
+        newKeys = generateNJitteredKeysBetween(
+          predecessor,
+          successor,
+          movedIndices.length,
+        );
+      }
 
       for (let i = 0; i < movedIndices.length; i++) {
         const element = elements[movedIndices[i]];
@@ -128,33 +140,24 @@ export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
 };
 
 const restoreFractionalIndex = (
-  index: FractionalIndex,
   predecessor: FractionalIndex,
   successor: FractionalIndex,
 ) => {
-  if (index) {
-    if (!predecessor && !successor) {
-      return index;
-    }
-
-    if (successor && !predecessor) {
-      // first element in the array
-      // insert before successor
-      return generateJitteredKeyBetween(null, successor);
-    }
-
-    if (predecessor && !successor) {
-      // last element in the array
-      // insert after predecessor
-      return generateJitteredKeyBetween(predecessor, null);
-    }
-
-    // both predecessor and successor exist
-    // insert after predecessor
-    return generateJitteredKeyBetween(predecessor, null);
+  if (successor && !predecessor) {
+    // first element in the array
+    // insert before successor
+    return generateKeyBetween(null, successor);
   }
 
-  return generateJitteredKeyBetween(null, null);
+  if (predecessor && !successor) {
+    // last element in the array
+    // insert after predecessor
+    return generateKeyBetween(predecessor, null);
+  }
+
+  // both predecessor and successor exist (or both do not)
+  // insert after predecessor
+  return generateKeyBetween(predecessor, null);
 };
 
 /**
@@ -169,13 +172,13 @@ const restoreFractionalIndex = (
 export const restoreFractionalIndicies = (
   allElements: readonly ExcalidrawElement[],
 ) => {
-  let pre = -1;
   let suc = 1;
 
   const normalized: ExcalidrawElement[] = [];
 
   for (const element of allElements) {
-    const predecessor = allElements[pre]?.fractionalIndex || null;
+    const predecessor =
+      normalized[normalized.length - 1]?.fractionalIndex || null;
     const successor = allElements[suc]?.fractionalIndex || null;
 
     if (
@@ -183,7 +186,6 @@ export const restoreFractionalIndicies = (
     ) {
       try {
         const nextFractionalIndex = restoreFractionalIndex(
-          element.fractionalIndex,
           predecessor,
           successor,
         );
@@ -198,7 +200,6 @@ export const restoreFractionalIndicies = (
     } else {
       normalized.push(element);
     }
-    pre++;
     suc++;
   }
 
@@ -212,24 +213,16 @@ export const validateFractionalIndicies = (
     const element = elements[i];
     const successor = elements[i + 1];
 
-    if (successor) {
-      if (element.fractionalIndex && successor.fractionalIndex) {
-        if (element.fractionalIndex >= successor.fractionalIndex) {
-          console.log(
-            "this is the case",
-            element.fractionalIndex,
-            successor.fractionalIndex,
-          );
-          return false;
-        }
-      } else {
-        console.log(
-          "this is the other case",
-          element.fractionalIndex,
-          successor.fractionalIndex,
-        );
+    if (element.fractionalIndex) {
+      if (
+        successor &&
+        successor.fractionalIndex &&
+        element.fractionalIndex >= successor.fractionalIndex
+      ) {
         return false;
       }
+    } else {
+      return false;
     }
   }
 
