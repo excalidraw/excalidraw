@@ -38,12 +38,12 @@
     "arrowhead_none": "Inga",
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Stolpe",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Cirkel",
+    "arrowhead_circle_outline": "Cirkel (kontur)",
     "arrowhead_triangle": "Triangel",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triangel (kontur)",
+    "arrowhead_diamond": "Diamant",
+    "arrowhead_diamond_outline": "Diamant (kontur)",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid till Excalidraw",
     "button": "Infoga",
-    "description": "",
+    "description": "För närvarande stöds endast <flowchartLink>Flödesdiagram</flowchartLink>,<sequenceLink> Sekvensdiagram </sequenceLink> och <classLink>Klassdiagram</classLink>. De andra typerna kommer att återges som bild i Excalidraw.",
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska"
   }
