@@ -93,7 +93,7 @@
     "fix:code": "yarn test:code --fix",
     "fix:other": "yarn prettier --write",
     "fix": "yarn fix:other && yarn fix:code",
-    "install:deps": "yarn install --frozen-lockfile && yarn --cwd ./excalidraw-app",
+    "install:deps": "yarn install --frozen-lockfile && yarn --frozen-lockfile --cwd ./excalidraw-app",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
