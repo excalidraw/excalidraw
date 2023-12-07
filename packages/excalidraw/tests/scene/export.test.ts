@@ -513,10 +513,14 @@ describe("exporting frames", () => {
       );
 
       const svg = await exportToSvg({
-        elements: exportedElements,
-        files: null,
-        exportPadding: 0,
-        exportingFrame,
+        data: {
+          elements: exportedElements,
+          files: null,
+        },
+        config: {
+          padding: 0,
+          exportingFrame,
+        },
       });
 
       // frame shouldn't be exported

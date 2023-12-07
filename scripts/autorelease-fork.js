@@ -2,7 +2,7 @@ const fs = require("fs");
 const { execSync } = require("child_process");
 const core = require("@actions/core");
 
-const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
+const excalidrawDir = `${__dirname}/../packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
 const pkg = require(excalidrawPackage);
 
@@ -17,10 +17,18 @@ const publish = () => {
 
     fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
 
+    console.info("installing deps...");
     execSync(`yarn --frozen-lockfile`);
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
-    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
+
+    console.info("bulding package...");
+    execSync(`yarn run build:esm`, { cwd: excalidrawDir });
+
+    console.info("publishing package...");
+    pkg.name = "@dwelle/excalidraw";
+    fs.writeFileSync(excalidrawPackage, JSON.stringify(pkg, null, 2), "utf8");
     execSync(`yarn --cwd ${excalidrawDir} publish`);
+
     console.info(`Published ${pkg.name}@latest 🎉`);
     core.setOutput(
       "result",
@@ -28,7 +36,12 @@ const publish = () => {
     );
   } catch (error) {
     core.setOutput("result", "package couldn't be published :warning:!");
-    console.error(error);
+    if (error.output) {
+      console.error("stdout:", error.output[1]?.toString());
+      console.error("stderr:", error.output[2]?.toString());
+    } else {
+      console.error(error);
+    }
     process.exit(1);
   }
 };

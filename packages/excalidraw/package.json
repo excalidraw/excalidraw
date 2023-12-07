@@ -1,5 +1,5 @@
 {
-  "name": "@dwelle/excalidraw",
+  "name": "@excalidraw/excalidraw",
   "version": "0.5.0",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",

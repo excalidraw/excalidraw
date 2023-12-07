@@ -49,7 +49,7 @@
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
-    "setup": "yarn && cd src/packages/excalidraw && yarn",
+    "clean-setup": "rm -rf node_modules && rm -rf packages/*/node_modules && rm -rf examples/*/node_modules && rm -rf dist && rm -rf packages/*/dist && rm -rf build && rm -rf packages/*/build && yarn",
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
