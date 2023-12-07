@@ -38,12 +38,12 @@
     "arrowhead_none": "Keine",
     "arrowhead_arrow": "Pfeil",
     "arrowhead_bar": "Balken",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Kreis",
+    "arrowhead_circle_outline": "Kreis (Umrandung)",
     "arrowhead_triangle": "Dreieck",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Dreieck (Umrandung)",
+    "arrowhead_diamond": "Raute",
+    "arrowhead_diamond_outline": "Raute (Umrandung)",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid zu Excalidraw",
     "button": "Einfügen",
-    "description": "",
+    "description": "Derzeit werden nur <flowchartLink>Flussdiagramme</flowchartLink>, <sequenceLink>Sequenzdiagramme</sequenceLink> und <classLink>Klassendiagramme</classLink> unterstützt. Die anderen Typen werden als Bild in Excalidraw dargestellt.",
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau"
   }
