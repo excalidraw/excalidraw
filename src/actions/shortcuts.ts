@@ -2,11 +2,12 @@ import { isDarwin } from "../constants";
 import { t } from "../i18n";
 import { SubtypeOf } from "../utility-types";
 import { getShortcutKey } from "../utils";
-import { ActionName } from "./types";
+import { ActionName, CustomActionName } from "./types";
 
 export type ShortcutName =
   | SubtypeOf<
       ActionName,
+      | CustomActionName
       | "toggleTheme"
       | "loadScene"
       | "clearCanvas"
@@ -39,6 +40,15 @@ export type ShortcutName =
     >
   | "saveScene"
   | "imageExport";
+
+export const registerCustomShortcuts = (
+  shortcuts: Record<CustomActionName, string[]>,
+) => {
+  for (const key in shortcuts) {
+    const shortcut = key as CustomActionName;
+    shortcutMap[shortcut] = shortcuts[shortcut];
+  }
+};
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
