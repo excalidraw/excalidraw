@@ -2,6 +2,7 @@ import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import {
   generateKeyBetween,
+  generateJitteredKeyBetween,
   generateNKeysBetween,
   generateNJitteredKeysBetween,
 } from "fractional-indexing-jittered";
@@ -77,6 +78,11 @@ export const fixFractionalIndices = (
     movedElementsMap,
   );
 
+  const generateFn =
+    import.meta.env.MODE === ENV.TEST
+      ? generateNKeysBetween
+      : generateNJitteredKeysBetween;
+
   for (const movedIndices of contiguousMovedIndices) {
     try {
       const predecessor =
@@ -85,21 +91,7 @@ export const fixFractionalIndices = (
         elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
         null;
 
-      let newKeys = [];
-
-      if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
-        newKeys = generateNKeysBetween(
-          predecessor,
-          successor,
-          movedIndices.length,
-        );
-      } else {
-        newKeys = generateNJitteredKeysBetween(
-          predecessor,
-          successor,
-          movedIndices.length,
-        );
-      }
+      const newKeys = generateFn(predecessor, successor, movedIndices.length);
 
       for (let i = 0; i < movedIndices.length; i++) {
         const element = elements[movedIndices[i]];
@@ -143,21 +135,26 @@ const restoreFractionalIndex = (
   predecessor: FractionalIndex,
   successor: FractionalIndex,
 ) => {
+  const generateFn =
+    import.meta.env.MODE === ENV.TEST
+      ? generateKeyBetween
+      : generateJitteredKeyBetween;
+
   if (successor && !predecessor) {
     // first element in the array
     // insert before successor
-    return generateKeyBetween(null, successor);
+    return generateFn(null, successor);
   }
 
   if (predecessor && !successor) {
     // last element in the array
     // insert after predecessor
-    return generateKeyBetween(predecessor, null);
+    return generateFn(predecessor, null);
   }
 
   // both predecessor and successor exist (or both do not)
   // insert after predecessor
-  return generateKeyBetween(predecessor, null);
+  return generateFn(predecessor, null);
 };
 
 /**
