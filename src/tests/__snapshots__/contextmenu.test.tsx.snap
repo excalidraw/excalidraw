@@ -263,7 +263,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -4847,7 +4846,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -5427,7 +5425,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6345,7 +6342,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -6719,7 +6715,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
-        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },

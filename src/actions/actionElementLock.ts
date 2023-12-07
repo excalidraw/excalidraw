@@ -11,17 +11,12 @@ const shouldLock = (elements: readonly ExcalidrawElement[]) =>
 export const actionToggleElementLock = register({
   name: "toggleElementLock",
   trackEvent: { category: "element" },
-  predicate: (elements, appState, _, app) => {
-    const selectedElements = app.scene.getSelectedElements(appState);
-    return !selectedElements.some(
-      (element) => element.locked && element.frameId,
-    );
-  },
   perform: (elements, appState, _, app) => {
+    // Frames and their children should not be selected at the same time.
+    // Therefore, there's no need to include elements in frame in the selection.
     const selectedElements = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
       includeBoundTextElement: true,
-      includeElementsInFrames: true,
     });
 
     if (!selectedElements.length) {
@@ -32,7 +27,12 @@ export const actionToggleElementLock = register({
     const selectedElementsMap = arrayToMap(selectedElements);
     return {
       elements: elements.map((element) => {
-        if (!selectedElementsMap.has(element.id)) {
+        if (
+          !selectedElementsMap.has(element.id) &&
+          (!element.frameId ||
+            // lock frame children if frame is selected
+            (element.frameId && !selectedElementsMap.has(element.frameId)))
+        ) {
           return element;
         }
 
