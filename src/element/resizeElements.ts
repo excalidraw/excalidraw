@@ -27,6 +27,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isIframeLikeElement,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
@@ -586,15 +587,31 @@ export const resizeSingleElement = (
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
-    mutateElement(element, {
-      scale: [
-        // defaulting because scaleX/Y can be 0/-0
-        (Math.sign(newBoundsX2 - stateAtResizeStart.x) ||
-          stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
-        (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
-          stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
-      ],
-    });
+    if (isIframeLikeElement(element)) {
+      if (shouldMaintainAspectRatio) {
+        const scale: [number, number] = [
+          Math.abs(
+            eleNewWidth /
+              (stateAtResizeStart.width / stateAtResizeStart.scale[0]),
+          ),
+          Math.abs(
+            eleNewHeight /
+              (stateAtResizeStart.height / stateAtResizeStart.scale[1]),
+          ),
+        ];
+        mutateElement(element, { scale });
+      }
+    } else {
+      mutateElement(element, {
+        scale: [
+          // defaulting because scaleX/Y can be 0/-0
+          (Math.sign(newBoundsX2 - stateAtResizeStart.x) ||
+            stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
+          (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
+            stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
+        ],
+      });
+    }
   }
 
   if (

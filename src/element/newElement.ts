@@ -142,6 +142,7 @@ export const newEmbeddableElement = (
   return {
     ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
     validated: opts.validated,
+    scale: [1, 1],
   };
 };
 
@@ -152,6 +153,7 @@ export const newIframeElement = (
 ): NonDeleted<ExcalidrawIframeElement> => {
   return {
     ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
+    scale: [1, 1],
   };
 };
 

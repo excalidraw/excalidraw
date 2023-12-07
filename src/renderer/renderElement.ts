@@ -13,6 +13,7 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
+  isIframeLikeElement,
   isMagicFrameElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
@@ -520,7 +521,8 @@ const drawElementFromCanvas = (
 
     if (
       "scale" in elementWithCanvas.element &&
-      !isPendingImageElement(element, renderConfig)
+      !isPendingImageElement(element, renderConfig) &&
+      !isIframeLikeElement(element)
     ) {
       context.scale(
         elementWithCanvas.element.scale[0],
@@ -992,6 +994,8 @@ export const renderElementToSvg = (
         renderConfig,
       );
 
+      const scaleX = element.scale?.[0] || 1;
+      const scaleY = element.scale?.[1] || 1;
       // render embeddable element + iframe
       const embeddableNode = roughSVGDrawWithPrecision(
         rsvg,
@@ -1003,7 +1007,7 @@ export const renderElementToSvg = (
         "transform",
         `translate(${offsetX || 0} ${
           offsetY || 0
-        }) rotate(${degree} ${cx} ${cy})`,
+        }) rotate(${degree} ${cx} ${cy}) scale(${scaleX}, ${scaleY})`,
       );
       while (embeddableNode.firstChild) {
         embeddableNode.removeChild(embeddableNode.firstChild);
@@ -1034,8 +1038,8 @@ export const renderElementToSvg = (
           SVG_NS,
           "foreignObject",
         );
-        foreignObject.style.width = `${element.width}px`;
-        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.width = `${element.width / scaleX}px`;
+        foreignObject.style.height = `${element.height / scaleY}px`;
         foreignObject.style.border = "none";
         const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
         div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
