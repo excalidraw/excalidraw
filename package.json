@@ -1,22 +1,11 @@
 {
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not ie <= 11",
-      "not op_mini all",
-      "not safari < 12",
-      "not kaios <= 2.5",
-      "not edge < 79",
-      "not chrome < 70",
-      "not and_uc < 13",
-      "not samsung < 10"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "peerDependencies": {
+    "react": "^17.0.2 || ^18.2.0",
+    "react-dom": "^17.0.2 || ^18.2.0"
+  },
+  "resolutions": {
+    "@types/react": "18.0.15",
+    "@types/react-dom": "18.0.6"
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
@@ -25,8 +14,6 @@
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-tabs": "1.0.2",
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "12.1.5",
     "@tldraw/vec": "1.7.1",
@@ -36,9 +23,6 @@
     "cross-env": "7.0.3",
     "eslint-plugin-react": "7.32.2",
     "fake-indexeddb": "3.1.7",
-    "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.4",
-    "idb-keyval": "6.0.3",
     "image-blob-reduce": "3.0.1",
     "jotai": "1.13.1",
     "lodash.throttle": "4.1.1",
@@ -56,7 +40,6 @@
     "react-dom": "18.2.0",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
-    "socket.io-client": "2.3.1",
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
@@ -70,7 +53,6 @@
     "@types/react": "18.0.15",
     "@types/react-dom": "18.0.6",
     "@types/resize-observer-browser": "0.1.7",
-    "@types/socket.io-client": "1.4.36",
     "@vitejs/plugin-react": "3.1.0",
     "@vitest/coverage-v8": "0.33.0",
     "@vitest/ui": "0.32.2",
@@ -107,16 +89,17 @@
     "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true VITE_APP_DISABLE_TRACKING=true vite build",
     "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
     "build:version": "node ./scripts/build-version.js",
-    "build": "yarn build:app && yarn build:version",
+    "build": "yarn --cwd ./excalidraw-app build",
     "fix:code": "yarn test:code --fix",
     "fix:other": "yarn prettier --write",
     "fix": "yarn fix:other && yarn fix:code",
+    "install:deps": "yarn install --frozen-lockfile && yarn --cwd ./excalidraw-app",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
-    "start": "vite",
-    "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
+    "start": "yarn --cwd ./excalidraw-app start",
+    "start:app:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
     "test:app": "vitest",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
