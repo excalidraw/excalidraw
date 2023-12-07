@@ -6,6 +6,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     coverage: {
+      reporter: ["text", "json-summary", "json", "html"],
       thresholds: {
         lines: 70,
         branches: 70,
