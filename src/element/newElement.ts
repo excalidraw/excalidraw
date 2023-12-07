@@ -312,7 +312,6 @@ const getAdjustedDimensions = (
 
     [x, y] = adjustXYWithRotation(
       {
-        s: true,
         e: textAlign === "center" || textAlign === "left",
         w: textAlign === "center" || textAlign === "right",
       },
