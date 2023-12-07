@@ -6,8 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 
 // To load .env.local variables
-const envVars = loadEnv("", process.cwd());
-
+const envVars = loadEnv("", `../`);
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
@@ -15,6 +14,9 @@ export default defineConfig({
     // open the browser
     open: true,
   },
+  // We need to specify the envDir since now there are no
+  //more located in parallel with the vite.config.ts file but in parent dir
+  envDir: "../",
   build: {
     outDir: "build",
     rollupOptions: {
@@ -44,7 +46,7 @@ export default defineConfig({
       eslint:
         envVars.VITE_APP_ENABLE_ESLINT === "false"
           ? undefined
-          : { lintCommand: 'eslint "./src/**/*.{js,ts,tsx}"' },
+          : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
       overlay: {
         initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
         badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
@@ -113,6 +115,16 @@ export default defineConfig({
             type: "image/png",
             sizes: "180x180",
           },
+          {
+            src: "favicon-32x32.png",
+            sizes: "32x32",
+            type: "image/png",
+          },
+          {
+            src: "favicon-16x16.png",
+            sizes: "16x16",
+            type: "image/png",
+          },
         ],
         start_url: "/",
         display: "standalone",
@@ -178,5 +190,5 @@ export default defineConfig({
       },
     }),
   ],
-  publicDir: "./public",
+  publicDir: "../public",
 });

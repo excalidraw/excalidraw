@@ -1,6 +1,5 @@
 import "./Modal.scss";
 
-import React from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
