@@ -89,8 +89,8 @@
     "typescript": "4.9.4",
     "vite": "5.0.6",
     "vite-plugin-checker": "0.6.1",
-    "vite-plugin-ejs": "1.6.4",
-    "vite-plugin-pwa": "0.16.4",
+    "vite-plugin-ejs": "1.7.0",
+    "vite-plugin-pwa": "0.17.4",
     "vite-plugin-svgr": "2.4.0",
     "vitest": "1.0.1",
     "vitest-canvas-mock": "0.3.2"
