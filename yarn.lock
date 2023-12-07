@@ -2649,10 +2649,10 @@
     loupe "^2.3.6"
     pretty-format "^29.5.0"
 
-"@zsviczian/mermaid-to-excalidraw@0.1.2-obsidian-3":
-  version "0.1.2-obsidian-3"
-  resolved "https://registry.yarnpkg.com/@zsviczian/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.1.2-obsidian-3.tgz#2feacb01fafc57c2c13e625e47a634a0694b2877"
-  integrity sha512-F/Sh9POAo24QTXTWXaBnudUvlGakcgeGo5tgdBJm3BH82xrgr7vBdOoXD76RxScvRjP72/YSXyz50iNFy+/Rcg==
+"@zsviczian/mermaid-to-excalidraw@0.2.0-obsidian-1":
+  version "0.2.0-obsidian-1"
+  resolved "https://registry.yarnpkg.com/@zsviczian/mermaid-to-excalidraw/-/mermaid-to-excalidraw-0.2.0-obsidian-1.tgz#adbf69931beaf60056502e2e77445d4cdf3fd03a"
+  integrity sha512-A4RN9hx0kEXHc1Lu7L/q8Yd049KI/mst+E9OHW5BQswqvqgxfHTC7/pkP9a8jGnHhKoPaQMNDA62MNPDeW3gmQ==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
     cross-env "^7.0.3"
@@ -5563,7 +5563,7 @@ nanoid@4.0.2:
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-4.0.2.tgz#140b3c5003959adbebf521c170f282c5e7f9fb9e"
   integrity sha512-7ZtY5KTCNheRGfEFxnedV5zFiORN1+Y1N6zvPTnHQd8ENUvfaDBeuJDZb2bN/oXwXxu3qkTXDzy57W5vAmDTBw==
 
-nanoid@^3.3.7:
+nanoid@^3.3.6:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.7.tgz#d0c301a691bc8d54efa0a2226ccf3fe2fd656bd8"
   integrity sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==
@@ -7210,14 +7210,14 @@ vite-plugin-svgr@2.4.0:
     "@rollup/pluginutils" "^5.0.2"
     "@svgr/core" "^6.5.1"
 
-vite@4.4.12, "vite@^3.0.0 || ^4.0.0":
+vite@4.4.12:
   version "4.4.12"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.12.tgz#e9c355d5a0d8a47afa46cb4bad10820da333da5c"
   integrity sha512-KtPlUbWfxzGVul8Nut8Gw2Qe8sBzWY+8QVc5SL8iRFnpnrcoCaNlzO40c1R6hPmcdTwIPEDkq0Y9+27a5tVbdQ==
   dependencies:
     esbuild "^0.18.10"
-    postcss "^8.4.24"
-    rollup "^3.25.2"
+    postcss "^8.4.27"
+    rollup "^3.27.1"
   optionalDependencies:
     fsevents "~2.3.2"
 
