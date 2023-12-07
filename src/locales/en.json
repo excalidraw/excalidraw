@@ -38,8 +38,12 @@
     "arrowhead_none": "None",
     "arrowhead_arrow": "Arrow",
     "arrowhead_bar": "Bar",
-    "arrowhead_dot": "Dot",
+    "arrowhead_circle": "Circle",
+    "arrowhead_circle_outline": "Circle (outline)",
     "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "Triangle (outline)",
+    "arrowhead_diamond": "Diamond",
+    "arrowhead_diamond_outline": "Diamond (outline)",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "addWatermark": "Add \"Made with Excalidraw\"",
@@ -514,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowcharts</flowchartLink> and <sequenceLink>Sequence Diagrams</sequenceLink> are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   }
