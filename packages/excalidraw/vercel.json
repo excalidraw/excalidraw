@@ -1,3 +1,4 @@
 {
-  "outputDirectory": "example/public"
+  "outputDirectory": "example/public",
+  "rootDirectory": "packages/excalidraw"
 }
