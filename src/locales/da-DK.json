@@ -11,8 +11,8 @@
     "copyAsPng": "Kopier til klippebord som PNG",
     "copyAsSvg": "Kopier til klippebord som SVG",
     "copyText": "Kopiér til udklipsholder som tekst",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Kopiér kilde til udklipsholder",
+    "convertToCode": "Konvertér til kode",
     "bringForward": "Flyt fremad",
     "sendToBack": "Placer bagest",
     "bringToFront": "Placer forrest",
@@ -137,8 +137,8 @@
     "selectAllElementsInFrame": "Vælg alle elementer i rammen",
     "removeAllElementsFromFrame": "Fjern alle elementer fra ramme",
     "eyeDropper": "Vælg farve fra lærred",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Tekst til diagram",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "Ingen varer tilføjet endnu...",
@@ -219,19 +219,19 @@
     "collabSaveFailed_sizeExceeded": "Kunne ikke gemme i databasen, lærredet lader til at være for stort. Du bør gemme filen lokalt for at sikre, at du ikke mister dit arbejde.",
     "imageToolNotSupported": "Billeder er deaktiveret.",
     "brave_measure_text_error": {
-      "line1": "",
+      "line1": "Det ser ud til, at du bruger Brave browser med indstillingen <bold>Aggressively Block Fingerprinting</bold> aktiveret.",
       "line2": "Dette kan resultere i brud på <bold>tekstelementerne</bold> i dine tegninger.",
-      "line3": "",
-      "line4": ""
+      "line3": "Vi anbefaler kraftigt at deaktivere denne indstilling. Du kan følge <link>disse trin</link> om, hvordan du gør det.",
+      "line4": "Hvis deaktivering af denne indstilling ikke løser visning af tekstelementer, åbn venligst et <issueLink>issue</issueLink> på vores GitHub, eller skriv os på <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "Indlejringselementer kan ikke tilføjes til biblioteket.",
+      "iframe": "IFrame elementer kan ikke tilføjes til biblioteket.",
+      "image": "Understøttelse af at tilføje billeder til biblioteket kommer snart!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Kunne ikke indsætte (kan ikke læse fra systemets udklipsholder).",
+    "asyncPasteFailedOnParse": "Kunne ikke indsætte.",
+    "copyToSystemClipboardFailed": "Kunne ikke kopiere til udklipsholderen."
   },
   "toolBar": {
     "selection": "&Udvalg",
@@ -244,30 +244,30 @@
     "freedraw": "Tegn",
     "text": "Tekster",
     "library": "~Bibliotek",
-    "lock": "",
-    "penMode": "",
-    "link": "",
+    "lock": "Behold valgte værktøj aktiv efter tegning",
+    "penMode": "Pen-tilstand - forhindrer berøring",
+    "link": "Tilføj/ Opdater link for en valgt form",
     "eraser": "Slet",
     "frame": "Rammeværktøj",
-    "magicframe": "",
+    "magicframe": "Wireframe til kode",
     "embeddable": "Web-indlejring",
     "laser": "Lasermarkør",
     "hand": "Hånd (panorering værktøj)",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "extraTools": "Flere værktøjer",
+    "mermaidToExcalidraw": "Mermaid til Excalidraw",
+    "magicSettings": "AI indstillinger"
   },
   "headings": {
-    "canvasActions": "",
-    "selectedShapeActions": "",
-    "shapes": ""
+    "canvasActions": "Lærred handlinger",
+    "selectedShapeActions": "Valgte figurhandlinger",
+    "shapes": "Former"
   },
   "hints": {
-    "canvasPanning": "",
-    "linearElement": "",
+    "canvasPanning": "For at flytte lærred, hold musehjulet eller mellemrumstasten mens du trækker, eller brug håndværktøjet",
+    "linearElement": "Klik for at starte flere punkter, træk for enkelt linje",
     "freeDraw": "Klik og træk, slip når du er færdig",
-    "text": "",
-    "embeddable": "",
+    "text": "Tip: du kan også tilføje tekst ved at dobbeltklikke hvor som helst med det valgte værktøj",
+    "embeddable": "Klik på træk for at oprette en hjemmeside indlejret",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
