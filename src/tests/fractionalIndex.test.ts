@@ -93,4 +93,31 @@ describe("restoring fractional indicies", () => {
       randomNumOfElements,
     );
   });
+
+  it("restore a mix of bad fractional indices", () => {
+    const elements = [
+      createElementWithIndex("a0"),
+      createElementWithIndex("a0"),
+      createElementWithIndex("a1"),
+      createElementWithIndex(),
+      createElementWithIndex("a3"),
+      createElementWithIndex("a2"),
+      createElementWithIndex(),
+      createElementWithIndex(),
+    ];
+
+    const restoredElements = restoreFractionalIndicies(elements);
+
+    // length is not changed
+    expect(restoredElements.length).toBe(elements.length);
+    // order is not changed
+    expect(restoredElements.map((e) => e.id)).deep.equal(
+      elements.map((e) => e.id),
+    );
+    // should've restored fractional indices properly
+    expect(validateFractionalIndicies(restoredElements)).toBe(true);
+    expect(new Set(restoredElements.map((e) => e.fractionalIndex)).size).toBe(
+      elements.length,
+    );
+  });
 });
