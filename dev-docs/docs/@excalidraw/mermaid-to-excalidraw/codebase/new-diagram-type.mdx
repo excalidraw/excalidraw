@@ -22,7 +22,7 @@ Once this is done the new diagram type won't be rendered as an image but start t
 
 Once the diagram type is added in previous step. Next step is to write the parser to parse the mermaid diagram.
 
-For this create a file named `{{diagramType}}.ts` in [`src/parser`](https://github.com/excalidraw/mermaid-to-excalidraw/tree/master/src/parser) and write a function `parseMermaid{{diagramType}}Diagram` similar to how we [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parser/flowchart.ts#L256) for parsing flowchart diagram.
+For this create a file named `{{diagramType}}.ts` in [`src/parser`](https://github.com/excalidraw/mermaid-to-excalidraw/tree/master/src/parser) and write a function `parseMermaid{{diagramType}}Diagram` similar to how we [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parser/flowchart.ts#L214) for parsing flowchart diagram.
 
 The main aim of the parser is :point_down:
 
@@ -34,13 +34,13 @@ For this you might have to dig in to the parser `diagram.parser.yy` and which at
 
 Once the parser is ready, lets start using it. 
 
-Add the diagram type in switch case in [`parseMermaid`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L97) and call the parser for the same.
+Add the diagram type in switch case in [`parseMermaid`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L45) and call the parser for the same.
 
 ## Writing the Excalidraw Skeleton Convertor
 
-With the completion of previous step, we have all the data, now we need to transform it so to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133) format.
+With the completion of previous step, we have all the data, now we need to transform it so to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L159) format.
 
-Similar to [`FlowChartToExcalidrawSkeletonConverter`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24), you have to write the `{{diagramType}}ToExcalidrawSkeletonConverter` which parses the data received in previous step and returns the [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133).
+Similar to [`FlowChartToExcalidrawSkeletonConverter`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L78), you have to write the `{{diagramType}}ToExcalidrawSkeletonConverter` which parses the data received in previous step and returns the [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L159).
 
 Thats it, you have added the new diagram type 🥳, now lets test it out!
 
