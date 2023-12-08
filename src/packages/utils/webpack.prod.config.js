@@ -21,12 +21,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: "javascript/auto",
+      },
+      {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
         use: ["style-loader", { loader: "css-loader" }, "sass-loader"],
       },
       {
         test: /\.(ts|tsx|js)$/,
+        exclude: /node_modules\/@babel\/runtime/,
         use: [
           {
             loader: "ts-loader",
