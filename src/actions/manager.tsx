@@ -151,6 +151,7 @@ export class ActionManager {
       const elements = this.getElementsIncludingDeleted();
       const appState = this.getAppState();
       const updateData = (formState?: any) => {
+        debugger;
         trackAction(action, "ui", appState, elements, this.app, formState);
 
         this.updater(

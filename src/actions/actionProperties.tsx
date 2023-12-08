@@ -597,6 +597,46 @@ export const actionChangeOpacity = register({
   ),
 });
 
+export const actionChangeOpacity1 = register({
+  name: "changeOpacity",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) =>
+          newElementWith(el, {
+            opacity: value,
+          }),
+        true,
+      ),
+      appState: { ...appState, currentItemOpacity: value },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <label className="control-label">
+      {t("labels.opacity1")}
+      <input
+        type="text"
+        min="0"
+        max="100"
+        step="10"
+        onChange={(event) => updateData(+event.target.value)}
+        value={
+          getFormValue(
+            elements,
+            appState,
+            (element) => element.opacity,
+            appState.currentItemOpacity,
+          ) ?? undefined
+        }
+      />
+    </label>
+  ),
+});
+
 export const actionChangeFontSize = register({
   name: "changeFontSize",
   trackEvent: false,
