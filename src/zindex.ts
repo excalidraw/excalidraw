@@ -1,4 +1,3 @@
-import { bumpVersion } from "./element/mutateElement";
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
 import { fixFractionalIndices } from "./fractionalIndex";

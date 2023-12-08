@@ -59,7 +59,7 @@ const __createSceneForElementsHack__ = (
   // ids to Scene instances so that we don't override the editor elements
   // mapping.
   // We still need to clone the objects themselves to regen references.
-  scene.replaceAllElements(cloneJSON(elements), false);
+  scene.replaceAllElements(cloneJSON(elements));
   return scene;
 };
 

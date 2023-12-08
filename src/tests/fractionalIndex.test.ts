@@ -1,10 +1,13 @@
-import { nanoid } from "nanoid";
 import {
+  fixFractionalIndices,
   restoreFractionalIndicies,
   validateFractionalIndicies,
 } from "../fractionalIndex";
 import { ExcalidrawElement } from "../element/types";
 import { API } from "./helpers/api";
+import { arrayToMap } from "../utils";
+import { moveAllLeft, moveOneLeft, moveOneRight } from "../zindex";
+import { AppState } from "../types";
 
 const createElementWithIndex = (
   fractionalIndex: string | null = null,
@@ -13,6 +16,30 @@ const createElementWithIndex = (
     type: "rectangle",
     fractionalIndex,
   });
+};
+
+const testLengthAndOrder = (
+  before: ExcalidrawElement[],
+  after: ExcalidrawElement[],
+) => {
+  // length is not changed
+  expect(after.length).toBe(before.length);
+  // order is not changed
+  expect(after.map((e) => e.id)).deep.equal(before.map((e) => e.id));
+};
+
+const testValidity = (elements: ExcalidrawElement[]) => {
+  expect(validateFractionalIndicies(elements)).toBe(true);
+};
+
+const genrateElementsAtLength = (length: number) => {
+  const elements: ExcalidrawElement[] = [];
+
+  for (let i = 0; i < length; i++) {
+    elements.push(createElementWithIndex());
+  }
+
+  return elements;
 };
 
 describe("restoring fractional indicies", () => {
@@ -30,14 +57,8 @@ describe("restoring fractional indicies", () => {
 
     const restoredElements = restoreFractionalIndicies(elements);
 
-    // length is not changed
-    expect(restoredElements.length).toBe(randomNumOfElements);
-    // order is not changed
-    expect(restoredElements.map((e) => e.id)).deep.equal(
-      elements.map((e) => e.id),
-    );
-    // fractional indices are valid
-    expect(validateFractionalIndicies(restoredElements)).toBe(true);
+    testLengthAndOrder(elements, restoredElements);
+    testValidity(restoredElements);
   });
 
   it("restore out of order fractional indices", () => {
@@ -50,14 +71,8 @@ describe("restoring fractional indicies", () => {
 
     const restoredElements = restoreFractionalIndicies(elements);
 
-    // length is not changed
-    expect(restoredElements.length).toBe(4);
-    // order is not changed
-    expect(restoredElements.map((e) => e.id)).deep.equal(
-      elements.map((e) => e.id),
-    );
-    // fractional indices are valid
-    expect(validateFractionalIndicies(restoredElements)).toBe(true);
+    testLengthAndOrder(elements, restoredElements);
+    testValidity(restoredElements);
     // should only fix the second element's fractional index
     expect(elements[1].fractionalIndex).not.toEqual(
       restoredElements[1].fractionalIndex,
@@ -81,14 +96,8 @@ describe("restoring fractional indicies", () => {
 
     const restoredElements = restoreFractionalIndicies(elements);
 
-    // length is not changed
-    expect(restoredElements.length).toBe(randomNumOfElements);
-    // order is not changed
-    expect(restoredElements.map((e) => e.id)).deep.equal(
-      elements.map((e) => e.id),
-    );
-    // should've restored fractional indices properly
-    expect(validateFractionalIndicies(restoredElements)).toBe(true);
+    testLengthAndOrder(elements, restoredElements);
+    testValidity(restoredElements);
     expect(new Set(restoredElements.map((e) => e.fractionalIndex)).size).toBe(
       randomNumOfElements,
     );
@@ -108,16 +117,213 @@ describe("restoring fractional indicies", () => {
 
     const restoredElements = restoreFractionalIndicies(elements);
 
-    // length is not changed
-    expect(restoredElements.length).toBe(elements.length);
-    // order is not changed
-    expect(restoredElements.map((e) => e.id)).deep.equal(
-      elements.map((e) => e.id),
-    );
-    // should've restored fractional indices properly
-    expect(validateFractionalIndicies(restoredElements)).toBe(true);
+    testLengthAndOrder(elements, restoredElements);
+    testValidity(restoredElements);
     expect(new Set(restoredElements.map((e) => e.fractionalIndex)).size).toBe(
       elements.length,
     );
+  });
+});
+
+describe("fix fractional indices", () => {
+  it("add each new element properly", () => {
+    const elements = [
+      createElementWithIndex(),
+      createElementWithIndex(),
+      createElementWithIndex(),
+      createElementWithIndex(),
+    ];
+
+    const fixedElements = elements.reduce((acc, el) => {
+      return fixFractionalIndices([...acc, el], arrayToMap([el]));
+    }, [] as ExcalidrawElement[]);
+
+    testLengthAndOrder(elements, fixedElements);
+    testValidity(fixedElements);
+  });
+
+  it("add multiple new elements properly", () => {
+    const elements = genrateElementsAtLength(Math.floor(Math.random() * 100));
+
+    const fixedElements = fixFractionalIndices(elements, arrayToMap(elements));
+
+    testLengthAndOrder(elements, fixedElements);
+    testValidity(fixedElements);
+
+    const elements2 = genrateElementsAtLength(Math.floor(Math.random() * 100));
+
+    const allElements2 = [...elements, ...elements2];
+
+    const fixedElements2 = fixFractionalIndices(
+      allElements2,
+      arrayToMap(elements2),
+    );
+
+    testLengthAndOrder(allElements2, fixedElements2);
+    testValidity(fixedElements2);
+  });
+
+  it("fix properly after z-index changes", () => {
+    const elements = genrateElementsAtLength(Math.random() * 100);
+
+    const fixedElements = fixFractionalIndices(elements, arrayToMap(elements));
+
+    let randomlySelected = [
+      ...new Set([
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+        fixedElements[Math.floor(Math.random() * fixedElements.length)],
+      ]),
+    ];
+
+    const movedOneLeftFixedElements = moveOneLeft(
+      fixedElements,
+      randomlySelected.reduce(
+        (acc, el) => {
+          acc.selectedElementIds[el.id] = true;
+          return acc;
+        },
+        {
+          selectedElementIds: {},
+        } as {
+          selectedElementIds: Record<string, boolean>;
+        },
+      ) as any as AppState,
+    );
+
+    testValidity(movedOneLeftFixedElements);
+
+    randomlySelected = [
+      ...new Set([
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+      ]),
+    ];
+
+    const movedOneRightFixedElements = moveOneRight(
+      movedOneLeftFixedElements,
+      randomlySelected.reduce(
+        (acc, el) => {
+          acc.selectedElementIds[el.id] = true;
+          return acc;
+        },
+        {
+          selectedElementIds: {},
+        } as {
+          selectedElementIds: Record<string, boolean>;
+        },
+      ) as any as AppState,
+    );
+
+    testValidity(movedOneRightFixedElements);
+
+    randomlySelected = [
+      ...new Set([
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedOneRightFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+      ]),
+    ];
+
+    const movedAllLeftFixedElements = moveAllLeft(
+      movedOneRightFixedElements,
+      randomlySelected.reduce(
+        (acc, el) => {
+          acc.selectedElementIds[el.id] = true;
+          return acc;
+        },
+        {
+          selectedElementIds: {},
+        } as {
+          selectedElementIds: Record<string, boolean>;
+        },
+      ) as any as AppState,
+    ) as ExcalidrawElement[];
+
+    testValidity(movedAllLeftFixedElements);
+
+    randomlySelected = [
+      ...new Set([
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+        movedAllLeftFixedElements[
+          Math.floor(Math.random() * fixedElements.length)
+        ],
+      ]),
+    ];
+
+    const movedAllRightFixedElements = moveAllLeft(
+      movedAllLeftFixedElements,
+      randomlySelected.reduce(
+        (acc, el) => {
+          acc.selectedElementIds[el.id] = true;
+          return acc;
+        },
+        {
+          selectedElementIds: {},
+        } as {
+          selectedElementIds: Record<string, boolean>;
+        },
+      ) as any as AppState,
+    ) as ExcalidrawElement[];
+
+    testValidity(movedAllRightFixedElements);
   });
 });
