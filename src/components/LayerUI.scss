@@ -17,6 +17,16 @@
     pointer-events: none;
     z-index: var(--zIndex-layerUI);
 
+    &.disable-pointerEvents {
+      .layer-ui__wrapper__footer > * {
+        pointer-events: none;
+      }
+
+      .footer-center > * {
+        pointer-events: none;
+      }
+    }
+
     &__top-right {
       display: flex;
       gap: 0.75rem;
