@@ -38,12 +38,12 @@
     "arrowhead_none": "없음",
     "arrowhead_arrow": "화살표",
     "arrowhead_bar": "막대",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "원",
+    "arrowhead_circle_outline": "원 (외곽선)",
     "arrowhead_triangle": "삼각형",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "삼각형 (외곽선)",
+    "arrowhead_diamond": "마름모",
+    "arrowhead_diamond_outline": "마름모 (외곽선)",
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
     "addWatermark": "\"Made with Excalidraw\" 추가",
@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "Mermaid에서 불러오기",
     "button": "삽입하기",
-    "description": "",
+    "description": "지금은 <flowchartLink>순서도</flowchartLink>,<sequenceLink> 시퀀스</sequenceLink>, <classLink>클래스 </classLink>다이어그램만 지원합니다. 다른 형식들은 Excalidraw에서는 이미지로 표시됩니다.",
     "syntax": "Mermaid 구문",
     "preview": "미리보기"
   }
