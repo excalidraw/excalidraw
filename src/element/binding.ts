@@ -27,6 +27,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { getContainingFrame, isPointInFrame } from "../frame";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -274,6 +275,18 @@ export const getHoveredElementForBinding = (
       isBindableElement(element, false) &&
       bindingBorderTest(element, pointerCoords),
   );
+
+  if (hoveredElement) {
+    const frame = getContainingFrame(hoveredElement);
+
+    if (frame) {
+      if (isPointInFrame(pointerCoords, frame)) {
+        return hoveredElement as NonDeleted<ExcalidrawBindableElement>;
+      }
+      return null;
+    }
+  }
+
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
 
@@ -500,10 +513,22 @@ const getElligibleElementsForBindingElement = (
   return [
     getElligibleElementForBindingElement(linearElement, "start"),
     getElligibleElementForBindingElement(linearElement, "end"),
-  ].filter(
-    (element): element is NonDeleted<ExcalidrawBindableElement> =>
-      element != null,
-  );
+  ].filter((element): element is NonDeleted<ExcalidrawBindableElement> => {
+    if (element != null) {
+      const frame = getContainingFrame(element);
+      return frame
+        ? isPointInFrame(
+            getLinearElementEdgeCoors(linearElement, "start"),
+            frame,
+          ) ||
+            isPointInFrame(
+              getLinearElementEdgeCoors(linearElement, "end"),
+              frame,
+            )
+        : true;
+    }
+    return false;
+  });
 };
 
 const getElligibleElementForBindingElement = (
