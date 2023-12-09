@@ -462,7 +462,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
   const push = (str: string) => {
     if (str.trim()) {
-      lines.push(str);
+      lines.push(str.trim());
     }
   };
 
