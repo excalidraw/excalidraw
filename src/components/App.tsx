@@ -6611,6 +6611,11 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ) {
     return withBatchedUpdatesThrottled((event: PointerEvent) => {
+      //To avoid pointerMove canceling the selection of locked elements on mobile
+      if (Boolean(this.state.contextMenu)) {
+        return;
+      }
+
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
