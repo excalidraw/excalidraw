@@ -1694,11 +1694,18 @@ export const alertTriangleIcon = createIcon(
 
 export const eyeDropperIcon = createIcon(
   <g strokeWidth={1.25}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <path d="M11 7l6 6"></path>
-    <path d="M4 16l11.7 -11.7a1 1 0 0 1 1.4 0l2.6 2.6a1 1 0 0 1 0 1.4l-11.7 11.7h-4v-4z"></path>
+    <path d="m9.168 5.833 5 5M9.999 6.667l-6.667 6.666v3.334h3.333L13.332 10M9.999 6.667l3.083-3.084a.833.833 0 0 1 1.167 0l2.166 2.167a.833.833 0 0 1 0 1.167L13.332 10M9.999 6.667 13.332 10" />
+    <rect
+      x="13.684"
+      y="2.976"
+      width="4.751"
+      height="5.106"
+      rx="1"
+      transform="rotate(45 13.684 2.976)"
+      fill="currentColor"
+    />
   </g>,
-  tablerIconProps,
+  modifiedTablerIconProps,
 );
 
 export const extraToolsIcon = createIcon(
