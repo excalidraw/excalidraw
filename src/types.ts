@@ -621,6 +621,7 @@ export type PointerDownState = Readonly<{
       erase: boolean;
     };
   };
+  selectedElementIds: AppState["selectedElementIds"];
 }>;
 
 type UnsubscribeCallback = () => void;
