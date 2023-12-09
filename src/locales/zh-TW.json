@@ -256,7 +256,7 @@
     "text_editing": "按跳脫鍵或 Ctrl 或 Cmd + Enter 以結束編輯",
     "linearElementMulti": "按下 Escape 或 Enter 以結束繪製",
     "lockAngle": "按住 SHIFT 可限制旋轉角度",
-    "resize": "縮放時按住 Shift 可保持原比例縮放；\\n按住 Alt 可由中心點進行縮放",
+    "resize": "縮放時按住 Shift 可保持原比例縮放；\n按住 Alt 可由中心點進行縮放",
     "resizeImage": "按住 SHIFT 可任意縮放，按住 ALT 可由中央縮放。",
     "rotate": "旋轉時按住 Shift 可限制旋轉角度",
     "lineEditor_info": "按住 Ctrl 或 Cmd 並雙擊或按住 Ctrl 或 Cmd + Enter 來編輯控制點",

@@ -256,7 +256,7 @@
     "text_editing": "Stlačte Escape alebo CtrlOrCmd+ENTER na ukončenie editovania",
     "linearElementMulti": "Kliknite na počiatočný bod alebo stlačte Escape alebo Enter na ukončenie",
     "lockAngle": "Počas rotácie obmedzíte uhol podržaním SHIFT",
-    "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\\npodržaním ALT meníte veľkosť so zachovaním stredu",
+    "resize": "Počas zmeny veľkosti zachováte proporcie podržaním SHIFT,\npodržaním ALT meníte veľkosť so zachovaním stredu",
     "resizeImage": "Podržte SHIFT pre voľnú zmenu veľkosti, podržte ALT pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním SHIFT",
     "lineEditor_info": "Podržte CtrlOrCmd a kliknite dva krát alebo stlačte CtrlOrCmd + Enter pre editáciu bodov",
