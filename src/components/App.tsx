@@ -2274,6 +2274,23 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
+    const { hash } = window.location;
+    const imageUrlMatch = hash.match(/#imageUrl=([^&]*)/);
+
+    if (imageUrlMatch) {
+      const imageUrl = decodeURIComponent(imageUrlMatch[1]);
+
+      this.onImageActionWithUrl({ insertOnCanvasDirectly: true, imageUrl });
+      const newHash = hash.replace(/#imageUrl=([^&]*)/, "");
+      const newHashWithoutTrailingSlash = newHash.replace(/\/$/, ""); // Remove trailing slash
+      const newURL =
+        window.location.origin +
+        window.location.pathname +
+        newHashWithoutTrailingSlash;
+      window.location.replace(newURL);
+    }
+
+
     if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -8268,6 +8285,80 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+ private onImageActionWithUrl = async (
+    { insertOnCanvasDirectly, imageUrl } = {
+      insertOnCanvasDirectly: false,
+      imageUrl: "",
+    },
+  ) => {
+    try {
+      const clientX = this.state.width / 2 + this.state.offsetLeft;
+      const clientY = this.state.height / 2 + this.state.offsetTop;
+
+      const { x, y } = viewportCoordsToSceneCoords(
+        { clientX, clientY },
+        this.state,
+      );
+
+      let imageFile: any;
+
+      if (imageUrl) {
+        const response = await this.downloadImage(imageUrl);
+        imageFile = response;
+      }
+
+      const imageElement = this.createImageElement({
+        sceneX: x,
+        sceneY: y,
+      });
+
+      if (insertOnCanvasDirectly) {
+        this.insertImageElement(imageElement, imageFile);
+        this.initializeImageDimensions(imageElement);
+        this.setState(
+          {
+            selectedElementIds: makeNextSelectedElementIds(
+              { [imageElement.id]: true },
+              this.state,
+            ),
+          },
+          () => {
+            this.actionManager.executeAction(actionFinalize);
+          },
+        );
+      } else {
+        this.setState(
+          {
+            pendingImageElementId: imageElement.id,
+          },
+          () => {
+            this.insertImageElement(
+              imageElement,
+              imageFile,
+              /* showCursorImagePreview */ true,
+            );
+          },
+        );
+      }
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        console.error(error);
+      } else {
+        console.warn(error);
+      }
+      this.setState(
+        {
+          pendingImageElementId: null,
+          editingElement: null,
+          activeTool: updateActiveTool(this.state, { type: "selection" }),
+        },
+        () => {
+          this.actionManager.executeAction(actionFinalize);
+        },
+      );
+    }
+  };
+      
   private initializeImageDimensions = (
     imageElement: ExcalidrawImageElement,
     forceNaturalSize = false,
