@@ -207,6 +207,11 @@
     box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
 
+  a:focus-visible {
+    outline: none;
+    text-decoration: underline;
+  }
+
   .buttonList {
     .ToolIcon__icon {
       all: unset !important;
