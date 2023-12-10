@@ -2838,6 +2838,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (this.props.onPaste) {
+        try {
+          if ((await this.props.onPaste(data, event)) === false) {
+            return;
+          }
+        } catch (error: any) {
+          console.error(error);
+        }
+      }
+
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
         if (!this.isToolSupported("image")) {
@@ -2858,16 +2868,6 @@ class App extends React.Component<AppProps, AppState> {
         });
 
         return;
-      }
-
-      if (this.props.onPaste) {
-        try {
-          if ((await this.props.onPaste(data, event)) === false) {
-            return;
-          }
-        } catch (error: any) {
-          console.error(error);
-        }
       }
 
       if (data.errorMessage) {
