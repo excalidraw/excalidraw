@@ -250,7 +250,12 @@ const renderLinearPointHandles = (
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
 ) => {
-  if (!appState.selectedLinearElement) {
+  if (
+    !appState.selectedLinearElement ||
+    (!appState.editingLinearElement &&
+      appState.selectedLinearElement.isDragging) ||
+    appState.editingLinearElement?.isDragging
+  ) {
     return;
   }
   context.save();
@@ -342,6 +347,7 @@ const renderLinearElementPointHighlight = (
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
+    appState.selectedLinearElement?.isDragging ||
     appState.editingLinearElement?.selectedPointsIndices?.includes(
       hoverPointIndex,
     )
