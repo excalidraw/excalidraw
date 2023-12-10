@@ -87,6 +87,26 @@ export const Stats = (props: {
                     )}
                   </td>
                 </tr>
+                {props.appState.gridSize !== null && (
+                  <tr>
+                    <td>{t("stats.grids")}</td>
+                    <td>
+                      {`${Number(
+                        (
+                          Math.round(
+                            selectedBoundingBox[2] - selectedBoundingBox[0],
+                          ) / props.appState.gridSize
+                        ).toFixed(1),
+                      )}x${Number(
+                        (
+                          Math.round(
+                            selectedBoundingBox[3] - selectedBoundingBox[1],
+                          ) / props.appState.gridSize
+                        ).toFixed(1),
+                      )}`}
+                    </td>
+                  </tr>
+                )}
               </>
             )}
             {selectedElements.length === 1 && (
