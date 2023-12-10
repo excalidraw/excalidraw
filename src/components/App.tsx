@@ -8757,7 +8757,7 @@ class App extends React.Component<AppProps, AppState> {
         distance(pointerDownState.origin.x, pointerCoords.x),
         distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter(event),
+        false,
       );
     } else {
       let [gridX, gridY] = getGridPoint(
