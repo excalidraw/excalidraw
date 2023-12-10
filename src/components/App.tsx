@@ -1891,7 +1891,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   //zsviczian - ugly hack
-  private OPENAI_KEY: string | null = hostPlugin?.settings?.openAIAPIToken;
+  private get OPENAI_KEY():string | null { return hostPlugin?.settings?.openAIAPIToken };
+  private set OPENAI_KEY(value:string | null) { return; };
   
   private OPENAI_KEY_IS_PERSISTED: boolean =
     EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
