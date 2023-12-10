@@ -118,6 +118,7 @@ describe("export", () => {
         scale: [1, 1],
         width: 100,
         height: 100,
+        roundness: null,
         angle: normalizeAngle(315),
       }),
       API.createElement({
@@ -128,6 +129,7 @@ describe("export", () => {
         scale: [-1, 1],
         width: 50,
         height: 50,
+        roundness: null,
         angle: normalizeAngle(45),
       }),
       API.createElement({
@@ -138,6 +140,7 @@ describe("export", () => {
         scale: [1, -1],
         width: 100,
         height: 100,
+        roundness: null,
         angle: normalizeAngle(45),
       }),
       API.createElement({
@@ -148,6 +151,7 @@ describe("export", () => {
         scale: [-1, -1],
         width: 50,
         height: 50,
+        roundness: null,
         angle: normalizeAngle(315),
       }),
     ];

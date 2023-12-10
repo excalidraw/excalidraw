@@ -42,7 +42,8 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "embeddable" ||
   type === "arrow" ||
   type === "line" ||
-  type === "diamond";
+  type === "diamond" ||
+  type === "image";
 
 export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";
 
