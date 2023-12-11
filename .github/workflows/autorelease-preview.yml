@@ -1,7 +1,10 @@
 name: Auto release excalidraw preview
 on:
-  issue_comment:
-    types: [created, edited]
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   Auto-release-excalidraw-preview:
@@ -41,7 +44,7 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Auto release preview
+      - name: Auto release preview123
         id: "autorelease"
         run: |
           yarn add @actions/core -W
