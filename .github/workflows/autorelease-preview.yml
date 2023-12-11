@@ -9,7 +9,7 @@ on:
 jobs:
   Auto-release-excalidraw-preview:
     name: Auto release preview
-    if: github.event.comment.body == '@excalibot trigger release' && github.event.issue.pull_request
+   
     runs-on: ubuntu-latest
     steps:
       - name: React to release comment
