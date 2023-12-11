@@ -38,34 +38,42 @@ export const reconcileElements = (
   localAppState: AppState,
 ): ReconciledElements => {
   const localElementsData = arrayToMap(localElements);
+
   const reconciledElements: ExcalidrawElement[] = [];
   const added = new Set<string>();
 
   // process remote elements
   for (const remoteElement of remoteElements) {
-    if (localElementsData.has(remoteElement.id)) {
-      const localElement = localElementsData.get(remoteElement.id);
+    if (!added.has(remoteElement.id)) {
+      // 'same' element and remote has made some changes
+      if (localElementsData.has(remoteElement.id)) {
+        const localElement = localElementsData.get(remoteElement.id);
 
-      if (
-        localElement &&
-        shouldDiscardRemoteElement(localAppState, localElement, remoteElement)
-      ) {
-        continue;
-      } else {
-        if (!added.has(remoteElement.id)) {
-          reconciledElements.push(remoteElement);
-          added.add(remoteElement.id);
+        if (localElement) {
+          if (
+            shouldDiscardRemoteElement(
+              localAppState,
+              localElement,
+              remoteElement,
+            )
+          ) {
+            reconciledElements.push(localElement);
+            added.add(localElement.id);
+          } else {
+            reconciledElements.push(remoteElement);
+            added.add(remoteElement.id);
+          }
+
+          continue;
         }
       }
-    } else {
-      if (!added.has(remoteElement.id)) {
-        reconciledElements.push(remoteElement);
-        added.add(remoteElement.id);
-      }
+
+      reconciledElements.push(remoteElement);
+      added.add(remoteElement.id);
     }
   }
 
-  // process local elements
+  // process remaining local elements
   for (const localElement of localElements) {
     if (!added.has(localElement.id)) {
       reconciledElements.push(localElement);

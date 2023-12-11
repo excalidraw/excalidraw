@@ -127,7 +127,8 @@ export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
       return compareStrings(a.id, b.id);
     }
 
-    return 0;
+    // respect the order of the array
+    return 1;
   });
 };
 
