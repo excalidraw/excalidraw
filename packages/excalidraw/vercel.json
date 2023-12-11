@@ -1,4 +1,4 @@
 {
   "outputDirectory": "example/public",
-  "rootDirectory": "packages/excalidraw"
+  "installCommand": "yarn install"
 }
