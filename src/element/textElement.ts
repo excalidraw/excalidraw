@@ -1,6 +1,7 @@
 import { getFontString, arrayToMap, isTestEnv } from "../utils";
 import {
   ExcalidrawElement,
+  ExcalidrawElementType,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -91,7 +92,7 @@ export const redrawTextBoundingBox = (
     );
     const maxContainerWidth = getBoundTextMaxWidth(container);
 
-    if (metrics.height > maxContainerHeight) {
+    if (!isArrowElement(container) && metrics.height > maxContainerHeight) {
       const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
         container.type,
@@ -867,7 +868,7 @@ const VALID_CONTAINER_TYPES = new Set([
 ]);
 
 export const isValidTextContainer = (element: {
-  type: ExcalidrawElement["type"];
+  type: ExcalidrawElementType;
 }) => VALID_CONTAINER_TYPES.has(element.type);
 
 export const computeContainerDimensionForBoundText = (

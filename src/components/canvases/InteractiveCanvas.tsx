@@ -203,10 +203,10 @@ const getRelevantAppStateProps = (
   suggestedBindings: appState.suggestedBindings,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
-  openSidebar: appState.openSidebar,
-  showHyperlinkPopup: appState.showHyperlinkPopup,
   collaborators: appState.collaborators, // Necessary for collab. sessions
   activeEmbeddable: appState.activeEmbeddable,
+  snapLines: appState.snapLines,
+  zenModeEnabled: appState.zenModeEnabled,
 });
 
 const areEqual = (

@@ -41,6 +41,14 @@ export const POINTER_BUTTON = {
   TOUCH: -1,
 } as const;
 
+export const POINTER_EVENTS = {
+  enabled: "all",
+  disabled: "none",
+  // asserted as any so it can be freely assigned to React Element
+  // "pointerEnvets" CSS prop
+  inheritFromUI: "var(--ui-pointerEvents)" as any,
+} as const;
+
 export enum EVENT {
   COPY = "copy",
   PASTE = "paste",
@@ -72,6 +80,7 @@ export enum EVENT {
   EXCALIDRAW_LINK = "excalidraw-link",
   MENU_ITEM_SELECT = "menu.itemSelect",
   MESSAGE = "message",
+  FULLSCREENCHANGE = "fullscreenchange",
 }
 
 export const YOUTUBE_STATES = {
@@ -97,6 +106,7 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
+  Assistant: 4,
 };
 
 export const THEME = {
@@ -106,13 +116,18 @@ export const THEME = {
 
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
-  strokeWidth: 1 as ExcalidrawElement["strokeWidth"],
+  strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
   strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
   fillStyle: "solid" as ExcalidrawElement["fillStyle"],
   roughness: 0 as ExcalidrawElement["roughness"],
   roundness: null as ExcalidrawElement["roundness"],
   backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
   radius: 8,
+  nameOffsetY: 3,
+  nameColorLightTheme: "#999999",
+  nameColorDarkTheme: "#7a7a7a",
+  nameFontSize: 14,
+  nameLineHeight: 1.25,
 };
 
 export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
@@ -139,6 +154,8 @@ export const IMAGE_MIME_TYPES = {
   avif: "image/avif",
   jfif: "image/jfif",
 } as const;
+
+export const ALLOWED_PASTE_MIME_TYPES = ["text/plain", "text/html"] as const;
 
 export const MIME_TYPES = {
   json: "application/json",
@@ -206,12 +223,13 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     toggleTheme: null,
     saveAsImage: true,
   },
+  tools: {
+    image: true,
+  },
 };
 
 // breakpoints
 // -----------------------------------------------------------------------------
-// sm screen
-export const MQ_SM_MAX_WIDTH = 640;
 // md screen
 export const MQ_MAX_WIDTH_PORTRAIT = 730;
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
@@ -288,6 +306,18 @@ export const ROUNDNESS = {
  * collaboration */
 export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
 
+export const ROUGHNESS = {
+  architect: 0,
+  artist: 1,
+  cartoonist: 2,
+} as const;
+
+export const STROKE_WIDTH = {
+  thin: 1,
+  bold: 2,
+  extraBold: 4,
+} as const;
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
@@ -300,10 +330,10 @@ export const DEFAULT_ELEMENT_PROPS: {
 } = {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
-  fillStyle: "hachure",
-  strokeWidth: 1,
+  fillStyle: "solid",
+  strokeWidth: 2,
   strokeStyle: "solid",
-  roughness: 1,
+  roughness: ROUGHNESS.artist,
   opacity: 100,
   locked: false,
 };
@@ -315,4 +345,34 @@ export const DEFAULT_SIDEBAR = {
   defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;
 
-export const LIBRARY_DISABLED_TYPES = new Set(["embeddable", "image"] as const);
+export const LIBRARY_DISABLED_TYPES = new Set([
+  "iframe",
+  "embeddable",
+  "image",
+] as const);
+
+// use these constants to easily identify reference sites
+export const TOOL_TYPE = {
+  selection: "selection",
+  rectangle: "rectangle",
+  diamond: "diamond",
+  ellipse: "ellipse",
+  arrow: "arrow",
+  line: "line",
+  freedraw: "freedraw",
+  text: "text",
+  image: "image",
+  eraser: "eraser",
+  hand: "hand",
+  frame: "frame",
+  magicframe: "magicframe",
+  embeddable: "embeddable",
+  laser: "laser",
+} as const;
+
+export const EDITOR_LS_KEYS = {
+  OAI_API_KEY: "excalidraw-oai-api-key",
+  // legacy naming (non)scheme
+  MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
+  PUBLISH_LIBRARY: "publish-library-data",
+} as const;

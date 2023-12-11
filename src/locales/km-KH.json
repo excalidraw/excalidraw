@@ -109,8 +109,12 @@
     "createContainerFromText": "រុំអត្ថបទក្នុងប្រអប់មួយ",
     "link": {
       "edit": "កែតំណភ្ជាប់",
+      "editEmbed": "",
       "create": "បង្កើតតំណភ្ជាប់",
-      "label": "តំណ"
+      "createEmbed": "",
+      "label": "តំណ",
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "កែសម្រួលបន្ទាត់",
@@ -160,13 +164,16 @@
     "darkMode": "ម៉ូដងងឹត",
     "lightMode": "ម៉ូដភ្លឺ",
     "zenMode": "ម៉ូត Zen",
+    "objectsSnapMode": "",
     "exitZenMode": "ចេញពី zen​ ម៉ូត",
     "cancel": "បោះបង់",
     "clear": "សម្អាត",
     "remove": "ដកចេញ",
+    "embed": "",
     "publishLibrary": "បោះពុម្ពផ្សាយ",
     "submit": "ដាក់​ស្នើ",
-    "confirm": "បញ្ជាក់"
+    "confirm": "បញ្ជាក់",
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "វានឹងសម្អាតបាវទាំងមូល។ តើ​អ្នក​ប្រាកដ​ឬ​អត់?",
@@ -196,6 +203,7 @@
     "imageInsertError": "មិនអាចបញ្ចូលរូបភាពបានទេ។ សូម​ព្យាយាម​ម្តង​ទៀត​នៅ​ពេល​ក្រោយ……",
     "fileTooBig": "ឯកសារធំពេក។ ទំហំអតិបរមាដែលអនុញ្ញាតគឺ {{maxSize}}។",
     "svgImageInsertError": "មិនអាចបញ្ចូលរូបភាព SVG បានទេ។ ស្លាក SVG ហាក់ដូចជាមិនត្រឹមត្រូវ។",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG មិន​ត្រឹមត្រូវ។",
     "cannotResolveCollabServer": "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេសហការផ្ទាល់បានទេ។ សូមផ្ទុកទំព័រឡើងវិញ ហើយព្យាយាមម្តងទៀត។",
     "importLibraryError": "មិនអាចផ្ទុកបណ្ណាល័យបានទេ។",
@@ -206,6 +214,10 @@
       "line2": "វាអាចបណ្តាលឱ្យមានការបំបែក <bold>ធាតុអត្ថបទ</bold> នៅក្នុងគំនូររបស់អ្នក។",
       "line3": "យើងណែនាំយ៉ាងមុតមាំឱ្យបិទការកំណត់នេះ។ អ្នកអាចអនុវត្តតាម <link>ជំហានទាំងនេះ</link> ដើម្បីបិទការកំណត់នេះ។",
       "line4": "ប្រសិនបើការបិទការកំណត់នេះមិនបានជួសជុលការបង្ហាញធាតុអត្ថបទទេ សូមដាក់ <issueLink>issue</issueLink> នៅលើ GitHub ឬរាយការណ៍នៅលើ <discordLink>Discord</discordLink> របស់យើង"
+    },
+    "libraryElementTypeError": {
+      "embeddable": "",
+      "image": ""
     }
   },
   "toolBar": {
@@ -224,6 +236,8 @@
     "link": "បន្ថែម/ធ្វើបច្ចុប្បន្នភាពតំណភ្ជាប់សម្រាប់រូបរាងដែលបានជ្រើសរើស",
     "eraser": "ជ័រលុប",
     "frame": "",
+    "embeddable": "",
+    "laser": "",
     "hand": "ដៃ (panning tool)",
     "extraTools": ""
   },
@@ -237,6 +251,7 @@
     "linearElement": "ចុចដើម្បីបង្កើតចំណុចច្រើន អូសដើម្បីបង្កើតបន្ទាត់មួយ",
     "freeDraw": "ចុច​ហើយ​អូស លែង​ពេល​រួចរាល់",
     "text": "គន្លឹះ៖ អ្នកក៏អាចបន្ថែមអត្ថបទដោយចុចពីរដងនៅកន្លែងណាមួយដោយប្រើឧបករណ៍ជ្រើសរើស",
+    "embeddable": "",
     "text_selected": "ចុចពីរដង ឬចុច ENTER ដើម្បីកែសម្រួលអត្ថបទ",
     "text_editing": "ចុច Escape ឬ CtrlOrCmd +ENTER ដើម្បីបញ្ចប់ការកែសម្រួល",
     "linearElementMulti": "ចុចលើចំណុចចុងក្រោយ ឬចុច Esc/Enter ដើម្បីបញ្ចប់",
@@ -252,7 +267,8 @@
     "bindTextToElement": "ចុច Enter ដើម្បីបន្ថែមអត្ថបទ",
     "deepBoxSelect": "សង្កត់ CtrlOrCmd ដើម្បីជ្រើសរើសយ៉ាងជ្រៅ និងជៀសវាងការអូស",
     "eraserRevert": "សង្កត់ Alt ដើម្បីដកការជ្រើសរើសធាតុដែលត្រូវបានសម្គាល់សម្រាប់ការលុប",
-    "firefox_clipboard_write": "បើកមុខងារនេះដោយកំណត់ទង់ \"dom.events.asyncClipboard.clipboardItem\" ទៅ \"true\" \nដើម្បីផ្លាស់ប្តូរទង់កម្មវិធីរុករកនៅក្នុង Firefox សូមចូលទៅកាន់ទំព័រ \"about:config\"។"
+    "firefox_clipboard_write": "បើកមុខងារនេះដោយកំណត់ទង់ \"dom.events.asyncClipboard.clipboardItem\" ទៅ \"true\" \nដើម្បីផ្លាស់ប្តូរទង់កម្មវិធីរុករកនៅក្នុង Firefox សូមចូលទៅកាន់ទំព័រ \"about:config\"។",
+    "disableSnapping": ""
   },
   "canvasError": {
     "cannotShowPreview": "មិនអាចបង្ហាញការមើលជាមុនបាន",
@@ -411,7 +427,9 @@
     "fileSavedToFilename": "បានរក្សាទុកនៅក្នុង {filename}",
     "canvas": "តំបន់គំនូរ",
     "selection": "ការជ្រើសរើស",
-    "pasteAsSingleElement": "ប្រើ {{shortcut}} ដើម្បីបិទភ្ជាប់ជាធាតុតែមួយ,\nឬបិទភ្ជាប់ទៅក្នុងកម្មវិធីនិពន្ធអត្ថបទដែលមានស្រាប់"
+    "pasteAsSingleElement": "ប្រើ {{shortcut}} ដើម្បីបិទភ្ជាប់ជាធាតុតែមួយ,\nឬបិទភ្ជាប់ទៅក្នុងកម្មវិធីនិពន្ធអត្ថបទដែលមានស្រាប់",
+    "unableToEmbed": "",
+    "unrecognizedLinkFormat": ""
   },
   "colors": {
     "transparent": "ថ្លាមើលធ្លុះ",
@@ -449,5 +467,36 @@
     "shades": "ស្រមោល",
     "hexCode": "លេខកូដ hex",
     "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ"
+  },
+  "overwriteConfirm": {
+    "action": {
+      "exportToImage": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "saveToDisk": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "excalidrawPlus": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    },
+    "modal": {
+      "loadFromFile": {
+        "title": "",
+        "button": "",
+        "description": ""
+      },
+      "shareableLink": {
+        "title": "",
+        "button": "",
+        "description": ""
+      }
+    }
   }
 }

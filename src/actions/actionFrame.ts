@@ -1,28 +1,33 @@
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
-import { getFrameElements } from "../frame";
+import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
 import { AppClassProperties, AppState } from "../types";
-import { setCursorForShape, updateActiveTool } from "../utils";
+import { updateActiveTool } from "../utils";
+import { setCursorForShape } from "../cursor";
 import { register } from "./register";
+import { isFrameLikeElement } from "../element/typeChecks";
 
 const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
-  return selectedElements.length === 1 && selectedElements[0].type === "frame";
+  return (
+    selectedElements.length === 1 && isFrameLikeElement(selectedElements[0])
+  );
 };
 
 export const actionSelectAllElementsInFrame = register({
   name: "selectAllElementsInFrame",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
-    const selectedFrame = app.scene.getSelectedElements(appState)[0];
+    const selectedElement =
+      app.scene.getSelectedElements(appState).at(0) || null;
 
-    if (selectedFrame && selectedFrame.type === "frame") {
-      const elementsInFrame = getFrameElements(
+    if (isFrameLikeElement(selectedElement)) {
+      const elementsInFrame = getFrameChildren(
         getNonDeletedElements(elements),
-        selectedFrame.id,
+        selectedElement.id,
       ).filter((element) => !(element.type === "text" && element.containerId));
 
       return {
@@ -53,15 +58,20 @@ export const actionRemoveAllElementsFromFrame = register({
   name: "removeAllElementsFromFrame",
   trackEvent: { category: "history" },
   perform: (elements, appState, _, app) => {
-    const selectedFrame = app.scene.getSelectedElements(appState)[0];
+    const selectedElement =
+      app.scene.getSelectedElements(appState).at(0) || null;
 
-    if (selectedFrame && selectedFrame.type === "frame") {
+    if (isFrameLikeElement(selectedElement)) {
       return {
-        elements: removeAllElementsFromFrame(elements, selectedFrame, appState),
+        elements: removeAllElementsFromFrame(
+          elements,
+          selectedElement,
+          appState,
+        ),
         appState: {
           ...appState,
           selectedElementIds: {
-            [selectedFrame.id]: true,
+            [selectedElement.id]: true,
           },
         },
         commitToHistory: true,

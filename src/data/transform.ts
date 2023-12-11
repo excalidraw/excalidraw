@@ -5,6 +5,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import {
+  getCommonBounds,
   newElement,
   newLinearElement,
   redrawTextBoundingBox,
@@ -12,7 +13,9 @@ import {
 import { bindLinearElement } from "../element/binding";
 import {
   ElementConstructorOpts,
+  newFrameElement,
   newImageElement,
+  newMagicFrameElement,
   newTextElement,
 } from "../element/newElement";
 import {
@@ -24,12 +27,13 @@ import {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
-  ExcalidrawEmbeddableElement,
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawGenericElement,
+  ExcalidrawIframeLikeElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
+  ExcalidrawMagicFrameElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FileId,
@@ -38,7 +42,9 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, getFontString } from "../utils";
+import { assertNever, cloneJSON, getFontString } from "../utils";
+import { getSizeFromPoints } from "../points";
+import { randomId } from "../random";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -57,7 +63,12 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -65,7 +76,12 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
               }
           )
@@ -89,7 +105,12 @@ export type ValidLinearElement = {
             | {
                 type: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
                 id?: ExcalidrawGenericElement["id"];
               }
@@ -97,7 +118,12 @@ export type ValidLinearElement = {
                 id: ExcalidrawGenericElement["id"];
                 type?: Exclude<
                   ExcalidrawBindableElement["type"],
-                  "image" | "text" | "frame" | "embeddable"
+                  | "image"
+                  | "text"
+                  | "frame"
+                  | "magicframe"
+                  | "embeddable"
+                  | "iframe"
                 >;
               }
           )
@@ -133,9 +159,7 @@ export type ValidContainer =
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-      | ExcalidrawEmbeddableElement
-      | ExcalidrawFreeDrawElement
-      | ExcalidrawFrameElement
+      ExcalidrawIframeLikeElement | ExcalidrawFreeDrawElement
     >
   | ({
       type: Extract<ExcalidrawLinearElement["type"], "line">;
@@ -156,10 +180,20 @@ export type ExcalidrawElementSkeleton =
       x: number;
       y: number;
       fileId: FileId;
-    } & Partial<ExcalidrawImageElement>);
+    } & Partial<ExcalidrawImageElement>)
+  | ({
+      type: "frame";
+      children: readonly ExcalidrawElement["id"][];
+      name?: string;
+    } & Partial<ExcalidrawFrameElement>)
+  | ({
+      type: "magicframe";
+      children: readonly ExcalidrawElement["id"][];
+      name?: string;
+    } & Partial<ExcalidrawMagicFrameElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
-  width: 300,
+  width: 100,
   height: 0,
 };
 
@@ -357,6 +391,49 @@ const bindLinearElementToElement = (
       );
     }
   }
+
+  // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
+  const endPointIndex = linearElement.points.length - 1;
+  const delta = 0.5;
+
+  const newPoints = cloneJSON(linearElement.points) as [number, number][];
+  // left to right so shift the arrow towards right
+  if (
+    linearElement.points[endPointIndex][0] >
+    linearElement.points[endPointIndex - 1][0]
+  ) {
+    newPoints[0][0] = delta;
+    newPoints[endPointIndex][0] -= delta;
+  }
+
+  // right to left so shift the arrow towards left
+  if (
+    linearElement.points[endPointIndex][0] <
+    linearElement.points[endPointIndex - 1][0]
+  ) {
+    newPoints[0][0] = -delta;
+    newPoints[endPointIndex][0] += delta;
+  }
+  // top to bottom so shift the arrow towards top
+  if (
+    linearElement.points[endPointIndex][1] >
+    linearElement.points[endPointIndex - 1][1]
+  ) {
+    newPoints[0][1] = delta;
+    newPoints[endPointIndex][1] -= delta;
+  }
+
+  // bottom to top so shift the arrow towards bottom
+  if (
+    linearElement.points[endPointIndex][1] <
+    linearElement.points[endPointIndex - 1][1]
+  ) {
+    newPoints[0][1] = -delta;
+    newPoints[endPointIndex][1] += delta;
+  }
+
+  Object.assign(linearElement, { points: newPoints });
+
   return {
     linearElement,
     startBoundElement,
@@ -384,18 +461,25 @@ class ElementStore {
 }
 
 export const convertToExcalidrawElements = (
-  elements: ExcalidrawElementSkeleton[] | null,
+  elementsSkeleton: ExcalidrawElementSkeleton[] | null,
+  opts?: { regenerateIds: boolean },
 ) => {
-  if (!elements) {
+  if (!elementsSkeleton) {
     return [];
   }
-
+  const elements = cloneJSON(elementsSkeleton);
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
+  const oldToNewElementIdMap = new Map<string, string>();
 
   // Create individual elements
   for (const element of elements) {
     let excalidrawElement: ExcalidrawElement;
+    const originalId = element.id;
+    if (opts?.regenerateIds !== false) {
+      Object.assign(element, { id: randomId() });
+    }
+
     switch (element.type) {
       case "rectangle":
       case "ellipse":
@@ -444,6 +528,11 @@ export const convertToExcalidrawElements = (
           ],
           ...element,
         });
+
+        Object.assign(
+          excalidrawElement,
+          getSizeFromPoints(excalidrawElement.points),
+        );
         break;
       }
       case "text": {
@@ -477,8 +566,24 @@ export const convertToExcalidrawElements = (
 
         break;
       }
+      case "frame": {
+        excalidrawElement = newFrameElement({
+          x: 0,
+          y: 0,
+          ...element,
+        });
+        break;
+      }
+      case "magicframe": {
+        excalidrawElement = newMagicFrameElement({
+          x: 0,
+          y: 0,
+          ...element,
+        });
+        break;
+      }
       case "freedraw":
-      case "frame":
+      case "iframe":
       case "embeddable": {
         excalidrawElement = element;
         break;
@@ -499,6 +604,9 @@ export const convertToExcalidrawElements = (
     } else {
       elementStore.add(excalidrawElement);
       elementsWithIds.set(excalidrawElement.id, element);
+      if (originalId) {
+        oldToNewElementIdMap.set(originalId, excalidrawElement.id);
+      }
     }
   }
 
@@ -524,6 +632,18 @@ export const convertToExcalidrawElements = (
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
               element.type === "arrow" ? element?.end : undefined;
+            if (originalStart && originalStart.id) {
+              const newStartId = oldToNewElementIdMap.get(originalStart.id);
+              if (newStartId) {
+                Object.assign(originalStart, { id: newStartId });
+              }
+            }
+            if (originalEnd && originalEnd.id) {
+              const newEndId = oldToNewElementIdMap.get(originalEnd.id);
+              if (newEndId) {
+                Object.assign(originalEnd, { id: newEndId });
+              }
+            }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
                 container as ExcalidrawArrowElement,
@@ -539,13 +659,23 @@ export const convertToExcalidrawElements = (
         } else {
           switch (element.type) {
             case "arrow": {
+              const { start, end } = element;
+              if (start && start.id) {
+                const newStartId = oldToNewElementIdMap.get(start.id);
+                Object.assign(start, { id: newStartId });
+              }
+              if (end && end.id) {
+                const newEndId = oldToNewElementIdMap.get(end.id);
+                Object.assign(end, { id: newEndId });
+              }
               const { linearElement, startBoundElement, endBoundElement } =
                 bindLinearElementToElement(
                   excalidrawElement as ExcalidrawArrowElement,
-                  element.start,
-                  element.end,
+                  start,
+                  end,
                   elementStore,
                 );
+
               elementStore.add(linearElement);
               elementStore.add(startBoundElement);
               elementStore.add(endBoundElement);
@@ -557,5 +687,60 @@ export const convertToExcalidrawElements = (
       }
     }
   }
+
+  // Once all the excalidraw elements are created, we can add frames since we
+  // need to calculate coordinates and dimensions of frame which is possibe after all
+  // frame children are processed.
+  for (const [id, element] of elementsWithIds) {
+    if (element.type !== "frame" && element.type !== "magicframe") {
+      continue;
+    }
+    const frame = elementStore.getElement(id);
+
+    if (!frame) {
+      throw new Error(`Excalidraw element with id ${id} doesn't exist`);
+    }
+    const childrenElements: ExcalidrawElement[] = [];
+
+    element.children.forEach((id) => {
+      const newElementId = oldToNewElementIdMap.get(id);
+      if (!newElementId) {
+        throw new Error(`Element with ${id} wasn't mapped correctly`);
+      }
+
+      const elementInFrame = elementStore.getElement(newElementId);
+      if (!elementInFrame) {
+        throw new Error(`Frame element with id ${newElementId} doesn't exist`);
+      }
+      Object.assign(elementInFrame, { frameId: frame.id });
+
+      elementInFrame?.boundElements?.forEach((boundElement) => {
+        const ele = elementStore.getElement(boundElement.id);
+        if (!ele) {
+          throw new Error(
+            `Bound element with id ${boundElement.id} doesn't exist`,
+          );
+        }
+        Object.assign(ele, { frameId: frame.id });
+        childrenElements.push(ele);
+      });
+
+      childrenElements.push(elementInFrame);
+    });
+
+    let [minX, minY, maxX, maxY] = getCommonBounds(childrenElements);
+
+    const PADDING = 10;
+    minX = minX - PADDING;
+    minY = minY - PADDING;
+    maxX = maxX + PADDING;
+    maxY = maxY + PADDING;
+
+    // Take the max of calculated and provided frame dimensions, whichever is higher
+    const width = Math.max(frame?.width, maxX - minX);
+    const height = Math.max(frame?.height, maxY - minY);
+    Object.assign(frame, { x: minX, y: minY, width, height });
+  }
+
   return elementStore.getElements();
 };

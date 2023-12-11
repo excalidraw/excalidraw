@@ -5,6 +5,7 @@ import {
 import { ToolButton } from "../components/ToolButton";
 import { distributeElements, Distribution } from "../distribute";
 import { getNonDeletedElements } from "../element";
+import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
@@ -19,7 +20,7 @@ const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   return (
     selectedElements.length > 1 &&
     // TODO enable distributing frames when implemented properly
-    !selectedElements.some((el) => el.type === "frame")
+    !selectedElements.some((el) => isFrameLikeElement(el))
   );
 };
 

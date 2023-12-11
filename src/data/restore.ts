@@ -1,5 +1,6 @@
 import {
   ExcalidrawElement,
+  ExcalidrawElementType,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -67,6 +68,8 @@ export const AllowedExcalidrawActiveTools: Record<
   frame: true,
   embeddable: true,
   hand: true,
+  laser: false,
+  magicframe: false,
 };
 
 export type RestoredDataState = {
@@ -110,7 +113,7 @@ const restoreElementWithProperties = <
     // @ts-ignore TS complains here but type checks the call sites fine.
     keyof K
   > &
-    Partial<Pick<ExcalidrawElement, "type" | "x" | "y">>,
+    Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
 ): T => {
   const base: Pick<T, keyof ExcalidrawElement> & {
     [PRECEDING_ELEMENT_KEY]?: string;
@@ -158,8 +161,9 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
-  if ("customData" in element) {
-    base.customData = element.customData;
+  if ("customData" in element || "customData" in extra) {
+    base.customData =
+      "customData" in extra ? extra.customData : element.customData;
   }
 
   if (PRECEDING_ELEMENT_KEY in element) {
@@ -188,7 +192,7 @@ const restoreElement = (
         fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      const text = element.text ?? "";
+      const text = (typeof element.text === "string" && element.text) || "";
 
       // line-height might not be specified either when creating elements
       // programmatically, or when importing old diagrams.
@@ -221,9 +225,17 @@ const restoreElement = (
         baseline,
       });
 
+      // if empty text, mark as deleted. We keep in array
+      // for data integrity purposes (collab etc.)
+      if (!text && !element.isDeleted) {
+        element = { ...element, originalText: text, isDeleted: true };
+        element = bumpVersion(element);
+      }
+
       if (refreshDimensions) {
         element = { ...element, ...refreshTextDimensions(element) };
       }
+
       return element;
     case "freedraw": {
       return restoreElementWithProperties(element, {
@@ -264,7 +276,7 @@ const restoreElement = (
 
       return restoreElementWithProperties(element, {
         type:
-          (element.type as ExcalidrawElement["type"] | "draw") === "draw"
+          (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
         startBinding: repairBinding(element.startBinding),
@@ -280,15 +292,15 @@ const restoreElement = (
 
     // generic elements
     case "ellipse":
-      return restoreElementWithProperties(element, {});
     case "rectangle":
-      return restoreElementWithProperties(element, {});
     case "diamond":
+    case "iframe":
       return restoreElementWithProperties(element, {});
     case "embeddable":
       return restoreElementWithProperties(element, {
         validated: null,
       });
+    case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
@@ -298,6 +310,7 @@ const restoreElement = (
     // We also don't want to throw, but instead return void so we filter
     // out these unsupported elements from the restored array.
   }
+  return null;
 };
 
 /**

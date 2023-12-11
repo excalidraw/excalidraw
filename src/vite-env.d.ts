@@ -17,6 +17,7 @@ interface ImportMetaEnv {
 
   // set this only if using the collaboration workflow we use on excalidraw.com
   VITE_APP_PORTAL_URL: string;
+  VITE_APP_AI_BACKEND: string;
 
   VITE_APP_FIREBASE_CONFIG: string;
 
@@ -46,6 +47,9 @@ interface ImportMetaEnv {
   VITE_PKG_NAME: string;
   VITE_PKG_VERSION: string;
   VITE_IS_EXCALIDRAW_NPM_PACKAGE: string;
+
+  VITE_APP_PLUS_LP: string;
+  VITE_APP_PLUS_APP: string;
 
   VITE_WORKER_ID: string;
   MODE: string;

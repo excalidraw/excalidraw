@@ -2,7 +2,11 @@ import clsx from "clsx";
 import { composeEventHandlers } from "../utils";
 import "./Button.scss";
 
-interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps
+  extends React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
   type?: "button" | "submit" | "reset";
   onSelect: () => any;
   /** whether button is in active state */

@@ -140,8 +140,8 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
  *
  * NOTE: does not trigger re-render.
  */
-export const bumpVersion = (
-  element: Mutable<ExcalidrawElement>,
+export const bumpVersion = <T extends Mutable<ExcalidrawElement>>(
+  element: T,
   version?: ExcalidrawElement["version"],
 ) => {
   element.version = (version ?? element.version) + 1;

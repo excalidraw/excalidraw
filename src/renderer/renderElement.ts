@@ -13,14 +13,21 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
+  isMagicFrameElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
-import { StaticCanvasRenderConfig } from "../scene/types";
-import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
+import { SVGRenderConfig, StaticCanvasRenderConfig } from "../scene/types";
+import {
+  distance,
+  getFontString,
+  getFontFamilyString,
+  isRTL,
+  isTestEnv,
+} from "../utils";
 import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import {
@@ -266,6 +273,7 @@ const drawElementOnCanvas = (
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
+    case "iframe":
     case "embeddable":
     case "diamond":
     case "ellipse": {
@@ -588,12 +596,9 @@ export const renderElement = (
   appState: StaticCanvasAppState,
 ) => {
   switch (element.type) {
+    case "magicframe":
     case "frame": {
-      if (
-        !renderConfig.isExporting &&
-        appState.frameRendering.enabled &&
-        appState.frameRendering.outline
-      ) {
+      if (appState.frameRendering.enabled && appState.frameRendering.outline) {
         context.save();
         context.translate(
           element.x + appState.scrollX,
@@ -601,8 +606,14 @@ export const renderElement = (
         );
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.lineWidth = 2 / appState.zoom.value;
+        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
         context.strokeStyle = FRAME_STYLE.strokeColor;
+
+        // TODO change later to only affect AI frames
+        if (isMagicFrameElement(element)) {
+          context.strokeStyle =
+            appState.theme === "light" ? "#7affd7" : "#1d8264";
+        }
 
         if (FRAME_STYLE.radius && context.roundRect) {
           context.beginPath();
@@ -627,7 +638,7 @@ export const renderElement = (
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
-      ShapeCache.generateElementShape(element);
+      ShapeCache.generateElementShape(element, null);
 
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -664,11 +675,12 @@ export const renderElement = (
     case "arrow":
     case "image":
     case "text":
+    case "iframe":
     case "embeddable": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
-      ShapeCache.generateElementShape(element, renderConfig.isExporting);
+      ShapeCache.generateElementShape(element, renderConfig);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -841,10 +853,13 @@ const maybeWrapNodesInFrameClipPath = (
   element: NonDeletedExcalidrawElement,
   root: SVGElement,
   nodes: SVGElement[],
-  exportedFrameId?: string | null,
+  frameRendering: AppState["frameRendering"],
 ) => {
+  if (!frameRendering.enabled || !frameRendering.clip) {
+    return null;
+  }
   const frame = getContainingFrame(element);
-  if (frame && frame.id === exportedFrameId) {
+  if (frame) {
     const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
     g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
     nodes.forEach((node) => g.appendChild(node));
@@ -861,9 +876,7 @@ export const renderElementToSvg = (
   files: BinaryFiles,
   offsetX: number,
   offsetY: number,
-  exportWithDarkMode?: boolean,
-  exportingFrameId?: string | null,
-  renderEmbeddables?: boolean,
+  renderConfig: SVGRenderConfig,
 ) => {
   const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -897,6 +910,13 @@ export const renderElementToSvg = (
     root = anchorTag;
   }
 
+  const addToRoot = (node: SVGElement, element: ExcalidrawElement) => {
+    if (isTestEnv()) {
+      node.setAttribute("data-id", element.id);
+    }
+    root.appendChild(node);
+  };
+
   const opacity =
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
 
@@ -909,7 +929,7 @@ export const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      const shape = ShapeCache.generateElementShape(element);
+      const shape = ShapeCache.generateElementShape(element, null);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         shape,
@@ -931,15 +951,16 @@ export const renderElementToSvg = (
         element,
         root,
         [node],
-        exportingFrameId,
+        renderConfig.frameRendering,
       );
 
-      g ? root.appendChild(g) : root.appendChild(node);
+      addToRoot(g || node, element);
       break;
     }
+    case "iframe":
     case "embeddable": {
       // render placeholder rectangle
-      const shape = ShapeCache.generateElementShape(element, true);
+      const shape = ShapeCache.generateElementShape(element, renderConfig);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         shape,
@@ -957,7 +978,7 @@ export const renderElementToSvg = (
           offsetY || 0
         }) rotate(${degree} ${cx} ${cy})`,
       );
-      root.appendChild(node);
+      addToRoot(node, element);
 
       const label: ExcalidrawElement =
         createPlaceholderEmbeddableLabel(element);
@@ -968,9 +989,7 @@ export const renderElementToSvg = (
         files,
         label.x + offset.x - element.x,
         label.y + offset.y - element.y,
-        exportWithDarkMode,
-        exportingFrameId,
-        renderEmbeddables,
+        renderConfig,
       );
 
       // render embeddable element + iframe
@@ -999,7 +1018,10 @@ export const renderElementToSvg = (
       // if rendering embeddables explicitly disabled or
       // embedding documents via srcdoc (which doesn't seem to work for SVGs)
       // replace with a link instead
-      if (renderEmbeddables === false || embedLink?.type === "document") {
+      if (
+        renderConfig.renderEmbeddables === false ||
+        embedLink?.type === "document"
+      ) {
         const anchorTag = svgRoot.ownerDocument!.createElementNS(SVG_NS, "a");
         anchorTag.setAttribute("href", normalizeLink(element.link || ""));
         anchorTag.setAttribute("target", "_blank");
@@ -1033,8 +1055,7 @@ export const renderElementToSvg = (
 
         embeddableNode.appendChild(foreignObject);
       }
-
-      root.appendChild(embeddableNode);
+      addToRoot(embeddableNode, element);
       break;
     }
     case "line":
@@ -1088,7 +1109,7 @@ export const renderElementToSvg = (
       }
       group.setAttribute("stroke-linecap", "round");
 
-      const shapes = ShapeCache.generateElementShape(element);
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
       shapes.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
@@ -1119,18 +1140,22 @@ export const renderElementToSvg = (
         element,
         root,
         [group, maskPath],
-        exportingFrameId,
+        renderConfig.frameRendering,
       );
       if (g) {
+        addToRoot(g, element);
         root.appendChild(g);
       } else {
-        root.appendChild(group);
+        addToRoot(group, element);
         root.append(maskPath);
       }
       break;
     }
     case "freedraw": {
-      const backgroundFillShape = ShapeCache.generateElementShape(element);
+      const backgroundFillShape = ShapeCache.generateElementShape(
+        element,
+        renderConfig,
+      );
       const node = backgroundFillShape
         ? roughSVGDrawWithPrecision(
             rsvg,
@@ -1158,10 +1183,10 @@ export const renderElementToSvg = (
         element,
         root,
         [node],
-        exportingFrameId,
+        renderConfig.frameRendering,
       );
 
-      g ? root.appendChild(g) : root.appendChild(node);
+      addToRoot(g || node, element);
       break;
     }
     case "image": {
@@ -1191,7 +1216,10 @@ export const renderElementToSvg = (
         use.setAttribute("href", `#${symbolId}`);
 
         // in dark theme, revert the image color filter
-        if (exportWithDarkMode && fileData.mimeType !== MIME_TYPES.svg) {
+        if (
+          renderConfig.exportWithDarkMode &&
+          fileData.mimeType !== MIME_TYPES.svg
+        ) {
           use.setAttribute("filter", IMAGE_INVERT_FILTER);
         }
 
@@ -1227,14 +1255,40 @@ export const renderElementToSvg = (
           element,
           root,
           [g],
-          exportingFrameId,
+          renderConfig.frameRendering,
         );
-        clipG ? root.appendChild(clipG) : root.appendChild(g);
+        addToRoot(clipG || g, element);
       }
       break;
     }
     // frames are not rendered and only acts as a container
-    case "frame": {
+    case "frame":
+    case "magicframe": {
+      if (
+        renderConfig.frameRendering.enabled &&
+        renderConfig.frameRendering.outline
+      ) {
+        const rect = document.createElementNS(SVG_NS, "rect");
+
+        rect.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
+        );
+
+        rect.setAttribute("width", `${element.width}px`);
+        rect.setAttribute("height", `${element.height}px`);
+        // Rounded corners
+        rect.setAttribute("rx", FRAME_STYLE.radius.toString());
+        rect.setAttribute("ry", FRAME_STYLE.radius.toString());
+
+        rect.setAttribute("fill", "none");
+        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
+        rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
+
+        addToRoot(rect, element);
+      }
       break;
     }
     default: {
@@ -1288,10 +1342,10 @@ export const renderElementToSvg = (
           element,
           root,
           [node],
-          exportingFrameId,
+          renderConfig.frameRendering,
         );
 
-        g ? root.appendChild(g) : root.appendChild(node);
+        addToRoot(g || node, element);
       } else {
         // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);

@@ -15,18 +15,20 @@ import { Mutable } from "./utility-types";
 import { ShapeCache } from "./scene/ShapeCache";
 
 export const rotate = (
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
+  // target point to rotate
+  x: number,
+  y: number,
+  // point to rotate against
+  cx: number,
+  cy: number,
   angle: number,
 ): [number, number] =>
   // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
   // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
   // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
   [
-    (x1 - x2) * Math.cos(angle) - (y1 - y2) * Math.sin(angle) + x2,
-    (x1 - x2) * Math.sin(angle) + (y1 - y2) * Math.cos(angle) + y2,
+    (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
+    (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
   ];
 
 export const rotatePoint = (
@@ -303,7 +305,7 @@ export const getControlPointsForBezierCurve = (
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: Point,
 ) => {
-  const shape = ShapeCache.generateElementShape(element);
+  const shape = ShapeCache.generateElementShape(element, null);
   if (!shape) {
     return null;
   }
@@ -471,4 +473,41 @@ export const isRightAngle = (angle: number) => {
   // Below, after dividing by Math.PI, a multiple of 0.5 indicates a right
   // angle, which we can check with modulo after rounding.
   return Math.round((angle / Math.PI) * 10000) % 5000 === 0;
+};
+
+// Given two ranges, return if the two ranges overlap with each other
+// e.g. [1, 3] overlaps with [2, 4] while [1, 3] does not overlap with [4, 5]
+export const rangesOverlap = (
+  [a0, a1]: [number, number],
+  [b0, b1]: [number, number],
+) => {
+  if (a0 <= b0) {
+    return a1 >= b0;
+  }
+
+  if (a0 >= b0) {
+    return b1 >= a0;
+  }
+
+  return false;
+};
+
+// Given two ranges,return ther intersection of the two ranges if any
+// e.g. the intersection of [1, 3] and [2, 4] is [2, 3]
+export const rangeIntersection = (
+  rangeA: [number, number],
+  rangeB: [number, number],
+): [number, number] | null => {
+  const rangeStart = Math.max(rangeA[0], rangeB[0]);
+  const rangeEnd = Math.min(rangeA[1], rangeB[1]);
+
+  if (rangeStart <= rangeEnd) {
+    return [rangeStart, rangeEnd];
+  }
+
+  return null;
+};
+
+export const isValueInRange = (value: number, min: number, max: number) => {
+  return value >= min && value <= max;
 };

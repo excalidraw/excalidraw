@@ -16,7 +16,7 @@ import {
   NonDeleted,
   GroupId,
   ExcalidrawBindableElement,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
 } from "../element/types";
 import {
   getElementAbsoluteCoords,
@@ -30,6 +30,7 @@ import { roundRect } from "./roundRect";
 import {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
+  SVGRenderConfig,
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
@@ -60,20 +61,22 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { throttleRAF, isOnlyExportingSingleFrame } from "../utils";
+import { throttleRAF } from "../utils";
 import { UserIdleState } from "../types";
 import { FRAME_STYLE, THEME_FILTER } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../element/Hyperlink";
+import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
-  isFrameElement,
+  isFrameLikeElement,
+  isIframeLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
 import {
-  isEmbeddableOrFrameLabel,
+  isIframeLikeOrItsLabel,
   createPlaceholderEmbeddableLabel,
 } from "../element/embeddable";
 import {
@@ -361,14 +364,14 @@ const renderLinearElementPointHighlight = (
 };
 
 const frameClip = (
-  frame: ExcalidrawFrameElement,
+  frame: ExcalidrawFrameLikeElement,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
   context.translate(frame.x + appState.scrollX, frame.y + appState.scrollY);
   context.beginPath();
-  if (context.roundRect && !renderConfig.isExporting) {
+  if (context.roundRect) {
     context.roundRect(
       0,
       0,
@@ -514,7 +517,7 @@ const _renderInteractiveScene = ({
   }
 
   const isFrameSelected = selectedElements.some((element) =>
-    isFrameElement(element),
+    isFrameLikeElement(element),
   );
 
   // Getting the element using LinearElementEditor during collab mismatches version - being one head of visible elements due to
@@ -719,6 +722,8 @@ const _renderInteractiveScene = ({
     }
     context.restore();
   }
+
+  renderSnaps(context, appState);
 
   // Reset zoom
   context.restore();
@@ -960,20 +965,15 @@ const _renderStaticScene = ({
 
   // Paint visible elements
   visibleElements
-    .filter((el) => !isEmbeddableOrFrameLabel(el))
+    .filter((el) => !isIframeLikeOrItsLabel(el))
     .forEach((element) => {
       try {
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
         const frameId = element.frameId || appState.frameToHighlight?.id;
 
         if (
           frameId &&
-          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-            (!renderConfig.isExporting &&
-              appState.frameRendering.enabled &&
-              appState.frameRendering.clip))
+          appState.frameRendering.enabled &&
+          appState.frameRendering.clip
         ) {
           context.save();
 
@@ -998,15 +998,16 @@ const _renderStaticScene = ({
 
   // render embeddables on top
   visibleElements
-    .filter((el) => isEmbeddableOrFrameLabel(el))
+    .filter((el) => isIframeLikeOrItsLabel(el))
     .forEach((element) => {
       try {
         const render = () => {
           renderElement(element, rc, context, renderConfig, appState);
 
           if (
-            isEmbeddableElement(element) &&
-            (isExporting || !element.validated) &&
+            isIframeLikeElement(element) &&
+            (isExporting ||
+              (isEmbeddableElement(element) && !element.validated)) &&
             element.width &&
             element.height
           ) {
@@ -1024,10 +1025,8 @@ const _renderStaticScene = ({
 
         if (
           frameId &&
-          ((renderConfig.isExporting && isOnlyExportingSingleFrame(elements)) ||
-            (!renderConfig.isExporting &&
-              appState.frameRendering.enabled &&
-              appState.frameRendering.clip))
+          appState.frameRendering.enabled &&
+          appState.frameRendering.clip
         ) {
           context.save();
 
@@ -1246,8 +1245,10 @@ const renderBindingHighlightForBindableElement = (
     case "rectangle":
     case "text":
     case "image":
+    case "iframe":
     case "embeddable":
     case "frame":
+    case "magicframe":
       strokeRectWithRotation(
         context,
         x1 - padding,
@@ -1288,14 +1289,14 @@ const renderBindingHighlightForBindableElement = (
 const renderFrameHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  frame: NonDeleted<ExcalidrawFrameElement>,
+  frame: NonDeleted<ExcalidrawFrameLikeElement>,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
   const width = x2 - x1;
   const height = y2 - y1;
 
   context.strokeStyle = "rgb(0,118,255)";
-  context.lineWidth = (FRAME_STYLE.strokeWidth * 2) / appState.zoom.value;
+  context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
@@ -1448,19 +1449,7 @@ export const renderSceneToSvg = (
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   files: BinaryFiles,
-  {
-    offsetX = 0,
-    offsetY = 0,
-    exportWithDarkMode = false,
-    exportingFrameId = null,
-    renderEmbeddables,
-  }: {
-    offsetX?: number;
-    offsetY?: number;
-    exportWithDarkMode?: boolean;
-    exportingFrameId?: string | null;
-    renderEmbeddables?: boolean;
-  } = {},
+  renderConfig: SVGRenderConfig,
 ) => {
   if (!svgRoot) {
     return;
@@ -1468,7 +1457,7 @@ export const renderSceneToSvg = (
 
   // render elements
   elements
-    .filter((el) => !isEmbeddableOrFrameLabel(el))
+    .filter((el) => !isIframeLikeOrItsLabel(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
@@ -1477,11 +1466,9 @@ export const renderSceneToSvg = (
             rsvg,
             svgRoot,
             files,
-            element.x + offsetX,
-            element.y + offsetY,
-            exportWithDarkMode,
-            exportingFrameId,
-            renderEmbeddables,
+            element.x + renderConfig.offsetX,
+            element.y + renderConfig.offsetY,
+            renderConfig,
           );
         } catch (error: any) {
           console.error(error);
@@ -1491,7 +1478,7 @@ export const renderSceneToSvg = (
 
   // render embeddables on top
   elements
-    .filter((el) => isEmbeddableElement(el))
+    .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
@@ -1500,11 +1487,9 @@ export const renderSceneToSvg = (
             rsvg,
             svgRoot,
             files,
-            element.x + offsetX,
-            element.y + offsetY,
-            exportWithDarkMode,
-            exportingFrameId,
-            renderEmbeddables,
+            element.x + renderConfig.offsetX,
+            element.y + renderConfig.offsetY,
+            renderConfig,
           );
         } catch (error: any) {
           console.error(error);

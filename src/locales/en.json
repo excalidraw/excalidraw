@@ -11,6 +11,8 @@
     "copyAsPng": "Copy to clipboard as PNG",
     "copyAsSvg": "Copy to clipboard as SVG",
     "copyText": "Copy to clipboard as text",
+    "copySource": "Copy source to clipboard",
+    "convertToCode": "Convert to code",
     "bringForward": "Bring forward",
     "sendToBack": "Send to back",
     "bringToFront": "Bring to front",
@@ -36,8 +38,12 @@
     "arrowhead_none": "None",
     "arrowhead_arrow": "Arrow",
     "arrowhead_bar": "Bar",
-    "arrowhead_dot": "Dot",
+    "arrowhead_circle": "Circle",
+    "arrowhead_circle_outline": "Circle (outline)",
     "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "Triangle (outline)",
+    "arrowhead_diamond": "Diamond",
+    "arrowhead_diamond_outline": "Diamond (outline)",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "addWatermark": "Add \"Made with Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Keep sidebar open",
     "selectAllElementsInFrame": "Select all elements in frame",
     "removeAllElementsFromFrame": "Remove all elements from frame",
-    "eyeDropper": "Pick color from canvas"
+    "eyeDropper": "Pick color from canvas",
+    "textToDiagram": "Text to diagram",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "No items added yet...",
@@ -164,6 +172,7 @@
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
     "zenMode": "Zen mode",
+    "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
     "clear": "Clear",
@@ -202,11 +211,13 @@
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
+    "failedToFetchImage": "Failed to fetch image.",
     "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
     "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work.",
+    "imageToolNotSupported": "Images are disabled.",
     "brave_measure_text_error": {
       "line1": "Looks like you are using Brave browser with the <bold>Aggressively Block Fingerprinting</bold> setting enabled.",
       "line2": "This could result in breaking the <bold>Text Elements</bold> in your drawings.",
@@ -215,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Embeddable elements cannot be added to the library.",
+      "iframe": "IFrame elements cannot be added to the library.",
       "image": "Support for adding images to the library coming soon!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
+    "asyncPasteFailedOnParse": "Couldn't paste.",
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
   },
   "toolBar": {
     "selection": "Selection",
@@ -234,9 +249,13 @@
     "link": "Add/ Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
+    "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
+    "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
-    "extraTools": "More tools"
+    "extraTools": "More tools",
+    "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "magicSettings": "AI settings"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -264,7 +283,8 @@
     "bindTextToElement": "Press enter to add text",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
-    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page."
+    "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -494,6 +514,13 @@
         "description": "Loading external drawing will <bold>replace your existing content</bold>.<br></br>You can back up your drawing first by using one of the options below."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid to Excalidraw",
+    "button": "Insert",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "syntax": "Mermaid Syntax",
+    "preview": "Preview"
   },
   "userList": {
     "search": {

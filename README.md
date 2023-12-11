@@ -1,7 +1,7 @@
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
-    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2FExcalidraw_Github_cover_dark.png" />
-    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2FExcalidraw_Github_cover.png" />
+    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
+    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png" />
   </picture>
 </a>
 
@@ -24,6 +24,9 @@
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
     <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  />
+  </a>
+  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
+    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  />
   </a>
   <a href="https://docs.excalidraw.com/docs/introduction/contributing">
     <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  />
@@ -70,7 +73,7 @@ The Excalidraw editor (npm package) supports:
 
 ## Excalidraw.com
 
-The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/src/excalidraw-app) is part of this repository as well, and the app features:
+The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
 
 - 📡&nbsp;PWA support (works offline).
 - 🤼&nbsp;Real-time collaboration.

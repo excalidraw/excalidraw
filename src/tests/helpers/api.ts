@@ -6,6 +6,9 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   FileId,
+  ExcalidrawFrameElement,
+  ExcalidrawElementType,
+  ExcalidrawMagicFrameElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
@@ -19,7 +22,9 @@ import {
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
+  newIframeElement,
   newImageElement,
+  newMagicFrameElement,
 } from "../../element/newElement";
 import { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
@@ -73,7 +78,7 @@ export class API {
   };
 
   static createElement = <
-    T extends Exclude<ExcalidrawElement["type"], "selection"> = "rectangle",
+    T extends Exclude<ExcalidrawElementType, "selection"> = "rectangle",
   >({
     // @ts-ignore
     type = "rectangle",
@@ -94,6 +99,7 @@ export class API {
     angle?: number;
     id?: string;
     isDeleted?: boolean;
+    frameId?: ExcalidrawElement["id"] | null;
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
@@ -135,6 +141,10 @@ export class API {
     ? ExcalidrawTextElement
     : T extends "image"
     ? ExcalidrawImageElement
+    : T extends "frame"
+    ? ExcalidrawFrameElement
+    : T extends "magicframe"
+    ? ExcalidrawMagicFrameElement
     : ExcalidrawGenericElement => {
     let element: Mutable<ExcalidrawElement> = null!;
 
@@ -151,12 +161,12 @@ export class API {
       | "versionNonce"
       | "isDeleted"
       | "groupIds"
-      | "frameId"
       | "link"
       | "updated"
     > = {
       x,
       y,
+      frameId: rest.frameId ?? null,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
@@ -196,6 +206,12 @@ export class API {
           type: "embeddable",
           ...base,
           validated: null,
+        });
+        break;
+      case "iframe":
+        element = newIframeElement({
+          type: "iframe",
+          ...base,
         });
         break;
       case "text":
@@ -248,6 +264,9 @@ export class API {
         break;
       case "frame":
         element = newFrameElement({ ...base, width, height });
+        break;
+      case "magicframe":
+        element = newMagicFrameElement({ ...base, width, height });
         break;
       default:
         assertNever(

@@ -2,31 +2,27 @@ import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
-import { getFontString, setCursorForShape, updateActiveTool } from "../utils";
+import { getFontString, updateActiveTool } from "../utils";
+import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
 import { getContainerElement, wrapText } from "./textElement";
-import { isEmbeddableElement } from "./typeChecks";
+import {
+  isFrameLikeElement,
+  isIframeElement,
+  isIframeLikeElement,
+} from "./typeChecks";
 import {
   ExcalidrawElement,
-  ExcalidrawEmbeddableElement,
+  ExcalidrawIframeLikeElement,
+  IframeData,
   NonDeletedExcalidrawElement,
-  Theme,
 } from "./types";
 
-type EmbeddedLink =
-  | ({
-      aspectRatio: { w: number; h: number };
-      warning?: string;
-    } & (
-      | { type: "video" | "generic"; link: string }
-      | { type: "document"; srcdoc: (theme: Theme) => string }
-    ))
-  | null;
-
-const embeddedLinkCache = new Map<string, EmbeddedLink>();
+const embeddedLinkCache = new Map<string, IframeData>();
 
 const RE_YOUTUBE =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
@@ -46,6 +42,9 @@ const RE_VALTOWN =
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
+const RE_GIPHY =
+  /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -58,13 +57,17 @@ const ALLOWED_DOMAINS = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
+  "giphy.com",
+  "dddice.com",
 ]);
 
-const createSrcDoc = (body: string) => {
+export const createSrcDoc = (body: string) => {
   return `<html><body>${body}</body></html>`;
 };
 
-export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
+export const getEmbedLink = (
+  link: string | null | undefined,
+): IframeData | null => {
   if (!link) {
     return null;
   }
@@ -97,8 +100,12 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+    });
+    return { link, intrinsicSize: aspectRatio, type };
   }
 
   const vimeoLink = link.match(RE_VIMEO);
@@ -112,8 +119,12 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
     aspectRatio = { w: 560, h: 315 };
     //warning deliberately ommited so it is displayed only once per link
     //same link next time will be served from cache
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type, warning };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+    });
+    return { link, intrinsicSize: aspectRatio, type, warning };
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -123,27 +134,35 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
       link,
     )}`;
     aspectRatio = { w: 550, h: 550 };
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+    });
+    return { link, intrinsicSize: aspectRatio, type };
   }
 
   const valLink = link.match(RE_VALTOWN);
   if (valLink) {
     link =
       valLink[1] === "embed" ? valLink[0] : valLink[0].replace("/v", "/embed");
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+    });
+    return { link, intrinsicSize: aspectRatio, type };
   }
 
   if (RE_TWITTER.test(link)) {
-    let ret: EmbeddedLink;
+    let ret: IframeData;
     // assume embed code
     if (/<blockquote/.test(link)) {
       const srcDoc = createSrcDoc(link);
       ret = {
         type: "document",
         srcdoc: () => srcDoc,
-        aspectRatio: { w: 480, h: 480 },
+        intrinsicSize: { w: 480, h: 480 },
       };
       // assume regular tweet url
     } else {
@@ -153,7 +172,7 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
           createSrcDoc(
             `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
           ),
-        aspectRatio: { w: 480, h: 480 },
+        intrinsicSize: { w: 480, h: 480 },
       };
     }
     embeddedLinkCache.set(originalLink, ret);
@@ -161,14 +180,14 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   }
 
   if (RE_GH_GIST.test(link)) {
-    let ret: EmbeddedLink;
+    let ret: IframeData;
     // assume embed code
     if (/<script>/.test(link)) {
       const srcDoc = createSrcDoc(link);
       ret = {
         type: "document",
         srcdoc: () => srcDoc,
-        aspectRatio: { w: 550, h: 720 },
+        intrinsicSize: { w: 550, h: 720 },
       };
       // assume regular url
     } else {
@@ -183,26 +202,26 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
             .gist .gist-file { height: calc(100vh - 2px); padding: 0px; display: grid; grid-template-rows: 1fr auto; }
           </style>
         `),
-        aspectRatio: { w: 550, h: 720 },
+        intrinsicSize: { w: 550, h: 720 },
       };
     }
     embeddedLinkCache.set(link, ret);
     return ret;
   }
 
-  embeddedLinkCache.set(link, { link, aspectRatio, type });
-  return { link, aspectRatio, type };
+  embeddedLinkCache.set(link, { link, intrinsicSize: aspectRatio, type });
+  return { link, intrinsicSize: aspectRatio, type };
 };
 
-export const isEmbeddableOrFrameLabel = (
+export const isIframeLikeOrItsLabel = (
   element: NonDeletedExcalidrawElement,
 ): Boolean => {
-  if (isEmbeddableElement(element)) {
+  if (isIframeLikeElement(element)) {
     return true;
   }
   if (element.type === "text") {
     const container = getContainerElement(element);
-    if (container && isEmbeddableElement(container)) {
+    if (container && isFrameLikeElement(container)) {
       return true;
     }
   }
@@ -210,10 +229,16 @@ export const isEmbeddableOrFrameLabel = (
 };
 
 export const createPlaceholderEmbeddableLabel = (
-  element: ExcalidrawEmbeddableElement,
+  element: ExcalidrawIframeLikeElement,
 ): ExcalidrawElement => {
-  const text =
-    !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;
+  let text: string;
+  if (isIframeElement(element)) {
+    text = "IFrame element";
+  } else {
+    text =
+      !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;
+  }
+
   const fontSize = Math.max(
     Math.min(element.width / 2, element.width / text.length),
     element.width / 30,
@@ -305,6 +330,10 @@ export const extractSrc = (htmlString: string): string => {
   const gistMatch = htmlString.match(RE_GH_GIST_EMBED);
   if (gistMatch && gistMatch.length === 2) {
     return gistMatch[1];
+  }
+
+  if (RE_GIPHY.test(htmlString)) {
+    return `https://giphy.com/embed/${RE_GIPHY.exec(htmlString)![1]}`;
   }
 
   const match = htmlString.match(RE_GENERIC_EMBED);

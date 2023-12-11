@@ -121,7 +121,7 @@ export const Hyperlink = ({
           setToast({ message: embedLink.warning, closable: true });
         }
         const ar = embedLink
-          ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+          ? embedLink.intrinsicSize.w / embedLink.intrinsicSize.h
           : 1;
         const hasLinkChanged =
           embeddableLinkCache.get(element.id) !== element.link;
@@ -210,6 +210,7 @@ export const Hyperlink = ({
   };
   const { x, y } = getCoordsForPopover(element, appState);
   if (
+    appState.contextMenu ||
     appState.draggingElement ||
     appState.resizingElement ||
     appState.isRotating ||
@@ -392,7 +393,7 @@ export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
   angle: number,
   appState: Pick<UIAppState, "zoom">,
-): [x: number, y: number, width: number, height: number] => {
+): Bounds => {
   const size = DEFAULT_LINK_SIZE;
   const linkWidth = size / appState.zoom.value;
   const linkHeight = size / appState.zoom.value;

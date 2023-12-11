@@ -94,7 +94,7 @@ export const PasteChartDialog = ({
 
   const handleChartClick = (chartType: ChartType, elements: ChartElements) => {
     onInsertElements(elements);
-    trackEvent("magic", "chart", chartType);
+    trackEvent("paste", "chart", chartType);
     setAppState({
       currentChartType: chartType,
       pasteDialog: {

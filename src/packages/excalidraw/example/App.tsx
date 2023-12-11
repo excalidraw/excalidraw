@@ -76,6 +76,8 @@ const {
   MainMenu,
   LiveCollaborationTrigger,
   convertToExcalidrawElements,
+  TTDDialog,
+  TTDDialogTrigger,
 } = window.ExcalidrawLib;
 
 const COMMENT_ICON_DIMENSION = 32;
@@ -98,6 +100,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
+  const [disableImageTool, setDisableImageTool] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
   const [commentIcons, setCommentIcons] = useState<{ [id: string]: Comment }>(
     {},
@@ -609,6 +612,16 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           <label>
             <input
               type="checkbox"
+              checked={disableImageTool === true}
+              onChange={() => {
+                setDisableImageTool(!disableImageTool);
+              }}
+            />
+            Disable Image Tool
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={isCollaborating}
               onChange={() => {
                 if (!isCollaborating) {
@@ -665,10 +678,12 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         </div>
         <div className="excalidraw-wrapper">
           <Excalidraw
-            ref={(api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api)}
+            excalidrawAPI={(api: ExcalidrawImperativeAPI) =>
+              setExcalidrawAPI(api)
+            }
             initialData={initialStatePromiseRef.current.promise}
             onChange={(elements, state) => {
-              console.info("Elements :", elements, "State : ", state);
+              // console.info("Elements :", elements, "State : ", state);
             }}
             onPointerUpdate={(payload: {
               pointer: { x: number; y: number };
@@ -684,6 +699,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               canvasActions: {
                 loadScene: false,
               },
+              tools: { image: !disableImageTool },
             }}
             renderTopRightUI={renderTopRightUI}
             onLinkOpen={onLinkOpen}
@@ -723,6 +739,20 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               Toggle Custom Sidebar
             </Sidebar.Trigger>
             {renderMenu()}
+            {excalidrawAPI && (
+              <TTDDialogTrigger icon={<span>😀</span>}>
+                Text to diagram
+              </TTDDialogTrigger>
+            )}
+            <TTDDialog
+              onTextSubmit={async (_) => {
+                console.info("submit");
+                // sleep for 2s
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                throw new Error("error, go away now");
+                // return "dummy";
+              }}
+            />
           </Excalidraw>
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
-import ExcalidrawApp from "../excalidraw-app";
+import { Excalidraw } from "../packages/excalidraw/index";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";
@@ -31,7 +31,7 @@ const { h } = window;
 
 describe("move element", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     const canvas = container.querySelector("canvas.interactive")!;
 
     {
@@ -43,7 +43,7 @@ describe("move element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(7);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -67,7 +67,7 @@ describe("move element", () => {
   });
 
   it("rectangles with binding arrow", async () => {
-    await render(<ExcalidrawApp />);
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
 
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
@@ -84,8 +84,8 @@ describe("move element", () => {
     // select the second rectangles
     new Pointer("mouse").clickOn(rectB);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(21);
-    expect(renderStaticScene).toHaveBeenCalledTimes(20);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(24);
+    expect(renderStaticScene).toHaveBeenCalledTimes(19);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
@@ -119,7 +119,7 @@ describe("move element", () => {
 
 describe("duplicate element on move when ALT is clicked", () => {
   it("rectangle", async () => {
-    const { getByToolName, container } = await render(<ExcalidrawApp />);
+    const { getByToolName, container } = await render(<Excalidraw />);
     const canvas = container.querySelector("canvas.interactive")!;
 
     {
@@ -131,7 +131,7 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(7);
+      expect(renderStaticScene).toHaveBeenCalledTimes(6);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();

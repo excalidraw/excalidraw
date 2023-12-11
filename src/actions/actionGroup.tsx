@@ -17,16 +17,13 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import {
-  ExcalidrawElement,
-  ExcalidrawFrameElement,
-  ExcalidrawTextElement,
-} from "../element/types";
+import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
-  groupByFrames,
+  getFrameLikeElements,
+  groupByFrameLikes,
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
@@ -105,7 +102,7 @@ export const actionGroup = register({
     // when it happens, we want to remove elements that are in the frame
     // and are going to be grouped from the frame (mouthful, I know)
     if (groupingElementsFromDifferentFrames) {
-      const frameElementsMap = groupByFrames(selectedElements);
+      const frameElementsMap = groupByFrameLikes(selectedElements);
 
       frameElementsMap.forEach((elementsInFrame, frameId) => {
         nextElements = removeElementsFromFrame(
@@ -190,13 +187,6 @@ export const actionUngroup = register({
 
     let nextElements = [...elements];
 
-    const selectedElements = app.scene.getSelectedElements(appState);
-    const frames = selectedElements
-      .filter((element) => element.frameId)
-      .map((element) =>
-        app.scene.getElement(element.frameId!),
-      ) as ExcalidrawFrameElement[];
-
     const boundTextElementIds: ExcalidrawTextElement["id"][] = [];
     nextElements = nextElements.map((element) => {
       if (isBoundToContainer(element)) {
@@ -221,7 +211,19 @@ export const actionUngroup = register({
       null,
     );
 
-    frames.forEach((frame) => {
+    const selectedElements = app.scene.getSelectedElements(appState);
+
+    const selectedElementFrameIds = new Set(
+      selectedElements
+        .filter((element) => element.frameId)
+        .map((element) => element.frameId!),
+    );
+
+    const targetFrames = getFrameLikeElements(elements).filter((frame) =>
+      selectedElementFrameIds.has(frame.id),
+    );
+
+    targetFrames.forEach((frame) => {
       if (frame) {
         nextElements = replaceAllElementsInFrame(
           nextElements,

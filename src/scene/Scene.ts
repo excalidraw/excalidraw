@@ -2,15 +2,11 @@ import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
-  ExcalidrawFrameElement,
+  ExcalidrawFrameLikeElement,
 } from "../element/types";
-import {
-  getNonDeletedElements,
-  getNonDeletedFrames,
-  isNonDeletedElement,
-} from "../element";
+import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { isFrameElement } from "../element/typeChecks";
+import { isFrameLikeElement } from "../element/typeChecks";
 import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
@@ -66,16 +62,29 @@ class Scene {
   private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapById = new Map<string, Scene>();
 
-  static mapElementToScene(elementKey: ElementKey, scene: Scene) {
+  static mapElementToScene(
+    elementKey: ElementKey,
+    scene: Scene,
+    /**
+     * needed because of frame exporting hack.
+     * elementId:Scene mapping will be removed completely, soon.
+     */
+    mapElementIds = true,
+  ) {
     if (isIdKey(elementKey)) {
+      if (!mapElementIds) {
+        return;
+      }
       // for cases where we don't have access to the element object
       // (e.g. restore serialized appState with id references)
       this.sceneMapById.set(elementKey, scene);
     } else {
       this.sceneMapByElement.set(elementKey, scene);
-      // if mapping element objects, also cache the id string when later
-      // looking up by id alone
-      this.sceneMapById.set(elementKey.id, scene);
+      if (!mapElementIds) {
+        // if mapping element objects, also cache the id string when later
+        // looking up by id alone
+        this.sceneMapById.set(elementKey.id, scene);
+      }
     }
   }
 
@@ -94,8 +103,9 @@ class Scene {
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private elements: readonly ExcalidrawElement[] = [];
-  private nonDeletedFrames: readonly NonDeleted<ExcalidrawFrameElement>[] = [];
-  private frames: readonly ExcalidrawFrameElement[] = [];
+  private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
+    [];
+  private frames: readonly ExcalidrawFrameLikeElement[] = [];
   private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
   private selectedElementsCache: {
     selectedElementIds: AppState["selectedElementIds"] | null;
@@ -166,8 +176,8 @@ class Scene {
     return selectedElements;
   }
 
-  getNonDeletedFrames(): readonly NonDeleted<ExcalidrawFrameElement>[] {
-    return this.nonDeletedFrames;
+  getNonDeletedFramesLikes(): readonly NonDeleted<ExcalidrawFrameLikeElement>[] {
+    return this.nonDeletedFramesLikes;
   }
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
@@ -217,20 +227,23 @@ class Scene {
     return didChange;
   }
 
-  replaceAllElements(nextElements: readonly ExcalidrawElement[]) {
+  replaceAllElements(
+    nextElements: readonly ExcalidrawElement[],
+    mapElementIds = true,
+  ) {
     this.elements = nextElements;
-    const nextFrames: ExcalidrawFrameElement[] = [];
+    const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
     this.elementsMap.clear();
     nextElements.forEach((element) => {
-      if (isFrameElement(element)) {
-        nextFrames.push(element);
+      if (isFrameLikeElement(element)) {
+        nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
       Scene.mapElementToScene(element, this);
     });
     this.nonDeletedElements = getNonDeletedElements(this.elements);
-    this.frames = nextFrames;
-    this.nonDeletedFrames = getNonDeletedFrames(this.frames);
+    this.frames = nextFrameLikes;
+    this.nonDeletedFramesLikes = getNonDeletedElements(this.frames);
 
     this.informMutation();
   }
@@ -261,7 +274,7 @@ class Scene {
   destroy() {
     this.nonDeletedElements = [];
     this.elements = [];
-    this.nonDeletedFrames = [];
+    this.nonDeletedFramesLikes = [];
     this.frames = [];
     this.elementsMap.clear();
     this.selectedElementsCache.selectedElementIds = null;
