@@ -594,7 +594,6 @@ class App extends React.Component<AppProps, AppState> {
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
     if (excalidrawAPI) {
-      console.log("HEY");
       const api: ExcalidrawImperativeAPI = {
         updateScene: this.updateScene,
         updateLibrary: this.library.updateLibrary,
