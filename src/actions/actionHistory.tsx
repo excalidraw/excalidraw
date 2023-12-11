@@ -9,6 +9,7 @@ import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import { ExcalidrawElement } from "../element/types";
 import { fixBindingsAfterDeletion } from "../element/binding";
+import { orderByFractionalIndex } from "../fractionalIndex";
 
 const writeData = (
   appState: Readonly<AppState>,
@@ -28,7 +29,9 @@ const writeData = (
 
     // TODO_UNDO: worth detecting z-index deltas or do we just order based on fractional indices?
     const [nextElementsMap, nextAppState] = result;
-    const nextElements = Array.from(nextElementsMap.values());
+    const nextElements = orderByFractionalIndex(
+      Array.from(nextElementsMap.values()),
+    );
 
     // TODO_UNDO: these are all deleted elements, but ideally we should get just those that were delted at this moment
     const deletedElements = nextElements.filter((element) => element.isDeleted);
@@ -37,7 +40,7 @@ const writeData = (
 
     return {
       appState: nextAppState,
-      elements: Array.from(nextElementsMap.values()),
+      elements: nextElements,
       storeAction: StoreAction.UPDATE,
     };
   }

@@ -40,8 +40,7 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { Action, ActionResult } from "../actions/types";
-import { ActionResult, StoreAction } from "../actions/types";
+import { Action, ActionResult, StoreAction } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
