@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useMemo } from "react";
 import { ActionManager } from "../actions/manager";
 import {
   CLASSES,
