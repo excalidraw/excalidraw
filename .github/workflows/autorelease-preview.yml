@@ -1,15 +1,12 @@
 name: Auto release excalidraw preview
 on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
+  issue_comment:
+    types: [created, edited]
 
 jobs:
   Auto-release-excalidraw-preview:
     name: Auto release preview
-   
+    if: github.event.comment.body == '@excalibot trigger release' && github.event.issue.pull_request
     runs-on: ubuntu-latest
     steps:
       - name: React to release comment
@@ -44,10 +41,10 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Auto release preview123
+      - name: Auto release preview
         id: "autorelease"
         run: |
-          yarn add @actions/core -W
+          yarn add @actions/core
           yarn autorelease preview ${{ github.event.issue.number }}
       - name: Post comment post release
         if: always()
