@@ -31,6 +31,17 @@ We strongly recommend turning it off. You can follow the steps below on how to d
 If disabling this setting doesn't fix the display of text elements, please consider opening an [issue](https://github.com/excalidraw/excalidraw/issues/new) on our GitHub, or message us on [Discord](https://discord.gg/UexuTaE).
 
 
+### ReferenceError: process is not defined
+
+When using `vite` or any build tools, you will have to make sure the `process` is accessible as we are accessing `process.env.IS_PREACT` to decide whether to use `preact` build.
+
+Since Vite removes env variables by default, you can update the vite config to ensure its available :point_down:
+
+```
+ define: {
+    "process.env.IS_PREACT": JSON.stringify("true"),
+  },
+```
 
 ## Need help?
 

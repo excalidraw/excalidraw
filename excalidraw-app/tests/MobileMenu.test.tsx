@@ -1,11 +1,11 @@
-import ExcalidrawApp from "../../excalidraw-app";
+import ExcalidrawApp from "../App";
 import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
-} from "../../src/tests/test-utils";
+} from "../../packages/excalidraw/tests/test-utils";
 
-import { UI } from "../../src/tests/helpers/ui";
+import { UI } from "../../packages/excalidraw/tests/helpers/ui";
 
 describe("Test MobileMenu", () => {
   const { h } = window;
@@ -17,8 +17,10 @@ describe("Test MobileMenu", () => {
 
   beforeEach(async () => {
     await render(<ExcalidrawApp />);
-    //@ts-ignore
-    h.app.refreshDeviceState(h.app.excalidrawContainerRef.current!);
+    // @ts-ignore
+    h.app.refreshViewportBreakpoints();
+    // @ts-ignore
+    h.app.refreshEditorBreakpoints();
   });
 
   afterAll(() => {
@@ -28,11 +30,15 @@ describe("Test MobileMenu", () => {
   it("should set device correctly", () => {
     expect(h.app.device).toMatchInlineSnapshot(`
       {
-        "canDeviceFitSidebar": false,
-        "isLandscape": true,
-        "isMobile": true,
-        "isSmScreen": false,
+        "editor": {
+          "canFitSidebar": false,
+          "isMobile": true,
+        },
         "isTouchScreen": false,
+        "viewport": {
+          "isLandscape": false,
+          "isMobile": true,
+        },
       }
     `);
   });

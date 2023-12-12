@@ -6,16 +6,23 @@
  *
  * - DataState refers to full state of the app: appState, elements, images,
  *   though some state is saved separately (collab username, library) for one
- *   reason or another. We also save different data to different sotrage
+ *   reason or another. We also save different data to different storage
  *   (localStorage, indexedDB).
  */
 
 import { createStore, entries, del, getMany, set, setMany } from "idb-keyval";
-import { clearAppStateForLocalStorage } from "../../src/appState";
-import { clearElementsForLocalStorage } from "../../src/element";
-import { ExcalidrawElement, FileId } from "../../src/element/types";
-import { AppState, BinaryFileData, BinaryFiles } from "../../src/types";
-import { debounce } from "../../src/utils";
+import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
+import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
+import {
+  ExcalidrawElement,
+  FileId,
+} from "../../packages/excalidraw/element/types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+} from "../../packages/excalidraw/types";
+import { debounce } from "../../packages/excalidraw/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
