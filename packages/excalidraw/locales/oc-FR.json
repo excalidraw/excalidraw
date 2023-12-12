@@ -40,7 +40,7 @@
     "arrowhead_bar": "Barra",
     "arrowhead_circle": "",
     "arrowhead_circle_outline": "",
-    "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle": "",
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
@@ -56,7 +56,7 @@
     "veryLarge": "Gradassa",
     "solid": "Solide",
     "hachure": "Raia",
-    "zigzag": "Zigzag",
+    "zigzag": "",
     "crossHatch": "Raia crosada",
     "thin": "Fin",
     "bold": "Espés",
@@ -83,7 +83,7 @@
     "madeWithExcalidraw": "Fabricat amb Excalidraw",
     "group": "Gropar la seleccion",
     "ungroup": "Desunir la seleccion",
-    "collaborators": "Collaborators",
+    "collaborators": "",
     "showGrid": "Afichar la gresilha",
     "addToLibrary": "Apondre a la bibliotèca",
     "removeFromLibrary": "Suprimir de la bibliotèca",
@@ -112,15 +112,15 @@
     "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
-    "createContainerFromText": "Envelopar lo tèxte dins un contenedor",
+    "createContainerFromText": "",
     "link": {
       "edit": "Modificar lo ligam",
-      "editEmbed": "Modificar lo ligam e l’integracion",
+      "editEmbed": "",
       "create": "Crear un ligam",
-      "createEmbed": "Crear un ligam e son integracion",
+      "createEmbed": "",
       "label": "Ligam",
-      "labelEmbed": "Ligam e integracion",
-      "empty": "Cap de ligam pas definit"
+      "labelEmbed": "",
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Modificar la linha",
@@ -134,9 +134,9 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Gardar la barra laterala dobèrta",
-    "selectAllElementsInFrame": "Seleccionar totes los elements del quadre",
-    "removeAllElementsFromFrame": "Tirar totes los elements d’al quadre",
-    "eyeDropper": "Prendre la color a partir d’un canabàs",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
+    "eyeDropper": "",
     "textToDiagram": "",
     "prompt": ""
   },
@@ -172,16 +172,16 @@
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
     "zenMode": "Mòde escur",
-    "objectsSnapMode": "Ancorar als objèctes",
+    "objectsSnapMode": "",
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
     "clear": "Escafar",
     "remove": "Tirar",
-    "embed": "Alternar l’integracion",
+    "embed": "",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
-    "embeddableInteractionButton": "Clicar per interagir"
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -211,7 +211,7 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "failedToFetchImage": "Fracàs de la recuperacion de l’imatge.",
+    "failedToFetchImage": "",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
@@ -229,14 +229,14 @@
       "iframe": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "Empegatge impossible (lectura impossibla a partir del quichapapièrs).",
-    "asyncPasteFailedOnParse": "Empegatge impossible.",
-    "copyToSystemClipboardFailed": "Còpia impossibla al quichapapièrs."
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Seleccion",
     "image": "Inserir imatge",
-    "rectangle": "Rectangle",
+    "rectangle": "",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",
     "arrow": "Sageta",
@@ -248,13 +248,13 @@
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
-    "frame": "Esplech quadre",
+    "frame": "",
     "magicframe": "",
-    "embeddable": "Integracion Web",
-    "laser": "Puntador laser",
+    "embeddable": "",
+    "laser": "",
     "hand": "Man (aisina de desplaçament de la vista)",
-    "extraTools": "Mai d’aisinas",
-    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
     "magicSettings": ""
   },
   "headings": {
@@ -310,7 +310,7 @@
     "shareTitle": "Rejonhètz una session collaborativa sus Excalidraw"
   },
   "errorDialog": {
-    "title": "Error"
+    "title": ""
   },
   "exportDialog": {
     "disk_title": "Salvar al disc",
@@ -333,9 +333,9 @@
     "documentation": "Documentacion",
     "doubleClick": "doble clic",
     "drag": "lisar",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "",
-    "editText": "Modificar lo tèxte / apondre etiqueta",
+    "editText": "",
     "github": "Problèma trobat ? Senhalatz-lo",
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
@@ -392,27 +392,27 @@
     "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
   },
   "imageExportDialog": {
-    "header": "Exportar imatges",
+    "header": "",
     "label": {
-      "withBackground": "Rèireplan",
-      "onlySelected": "Seleccion sonque",
-      "darkMode": "Mòde escur",
-      "embedScene": "Embarcar la scèna",
-      "scale": "Escala",
-      "padding": "Espaçament"
+      "withBackground": "",
+      "onlySelected": "",
+      "darkMode": "",
+      "embedScene": "",
+      "scale": "",
+      "padding": ""
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "Exportar en PNG",
-      "exportToSvg": "Exportar en SVG",
-      "copyPngToClipboard": "Copiar PNG al quichapapièrs"
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
-      "copyPngToClipboard": "Copiar al quichapapièrs"
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
     }
   },
   "encrypted": {
@@ -420,16 +420,16 @@
     "link": "Article de blòg sul chiframent del cap a la fin dins Excalidraw"
   },
   "stats": {
-    "angle": "Angle",
-    "element": "Element",
-    "elements": "Elements",
+    "angle": "",
+    "element": "",
+    "elements": "",
     "height": "Nautor",
     "scene": "Scèna",
     "selected": "Seleccionat",
     "storage": "Emmagazinatge",
     "title": "Estatisticas pels nerds",
-    "total": "Total",
-    "version": "Version",
+    "total": "",
+    "version": "",
     "versionCopy": "Clicar per copiar",
     "versionNotAvailable": "Version pas disponibla",
     "width": "Largor"
@@ -449,20 +449,20 @@
   },
   "colors": {
     "transparent": "Transparéncia",
-    "black": "Negre",
-    "white": "Blanc",
-    "red": "Roge",
-    "pink": "Ròse",
-    "grape": "Bordèu",
-    "violet": "Violet",
-    "gray": "Gris",
-    "blue": "Blau",
-    "cyan": "Cian",
-    "teal": "Sarcèla",
-    "green": "Verd",
-    "yellow": "Jaune",
-    "orange": "Irange",
-    "bronze": "Bronze"
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
+    "grape": "",
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -478,48 +478,48 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "Colors personalizadas mai utilizadas",
-    "colors": "Colors",
-    "shades": "Nuanças",
-    "hexCode": "Còdi exadecimal",
-    "noShades": "Cap de nuança pas disponibla per aquesta color"
+    "mostUsedCustomColors": "",
+    "colors": "",
+    "shades": "",
+    "hexCode": "",
+    "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "Exportar coma imatge",
-        "button": "Exportar coma imatge",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "saveToDisk": {
-        "title": "Salvar al disc",
-        "button": "Salvar al disc",
-        "description": "Exportar las donadas de la scèna cap a un fichièr que podètz importar mai tard."
+        "title": "",
+        "button": "",
+        "description": ""
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
-        "button": "Exportar dins Excalidraw+",
-        "description": "Enregistrar la scèna dins vòstre espaci de trabalh Excalidraw+."
+        "title": "",
+        "button": "",
+        "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "Cargar d’un fichièr",
-        "button": "Cargar d’un fichièr",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "shareableLink": {
-        "title": "Cargar d’un ligam",
-        "button": "Remplaçar mon contengut",
+        "title": "",
+        "button": "",
         "description": ""
       }
     }
   },
   "mermaid": {
-    "title": "De Mermaid cap a Excalidraw",
-    "button": "Inserir",
+    "title": "",
+    "button": "",
     "description": "",
-    "syntax": "Sintaxi Mermaid",
-    "preview": "Apercebut"
+    "syntax": "",
+    "preview": ""
   }
 }
