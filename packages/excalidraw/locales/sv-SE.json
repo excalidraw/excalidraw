@@ -11,8 +11,8 @@
     "copyAsPng": "Kopiera till urklipp som PNG",
     "copyAsSvg": "Kopiera till urklipp som SVG",
     "copyText": "Kopiera till urklipp som text",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Kopiera källa till urklipp",
+    "convertToCode": "Konvertera till kod",
     "bringForward": "Flytta framåt",
     "sendToBack": "Flytta underst",
     "bringToFront": "Flytta främst",
@@ -25,7 +25,7 @@
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
     "strokeStyle": "Linjestil",
-    "strokeStyle_solid": "",
+    "strokeStyle_solid": "Solid",
     "strokeStyle_dashed": "Streckad",
     "strokeStyle_dotted": "Punktad",
     "sloppiness": "Slarvighet",
@@ -38,23 +38,23 @@
     "arrowhead_none": "Inga",
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Stolpe",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Cirkel",
+    "arrowhead_circle_outline": "Cirkel (kontur)",
     "arrowhead_triangle": "Triangel",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triangel (kontur)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (kontur)",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
     "handDrawn": "Handritad",
-    "normal": "",
+    "normal": "Normal",
     "code": "Kod",
     "small": "Liten",
-    "medium": "",
+    "medium": "Medium",
     "large": "Stor",
     "veryLarge": "Mycket stor",
-    "solid": "",
+    "solid": "Solid",
     "hachure": "Skraffering",
     "zigzag": "Sicksack",
     "crossHatch": "Skraffera med kors",
@@ -65,7 +65,7 @@
     "right": "Höger",
     "extraBold": "Extra fet",
     "architect": "Arkitekt",
-    "artist": "",
+    "artist": "Konstnär",
     "cartoonist": "Serietecknare",
     "fileTitle": "Filnamn",
     "colorPicker": "Färgväljare",
@@ -137,7 +137,7 @@
     "selectAllElementsInFrame": "Markera alla element i rutan",
     "removeAllElementsFromFrame": "Ta bort alla element från rutan",
     "eyeDropper": "Välj färg från canvas",
-    "textToDiagram": "",
+    "textToDiagram": "Text till diagram",
     "prompt": ""
   },
   "library": {
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Kopiera PNG till urklipp"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Kopiera till urklipp"
     }
   },
@@ -429,7 +429,7 @@
     "storage": "Lagring",
     "title": "Statistik för nördar",
     "total": "Totalt",
-    "version": "",
+    "version": "Version",
     "versionCopy": "Klicka för att kopiera",
     "versionNotAvailable": "Versionen är inte tillgänglig",
     "width": "Bredd"
@@ -441,7 +441,7 @@
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",
     "fileSaved": "Fil sparad.",
     "fileSavedToFilename": "Sparad till {filename}",
-    "canvas": "",
+    "canvas": "arbetsyta",
     "selection": "markering",
     "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare",
     "unableToEmbed": "Att bädda in denna webbadress är för närvarande inte tillåtet. Skapa en problemrapport på GitHub för att begära att webbadressen vitlistas.",
@@ -461,7 +461,7 @@
     "teal": "Blågrön",
     "green": "Grön",
     "yellow": "Gul",
-    "orange": "",
+    "orange": "Orange",
     "bronze": "Brons"
   },
   "welcomeScreen": {
@@ -497,7 +497,7 @@
         "description": "Exportera scendata till en fil från vilken du kan importera senare."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Exportera till Excalidraw+",
         "description": "Spara skissen till din Excalidraw+ arbetsyta."
       }
@@ -517,9 +517,9 @@
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "Infoga",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "Förhandsgranska"
   }
 }
