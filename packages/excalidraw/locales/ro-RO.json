@@ -11,8 +11,8 @@
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
     "copyText": "Copiere în memoria temporară ca text",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiere sursă în memoria temporară",
+    "convertToCode": "Convertire în cod",
     "bringForward": "Aducere în plan apropiat",
     "sendToBack": "Trimitere în ultimul plan",
     "bringToFront": "Aducere în prim plan",
@@ -38,17 +38,17 @@
     "arrowhead_none": "Niciunul",
     "arrowhead_arrow": "Săgeată",
     "arrowhead_bar": "Bară",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Cerc",
+    "arrowhead_circle_outline": "Cerc (contur)",
     "arrowhead_triangle": "Triunghi",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triunghi (contur)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (contur)",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
     "handDrawn": "Scris de mână",
-    "normal": "",
+    "normal": "Normal",
     "code": "Cod",
     "small": "Mică",
     "medium": "Medie",
@@ -56,7 +56,7 @@
     "veryLarge": "Foarte mare",
     "solid": "Plină",
     "hachure": "Hașură",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Hașură transversală",
     "thin": "Subțire",
     "bold": "Îngroșată",
@@ -65,7 +65,7 @@
     "right": "Dreapta",
     "extraBold": "Extra îngroșată",
     "architect": "Arhitect",
-    "artist": "",
+    "artist": "Artist",
     "cartoonist": "Caricaturist",
     "fileTitle": "Nume de fișier",
     "colorPicker": "Selector de culoare",
@@ -134,11 +134,11 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Păstrează deschisă bara laterală",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Selectează toate elementele din cadru",
+    "removeAllElementsFromFrame": "Elimină toate elementele din cadru",
     "eyeDropper": "Alegere culoare din pânză",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Text la diagramă",
+    "prompt": "Mesaj sistem"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -163,7 +163,7 @@
     "resetZoom": "Resetare transfocare",
     "menu": "Meniu",
     "done": "Efectuat",
-    "edit": "",
+    "edit": "Editare",
     "undo": "Anulare",
     "redo": "Refacere",
     "resetLibrary": "Resetare bibliotecă",
@@ -211,13 +211,13 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Preluarea imaginii a eșuat.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
     "importLibraryError": "Biblioteca nu a putut fi încărcată",
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Imaginile sunt dezactivate.",
     "brave_measure_text_error": {
       "line1": "Se pare că folosești navigatorul Brave cu opțiunea <bold>strictă pentru blocarea amprentării</bold>.",
       "line2": "Acest lucru poate duce la întreruperea <bold>elementelor text</bold> din desene.",
@@ -226,12 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementele încorporabile nu pot fi adăugate la bibliotecă.",
-      "iframe": "",
+      "iframe": "Elementele iFrame nu pot fi adăugate la bibliotecă.",
       "image": "În curând vor putea fi adăugate imagini în bibliotecă!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Lipirea nu a putut fi efectuată (nu s-a putut citit din memoria temporară a sistemului).",
+    "asyncPasteFailedOnParse": "Lipirea nu a putut fi efectuată.",
+    "copyToSystemClipboardFailed": "Nu s-a putut copia în memoria temporară."
   },
   "toolBar": {
     "selection": "Selecție",
@@ -242,20 +242,20 @@
     "arrow": "Săgeată",
     "line": "Linie",
     "freedraw": "Desenare",
-    "text": "",
+    "text": "Text",
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
-    "frame": "",
-    "magicframe": "",
+    "frame": "Instrument cadru",
+    "magicframe": "Structură-de-fire la cod",
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "extraTools": "Mai multe instrumente",
+    "mermaidToExcalidraw": "Mermaid la Excalidraw",
+    "magicSettings": "Setări IA"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -333,7 +333,7 @@
     "documentation": "Documentație",
     "doubleClick": "dublu clic",
     "drag": "glisare",
-    "editor": "",
+    "editor": "Editor",
     "editLineArrowPoints": "Editare puncte de săgeată/rând",
     "editText": "Editare text/adăugare etichetă",
     "github": "Ai întâmpinat o problemă? Trimite un raport",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Copiere PNG în memoria temporară"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Copiere în memoria temporară"
     }
   },
@@ -421,14 +421,14 @@
   },
   "stats": {
     "angle": "Unghi",
-    "element": "",
+    "element": "Element",
     "elements": "Elemente",
     "height": "Înălțime",
     "scene": "Scenă",
     "selected": "Selectate",
     "storage": "Stocare",
     "title": "Statistici pentru pasionați",
-    "total": "",
+    "total": "Total",
     "version": "Versiune",
     "versionCopy": "Clic pentru copiere",
     "versionNotAvailable": "Versiune indisponibilă",
@@ -448,16 +448,16 @@
     "unrecognizedLinkFormat": "URL-ul pe care l-ai încorporat nu coincide cu formatul așteptat. Încearcă să lipești șirul „de încorporat” furnizat de pagina sursă"
   },
   "colors": {
-    "transparent": "",
+    "transparent": "Transparent",
     "black": "Negru",
     "white": "Alb",
     "red": "Roșu",
     "pink": "Roz",
     "grape": "Struguriu",
-    "violet": "",
+    "violet": "Violet",
     "gray": "Gri",
     "blue": "Albastru",
-    "cyan": "",
+    "cyan": "Cyan",
     "teal": "Cyan-verde",
     "green": "Verde",
     "yellow": "Galben",
@@ -497,7 +497,7 @@
         "description": "Exportă datele scenei pe un fișier din care poți importa mai târziu."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Exportare în Excalidraw+",
         "description": "Salvează scena în spațiul de lucru Excalidraw+."
       }
@@ -516,10 +516,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid la Excalidraw",
+    "button": "Introducere",
+    "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "syntax": "Sintaxă Mermaid",
+    "preview": "Previzualizare"
   }
 }
