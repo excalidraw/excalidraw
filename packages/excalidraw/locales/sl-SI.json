@@ -11,8 +11,8 @@
     "copyAsPng": "Kopiraj v odložišče kot PNG",
     "copyAsSvg": "Kopiraj v odložišče kot SVG",
     "copyText": "Kopiraj v odložišče kot besedilo",
-    "copySource": "Kopiraj vir v odložišče",
-    "convertToCode": "Pretvori v kodo",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Postavi naprej",
     "sendToBack": "Pomakni v ozadje",
     "bringToFront": "Pomakni v ospredje",
@@ -38,12 +38,12 @@
     "arrowhead_none": "Brez",
     "arrowhead_arrow": "Puščica",
     "arrowhead_bar": "Palica",
-    "arrowhead_circle": "Krog",
-    "arrowhead_circle_outline": "Krog (oris)",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Trikotnik",
-    "arrowhead_triangle_outline": "Trikotnik (oris)",
-    "arrowhead_diamond": "Diamant",
-    "arrowhead_diamond_outline": "Diamant (oris)",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
@@ -137,8 +137,8 @@
     "selectAllElementsInFrame": "Izberi vse elemente v okvirju",
     "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
     "eyeDropper": "Izberi barvo s platna",
-    "textToDiagram": "Besedilo v diagram",
-    "prompt": "Poziv"
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -217,7 +217,7 @@
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
-    "imageToolNotSupported": "Slike so onemogočene.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo <bold>Agresivno blokiranje prstnih odtisov</bold>.",
       "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
@@ -226,12 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Vdelani elementi ne morejo biti dodani v knjižnico.",
-      "iframe": "Elementov iFrame ni mogoče dodati v knjižnico.",
+      "iframe": "",
       "image": "Podpora za dodajanje slik v knjižnico prihaja kmalu!"
     },
-    "asyncPasteFailedOnRead": "Ni bilo mogoče prilepiti (ni bilo mogoče brati iz sistemskega odložišča).",
-    "asyncPasteFailedOnParse": "Ni bilo mogoče prilepiti.",
-    "copyToSystemClipboardFailed": "Ni bilo mogoče kopirati v odložišče."
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Izbor",
@@ -249,13 +249,13 @@
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
-    "magicframe": "Žični okvir v kodo",
+    "magicframe": "",
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
-    "mermaidToExcalidraw": "Mermaid v Excalidraw",
-    "magicSettings": "Nastavitve AI"
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Kopiraj PNG v odložišče"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Kopiraj v odložišče"
     }
   },
@@ -421,7 +421,7 @@
   },
   "stats": {
     "angle": "Kot",
-    "element": "Element",
+    "element": "",
     "elements": "Elementi",
     "height": "Višina",
     "scene": "Scena",
@@ -497,7 +497,7 @@
         "description": "Izvozite podatke scene v datoteko, iz katere jo lahko pozneje uvozite."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Izvozi v Excalidraw+",
         "description": "Shrani sceno v svoj delovni prostor Excalidraw+."
       }
@@ -516,10 +516,10 @@
     }
   },
   "mermaid": {
-    "title": "Mermaid v Excalidraw",
-    "button": "Vstavi",
-    "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink>, <sequenceLink>diagrami zaporedij</sequenceLink> in <classLink>Razredni diagrami</classLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
-    "syntax": "Sintaksa Mermaid",
-    "preview": "Predogled"
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
