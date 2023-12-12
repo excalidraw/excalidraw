@@ -134,11 +134,11 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Păstrează deschisă bara laterală",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Selectează toate elementele din cadru",
+    "removeAllElementsFromFrame": "Elimină toate elementele din cadru",
     "eyeDropper": "Alegere culoare din pânză",
     "textToDiagram": "Text la diagramă",
-    "prompt": "Solicitare"
+    "prompt": "Mesaj sistem"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -163,7 +163,7 @@
     "resetZoom": "Resetare transfocare",
     "menu": "Meniu",
     "done": "Efectuat",
-    "edit": "Edit",
+    "edit": "Editare",
     "undo": "Anulare",
     "redo": "Refacere",
     "resetLibrary": "Resetare bibliotecă",
@@ -248,12 +248,12 @@
     "penMode": "Mod stilou – împiedică atingerea",
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
-    "frame": "",
+    "frame": "Instrument cadru",
     "magicframe": "Structură-de-fire la cod",
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
-    "extraTools": "",
+    "extraTools": "Mai multe instrumente",
     "mermaidToExcalidraw": "Mermaid la Excalidraw",
     "magicSettings": "Setări IA"
   },
