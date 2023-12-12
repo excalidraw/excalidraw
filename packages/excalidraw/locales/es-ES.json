@@ -11,8 +11,8 @@
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
     "copyText": "Copiar al portapapeles como texto",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiar fuente al portapapeles",
+    "convertToCode": "Convertir a código",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
@@ -39,16 +39,16 @@
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
     "arrowhead_circle": "Círculo",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle_outline": "Círculo (contorno)",
     "arrowhead_triangle": "Triángulo",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triángulo (contorno)",
+    "arrowhead_diamond": "Diamante",
+    "arrowhead_diamond_outline": "Diamante (contorno)",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
     "handDrawn": "Dibujado a mano",
-    "normal": "",
+    "normal": "Normal",
     "code": "Código",
     "small": "Pequeña",
     "medium": "Mediana",
@@ -56,7 +56,7 @@
     "veryLarge": "Muy grande",
     "solid": "Sólido",
     "hachure": "Folleto",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Rayado transversal",
     "thin": "Fino",
     "bold": "Grueso",
@@ -137,8 +137,8 @@
     "selectAllElementsInFrame": "Seleccionar todos los elementos en el marco",
     "removeAllElementsFromFrame": "Eliminar todos los elementos del marco",
     "eyeDropper": "Seleccionar un color del lienzo",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Texto a diagrama",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
@@ -177,7 +177,7 @@
     "cancel": "Cancelar",
     "clear": "Borrar",
     "remove": "Eliminar",
-    "embed": "",
+    "embed": "Alternar incrustación",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
@@ -211,27 +211,27 @@
     "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Error al obtener la imagen.",
     "invalidSVGString": "SVG no válido.",
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
     "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Las imágenes están desactivadas.",
     "brave_measure_text_error": {
       "line1": "Parece que estás usando el navegador Brave con el ajuste <bold>Forzar el bloqueo de huellas digitales</bold> habilitado.",
       "line2": "Esto podría resultar en errores en los <bold>Elementos de Texto</bold> en tus dibujos.",
       "line3": "Recomendamos fuertemente deshabilitar esta configuración. Puedes seguir <link>estos pasos</link> sobre cómo hacerlo.",
-      "line4": ""
+      "line4": "Si deshabilitar esta opción no arregla la visualización de elementos conformados por texto, por favor abre un <issueLink>problema</issueLink> en nuestro GitHub o escríbanos en <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "Los elementos incrustables no pueden ser añadidos a la biblioteca.",
+      "iframe": "Los elementos IFrame no se pueden agregar a la biblioteca.",
+      "image": "¡Soporte para añadir imágenes a la biblioteca muy pronto!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "No se pudo pegar (no se pudo leer desde el portapapeles del sistema).",
+    "asyncPasteFailedOnParse": "No se pudo pegar.",
+    "copyToSystemClipboardFailed": "No se pudo copiar al portapapeles."
   },
   "toolBar": {
     "selection": "Selección",
@@ -248,14 +248,14 @@
     "penMode": "Modo Lápiz - previene toque",
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
     "eraser": "Borrar",
-    "frame": "",
-    "magicframe": "",
+    "frame": "Herramienta Estructura",
+    "magicframe": "Esquema a código",
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
     "hand": "Mano (herramienta de panoramización)",
     "extraTools": "Más herramientas",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "Mermaid a Excalidraw",
+    "magicSettings": "Ajustes IA"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -310,7 +310,7 @@
     "shareTitle": "Únase a una sesión colaborativa en vivo en Excalidraw"
   },
   "errorDialog": {
-    "title": ""
+    "title": "Error"
   },
   "exportDialog": {
     "disk_title": "Guardar en disco",
@@ -325,7 +325,7 @@
   },
   "helpDialog": {
     "blog": "Lea nuestro blog",
-    "click": "",
+    "click": "clic",
     "deepSelect": "Selección profunda",
     "deepBoxSelect": "Seleccione en profundidad dentro de la caja, y evite arrastrar",
     "curvedArrow": "Flecha curva",
@@ -333,7 +333,7 @@
     "documentation": "Documentación",
     "doubleClick": "doble clic",
     "drag": "arrastrar",
-    "editor": "",
+    "editor": "Editor",
     "editLineArrowPoints": "Editar puntos de línea/flecha",
     "editText": "Editar texto / añadir etiqueta",
     "github": "¿Ha encontrado un problema? Envíelo",
@@ -402,7 +402,7 @@
       "padding": "Espaciado"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Los datos de la escena se guardarán en el archivo PNG/SVG exportado, así la escena puede ser restaurada desde la misma. Esto acción aumentará el tamaño del archivo exportado."
     },
     "title": {
       "exportToPng": "Exportar a PNG",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Copiar PNG al portapapeles"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Copiar al portapapeles"
     }
   },
@@ -428,7 +428,7 @@
     "selected": "Seleccionado",
     "storage": "Almacenamiento",
     "title": "Estadísticas para nerds",
-    "total": "",
+    "total": "Total",
     "version": "Versión",
     "versionCopy": "Click para copiar",
     "versionNotAvailable": "Versión no disponible",
@@ -444,8 +444,8 @@
     "canvas": "lienzo",
     "selection": "selección",
     "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un solo elemento,\no pegar en un editor de texto existente",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "Incorporar esta url no está permitido actualmente. Señale esta incidencia en nuestro GitHub para solicitar que esta url esté entre las permitidas",
+    "unrecognizedLinkFormat": "El enlace que incrustó no coincide con el formato esperado. Por favor intente pegar la cadena 'embed' proporcionada por el sitio de origen"
   },
   "colors": {
     "transparent": "Transparente",
@@ -480,16 +480,16 @@
   "colorPicker": {
     "mostUsedCustomColors": "Colores personalizados más utilizados",
     "colors": "Colores",
-    "shades": "",
+    "shades": "Sombras",
     "hexCode": "Código Hexadecimal",
-    "noShades": ""
+    "noShades": "No hay sombras disponibles para este color"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
         "title": "Exportar como imagen",
         "button": "Exportar como imagen",
-        "description": ""
+        "description": "Exporta los datos de la escena como una imagen desde el cual podrás importarlo más tarde."
       },
       "saveToDisk": {
         "title": "Guardar en el disco",
@@ -497,16 +497,16 @@
         "description": "Exporta los datos de la escena a un archivo desde el cual podrás importar más tarde."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Exportar a Excalidraw+",
-        "description": ""
+        "description": "Guarda la escena en su espacio de trabajo de Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
         "title": "Cargar desde un archivo",
         "button": "Cargar desde un archivo",
-        "description": ""
+        "description": "Cargando desde un archivo <bold>reemplazará tu contenido actual</bold> <br></br>Puedes primero hacer una copia de seguridad usando una de las siguientes opciones."
       },
       "shareableLink": {
         "title": "Cargar desde un enlace",
@@ -516,10 +516,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid a Excalidraw",
+    "button": "Insertar",
+    "description": "Actualmente sólo estos tipos de <flowchartLink>diagrama de flujo</flowchartLink>,<sequenceLink> Secuencia, </sequenceLink> y <classLink>Clase </classLink> son soportados. Los otros tipos de diagramas se renderizarán como imagen en Excalidraw.",
+    "syntax": "Sintaxis Mermaid",
+    "preview": "Vista previa"
   }
 }
