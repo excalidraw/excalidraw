@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
+    "pasteAsPlaintext": "",
     "pasteCharts": "Grafikon beillesztése",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
@@ -10,7 +10,7 @@
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
-    "copyText": "Vágólapra másolás szövegként",
+    "copyText": "",
     "copySource": "",
     "convertToCode": "",
     "bringForward": "Előrébb hozás",
@@ -56,7 +56,7 @@
     "veryLarge": "Nagyon nagy",
     "solid": "Kitöltött",
     "hachure": "Vonalkázott",
-    "zigzag": "Cikkcakk",
+    "zigzag": "",
     "crossHatch": "Keresztcsíkozott",
     "thin": "Vékony",
     "bold": "Félkövér",
@@ -75,7 +75,7 @@
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
-    "liveCollaboration": "Élő együttműködés...",
+    "liveCollaboration": "",
     "duplicateSelection": "Duplikálás",
     "untitled": "Névtelen",
     "name": "Név",
@@ -112,12 +112,12 @@
     "increaseFontSize": "Betűméret növelése",
     "unbindText": "Szövegkötés feloldása",
     "bindText": "",
-    "createContainerFromText": "Szöveg bekeretezése",
+    "createContainerFromText": "",
     "link": {
       "edit": "Hivatkozás szerkesztése",
-      "editEmbed": "Link szerkesztése / beágyazása",
+      "editEmbed": "",
       "create": "Hivatkozás létrehozása",
-      "createEmbed": "Link létrehozása / beágyazása",
+      "createEmbed": "",
       "label": "Hivatkozás",
       "labelEmbed": "",
       "empty": ""
@@ -127,10 +127,10 @@
       "exit": ""
     },
     "elementLock": {
-      "lock": "Rögzítés",
-      "unlock": "Rögzítés feloldása",
-      "lockAll": "Összes rögzítése",
-      "unlockAll": "Összes feloldása"
+      "lock": "",
+      "unlock": "",
+      "lockAll": "",
+      "unlockAll": ""
     },
     "statusPublished": "",
     "sidebarLock": "",
@@ -148,12 +148,12 @@
   "buttons": {
     "clearReset": "Vászon törlése",
     "exportJSON": "Exportálás fájlba",
-    "exportImage": "Kép exportálása...",
-    "export": "Mentés másként...",
+    "exportImage": "",
+    "export": "",
     "copyToClipboard": "Vágólapra másolás",
     "save": "Mentés az aktuális fájlba",
     "saveAs": "Mentés másként",
-    "load": "Megnyitás",
+    "load": "",
     "getShareableLink": "Megosztható link létrehozása",
     "close": "Bezárás",
     "selectLanguage": "Nyelv kiválasztása",
@@ -247,13 +247,13 @@
     "lock": "Rajzolás után az aktív eszközt tartsa kijelölve",
     "penMode": "",
     "link": "Hivatkozás hozzáadása/frissítése a kiválasztott alakzathoz",
-    "eraser": "Radír",
+    "eraser": "",
     "frame": "",
     "magicframe": "",
-    "embeddable": "Weblap beágyazása",
-    "laser": "Lézermutató",
+    "embeddable": "",
+    "laser": "",
     "hand": "",
-    "extraTools": "További eszközök",
+    "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
   },
@@ -410,9 +410,9 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
-      "copyPngToClipboard": "Vágólapra másolás"
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
     }
   },
   "encrypted": {
@@ -449,20 +449,20 @@
   },
   "colors": {
     "transparent": "Átlátszó",
-    "black": "Fekete",
-    "white": "Fehér",
-    "red": "Piros",
-    "pink": "Rózsaszín",
+    "black": "",
+    "white": "",
+    "red": "",
+    "pink": "",
     "grape": "",
-    "violet": "Ibolya",
-    "gray": "Szürke",
-    "blue": "Kék",
-    "cyan": "Cián",
-    "teal": "Kékes-zöld",
-    "green": "Zöld",
-    "yellow": "Sárga",
-    "orange": "Narancssárga",
-    "bronze": "Bronz"
+    "violet": "",
+    "gray": "",
+    "blue": "",
+    "cyan": "",
+    "teal": "",
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -481,35 +481,35 @@
     "mostUsedCustomColors": "",
     "colors": "",
     "shades": "",
-    "hexCode": "Hexadecimális kód",
+    "hexCode": "",
     "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "Exportálás képként",
-        "button": "Exportálás képként",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "saveToDisk": {
-        "title": "Mentés a lemezre",
-        "button": "Mentés a lemezre",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "Betöltés fájlból",
-        "button": "Betöltés fájlból",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "shareableLink": {
-        "title": "Feltöltás linkből",
+        "title": "",
         "button": "",
         "description": ""
       }
