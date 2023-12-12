@@ -48,10 +48,10 @@
     "fontFamily": "Fontfamilie",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
-    "normal": "Normal",
+    "normal": "",
     "code": "Kode",
     "small": "Liten",
-    "medium": "Medium",
+    "medium": "",
     "large": "Stor",
     "veryLarge": "Svært stor",
     "solid": "Helfarge",
@@ -238,7 +238,7 @@
     "image": "Sett inn bilde",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
-    "ellipse": "Ellipse",
+    "ellipse": "",
     "arrow": "Pil",
     "line": "Linje",
     "freedraw": "Tegn",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Kopier PNG til utklippstavlen"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Kopier til utklippstavle"
     }
   },
@@ -421,10 +421,10 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "element": "Element",
+    "element": "",
     "elements": "Elementer",
     "height": "Høyde",
-    "scene": "Scene",
+    "scene": "",
     "selected": "Valgt",
     "storage": "Lagring",
     "title": "Statistikk for nerder",
@@ -497,7 +497,7 @@
         "description": "Eksporter scene-dataene til en fil som du kan importere fra senere."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Eksporter til Excalidraw+",
         "description": "Lagre scenen til ditt Excalidraw+-arbeidsområde."
       }
