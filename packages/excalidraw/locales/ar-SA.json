@@ -410,8 +410,8 @@
       "copyPngToClipboard": "نسخ الـ PNG إلى الحافظة"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "نسخ إلى الحافظة"
     }
   },
@@ -497,7 +497,7 @@
         "description": "تصدير بيانات المشهد إلى ملف يمكنك الاستيراد منه لاحقاً."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "تصدير إلى Excalidraw+",
         "description": "حفظ المشهد إلى مساحة العمل +Excalidraw الخاصة بك."
       }
