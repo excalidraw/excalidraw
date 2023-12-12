@@ -410,8 +410,8 @@
       "copyPngToClipboard": "คัดลอก PNG ไปยังคลิปบอร์ด"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "คัดลอกไปยังคลิปบอร์ด"
     }
   },
