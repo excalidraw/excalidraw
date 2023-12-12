@@ -55,7 +55,7 @@
     "large": "Velké",
     "veryLarge": "Velmi velké",
     "solid": "Plný",
-    "hachure": "Hachure",
+    "hachure": "",
     "zigzag": "Klikatě",
     "crossHatch": "Křížový šrafování",
     "thin": "Tenký",
@@ -161,7 +161,7 @@
     "zoomIn": "Přiblížit",
     "zoomOut": "Oddálit",
     "resetZoom": "Resetovat přiblížení",
-    "menu": "Menu",
+    "menu": "",
     "done": "Hotovo",
     "edit": "Upravit",
     "undo": "Zpět",
@@ -242,7 +242,7 @@
     "arrow": "Šipka",
     "line": "Čára",
     "freedraw": "Kreslení",
-    "text": "Text",
+    "text": "",
     "library": "Knihovna",
     "lock": "Po kreslení ponechat vybraný nástroj aktivní",
     "penMode": "Režim Pera - zabránit dotyku",
@@ -333,7 +333,7 @@
     "documentation": "Dokumentace",
     "doubleClick": "dvojklik",
     "drag": "tažení",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "Upravit body linií/šipek",
     "editText": "Upravit text / přidat popis",
     "github": "Našel jsi problém? Nahlaš ho",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Kopírovat PNG do schránky"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Kopírovat do schránky"
     }
   },
