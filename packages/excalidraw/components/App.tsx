@@ -2536,6 +2536,14 @@ class App extends React.Component<AppProps, AppState> {
       this.refreshEditorBreakpoints();
     }
 
+    const hasFollowedPersonLeft =
+      prevState.userToFollow &&
+      !this.state.collaborators.has(prevState.userToFollow.clientId);
+
+    if (hasFollowedPersonLeft) {
+      this.setState({ userToFollow: null });
+    }
+
     const hasScrollChanged =
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY;

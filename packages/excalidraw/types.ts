@@ -311,7 +311,7 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-  /** the user's clientId who is being followed on the canvas */
+  /** the user's clientId & username who is being followed on the canvas */
   userToFollow: UserToFollow | null;
   /** the clientIds of the users following the current user */
   followedBy: Set<string>;
