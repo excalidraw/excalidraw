@@ -410,8 +410,8 @@
       "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪੋਬਰਡ ‘ਤੇ ਕਾਪੀ ਕਰੋ"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "ਗੱਤੇ 'ਤੇ ਕਾਪੀ ਕਰੋ"
     }
   },
