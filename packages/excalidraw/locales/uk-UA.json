@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Скопіювати PNG в буфер обміну"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Копіювати в буфер обміну"
     }
   },
@@ -497,7 +497,7 @@
         "description": "Експорт даних сцени в файл, з якого можна імпортувати пізніше."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Експортувати до Excalidraw+",
         "description": "Зберегти сцену до робочого простору Excalidraw+."
       }
