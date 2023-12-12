@@ -1,7 +1,15 @@
 import { ExcalidrawElement } from "../../src/element/types";
+import {
+  orderByFractionalIndex,
+  validateFractionalIndicies,
+} from "../../src/fractionalIndex";
 import { randomInteger } from "../../src/random";
 import { AppState } from "../../src/types";
 import { reconcileElements } from "../collab/reconciliation";
+import {
+  generateKeyBetween,
+  generateJitteredKeyBetween,
+} from "fractional-indexing-jittered";
 
 const SEPARATOR = ":";
 const NULL_PLACEHOLDER = "x";
@@ -168,5 +176,102 @@ describe("reconcile without fractional indices", () => {
       ["R:2:2:2:x", "R:1:1:1:x"],
     );
     testReconciled(reconciledEls, expectedEls);
+  });
+});
+
+describe("reconcile with fractional indices", () => {
+  it("order by fractional indices", () => {
+    const first = generateKeyBetween(null, null);
+    const second = generateKeyBetween(first, null);
+    const third = generateKeyBetween(second, null);
+
+    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
+      [`L:1:1:1:${first}`, `L:2:1:1:${second}`],
+      // simulates a z-index change for (el.id = 1)
+      [`R:1:2:x:${third}`],
+      [`L:2:1:1${second}`, `R:1:2:x:${third}`],
+    );
+
+    testReconciled(reconciledEls, expectedEls);
+  });
+
+  it("restore when fractional indices duplicate", () => {
+    const first = generateKeyBetween(null, null);
+    const second = generateKeyBetween(first, null);
+    const third = generateKeyBetween(second, null);
+
+    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
+      [`L:1:1:1:${first}`, `L:2:1:1:${second}`, `L:3:1:1:${third}`],
+      // simulates a z-index change for (el.id = 1)
+      [`R:1:2:x:${third}`],
+      [`L:2:1:1${second}`, `R:1:2:x:x`, `L:3:1:1:x`],
+    );
+
+    testReconciled(reconciledEls, expectedEls);
+
+    expect(
+      validateFractionalIndicies(reconciledEls as any as ExcalidrawElement[]),
+    ).toBe(true);
+  });
+
+  it("order by fractional indices - longer", () => {
+    const totalCount = Math.floor(Math.random() * 100 + 10);
+    let nextKey = generateKeyBetween(null, null);
+
+    const local_input: string[] = [];
+    const remote_input: string[] = [];
+    const expected_input: string[] = [];
+
+    for (let i = 0; i < totalCount; i++) {
+      nextKey = generateKeyBetween(nextKey, null);
+      const localStr = `L:${i}:1:x:${nextKey}`;
+      local_input.push(localStr);
+      if (Math.random() > 0.5) {
+        const remoteStr = `R:${i}:2:x:${generateJitteredKeyBetween(
+          nextKey,
+          null,
+        )}`;
+        remote_input.push(remoteStr);
+        expected_input.push(remoteStr);
+      } else {
+        expected_input.push(localStr);
+      }
+    }
+
+    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
+      local_input,
+      remote_input,
+      expected_input,
+    );
+
+    testReconciled(
+      reconciledEls,
+      orderByFractionalIndex(
+        expectedEls as any as ExcalidrawElement[],
+      ) as any as ElementLike[],
+    );
+    expect(
+      validateFractionalIndicies(reconciledEls as any as ExcalidrawElement[]),
+    ).toBe(true);
+
+    const localEls = local_input.map((ls) =>
+      createElementFromString(ls),
+    ) as any as ExcalidrawElement[];
+
+    const localFractionalIndices = new Set(
+      localEls.map((e) => e.fractionalIndex),
+    );
+    const reconciledFractionalIndices = new Set(
+      reconciledEls.map((e) => e.fractionalIndex),
+    );
+
+    let actualDiffCount = 0;
+    for (const fi of localFractionalIndices) {
+      if (!reconciledFractionalIndices.has(fi)) {
+        actualDiffCount += 1;
+      }
+    }
+
+    expect(actualDiffCount).toBe(remote_input.length);
   });
 });
