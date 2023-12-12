@@ -48,7 +48,7 @@
     "fontFamily": "Yazı tipi ailesi",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
     "handDrawn": "El-yazısı",
-    "normal": "Normal",
+    "normal": "",
     "code": "Kod",
     "small": "Küçük",
     "medium": "Orta",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Panoya kopyala"
     }
   },
