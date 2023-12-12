@@ -48,7 +48,7 @@
     "fontFamily": "Tipo de fonte",
     "addWatermark": "Engadir \"Feito con Excalidraw\"",
     "handDrawn": "Debuxado a man",
-    "normal": "Normal",
+    "normal": "",
     "code": "Código",
     "small": "Pequeno",
     "medium": "Mediano",
@@ -56,7 +56,7 @@
     "veryLarge": "Moi grande",
     "solid": "Sólido",
     "hachure": "Folleto",
-    "zigzag": "Zigzag",
+    "zigzag": "",
     "crossHatch": "Raiado transversal",
     "thin": "Estreito",
     "bold": "Groso",
@@ -333,7 +333,7 @@
     "documentation": "Documentación",
     "doubleClick": "dobre-clic",
     "drag": "arrastrar",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "",
     "editText": "",
     "github": "Encontrou un problema? Envíeo",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Copiar PNG ao portapapeis"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Copiar ao portapapeis"
     }
   },
@@ -428,7 +428,7 @@
     "selected": "Seleccionado",
     "storage": "Almacenamento",
     "title": "Estadísticas para nerds",
-    "total": "Total",
+    "total": "",
     "version": "Versión",
     "versionCopy": "Faga clic para copiar",
     "versionNotAvailable": "Versión non dispoñible",
@@ -497,7 +497,7 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Exportar a Excalidraw+",
         "description": ""
       }
