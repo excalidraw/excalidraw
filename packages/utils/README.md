@@ -16,7 +16,7 @@ yarn add @excalidraw/utils
 
 ### `serializeAsJSON`
 
-See [`serializeAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeAsJSON) for API and description.
+See [`serializeAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/excalidraw/README.md#serializeAsJSON) for API and description.
 
 ### `exportToBlob` (async)
 
