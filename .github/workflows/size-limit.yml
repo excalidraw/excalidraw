@@ -15,10 +15,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-      - name: Install
-        run: yarn --frozen-lockfile
       - name: Install in packages/excalidraw
-        run: yarn --frozen-lockfile
+        run: yarn
         working-directory: packages/excalidraw
         env:
           CI: true
