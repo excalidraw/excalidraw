@@ -20,6 +20,7 @@ import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   preventUnload,
   resolvablePromise,
+  throttleRAF,
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../../packages/excalidraw/utils";
@@ -806,7 +807,7 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  relaySceneBounds = throttle((props?: { shouldPerform: boolean }) => {
+  relaySceneBounds = throttleRAF((props?: { shouldPerform: boolean }) => {
     const appState = this.excalidrawAPI.getAppState();
 
     if (appState.followedBy.size > 0 || props?.shouldPerform) {
