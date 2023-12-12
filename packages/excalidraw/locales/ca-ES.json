@@ -11,7 +11,7 @@
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
     "copyText": "Copia al porta-retalls com a text",
-    "copySource": "Copia l'origen al porta-retalls",
+    "copySource": "",
     "convertToCode": "",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
@@ -40,7 +40,7 @@
     "arrowhead_bar": "Barra",
     "arrowhead_circle": "",
     "arrowhead_circle_outline": "",
-    "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle": "",
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
@@ -48,7 +48,7 @@
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
     "handDrawn": "Dibuixat a mà",
-    "normal": "Normal",
+    "normal": "",
     "code": "Codi",
     "small": "Petit",
     "medium": "Mitjà",
@@ -115,12 +115,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Edita l'enllaç",
-      "editEmbed": "Edita l'enllaç i incrusta-ho",
+      "editEmbed": "",
       "create": "Crea un enllaç",
       "createEmbed": "",
       "label": "Enllaç",
       "labelEmbed": "",
-      "empty": "No s'ha definit cap enllaç"
+      "empty": ""
     },
     "lineEditor": {
       "edit": "Editar línia",
@@ -134,8 +134,8 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Manté la barra lateral oberta",
-    "selectAllElementsInFrame": "Selecciona tots els elements del marc",
-    "removeAllElementsFromFrame": "Eliminat tots els elements del marc",
+    "selectAllElementsInFrame": "",
+    "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
     "prompt": ""
@@ -181,7 +181,7 @@
     "publishLibrary": "Publica",
     "submit": "Envia",
     "confirm": "Confirma",
-    "embeddableInteractionButton": "Feu clic per interactuar"
+    "embeddableInteractionButton": ""
   },
   "alerts": {
     "clearReset": "S'esborrarà tot el llenç. N'esteu segur?",
@@ -230,19 +230,19 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "No s'ha pogut enganxar.",
+    "asyncPasteFailedOnParse": "",
     "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selecció",
     "image": "Insereix imatge",
-    "rectangle": "Rectangle",
+    "rectangle": "",
     "diamond": "Rombe",
     "ellipse": "El·lipse",
     "arrow": "Fletxa",
     "line": "Línia",
     "freedraw": "Dibuix",
-    "text": "Text",
+    "text": "",
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "Mode de llapis - evita tocar",
@@ -254,8 +254,8 @@
     "laser": "",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "",
-    "mermaidToExcalidraw": "De Mermaid a Excalidraw",
-    "magicSettings": "Preferències d'IA"
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -310,7 +310,7 @@
     "shareTitle": "Uniu-vos a una sessió de col·laboració en directe a Excalidraw"
   },
   "errorDialog": {
-    "title": "Error"
+    "title": ""
   },
   "exportDialog": {
     "disk_title": "Desa al disc",
@@ -333,7 +333,7 @@
     "documentation": "Documentació",
     "doubleClick": "doble clic",
     "drag": "arrossega",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "",
     "editText": "",
     "github": "Hi heu trobat un problema? Informeu-ne",
@@ -395,8 +395,8 @@
     "header": "",
     "label": {
       "withBackground": "",
-      "onlySelected": "Només els seleccionats",
-      "darkMode": "Mode fosc",
+      "onlySelected": "",
+      "darkMode": "",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -405,12 +405,12 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "Exporta a PNG",
-      "exportToSvg": "Exporta a SVG",
-      "copyPngToClipboard": "Copia el PNG al porta-retalls"
+      "exportToPng": "",
+      "exportToSvg": "",
+      "copyPngToClipboard": ""
     },
     "button": {
-      "exportToPng": "PNG",
+      "exportToPng": "",
       "exportToSvg": "",
       "copyPngToClipboard": ""
     }
@@ -420,15 +420,15 @@
     "link": "Article del blog sobre encriptació d'extrem a extrem a Excalidraw"
   },
   "stats": {
-    "angle": "Angle",
-    "element": "Element",
-    "elements": "Elements",
+    "angle": "",
+    "element": "",
+    "elements": "",
     "height": "Altura",
     "scene": "Escena",
     "selected": "Seleccionat",
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
-    "total": "Total",
+    "total": "",
     "version": "Versió",
     "versionCopy": "Feu clic per a copiar",
     "versionNotAvailable": "Versió no disponible",
@@ -448,7 +448,7 @@
     "unrecognizedLinkFormat": ""
   },
   "colors": {
-    "transparent": "Transparent",
+    "transparent": "",
     "black": "",
     "white": "",
     "red": "",
@@ -459,10 +459,10 @@
     "blue": "",
     "cyan": "",
     "teal": "",
-    "green": "Verd",
-    "yellow": "Groc",
-    "orange": "Taronja",
-    "bronze": "Bronze"
+    "green": "",
+    "yellow": "",
+    "orange": "",
+    "bronze": ""
   },
   "welcomeScreen": {
     "app": {
@@ -487,13 +487,13 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "Exporta com a imatge",
-        "button": "Exporta com a imatge",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "saveToDisk": {
-        "title": "Desa al disc",
-        "button": "Desa al disc",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "excalidrawPlus": {
@@ -504,22 +504,22 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "Carrega des d'un fitxer",
-        "button": "Carrega des d'un fitxer",
+        "title": "",
+        "button": "",
         "description": ""
       },
       "shareableLink": {
-        "title": "Carrega des d'un enllaç",
+        "title": "",
         "button": "",
         "description": ""
       }
     }
   },
   "mermaid": {
-    "title": "De Mermaid a Excalidraw",
-    "button": "Insereix",
+    "title": "",
+    "button": "",
     "description": "",
-    "syntax": "Sintaxi de Mermaid",
-    "preview": "Previsualització"
+    "syntax": "",
+    "preview": ""
   }
 }
