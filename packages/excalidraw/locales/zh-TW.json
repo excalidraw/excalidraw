@@ -11,6 +11,8 @@
     "copyAsPng": "以PNG格式儲存到剪貼板",
     "copyAsSvg": "以SVG格式複製到剪貼板",
     "copyText": "以文字格式複製至剪貼簿",
+    "copySource": "複製來源至剪貼簿",
+    "convertToCode": "轉換為程式碼",
     "bringForward": "上移一層",
     "sendToBack": "移到最底層",
     "bringToFront": "置於最頂層",
@@ -36,8 +38,12 @@
     "arrowhead_none": "無",
     "arrowhead_arrow": "箭頭",
     "arrowhead_bar": "條狀箭頭",
-    "arrowhead_dot": "點箭頭",
+    "arrowhead_circle": "圓形",
+    "arrowhead_circle_outline": "圓形（外框）",
     "arrowhead_triangle": "三角形",
+    "arrowhead_triangle_outline": "三角形（外框）",
+    "arrowhead_diamond": "菱形",
+    "arrowhead_diamond_outline": "菱形（外框）",
     "fontSize": "字型大小",
     "fontFamily": "字體集",
     "addWatermark": "加上 \"Made with Excalidraw\" 浮水印",
@@ -130,7 +136,9 @@
     "sidebarLock": "側欄維持開啟",
     "selectAllElementsInFrame": "選取框架內的所有元素",
     "removeAllElementsFromFrame": "從框架內移除所有元素",
-    "eyeDropper": "從畫布中選取顏色"
+    "eyeDropper": "從畫布中選取顏色",
+    "textToDiagram": "文字轉圖表",
+    "prompt": "提示詞"
   },
   "library": {
     "noItems": "尚未加入任何物件...",
@@ -209,6 +217,7 @@
     "importLibraryError": "無法載入資料庫",
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
     "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
+    "imageToolNotSupported": "圖片已停用",
     "brave_measure_text_error": {
       "line1": "看起來您開啟了 Brave 瀏覽器的 <bold>Aggressively Block Fingerprinting</bold> 設定。",
       "line2": "這可能造成您畫布中 <bold>文字元素</bold> 的異常。",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "可嵌入元素無法加入資料庫",
+      "iframe": "IFrame 元素無法加入資料庫",
       "image": "即將支援加入圖片至資料庫！"
-    }
+    },
+    "asyncPasteFailedOnRead": "無法貼上（無法由系統剪貼簿讀入）",
+    "asyncPasteFailedOnParse": "無法貼上",
+    "copyToSystemClipboardFailed": "無法複製至剪貼簿"
   },
   "toolBar": {
     "selection": "選取",
@@ -236,10 +249,13 @@
     "link": "為所選的形狀增加\b/更新連結",
     "eraser": "橡皮擦",
     "frame": "框架工具",
+    "magicframe": "線框稿轉為程式碼",
     "embeddable": "嵌入網站",
     "laser": "雷射筆",
     "hand": "手形（平移工具）",
-    "extraTools": "更多工具"
+    "extraTools": "更多工具",
+    "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
+    "magicSettings": "AI 設定"
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -498,5 +514,12 @@
         "description": "載入外部繪圖將<bold>取代您目前的內容</bold>。<br></br>可先使用下方的選項備份您的繪圖。"
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid 至 Excalidraw",
+    "button": "插入",
+    "description": "目前僅支援 <flowchartLink>Flowchart</flowchartLink> 、 <sequenceLink>Sequence</sequenceLink> 及 <classLink>Class </classLink> 圖表。其餘檔案類型在 Excalidraw 將會以圖像呈現。",
+    "syntax": "Mermaid 語法",
+    "preview": "預覽"
   }
 }

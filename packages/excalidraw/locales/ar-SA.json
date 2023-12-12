@@ -11,6 +11,8 @@
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
     "copyText": "نسخ إلى الحافظة كنص",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
@@ -36,8 +38,12 @@
     "arrowhead_none": "لا شيء",
     "arrowhead_arrow": "سهم",
     "arrowhead_bar": "شريط",
-    "arrowhead_dot": "نقطة",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "مثلث",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "إبقاء الشريط الجانبي مفتوح",
     "selectAllElementsInFrame": "تحديد جميع العناصر في الإطار",
     "removeAllElementsFromFrame": "إزالة جميع العناصر من الإطار",
-    "eyeDropper": "اختيار اللون من القماش"
+    "eyeDropper": "اختيار اللون من القماش",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -209,6 +217,7 @@
     "importLibraryError": "تعذر تحميل المكتبة",
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "يبدو أنك تستخدم متصفح Brave مع إعداد <bold>حظر صارم لتتبع البصمة</bold>.",
       "line2": "قد يؤدي هذا إلى كسر <bold>عناصر النص</bold> في الرسومات الخاصة بك.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "لا يمكن إضافة العناصر القابلة للتضمين في المكتبة.",
+      "iframe": "",
       "image": "سوف يتم دعم إضافة صور إلى المكتبة قريباً!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "تحديد",
@@ -236,10 +249,13 @@
     "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
     "frame": "أداة الإطار",
+    "magicframe": "",
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
     "hand": "يد (أداة الإزاحة)",
-    "extraTools": "المزيد من أﻷدوات"
+    "extraTools": "المزيد من أﻷدوات",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -498,5 +514,12 @@
         "description": "سيتسبب تحميل رسمة خارجية <bold>باستبدال محتواك الموجود حالياً</bold>.<br></br>بإمكانك إجراء النسخ الاحتياطي لرسمتك الحالية باستخدام أحد الخيارات أدناه."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

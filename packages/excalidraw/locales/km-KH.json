@@ -11,6 +11,8 @@
     "copyAsPng": "ចម្លងទៅក្តារតម្បៀតខ្ទាស់ជា​ PNG",
     "copyAsSvg": "ចម្លងទៅក្តារតម្បៀតខ្ទាស់ជា​ SVG",
     "copyText": "ចម្លងទៅក្តារតម្បៀតខ្ទាស់ជា​អត្ថបទ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "នាំយកទៅលើ",
     "sendToBack": "នាំយកទៅក្រោយបង្អស់",
     "bringToFront": "នាំយកទៅលើបង្អស់",
@@ -36,8 +38,12 @@
     "arrowhead_none": "គ្មាន",
     "arrowhead_arrow": "ព្រួញ",
     "arrowhead_bar": "របារ",
-    "arrowhead_dot": "ចំណុច",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "ត្រីកោណ",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "ទំហំពុម្ពអក្សរ",
     "fontFamily": "ក្រុម​ពុម្ពអក្សរ",
     "addWatermark": "បន្ថែមវ៉ាត់ធើម៉ាក \"Made with Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "ទុករបារចំហៀងបើក",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
@@ -209,6 +217,7 @@
     "importLibraryError": "មិនអាចផ្ទុកបណ្ណាល័យបានទេ។",
     "collabSaveFailed": "មិនអាចរក្សាទុកទៅម៉ាស៊ីនមេបានទេ។ ប្រសិនបើបញ្ហានៅតែបន្តកើតមាន​ អ្នកគួរតែរក្សាទុកឯកសាររបស់អ្នកនៅលើកុំព្យូទ័ររបស់អ្នកសិន ដើម្បីធានាថាការងាររបស់អ្នកមិនបាត់បង់។",
     "collabSaveFailed_sizeExceeded": "មិនអាចរក្សាទុកទៅម៉ាស៊ីនមេបានទេ, ផ្ទាំងបាវហាក់ដូចជាធំពេក។ អ្នកគួរតែរក្សាទុកឯកសាររបស់អ្នកនៅលើកុំព្យូទ័ររបស់អ្នកសិន ដើម្បីធានាថាការងាររបស់អ្នកមិនបាត់បង់។",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "អ្នកហាក់ដូចជាកំពុងប្រើប្រាស់កម្មវិធីរុករកតាមអ៊ីនធឺណិត Brave ជាមួយនឹងការកំណត់ <bold>ការពារស្នាមម្រាមដៃយ៉ាងធ្ងន់ធ្ងរ</bold> ត្រូវបានបើក។",
       "line2": "វាអាចបណ្តាលឱ្យមានការបំបែក <bold>ធាតុអត្ថបទ</bold> នៅក្នុងគំនូររបស់អ្នក។",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "ការជ្រើសរើស",
@@ -236,10 +249,13 @@
     "link": "បន្ថែម/ធ្វើបច្ចុប្បន្នភាពតំណភ្ជាប់សម្រាប់រូបរាងដែលបានជ្រើសរើស",
     "eraser": "ជ័រលុប",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "ដៃ (panning tool)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "សកម្មភាពបាវ",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
