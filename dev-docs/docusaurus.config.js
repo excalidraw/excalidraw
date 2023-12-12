@@ -41,10 +41,7 @@ const config = {
           showLastUpdateTime: true,
         },
         theme: {
-          customCss: [
-            require.resolve("./src/css/custom.scss"),
-            require.resolve("../packages/excalidraw/example/App.scss"),
-          ],
+          customCss: [require.resolve("./src/css/custom.scss")],
         },
       }),
     ],

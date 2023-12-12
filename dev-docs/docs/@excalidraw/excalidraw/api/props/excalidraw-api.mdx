@@ -2,7 +2,7 @@
 
 <pre>
   (api:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L616">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L616">
     ExcalidrawAPI
   </a>
   ) => void;
@@ -17,7 +17,7 @@ export default function App() {
 }
 ```
 
-You can use this prop when you want to access some [Excalidraw APIs](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L616). We expose the below APIs :point_down:
+You can use this prop when you want to access some [Excalidraw APIs](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L616). We expose the below APIs :point_down:
 
 | API | Signature | Usage |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ Additionally `ready` and `readyPromise` from the API have been discontinued. The
 
 <pre>
   (scene:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L339">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L339">
     sceneData
   </a>
   ) => void
@@ -62,9 +62,9 @@ You can use this function to update the scene with the sceneData. It accepts the
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L38) | The `elements` to be updated in the scene |
-| `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L39) | The `appState` to be updated in the scene. |
-| `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
+| `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
+| `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
+| `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
 | `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
 
 ```jsx live
@@ -125,13 +125,13 @@ function App() {
 
 <pre>
   (opts: &#123; <br /> libraryItems:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L249">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L249">
     LibraryItemsSource
   </a>
   ;<br /> merge?: boolean; <br /> prompt?: boolean;
   <br /> openLibraryMenu?: boolean;
   <br /> defaultStatus?: "unpublished" | "published"; <br /> &#125;) => Promise&lt;
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L246">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L246">
     LibraryItems
   </a>
   &gt;
@@ -141,7 +141,7 @@ You can use this function to update the library. It accepts the below attributes
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `libraryItems` | [LibraryItemsSource](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L249) | \_ | The `libraryItems` to be replaced/merged with current library |
+| `libraryItems` | [LibraryItemsSource](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L249) | \_ | The `libraryItems` to be replaced/merged with current library |
 | `merge` | boolean | `false` | Whether to merge with existing library items. |
 | `prompt` | boolean | `false` | Whether to prompt user for confirmation. |
 | `openLibraryMenu` | boolean | `false` | Keep the library menu open after library is updated. |
@@ -189,7 +189,7 @@ function App() {
       </button>
       <Excalidraw
         ref={(api) => setExcalidrawAPI(api)}
-        // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/src/initialData.js
+        // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
         initialData={{
           libraryItems: initialData.libraryItems,
           appState: { openSidebar: "library" },
@@ -204,7 +204,7 @@ function App() {
 
 <pre>
   (files:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L59">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L59">
     BinaryFileData
   </a>
   ) => void
@@ -224,7 +224,7 @@ Resets the scene. If `resetLoadingState` is passed as true then it will also for
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
     ExcalidrawElement[]
   </a>
 </pre>
@@ -235,7 +235,7 @@ Returns all the elements including the deleted in the scene.
 
 <pre>
   () => NonDeleted&#60;
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
     ExcalidrawElement
   </a>
   []&#62;
@@ -247,7 +247,7 @@ Returns all the elements excluding the deleted in the scene
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
     AppState
   </a>
 </pre>
@@ -288,7 +288,7 @@ Scroll the nearest element out of the elements supplied to the center of the vie
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
 | opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
 | opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
 | opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
@@ -336,7 +336,7 @@ The unique id of the excalidraw component. This can be used to identify the exca
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L82">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L82">
     files
   </a>
 </pre>
@@ -364,7 +364,7 @@ This API has the below signature. It sets the `tool` passed in param as the acti
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L91) | `selection` | The tool type which should be set as active tool. When setting `image` as active tool, the insertion onto canvas when using image tool is disabled by default, so you can enable it by setting `insertOnCanvasDirectly` to `true` |
+| `type` | [ToolType](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L91) | `selection` | The tool type which should be set as active tool. When setting `image` as active tool, the insertion onto canvas when using image tool is disabled by default, so you can enable it by setting `insertOnCanvasDirectly` to `true` |
 | `locked` | `boolean` | `false` | Indicates whether the the active tool should be locked. It behaves the same way when using the `lock` tool in the editor interface |
 
 ## setCursor

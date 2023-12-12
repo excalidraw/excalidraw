@@ -23,7 +23,7 @@ All `props` are _optional_.
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
-| [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
+| [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](#canvasactions) |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
@@ -33,7 +33,7 @@ All `props` are _optional_.
 
 ### Storing custom data on Excalidraw elements
 
-Beyond attributes that Excalidraw elements already support, you can store `custom` data on each `element` in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L66) and is optional.
+Beyond attributes that Excalidraw elements already support, you can store `custom` data on each `element` in a `customData` object. The type of the attribute is [`Record<string, any>`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L66) and is optional.
 
 You can use this to add any extra information you need to keep track of.
 
@@ -59,11 +59,11 @@ Every time component updates, this callback if passed will get triggered and has
 (excalidrawElements, appState, files) => void;
 ```
 
-1. `excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114) in the scene.
+1. `excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) in the scene.
 
-2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95) of the scene.
+2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) of the scene.
 
-3. `files`: The [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L64) which are added to the scene.
+3. `files`: The [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L64) which are added to the scene.
 
 Here you can try saving the data to your backend or local storage for example.
 
@@ -79,14 +79,14 @@ This callback is triggered when mouse pointer is updated.
 
 2.`button`: The position of the button. This will be one of `["down", "up"]`
 
-3.`pointersMap`: [`pointers`](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L131) map of the scene
+3.`pointersMap`: [`pointers`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L131) map of the scene
 
 ```js
 (exportedElements, appState, canvas) => void
 ```
 
-1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L87) which needs to be exported.
-2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95) of the scene.
+1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L87) which needs to be exported.
+2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) of the scene.
 3. `canvas`: The `HTMLCanvasElement` of the scene.
 
 ### onPointerDown
@@ -96,11 +96,11 @@ This prop if passed will be triggered on pointer down events and has the below s
 
 <pre>
 (activeTool:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L115">
     {" "}
     AppState["activeTool"]
   </a>
-  , pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L424">
+  , pointerDownState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L424">
     PointerDownState
   </a>) => void
 </pre>
@@ -119,7 +119,7 @@ This callback is triggered if passed when something is pasted into the scene. Yo
 
 <pre>
   (data:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/clipboard.ts#L18">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/clipboard.ts#L18">
     ClipboardData
   </a>
   , event: ClipboardEvent &#124; null) => boolean
@@ -135,7 +135,7 @@ This callback if supplied will get triggered when the library is updated and has
 
 <pre>
   (items:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L200">
     LibraryItems
   </a>
   ) => void | Promise&lt;any&gt;
@@ -149,7 +149,7 @@ This prop if passed will be triggered when clicked on `link`. To handle the redi
 
 <pre>
   (element:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
     ExcalidrawElement
   </a>
   , event: CustomEvent&lt;&#123; nativeEvent: MouseEvent }&gt;) => void
@@ -182,7 +182,7 @@ const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
 
 ### langCode
 
-Determines the `language` of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
+Determines the `language` of the UI. It should be one of the [available language codes](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/i18n.ts#L14). Defaults to `en` (English). We also export default language and supported languages which you can import as shown below.
 
 ```js
 import { defaultLang, languages } from "@excalidraw/excalidraw";
@@ -191,7 +191,7 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 | name | type |
 | --- | --- |
 | `defaultLang` | `string` |
-| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
+| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/i18n.ts#L15) |
 
 ### viewModeEnabled
 
