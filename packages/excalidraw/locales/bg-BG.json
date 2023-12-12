@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Копирай PNG в клипборда"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Копиране в клипборда"
     }
   },
@@ -497,7 +497,7 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Експортирай към Excalidraw+",
         "description": "Запази сцената към Excalidraw+ работното място."
       }
