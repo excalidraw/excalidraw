@@ -11,6 +11,8 @@
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
     "copyText": "Copier dans le presse-papier en tant que texte",
+    "copySource": "Copier la source dans le presse-papiers",
+    "convertToCode": "Convertir en code",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Déplacer à l'arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Sans",
     "arrowhead_arrow": "Flèche",
     "arrowhead_bar": "Barre",
-    "arrowhead_dot": "Point",
+    "arrowhead_circle": "Cercle",
+    "arrowhead_circle_outline": "Contour du cercle",
     "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "Triangle (contour)",
+    "arrowhead_diamond": "Losange",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
@@ -113,7 +119,7 @@
       "create": "Ajouter un lien",
       "createEmbed": "Créer un lien & intégrer",
       "label": "Lien",
-      "labelEmbed": "",
+      "labelEmbed": "Lier & intégrer",
       "empty": "Aucun lien défini"
     },
     "lineEditor": {
@@ -130,7 +136,9 @@
     "sidebarLock": "Maintenir la barre latérale ouverte",
     "selectAllElementsInFrame": "Sélectionner tous les éléments du cadre",
     "removeAllElementsFromFrame": "Supprimer tous les éléments du cadre",
-    "eyeDropper": ""
+    "eyeDropper": "Choisir la couleur depuis la toile",
+    "textToDiagram": "Texte vers Diagramme",
+    "prompt": "Consignes"
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -203,12 +211,13 @@
     "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Échec de récupération de l'image.",
     "invalidSVGString": "SVG invalide.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
     "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
+    "imageToolNotSupported": "Les images sont désactivées.",
     "brave_measure_text_error": {
       "line1": "On dirait que vous utilisez le navigateur Brave avec l'option <bold>Bloquer agressivement le fichage</bold> activée.",
       "line2": "Cela pourrait entraîner des problèmes avec les <bold>Éléments Textuels</bold> dans vos dessins.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Les éléments intégrés ne peuvent pas être ajoutés à la librairie.",
+      "iframe": "",
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
-    }
+    },
+    "asyncPasteFailedOnRead": "Impossible de coller (impossible de lire le presse-papiers système).",
+    "asyncPasteFailedOnParse": "Impossible de coller.",
+    "copyToSystemClipboardFailed": "Échec de la copie dans le presse-papiers."
   },
   "toolBar": {
     "selection": "Sélection",
@@ -236,10 +249,13 @@
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme",
     "frame": "Outil de cadre",
+    "magicframe": "",
     "embeddable": "Intégration Web",
-    "laser": "",
+    "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
-    "extraTools": "Plus d'outils"
+    "extraTools": "Plus d'outils",
+    "mermaidToExcalidraw": "De Mermaid à Excalidraw",
+    "magicSettings": "Paramètres IA"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -383,7 +399,7 @@
       "darkMode": "Mode sombre",
       "embedScene": "Intégrer la scène",
       "scale": "Échelle",
-      "padding": ""
+      "padding": "Marge interne"
     },
     "tooltip": {
       "embedScene": "Les données de la scène seront sauvegardées dans le fichier PNG/SVG exporté afin que la scène puisse être restaurée depuis celui-ci.\nCela augmentera la taille du fichier exporté."
@@ -498,5 +514,12 @@
         "description": "Charger un dessin externe va <bold>remplacer votre contenu existant</bold>.<br></br>Vous pouvez d'abord sauvegarder votre dessin en utilisant l'une des options ci-dessous."
       }
     }
+  },
+  "mermaid": {
+    "title": "De Mermaid à Excalidraw",
+    "button": "Insérer",
+    "description": "",
+    "syntax": "Syntaxe Mermaid",
+    "preview": "Prévisualisation"
   }
 }

@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar para a área de transferência como PNG",
     "copyAsSvg": "Copiar para a área de transferência como SVG",
     "copyText": "Copiar para área de transferência como texto",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Trazer para a frente",
     "sendToBack": "Enviar para o fundo",
     "bringToFront": "Trazer para o primeiro plano",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Nenhuma",
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Ponto",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Triângulo",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fonte",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Manter barra lateral aberta",
     "selectAllElementsInFrame": "Selecionar todos os elementos no quadro",
     "removeAllElementsFromFrame": "Remover todos os elementos do quadro",
-    "eyeDropper": "Escolher cor da tela"
+    "eyeDropper": "Escolher cor da tela",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Não foi possível carregar a biblioteca",
     "collabSaveFailed": "Não foi possível salvar no banco de dados do servidor. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível salvar no banco de dados do servidor, a tela parece ser muito grande. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "Parece que você está usando o navegador Brave com a configuração <bold>Bloquear Impressões Digitais</bold> no modo agressivo.",
       "line2": "Isso pode acabar quebrando <bold>Elementos de Texto</bold> em seus desenhos.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Seleção",
@@ -236,10 +249,13 @@
     "link": "Adicionar/Atualizar link para uma forma selecionada",
     "eraser": "Borracha",
     "frame": "Ferramenta de quadro",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Mão (ferramenta de rolagem)",
-    "extraTools": "Mais ferramentas"
+    "extraTools": "Mais ferramentas",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -498,5 +514,12 @@
         "description": "Carregar um desenho externo irá <bold> substituir seu conteúdo existente</bold>.<br></br>Você pode salvar seu desenho antes utilizando uma das opções abaixo."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

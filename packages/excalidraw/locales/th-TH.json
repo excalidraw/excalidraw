@@ -11,6 +11,8 @@
     "copyAsPng": "คัดลองไปยังคลิปบอร์ดเป็น PNG",
     "copyAsSvg": "คัดลองไปยังคลิปบอร์ดเป็น SVG",
     "copyText": "คัดลองไปยังคลิปบอร์ดเป็นข้อความ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "นำขึ้นข้างบน",
     "sendToBack": "ย้ายไปข้างล่าง",
     "bringToFront": "นำขึ้นข้างหน้า",
@@ -36,8 +38,12 @@
     "arrowhead_none": "ไม่มี",
     "arrowhead_arrow": "ลูกศร",
     "arrowhead_bar": "แถบ",
-    "arrowhead_dot": "จุด",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "สามเหลี่ยม",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "ขนาดตัวอักษร",
     "fontFamily": "แบบตัวอักษร",
     "addWatermark": "เพิ่มลายน้ำ \"สร้างด้วย Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
@@ -209,6 +217,7 @@
     "importLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "การเพิ่มองค์ประกอบที่ฝังยังไม่สามารถเพิ่มเข้าไปในไลบลารีได้",
+      "iframe": "",
       "image": "การสนับสนุนสำหรับเพิ่มรูปภาพลงในไลบลารีจะมาในเร็ว ๆ นี้"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "",
@@ -236,10 +249,13 @@
     "link": "",
     "eraser": "ยางลบ",
     "frame": "",
+    "magicframe": "",
     "embeddable": "ฝังเว็บ",
     "laser": "",
     "hand": "",
-    "extraTools": "เครื่องมืออื่นๆ"
+    "extraTools": "เครื่องมืออื่นๆ",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

@@ -9,8 +9,10 @@
     "cut": "Qıyıw",
     "copy": "Kóshirip alıw",
     "copyAsPng": "Almasıw buferine PNG retinde kóshirip alıw",
-    "copyAsSvg": "",
-    "copyText": "",
+    "copyAsSvg": "Almasıw buferine SVG retinde kóshirip alıw",
+    "copyText": "Almasıw buferine tekst retinde kóshirip alıw",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -33,19 +35,23 @@
     "sharp": "",
     "round": "",
     "arrowheads": "",
-    "arrowhead_none": "",
+    "arrowhead_none": "Joq",
     "arrowhead_arrow": "Jebe",
     "arrowhead_bar": "",
-    "arrowhead_dot": "Noqat",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Shrift ólshemi",
-    "fontFamily": "",
+    "fontFamily": "Shrift toplamı",
     "addWatermark": "",
     "handDrawn": "",
     "normal": "",
     "code": "Kod",
     "small": "",
-    "medium": "",
+    "medium": "Ortasha",
     "large": "Úlken",
     "veryLarge": "Júdá úlken",
     "solid": "",
@@ -59,14 +65,14 @@
     "right": "",
     "extraBold": "",
     "architect": "",
-    "artist": "",
+    "artist": "Súwretshi",
     "cartoonist": "",
     "fileTitle": "Fayl ataması",
-    "colorPicker": "",
+    "colorPicker": "Reńdi tańlaw",
     "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
-    "layers": "",
+    "layers": "Qatlamlar",
     "actions": "Háreketler",
     "language": "Til",
     "liveCollaboration": "",
@@ -130,7 +136,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "",
@@ -170,7 +178,7 @@
     "clear": "Tazalaw",
     "remove": "Óshiriw",
     "embed": "",
-    "publishLibrary": "",
+    "publishLibrary": "Jariyalaw",
     "submit": "Jiberiw",
     "confirm": "Tastıyıqlaw",
     "embeddableInteractionButton": ""
@@ -209,6 +217,7 @@
     "importLibraryError": "Kitapxananı júklew ámelge aspadı",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "",
@@ -236,10 +249,13 @@
     "link": "",
     "eraser": "Óshirgish",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "",
@@ -271,7 +287,7 @@
     "disableSnapping": ""
   },
   "canvasError": {
-    "cannotShowPreview": "",
+    "cannotShowPreview": "Aldınnan kóriwdi kórsetiw múmkin emes",
     "canvasTooBig": "",
     "canvasTooBigTip": ""
   },
@@ -350,15 +366,15 @@
     "website": "Veb-sayt",
     "placeholder": {
       "authorName": "Atıńız yamasa paydalanıwshı atı",
-      "libraryName": "",
+      "libraryName": "Kitapxanańız ataması",
       "libraryDesc": "",
       "githubHandle": "",
       "twitterHandle": "",
-      "website": ""
+      "website": "Jeke veb-saytıńız yamasa basqa saytqa silteme (májbúriy emes)"
     },
     "errors": {
-      "required": "",
-      "website": ""
+      "required": "Májbúriy",
+      "website": "Jaramlı URL mánzil kirgiziń"
     },
     "noteDescription": "",
     "noteGuidelines": "",
@@ -368,7 +384,7 @@
     "republishWarning": ""
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "Kitapxana jiberildi",
     "content": ""
   },
   "confirmDialog": {
@@ -382,7 +398,7 @@
       "onlySelected": "",
       "darkMode": "Qarańǵı tema",
       "embedScene": "",
-      "scale": "",
+      "scale": "Kólem",
       "padding": ""
     },
     "tooltip": {
@@ -416,7 +432,7 @@
     "version": "Versiya",
     "versionCopy": "Kóshirip alıw ushın basıń",
     "versionNotAvailable": "",
-    "width": ""
+    "width": "Eni"
   },
   "toast": {
     "addedToLibrary": "Kitapxanaǵa qosıldı",
@@ -451,18 +467,18 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
-      "center_heading_plus": "",
+      "center_heading_plus": "Excalidraw+ ge ótiwdi qáleysiz be?",
       "menuHint": "Eksportlaw, sazlawlar, tiller, ..."
     },
     "defaults": {
       "menuHint": "Eksportlaw, sazlawlar hám basqa...",
-      "center_heading": "",
+      "center_heading": "Diagrammalar. Ápiwayı.",
       "toolbarHint": "",
       "helpHint": ""
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "Kóp qollanılatuǵın arnawlı reńler",
     "colors": "Reńler",
     "shades": "",
     "hexCode": "",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

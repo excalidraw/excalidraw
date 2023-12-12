@@ -11,6 +11,8 @@
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
     "copyText": "Скопировать в буфер обмена как текст",
+    "copySource": "Копировать источник в буфер обмена",
+    "convertToCode": "Преобразовать в код",
     "bringForward": "Переместить вперед",
     "sendToBack": "На задний план",
     "bringToFront": "На передний план",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Нет",
     "arrowhead_arrow": "Cтрелка",
     "arrowhead_bar": "Черта",
-    "arrowhead_dot": "Точка",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Треугольник",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "addWatermark": "Добавить «Создано в Excalidraw»",
@@ -130,7 +136,9 @@
     "sidebarLock": "Держать боковую панель открытой",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "Взять образец цвета с холста"
+    "eyeDropper": "Взять образец цвета с холста",
+    "textToDiagram": "Текст в диаграмму",
+    "prompt": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Не удалось загрузить библиотеку",
     "collabSaveFailed": "Не удалось сохранить в базу данных. Если проблема повторится, нужно будет сохранить файл локально, чтобы быть уверенным, что вы не потеряете вашу работу.",
     "collabSaveFailed_sizeExceeded": "Не удалось сохранить в базу данных. Похоже, что холст слишком большой. Нужно сохранить файл локально, чтобы быть уверенным, что вы не потеряете вашу работу.",
+    "imageToolNotSupported": "Изображения отключены.",
     "brave_measure_text_error": {
       "line1": "Похоже, вы используете браузер Brave с включенной опцией <bold>Агрессивно блокировать отслеживание</bold>.",
       "line2": "Это может привести к поломке <bold>Текстовых объектов</bold> на рисунке.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "Элементы IFrame не могут быть добавлены в библиотеку.",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "Не удалось вставить (невозможно прочитать из системного буфера обмена).",
+    "asyncPasteFailedOnParse": "Не удалось вставить.",
+    "copyToSystemClipboardFailed": "Не удалось скопировать в буфер обмена."
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -236,10 +249,13 @@
     "link": "Добавить/обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "Из Mermaid в Excalidraw",
+    "magicSettings": "Параметры AI"
   },
   "headings": {
     "canvasActions": "Операции холста",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "Из Mermaid в Excalidraw",
+    "button": "Вставить",
+    "description": "",
+    "syntax": "Синтаксис Mermaid",
+    "preview": "Предпросмотр"
   }
 }

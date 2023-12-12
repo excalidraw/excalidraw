@@ -11,6 +11,8 @@
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
     "copyText": "Kopioi tekstinä",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Ei mitään",
     "arrowhead_arrow": "Nuoli",
     "arrowhead_bar": "Tasapää",
-    "arrowhead_dot": "Piste",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Kolmio",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Pidä sivupalkki avoinna",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Kokoelman lataaminen epäonnistui",
     "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
     "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Valinta",
@@ -236,10 +249,13 @@
     "link": "Lisää/päivitä linkki valitulle muodolle",
     "eraser": "Poistotyökalu",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Käsi (panning-työkalu)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
