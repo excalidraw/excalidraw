@@ -11,6 +11,8 @@
     "copyAsPng": "Copia negli appunti come PNG",
     "copyAsSvg": "Copia negli appunti come SVG",
     "copyText": "Copia negli appunti come testo",
+    "copySource": "Copia sorgente negli appunti",
+    "convertToCode": "Converti in codice",
     "bringForward": "Porta avanti",
     "sendToBack": "Manda in fondo",
     "bringToFront": "Porta in cima",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Nessuno",
     "arrowhead_arrow": "Freccia",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Punto",
+    "arrowhead_circle": "Cerchio",
+    "arrowhead_circle_outline": "Cerchio (contorno)",
     "arrowhead_triangle": "Triangolo",
+    "arrowhead_triangle_outline": "Triangolo (contorno)",
+    "arrowhead_diamond": "Diamante",
+    "arrowhead_diamond_outline": "Diamante (contorno)",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
     "addWatermark": "Aggiungi \"Creato con Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Mantieni aperta la barra laterale",
     "selectAllElementsInFrame": "Seleziona tutti gli elementi nel riquadro",
     "removeAllElementsFromFrame": "Rimuovi tutti gli elementi dal riquadro",
-    "eyeDropper": "Scegli il colore della tela"
+    "eyeDropper": "Scegli il colore della tela",
+    "textToDiagram": "Testo a diagramma",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -203,12 +211,13 @@
     "imageInsertError": "Non è stato possibile inserire l'immagine. Riprova più tardi...",
     "fileTooBig": "Il file è troppo grande. La dimensione massima consentita è {{maxSize}}.",
     "svgImageInsertError": "Impossibile inserire l'immagine SVG. Il markup SVG non sembra corretto.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Impossibile recuperare l'immagine.",
     "invalidSVGString": "SVG non valido.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
     "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
+    "imageToolNotSupported": "Le immagini sono disabilitate.",
     "brave_measure_text_error": {
       "line1": "Sembra che tu stia utilizzando il browser Brave con l'impostazione <bold>Blocco aggressivo delle impronte digitali</bold> abilitata.",
       "line2": "Ciò potrebbe causare la rottura degli <bold>Elementi di testo</bold> nei tuoi disegni.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Gli elementi incorporabili non possono essere aggiunti alla libreria.",
+      "iframe": "Gli elementi IFrame non possono essere aggiunti alla libreria.",
       "image": "Il supporto per l'aggiunta d'immagini alla libreria verrà aggiunto a breve!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Impossibile incollare (non è possibile leggere dagli appunti di sistema).",
+    "asyncPasteFailedOnParse": "Impossibile incollare.",
+    "copyToSystemClipboardFailed": "Impossibile copiare negli appunti."
   },
   "toolBar": {
     "selection": "Selezione",
@@ -236,10 +249,13 @@
     "link": "Aggiungi/ aggiorna il link per una forma selezionata",
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
+    "magicframe": "",
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
     "hand": "Mano (strumento di panoramica)",
-    "extraTools": "Altri strumenti"
+    "extraTools": "Altri strumenti",
+    "mermaidToExcalidraw": "",
+    "magicSettings": "Impostazioni di IA"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -498,5 +514,12 @@
         "description": "Il caricamento da file sostituirà <bold>il contenuto esistente</bold>.<br></br>Puoi salvare il tuo disegno prima usando una delle opzioni qui sotto."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "Inserisci",
+    "description": "",
+    "syntax": "",
+    "preview": "Anteprima"
   }
 }

@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar al portapapeles como PNG",
     "copyAsSvg": "Copiar al portapapeles como SVG",
     "copyText": "Copiar al portapapeles como texto",
+    "copySource": "Copiar fuente al portapapeles",
+    "convertToCode": "Convertir a código",
     "bringForward": "Traer hacia delante",
     "sendToBack": "Enviar al fondo",
     "bringToFront": "Traer al frente",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Ninguna",
     "arrowhead_arrow": "Flecha",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Punto",
+    "arrowhead_circle": "Círculo",
+    "arrowhead_circle_outline": "Círculo (contorno)",
     "arrowhead_triangle": "Triángulo",
+    "arrowhead_triangle_outline": "Triángulo (contorno)",
+    "arrowhead_diamond": "Diamante",
+    "arrowhead_diamond_outline": "Diamante (contorno)",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Mantener barra lateral abierta",
     "selectAllElementsInFrame": "Seleccionar todos los elementos en el marco",
     "removeAllElementsFromFrame": "Eliminar todos los elementos del marco",
-    "eyeDropper": "Seleccionar un color del lienzo"
+    "eyeDropper": "Seleccionar un color del lienzo",
+    "textToDiagram": "Texto a diagrama",
+    "prompt": "Sugerencia"
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
@@ -203,12 +211,13 @@
     "imageInsertError": "No se pudo insertar la imagen. Inténtelo de nuevo más tarde...",
     "fileTooBig": "Archivo demasiado grande. El tamaño máximo permitido es {{maxSize}}.",
     "svgImageInsertError": "No se pudo insertar la imagen SVG. El código SVG parece inválido.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Error al obtener la imagen.",
     "invalidSVGString": "SVG no válido.",
     "cannotResolveCollabServer": "No se pudo conectar al servidor colaborador. Por favor, vuelva a cargar la página y vuelva a intentarlo.",
     "importLibraryError": "No se pudo cargar la librería",
     "collabSaveFailed": "No se pudo guardar en la base de datos del backend. Si los problemas persisten, debería guardar su archivo localmente para asegurarse de que no pierde su trabajo.",
     "collabSaveFailed_sizeExceeded": "No se pudo guardar en la base de datos del backend, el lienzo parece ser demasiado grande. Debería guardar el archivo localmente para asegurarse de que no pierde su trabajo.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "Parece que estás usando el navegador Brave con el ajuste <bold>Forzar el bloqueo de huellas digitales</bold> habilitado.",
       "line2": "Esto podría resultar en errores en los <bold>Elementos de Texto</bold> en tus dibujos.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "Los elementos IFrame no se pueden agregar a la biblioteca.",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "No se pudo pegar (no se pudo leer desde el portapapeles del sistema).",
+    "asyncPasteFailedOnParse": "No se pudo pegar.",
+    "copyToSystemClipboardFailed": "No se pudo copiar al portapapeles."
   },
   "toolBar": {
     "selection": "Selección",
@@ -236,10 +249,13 @@
     "link": "Añadir/Actualizar enlace para una forma seleccionada",
     "eraser": "Borrar",
     "frame": "",
+    "magicframe": "Esquema a código",
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
     "hand": "Mano (herramienta de panoramización)",
-    "extraTools": "Más herramientas"
+    "extraTools": "Más herramientas",
+    "mermaidToExcalidraw": "Mermaid a Excalidraw",
+    "magicSettings": "Ajustes AI"
   },
   "headings": {
     "canvasActions": "Acciones del lienzo",
@@ -498,5 +514,12 @@
         "description": "Cargar un dibujo externo <bold>reemplazará tu contenido existente</bold>.<br></br>Puedes primero hacer una copia de seguridad de tu dibujo usando una de las opciones de abajo."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid a Excalidraw",
+    "button": "Insertar",
+    "description": "Actualmente sólo <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Secuencia, </sequenceLink> y <classLink>Class </classLink>Diagramas son soportados. Los otros tipos se renderizarán como imagen en Excalidraw.",
+    "syntax": "Sintaxis Mermaid",
+    "preview": "Vista previa"
   }
 }

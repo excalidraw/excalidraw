@@ -11,6 +11,8 @@
     "copyAsPng": "क्लिपबोर्ड पर कॉपी करें ,पीएनजी के रूप में",
     "copyAsSvg": "क्लिपबोर्ड पर कॉपी करें,एसवीजी के रूप में",
     "copyText": "लेखन के रूप में पटल पर कॉपी करें",
+    "copySource": "स्त्रोत को प्रति-फलक पे प्रतिलिपित करे.",
+    "convertToCode": "सांकेतिक लिपि में परिवर्तित करे",
     "bringForward": "सामने लाएं",
     "sendToBack": "पीछे भेजें",
     "bringToFront": "सामने लाएँ",
@@ -36,8 +38,12 @@
     "arrowhead_none": "कोई भी नहीं",
     "arrowhead_arrow": "तीर",
     "arrowhead_bar": "बार",
-    "arrowhead_dot": "बिंदु",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "त्रिकोण",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
@@ -100,15 +106,15 @@
     "showStroke": "",
     "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
     "toggleTheme": "",
-    "personalLib": "",
-    "excalidrawLib": "",
+    "personalLib": "वैयक्तिक समूहकोष",
+    "excalidrawLib": "एक्सकेलीड्रॉ समूहकोष",
     "decreaseFontSize": "आकार घटाइऐ",
     "increaseFontSize": "फ़ॉन्ट आकार बढ़ाएँ",
-    "unbindText": "",
+    "unbindText": "लिपि को बंधमुक्त करें",
     "bindText": "लेखन को कोश से जोड़े",
     "createContainerFromText": "मूलपाठ कंटेनर में मोड के दिखाए",
     "link": {
-      "edit": "",
+      "edit": "कड़ी संपादित करे",
       "editEmbed": "",
       "create": "",
       "createEmbed": "",
@@ -130,7 +136,9 @@
     "sidebarLock": "साइडबार खुला रखे.",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "चित्रफलक से रंग चुने"
+    "eyeDropper": "चित्रफलक से रंग चुने",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
@@ -209,6 +217,7 @@
     "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
     "collabSaveFailed": "किसी कारण वश अंदरूनी डेटाबेस में सहेजा नहीं जा सका। यदि समस्या बनी रहती है, तो किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
     "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।",
+    "imageToolNotSupported": "प्रतिमायें अक्षम की गयी हैं",
     "brave_measure_text_error": {
       "line1": "लगता है कि आप Brave ब्राउज़र का उपयोग कर रहे और साथ में <bold>आक्रामक उँगलियो के छाप </bold> का चयन किया हुवा है",
       "line2": "यह आपके चित्रों के <bold>पाठ तत्वों</bold>को खंडित कर सकता हैं",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "आयफ़्रेम तत्व समूहकोष में जोडा नहीं जा सका.",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "चिपकाया नहीं जा सका (सिस्टम क्लिपबोर्ड से पढ़ा नहीं जा सका).",
+    "asyncPasteFailedOnParse": "चिपकाया नहीं जा सका.",
+    "copyToSystemClipboardFailed": "क्लिपबोर्ड पर प्रतिलिपि नहीं बनाई जा सकी."
   },
   "toolBar": {
     "selection": "चयन",
@@ -236,10 +249,13 @@
     "link": "",
     "eraser": "रबड़",
     "frame": "",
+    "magicframe": "तारिक ढाँचें को सांकेतिक लिपि में",
     "embeddable": "",
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसकाने का औज़ार)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
+    "magicSettings": "कृतिम बुद्धिमत्ता सेटिंग्स"
   },
   "headings": {
     "canvasActions": "कैनवास क्रिया",
@@ -498,5 +514,12 @@
         "description": "बाहर का चित्र लोड करने पर <bold>यह आपके कार्य की जगह लेलेगा </bold><br></br>आप आपकी ड्रॉइंग पहले निम्न दर्शित विकल्पो में से एक चुनके और उपयोग करके सम्हाल सकते हों."
       }
     }
+  },
+  "mermaid": {
+    "title": "मर्मेड से एक्सकाली में",
+    "button": "अंदर डाले",
+    "description": "",
+    "syntax": "मर्मेड संरचना नियम",
+    "preview": "पूर्वावलोकन"
   }
 }

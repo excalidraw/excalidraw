@@ -11,6 +11,8 @@
     "copyAsPng": "Kopēt starpliktuvē kā PNG",
     "copyAsSvg": "Kopēt starpliktuvē kā SVG",
     "copyText": "Kopēt starpliktuvē kā tekstu",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Pārvietot vienu slāni augstāk",
     "sendToBack": "Pārvietot uz zemāko slāni",
     "bringToFront": "Pārvietot uz virsējo slāni",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Nekādas",
     "arrowhead_arrow": "Bulta",
     "arrowhead_bar": "Svītra",
-    "arrowhead_dot": "Punkts",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Trijstūris",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Teksta lielums",
     "fontFamily": "Fontu saime",
     "addWatermark": "Pievienot \"Radīts ar Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Paturēt atvērtu sānjoslu",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Neviena vienība vēl nav pievienota...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Nevarēja ielādēt bibliotēku",
     "collabSaveFailed": "Darbs nav saglabāts datubāzē. Ja problēma turpinās, saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
     "collabSaveFailed_sizeExceeded": "Darbs nav saglabāts datubāzē, šķiet, ka tāfele ir pārāk liela. Saglabājiet datni lokālajā krātuvē, lai nodrošinātos pret darba pazaudēšanu.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Atlase",
@@ -236,10 +249,13 @@
     "link": "Pievienot/rediģēt atlasītās figūras saiti",
     "eraser": "Dzēšgumija",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Roka (panoramēšanas rīks)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Tāfeles darbības",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

@@ -11,6 +11,8 @@
     "copyAsPng": "Kopiatu arbelera PNG gisa",
     "copyAsSvg": "Kopiatu arbelera SVG gisa",
     "copyText": "Kopiatu arbelera testu gisa",
+    "copySource": "Kopiatu iturria arbelean",
+    "convertToCode": "Bihurtu kodea",
     "bringForward": "Ekarri aurrerago",
     "sendToBack": "Eraman atzera",
     "bringToFront": "Ekarri aurrera",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Bat ere ez",
     "arrowhead_arrow": "Gezia",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Puntua",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Hirukia",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Mantendu alboko barra irekita",
     "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
     "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
-    "eyeDropper": "Aukeratu kolorea oihaletik"
+    "eyeDropper": "Aukeratu kolorea oihaletik",
+    "textToDiagram": "Testutik diagramara",
+    "prompt": ""
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -203,12 +211,13 @@
     "imageInsertError": "Ezin izan da irudia txertatu. Saiatu berriro geroago...",
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Ezin izan da irudia eskuratu.",
     "invalidSVGString": "SVG baliogabea.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
     "importLibraryError": "Ezin izan da liburutegia kargatu",
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
+    "imageToolNotSupported": "Irudiak desgaituta daude.",
     "brave_measure_text_error": {
       "line1": "Brave arakatzailea erabiltzen ari zarela dirudi <bold>Blokeatu hatz-markak erasokorki</bold> ezarpena gaituta.",
       "line2": "Honek zure marrazkietako <bold>Testu-elementuak</bold> hautsi ditzake.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
+      "iframe": "IFrame elementuak ezin dira liburutegira gehitu.",
       "image": "Laster egongo da irudiak liburutegian gehitzeko laguntza!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Ezin izan da itsatsi (ezin izan da sistemaren arbeletik irakurri).",
+    "asyncPasteFailedOnParse": "Ezin izan da itsatsi.",
+    "copyToSystemClipboardFailed": "Ezin izan da arbelean kopiatu."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -236,10 +249,13 @@
     "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
     "frame": "Marko tresna",
+    "magicframe": "Wireframe kodetzeko",
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "hand": "Eskua (panoratze tresna)",
-    "extraTools": "Tresna gehiago"
+    "extraTools": "Tresna gehiago",
+    "mermaidToExcalidraw": "",
+    "magicSettings": "AI ezarpenak"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -498,5 +514,12 @@
         "description": "Kanpoko irudi bat kargatzeak <bold>lehendik duzun edukia ordezkatuko du</bold>.<br></br>. Zure marrazkiaren babeskopia egin dezakezu lehenik beheko aukeretako bat erabiliz."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "Txertatu",
+    "description": "",
+    "syntax": "",
+    "preview": "Aurrebista"
   }
 }

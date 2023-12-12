@@ -11,6 +11,8 @@
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
     "copyText": "Αντιγραφή στο πρόχειρο ως κείμενο",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Στο προσκήνιο",
     "sendToBack": "Ένα επίπεδο πίσω",
     "bringToFront": "Ένα επίπεδο μπροστά",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Κανένα",
     "arrowhead_arrow": "Βέλος",
     "arrowhead_bar": "Μπάρα",
-    "arrowhead_dot": "Τελεία",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Τρίγωνο",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Μέγεθος γραμματοσειράς",
     "fontFamily": "Γραμματοσειρά",
     "addWatermark": "Προσθήκη \"Φτιαγμένο με Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Κρατήστε την πλαϊνή μπάρα ανοιχτή",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Αδυναμία φόρτωσης βιβλιοθήκης",
     "collabSaveFailed": "Η αποθήκευση στη βάση δεδομένων δεν ήταν δυνατή. Αν το προβλήματα παραμείνει, θα πρέπει να αποθηκεύσετε το αρχείο σας τοπικά για να βεβαιωθείτε ότι δεν χάνετε την εργασία σας.",
     "collabSaveFailed_sizeExceeded": "Η αποθήκευση στη βάση δεδομένων δεν ήταν δυνατή, ο καμβάς φαίνεται να είναι πολύ μεγάλος. Θα πρέπει να αποθηκεύσετε το αρχείο τοπικά για να βεβαιωθείτε ότι δεν θα χάσετε την εργασία σας.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Επιλογή",
@@ -236,10 +249,13 @@
     "link": "Προσθήκη/ Ενημέρωση συνδέσμου για ένα επιλεγμένο σχήμα",
     "eraser": "Γόμα",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

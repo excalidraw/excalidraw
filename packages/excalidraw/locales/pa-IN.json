@@ -11,6 +11,8 @@
     "copyAsPng": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ PNG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyAsSvg": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ SVG ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
     "copyText": "ਕਲਿੱਪਬੋਰਡ 'ਤੇ ਪਾਠ ਵਜੋਂ ਕਾਪੀ ਕਰੋ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "ਅੱਗੇ ਲਿਆਓ",
     "sendToBack": "ਸਭ ਤੋਂ ਪਿੱਛੇ ਭੇਜੋ",
     "bringToFront": "ਸਭ ਤੋਂ ਅੱਗੇ ਲਿਆਓ",
@@ -36,8 +38,12 @@
     "arrowhead_none": "ਕੋਈ ਨਹੀਂ",
     "arrowhead_arrow": "ਤੀਰ",
     "arrowhead_bar": "ਡੰਡੀ",
-    "arrowhead_dot": "ਬਿੰਦੀ",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "ਤਿਕੋਣ",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
@@ -130,7 +136,9 @@
     "sidebarLock": "ਸਾਈਡਬਾਰ ਨੂੰ ਖੁੱਲ੍ਹਾ ਰੱਖੋ",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਚੀਜ ਜੋੜੀ ਨਹੀਂ ਗਈ...",
@@ -209,6 +217,7 @@
     "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "ਚੋਣਕਾਰ",
@@ -236,10 +249,13 @@
     "link": "",
     "eraser": "ਰਬੜ",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

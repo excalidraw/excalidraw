@@ -11,6 +11,8 @@
     "copyAsPng": "PNGとしてクリップボードへコピー",
     "copyAsSvg": "SVGとしてクリップボードへコピー",
     "copyText": "テキストとしてクリップボードにコピー",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "前面に移動",
     "sendToBack": "最背面に移動",
     "bringToFront": "最前面に移動",
@@ -36,8 +38,12 @@
     "arrowhead_none": "なし",
     "arrowhead_arrow": "矢印",
     "arrowhead_bar": "バー",
-    "arrowhead_dot": "ドット",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "三角",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "addWatermark": "\"Made with Excalidraw\"と表示",
@@ -130,7 +136,9 @@
     "sidebarLock": "サイドバーを開いたままにする",
     "selectAllElementsInFrame": "フレーム内のすべての要素を選択",
     "removeAllElementsFromFrame": "フレーム内のすべての要素を削除",
-    "eyeDropper": "キャンバスから色を選択"
+    "eyeDropper": "キャンバスから色を選択",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -209,6 +217,7 @@
     "importLibraryError": "ライブラリを読み込めませんでした。",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "<bold>Aggressly Block Fingerprinting</bold> の設定が有効なBraveブラウザを使用しているようです。",
       "line2": "これにより、図面の <bold>テキスト要素</bold> が壊れる可能性があります。",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "選択",
@@ -236,10 +249,13 @@
     "link": "選択した図形のリンクを追加/更新",
     "eraser": "消しゴム",
     "frame": "フレームツール",
+    "magicframe": "",
     "embeddable": "Web埋め込み",
     "laser": "",
     "hand": "手 (パンニングツール)",
-    "extraTools": "その他のツール"
+    "extraTools": "その他のツール",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

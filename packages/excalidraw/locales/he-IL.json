@@ -11,6 +11,8 @@
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
     "copyText": "העתק ללוח כטקסט",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "שלח אחורה",
     "bringToFront": "העבר לחזית",
@@ -36,8 +38,12 @@
     "arrowhead_none": "ללא",
     "arrowhead_arrow": "חץ",
     "arrowhead_bar": "קצה אנכי",
-    "arrowhead_dot": "נקודה",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "משולש",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
     "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "שמור את סרגל הצד פתוח",
     "selectAllElementsInFrame": "בחר את כל האלמנטים במסגרת",
     "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -209,6 +217,7 @@
     "importLibraryError": "לא ניתן היה לטעון את הספריה",
     "collabSaveFailed": "לא הצלחתי להתחבר למסד הנתונים האחורי. אם הבעיה ממשיכה, כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
     "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "בחירה",
@@ -236,10 +249,13 @@
     "link": "הוספה/עדכון קישור של הצורה שנבחרה",
     "eraser": "מחק",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "יד (כלי הזזה)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "פעולות קנבאס",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

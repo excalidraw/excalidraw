@@ -11,6 +11,8 @@
     "copyAsPng": "Sao chép vào bộ nhớ tạm dưới dạng PNG",
     "copyAsSvg": "Sao chép vào bộ nhớ tạm dưới dạng SVG",
     "copyText": "Sao chép vào bộ nhớ tạm dưới dạng chữ",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Đưa ra trước",
     "sendToBack": "Hạ xuống dưới",
     "bringToFront": "Đưa ra đầu tiên",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Không",
     "arrowhead_arrow": "Mũi tên",
     "arrowhead_bar": "Thanh",
-    "arrowhead_dot": "Chấm",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Tam giác",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Cỡ chữ",
     "fontFamily": "Phông chữ",
     "addWatermark": "Làm với Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Giữ thanh bên luôn mở",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Chưa có món nào...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Không thể tải thư viện",
     "collabSaveFailed": "Không thể lưu vào cơ sở dữ liệu. Nếu vấn đề tiếp tục xảy ra, bạn nên lưu tệp vào máy để đảm bảo bạn không bị mất công việc.",
     "collabSaveFailed_sizeExceeded": "Không thể lưu vào cơ sở dữ liệu, canvas có vẻ quá lớn. Bạn nên lưu tệp cục bộ để đảm bảo bạn không bị mất công việc.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Lựa chọn",
@@ -236,10 +249,13 @@
     "link": "Thêm/ Chỉnh sửa liên kết cho hình được chọn",
     "eraser": "Xóa",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Tay kéo",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Hành động canvas",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

@@ -11,6 +11,8 @@
     "copyAsPng": "Copiere în memoria temporară ca PNG",
     "copyAsSvg": "Copiere în memoria temporară ca SVG",
     "copyText": "Copiere în memoria temporară ca text",
+    "copySource": "Copiere sursă în memoria temporară",
+    "convertToCode": "Convertire în cod",
     "bringForward": "Aducere în plan apropiat",
     "sendToBack": "Trimitere în ultimul plan",
     "bringToFront": "Aducere în prim plan",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Niciunul",
     "arrowhead_arrow": "Săgeată",
     "arrowhead_bar": "Bară",
-    "arrowhead_dot": "Bulină",
+    "arrowhead_circle": "Cerc",
+    "arrowhead_circle_outline": "Cerc (contur)",
     "arrowhead_triangle": "Triunghi",
+    "arrowhead_triangle_outline": "Triunghi (contur)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (contur)",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
@@ -130,7 +136,9 @@
     "sidebarLock": "Păstrează deschisă bara laterală",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": "Alegere culoare din pânză"
+    "eyeDropper": "Alegere culoare din pânză",
+    "textToDiagram": "Text la diagramă",
+    "prompt": "Solicitare"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -203,12 +211,13 @@
     "imageInsertError": "Imaginea nu a putut fi introdusă. Reîncearcă mai târziu...",
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Preluarea imaginii a eșuat.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
     "importLibraryError": "Biblioteca nu a putut fi încărcată",
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
+    "imageToolNotSupported": "Imaginile sunt dezactivate.",
     "brave_measure_text_error": {
       "line1": "Se pare că folosești navigatorul Brave cu opțiunea <bold>strictă pentru blocarea amprentării</bold>.",
       "line2": "Acest lucru poate duce la întreruperea <bold>elementelor text</bold> din desene.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementele încorporabile nu pot fi adăugate la bibliotecă.",
+      "iframe": "Elementele iFrame nu pot fi adăugate la bibliotecă.",
       "image": "În curând vor putea fi adăugate imagini în bibliotecă!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Lipirea nu a putut fi efectuată (nu s-a putut citit din memoria temporară a sistemului).",
+    "asyncPasteFailedOnParse": "Lipirea nu a putut fi efectuată.",
+    "copyToSystemClipboardFailed": "Nu s-a putut copia în memoria temporară."
   },
   "toolBar": {
     "selection": "Selecție",
@@ -236,10 +249,13 @@
     "link": "Adăugare/actualizare URL pentru forma selectată",
     "eraser": "Radieră",
     "frame": "",
+    "magicframe": "Structură-de-fire la cod",
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "Mermaid la Excalidraw",
+    "magicSettings": "Setări IA"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -498,5 +514,12 @@
         "description": "Încărcarea unui desen extern va <bold>înlocui conținutul existent</bold>.<br></br>Poți face mai întâi o copie de rezervă a desenului folosind una dintre opțiunile de mai jos."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid la Excalidraw",
+    "button": "Introducere",
+    "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "syntax": "Sintaxă Mermaid",
+    "preview": "Previzualizare"
   }
 }

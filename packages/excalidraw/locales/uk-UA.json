@@ -11,6 +11,8 @@
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
     "copyText": "Копіювати в буфер обміну як текст",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Перемістити вперед",
     "sendToBack": "На задній план",
     "bringToFront": "На передній план",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Жоден",
     "arrowhead_arrow": "Стрілка",
     "arrowhead_bar": "Колона",
-    "arrowhead_dot": "Точка",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Трикутник",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
@@ -130,7 +136,9 @@
     "sidebarLock": "Не закривати бокове меню",
     "selectAllElementsInFrame": "Обрати всі елементи у фреймі",
     "removeAllElementsFromFrame": "Видалити всі елементи з фрейму",
-    "eyeDropper": "Вибрати колір з полотна"
+    "eyeDropper": "Вибрати колір з полотна",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Тут поки пусто...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Не вдалося завантажити бібліотеку",
     "collabSaveFailed": "Не вдалося зберегти у базу даних сервера. Якщо проблеми не зникнуть, Вам слід зберегти файл локально, щоб не втратити роботу.",
     "collabSaveFailed_sizeExceeded": "Полотно завелике! Не вдалося зберегти у базу даних сервера. Вам слід зберегти файл локально, щоб не втратити свою роботу.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "Ви використовуєте браузер Brave з увімкненим налаштуванням <bold>Агресивного Блокування Розпізнавання Пристрою</bold>.",
       "line2": "Це може нашкодити <bold>текстовим елементам</bold> у ваших малюнках.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Вбудовані елементи не можна додати в бібліотеку.",
+      "iframe": "",
       "image": "Підтримка додавання зображень в бібліотеку найближчим часом!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Виділення",
@@ -236,10 +249,13 @@
     "link": "Додати/Оновити посилання для вибраної форми",
     "eraser": "Очищувач",
     "frame": "Інструмент фрейму",
+    "magicframe": "",
     "embeddable": "Веб вкладення",
     "laser": "",
     "hand": "Рука (інструмент для панорамування)",
-    "extraTools": "Інші інструменти"
+    "extraTools": "Інші інструменти",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Дії з полотном",
@@ -498,5 +514,12 @@
         "description": "Завантаження зовнішнього малюнка <bold>замінить ваш наявний вміст</bold>.<br></br>Ви можете спочатку створити резервну копію малюнка, скориставшись одним із наведених нижче способів."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

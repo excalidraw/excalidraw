@@ -11,6 +11,8 @@
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
     "copyText": "Skopiuj do schowka jako tekst",
+    "copySource": "Skopiuj źródło do schowka",
+    "convertToCode": "Skonwertuj do kodu",
     "bringForward": "Przenieś wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Brak",
     "arrowhead_arrow": "Strzałka",
     "arrowhead_bar": "Kreska",
-    "arrowhead_dot": "Kropka",
+    "arrowhead_circle": "Okrąg",
+    "arrowhead_circle_outline": "Okrąg (obrys)",
     "arrowhead_triangle": "Trójkąt",
+    "arrowhead_triangle_outline": "Trójkąt (obrys)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (obrys)",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
@@ -114,7 +120,7 @@
       "createEmbed": "Stwórz i osadź link",
       "label": "Łącze",
       "labelEmbed": "Podlinkuj i osadź",
-      "empty": "Brakujący link"
+      "empty": "Nie ustawiono linku"
     },
     "lineEditor": {
       "edit": "Edytuj linię",
@@ -130,7 +136,9 @@
     "sidebarLock": "Panel boczny zawsze otwarty",
     "selectAllElementsInFrame": "Zaznacz wszystkie elementy w ramce",
     "removeAllElementsFromFrame": "Usuń wszystkie elementy z ramki",
-    "eyeDropper": "Wybierz kolor z płótna"
+    "eyeDropper": "Wybierz kolor z płótna",
+    "textToDiagram": "Tekst do diagramu",
+    "prompt": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
+    "imageToolNotSupported": "Dodawanie obrazów jest wyłączone.",
     "brave_measure_text_error": {
       "line1": "Wygląda na to, że używasz przeglądarki Brave z włączonym ustawieniem <bold>Agressively Block Fingerprinting</bold>.",
       "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementy osadzone nie mogą zostać dodane do biblioteki.",
+      "iframe": "Elementy IFrame nie mogą zostać dodane do biblioteki.",
       "image": "Dodawania obrazów do biblioteki nadejdzie wkrótce!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Nie udało się wkleić (nie udało się odczytać ze schowka systemowego).",
+    "asyncPasteFailedOnParse": "Nie udało się wkleić.",
+    "copyToSystemClipboardFailed": "Nie udało się skopiować do schowka."
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -236,10 +249,13 @@
     "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
     "frame": "Ramka",
+    "magicframe": "Wireframe do kodu",
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
-    "extraTools": "Więcej narzędzi"
+    "extraTools": "Więcej narzędzi",
+    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
+    "magicSettings": "Ustawienia AI"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -498,5 +514,12 @@
         "description": "Wczytanie zewnętrznego pliku <bold>nadpisze istniejącą zawartość</bold>.<br></br>Możesz najpierw utworzyć kopię zapasową swojego rysunku, używając jednej z poniższych opcji."
       }
     }
+  },
+  "mermaid": {
+    "title": "Konwertuj diagram Mermaid do Excalidraw",
+    "button": "Wstaw",
+    "description": "Obecnie wspierane są jedynie <flowchartLink>proste grafy</flowchartLink>, <sequenceLink>sekwencje</sequenceLink> i <classLink>diagramy klas</classLink>. Pozostałe typy będą wyświetlane jako obrazy w Excalidraw.",
+    "syntax": "Składnia diagramów Mermaid",
+    "preview": "Podgląd"
   }
 }

@@ -11,6 +11,8 @@
     "copyAsPng": "Kopieer als PNG",
     "copyAsSvg": "Kopieer naar klembord als SVG",
     "copyText": "Kopieer naar klembord als tekst",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Geen",
     "arrowhead_arrow": "Pijl",
     "arrowhead_bar": "Balk",
-    "arrowhead_dot": "Punt",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Driehoek",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
@@ -130,7 +136,9 @@
     "sidebarLock": "Zijbalk open houden",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Kon bibliotheek niet laden",
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Ingesloten elementen kunnen niet worden toegevoegd aan de bibliotheek.",
+      "iframe": "",
       "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selectie",
@@ -236,10 +249,13 @@
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
     "frame": "",
+    "magicframe": "",
     "embeddable": "Web insluiten",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

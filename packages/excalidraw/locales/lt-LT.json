@@ -11,6 +11,8 @@
     "copyAsPng": "Kopijuoti į iškarpinę kaip PNG",
     "copyAsSvg": "Kopijuoti į iškarpinę kaip SVG",
     "copyText": "Kopijuoti į iškarpinę kaip tekstą",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Kelti priekio link",
     "sendToBack": "Nustumti į užnugarį",
     "bringToFront": "Iškelti į priekį",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Jokios",
     "arrowhead_arrow": "Rodyklė",
     "arrowhead_bar": "Brukšnys",
-    "arrowhead_dot": "Taškas",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Trikampis",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Šrifto dydis",
     "fontFamily": "Šriftas",
     "addWatermark": "Sukurta su Excalidraw",
@@ -130,7 +136,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "",
@@ -209,6 +217,7 @@
     "importLibraryError": "Nepavyko įkelti bibliotekos",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Žymėjimas",
@@ -236,10 +249,13 @@
     "link": "Pridėti / Atnaujinti pasirinktos figūros nuorodą",
     "eraser": "Trintukas",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Veiksmai su drobe",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

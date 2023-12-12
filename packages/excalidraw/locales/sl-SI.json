@@ -11,6 +11,8 @@
     "copyAsPng": "Kopiraj v odložišče kot PNG",
     "copyAsSvg": "Kopiraj v odložišče kot SVG",
     "copyText": "Kopiraj v odložišče kot besedilo",
+    "copySource": "Kopiraj vir v odložišče",
+    "convertToCode": "Pretvori v kodo",
     "bringForward": "Postavi naprej",
     "sendToBack": "Pomakni v ozadje",
     "bringToFront": "Pomakni v ospredje",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Brez",
     "arrowhead_arrow": "Puščica",
     "arrowhead_bar": "Palica",
-    "arrowhead_dot": "Pika",
+    "arrowhead_circle": "Krog",
+    "arrowhead_circle_outline": "Krog (oris)",
     "arrowhead_triangle": "Trikotnik",
+    "arrowhead_triangle_outline": "Trikotnik (oris)",
+    "arrowhead_diamond": "Diamant",
+    "arrowhead_diamond_outline": "Diamant (oris)",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Obdrži stransko vrstico odprto",
     "selectAllElementsInFrame": "Izberi vse elemente v okvirju",
     "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
-    "eyeDropper": "Izberi barvo s platna"
+    "eyeDropper": "Izberi barvo s platna",
+    "textToDiagram": "Besedilo v diagram",
+    "prompt": "Poziv"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
+    "imageToolNotSupported": "Slike so onemogočene.",
     "brave_measure_text_error": {
       "line1": "Videti je, da uporabljate brskalnik Brave z omogočeno nastavitvijo <bold>Agresivno blokiranje prstnih odtisov</bold>.",
       "line2": "To bi lahko povzročilo motnje v obnašanju <bold>besedilnih elementov</bold> v vaših risbah.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Vdelani elementi ne morejo biti dodani v knjižnico.",
+      "iframe": "Elementov iFrame ni mogoče dodati v knjižnico.",
       "image": "Podpora za dodajanje slik v knjižnico prihaja kmalu!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Ni bilo mogoče prilepiti (ni bilo mogoče brati iz sistemskega odložišča).",
+    "asyncPasteFailedOnParse": "Ni bilo mogoče prilepiti.",
+    "copyToSystemClipboardFailed": "Ni bilo mogoče kopirati v odložišče."
   },
   "toolBar": {
     "selection": "Izbor",
@@ -236,10 +249,13 @@
     "link": "Dodaj/posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
+    "magicframe": "Žični okvir v kodo",
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
     "hand": "Roka (orodje za premikanje)",
-    "extraTools": "Več orodij"
+    "extraTools": "Več orodij",
+    "mermaidToExcalidraw": "Mermaid v Excalidraw",
+    "magicSettings": "Nastavitve AI"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -498,5 +514,12 @@
         "description": "Nalaganje zunanje risbe bo <bold>prepisalo vašo obstoječo vsebino</bold>.<br></br>Svojo risbo lahko najprej varnostno kopirate z eno od spodnjih možnosti."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid v Excalidraw",
+    "button": "Vstavi",
+    "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink>, <sequenceLink>diagrami zaporedij</sequenceLink> in <classLink>Razredni diagrami</classLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
+    "syntax": "Sintaksa Mermaid",
+    "preview": "Predogled"
   }
 }

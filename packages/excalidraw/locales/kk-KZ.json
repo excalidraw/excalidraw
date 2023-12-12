@@ -11,6 +11,8 @@
     "copyAsPng": "",
     "copyAsSvg": "",
     "copyText": "",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "",
     "sendToBack": "",
     "bringToFront": "",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Жоқ",
     "arrowhead_arrow": "Нұсқар",
     "arrowhead_bar": "Тосқауыл",
-    "arrowhead_dot": "Нүкте",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Қаріп өлшемі",
     "fontFamily": "Қаріп тобы",
     "addWatermark": "",
@@ -130,7 +136,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "",
@@ -209,6 +217,7 @@
     "importLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "",
@@ -236,10 +249,13 @@
     "link": "",
     "eraser": "",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

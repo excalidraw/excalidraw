@@ -11,6 +11,8 @@
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
     "copyText": "In die Zwischenablage als Text kopieren",
+    "copySource": "Quelle in Zwischenablage kopieren",
+    "convertToCode": "In Code konvertieren",
     "bringForward": "Nach vorne",
     "sendToBack": "In den Hintergrund",
     "bringToFront": "In den Vordergrund",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Keine",
     "arrowhead_arrow": "Pfeil",
     "arrowhead_bar": "Balken",
-    "arrowhead_dot": "Punkt",
+    "arrowhead_circle": "Kreis",
+    "arrowhead_circle_outline": "Kreis (Umrandung)",
     "arrowhead_triangle": "Dreieck",
+    "arrowhead_triangle_outline": "Dreieck (Umrandung)",
+    "arrowhead_diamond": "Raute",
+    "arrowhead_diamond_outline": "Raute (Umrandung)",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
@@ -130,7 +136,9 @@
     "sidebarLock": "Seitenleiste offen lassen",
     "selectAllElementsInFrame": "Alle Elemente im Rahmen auswählen",
     "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
-    "eyeDropper": "Farbe von der Zeichenfläche auswählen"
+    "eyeDropper": "Farbe von der Zeichenfläche auswählen",
+    "textToDiagram": "Text zu Diagramm",
+    "prompt": "Eingabe"
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
+    "imageToolNotSupported": "Bilder sind deaktiviert.",
     "brave_measure_text_error": {
       "line1": "Sieht so aus, als ob Du den Brave-Browser verwendest und die <bold>aggressive Blockierung von Fingerabdrücken</bold> aktiviert hast.",
       "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Einbettbare Elemente können der Bibliothek nicht hinzugefügt werden.",
+      "iframe": "IFrame-Elemente können nicht zur Bibliothek hinzugefügt werden.",
       "image": "Unterstützung für das Hinzufügen von Bildern in die Bibliothek kommt bald!"
-    }
+    },
+    "asyncPasteFailedOnRead": "Einfügen fehlgeschlagen (konnte aus der Zwischenablage des Systems nicht gelesen werden).",
+    "asyncPasteFailedOnParse": "Einfügen fehlgeschlagen.",
+    "copyToSystemClipboardFailed": "Kopieren in die Zwischenablage fehlgeschlagen."
   },
   "toolBar": {
     "selection": "Auswahl",
@@ -236,10 +249,13 @@
     "link": "Link für ausgewählte Form hinzufügen / aktualisieren",
     "eraser": "Radierer",
     "frame": "Rahmenwerkzeug",
+    "magicframe": "Wireframe zu Code",
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
-    "extraTools": "Weitere Werkzeuge"
+    "extraTools": "Weitere Werkzeuge",
+    "mermaidToExcalidraw": "Mermaid zu Excalidraw",
+    "magicSettings": "KI-Einstellungen"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -498,5 +514,12 @@
         "description": "Das Laden einer externen Zeichnung wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid zu Excalidraw",
+    "button": "Einfügen",
+    "description": "Derzeit werden nur <flowchartLink>Flussdiagramme</flowchartLink>, <sequenceLink>Sequenzdiagramme</sequenceLink> und <classLink>Klassendiagramme</classLink> unterstützt. Die anderen Typen werden als Bild in Excalidraw dargestellt.",
+    "syntax": "Mermaid-Syntax",
+    "preview": "Vorschau"
   }
 }

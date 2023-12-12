@@ -11,6 +11,8 @@
     "copyAsPng": "Nɣel ɣer tecfawit am PNG",
     "copyAsSvg": "Nɣel ɣer tecfawit am SVG",
     "copyText": "Nɣel ɣer tecfawit am uḍris",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Awi ɣer sdat",
     "sendToBack": "Awi s agilal",
     "bringToFront": "Err ɣer deffir",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Ulac",
     "arrowhead_arrow": "Taneccabt",
     "arrowhead_bar": "Afeggag",
-    "arrowhead_dot": "Tanqiḍt",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Akerdis",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Tiddi n tsefsit",
     "fontFamily": "Tawacult n tsefsiyin",
     "addWatermark": "Seddu \"Yettwaxdem s Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Eǧǧ afeggag n yidis yeldi",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Ur d-ssalay ara tamkarḍit",
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "Ayagi yezmer ad d-iglu s truẓi n<bold>Iferdisen n uḍris</bold>deg wunuɣen-inek.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Tafrayt",
@@ -236,10 +249,13 @@
     "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
     "eraser": "Sfeḍ",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Afus (afecku n usmutti n tmuɣli)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Tigawin n teɣzut n usuneɣ",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

@@ -11,6 +11,8 @@
     "copyAsPng": "Kopier til utklippstavla som PNG",
     "copyAsSvg": "Kopier til utklippstavla som SVG",
     "copyText": "",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Flytt framover",
     "sendToBack": "Send heilt bak",
     "bringToFront": "Flytt heilt fram",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Ingen",
     "arrowhead_arrow": "Pil",
     "arrowhead_bar": "Stolpe",
-    "arrowhead_dot": "Prikk",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Trekant",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "addWatermark": "Legg til «Laga med Excalidraw»",
@@ -130,7 +136,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "",
@@ -209,6 +217,7 @@
     "importLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Vel",
@@ -236,10 +249,13 @@
     "link": "Legg til/ oppdater lenke til valt figur",
     "eraser": "Viskelêr",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Handlingar: lerret",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }
