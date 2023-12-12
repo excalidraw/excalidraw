@@ -40,5 +40,5 @@
     }
   ],
   "outputDirectory": "excalidraw-app/build",
-  "installCommand": "yarn install:deps"
+  "installCommand": "yarn install"
 }

@@ -1,9 +1,9 @@
-import polyfill from "../src/polyfill";
+import polyfill from "../packages/excalidraw/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { useEffect, useRef, useState } from "react";
-import { trackEvent } from "../src/analytics";
-import { getDefaultAppState } from "../src/appState";
-import { ErrorDialog } from "../src/components/ErrorDialog";
+import { trackEvent } from "../packages/excalidraw/analytics";
+import { getDefaultAppState } from "../packages/excalidraw/appState";
+import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import {
   APP_NAME,
@@ -11,23 +11,23 @@ import {
   THEME,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
-} from "../src/constants";
-import { loadFromBlob } from "../src/data/blob";
+} from "../packages/excalidraw/constants";
+import { loadFromBlob } from "../packages/excalidraw/data/blob";
 import {
   ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
   Theme,
-} from "../src/element/types";
-import { useCallbackRefState } from "../src/hooks/useCallbackRefState";
-import { t } from "../src/i18n";
+} from "../packages/excalidraw/element/types";
+import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
+import { t } from "../packages/excalidraw/i18n";
 import {
   Excalidraw,
   defaultLang,
   LiveCollaborationTrigger,
   TTDDialog,
   TTDDialogTrigger,
-} from "../src/packages/excalidraw/index";
+} from "../packages/excalidraw/index";
 import {
   AppState,
   LibraryItems,
@@ -35,7 +35,7 @@ import {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
-} from "../src/types";
+} from "../packages/excalidraw/types";
 import {
   debounce,
   getVersion,
@@ -45,7 +45,7 @@ import {
   ResolvablePromise,
   resolvablePromise,
   isRunningInIframe,
-} from "../src/utils";
+} from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
   STORAGE_KEYS,
@@ -74,14 +74,14 @@ import {
   restore,
   restoreAppState,
   RestoredDataState,
-} from "../src/data/restore";
+} from "../packages/excalidraw/data/restore";
 import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
-import { newElementWith } from "../src/element/mutateElement";
-import { isInitializedImageElement } from "../src/element/typeChecks";
+import { newElementWith } from "../packages/excalidraw/element/mutateElement";
+import { isInitializedImageElement } from "../packages/excalidraw/element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
@@ -90,20 +90,20 @@ import { reconcileElements } from "./collab/reconciliation";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
-} from "../src/data/library";
+} from "../packages/excalidraw/data/library";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
 import { atom, Provider, useAtom, useAtomValue } from "jotai";
-import { useAtomWithInitialValue } from "../src/jotai";
+import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
-import { ResolutionType } from "../src/utility-types";
-import { ShareableLinkDialog } from "../src/components/ShareableLinkDialog";
-import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteConfirmState";
-import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
-import Trans from "../src/components/Trans";
+import { ResolutionType } from "../packages/excalidraw/utility-types";
+import { ShareableLinkDialog } from "../packages/excalidraw/components/ShareableLinkDialog";
+import { openConfirmModal } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
+import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
+import Trans from "../packages/excalidraw/components/Trans";
 
 polyfill();
 

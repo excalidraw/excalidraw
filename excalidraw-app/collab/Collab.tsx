@@ -1,28 +1,28 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ErrorDialog } from "../../src/components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "../../src/constants";
+import {
+  ExcalidrawImperativeAPI,
+  OnUserFollowedPayload,
+} from "../../packages/excalidraw/types";
+import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
+import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
+import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
-} from "../../src/element/types";
+} from "../../packages/excalidraw/element/types";
 import {
   getSceneVersion,
   restoreElements,
   zoomToFitBounds,
-} from "../../src/packages/excalidraw/index";
-import {
-  Collaborator,
-  ExcalidrawImperativeAPI,
-  Gesture,
-  OnUserFollowedPayload,
-} from "../../src/types";
+} from "../../packages/excalidraw/index";
+import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   preventUnload,
   resolvablePromise,
   viewportCoordsToSceneCoords,
   withBatchedUpdates,
-} from "../../src/utils";
+} from "../../packages/excalidraw/utils";
 import {
   CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
@@ -53,30 +53,32 @@ import {
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
-import { t } from "../../src/i18n";
-import { UserIdleState } from "../../src/types";
-import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../src/constants";
+import { t } from "../../packages/excalidraw/i18n";
+import { UserIdleState } from "../../packages/excalidraw/types";
+import {
+  IDLE_THRESHOLD,
+  ACTIVE_THRESHOLD,
+} from "../../packages/excalidraw/constants";
 import {
   encodeFilesForUpload,
   FileManager,
   updateStaleImageStatuses,
 } from "../data/FileManager";
-import { AbortError } from "../../src/errors";
+import { AbortError } from "../../packages/excalidraw/errors";
 import {
   isImageElement,
   isInitializedImageElement,
-} from "../../src/element/typeChecks";
-import { newElementWith } from "../../src/element/mutateElement";
+} from "../../packages/excalidraw/element/typeChecks";
+import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import {
   ReconciledElements,
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
-import { decryptData } from "../../src/data/encryption";
+import { decryptData } from "../../packages/excalidraw/data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { ImportedDataState } from "../../src/data/types";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
