@@ -410,8 +410,8 @@
       "copyPngToClipboard": "لەبەربگرەوە بۆ سەر تەختەنوس"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "له‌به‌ری بگره‌وه‌ بۆ ته‌خته‌نووس"
     }
   },
