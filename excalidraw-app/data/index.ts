@@ -113,8 +113,8 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
-  SCROLL_AND_ZOOM: {
-    type: "SCROLL_AND_ZOOM";
+  SCENE_BOUNDS: {
+    type: "SCENE_BOUNDS";
     payload: {
       socketId: string;
       username: string;

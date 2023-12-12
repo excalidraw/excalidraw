@@ -222,15 +222,15 @@ class Portal {
     }
   };
 
-  broadcastScrollAndZoom = (
+  broadcastSceneBounds = (
     payload: {
       bounds: [number, number, number, number];
     },
     roomId: string,
   ) => {
     if (this.socket?.id) {
-      const data: SocketUpdateDataSource["SCROLL_AND_ZOOM"] = {
-        type: "SCROLL_AND_ZOOM",
+      const data: SocketUpdateDataSource["SCENE_BOUNDS"] = {
+        type: "SCENE_BOUNDS",
         payload: {
           socketId: this.socket.id,
           username: this.collab.state.username,

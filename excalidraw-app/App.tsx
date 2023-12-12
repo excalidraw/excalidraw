@@ -693,8 +693,8 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        onScrollAndZoomChange={({ zoom, scroll }) => {
-          collabAPI?.onScrollAndZoomChange({ zoom, scroll });
+        onScrollAndZoomChange={() => {
+          collabAPI?.relaySceneBounds();
         }}
         onUserFollowed={(userToFollow) => {
           collabAPI?.onUserFollowed(userToFollow);

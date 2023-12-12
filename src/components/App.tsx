@@ -3457,12 +3457,10 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.cancelInProgresAnimation?.();
 
-    // potentially unfollow participant
+    // unfollow participant
     this.setState((prevState, props) => ({
       ...(typeof state === "function" ? state(prevState, props) : state),
-      userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
-        ? null
-        : prevState.userToFollow,
+      userToFollow: null,
     }));
   };
 
@@ -5191,11 +5189,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    this.setState((prevState) => ({
-      userToFollow: prevState.shouldDisconnectFollowModeOnCanvasInteraction
-        ? null
-        : prevState.userToFollow,
-    }));
+    this.setState({ userToFollow: null });
 
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must

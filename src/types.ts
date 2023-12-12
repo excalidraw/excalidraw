@@ -313,10 +313,8 @@ export interface AppState {
   objectsSnapModeEnabled: boolean;
   /** the user's clientId who is being followed on the canvas */
   userToFollow: UserToFollow | null;
-  /** whether follow mode should be disconnected when the non-remote user interacts with the canvas */
-  shouldDisconnectFollowModeOnCanvasInteraction: boolean;
-  /** whether the user is being followed on the canvas */
-  amIBeingFollowed: boolean;
+  /** the clientIds of the users following the current user */
+  followedBy: Set<string>;
 }
 
 export type UIAppState = Omit<

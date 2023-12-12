@@ -12,7 +12,6 @@ import {
   zoomToFitBounds,
 } from "../../src/packages/excalidraw/index";
 import {
-  AppState,
   Collaborator,
   ExcalidrawImperativeAPI,
   Gesture,
@@ -96,7 +95,7 @@ export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
-  onScrollAndZoomChange: CollabInstance["onScrollAndZoomChange"];
+  relaySceneBounds: CollabInstance["relaySceneBounds"];
   onUserFollowed: CollabInstance["onUserFollowed"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
@@ -171,7 +170,7 @@ class Collab extends PureComponent<Props, CollabState> {
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
-      onScrollAndZoomChange: this.onScrollAndZoomChange,
+      relaySceneBounds: this.relaySceneBounds,
       onUserFollowed: this.onUserFollowed,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
@@ -540,10 +539,16 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
 
-          case "SCROLL_AND_ZOOM": {
+          case "SCENE_BOUNDS": {
             const { bounds } = decryptedData.payload;
 
             const _appState = this.excalidrawAPI.getAppState();
+
+            const { userToFollow, followedBy } = _appState;
+            // cross-follow case, ignore updates in this case
+            if (userToFollow && followedBy.has(userToFollow.clientId)) {
+              return;
+            }
 
             const { appState } = zoomToFitBounds({
               appState: _appState,
@@ -582,16 +587,14 @@ class Collab extends PureComponent<Props, CollabState> {
       scenePromise.resolve(sceneData);
     });
 
-    this.portal.socket.on("broadcast-follow", () => {
+    this.portal.socket.on("follow-room-user-change", (followedBy: string[]) => {
       this.excalidrawAPI.updateScene({
-        appState: { amIBeingFollowed: true },
+        appState: { followedBy: new Set(followedBy) },
       });
-    });
 
-    this.portal.socket.on("broadcast-unfollow", () => {
-      this.excalidrawAPI.updateScene({
-        appState: { amIBeingFollowed: false },
-      });
+      if (followedBy.length === 1) {
+        this.relaySceneBounds({ shouldPerform: true });
+      }
     });
 
     this.initializeIdleDetector();
@@ -801,41 +804,39 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  onScrollAndZoomChange = throttle(
-    (payload: { zoom: AppState["zoom"]; scroll: { x: number; y: number } }) => {
-      const appState = this.excalidrawAPI.getAppState();
+  relaySceneBounds = throttle((props?: { shouldPerform: boolean }) => {
+    const appState = this.excalidrawAPI.getAppState();
 
-      if (appState.amIBeingFollowed) {
-        const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
-          { clientX: 0, clientY: 0 },
-          {
-            offsetLeft: appState.offsetLeft,
-            offsetTop: appState.offsetTop,
-            scrollX: payload.scroll.x,
-            scrollY: payload.scroll.y,
-            zoom: payload.zoom,
-          },
+    if (appState.followedBy.size > 0 || props?.shouldPerform) {
+      const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
+        { clientX: 0, clientY: 0 },
+        {
+          offsetLeft: appState.offsetLeft,
+          offsetTop: appState.offsetTop,
+          scrollX: appState.scrollX,
+          scrollY: appState.scrollY,
+          zoom: appState.zoom,
+        },
+      );
+
+      const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
+        { clientX: appState.width, clientY: appState.height },
+        {
+          offsetLeft: appState.offsetLeft,
+          offsetTop: appState.offsetTop,
+          scrollX: appState.scrollX,
+          scrollY: appState.scrollY,
+          zoom: appState.zoom,
+        },
+      );
+
+      this.portal.socket &&
+        this.portal.broadcastSceneBounds(
+          { bounds: [x1, y1, x2, y2] },
+          `follow_${this.portal.socket.id}`,
         );
-
-        const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
-          { clientX: appState.width, clientY: appState.height },
-          {
-            offsetLeft: appState.offsetLeft,
-            offsetTop: appState.offsetTop,
-            scrollX: payload.scroll.x,
-            scrollY: payload.scroll.y,
-            zoom: payload.zoom,
-          },
-        );
-
-        this.portal.socket &&
-          this.portal.broadcastScrollAndZoom(
-            { bounds: [x1, y1, x2, y2] },
-            `follow_${this.portal.socket.id}`,
-          );
-      }
-    },
-  );
+    }
+  });
 
   onUserFollowed = (payload: OnUserFollowedPayload) => {
     this.portal.socket && this.portal.broadcastUserFollowed(payload);

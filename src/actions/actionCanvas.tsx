@@ -109,9 +109,7 @@ export const actionZoomIn = register({
           },
           appState,
         ),
-        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : appState.userToFollow,
+        userToFollow: null,
       },
       commitToHistory: false,
     };
@@ -149,9 +147,7 @@ export const actionZoomOut = register({
           },
           appState,
         ),
-        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : appState.userToFollow,
+        userToFollow: null,
       },
       commitToHistory: false,
     };
@@ -189,9 +185,7 @@ export const actionResetZoom = register({
           },
           appState,
         ),
-        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : appState.userToFollow,
+        userToFollow: null,
       },
       commitToHistory: false,
     };
@@ -353,9 +347,7 @@ export const actionZoomToFitSelectionInViewport = register({
       targetElements: selectedElements.length ? selectedElements : elements,
       appState: {
         ...appState,
-        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : appState.userToFollow,
+        userToFollow: null,
       },
       fitToViewport: false,
     });
@@ -378,9 +370,7 @@ export const actionZoomToFitSelection = register({
       targetElements: selectedElements.length ? selectedElements : elements,
       appState: {
         ...appState,
-        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : appState.userToFollow,
+        userToFollow: null,
       },
       fitToViewport: true,
     });
@@ -402,9 +392,7 @@ export const actionZoomToFit = register({
       targetElements: elements,
       appState: {
         ...appState,
-        userToFollow: appState.shouldDisconnectFollowModeOnCanvasInteraction
-          ? null
-          : appState.userToFollow,
+        userToFollow: null,
       },
       fitToViewport: false,
     }),
