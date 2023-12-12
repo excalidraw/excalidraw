@@ -93,7 +93,7 @@ Since Vite removes env variables by default, you can update the vite config to e
 
 ```
  define: {
-    "process.env.IS_PREACT": process.env.IS_PREACT,
+    "process.env.IS_PREACT": JSON.stringify("true"),
   },
 ```
 ::: 
@@ -148,7 +148,7 @@ import TabItem from "@theme/TabItem";
       <h1>Excalidraw Embed Example</h1>
       <div id="app"></div>
     </div>
-    <script type="text/javascript" src="src/index.js"></script>
+    <script type="text/javascript" src="packages/excalidraw/index.js"></script>
   </body>
 </html>
 ```

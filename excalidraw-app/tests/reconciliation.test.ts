@@ -1,10 +1,10 @@
-import { ExcalidrawElement } from "../../src/element/types";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
   validateFractionalIndicies,
-} from "../../src/fractionalIndex";
-import { randomInteger } from "../../src/random";
-import { AppState } from "../../src/types";
+} from "../../packages/excalidraw/fractionalIndex";
+import { randomInteger } from "../../packages/excalidraw/random";
+import { AppState } from "../../packages/excalidraw/types";
 import { reconcileElements } from "../collab/reconciliation";
 import {
   generateKeyBetween,

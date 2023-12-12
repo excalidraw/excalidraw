@@ -1,11 +1,11 @@
-import { ExcalidrawElement } from "../../src/element/types";
-import { AppState } from "../../src/types";
-import { arrayToMap } from "../../src/utils";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
   restoreFractionalIndicies,
   validateFractionalIndicies,
-} from "../../src/fractionalIndex";
+} from "../../packages/excalidraw/fractionalIndex";
+import { AppState } from "../../packages/excalidraw/types";
+import { arrayToMap } from "../../packages/excalidraw/utils";
 
 export type ReconciledElements = readonly ExcalidrawElement[] & {
   _brand: "reconciledElements";
