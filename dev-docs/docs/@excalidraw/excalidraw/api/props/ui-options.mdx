@@ -4,7 +4,7 @@ This prop can be used to customise UI of Excalidraw. Currently we support custom
 
 <pre>
   &#123;
-  <br /> canvasActions?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L372">
+  <br /> canvasActions?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L372">
     CanvasActions
   </a>, <br /> dockedSidebarBreakpoint?: number, <br /> welcomeScreen?: boolean <br />
 
@@ -55,7 +55,7 @@ If `UIOptions.canvasActions.export` is `false` the export button will not be ren
 
 ## dockedSidebarBreakpoint
 
-This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L161).  
+This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/constants.ts#L161).  
 If the _width_ of the _excalidraw_ container exceeds _dockedSidebarBreakpoint_, the sidebar will be `dockable` and the button to `dock` the sidebar will be shown  
 If user choses to `dock` the sidebar, it will push the right part of the UI towards the left, making space for the sidebar as shown below.
 

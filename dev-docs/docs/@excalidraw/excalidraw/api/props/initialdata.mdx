@@ -1,18 +1,18 @@
 # initialData
 
 <pre>
-&#123; elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> &#125;
+&#123; elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a> &#125;
 </pre>
 
 This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114) | The `elements` with which `Excalidraw` should be mounted. |
-| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95) | The `AppState` with which `Excalidraw` should be mounted. |
+| `elements` | [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) | The `elements` with which `Excalidraw` should be mounted. |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) | The `AppState` with which `Excalidraw` should be mounted. |
 | `scrollToContent` | `boolean` | This attribute indicates whether to `scroll` to the nearest element to center once `Excalidraw` is mounted. By default, it will not scroll the nearest element to the center. Make sure you pass `initialData.appState.scrollX` and `initialData.appState.scrollY` when `scrollToContent` is false so that scroll positions are retained |
-| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L247) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200)&gt; | This library items with which `Excalidraw` should be mounted. |
-| `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L82) | The `files` added to the scene. |
+| `libraryItems` | [LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L247) &#124; Promise&lt;[LibraryItems](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L200)&gt; | This library items with which `Excalidraw` should be mounted. |
+| `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L82) | The `files` added to the scene. |
 
 You might want to use this when you want to load excalidraw with some initial elements and app state.
 
