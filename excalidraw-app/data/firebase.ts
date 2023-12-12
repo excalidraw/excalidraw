@@ -1,20 +1,26 @@
-import { ExcalidrawElement, FileId } from "../../src/element/types";
-import { getSceneVersion } from "../../src/element";
+import {
+  ExcalidrawElement,
+  FileId,
+} from "../../packages/excalidraw/element/types";
+import { getSceneVersion } from "../../packages/excalidraw/element";
 import Portal from "../collab/Portal";
-import { restoreElements } from "../../src/data/restore";
+import { restoreElements } from "../../packages/excalidraw/data/restore";
 import {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
-} from "../../src/types";
+} from "../../packages/excalidraw/types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
-import { decompressData } from "../../src/data/encode";
-import { encryptData, decryptData } from "../../src/data/encryption";
-import { MIME_TYPES } from "../../src/constants";
+import { decompressData } from "../../packages/excalidraw/data/encode";
+import {
+  encryptData,
+  decryptData,
+} from "../../packages/excalidraw/data/encryption";
+import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { ResolutionType } from "../../src/utility-types";
+import { ResolutionType } from "../../packages/excalidraw/utility-types";
 
 // private
 // -----------------------------------------------------------------------------

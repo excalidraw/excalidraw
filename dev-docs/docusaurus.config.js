@@ -43,7 +43,7 @@ const config = {
         theme: {
           customCss: [
             require.resolve("./src/css/custom.scss"),
-            require.resolve("../src/packages/excalidraw/example/App.scss"),
+            require.resolve("../packages/excalidraw/example/App.scss"),
           ],
         },
       }),

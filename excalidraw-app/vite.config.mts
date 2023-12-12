@@ -27,7 +27,7 @@ export default defineConfig({
         // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
         manualChunks(id) {
           if (
-            id.includes("src/locales") &&
+            id.includes("packages/excalidraw/locales") &&
             id.match(/en.json|percentages.json/) === null
           ) {
             const index = id.indexOf("locales/");

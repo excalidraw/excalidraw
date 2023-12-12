@@ -1,3 +1,3 @@
 files:
-  - source: /src/locales/en.json
-    translation: /src/locales/%locale%.json
+  - source: /packages/excalidraw/locales/en.json
+    translation: /packages/excalidraw/locales/%locale%.json

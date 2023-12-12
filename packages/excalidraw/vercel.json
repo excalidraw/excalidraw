@@ -1,0 +1,4 @@
+{
+  "outputDirectory": "example/public",
+  "installCommand": "yarn install"
+}

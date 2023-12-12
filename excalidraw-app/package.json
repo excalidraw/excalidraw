@@ -18,23 +18,14 @@
       "last 1 safari version"
     ]
   },
-  "dependencies": {
-    "@excalidraw/random-username": "1.0.0",
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
-    "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.4",
-    "idb-keyval": "6.0.3",
-    "socket.io-client": "2.3.1"
-  },
-  "devDependencies": {
-    "@types/socket.io-client": "1.4.36"
-  },
   "engines": {
     "node": ">=18.0.0"
   },
+  "dependencies": {
+    "packages/excalidraw": "*"
+  },
   "homepage": ".",
-  "name": "excalidraw",
+  "name": "excalidraw-app",
   "prettier": "@excalidraw/prettier-config",
   "private": true,
   "scripts": {
