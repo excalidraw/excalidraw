@@ -229,7 +229,7 @@
       "iframe": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Não foi possível colar (não foi possível ler da área de transferência do sistema).",
     "asyncPasteFailedOnParse": "",
     "copyToSystemClipboardFailed": ""
   },
@@ -444,7 +444,7 @@
     "canvas": "tela",
     "selection": "seleção",
     "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
-    "unableToEmbed": "",
+    "unableToEmbed": "No momento não é permitido incorporar este url. Crie um problema no GitHub para solicitar a lista branca da url",
     "unrecognizedLinkFormat": ""
   },
   "colors": {
@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "",
     "button": "",
-    "description": "",
+    "description": "Atualmente apenas os diagramas<flowchartLink>Flowchart</flowchartLink><sequenceLink>Sequência,</sequenceLink> e <classLink>Class</classLink>são suportados. Os outros tipos serão renderizados como uma imagem no Excalidraw.",
     "syntax": "",
     "preview": ""
   }
