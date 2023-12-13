@@ -245,6 +245,7 @@ import {
   KeyboardModifiersObject,
   CollaboratorPointer,
   ToolType,
+  OnUserFollowedPayload,
 } from "../types";
 import {
   debounce,
@@ -552,6 +553,10 @@ class App extends React.Component<AppProps, AppState> {
       event: PointerEvent,
     ]
   >();
+  onUserFollowEmitter = new Emitter<[payload: OnUserFollowedPayload]>();
+  onScrollChangeEmitter = new Emitter<
+    [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
+  >();
 
   constructor(props: AppProps) {
     super(props);
@@ -621,6 +626,8 @@ class App extends React.Component<AppProps, AppState> {
         onChange: (cb) => this.onChangeEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
+        onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
+        onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
@@ -2554,18 +2561,23 @@ class App extends React.Component<AppProps, AppState> {
         this.state.scrollY,
         this.state.zoom,
       );
+      this.onScrollChangeEmitter.trigger(
+        this.state.scrollX,
+        this.state.scrollY,
+        this.state.zoom,
+      );
     }
 
     if (prevState.userToFollow !== this.state.userToFollow) {
       if (prevState.userToFollow) {
-        this.props?.onUserFollowed?.({
+        this.onUserFollowEmitter.trigger({
           userToFollow: prevState.userToFollow,
           action: "unfollow",
         });
       }
 
       if (this.state.userToFollow) {
-        this.props?.onUserFollowed?.({
+        this.onUserFollowEmitter.trigger({
           userToFollow: this.state.userToFollow,
           action: "follow",
         });

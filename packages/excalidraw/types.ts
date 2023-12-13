@@ -453,7 +453,7 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
-  onUserFollowed?: (payload: OnUserFollowedPayload) => void;
+  onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
   validateEmbeddable?:
     | boolean
@@ -689,6 +689,12 @@ export type ExcalidrawImperativeAPI = {
       pointerDownState: PointerDownState,
       event: PointerEvent,
     ) => void,
+  ) => UnsubscribeCallback;
+  onScrollChange: (
+    callback: (scrollX: number, scrollY: number, zoom: Zoom) => void,
+  ) => UnsubscribeCallback;
+  onUserFollow: (
+    callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 };
 

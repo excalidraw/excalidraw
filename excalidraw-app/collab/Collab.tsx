@@ -1,9 +1,6 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import {
-  ExcalidrawImperativeAPI,
-  OnUserFollowedPayload,
-} from "../../packages/excalidraw/types";
+import { ExcalidrawImperativeAPI } from "../../packages/excalidraw/types";
 import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
@@ -98,8 +95,6 @@ export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
   onPointerUpdate: CollabInstance["onPointerUpdate"];
-  relaySceneBounds: CollabInstance["relaySceneBounds"];
-  onUserFollowed: CollabInstance["onUserFollowed"];
   startCollaboration: CollabInstance["startCollaboration"];
   stopCollaboration: CollabInstance["stopCollaboration"];
   syncElements: CollabInstance["syncElements"];
@@ -162,19 +157,31 @@ class Collab extends PureComponent<Props, CollabState> {
     this.idleTimeoutId = null;
   }
 
+  private onUmmount: (() => void) | null = null;
+
   componentDidMount() {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener("online", this.onOfflineStatusToggle);
     window.addEventListener("offline", this.onOfflineStatusToggle);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
+    const unsubOnUserFollow = this.excalidrawAPI.onUserFollow((payload) => {
+      this.portal.socket && this.portal.broadcastUserFollowed(payload);
+    });
+    const throttledRelaySceneBounds = throttleRAF(this.relaySceneBounds);
+    const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
+      throttledRelaySceneBounds(),
+    );
+    this.onUmmount = () => {
+      unsubOnUserFollow();
+      unsubOnScrollChange();
+    };
+
     this.onOfflineStatusToggle();
 
     const collabAPI: CollabAPI = {
       isCollaborating: this.isCollaborating,
       onPointerUpdate: this.onPointerUpdate,
-      relaySceneBounds: this.relaySceneBounds,
-      onUserFollowed: this.onUserFollowed,
       startCollaboration: this.startCollaboration,
       syncElements: this.syncElements,
       fetchImageFilesFromFirebase: this.fetchImageFilesFromFirebase,
@@ -217,6 +224,7 @@ class Collab extends PureComponent<Props, CollabState> {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
     }
+    this.onUmmount?.();
   }
 
   isCollaborating = () => appJotaiStore.get(isCollaboratingAtom)!;
@@ -805,7 +813,7 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  relaySceneBounds = throttleRAF((props?: { shouldPerform: boolean }) => {
+  relaySceneBounds = (props?: { shouldPerform: boolean }) => {
     const appState = this.excalidrawAPI.getAppState();
 
     if (
@@ -827,10 +835,6 @@ class Collab extends PureComponent<Props, CollabState> {
         `follow_${this.portal.socket.id}`,
       );
     }
-  });
-
-  onUserFollowed = (payload: OnUserFollowedPayload) => {
-    this.portal.socket && this.portal.broadcastUserFollowed(payload);
   };
 
   onIdleStateChange = (userState: UserIdleState) => {

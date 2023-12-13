@@ -693,12 +693,6 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        onScrollChange={() => {
-          collabAPI?.relaySceneBounds();
-        }}
-        onUserFollowed={(userToFollow) => {
-          collabAPI?.onUserFollowed(userToFollow);
-        }}
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
