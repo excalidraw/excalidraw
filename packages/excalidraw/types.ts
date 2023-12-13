@@ -56,6 +56,7 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
+  socketId?: string;
 };
 
 export type CollaboratorPointer = {
@@ -123,7 +124,11 @@ export type ActiveTool =
 export type SidebarName = string;
 export type SidebarTabName = string;
 
-export type UserToFollow = { clientId: string; username: string };
+export type UserToFollow = {
+  userId: string | null;
+  socketId: string;
+  username: string;
+};
 
 type _CommonCanvasAppState = {
   zoom: AppState["zoom"];

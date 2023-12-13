@@ -2538,7 +2538,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const hasFollowedPersonLeft =
       prevState.userToFollow &&
-      !this.state.collaborators.has(prevState.userToFollow.clientId);
+      !this.state.collaborators.has(prevState.userToFollow.socketId);
 
     if (hasFollowedPersonLeft) {
       this.setState({ userToFollow: null });

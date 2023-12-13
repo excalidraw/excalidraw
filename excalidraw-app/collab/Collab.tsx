@@ -549,7 +549,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
             const { userToFollow, followedBy } = _appState;
             // cross-follow case, ignore updates in this case
-            if (userToFollow && followedBy.has(userToFollow.clientId)) {
+            if (userToFollow && followedBy.has(userToFollow.socketId)) {
               return;
             }
 

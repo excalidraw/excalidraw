@@ -144,7 +144,7 @@ export const UserList = ({
       map.set(
         // filter on user id, else fall back on unique socketId
         collaborator.id || socketId,
-        collaborator,
+        { ...collaborator, socketId },
       );
     });
     return map;
@@ -154,7 +154,7 @@ export const UserList = ({
   const uniqueCollaboratorsArray = React.useMemo(
     () =>
       Array.from(uniqueCollaboratorsMap).filter(
-        ([_, collaborator]) => Object.keys(collaborator).length !== 0,
+        ([_, collaborator]) => Object.keys(collaborator).length !== 1,
       ),
     [uniqueCollaboratorsMap],
   );

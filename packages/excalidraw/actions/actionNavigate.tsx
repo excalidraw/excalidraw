@@ -8,14 +8,14 @@ export const actionGoToCollaborator = register({
   viewMode: true,
   trackEvent: { category: "collab" },
   perform: (_elements, appState, value) => {
-    const _value = value as Collaborator & { clientId: string };
+    const _value = value as Collaborator;
     const point = _value.pointer;
 
     if (!point) {
       return { appState, commitToHistory: false };
     }
 
-    if (appState.userToFollow?.clientId === _value.clientId) {
+    if (appState.userToFollow?.socketId === _value.socketId) {
       return {
         appState: {
           ...appState,
@@ -29,7 +29,8 @@ export const actionGoToCollaborator = register({
       appState: {
         ...appState,
         userToFollow: {
-          clientId: _value.clientId,
+          socketId: _value.socketId!,
+          userId: _value.id || null,
           username: _value.username || "",
         },
         // Close mobile menu
@@ -57,7 +58,7 @@ export const actionGoToCollaborator = register({
           onClick={() => {}}
           name={collaborator.username || ""}
           src={collaborator.avatarUrl}
-          isBeingFollowed={appState.userToFollow?.clientId === clientId}
+          isBeingFollowed={appState.userToFollow?.socketId === clientId}
         />
         {collaborator.username}
       </div>
@@ -69,7 +70,7 @@ export const actionGoToCollaborator = register({
         }}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
-        isBeingFollowed={appState.userToFollow?.clientId === clientId}
+        isBeingFollowed={appState.userToFollow?.socketId === clientId}
       />
     );
   },
