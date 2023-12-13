@@ -53,7 +53,6 @@
     "@radix-ui/react-tabs": "1.0.2",
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "12.1.5",
-    "@tldraw/tldraw": "1.29.2",
     "@tldraw/vec": "1.7.1",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
