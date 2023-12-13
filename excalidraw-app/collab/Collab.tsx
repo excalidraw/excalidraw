@@ -808,34 +808,24 @@ class Collab extends PureComponent<Props, CollabState> {
   relaySceneBounds = throttleRAF((props?: { shouldPerform: boolean }) => {
     const appState = this.excalidrawAPI.getAppState();
 
-    if (appState.followedBy.size > 0 || props?.shouldPerform) {
+    if (
+      this.portal.socket &&
+      (appState.followedBy.size > 0 || props?.shouldPerform)
+    ) {
       const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
         { clientX: 0, clientY: 0 },
-        {
-          offsetLeft: appState.offsetLeft,
-          offsetTop: appState.offsetTop,
-          scrollX: appState.scrollX,
-          scrollY: appState.scrollY,
-          zoom: appState.zoom,
-        },
+        appState,
       );
 
       const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
         { clientX: appState.width, clientY: appState.height },
-        {
-          offsetLeft: appState.offsetLeft,
-          offsetTop: appState.offsetTop,
-          scrollX: appState.scrollX,
-          scrollY: appState.scrollY,
-          zoom: appState.zoom,
-        },
+        appState,
       );
 
-      this.portal.socket &&
-        this.portal.broadcastSceneBounds(
-          { bounds: [x1, y1, x2, y2] },
-          `follow_${this.portal.socket.id}`,
-        );
+      this.portal.broadcastSceneBounds(
+        { bounds: [x1, y1, x2, y2] },
+        `follow_${this.portal.socket.id}`,
+      );
     }
   });
 
