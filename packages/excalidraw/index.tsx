@@ -41,7 +41,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onPointerDown,
     onScrollChange,
-    onScrollAndZoomChange,
     onUserFollowed,
     children,
     validateEmbeddable,
@@ -123,7 +122,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onPointerDown={onPointerDown}
           onScrollChange={onScrollChange}
-          onScrollAndZoomChange={onScrollAndZoomChange}
           onUserFollowed={onUserFollowed}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}

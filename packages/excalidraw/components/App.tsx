@@ -2548,15 +2548,12 @@ class App extends React.Component<AppProps, AppState> {
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY;
 
-    if (hasScrollChanged) {
-      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
-    }
-
     if (prevState.zoom.value !== this.state.zoom.value || hasScrollChanged) {
-      this.props?.onScrollAndZoomChange?.({
-        zoom: this.state.zoom,
-        scroll: { x: this.state.scrollX, y: this.state.scrollY },
-      });
+      this.props?.onScrollChange?.(
+        this.state.scrollX,
+        this.state.scrollY,
+        this.state.zoom,
+      );
     }
 
     if (prevState.userToFollow !== this.state.userToFollow) {
