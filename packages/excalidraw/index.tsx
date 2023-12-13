@@ -216,7 +216,7 @@ export {
   getFreeDrawSvgPath,
   exportToClipboard,
   mergeLibraryItems,
-} from "@excalidraw/utils";
+} from "../utils/export";
 export { isLinearElement } from "./element/typeChecks";
 
 export { FONT_FAMILY, THEME, MIME_TYPES } from "./constants";
@@ -254,4 +254,4 @@ export {
   elementsOverlappingBBox,
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
-} from "@excalidraw/utils";
+} from "../utils/export";

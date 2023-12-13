@@ -116,5 +116,3 @@ declare namespace jest {
     toBeNonNaNNumber(): void;
   }
 }
-
-declare module "@excalidraw/utils";
