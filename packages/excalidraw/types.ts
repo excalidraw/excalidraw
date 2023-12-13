@@ -125,7 +125,6 @@ export type SidebarName = string;
 export type SidebarTabName = string;
 
 export type UserToFollow = {
-  userId: string | null;
   socketId: string;
   username: string;
 };

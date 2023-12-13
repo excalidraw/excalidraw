@@ -30,7 +30,6 @@ export const actionGoToCollaborator = register({
         ...appState,
         userToFollow: {
           socketId: _value.socketId!,
-          userId: _value.id || null,
           username: _value.username || "",
         },
         // Close mobile menu
