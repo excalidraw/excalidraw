@@ -231,7 +231,7 @@
     },
     "asyncPasteFailedOnRead": "चिटकवता नाही जमले ( सिस्टम क्लिप्बॉर्ड पासून वाचणे नाही जमले).",
     "asyncPasteFailedOnParse": "चिटकवता नाही जमले.",
-    "copyToSystemClipboardFailed": ""
+    "copyToSystemClipboardFailed": "क्लिपबोर्ड वर प्रतिलिपि करणे नाही जमले."
   },
   "toolBar": {
     "selection": "निवड",
@@ -248,14 +248,14 @@
     "penMode": "पेन चा मोड - स्पर्श टाळा",
     "link": "निवडलेल्या आकारासाठी दुवा जोडा/बदल करा",
     "eraser": "खोड रबर",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
+    "frame": "चौकट यंत्र",
+    "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
+    "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
     "hand": "हात ( सरकवण्या चे उपकरण)",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "extraTools": "आणिक यंत्रे",
+    "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
+    "magicSettings": "कृतिम बुद्दिवत्ता सेटिंग्स"
   },
   "headings": {
     "canvasActions": "पटल क्रिया",
@@ -267,7 +267,7 @@
     "linearElement": "अनेक बिंदु साठी क्लिक करा, रेघे साठी ड्रैग करा",
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
-    "embeddable": "",
+    "embeddable": "वेबसाइट रुतोण्या साठी दाबून-खेचा (क्लिक-ड्रैग करा)",
     "text_selected": "लेखन संपादन साठी दुहेरी क्लिक करा किव्हा एंटर दाबा",
     "text_editing": "संपादन संपवायचं असल्यास एस्केप दाबा किव्हा कंट्रोल या कम्मांड बरोबार एंटर दाबा",
     "linearElementMulti": "शेवटच्या बिंदु वर क्लिक करा किव्हा एस्केप या एंटर दाबा",
@@ -392,27 +392,27 @@
     "removeItemsFromLib": "निवडलेले आयटम्स संग्रहातून काढा"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "प्रतिमा निर्यात करा",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "पार्श्वभूमि",
+      "onlySelected": "फक्त चयन केलेले",
+      "darkMode": "अंधारमय स्थिति",
+      "embedScene": "दृश्य रुतवा",
+      "scale": "क़िती पट",
+      "padding": "ग़ादी"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "दृश्य डेटा निर्यात केलेल्या पी-एन-जी किव्हा एस-वी-जी फ़ाईल मधे सुरक्षीत केला जाईल, त्याने दृश्य पुनः परत आणता येईल. निर्यात केलेली फ़ाईल चा आकार त्याने वाढेल."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पी-एन-जी स्वरूपात बाहेर ठेवा",
+      "exportToSvg": "एस-वी-जी स्वरूपात बाहेर ठेवा",
+      "copyPngToClipboard": "पी-एन-जी रूपे फळी वर कॉपी करा"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पीएनजी",
+      "exportToSvg": "एसविज़ी",
+      "copyPngToClipboard": "फळी वर कॉपी करा"
     }
   },
   "encrypted": {
@@ -444,8 +444,8 @@
     "canvas": "पटल",
     "selection": "निवड",
     "pasteAsSingleElement": "एक घटक म्हणून चिपकावण्या साठी {{shortcut}} वापरा,\nकिंवा विद्यमान मजकूर संपादकात चिपकवा",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "युआरेल रूतवणे प्रतिबंधित आहेत. आपली युआरेल श्वेतसूचित आणण्या साठी कृपया एक मुद्दा ग़िटहब वर उठवा",
+    "unrecognizedLinkFormat": "जी युआरेल तुम्हीं रतवली आहे, ती आपेक्षित प्रकारे नाही आहे. कृपया स्त्रोत साइट नी 'रूतवण्या साठी दिलेलि लिपि' चिपकावण्याचा प्रयास करा"
   },
   "colors": {
     "transparent": "पारदर्शक",
@@ -516,8 +516,8 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "मर्मेड पासून एक्सकाली मधे",
+    "button": "शिरवा",
     "description": "",
     "syntax": "",
     "preview": ""
