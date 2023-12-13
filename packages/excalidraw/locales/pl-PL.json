@@ -11,8 +11,8 @@
     "copyAsPng": "Skopiuj do schowka jako plik PNG",
     "copyAsSvg": "Skopiuj do schowka jako plik SVG",
     "copyText": "Skopiuj do schowka jako tekst",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Skopiuj źródło do schowka",
+    "convertToCode": "Skonwertuj do kodu",
     "bringForward": "Przenieś wyżej",
     "sendToBack": "Przenieś na spód",
     "bringToFront": "Przenieś na wierzch",
@@ -38,12 +38,12 @@
     "arrowhead_none": "Brak",
     "arrowhead_arrow": "Strzałka",
     "arrowhead_bar": "Kreska",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Koło",
+    "arrowhead_circle_outline": "Koło (puste)",
     "arrowhead_triangle": "Trójkąt",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Trójkąt (pusty)",
+    "arrowhead_diamond": "Romb",
+    "arrowhead_diamond_outline": "Romb (pusty)",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
@@ -137,8 +137,8 @@
     "selectAllElementsInFrame": "Zaznacz wszystkie elementy w ramce",
     "removeAllElementsFromFrame": "Usuń wszystkie elementy z ramki",
     "eyeDropper": "Wybierz kolor z płótna",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Generuj diagram z opisu",
+    "prompt": "Opis"
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
@@ -161,7 +161,7 @@
     "zoomIn": "Powiększ",
     "zoomOut": "Pomniejsz",
     "resetZoom": "Zresetuj powiększenie",
-    "menu": "",
+    "menu": "Menu",
     "done": "Gotowe",
     "edit": "Edytuj",
     "undo": "Cofnij",
@@ -217,7 +217,7 @@
     "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Dodawanie obrazów jest wyłączone.",
     "brave_measure_text_error": {
       "line1": "Wygląda na to, że używasz przeglądarki Brave z włączonym ustawieniem <bold>Agressively Block Fingerprinting</bold>.",
       "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
@@ -226,12 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementy osadzone nie mogą zostać dodane do biblioteki.",
-      "iframe": "",
+      "iframe": "Elementy IFrame nie mogą zostać dodane do biblioteki.",
       "image": "Dodawania obrazów do biblioteki nadejdzie wkrótce!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Nie udało się wkleić (nie udało się odczytać ze schowka systemowego).",
+    "asyncPasteFailedOnParse": "Nie udało się wkleić.",
+    "copyToSystemClipboardFailed": "Nie udało się skopiować do schowka."
   },
   "toolBar": {
     "selection": "Zaznaczenie",
@@ -249,13 +249,13 @@
     "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
     "frame": "Ramka",
-    "magicframe": "",
+    "magicframe": "Wireframe do kodu",
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
+    "magicSettings": "Ustawienia AI"
   },
   "headings": {
     "canvasActions": "Narzędzia",
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Skopiuj do schowka jako PNG"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Skopiuj do schowka"
     }
   },
@@ -421,7 +421,7 @@
   },
   "stats": {
     "angle": "Kąt",
-    "element": "",
+    "element": "Element",
     "elements": "Elementy",
     "height": "Wysokość",
     "scene": "Scena",
@@ -497,7 +497,7 @@
         "description": "Eksportuj zawartość sceny jako plik z możliwością importowania."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Eksportuj do Excalidraw+",
         "description": "Zapisz scenę do swojego obszaru roboczego Excalidraw+."
       }
@@ -516,10 +516,10 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Konwertuj diagram Mermaid do Excalidraw",
+    "button": "Wstaw",
+    "description": "Obecnie wspierane są jedynie <flowchartLink>proste grafy</flowchartLink>, <sequenceLink>sekwencje</sequenceLink> i <classLink>diagramy klas</classLink>. Pozostałe typy będą wyświetlane jako obrazy w Excalidraw.",
+    "syntax": "Składnia diagramów Mermaid",
+    "preview": "Podgląd"
   }
 }
