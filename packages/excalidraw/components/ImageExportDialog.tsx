@@ -23,7 +23,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../../utils";
+import { exportToCanvas } from "@excalidraw/utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -120,7 +120,7 @@ const ImageExportModal = ({
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
     })
-      .then((canvas) => {
+      .then((canvas: HTMLCanvasElement) => {
         setRenderError(null);
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
@@ -128,7 +128,7 @@ const ImageExportModal = ({
           previewNode.replaceChildren(canvas);
         });
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error);
         setRenderError(error);
       });

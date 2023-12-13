@@ -11,7 +11,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { t } from "../i18n";
-import { elementsOverlappingBBox } from "../../withinBounds";
+import { elementsOverlappingBBox } from "@excalidraw/utils";
 import { isSomeElementSelected, getSelectedElements } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";

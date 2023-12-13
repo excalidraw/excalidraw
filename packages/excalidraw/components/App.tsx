@@ -392,7 +392,7 @@ import {
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
 import { MagicCacheData, diagramToHTML } from "../data/magic";
-import { elementsOverlappingBBox, exportToBlob } from "../../utils";
+import { elementsOverlappingBBox, exportToBlob } from "@excalidraw/utils";
 import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
@@ -1715,7 +1715,7 @@ class App extends React.Component<AppProps, AppState> {
       elements: this.scene.getNonDeletedElements(),
       bounds: magicFrame,
       type: "overlap",
-    }).filter((el) => !isMagicFrameElement(el));
+    }).filter((el: ExcalidrawElement | null) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
       if (source === "button") {

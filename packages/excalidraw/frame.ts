@@ -21,7 +21,7 @@ import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
-import { doLineSegmentsIntersect } from "../utils";
+import { doLineSegmentsIntersect } from "@excalidraw/utils";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 
 // --------------------------- Frame State ------------------------------------
