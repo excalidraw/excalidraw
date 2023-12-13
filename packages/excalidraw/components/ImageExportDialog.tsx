@@ -120,7 +120,7 @@ const ImageExportModal = ({
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
     })
-      .then((canvas: HTMLCanvasElement) => {
+      .then((canvas) => {
         setRenderError(null);
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
@@ -128,7 +128,7 @@ const ImageExportModal = ({
           previewNode.replaceChildren(canvas);
         });
       })
-      .catch((error: any) => {
+      .catch((error) => {
         console.error(error);
         setRenderError(error);
       });

@@ -5,7 +5,6 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
-import { abc } from "../../utils/index";
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -643,8 +642,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
-
-    console.log(abc());
   }
 
   private onWindowMessage(event: MessageEvent) {
@@ -1717,7 +1714,7 @@ class App extends React.Component<AppProps, AppState> {
       elements: this.scene.getNonDeletedElements(),
       bounds: magicFrame,
       type: "overlap",
-    }).filter((el: ExcalidrawElement | null) => !isMagicFrameElement(el));
+    }).filter((el) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
       if (source === "button") {
