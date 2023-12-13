@@ -595,9 +595,7 @@ class Collab extends PureComponent<Props, CollabState> {
         appState: { followedBy: new Set(followedBy) },
       });
 
-      if (followedBy.length === 1) {
-        this.relaySceneBounds({ shouldPerform: true });
-      }
+      this.relaySceneBounds({ shouldPerform: true });
     });
 
     this.initializeIdleDetector();
