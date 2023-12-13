@@ -1,4 +1,4 @@
-import * as utils from "../utils";
+import * as utils from ".";
 import { diagramFactory } from "../excalidraw/tests/fixtures/diagramFixture";
 import { vi } from "vitest";
 import * as mockedSceneExportUtils from "../excalidraw/scene/export";
