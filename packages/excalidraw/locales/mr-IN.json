@@ -39,11 +39,11 @@
     "arrowhead_arrow": "बाण",
     "arrowhead_bar": "दांडुक",
     "arrowhead_circle": "वृत्त",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle_outline": "वृत्त (बाह्यरेखा)",
     "arrowhead_triangle": "त्रिकोण",
-    "arrowhead_triangle_outline": "",
+    "arrowhead_triangle_outline": "त्रिभुज (बाह्यरेखा)",
     "arrowhead_diamond": "चौकट",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_diamond_outline": "चौकट (बाह्यरेखा)",
     "fontSize": "अक्षर आकार",
     "fontFamily": "अक्षर समूह",
     "addWatermark": "\"एक्सकेलीड्रॉ ने बनवलेलं\" जोडा",
@@ -137,8 +137,8 @@
     "selectAllElementsInFrame": "चौकटीतले सर्व तत्वांचे चयन करा",
     "removeAllElementsFromFrame": "चौकटीतून सर्व काढून टाका",
     "eyeDropper": "चित्रफलकातून रंग निवडा",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "लिपि पासून चित्र",
+    "prompt": "प्रश्न"
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
@@ -518,8 +518,8 @@
   "mermaid": {
     "title": "मर्मेड पासून एक्सकाली मधे",
     "button": "शिरवा",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "description": "सध्या फक्त <flowchartLink> प्रवाह चित्र (फ़्लो चार्ट) </flowchartLink> आणि <sequenceLink> क्रम चित्र (सिकवेंस ड़ायग्राम) </sequenceLink> करता येतात. बाक़ीचे चित्र प्रकार एक्सकाली चित्र पद्धति नी चित्रित होतील.",
+    "syntax": "मर्मेड संरचना नियम",
+    "preview": "पूर्वावलोकन"
   }
 }
