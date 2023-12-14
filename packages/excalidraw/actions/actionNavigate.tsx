@@ -1,6 +1,5 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import { centerScrollOn } from "../scene/scroll";
 import { Collaborator } from "../types";
 import { register } from "./register";
 
@@ -9,39 +8,68 @@ export const actionGoToCollaborator = register({
   viewMode: true,
   trackEvent: { category: "collab" },
   perform: (_elements, appState, value) => {
-    const point = value as Collaborator["pointer"];
+    const _value = value as Collaborator;
+    const point = _value.pointer;
+
     if (!point) {
       return { appState, commitToHistory: false };
+    }
+
+    if (appState.userToFollow?.socketId === _value.socketId) {
+      return {
+        appState: {
+          ...appState,
+          userToFollow: null,
+        },
+        commitToHistory: false,
+      };
     }
 
     return {
       appState: {
         ...appState,
-        ...centerScrollOn({
-          scenePoint: point,
-          viewportDimensions: {
-            width: appState.width,
-            height: appState.height,
-          },
-          zoom: appState.zoom,
-        }),
+        userToFollow: {
+          socketId: _value.socketId!,
+          username: _value.username || "",
+        },
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, data }) => {
-    const [clientId, collaborator] = data as [string, Collaborator];
+  PanelComponent: ({ updateData, data, appState }) => {
+    const [clientId, collaborator, withName] = data as [
+      string,
+      Collaborator,
+      boolean,
+    ];
 
     const background = getClientColor(clientId);
 
-    return (
+    return withName ? (
+      <div
+        className="dropdown-menu-item dropdown-menu-item-base"
+        onClick={() => updateData({ ...collaborator, clientId })}
+      >
+        <Avatar
+          color={background}
+          onClick={() => {}}
+          name={collaborator.username || ""}
+          src={collaborator.avatarUrl}
+          isBeingFollowed={appState.userToFollow?.socketId === clientId}
+        />
+        {collaborator.username}
+      </div>
+    ) : (
       <Avatar
         color={background}
-        onClick={() => updateData(collaborator.pointer)}
+        onClick={() => {
+          updateData({ ...collaborator, clientId });
+        }}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
+        isBeingFollowed={appState.userToFollow?.socketId === clientId}
       />
     );
   },

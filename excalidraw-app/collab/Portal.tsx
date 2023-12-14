@@ -7,12 +7,11 @@ import {
 import { TCollabClass } from "./Collab";
 
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
 import {
-  WS_EVENTS,
-  FILE_UPLOAD_TIMEOUT,
-  WS_SCENE_EVENT_TYPES,
-} from "../app_constants";
-import { UserIdleState } from "../../packages/excalidraw/types";
+  OnUserFollowedPayload,
+  UserIdleState,
+} from "../../packages/excalidraw/types";
 import { trackEvent } from "../../packages/excalidraw/analytics";
 import throttle from "lodash.throttle";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
@@ -46,7 +45,7 @@ class Portal {
     });
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
-        WS_SCENE_EVENT_TYPES.INIT,
+        WS_SUBTYPES.INIT,
         this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
@@ -83,6 +82,7 @@ class Portal {
   async _broadcastSocketData(
     data: SocketUpdateData,
     volatile: boolean = false,
+    roomId?: string,
   ) {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
@@ -91,7 +91,7 @@ class Portal {
 
       this.socket?.emit(
         volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
-        this.roomId,
+        roomId ?? this.roomId,
         encryptedBuffer,
         iv,
       );
@@ -130,11 +130,11 @@ class Portal {
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (
-    updateType: WS_SCENE_EVENT_TYPES.INIT | WS_SCENE_EVENT_TYPES.UPDATE,
+    updateType: WS_SUBTYPES.INIT | WS_SUBTYPES.UPDATE,
     allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
-    if (updateType === WS_SCENE_EVENT_TYPES.INIT && !syncAll) {
+    if (updateType === WS_SUBTYPES.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
@@ -213,10 +213,41 @@ class Portal {
           username: this.collab.state.username,
         },
       };
+
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile
       );
+    }
+  };
+
+  broadcastUserViewportBounds = (
+    payload: {
+      bounds: [number, number, number, number];
+    },
+    roomId: string,
+  ) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["USER_VIEWPORT_BOUNDS"] = {
+        type: WS_SUBTYPES.USER_VIEWPORT_BOUNDS,
+        payload: {
+          socketId: this.socket.id,
+          username: this.collab.state.username,
+          bounds: payload.bounds,
+        },
+      };
+
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        true, // volatile
+        roomId,
+      );
+    }
+  };
+
+  broadcastUserFollowed = (payload: OnUserFollowedPayload) => {
+    if (this.socket?.id) {
+      this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
   };
 }

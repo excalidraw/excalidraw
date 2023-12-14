@@ -119,6 +119,14 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
+  USER_VIEWPORT_BOUNDS: {
+    type: "USER_VIEWPORT_BOUNDS";
+    payload: {
+      socketId: string;
+      username: string;
+      bounds: [number, number, number, number];
+    };
+  };
   IDLE_STATUS: {
     type: "IDLE_STATUS";
     payload: {
