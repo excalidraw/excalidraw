@@ -13,7 +13,7 @@ import { searchIcon } from "./icons";
 import { t } from "../i18n";
 
 const FIRST_N_AVATARS = 3;
-const SHOW_COLLABORATORS_FILTER_AT = 6;
+const SHOW_COLLABORATORS_FILTER_AT = 8;
 
 const ConditionalTooltipWrapper = ({
   shouldWrap,
@@ -161,8 +161,8 @@ export const UserList = ({
             sideOffset={10}
           >
             <Island style={{ overflow: "hidden" }}>
-              {SHOW_COLLABORATORS_FILTER_AT <=
-                uniqueCollaboratorsArray.length && (
+              {uniqueCollaboratorsArray.length >=
+                SHOW_COLLABORATORS_FILTER_AT && (
                 <div className="UserList__search-wrapper">
                   {searchIcon}
                   <input
