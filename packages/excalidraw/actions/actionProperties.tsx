@@ -1170,15 +1170,22 @@ export const actionChangeArrowhead = register({
   },
 });
 
-function calculateAdjustedStrokeWidth(speed: any) {
-  return 1 * speed;
+function calculateAdjustedStrokeWidth(
+  speed: any,
+  pressureSimulationEnabled: boolean,
+) {
+  const pressureFactor = pressureSimulationEnabled ? 0.5 : 1;
+  return pressureFactor * speed;
 }
 
 export const actionPressureSensitivity = register({
   name: "pressureSensitivity",
   trackEvent: false,
   perform: (elements, appState, value, drawingSpeed) => {
-    const adjustedStrokeWidth = calculateAdjustedStrokeWidth(drawingSpeed);
+    const adjustedStrokeWidth = calculateAdjustedStrokeWidth(
+      drawingSpeed,
+      appState.pressureSimulationEnabled,
+    );
 
     return {
       elements: changeProperty(elements, appState, (el) =>
@@ -1195,15 +1202,13 @@ export const actionPressureSensitivity = register({
       useState(false);
 
     const togglePressureSimulation = () => {
-      setPressureSimulationEnabled((prev: any) => !prev);
-      const strokeWidth = pressureSimulationEnabled
-        ? 1
+      setPressureSimulationEnabled((prev: boolean) => !prev);
+      const newStrokeWidth = pressureSimulationEnabled
+        ? STROKE_WIDTH.thin
         : appState.currentItemStrokeWidth;
-
       updateData({
         ...appState,
-        pressureSimulationEnabled,
-        currentItemStrokeWidth: strokeWidth,
+        currentItemStrokeWidth: newStrokeWidth,
       });
     };
     return (
@@ -1224,9 +1229,13 @@ export const actionPressureSensitivity = register({
             value={getFormValue(
               elements,
               appState,
-              (element) => calculateAdjustedStrokeWidth(element),
+              (element) =>
+                calculateAdjustedStrokeWidth(
+                  element,
+                  appState.pressureSimulationEnabled,
+                ),
               true,
-              1,
+              appState.currentItemStrokeWidth,
             )}
           ></button>
         </div>
