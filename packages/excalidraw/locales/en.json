@@ -521,5 +521,14 @@
     "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Quick search",
+      "empty": "No users found"
+    },
+    "hint": {
+      "text": "Click on user to follow"
+    }
   }
 }

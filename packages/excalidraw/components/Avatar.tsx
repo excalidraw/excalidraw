@@ -2,21 +2,33 @@ import "./Avatar.scss";
 
 import React, { useState } from "react";
 import { getNameInitial } from "../clients";
+import clsx from "clsx";
 
 type AvatarProps = {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   color: string;
   name: string;
   src?: string;
+  isBeingFollowed?: boolean;
 };
 
-export const Avatar = ({ color, onClick, name, src }: AvatarProps) => {
+export const Avatar = ({
+  color,
+  onClick,
+  name,
+  src,
+  isBeingFollowed,
+}: AvatarProps) => {
   const shortName = getNameInitial(name);
   const [error, setError] = useState(false);
   const loadImg = !error && src;
   const style = loadImg ? undefined : { background: color };
   return (
-    <div className="Avatar" style={style} onClick={onClick}>
+    <div
+      className={clsx("Avatar", { "Avatar--is-followed": isBeingFollowed })}
+      style={style}
+      onClick={onClick}
+    >
       {loadImg ? (
         <img
           className="Avatar-img"
