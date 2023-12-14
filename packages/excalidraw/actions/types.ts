@@ -104,6 +104,7 @@ export type ActionName =
   | "distributeHorizontally"
   | "distributeVertically"
   | "flipHorizontal"
+  | "pressureSensitivity"
   | "flipVertical"
   | "viewMode"
   | "exportWithDarkMode"

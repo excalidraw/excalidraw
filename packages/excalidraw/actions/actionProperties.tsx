@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppState, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -1165,6 +1166,71 @@ export const actionChangeArrowhead = register({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+function calculateAdjustedStrokeWidth(speed: any) {
+  return 1 * speed;
+}
+
+export const actionPressureSensitivity = register({
+  name: "pressureSensitivity",
+  trackEvent: false,
+  perform: (elements, appState, value, drawingSpeed) => {
+    const adjustedStrokeWidth = calculateAdjustedStrokeWidth(drawingSpeed);
+
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          strokeWidth: adjustedStrokeWidth,
+        }),
+      ),
+      appState: { ...appState, currentItemStrokeWidth: adjustedStrokeWidth },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const [pressureSimulationEnabled, setPressureSimulationEnabled] =
+      useState(false);
+
+    const togglePressureSimulation = () => {
+      setPressureSimulationEnabled((prev: any) => !prev);
+      const strokeWidth = pressureSimulationEnabled
+        ? 1
+        : appState.currentItemStrokeWidth;
+
+      updateData({
+        ...appState,
+        pressureSimulationEnabled,
+        currentItemStrokeWidth: strokeWidth,
+      });
+    };
+    return (
+      <div className="pressure-container">
+        <label className="pressure-label">
+          {t("labels.pressureSensitivity")}
+        </label>
+        <div className="pressure-button-container">
+          <div
+            onClick={togglePressureSimulation}
+            className={`pressure-button-toggle-ball ${
+              pressureSimulationEnabled ? "active" : ""
+            }`}
+          ></div>
+          <button
+            className="pressure-button"
+            onClick={togglePressureSimulation}
+            value={getFormValue(
+              elements,
+              appState,
+              (element) => calculateAdjustedStrokeWidth(element),
+              true,
+              1,
+            )}
+          ></button>
+        </div>
+      </div>
     );
   },
 });
