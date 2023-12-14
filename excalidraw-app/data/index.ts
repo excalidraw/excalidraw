@@ -119,8 +119,8 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
-  SCENE_BOUNDS: {
-    type: "SCENE_BOUNDS";
+  USER_VIEWPORT_BOUNDS: {
+    type: "USER_VIEWPORT_BOUNDS";
     payload: {
       socketId: string;
       username: string;

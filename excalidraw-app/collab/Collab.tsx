@@ -27,8 +27,9 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
-  WS_SCENE_EVENT_TYPES,
+  WS_SUBTYPES,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  WS_EVENTS,
 } from "../app_constants";
 import {
   generateCollaborationLinkData,
@@ -168,9 +169,11 @@ class Collab extends PureComponent<Props, CollabState> {
     const unsubOnUserFollow = this.excalidrawAPI.onUserFollow((payload) => {
       this.portal.socket && this.portal.broadcastUserFollowed(payload);
     });
-    const throttledRelaySceneBounds = throttleRAF(this.relaySceneBounds);
+    const throttledRelayUserViewportBounds = throttleRAF(
+      this.relayUserViewportBounds,
+    );
     const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
-      throttledRelaySceneBounds(),
+      throttledRelayUserViewportBounds(),
     );
     this.onUmmount = () => {
       unsubOnUserFollow();
@@ -507,7 +510,7 @@ class Collab extends PureComponent<Props, CollabState> {
         switch (decryptedData.type) {
           case "INVALID_RESPONSE":
             return;
-          case WS_SCENE_EVENT_TYPES.INIT: {
+          case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
@@ -523,7 +526,7 @@ class Collab extends PureComponent<Props, CollabState> {
             }
             break;
           }
-          case WS_SCENE_EVENT_TYPES.UPDATE:
+          case WS_SUBTYPES.UPDATE:
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
@@ -550,7 +553,7 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
 
-          case "SCENE_BOUNDS": {
+          case WS_SUBTYPES.USER_VIEWPORT_BOUNDS: {
             const { bounds, socketId } = decryptedData.payload;
 
             const appState = this.excalidrawAPI.getAppState();
@@ -610,13 +613,16 @@ class Collab extends PureComponent<Props, CollabState> {
       scenePromise.resolve(sceneData);
     });
 
-    this.portal.socket.on("follow-room-user-change", (followedBy: string[]) => {
-      this.excalidrawAPI.updateScene({
-        appState: { followedBy: new Set(followedBy) },
-      });
+    this.portal.socket.on(
+      WS_EVENTS.USER_FOLLOW_ROOM_CHANGE,
+      (followedBy: string[]) => {
+        this.excalidrawAPI.updateScene({
+          appState: { followedBy: new Set(followedBy) },
+        });
 
-      this.relaySceneBounds({ shouldPerform: true });
-    });
+        this.relayUserViewportBounds({ shouldPerform: true });
+      },
+    );
 
     this.initializeIdleDetector();
 
@@ -825,7 +831,7 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  relaySceneBounds = (props?: { shouldPerform: boolean }) => {
+  relayUserViewportBounds = (props?: { shouldPerform: boolean }) => {
     const appState = this.excalidrawAPI.getAppState();
 
     if (
@@ -842,7 +848,7 @@ class Collab extends PureComponent<Props, CollabState> {
         appState,
       );
 
-      this.portal.broadcastSceneBounds(
+      this.portal.broadcastUserViewportBounds(
         { bounds: [x1, y1, x2, y2] },
         `follow_${this.portal.socket.id}`,
       );
@@ -858,7 +864,7 @@ class Collab extends PureComponent<Props, CollabState> {
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
     ) {
-      this.portal.broadcastScene(WS_SCENE_EVENT_TYPES.UPDATE, elements, false);
+      this.portal.broadcastScene(WS_SUBTYPES.UPDATE, elements, false);
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
       this.queueBroadcastAllElements();
     }
@@ -871,7 +877,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
-      WS_SCENE_EVENT_TYPES.UPDATE,
+      WS_SUBTYPES.UPDATE,
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
     );

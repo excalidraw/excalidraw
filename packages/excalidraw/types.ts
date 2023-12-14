@@ -396,7 +396,7 @@ export type ExcalidrawInitialDataState = Merge<
 
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
-  action: "follow" | "unfollow";
+  action: "FOLLOW" | "UNFOLLOW";
 };
 
 export interface ExcalidrawProps {
