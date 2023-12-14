@@ -1596,9 +1596,7 @@ class App extends React.Component<AppProps, AppState> {
                             width={this.state.width}
                             height={this.state.height}
                             userToFollow={this.state.userToFollow}
-                            onDisconnect={() => {
-                              this.setState({ userToFollow: null });
-                            }}
+                            onDisconnect={this.maybeUnfollowRemoteUser}
                           />
                         )}
                         {this.renderFrameNames()}
@@ -2555,7 +2553,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.collaborators.has(prevState.userToFollow.socketId);
 
     if (hasFollowedPersonLeft) {
-      this.setState({ userToFollow: null });
+      this.maybeUnfollowRemoteUser();
     }
 
     if (
@@ -3474,17 +3472,19 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private maybeUnfollowRemoteUser = () => {
+    if (this.state.userToFollow) {
+      this.setState({ userToFollow: null });
+    }
+  };
+
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
   ) => {
     this.cancelInProgresAnimation?.();
-
-    // unfollow participant
-    this.setState((prevState, props) => ({
-      ...(typeof state === "function" ? state(prevState, props) : state),
-      userToFollow: null,
-    }));
+    this.maybeUnfollowRemoteUser();
+    this.setState(state);
   };
 
   setToast = (
@@ -5212,7 +5212,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    this.setState({ userToFollow: null });
+    this.maybeUnfollowRemoteUser();
 
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
