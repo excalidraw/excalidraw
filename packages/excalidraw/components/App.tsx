@@ -244,6 +244,7 @@ import {
   KeyboardModifiersObject,
   CollaboratorPointer,
   ToolType,
+  ActiveTool,
 } from "../types";
 import {
   debounce,
@@ -5256,7 +5257,8 @@ class App extends React.Component<AppProps, AppState> {
     // only handle left mouse button or touch
     if (
       event.button !== POINTER_BUTTON.MAIN &&
-      event.button !== POINTER_BUTTON.TOUCH
+      event.button !== POINTER_BUTTON.TOUCH &&
+      event.button !== POINTER_BUTTON.ERASER
     ) {
       return;
     }
@@ -5268,7 +5270,10 @@ class App extends React.Component<AppProps, AppState> {
 
     // State for the duration of a pointer interaction, which starts with a
     // pointerDown event, ends with a pointerUp event (or another pointerDown)
-    const pointerDownState = this.initialPointerDownState(event);
+    const pointerDownState = this.initialPointerDownState(
+      event,
+      this.state.activeTool,
+    );
 
     this.setState({
       selectedElementsAreBeingDragged: false,
@@ -5288,27 +5293,27 @@ class App extends React.Component<AppProps, AppState> {
     const allowOnPointerDown =
       !this.state.penMode ||
       event.pointerType !== "touch" ||
-      this.state.activeTool.type === "selection" ||
-      this.state.activeTool.type === "text" ||
-      this.state.activeTool.type === "image";
+      pointerDownState.tool.type === "selection" ||
+      pointerDownState.tool.type === "text" ||
+      pointerDownState.tool.type === "image";
 
     if (!allowOnPointerDown) {
       return;
     }
 
-    if (this.state.activeTool.type === "text") {
+    if (pointerDownState.tool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
       return;
     } else if (
-      this.state.activeTool.type === "arrow" ||
-      this.state.activeTool.type === "line"
+      pointerDownState.tool.type === "arrow" ||
+      pointerDownState.tool.type === "line"
     ) {
       this.handleLinearElementOnPointerDown(
         event,
-        this.state.activeTool.type,
+        pointerDownState.tool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool.type === "image") {
+    } else if (pointerDownState.tool.type === "image") {
       // reset image preview on pointerdown
       setCursor(this.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
 
@@ -5337,33 +5342,33 @@ class App extends React.Component<AppProps, AppState> {
         y,
         frameId: frame ? frame.id : null,
       });
-    } else if (this.state.activeTool.type === "freedraw") {
+    } else if (pointerDownState.tool.type === "freedraw") {
       this.handleFreeDrawElementOnPointerDown(
         event,
-        this.state.activeTool.type,
+        pointerDownState.tool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool.type === "custom") {
+    } else if (pointerDownState.tool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
-      this.state.activeTool.type === TOOL_TYPE.frame ||
-      this.state.activeTool.type === TOOL_TYPE.magicframe
+      pointerDownState.tool.type === TOOL_TYPE.frame ||
+      pointerDownState.tool.type === TOOL_TYPE.magicframe
     ) {
       this.createFrameElementOnPointerDown(
         pointerDownState,
-        this.state.activeTool.type,
+        pointerDownState.tool.type,
       );
-    } else if (this.state.activeTool.type === "laser") {
+    } else if (pointerDownState.tool.type === "laser") {
       this.laserPathManager.startPath(
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
     } else if (
-      this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand"
+      pointerDownState.tool.type !== "eraser" &&
+      pointerDownState.tool.type !== "hand"
     ) {
       this.createGenericElementOnPointerDown(
-        this.state.activeTool.type,
+        pointerDownState.tool.type,
         pointerDownState,
       );
     }
@@ -5623,6 +5628,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private initialPointerDownState(
     event: React.PointerEvent<HTMLElement>,
+    tool: ActiveTool,
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -5631,6 +5637,10 @@ class App extends React.Component<AppProps, AppState> {
     return {
       origin,
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
+      tool:
+        event.button !== POINTER_BUTTON.ERASER
+          ? tool
+          : { type: "eraser", customType: null },
       originInGrid: tupleToCoors(
         getGridPoint(
           origin.x,
@@ -6633,7 +6643,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
-      if (isEraserActive(this.state)) {
+      if (pointerDownState.tool.type === "eraser") {
         this.handleEraser(event, pointerDownState, pointerCoords);
         return;
       }
@@ -7642,7 +7652,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-      if (isEraserActive(this.state)) {
+      if (pointerDownState.tool.type === "eraser") {
         const draggedDistance = distance2d(
           this.lastPointerDownEvent!.clientX,
           this.lastPointerDownEvent!.clientY,
