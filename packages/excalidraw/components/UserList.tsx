@@ -12,68 +12,6 @@ import { Island } from "./Island";
 import { searchIcon } from "./icons";
 import { t } from "../i18n";
 
-// TODO follow-participant
-// can be used for debugging styling, filter, etc
-// don't forget to remove it before shipping
-// const sampleCollaborators = new Map([
-//   [
-//     "client-id-1",
-//     {
-//       username: "John Doe",
-//       color: "#1CA6FC",
-//     },
-//   ],
-//   [
-//     "client-id-2",
-//     {
-//       username: "Jane Doe",
-//       color: "#FEA3AA",
-//     },
-//   ],
-//   [
-//     "client-id-3",
-//     {
-//       username: "Kate Doe",
-//       color: "#B2F2BB",
-//     },
-//   ],
-//   [
-//     "client-id-4",
-//     {
-//       username: "Handsome Swan",
-//       color: "#FFDBAB",
-//     },
-//   ],
-//   [
-//     "client-id-5",
-//     {
-//       username: "Brilliant Chameleon",
-//       color: "#E2E2E2",
-//     },
-//   ],
-//   [
-//     "client-id-6",
-//     {
-//       username: "Jill Doe",
-//       color: "#FCCB5F",
-//     },
-//   ],
-//   [
-//     "client-id-7",
-//     {
-//       username: "Jack Doe",
-//       color: "#BCE784",
-//     },
-//   ],
-//   [
-//     "client-id-8",
-//     {
-//       username: "Jolly Doe",
-//       color: "#5DD39E",
-//     },
-//   ],
-// ]) as any as Map<string, Collaborator>;
-
 const FIRST_N_AVATARS = 3;
 const SHOW_COLLABORATORS_FILTER_AT = 6;
 
