@@ -3,7 +3,8 @@
   "name": "excalidraw-monorepo",
   "workspaces": [
     "excalidraw-app",
-    "packages/excalidraw"
+    "packages/excalidraw",
+    "packages/utils"
   ],
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",

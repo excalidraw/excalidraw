@@ -1,5 +1,5 @@
-import { Bounds } from "./excalidraw/element/bounds";
-import { Point } from "./excalidraw/types";
+import { Bounds } from "../excalidraw/element/bounds";
+import { Point } from "../excalidraw/types";
 
 export type LineSegment = [Point, Point];
 
