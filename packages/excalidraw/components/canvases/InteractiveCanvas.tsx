@@ -8,17 +8,12 @@ import {
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
 import type { DOMAttributes } from "react";
-import type {
-  AppState,
-  InteractiveCanvasAppState,
-  UserToFollow,
-} from "../../types";
+import type { AppState, InteractiveCanvasAppState } from "../../types";
 import type {
   InteractiveCanvasRenderConfig,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
-import FollowMode from "../FollowMode/FollowMode";
 
 type InteractiveCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -62,8 +57,6 @@ type InteractiveCanvasProps = {
     DOMAttributes<HTMLCanvasElement>["onDoubleClick"],
     undefined
   >;
-  userToFollow: UserToFollow | null;
-  resetUserToFollow: () => void;
 };
 
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
@@ -144,37 +137,30 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   });
 
   return (
-    <FollowMode
-      width={props.appState.width}
-      height={props.appState.height}
-      userToFollow={props.userToFollow}
-      onDisconnect={props.resetUserToFollow}
+    <canvas
+      className="excalidraw__canvas interactive"
+      style={{
+        width: props.appState.width,
+        height: props.appState.height,
+        cursor: props.appState.viewModeEnabled
+          ? CURSOR_TYPE.GRAB
+          : CURSOR_TYPE.AUTO,
+      }}
+      width={props.appState.width * props.scale}
+      height={props.appState.height * props.scale}
+      ref={props.handleCanvasRef}
+      onContextMenu={props.onContextMenu}
+      onPointerMove={props.onPointerMove}
+      onPointerUp={props.onPointerUp}
+      onPointerCancel={props.onPointerCancel}
+      onTouchMove={props.onTouchMove}
+      onPointerDown={props.onPointerDown}
+      onDoubleClick={
+        props.appState.viewModeEnabled ? undefined : props.onDoubleClick
+      }
     >
-      <canvas
-        className="excalidraw__canvas interactive"
-        style={{
-          width: props.appState.width,
-          height: props.appState.height,
-          cursor: props.appState.viewModeEnabled
-            ? CURSOR_TYPE.GRAB
-            : CURSOR_TYPE.AUTO,
-        }}
-        width={props.appState.width * props.scale}
-        height={props.appState.height * props.scale}
-        ref={props.handleCanvasRef}
-        onContextMenu={props.onContextMenu}
-        onPointerMove={props.onPointerMove}
-        onPointerUp={props.onPointerUp}
-        onPointerCancel={props.onPointerCancel}
-        onTouchMove={props.onTouchMove}
-        onPointerDown={props.onPointerDown}
-        onDoubleClick={
-          props.appState.viewModeEnabled ? undefined : props.onDoubleClick
-        }
-      >
-        {t("labels.drawingCanvas")}
-      </canvas>
-    </FollowMode>
+      {t("labels.drawingCanvas")}
+    </canvas>
   );
 };
 
@@ -223,8 +209,7 @@ const areEqual = (
     // on appState)
     prevProps.elements !== nextProps.elements ||
     prevProps.visibleElements !== nextProps.visibleElements ||
-    prevProps.selectedElements !== nextProps.selectedElements ||
-    prevProps.userToFollow !== nextProps.userToFollow
+    prevProps.selectedElements !== nextProps.selectedElements
   ) {
     return false;
   }

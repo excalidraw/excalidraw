@@ -5,22 +5,16 @@ import "./FollowMode.scss";
 interface FollowModeProps {
   width: number;
   height: number;
-  children: React.ReactNode;
-  userToFollow?: UserToFollow | null;
+  userToFollow: UserToFollow;
   onDisconnect: () => void;
 }
 
 const FollowMode = ({
-  children,
   height,
   width,
   userToFollow,
   onDisconnect,
 }: FollowModeProps) => {
-  if (!userToFollow) {
-    return <>{children}</>;
-  }
-
   return (
     <div style={{ position: "relative" }}>
       <div className="follow-mode" style={{ width, height }}>
@@ -42,7 +36,6 @@ const FollowMode = ({
           </button>
         </div>
       </div>
-      {children}
     </div>
   );
 };
