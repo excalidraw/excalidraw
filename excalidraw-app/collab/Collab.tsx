@@ -1,6 +1,9 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../packages/excalidraw/types";
+import {
+  ExcalidrawImperativeAPI,
+  SocketId,
+} from "../../packages/excalidraw/types";
 import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
@@ -78,6 +81,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { Mutable } from "../../packages/excalidraw/utility-types";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -540,16 +544,13 @@ class Collab extends PureComponent<Props, CollabState> {
               // @ts-ignore legacy, see #2094 (#2097)
               decryptedData.payload.socketID;
 
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.pointer = pointer;
-            user.button = button;
-            user.selectedElementIds = selectedElementIds;
-            user.username = username;
-            collaborators.set(socketId, user);
-            this.excalidrawAPI.updateScene({
-              collaborators,
+            this.updateCollaborator(socketId, {
+              pointer,
+              button,
+              selectedElementIds,
+              username,
             });
+
             break;
           }
 
@@ -589,12 +590,9 @@ class Collab extends PureComponent<Props, CollabState> {
 
           case "IDLE_STATUS": {
             const { userState, socketId, username } = decryptedData.payload;
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.userState = userState;
-            user.username = username;
-            this.excalidrawAPI.updateScene({
-              collaborators,
+            this.updateCollaborator(socketId, {
+              userState,
+              username,
             });
             break;
           }
@@ -805,6 +803,24 @@ class Collab extends PureComponent<Props, CollabState> {
     this.collaborators = collaborators;
     this.excalidrawAPI.updateScene({ collaborators });
   }
+
+  private updateCollaborator = (
+    socketId: SocketId,
+    updates: Partial<Collaborator>,
+  ) => {
+    const collaborators = new Map(this.collaborators);
+    const user: Mutable<Collaborator> = Object.assign(
+      {},
+      collaborators.get(socketId),
+      updates,
+    );
+    collaborators.set(socketId, user);
+    this.collaborators = collaborators;
+
+    this.excalidrawAPI.updateScene({
+      collaborators,
+    });
+  };
 
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
     this.lastBroadcastedOrReceivedSceneVersion = version;

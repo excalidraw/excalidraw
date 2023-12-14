@@ -41,7 +41,9 @@ import { Merge, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
-export type Collaborator = {
+export type SocketId = string;
+
+export type Collaborator = Readonly<{
   pointer?: CollaboratorPointer;
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
@@ -56,8 +58,8 @@ export type Collaborator = {
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
-  socketId?: string;
-};
+  socketId?: SocketId;
+}>;
 
 export type CollaboratorPointer = {
   x: number;
