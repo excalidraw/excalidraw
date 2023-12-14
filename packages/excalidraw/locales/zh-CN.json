@@ -11,6 +11,8 @@
     "copyAsPng": "复制为 PNG 到剪贴板",
     "copyAsSvg": "复制为 SVG 到剪贴板",
     "copyText": "复制文本到剪贴板",
+    "copySource": "复制源码到剪贴板",
+    "convertToCode": "转换成代码",
     "bringForward": "上移一层",
     "sendToBack": "置于底层",
     "bringToFront": "置于顶层",
@@ -36,8 +38,12 @@
     "arrowhead_none": "无",
     "arrowhead_arrow": "箭头",
     "arrowhead_bar": "条状",
-    "arrowhead_dot": "圆点",
+    "arrowhead_circle": "圆点",
+    "arrowhead_circle_outline": "圆点（空心）",
     "arrowhead_triangle": "三角箭头",
+    "arrowhead_triangle_outline": "三角箭头（空心）",
+    "arrowhead_diamond": "菱形",
+    "arrowhead_diamond_outline": "菱形（空心）",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -130,7 +136,9 @@
     "sidebarLock": "侧边栏常驻",
     "selectAllElementsInFrame": "选择画框中的所有元素",
     "removeAllElementsFromFrame": "分离出画框中的所有元素",
-    "eyeDropper": "从画布上取色"
+    "eyeDropper": "从画布上取色",
+    "textToDiagram": "文字至图表",
+    "prompt": "Prompt"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -203,12 +211,13 @@
     "imageInsertError": "无法插入图像。请稍后再试……",
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "无法获取图片。",
     "invalidSVGString": "无效的 SVG。",
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
     "importLibraryError": "无法加载素材库",
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
     "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
+    "imageToolNotSupported": "图片已被禁用。",
     "brave_measure_text_error": {
       "line1": "您似乎正在使用 Brave 浏览器并启用了<bold>积极阻止指纹识别</bold>的设置。",
       "line2": "这可能会破坏绘图中的 <bold>文本元素</bold>。",
@@ -216,9 +225,13 @@
       "line4": "如果禁用此设置无法修复文本元素的显示，请在 GitHub 上提交一个 <issueLink>issue</issueLink> ，或者在 <discordLink>Discord</discordLink> 上反馈"
     },
     "libraryElementTypeError": {
-      "embeddable": "嵌入元素不能添加到素材库。",
+      "embeddable": "嵌入的元素不能被添加到素材库。",
+      "iframe": "不能将 IFrame 元素添加到素材库中。",
       "image": "我们不久将支持添加图片到素材库"
-    }
+    },
+    "asyncPasteFailedOnRead": "无法粘贴（无法读取系统剪贴板）。",
+    "asyncPasteFailedOnParse": "无法粘贴。",
+    "copyToSystemClipboardFailed": "无法复制到剪贴板。"
   },
   "toolBar": {
     "selection": "选择",
@@ -236,10 +249,13 @@
     "link": "为选中的形状添加/更新链接",
     "eraser": "橡皮",
     "frame": "画框工具",
+    "magicframe": "线框图至代码",
     "embeddable": "嵌入网页",
     "laser": "激光笔",
     "hand": "抓手（平移工具）",
-    "extraTools": "更多工具"
+    "extraTools": "更多工具",
+    "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
+    "magicSettings": "AI 设置"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -268,7 +284,7 @@
     "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
     "eraserRevert": "按住 Alt 以反选被标记删除的元素",
     "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.clipboardItem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。",
-    "disableSnapping": "按住 CtrlOrCmd 以禁用吸附"
+    "disableSnapping": "按住 Ctrl 或 Cmd 以禁用吸附"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -320,7 +336,7 @@
     "editor": "编辑器",
     "editLineArrowPoints": "编辑线条或箭头的点",
     "editText": "添加或编辑文本",
-    "github": "提交问题",
+    "github": "发现问题？提交反馈",
     "howto": "帮助文档",
     "or": "或",
     "preventBinding": "禁用箭头吸附",
@@ -498,5 +514,12 @@
         "description": "加载外部绘图将<bold>替换您现有的内容</bold>。<br></br>您可以先使用下列方式备份您的绘图。"
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid 至 Excalidraw",
+    "button": "插入",
+    "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>和<classLink>类图</classLink>。其他类型在 Excalidraw 中将以图像呈现。",
+    "syntax": "Mermaid 语法",
+    "preview": "预览"
   }
 }

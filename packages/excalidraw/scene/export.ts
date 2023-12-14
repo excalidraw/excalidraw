@@ -26,7 +26,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { elementsOverlappingBBox } from "../../withinBounds";
+import { elementsOverlappingBBox } from "../../utils/export";
 import {
   getFrameLikeElements,
   getFrameLikeTitle,
