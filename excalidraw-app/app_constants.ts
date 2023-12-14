@@ -15,11 +15,14 @@ export const FILE_CACHE_MAX_AGE_SEC = 31536000;
 export const WS_EVENTS = {
   SERVER_VOLATILE: "server-volatile-broadcast",
   SERVER: "server-broadcast",
-};
+  USER_FOLLOW_CHANGE: "user-follow",
+  USER_FOLLOW_ROOM_CHANGE: "user-follow-room-change",
+} as const;
 
-export enum WS_SCENE_EVENT_TYPES {
+export enum WS_SUBTYPES {
   INIT = "SCENE_INIT",
   UPDATE = "SCENE_UPDATE",
+  USER_VIEWPORT_BOUNDS = "USER_VIEWPORT_BOUNDS",
 }
 
 export const FIREBASE_STORAGE_PREFIXES = {

@@ -1,6 +1,9 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../packages/excalidraw/types";
+import {
+  ExcalidrawImperativeAPI,
+  SocketId,
+} from "../../packages/excalidraw/types";
 import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
@@ -11,11 +14,14 @@ import {
 import {
   getSceneVersion,
   restoreElements,
+  zoomToFitBounds,
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   preventUnload,
   resolvablePromise,
+  throttleRAF,
+  viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../../packages/excalidraw/utils";
 import {
@@ -24,8 +30,9 @@ import {
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
-  WS_SCENE_EVENT_TYPES,
+  WS_SUBTYPES,
   SYNC_FULL_SCENE_INTERVAL_MS,
+  WS_EVENTS,
 } from "../app_constants";
 import {
   generateCollaborationLinkData,
@@ -74,6 +81,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { Mutable } from "../../packages/excalidraw/utility-types";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -154,11 +162,27 @@ class Collab extends PureComponent<Props, CollabState> {
     this.idleTimeoutId = null;
   }
 
+  private onUmmount: (() => void) | null = null;
+
   componentDidMount() {
     window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
     window.addEventListener("online", this.onOfflineStatusToggle);
     window.addEventListener("offline", this.onOfflineStatusToggle);
     window.addEventListener(EVENT.UNLOAD, this.onUnload);
+
+    const unsubOnUserFollow = this.excalidrawAPI.onUserFollow((payload) => {
+      this.portal.socket && this.portal.broadcastUserFollowed(payload);
+    });
+    const throttledRelayUserViewportBounds = throttleRAF(
+      this.relayUserViewportBounds,
+    );
+    const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
+      throttledRelayUserViewportBounds(),
+    );
+    this.onUmmount = () => {
+      unsubOnUserFollow();
+      unsubOnScrollChange();
+    };
 
     this.onOfflineStatusToggle();
 
@@ -207,6 +231,7 @@ class Collab extends PureComponent<Props, CollabState> {
       window.clearTimeout(this.idleTimeoutId);
       this.idleTimeoutId = null;
     }
+    this.onUmmount?.();
   }
 
   isCollaborating = () => appJotaiStore.get(isCollaboratingAtom)!;
@@ -489,7 +514,7 @@ class Collab extends PureComponent<Props, CollabState> {
         switch (decryptedData.type) {
           case "INVALID_RESPONSE":
             return;
-          case WS_SCENE_EVENT_TYPES.INIT: {
+          case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
@@ -505,7 +530,7 @@ class Collab extends PureComponent<Props, CollabState> {
             }
             break;
           }
-          case WS_SCENE_EVENT_TYPES.UPDATE:
+          case WS_SUBTYPES.UPDATE:
             this.handleRemoteSceneUpdate(
               this.reconcileElements(decryptedData.payload.elements),
             );
@@ -513,31 +538,61 @@ class Collab extends PureComponent<Props, CollabState> {
           case "MOUSE_LOCATION": {
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
+
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
               // @ts-ignore legacy, see #2094 (#2097)
               decryptedData.payload.socketID;
 
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.pointer = pointer;
-            user.button = button;
-            user.selectedElementIds = selectedElementIds;
-            user.username = username;
-            collaborators.set(socketId, user);
-            this.excalidrawAPI.updateScene({
-              collaborators,
+            this.updateCollaborator(socketId, {
+              pointer,
+              button,
+              selectedElementIds,
+              username,
             });
+
             break;
           }
+
+          case WS_SUBTYPES.USER_VIEWPORT_BOUNDS: {
+            const { bounds, socketId } = decryptedData.payload;
+
+            const appState = this.excalidrawAPI.getAppState();
+
+            // we're not following the user
+            // (shouldn't happen, but could be late message or bug upstream)
+            if (appState.userToFollow?.socketId !== socketId) {
+              console.warn(
+                `receiving remote client's (from ${socketId}) viewport bounds even though we're not subscribed to it!`,
+              );
+              return;
+            }
+
+            // cross-follow case, ignore updates in this case
+            if (
+              appState.userToFollow &&
+              appState.followedBy.has(appState.userToFollow.socketId)
+            ) {
+              return;
+            }
+
+            this.excalidrawAPI.updateScene({
+              appState: zoomToFitBounds({
+                appState,
+                bounds,
+                fitToViewport: true,
+                viewportZoomFactor: 1,
+              }).appState,
+            });
+
+            break;
+          }
+
           case "IDLE_STATUS": {
             const { userState, socketId, username } = decryptedData.payload;
-            const collaborators = new Map(this.collaborators);
-            const user = collaborators.get(socketId) || {}!;
-            user.userState = userState;
-            user.username = username;
-            this.excalidrawAPI.updateScene({
-              collaborators,
+            this.updateCollaborator(socketId, {
+              userState,
+              username,
             });
             break;
           }
@@ -555,6 +610,17 @@ class Collab extends PureComponent<Props, CollabState> {
       });
       scenePromise.resolve(sceneData);
     });
+
+    this.portal.socket.on(
+      WS_EVENTS.USER_FOLLOW_ROOM_CHANGE,
+      (followedBy: string[]) => {
+        this.excalidrawAPI.updateScene({
+          appState: { followedBy: new Set(followedBy) },
+        });
+
+        this.relayUserViewportBounds({ shouldPerform: true });
+      },
+    );
 
     this.initializeIdleDetector();
 
@@ -738,6 +804,24 @@ class Collab extends PureComponent<Props, CollabState> {
     this.excalidrawAPI.updateScene({ collaborators });
   }
 
+  private updateCollaborator = (
+    socketId: SocketId,
+    updates: Partial<Collaborator>,
+  ) => {
+    const collaborators = new Map(this.collaborators);
+    const user: Mutable<Collaborator> = Object.assign(
+      {},
+      collaborators.get(socketId),
+      updates,
+    );
+    collaborators.set(socketId, user);
+    this.collaborators = collaborators;
+
+    this.excalidrawAPI.updateScene({
+      collaborators,
+    });
+  };
+
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {
     this.lastBroadcastedOrReceivedSceneVersion = version;
   };
@@ -763,6 +847,30 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
+  relayUserViewportBounds = (props?: { shouldPerform: boolean }) => {
+    const appState = this.excalidrawAPI.getAppState();
+
+    if (
+      this.portal.socket &&
+      (appState.followedBy.size > 0 || props?.shouldPerform)
+    ) {
+      const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
+        { clientX: 0, clientY: 0 },
+        appState,
+      );
+
+      const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
+        { clientX: appState.width, clientY: appState.height },
+        appState,
+      );
+
+      this.portal.broadcastUserViewportBounds(
+        { bounds: [x1, y1, x2, y2] },
+        `follow_${this.portal.socket.id}`,
+      );
+    }
+  };
+
   onIdleStateChange = (userState: UserIdleState) => {
     this.portal.broadcastIdleChange(userState);
   };
@@ -772,7 +880,7 @@ class Collab extends PureComponent<Props, CollabState> {
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
     ) {
-      this.portal.broadcastScene(WS_SCENE_EVENT_TYPES.UPDATE, elements, false);
+      this.portal.broadcastScene(WS_SUBTYPES.UPDATE, elements, false);
       this.lastBroadcastedOrReceivedSceneVersion = getSceneVersion(elements);
       this.queueBroadcastAllElements();
     }
@@ -785,7 +893,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
   queueBroadcastAllElements = throttle(() => {
     this.portal.broadcastScene(
-      WS_SCENE_EVENT_TYPES.UPDATE,
+      WS_SUBTYPES.UPDATE,
       this.excalidrawAPI.getSceneElementsIncludingDeleted(),
       true,
     );

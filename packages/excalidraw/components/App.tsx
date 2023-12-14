@@ -244,6 +244,7 @@ import {
   KeyboardModifiersObject,
   CollaboratorPointer,
   ToolType,
+  OnUserFollowedPayload,
 } from "../types";
 import {
   debounce,
@@ -396,6 +397,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import FollowMode from "./FollowMode/FollowMode";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -551,6 +553,10 @@ class App extends React.Component<AppProps, AppState> {
       event: PointerEvent,
     ]
   >();
+  onUserFollowEmitter = new Emitter<[payload: OnUserFollowedPayload]>();
+  onScrollChangeEmitter = new Emitter<
+    [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
+  >();
 
   constructor(props: AppProps) {
     super(props);
@@ -620,6 +626,8 @@ class App extends React.Component<AppProps, AppState> {
         onChange: (cb) => this.onChangeEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
+        onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
+        onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
@@ -1582,6 +1590,14 @@ class App extends React.Component<AppProps, AppState> {
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
                         />
+                        {this.state.userToFollow && (
+                          <FollowMode
+                            width={this.state.width}
+                            height={this.state.height}
+                            userToFollow={this.state.userToFollow}
+                            onDisconnect={this.maybeUnfollowRemoteUser}
+                          />
+                        )}
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
@@ -2531,11 +2547,45 @@ class App extends React.Component<AppProps, AppState> {
       this.refreshEditorBreakpoints();
     }
 
+    const hasFollowedPersonLeft =
+      prevState.userToFollow &&
+      !this.state.collaborators.has(prevState.userToFollow.socketId);
+
+    if (hasFollowedPersonLeft) {
+      this.maybeUnfollowRemoteUser();
+    }
+
     if (
+      prevState.zoom.value !== this.state.zoom.value ||
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
     ) {
-      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
+      this.props?.onScrollChange?.(
+        this.state.scrollX,
+        this.state.scrollY,
+        this.state.zoom,
+      );
+      this.onScrollChangeEmitter.trigger(
+        this.state.scrollX,
+        this.state.scrollY,
+        this.state.zoom,
+      );
+    }
+
+    if (prevState.userToFollow !== this.state.userToFollow) {
+      if (prevState.userToFollow) {
+        this.onUserFollowEmitter.trigger({
+          userToFollow: prevState.userToFollow,
+          action: "UNFOLLOW",
+        });
+      }
+
+      if (this.state.userToFollow) {
+        this.onUserFollowEmitter.trigger({
+          userToFollow: this.state.userToFollow,
+          action: "FOLLOW",
+        });
+      }
     }
 
     if (
@@ -3421,11 +3471,18 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private maybeUnfollowRemoteUser = () => {
+    if (this.state.userToFollow) {
+      this.setState({ userToFollow: null });
+    }
+  };
+
   /** use when changing scrollX/scrollY/zoom based on user interaction */
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
   ) => {
     this.cancelInProgresAnimation?.();
+    this.maybeUnfollowRemoteUser();
     this.setState(state);
   };
 
@@ -5154,6 +5211,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.maybeUnfollowRemoteUser();
+
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
     // close the contextMenu before we update the selection on pointerDown
