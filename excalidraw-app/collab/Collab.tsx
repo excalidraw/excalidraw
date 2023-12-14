@@ -551,23 +551,35 @@ class Collab extends PureComponent<Props, CollabState> {
           }
 
           case "SCENE_BOUNDS": {
-            const { bounds } = decryptedData.payload;
+            const { bounds, socketId } = decryptedData.payload;
 
-            const _appState = this.excalidrawAPI.getAppState();
+            const appState = this.excalidrawAPI.getAppState();
 
-            const { userToFollow, followedBy } = _appState;
-            // cross-follow case, ignore updates in this case
-            if (userToFollow && followedBy.has(userToFollow.socketId)) {
+            // we're not following the user
+            // (shouldn't happen, but could be late message or bug upstream)
+            if (appState.userToFollow?.socketId !== socketId) {
+              console.warn(
+                `receiving remote client's (from ${socketId}) viewport bounds even though we're not subscribed to it!`,
+              );
               return;
             }
 
-            const { appState } = zoomToFitBounds({
-              appState: _appState,
-              bounds,
-              fitToViewport: true,
-              viewportZoomFactor: 1,
+            // cross-follow case, ignore updates in this case
+            if (
+              appState.userToFollow &&
+              appState.followedBy.has(appState.userToFollow.socketId)
+            ) {
+              return;
+            }
+
+            this.excalidrawAPI.updateScene({
+              appState: zoomToFitBounds({
+                appState,
+                bounds,
+                fitToViewport: true,
+                viewportZoomFactor: 1,
+              }).appState,
             });
-            this.excalidrawAPI.updateScene({ appState });
 
             break;
           }
