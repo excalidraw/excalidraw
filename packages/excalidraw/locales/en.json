@@ -528,8 +528,7 @@
       "empty": "No users found"
     },
     "hint": {
-      "heading": "Follow mode",
-      "text": "You can click on a user to toggle follow mode. In follow mode, their canvas movements will be mirrored on your canvas."
+      "text": "Click on user to follow"
     }
   }
 }

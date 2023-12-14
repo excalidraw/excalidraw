@@ -48,7 +48,7 @@
     font-size: 0.5rem;
     font-weight: 400;
     flex-shrink: 0;
-    color: var(--color-gray-70);
+    color: var(--color-gray-100);
   }
 
   --userlist-hint-bg-color: var(--color-gray-10);
@@ -82,23 +82,12 @@
   }
 
   .UserList__hint {
-    background-color: var(--userlist-hint-bg-color);
     padding: 0.5rem 0.75rem;
     overflow: hidden;
-    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
-
-    &-heading {
-      color: var(--userlist-hint-heading-color);
-      font-size: 0.875rem;
-      font-weight: 600;
-      line-height: 150%;
-    }
-
-    &-text {
-      color: var(--userlist-hint-text-color);
-      font-size: 0.75rem;
-      line-height: 150%;
-    }
+    text-align: center;
+    color: var(--userlist-hint-text-color);
+    font-size: 0.75rem;
+    line-height: 150%;
   }
 
   .UserList__search-wrapper {

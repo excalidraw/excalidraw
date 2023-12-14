@@ -152,7 +152,11 @@ export const UserList = ({
             +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
           </Popover.Trigger>
           <Popover.Content
-            style={{ zIndex: 2, maxWidth: "14rem", textAlign: "left" }}
+            style={{
+              zIndex: 2,
+              width: "12rem",
+              textAlign: "left",
+            }}
             align="end"
             sideOffset={10}
           >
@@ -178,6 +182,7 @@ export const UserList = ({
                     {t("userList.search.empty")}
                   </div>
                 )}
+                <div className="UserList__hint">{t("userList.hint.text")}</div>
                 {filteredCollaborators.map(([clientId, collaborator]) =>
                   renderCollaborator({
                     actionManager,
@@ -186,14 +191,6 @@ export const UserList = ({
                     withName: true,
                   }),
                 )}
-              </div>
-              <div className="UserList__hint">
-                <div className="UserList__hint-heading">
-                  {t("userList.hint.heading")}
-                </div>
-                <div className="UserList__hint-text">
-                  {t("userList.hint.text")}
-                </div>
               </div>
             </Island>
           </Popover.Content>
