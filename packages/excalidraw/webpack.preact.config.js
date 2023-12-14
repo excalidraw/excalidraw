@@ -1,5 +1,5 @@
-const prodConfig = require("./webpack.prod.config");
-const devConfig = require("./webpack.dev.config");
+const prodConfig = require("./webpack.prod.config.cjs");
+const devConfig = require("./webpack.dev.config.cjs");
 
 const isProd = process.env.NODE_ENV === "production";
 

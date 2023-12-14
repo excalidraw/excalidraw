@@ -22,8 +22,11 @@
 
     <!-- This is so that we use the bundled excalidraw.development.js file instead
     of the actual source code -->
-    <script src="./excalidraw.development.js"></script>
-
-    <script src="./bundle.js"></script>
+    <script type="module">
+      import * as ExcalidrawLib from "./dist/esm/index.js";
+      window.ExcalidrawLib = ExcalidrawLib;
+      console.log(window.ExcalidrawLib);
+    </script>
+    <script src="bundle.js" defer></script>
   </body>
 </html>

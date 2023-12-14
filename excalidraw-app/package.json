@@ -22,7 +22,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "packages/excalidraw": "*"
+    "@excalidraw/excalidraw": "workspace*"
   },
   "homepage": ".",
   "name": "excalidraw-app",

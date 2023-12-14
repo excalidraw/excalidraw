@@ -56,6 +56,7 @@ type PointerDownState = {
     y: number;
   };
 };
+console.log(window.ExcalidrawLib, "APP");
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
@@ -79,7 +80,6 @@ const {
   TTDDialog,
   TTDDialogTrigger,
 } = window.ExcalidrawLib;
-
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;

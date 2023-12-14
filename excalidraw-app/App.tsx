@@ -27,7 +27,7 @@ import {
   LiveCollaborationTrigger,
   TTDDialog,
   TTDDialogTrigger,
-} from "../packages/excalidraw/index";
+} from "@excalidraw/excalidraw";
 import {
   AppState,
   LibraryItems,

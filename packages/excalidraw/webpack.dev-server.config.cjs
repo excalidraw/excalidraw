@@ -1,23 +1,18 @@
 const path = require("path");
 const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
-const { parseEnvVariables } = require("./env");
-const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
+const { parseEnvVariables } = require("./env.cjs");
 
-module.exports = {
+const devServerConfig = {
   mode: "development",
-  devtool: false,
+
   entry: {
-    "excalidraw.development": "./entry.js",
+    bundle: "./example/index.tsx",
   },
   output: {
-    path: path.resolve(__dirname, outputDir),
-    library: "ExcalidrawLib",
+    path: path.resolve(__dirname, "example/public"),
     libraryTarget: "umd",
     filename: "[name].js",
-    chunkFilename: "excalidraw-assets-dev/[name]-[contenthash].js",
-    assetModuleFilename: "excalidraw-assets-dev/[name][ext]",
-    publicPath: "",
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
@@ -51,8 +46,7 @@ module.exports = {
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
-        exclude:
-          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfill))/,
+        exclude: /node_modules/,
         use: [
           {
             loader: "import-meta-loader",
@@ -72,19 +66,7 @@ module.exports = {
       },
     ],
   },
-  optimization: {
-    splitChunks: {
-      chunks: "async",
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: "vendor",
-        },
-      },
-    },
-  },
   plugins: [
-    new webpack.EvalSourceMapDevToolPlugin({ exclude: /vendor/ }),
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(
         path.resolve(__dirname, "../../.env.development"),
@@ -105,4 +87,22 @@ module.exports = {
       amd: "react-dom",
     },
   },
+  // Server Configuration options
+  devServer: {
+    port: 3001,
+    host: "localhost",
+    hot: true,
+    compress: true,
+    static: {
+      directory: path.join(__dirname, "./example/public"),
+    },
+    client: {
+      progress: true,
+      logging: "info",
+      overlay: true, //Shows a full-screen overlay in the browser when there are compiler errors or warnings.
+    },
+    open: ["./"],
+  },
 };
+
+module.exports = devServerConfig;

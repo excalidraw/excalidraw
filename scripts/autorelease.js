@@ -32,7 +32,7 @@ const publish = () => {
   }
 };
 // get files changed between prev and head commit
-exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
+`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (error || stderr) {
     console.error(error);
     core.setOutput("result", ":warning: Package couldn't be published!");
