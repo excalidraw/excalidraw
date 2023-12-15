@@ -866,7 +866,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
       this.portal.broadcastUserViewportBounds(
         { bounds: [x1, y1, x2, y2] },
-        `follow_${this.portal.socket.id}`,
+        `follow@${this.portal.socket.id}`,
       );
     }
   };
