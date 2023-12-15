@@ -1,6 +1,5 @@
-import { ExcalidrawImperativeAPI } from "../types";
+import type { ExcalidrawImperativeAPI } from "../types";
 import CustomFooter from "./CustomFooter";
-console.log(window.ExcalidrawLib, "MOBILE");
 const { useDevice, Footer } = window.ExcalidrawLib;
 
 const MobileFooter = ({

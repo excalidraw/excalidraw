@@ -36,14 +36,6 @@ const devServerConfig = {
           "sass-loader",
         ],
       },
-      // So that type module works with webpack
-      // https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
-        },
-      },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
         exclude: /node_modules/,
@@ -59,10 +51,6 @@ const devServerConfig = {
             },
           },
         ],
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/resource",
       },
     ],
   },

@@ -3,7 +3,7 @@
   "version": "0.17.1",
   "main": "main.js",
   "type": "module",
-  "module": "dist/esm/excalidraw/index.js",
+  "module": "dist/index.js",
   "types": "types/excalidraw/index.d.ts",
   "files": [
     "dist/*",
@@ -124,10 +124,10 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
-    "gen:types": "tsc --project tsconfig-types.json",
+    "gen:types": "rm -rf types && tsc",
     "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.cjs && NODE_ENV=development webpack --config webpack.preact.config.js && NODE_ENV=production webpack --config webpack.preact.config.js && yarn gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "build:esm:browser": "rm -rf dist && node ../../scripts/build-package.js",
+    "build:esm": "rm -rf dist && node ../../scripts/build-package.js && yarn gen:types",
     "pack": "yarn build:umd && yarn pack",
     "start": "rm -rf example/public/dist && yarn build:esm:browser && cp -r dist example/public && webpack serve --config webpack.dev-server.config.cjs",
     "build:example": "rm -rf example/public/dist && yarn build:esm:browser && cp -r dist example/public && EXAMPLE=true webpack --config webpack.dev-server.config.cjs",

@@ -17,7 +17,7 @@ import { EVENT, ROUNDNESS } from "../constants";
 import { distance2d } from "../math";
 import { fileOpen } from "../data/filesystem";
 import { loadSceneOrLibraryFromBlob } from "../../utils";
-import {
+import type {
   AppState,
   BinaryFileData,
   ExcalidrawImperativeAPI,
@@ -26,7 +26,7 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "../types";
-import { NonDeletedExcalidrawElement, Theme } from "../element/types";
+import type { NonDeletedExcalidrawElement, Theme } from "../element/types";
 import { ImportedLibraryData } from "../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
@@ -56,8 +56,6 @@ type PointerDownState = {
     y: number;
   };
 };
-console.log(window.ExcalidrawLib, "APP");
-
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 const {
