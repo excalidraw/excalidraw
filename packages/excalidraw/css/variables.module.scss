@@ -150,6 +150,9 @@
   &--is-followed::before {
     border-color: var(--color-primary-hover);
   }
+  &--is-current-user {
+    cursor: auto;
+  }
 }
 
 @mixin filledButtonOnCanvas {
