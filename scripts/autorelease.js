@@ -16,7 +16,8 @@ const publish = () => {
 
   try {
     execSync(`yarn  --frozen-lockfile`);
-    execSync(`yarn run build:esm`, { cwd: excalidrawDir });
+    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
+    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish --tag ${tag}`);
     console.info(`Published ${pkg.name}@${tag}🎉`);
     core.setOutput(
@@ -31,7 +32,7 @@ const publish = () => {
   }
 };
 // get files changed between prev and head commit
-`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
+exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   if (error || stderr) {
     console.error(error);
     core.setOutput("result", ":warning: Package couldn't be published!");
