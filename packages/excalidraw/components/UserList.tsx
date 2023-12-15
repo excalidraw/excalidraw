@@ -100,7 +100,7 @@ export const UserList = React.memo(
 
     // const uniqueCollaboratorsMap = sampleCollaborators;
     const uniqueCollaboratorsArray = Array.from(uniqueCollaboratorsMap).filter(
-      ([_, collaborator]) => Object.keys(collaborator).length !== 1,
+      ([_, collaborator]) => collaborator.username?.trim(),
     );
 
     const [searchTerm, setSearchTerm] = React.useState("");
