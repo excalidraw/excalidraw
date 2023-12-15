@@ -7,15 +7,8 @@ export const actionGoToCollaborator = register({
   name: "goToCollaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
-  perform: (_elements, appState, value) => {
-    const _value = value as Collaborator;
-    const point = _value.pointer;
-
-    if (!point) {
-      return { appState, commitToHistory: false };
-    }
-
-    if (appState.userToFollow?.socketId === _value.socketId) {
+  perform: (_elements, appState, collaborator: Collaborator) => {
+    if (appState.userToFollow?.socketId === collaborator.socketId) {
       return {
         appState: {
           ...appState,
@@ -29,8 +22,8 @@ export const actionGoToCollaborator = register({
       appState: {
         ...appState,
         userToFollow: {
-          socketId: _value.socketId!,
-          username: _value.username || "",
+          socketId: collaborator.socketId!,
+          username: collaborator.username || "",
         },
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
