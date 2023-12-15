@@ -8,7 +8,10 @@ export const actionGoToCollaborator = register({
   viewMode: true,
   trackEvent: { category: "collab" },
   perform: (_elements, appState, collaborator: Collaborator) => {
-    if (appState.userToFollow?.socketId === collaborator.socketId) {
+    if (
+      appState.userToFollow?.socketId === collaborator.socketId ||
+      collaborator.isCurrentUser
+    ) {
       return {
         appState: {
           ...appState,
@@ -51,6 +54,7 @@ export const actionGoToCollaborator = register({
           name={collaborator.username || ""}
           src={collaborator.avatarUrl}
           isBeingFollowed={appState.userToFollow?.socketId === clientId}
+          isCurrentUser={collaborator.isCurrentUser === true}
         />
         {collaborator.username}
       </div>
@@ -63,6 +67,7 @@ export const actionGoToCollaborator = register({
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
         isBeingFollowed={appState.userToFollow?.socketId === clientId}
+        isCurrentUser={collaborator.isCurrentUser === true}
       />
     );
   },
