@@ -129,8 +129,8 @@
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
     "build:esm": "rm -rf dist && node ../../scripts/build-package.js && yarn gen:types",
     "pack": "yarn build:umd && yarn pack",
-    "start": "rm -rf example/public/dist && yarn build:esm:browser && cp -r dist example/public && webpack serve --config webpack.dev-server.config.cjs",
-    "build:example": "rm -rf example/public/dist && yarn build:esm:browser && cp -r dist example/public && EXAMPLE=true webpack --config webpack.dev-server.config.cjs",
+    "start": "rm -rf example/public/dist && yarn build:esm && cp -r dist example/public && webpack serve --config webpack.dev-server.config.cjs",
+    "build:example": "rm -rf example/public/dist && yarn build:esm && cp -r dist example/public && EXAMPLE=true webpack --config webpack.dev-server.config.cjs",
     "size": "yarn build:umd && size-limit"
   }
 }
