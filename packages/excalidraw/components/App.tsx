@@ -579,7 +579,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-
+    console.info("dummy")
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
