@@ -338,7 +338,9 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList collaborators={appState.collaborators} />
+            {appState.collaborators.size > 0 && (
+              <UserList collaborators={appState.collaborators} />
+            )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked

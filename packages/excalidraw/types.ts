@@ -59,6 +59,7 @@ export type Collaborator = Readonly<{
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
   socketId?: SocketId;
+  isCurrentUser?: boolean;
 }>;
 
 export type CollaboratorPointer = {
