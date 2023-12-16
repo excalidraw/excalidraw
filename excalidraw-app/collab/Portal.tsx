@@ -184,7 +184,7 @@ class Portal {
   broadcastIdleChange = (userState: UserIdleState) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
-        type: "IDLE_STATUS",
+        type: WS_SUBTYPES.IDLE_STATUS,
         payload: {
           socketId: this.socket.id,
           userState,
@@ -204,7 +204,7 @@ class Portal {
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
-        type: "MOUSE_LOCATION",
+        type: WS_SUBTYPES.MOUSE_LOCATION,
         payload: {
           socketId: this.socket.id,
           pointer: payload.pointer,
@@ -222,19 +222,19 @@ class Portal {
     }
   };
 
-  broadcastUserViewportBounds = (
+  broadcastVisibleSceneBounds = (
     payload: {
-      bounds: [number, number, number, number];
+      sceneBounds: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"]["payload"]["sceneBounds"];
     },
     roomId: string,
   ) => {
     if (this.socket?.id) {
-      const data: SocketUpdateDataSource["USER_VIEWPORT_BOUNDS"] = {
-        type: WS_SUBTYPES.USER_VIEWPORT_BOUNDS,
+      const data: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"] = {
+        type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS,
         payload: {
           socketId: this.socket.id,
           username: this.collab.state.username,
-          bounds: payload.bounds,
+          sceneBounds: payload.sceneBounds,
         },
       };
 

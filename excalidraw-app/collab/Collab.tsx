@@ -18,10 +18,10 @@ import {
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
+  assertNever,
   preventUnload,
   resolvablePromise,
   throttleRAF,
-  viewportCoordsToSceneCoords,
   withBatchedUpdates,
 } from "../../packages/excalidraw/utils";
 import {
@@ -81,7 +81,8 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { Mutable } from "../../packages/excalidraw/utility-types";
+import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
+import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -174,7 +175,7 @@ class Collab extends PureComponent<Props, CollabState> {
       this.portal.socket && this.portal.broadcastUserFollowed(payload);
     });
     const throttledRelayUserViewportBounds = throttleRAF(
-      this.relayUserViewportBounds,
+      this.relayVisibleSceneBounds,
     );
     const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
       throttledRelayUserViewportBounds(),
@@ -384,7 +385,7 @@ class Collab extends PureComponent<Props, CollabState> {
     iv: Uint8Array,
     encryptedData: ArrayBuffer,
     decryptionKey: string,
-  ) => {
+  ): Promise<ValueOf<SocketUpdateDataSource>> => {
     try {
       const decrypted = await decryptData(iv, encryptedData, decryptionKey);
 
@@ -396,7 +397,7 @@ class Collab extends PureComponent<Props, CollabState> {
       window.alert(t("alerts.decryptFailed"));
       console.error(error);
       return {
-        type: "INVALID_RESPONSE",
+        type: WS_SUBTYPES.INVALID_RESPONSE,
       };
     }
   };
@@ -512,7 +513,7 @@ class Collab extends PureComponent<Props, CollabState> {
         );
 
         switch (decryptedData.type) {
-          case "INVALID_RESPONSE":
+          case WS_SUBTYPES.INVALID_RESPONSE:
             return;
           case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
@@ -535,7 +536,7 @@ class Collab extends PureComponent<Props, CollabState> {
               this.reconcileElements(decryptedData.payload.elements),
             );
             break;
-          case "MOUSE_LOCATION": {
+          case WS_SUBTYPES.MOUSE_LOCATION: {
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
 
@@ -554,8 +555,8 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
 
-          case WS_SUBTYPES.USER_VIEWPORT_BOUNDS: {
-            const { bounds, socketId } = decryptedData.payload;
+          case WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS: {
+            const { sceneBounds, socketId } = decryptedData.payload;
 
             const appState = this.excalidrawAPI.getAppState();
 
@@ -579,7 +580,7 @@ class Collab extends PureComponent<Props, CollabState> {
             this.excalidrawAPI.updateScene({
               appState: zoomToFitBounds({
                 appState,
-                bounds,
+                bounds: sceneBounds,
                 fitToViewport: true,
                 viewportZoomFactor: 1,
               }).appState,
@@ -588,13 +589,17 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
 
-          case "IDLE_STATUS": {
+          case WS_SUBTYPES.IDLE_STATUS: {
             const { userState, socketId, username } = decryptedData.payload;
             this.updateCollaborator(socketId, {
               userState,
               username,
             });
             break;
+          }
+
+          default: {
+            assertNever(decryptedData, null);
           }
         }
       },
@@ -618,7 +623,7 @@ class Collab extends PureComponent<Props, CollabState> {
           appState: { followedBy: new Set(followedBy) },
         });
 
-        this.relayUserViewportBounds({ shouldPerform: true });
+        this.relayVisibleSceneBounds({ force: true });
       },
     );
 
@@ -848,25 +853,14 @@ class Collab extends PureComponent<Props, CollabState> {
     CURSOR_SYNC_TIMEOUT,
   );
 
-  relayUserViewportBounds = (props?: { shouldPerform: boolean }) => {
+  relayVisibleSceneBounds = (props?: { force: boolean }) => {
     const appState = this.excalidrawAPI.getAppState();
 
-    if (
-      this.portal.socket &&
-      (appState.followedBy.size > 0 || props?.shouldPerform)
-    ) {
-      const { x: x1, y: y1 } = viewportCoordsToSceneCoords(
-        { clientX: 0, clientY: 0 },
-        appState,
-      );
-
-      const { x: x2, y: y2 } = viewportCoordsToSceneCoords(
-        { clientX: appState.width, clientY: appState.height },
-        appState,
-      );
-
-      this.portal.broadcastUserViewportBounds(
-        { bounds: [x1, y1, x2, y2] },
+    if (this.portal.socket && (appState.followedBy.size > 0 || props?.force)) {
+      this.portal.broadcastVisibleSceneBounds(
+        {
+          sceneBounds: getVisibleSceneBounds(appState),
+        },
         `follow@${this.portal.socket.id}`,
       );
     }
