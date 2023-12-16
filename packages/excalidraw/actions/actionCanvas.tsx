@@ -20,7 +20,7 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { Bounds } from "../element/bounds";
+import { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 
 export const actionChangeViewBackgroundColor = register({
@@ -211,7 +211,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: Bounds,
+  bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
 ) => {
   const [x1, y1, x2, y2] = bounds;
@@ -235,7 +235,7 @@ export const zoomToFitBounds = ({
   fitToViewport = false,
   viewportZoomFactor = 0.7,
 }: {
-  bounds: readonly [number, number, number, number];
+  bounds: SceneBounds;
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;

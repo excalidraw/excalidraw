@@ -10,6 +10,7 @@ import {
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
+import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
 import {
@@ -119,12 +120,12 @@ export type SocketUpdateDataSource = {
       username: string;
     };
   };
-  USER_VIEWPORT_BOUNDS: {
-    type: "USER_VIEWPORT_BOUNDS";
+  USER_VISIBLE_SCENE_BOUNDS: {
+    type: "USER_VISIBLE_SCENE_BOUNDS";
     payload: {
       socketId: string;
       username: string;
-      bounds: [number, number, number, number];
+      sceneBounds: SceneBounds;
     };
   };
   IDLE_STATUS: {

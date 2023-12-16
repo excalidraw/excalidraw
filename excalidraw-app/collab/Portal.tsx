@@ -222,19 +222,19 @@ class Portal {
     }
   };
 
-  broadcastUserViewportBounds = (
+  broadcastVisibleSceneBounds = (
     payload: {
-      bounds: [number, number, number, number];
+      sceneBounds: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"]["payload"]["sceneBounds"];
     },
     roomId: string,
   ) => {
     if (this.socket?.id) {
-      const data: SocketUpdateDataSource["USER_VIEWPORT_BOUNDS"] = {
-        type: WS_SUBTYPES.USER_VIEWPORT_BOUNDS,
+      const data: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"] = {
+        type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS,
         payload: {
           socketId: this.socket.id,
           username: this.collab.state.username,
-          bounds: payload.bounds,
+          sceneBounds: payload.sceneBounds,
         },
       };
 
