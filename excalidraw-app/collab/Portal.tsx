@@ -18,7 +18,7 @@ import { newElementWith } from "../../packages/excalidraw/element/mutateElement"
 import { BroadcastedExcalidrawElement } from "./reconciliation";
 import { encryptData } from "../../packages/excalidraw/data/encryption";
 import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
-import { Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 
 class Portal {
   collab: TCollabClass;
