@@ -13,6 +13,8 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+- Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
+
 ### Breaking Changes
 
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)

@@ -9,7 +9,7 @@ import {
 import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
 import { Drawable, Op } from "roughjs/bin/core";
-import { Point } from "../types";
+import { AppState, Point } from "../types";
 import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
@@ -35,12 +35,21 @@ export type RectangleBox = {
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
-// x and y position of top left corner, x and y position of bottom right corner
+/**
+ * x and y position of top left corner, x and y position of bottom right corner
+ */
 export type Bounds = readonly [
   minX: number,
   minY: number,
   maxX: number,
   maxY: number,
+];
+
+export type SceneBounds = readonly [
+  sceneX: number,
+  sceneY: number,
+  sceneX2: number,
+  sceneY2: number,
 ];
 
 export class ElementBounds {
@@ -878,4 +887,22 @@ export const getCommonBoundingBox = (
     midX: (minX + maxX) / 2,
     midY: (minY + maxY) / 2,
   };
+};
+
+/**
+ * returns scene coords of user's editor viewport (visible canvas area) bounds
+ */
+export const getVisibleSceneBounds = ({
+  scrollX,
+  scrollY,
+  width,
+  height,
+  zoom,
+}: AppState): SceneBounds => {
+  return [
+    -scrollX,
+    -scrollY,
+    -scrollX + width / zoom.value,
+    -scrollY + height / zoom.value,
+  ];
 };

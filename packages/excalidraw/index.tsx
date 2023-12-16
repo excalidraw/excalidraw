@@ -249,7 +249,7 @@ export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
 export { normalizeLink } from "./data/url";
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";
-export { getCommonBounds } from "./element/bounds";
+export { getCommonBounds, getVisibleSceneBounds } from "./element/bounds";
 
 export {
   elementsOverlappingBBox,
