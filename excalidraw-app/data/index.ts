@@ -29,6 +29,7 @@ import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
+  WS_SUBTYPES,
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
@@ -98,20 +99,23 @@ export type EncryptedData = {
 };
 
 export type SocketUpdateDataSource = {
+  INVALID_RESPONSE: {
+    type: WS_SUBTYPES.INVALID_RESPONSE;
+  };
   SCENE_INIT: {
-    type: "SCENE_INIT";
+    type: WS_SUBTYPES.INIT;
     payload: {
       elements: readonly ExcalidrawElement[];
     };
   };
   SCENE_UPDATE: {
-    type: "SCENE_UPDATE";
+    type: WS_SUBTYPES.UPDATE;
     payload: {
       elements: readonly ExcalidrawElement[];
     };
   };
   MOUSE_LOCATION: {
-    type: "MOUSE_LOCATION";
+    type: WS_SUBTYPES.MOUSE_LOCATION;
     payload: {
       socketId: string;
       pointer: { x: number; y: number; tool: "pointer" | "laser" };
@@ -121,7 +125,7 @@ export type SocketUpdateDataSource = {
     };
   };
   USER_VISIBLE_SCENE_BOUNDS: {
-    type: "USER_VISIBLE_SCENE_BOUNDS";
+    type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS;
     payload: {
       socketId: string;
       username: string;
@@ -129,7 +133,7 @@ export type SocketUpdateDataSource = {
     };
   };
   IDLE_STATUS: {
-    type: "IDLE_STATUS";
+    type: WS_SUBTYPES.IDLE_STATUS;
     payload: {
       socketId: string;
       userState: UserIdleState;
@@ -139,10 +143,7 @@ export type SocketUpdateDataSource = {
 };
 
 export type SocketUpdateDataIncoming =
-  | SocketUpdateDataSource[keyof SocketUpdateDataSource]
-  | {
-      type: "INVALID_RESPONSE";
-    };
+  SocketUpdateDataSource[keyof SocketUpdateDataSource];
 
 export type SocketUpdateData =
   SocketUpdateDataSource[keyof SocketUpdateDataSource] & {

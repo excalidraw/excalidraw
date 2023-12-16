@@ -184,7 +184,7 @@ class Portal {
   broadcastIdleChange = (userState: UserIdleState) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
-        type: "IDLE_STATUS",
+        type: WS_SUBTYPES.IDLE_STATUS,
         payload: {
           socketId: this.socket.id,
           userState,
@@ -204,7 +204,7 @@ class Portal {
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
-        type: "MOUSE_LOCATION",
+        type: WS_SUBTYPES.MOUSE_LOCATION,
         payload: {
           socketId: this.socket.id,
           pointer: payload.pointer,

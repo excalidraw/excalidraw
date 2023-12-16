@@ -18,6 +18,7 @@ import {
 } from "../../packages/excalidraw/index";
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
+  assertNever,
   preventUnload,
   resolvablePromise,
   throttleRAF,
@@ -80,7 +81,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { Mutable } from "../../packages/excalidraw/utility-types";
+import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -384,7 +385,7 @@ class Collab extends PureComponent<Props, CollabState> {
     iv: Uint8Array,
     encryptedData: ArrayBuffer,
     decryptionKey: string,
-  ) => {
+  ): Promise<ValueOf<SocketUpdateDataSource>> => {
     try {
       const decrypted = await decryptData(iv, encryptedData, decryptionKey);
 
@@ -396,7 +397,7 @@ class Collab extends PureComponent<Props, CollabState> {
       window.alert(t("alerts.decryptFailed"));
       console.error(error);
       return {
-        type: "INVALID_RESPONSE",
+        type: WS_SUBTYPES.INVALID_RESPONSE,
       };
     }
   };
@@ -512,7 +513,7 @@ class Collab extends PureComponent<Props, CollabState> {
         );
 
         switch (decryptedData.type) {
-          case "INVALID_RESPONSE":
+          case WS_SUBTYPES.INVALID_RESPONSE:
             return;
           case WS_SUBTYPES.INIT: {
             if (!this.portal.socketInitialized) {
@@ -535,7 +536,7 @@ class Collab extends PureComponent<Props, CollabState> {
               this.reconcileElements(decryptedData.payload.elements),
             );
             break;
-          case "MOUSE_LOCATION": {
+          case WS_SUBTYPES.MOUSE_LOCATION: {
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
 
@@ -588,13 +589,17 @@ class Collab extends PureComponent<Props, CollabState> {
             break;
           }
 
-          case "IDLE_STATUS": {
+          case WS_SUBTYPES.IDLE_STATUS: {
             const { userState, socketId, username } = decryptedData.payload;
             this.updateCollaborator(socketId, {
               userState,
               username,
             });
             break;
+          }
+
+          default: {
+            assertNever(decryptedData, null);
           }
         }
       },
