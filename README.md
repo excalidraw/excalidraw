@@ -85,6 +85,8 @@ We'll be adding these features as drop-in plugins for the npm package in the fut
 
 ## Quick start
 
+**Note:** These instructions are for installing the [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) only. If you intend to run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+
 Install the [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
 
 ```
