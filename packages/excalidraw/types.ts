@@ -53,7 +53,7 @@ export type Collaborator = Readonly<{
     background: string;
     stroke: string;
   };
-  // The url of the collaborator's avatar, defaults to username intials
+  // The url of the collaborator's avatar, defaults to username initials
   // if not present
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
@@ -500,10 +500,10 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
-// NOTE at the moment, if action name coressponds to canvasAction prop, its
+// NOTE at the moment, if action name corresponds to canvasAction prop, its
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
-// excalidraw package index.tsx.
+// Excalidraw package index.tsx.
 export type CanvasActions = Partial<{
   changeViewBackgroundColor: boolean;
   clearCanvas: boolean;
