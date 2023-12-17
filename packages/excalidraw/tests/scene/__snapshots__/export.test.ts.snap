@@ -35,10 +35,11 @@ exports[`exportToSvg > with default arguments 1`] = `
         font-display: swap;
         unicode-range: U+0E00–U+0E7F;
       }
-      @font-face {
+	  @font-face {
         font-family: "Assistant";
         src: url("https://excalidraw.com/Assistant-Regular.woff2");
       }
+    
     </style>
     
     
@@ -100,14 +101,14 @@ exports[`exportToSvg > with elements that have a link 1`] = `
         src: url("https://excalidraw.com/Cascadia.woff2");
       }
       @font-face {
-        font-family: "Assistant";
-        src: url("https://excalidraw.com/Assistant-Regular.woff2");
-      }
-      @font-face {
-        font-family: \\"Itim\\";
-        src: url(\\"Itim-Regular.woff2\\");
+        font-family: "Itim";
+        src: url("Itim-Regular.woff2");
         font-display: swap;
         unicode-range: U+0E00–U+0E7F;
+      }
+	  @font-face {
+        font-family: "Assistant";
+        src: url("https://excalidraw.com/Assistant-Regular.woff2");
       }
     </style>
     
@@ -130,14 +131,14 @@ exports[`exportToSvg > with exportEmbedScene 1`] = `
         src: url("https://excalidraw.com/Cascadia.woff2");
       }
       @font-face {
-        font-family: "Assistant";
-        src: url("https://excalidraw.com/Assistant-Regular.woff2");
-      }
-      @font-face {
-        font-family: \\"Itim\\";
-        src: url(\\"Itim-Regular.woff2\\");
+        font-family: "Itim";
+        src: url("Itim-Regular.woff2");
         font-display: swap;
         unicode-range: U+0E00–U+0E7F;
+      }
+	  @font-face {
+        font-family: "Assistant";
+        src: url("https://excalidraw.com/Assistant-Regular.woff2");
       }
     </style>
     
