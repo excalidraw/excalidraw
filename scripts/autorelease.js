@@ -2,7 +2,7 @@ const fs = require("fs");
 const { exec, execSync } = require("child_process");
 const core = require("@actions/core");
 
-const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
+const excalidrawDir = `${__dirname}/../packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
 const pkg = require(excalidrawPackage);
 const isPreview = process.argv.slice(2)[0] === "preview";
@@ -39,13 +39,9 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     process.exit(1);
   }
   const changedFiles = stdout.trim().split("\n");
-  const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
   const excalidrawPackageFiles = changedFiles.filter((file) => {
-    return (
-      (file.indexOf("src") >= 0 || file.indexOf("package.json")) >= 0 &&
-      !filesToIgnoreRegex.test(file)
-    );
+    return file.indexOf("packages/excalidraw") >= 0;
   });
   if (!excalidrawPackageFiles.length) {
     console.info("Skipping release as no valid diff found");
