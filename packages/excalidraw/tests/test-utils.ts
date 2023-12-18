@@ -248,15 +248,3 @@ expect.extend({
     };
   },
 });
-
-export const updateTextEditor = (
-  editor: HTMLTextAreaElement,
-  value: string,
-) => {
-  fireEvent.change(editor, { target: { value } });
-  editor.dispatchEvent(new Event("input"));
-};
-
-export const getTextEditor = (selector: string) => {
-  return document.querySelector(selector) as HTMLTextAreaElement;
-};

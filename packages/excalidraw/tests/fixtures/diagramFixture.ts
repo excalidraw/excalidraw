@@ -1,4 +1,4 @@
-import { VERSIONS } from "../../../packages/excalidraw/constants";
+import { VERSIONS } from "../../constants";
 import {
   diamondFixture,
   ellipseFixture,

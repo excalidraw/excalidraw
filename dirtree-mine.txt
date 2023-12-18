@@ -1,0 +1,896 @@
+Folder PATH listing
+Volume serial number is 182E-25E3
+C:.
+¦   .dockerignore
+¦   .editorconfig
+¦   .env.development
+¦   .env.production
+¦   .eslintignore
+¦   .eslintrc.json
+¦   .gitattributes
+¦   .gitignore
+¦   .lintstagedrc.js
+¦   .npmrc
+¦   .nvmrc
+¦   .prettierignore
+¦   .watchmanconfig
+¦   CONTRIBUTING.md
+¦   crowdin.yml
+¦   dirtree-mine.txt
+¦   docker-compose.yml
+¦   Dockerfile
+¦   LICENSE
+¦   package.json
+¦   README.md
+¦   setupTests.ts
+¦   tsconfig.json
+¦   vercel.json
+¦   vitest.config.mts
+¦   yarn.lock
+¦   
++---.codesandbox
+¦       Dockerfile
+¦       tasks.json
+¦       
++---.github
+¦   ¦   FUNDING.yml
+¦   ¦   
+¦   +---assets
+¦   ¦       crowdin.svg
+¦   ¦       sentry.svg
+¦   ¦       vercel.svg
+¦   ¦       
+¦   +---workflows
+¦           autorelease-excalidraw.yml
+¦           autorelease-preview.yml
+¦           build-docker.yml
+¦           cancel.yml
+¦           lint.yml
+¦           locales-coverage.yml
+¦           publish-docker.yml
+¦           semantic-pr-title.yml
+¦           sentry-production.yml
+¦           size-limit.yml
+¦           test-coverage-pr.yml
+¦           test.yml
+¦           
++---.husky
+¦   ¦   pre-commit
+¦   ¦   
+¦   +---_
+¦           .gitignore
+¦           husky.sh
+¦           
++---.vscode
+¦       launch.json
+¦       
++---dev-docs
+¦   ¦   .gitignore
+¦   ¦   babel.config.js
+¦   ¦   docusaurus.config.js
+¦   ¦   package.json
+¦   ¦   README.md
+¦   ¦   sidebars.js
+¦   ¦   tsconfig.json
+¦   ¦   vercel.json
+¦   ¦   yarn.lock
+¦   ¦   
+¦   +---docs
+¦   ¦   +---@excalidraw
+¦   ¦   ¦   +---excalidraw
+¦   ¦   ¦   ¦   ¦   customizing-styles.mdx
+¦   ¦   ¦   ¦   ¦   development.mdx
+¦   ¦   ¦   ¦   ¦   faq.mdx
+¦   ¦   ¦   ¦   ¦   installation.mdx
+¦   ¦   ¦   ¦   ¦   integration.mdx
+¦   ¦   ¦   ¦   ¦   
+¦   ¦   ¦   ¦   +---api
+¦   ¦   ¦   ¦       ¦   api-intro.mdx
+¦   ¦   ¦   ¦       ¦   constants.mdx
+¦   ¦   ¦   ¦       ¦   excalidraw-element-skeleton.mdx
+¦   ¦   ¦   ¦       ¦   
+¦   ¦   ¦   ¦       +---children-components
+¦   ¦   ¦   ¦       ¦       children-components-intro.mdx
+¦   ¦   ¦   ¦       ¦       footer.mdx
+¦   ¦   ¦   ¦       ¦       live-collaboration-trigger.mdx
+¦   ¦   ¦   ¦       ¦       main-menu.mdx
+¦   ¦   ¦   ¦       ¦       sidebar.mdx
+¦   ¦   ¦   ¦       ¦       welcome-screen.mdx
+¦   ¦   ¦   ¦       ¦       
+¦   ¦   ¦   ¦       +---props
+¦   ¦   ¦   ¦       ¦       excalidraw-api.mdx
+¦   ¦   ¦   ¦       ¦       initialdata.mdx
+¦   ¦   ¦   ¦       ¦       props.mdx
+¦   ¦   ¦   ¦       ¦       render-props.mdx
+¦   ¦   ¦   ¦       ¦       ui-options.mdx
+¦   ¦   ¦   ¦       ¦       
+¦   ¦   ¦   ¦       +---utils
+¦   ¦   ¦   ¦               export.mdx
+¦   ¦   ¦   ¦               restore.mdx
+¦   ¦   ¦   ¦               utils-intro.md
+¦   ¦   ¦   ¦               
+¦   ¦   ¦   +---mermaid-to-excalidraw
+¦   ¦   ¦       ¦   api.mdx
+¦   ¦   ¦       ¦   development.mdx
+¦   ¦   ¦       ¦   installation.mdx
+¦   ¦   ¦       ¦   
+¦   ¦   ¦       +---codebase
+¦   ¦   ¦           ¦   codebase.mdx
+¦   ¦   ¦           ¦   new-diagram-type.mdx
+¦   ¦   ¦           ¦   
+¦   ¦   ¦           +---parser
+¦   ¦   ¦                   flowchart.mdx
+¦   ¦   ¦                   parser.mdx
+¦   ¦   ¦                   
+¦   ¦   +---assets
+¦   ¦   ¦       aggressive-block-fingerprint.png
+¦   ¦   ¦       block-fingerprint.png
+¦   ¦   ¦       brave-shield.png
+¦   ¦   ¦       nerd-stats.png
+¦   ¦   ¦       
+¦   ¦   +---codebase
+¦   ¦   ¦       frames.mdx
+¦   ¦   ¦       json-schema.mdx
+¦   ¦   ¦       
+¦   ¦   +---introduction
+¦   ¦           contributing.mdx
+¦   ¦           development.mdx
+¦   ¦           get-started.mdx
+¦   ¦           
+¦   +---src
+¦   ¦   ¦   initialData.js
+¦   ¦   ¦   
+¦   ¦   +---components
+¦   ¦   ¦   ¦   Highlight.js
+¦   ¦   ¦   ¦   
+¦   ¦   ¦   +---Homepage
+¦   ¦   ¦           index.js
+¦   ¦   ¦           index.tsx
+¦   ¦   ¦           styles.module.css
+¦   ¦   ¦           
+¦   ¦   +---css
+¦   ¦   ¦       custom.scss
+¦   ¦   ¦       
+¦   ¦   +---pages
+¦   ¦   ¦       index.module.css
+¦   ¦   ¦       index.tsx
+¦   ¦   ¦       markdown-page.md
+¦   ¦   ¦       
+¦   ¦   +---theme
+¦   ¦       ¦   MDXComponents.js
+¦   ¦       ¦   
+¦   ¦       +---ReactLiveScope
+¦   ¦               index.js
+¦   ¦               
+¦   +---static
+¦       ¦   .nojekyll
+¦       ¦   
+¦       +---img
+¦               docusaurus.png
+¦               doremon.png
+¦               favicon.ico
+¦               favicon.png
+¦               logo.svg
+¦               og-image-2.png
+¦               og-image.png
+¦               pika.jpeg
+¦               undraw_add_files.svg
+¦               undraw_blank_canvas.svg
+¦               undraw_innovative.svg
+¦               welcome-screen-overview.png
+¦               
++---excalidraw-app
+¦   ¦   app-jotai.ts
+¦   ¦   App.tsx
+¦   ¦   app_constants.ts
+¦   ¦   bug-issue-template.js
+¦   ¦   CustomStats.tsx
+¦   ¦   debug.ts
+¦   ¦   global.d.ts
+¦   ¦   index.html
+¦   ¦   index.scss
+¦   ¦   index.tsx
+¦   ¦   package.json
+¦   ¦   sentry.ts
+¦   ¦   vite-env.d.ts
+¦   ¦   vite.config.mts
+¦   ¦   
+¦   +---collab
+¦   ¦       Collab.tsx
+¦   ¦       Portal.tsx
+¦   ¦       reconciliation.ts
+¦   ¦       RoomDialog.scss
+¦   ¦       RoomDialog.tsx
+¦   ¦       
+¦   +---components
+¦   ¦       AppFooter.tsx
+¦   ¦       AppMainMenu.tsx
+¦   ¦       AppWelcomeScreen.tsx
+¦   ¦       EncryptedIcon.tsx
+¦   ¦       ExcalidrawPlusAppLink.tsx
+¦   ¦       ExportToExcalidrawPlus.tsx
+¦   ¦       GitHubCorner.tsx
+¦   ¦       LanguageList.tsx
+¦   ¦       TopErrorBoundary.tsx
+¦   ¦       
+¦   +---data
+¦   ¦       FileManager.ts
+¦   ¦       firebase.ts
+¦   ¦       index.ts
+¦   ¦       LocalData.ts
+¦   ¦       localStorage.ts
+¦   ¦       Locker.ts
+¦   ¦       tabSync.ts
+¦   ¦       
+¦   +---tests
+¦       ¦   collab.test.tsx
+¦       ¦   LanguageList.test.tsx
+¦       ¦   MobileMenu.test.tsx
+¦       ¦   reconciliation.test.ts
+¦       ¦   
+¦       +---__snapshots__
+¦               MobileMenu.test.tsx.snap
+¦               
++---firebase-project
+¦       .firebaserc
+¦       .gitignore
+¦       firebase.json
+¦       firestore.indexes.json
+¦       firestore.rules
+¦       storage.rules
+¦       
++---packages
+¦   ¦   tsconfig.dev.json
+¦   ¦   tsconfig.prod.json
+¦   ¦   
+¦   +---excalidraw
+¦   ¦   ¦   .gitignore
+¦   ¦   ¦   .size-limit.json
+¦   ¦   ¦   align.ts
+¦   ¦   ¦   analytics.ts
+¦   ¦   ¦   appState.ts
+¦   ¦   ¦   CHANGELOG.md
+¦   ¦   ¦   charts.test.ts
+¦   ¦   ¦   charts.ts
+¦   ¦   ¦   clients.ts
+¦   ¦   ¦   clipboard.test.ts
+¦   ¦   ¦   clipboard.ts
+¦   ¦   ¦   colors.ts
+¦   ¦   ¦   constants.ts
+¦   ¦   ¦   css.d.ts
+¦   ¦   ¦   cursor.ts
+¦   ¦   ¦   distribute.ts
+¦   ¦   ¦   emitter.ts
+¦   ¦   ¦   entry.js
+¦   ¦   ¦   env.js
+¦   ¦   ¦   errors.ts
+¦   ¦   ¦   frame.test.tsx
+¦   ¦   ¦   frame.ts
+¦   ¦   ¦   ga.ts
+¦   ¦   ¦   gadirections.ts
+¦   ¦   ¦   galines.ts
+¦   ¦   ¦   gapoints.ts
+¦   ¦   ¦   gatransforms.ts
+¦   ¦   ¦   gesture.ts
+¦   ¦   ¦   global.d.ts
+¦   ¦   ¦   groups.ts
+¦   ¦   ¦   history.ts
+¦   ¦   ¦   i18n.ts
+¦   ¦   ¦   index-node.ts
+¦   ¦   ¦   index.tsx
+¦   ¦   ¦   jotai.ts
+¦   ¦   ¦   keys.ts
+¦   ¦   ¦   main.js
+¦   ¦   ¦   math.test.ts
+¦   ¦   ¦   math.ts
+¦   ¦   ¦   package-lock.json
+¦   ¦   ¦   package.json
+¦   ¦   ¦   points.ts
+¦   ¦   ¦   polyfill.ts
+¦   ¦   ¦   publicPath.js
+¦   ¦   ¦   pwacompat.d.ts
+¦   ¦   ¦   random.ts
+¦   ¦   ¦   react-app-env.d.ts
+¦   ¦   ¦   README.md
+¦   ¦   ¦   shapes.tsx
+¦   ¦   ¦   snapping.ts
+¦   ¦   ¦   tsconfig-types.json
+¦   ¦   ¦   types.ts
+¦   ¦   ¦   utility-types.ts
+¦   ¦   ¦   utils.ts
+¦   ¦   ¦   vercel.json
+¦   ¦   ¦   vite-env.d.ts
+¦   ¦   ¦   webpack.dev-server.config.js
+¦   ¦   ¦   webpack.dev.config.js
+¦   ¦   ¦   webpack.preact.config.js
+¦   ¦   ¦   webpack.prod.config.js
+¦   ¦   ¦   zindex.ts
+¦   ¦   ¦   
+¦   ¦   +---actions
+¦   ¦   ¦       actionAddToLibrary.ts
+¦   ¦   ¦       actionAlign.tsx
+¦   ¦   ¦       actionBoundText.tsx
+¦   ¦   ¦       actionCanvas.tsx
+¦   ¦   ¦       actionClipboard.tsx
+¦   ¦   ¦       actionDeleteSelected.tsx
+¦   ¦   ¦       actionDistribute.tsx
+¦   ¦   ¦       actionDuplicateSelection.tsx
+¦   ¦   ¦       actionElementLock.test.tsx
+¦   ¦   ¦       actionElementLock.ts
+¦   ¦   ¦       actionExport.tsx
+¦   ¦   ¦       actionFinalize.tsx
+¦   ¦   ¦       actionFlip.ts
+¦   ¦   ¦       actionFrame.ts
+¦   ¦   ¦       actionGroup.tsx
+¦   ¦   ¦       actionHistory.tsx
+¦   ¦   ¦       actionLinearEditor.ts
+¦   ¦   ¦       actionMenu.tsx
+¦   ¦   ¦       actionNavigate.tsx
+¦   ¦   ¦       actionProperties.test.tsx
+¦   ¦   ¦       actionProperties.tsx
+¦   ¦   ¦       actionSelectAll.ts
+¦   ¦   ¦       actionStyles.ts
+¦   ¦   ¦       actionToggleGridMode.tsx
+¦   ¦   ¦       actionToggleObjectsSnapMode.tsx
+¦   ¦   ¦       actionToggleStats.tsx
+¦   ¦   ¦       actionToggleViewMode.tsx
+¦   ¦   ¦       actionToggleZenMode.tsx
+¦   ¦   ¦       actionZindex.tsx
+¦   ¦   ¦       index.ts
+¦   ¦   ¦       manager.tsx
+¦   ¦   ¦       register.ts
+¦   ¦   ¦       shortcuts.ts
+¦   ¦   ¦       types.ts
+¦   ¦   ¦       
+¦   ¦   +---assets
+¦   ¦   ¦       lock.svg
+¦   ¦   ¦       
+¦   ¦   +---components
+¦   ¦   ¦   ¦   Actions.scss
+¦   ¦   ¦   ¦   Actions.tsx
+¦   ¦   ¦   ¦   ActiveConfirmDialog.tsx
+¦   ¦   ¦   ¦   App.tsx
+¦   ¦   ¦   ¦   Avatar.scss
+¦   ¦   ¦   ¦   Avatar.tsx
+¦   ¦   ¦   ¦   BraveMeasureTextError.tsx
+¦   ¦   ¦   ¦   Button.scss
+¦   ¦   ¦   ¦   Button.tsx
+¦   ¦   ¦   ¦   ButtonIconCycle.tsx
+¦   ¦   ¦   ¦   ButtonIconSelect.tsx
+¦   ¦   ¦   ¦   ButtonSelect.tsx
+¦   ¦   ¦   ¦   Card.scss
+¦   ¦   ¦   ¦   Card.tsx
+¦   ¦   ¦   ¦   CheckboxItem.scss
+¦   ¦   ¦   ¦   CheckboxItem.tsx
+¦   ¦   ¦   ¦   ConfirmDialog.scss
+¦   ¦   ¦   ¦   ConfirmDialog.tsx
+¦   ¦   ¦   ¦   ContextMenu.scss
+¦   ¦   ¦   ¦   ContextMenu.tsx
+¦   ¦   ¦   ¦   DarkModeToggle.tsx
+¦   ¦   ¦   ¦   DefaultSidebar.test.tsx
+¦   ¦   ¦   ¦   DefaultSidebar.tsx
+¦   ¦   ¦   ¦   Dialog.scss
+¦   ¦   ¦   ¦   Dialog.tsx
+¦   ¦   ¦   ¦   DialogActionButton.scss
+¦   ¦   ¦   ¦   DialogActionButton.tsx
+¦   ¦   ¦   ¦   ErrorDialog.tsx
+¦   ¦   ¦   ¦   ExcalidrawLogo.scss
+¦   ¦   ¦   ¦   ExcalidrawLogo.tsx
+¦   ¦   ¦   ¦   ExportDialog.scss
+¦   ¦   ¦   ¦   EyeDropper.scss
+¦   ¦   ¦   ¦   EyeDropper.tsx
+¦   ¦   ¦   ¦   FilledButton.scss
+¦   ¦   ¦   ¦   FilledButton.tsx
+¦   ¦   ¦   ¦   FixedSideContainer.scss
+¦   ¦   ¦   ¦   FixedSideContainer.tsx
+¦   ¦   ¦   ¦   HandButton.tsx
+¦   ¦   ¦   ¦   HelpButton.tsx
+¦   ¦   ¦   ¦   HelpDialog.scss
+¦   ¦   ¦   ¦   HelpDialog.tsx
+¦   ¦   ¦   ¦   HintViewer.scss
+¦   ¦   ¦   ¦   HintViewer.tsx
+¦   ¦   ¦   ¦   IconPicker.scss
+¦   ¦   ¦   ¦   IconPicker.tsx
+¦   ¦   ¦   ¦   icons.tsx
+¦   ¦   ¦   ¦   ImageExportDialog.scss
+¦   ¦   ¦   ¦   ImageExportDialog.tsx
+¦   ¦   ¦   ¦   InitializeApp.tsx
+¦   ¦   ¦   ¦   InlineIcon.tsx
+¦   ¦   ¦   ¦   Island.scss
+¦   ¦   ¦   ¦   Island.tsx
+¦   ¦   ¦   ¦   JSONExportDialog.tsx
+¦   ¦   ¦   ¦   LayerUI.scss
+¦   ¦   ¦   ¦   LayerUI.tsx
+¦   ¦   ¦   ¦   LibraryMenu.scss
+¦   ¦   ¦   ¦   LibraryMenu.tsx
+¦   ¦   ¦   ¦   LibraryMenuBrowseButton.tsx
+¦   ¦   ¦   ¦   LibraryMenuControlButtons.tsx
+¦   ¦   ¦   ¦   LibraryMenuHeaderContent.tsx
+¦   ¦   ¦   ¦   LibraryMenuItems.scss
+¦   ¦   ¦   ¦   LibraryMenuItems.tsx
+¦   ¦   ¦   ¦   LibraryMenuSection.tsx
+¦   ¦   ¦   ¦   LibraryUnit.scss
+¦   ¦   ¦   ¦   LibraryUnit.tsx
+¦   ¦   ¦   ¦   LoadingMessage.tsx
+¦   ¦   ¦   ¦   LockButton.tsx
+¦   ¦   ¦   ¦   MagicButton.tsx
+¦   ¦   ¦   ¦   MagicSettings.scss
+¦   ¦   ¦   ¦   MagicSettings.tsx
+¦   ¦   ¦   ¦   MobileMenu.tsx
+¦   ¦   ¦   ¦   Modal.scss
+¦   ¦   ¦   ¦   Modal.tsx
+¦   ¦   ¦   ¦   Paragraph.tsx
+¦   ¦   ¦   ¦   PasteChartDialog.scss
+¦   ¦   ¦   ¦   PasteChartDialog.tsx
+¦   ¦   ¦   ¦   PenModeButton.tsx
+¦   ¦   ¦   ¦   Popover.scss
+¦   ¦   ¦   ¦   Popover.tsx
+¦   ¦   ¦   ¦   ProjectName.scss
+¦   ¦   ¦   ¦   ProjectName.tsx
+¦   ¦   ¦   ¦   PublishLibrary.scss
+¦   ¦   ¦   ¦   PublishLibrary.tsx
+¦   ¦   ¦   ¦   RadioGroup.scss
+¦   ¦   ¦   ¦   RadioGroup.tsx
+¦   ¦   ¦   ¦   Section.tsx
+¦   ¦   ¦   ¦   ShareableLinkDialog.scss
+¦   ¦   ¦   ¦   ShareableLinkDialog.tsx
+¦   ¦   ¦   ¦   Spinner.scss
+¦   ¦   ¦   ¦   Spinner.tsx
+¦   ¦   ¦   ¦   Stack.scss
+¦   ¦   ¦   ¦   Stack.tsx
+¦   ¦   ¦   ¦   Stats.scss
+¦   ¦   ¦   ¦   Stats.tsx
+¦   ¦   ¦   ¦   Switch.scss
+¦   ¦   ¦   ¦   Switch.tsx
+¦   ¦   ¦   ¦   TextField.scss
+¦   ¦   ¦   ¦   TextField.tsx
+¦   ¦   ¦   ¦   TextInput.scss
+¦   ¦   ¦   ¦   Toast.scss
+¦   ¦   ¦   ¦   Toast.tsx
+¦   ¦   ¦   ¦   Toolbar.scss
+¦   ¦   ¦   ¦   ToolButton.tsx
+¦   ¦   ¦   ¦   ToolIcon.scss
+¦   ¦   ¦   ¦   Tooltip.scss
+¦   ¦   ¦   ¦   Tooltip.tsx
+¦   ¦   ¦   ¦   Trans.test.tsx
+¦   ¦   ¦   ¦   Trans.tsx
+¦   ¦   ¦   ¦   UserList.scss
+¦   ¦   ¦   ¦   UserList.tsx
+¦   ¦   ¦   ¦   
+¦   ¦   ¦   +---canvases
+¦   ¦   ¦   ¦       index.tsx
+¦   ¦   ¦   ¦       InteractiveCanvas.tsx
+¦   ¦   ¦   ¦       StaticCanvas.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---ColorPicker
+¦   ¦   ¦   ¦       ColorInput.tsx
+¦   ¦   ¦   ¦       ColorPicker.scss
+¦   ¦   ¦   ¦       ColorPicker.tsx
+¦   ¦   ¦   ¦       colorPickerUtils.ts
+¦   ¦   ¦   ¦       CustomColorList.tsx
+¦   ¦   ¦   ¦       HotkeyLabel.tsx
+¦   ¦   ¦   ¦       keyboardNavHandlers.ts
+¦   ¦   ¦   ¦       Picker.tsx
+¦   ¦   ¦   ¦       PickerColorList.tsx
+¦   ¦   ¦   ¦       PickerHeading.tsx
+¦   ¦   ¦   ¦       ShadeList.tsx
+¦   ¦   ¦   ¦       TopPicks.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---dropdownMenu
+¦   ¦   ¦   ¦       common.ts
+¦   ¦   ¦   ¦       DropdownMenu.scss
+¦   ¦   ¦   ¦       DropdownMenu.tsx
+¦   ¦   ¦   ¦       DropdownMenuContent.tsx
+¦   ¦   ¦   ¦       DropdownMenuGroup.tsx
+¦   ¦   ¦   ¦       DropdownMenuItem.tsx
+¦   ¦   ¦   ¦       DropdownMenuItemContent.tsx
+¦   ¦   ¦   ¦       DropdownMenuItemCustom.tsx
+¦   ¦   ¦   ¦       DropdownMenuItemLink.tsx
+¦   ¦   ¦   ¦       DropdownMenuSeparator.tsx
+¦   ¦   ¦   ¦       DropdownMenuTrigger.tsx
+¦   ¦   ¦   ¦       dropdownMenuUtils.ts
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---FollowMode
+¦   ¦   ¦   ¦       FollowMode.scss
+¦   ¦   ¦   ¦       FollowMode.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---footer
+¦   ¦   ¦   ¦       Footer.tsx
+¦   ¦   ¦   ¦       FooterCenter.scss
+¦   ¦   ¦   ¦       FooterCenter.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---hoc
+¦   ¦   ¦   ¦       withInternalFallback.test.tsx
+¦   ¦   ¦   ¦       withInternalFallback.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---LaserTool
+¦   ¦   ¦   ¦       LaserPathManager.ts
+¦   ¦   ¦   ¦       LaserPointerButton.tsx
+¦   ¦   ¦   ¦       LaserTool.tsx
+¦   ¦   ¦   ¦       LaserToolOverlay.scss
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---live-collaboration
+¦   ¦   ¦   ¦       LiveCollaborationTrigger.scss
+¦   ¦   ¦   ¦       LiveCollaborationTrigger.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---main-menu
+¦   ¦   ¦   ¦       DefaultItems.scss
+¦   ¦   ¦   ¦       DefaultItems.tsx
+¦   ¦   ¦   ¦       MainMenu.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---OverwriteConfirm
+¦   ¦   ¦   ¦       OverwriteConfirm.scss
+¦   ¦   ¦   ¦       OverwriteConfirm.tsx
+¦   ¦   ¦   ¦       OverwriteConfirmActions.tsx
+¦   ¦   ¦   ¦       OverwriteConfirmState.ts
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---Sidebar
+¦   ¦   ¦   ¦       common.ts
+¦   ¦   ¦   ¦       Sidebar.scss
+¦   ¦   ¦   ¦       Sidebar.test.tsx
+¦   ¦   ¦   ¦       Sidebar.tsx
+¦   ¦   ¦   ¦       SidebarHeader.tsx
+¦   ¦   ¦   ¦       SidebarTab.tsx
+¦   ¦   ¦   ¦       SidebarTabs.tsx
+¦   ¦   ¦   ¦       SidebarTabTrigger.tsx
+¦   ¦   ¦   ¦       SidebarTabTriggers.tsx
+¦   ¦   ¦   ¦       SidebarTrigger.scss
+¦   ¦   ¦   ¦       SidebarTrigger.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---TTDDialog
+¦   ¦   ¦   ¦       common.ts
+¦   ¦   ¦   ¦       MermaidToExcalidraw.scss
+¦   ¦   ¦   ¦       MermaidToExcalidraw.tsx
+¦   ¦   ¦   ¦       TTDDialog.scss
+¦   ¦   ¦   ¦       TTDDialog.tsx
+¦   ¦   ¦   ¦       TTDDialogInput.tsx
+¦   ¦   ¦   ¦       TTDDialogOutput.tsx
+¦   ¦   ¦   ¦       TTDDialogPanel.tsx
+¦   ¦   ¦   ¦       TTDDialogPanels.tsx
+¦   ¦   ¦   ¦       TTDDialogSubmitShortcut.tsx
+¦   ¦   ¦   ¦       TTDDialogTab.tsx
+¦   ¦   ¦   ¦       TTDDialogTabs.tsx
+¦   ¦   ¦   ¦       TTDDialogTabTrigger.tsx
+¦   ¦   ¦   ¦       TTDDialogTabTriggers.tsx
+¦   ¦   ¦   ¦       TTDDialogTrigger.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---welcome-screen
+¦   ¦   ¦   ¦       WelcomeScreen.Center.tsx
+¦   ¦   ¦   ¦       WelcomeScreen.Hints.tsx
+¦   ¦   ¦   ¦       WelcomeScreen.scss
+¦   ¦   ¦   ¦       WelcomeScreen.tsx
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---__snapshots__
+¦   ¦   ¦           App.test.tsx.snap
+¦   ¦   ¦           
+¦   ¦   +---context
+¦   ¦   ¦       tunnels.ts
+¦   ¦   ¦       ui-appState.ts
+¦   ¦   ¦       
+¦   ¦   +---css
+¦   ¦   ¦       app.scss
+¦   ¦   ¦       styles.scss
+¦   ¦   ¦       theme.scss
+¦   ¦   ¦       variables.module.scss
+¦   ¦   ¦       
+¦   ¦   +---data
+¦   ¦   ¦   ¦   blob.ts
+¦   ¦   ¦   ¦   EditorLocalStorage.ts
+¦   ¦   ¦   ¦   encode.ts
+¦   ¦   ¦   ¦   encryption.ts
+¦   ¦   ¦   ¦   filesystem.ts
+¦   ¦   ¦   ¦   image.ts
+¦   ¦   ¦   ¦   index.ts
+¦   ¦   ¦   ¦   json.ts
+¦   ¦   ¦   ¦   library.ts
+¦   ¦   ¦   ¦   magic.ts
+¦   ¦   ¦   ¦   resave.ts
+¦   ¦   ¦   ¦   restore.ts
+¦   ¦   ¦   ¦   transform.test.ts
+¦   ¦   ¦   ¦   transform.ts
+¦   ¦   ¦   ¦   types.ts
+¦   ¦   ¦   ¦   url.test.tsx
+¦   ¦   ¦   ¦   url.ts
+¦   ¦   ¦   ¦   
+¦   ¦   ¦   +---ai
+¦   ¦   ¦   ¦       types.ts
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---__snapshots__
+¦   ¦   ¦           transform.test.ts.snap
+¦   ¦   ¦           
+¦   ¦   +---element
+¦   ¦   ¦       binding.ts
+¦   ¦   ¦       bounds.test.ts
+¦   ¦   ¦       bounds.ts
+¦   ¦   ¦       collision.ts
+¦   ¦   ¦       dragElements.ts
+¦   ¦   ¦       ElementCanvasButtons.scss
+¦   ¦   ¦       ElementCanvasButtons.tsx
+¦   ¦   ¦       embeddable.ts
+¦   ¦   ¦       Hyperlink.scss
+¦   ¦   ¦       Hyperlink.tsx
+¦   ¦   ¦       image.ts
+¦   ¦   ¦       index.ts
+¦   ¦   ¦       linearElementEditor.ts
+¦   ¦   ¦       mutateElement.ts
+¦   ¦   ¦       newElement.test.ts
+¦   ¦   ¦       newElement.ts
+¦   ¦   ¦       resizeElements.ts
+¦   ¦   ¦       resizeTest.ts
+¦   ¦   ¦       showSelectedShapeActions.ts
+¦   ¦   ¦       sizeHelpers.test.ts
+¦   ¦   ¦       sizeHelpers.ts
+¦   ¦   ¦       sortElements.test.ts
+¦   ¦   ¦       sortElements.ts
+¦   ¦   ¦       textElement.test.ts
+¦   ¦   ¦       textElement.ts
+¦   ¦   ¦       textWysiwyg.test.tsx
+¦   ¦   ¦       textWysiwyg.tsx
+¦   ¦   ¦       transformHandles.ts
+¦   ¦   ¦       typeChecks.test.ts
+¦   ¦   ¦       typeChecks.ts
+¦   ¦   ¦       types.ts
+¦   ¦   ¦       
+¦   ¦   +---example
+¦   ¦   ¦   ¦   App.scss
+¦   ¦   ¦   ¦   App.tsx
+¦   ¦   ¦   ¦   CustomFooter.tsx
+¦   ¦   ¦   ¦   index.tsx
+¦   ¦   ¦   ¦   initialData.tsx
+¦   ¦   ¦   ¦   MobileFooter.tsx
+¦   ¦   ¦   ¦   
+¦   ¦   ¦   +---public
+¦   ¦   ¦   ¦   ¦   index.html
+¦   ¦   ¦   ¦   ¦   
+¦   ¦   ¦   ¦   +---images
+¦   ¦   ¦   ¦           doremon.png
+¦   ¦   ¦   ¦           excalibot.png
+¦   ¦   ¦   ¦           pika.jpeg
+¦   ¦   ¦   ¦           rocket.jpeg
+¦   ¦   ¦   ¦           
+¦   ¦   ¦   +---sidebar
+¦   ¦   ¦           ExampleSidebar.scss
+¦   ¦   ¦           ExampleSidebar.tsx
+¦   ¦   ¦           
+¦   ¦   +---hooks
+¦   ¦   ¦       useCallbackRefState.ts
+¦   ¦   ¦       useCreatePortalContainer.ts
+¦   ¦   ¦       useLibraryItemSvg.ts
+¦   ¦   ¦       useOutsideClick.ts
+¦   ¦   ¦       useScrollPosition.ts
+¦   ¦   ¦       useStable.ts
+¦   ¦   ¦       useTransition.ts
+¦   ¦   ¦       
+¦   ¦   +---locales
+¦   ¦   ¦       ar-SA.json
+¦   ¦   ¦       az-AZ.json
+¦   ¦   ¦       bg-BG.json
+¦   ¦   ¦       bn-BD.json
+¦   ¦   ¦       ca-ES.json
+¦   ¦   ¦       cs-CZ.json
+¦   ¦   ¦       da-DK.json
+¦   ¦   ¦       de-DE.json
+¦   ¦   ¦       el-GR.json
+¦   ¦   ¦       en.json
+¦   ¦   ¦       es-ES.json
+¦   ¦   ¦       eu-ES.json
+¦   ¦   ¦       fa-IR.json
+¦   ¦   ¦       fi-FI.json
+¦   ¦   ¦       fr-FR.json
+¦   ¦   ¦       gl-ES.json
+¦   ¦   ¦       he-IL.json
+¦   ¦   ¦       hi-IN.json
+¦   ¦   ¦       hu-HU.json
+¦   ¦   ¦       id-ID.json
+¦   ¦   ¦       it-IT.json
+¦   ¦   ¦       ja-JP.json
+¦   ¦   ¦       kaa.json
+¦   ¦   ¦       kab-KAB.json
+¦   ¦   ¦       kk-KZ.json
+¦   ¦   ¦       km-KH.json
+¦   ¦   ¦       ko-KR.json
+¦   ¦   ¦       ku-TR.json
+¦   ¦   ¦       lt-LT.json
+¦   ¦   ¦       lv-LV.json
+¦   ¦   ¦       mr-IN.json
+¦   ¦   ¦       my-MM.json
+¦   ¦   ¦       nb-NO.json
+¦   ¦   ¦       nl-NL.json
+¦   ¦   ¦       nn-NO.json
+¦   ¦   ¦       oc-FR.json
+¦   ¦   ¦       pa-IN.json
+¦   ¦   ¦       percentages.json
+¦   ¦   ¦       pl-PL.json
+¦   ¦   ¦       pt-BR.json
+¦   ¦   ¦       pt-PT.json
+¦   ¦   ¦       README.md
+¦   ¦   ¦       ro-RO.json
+¦   ¦   ¦       ru-RU.json
+¦   ¦   ¦       si-LK.json
+¦   ¦   ¦       sk-SK.json
+¦   ¦   ¦       sl-SI.json
+¦   ¦   ¦       sv-SE.json
+¦   ¦   ¦       ta-IN.json
+¦   ¦   ¦       th-TH.json
+¦   ¦   ¦       tr-TR.json
+¦   ¦   ¦       uk-UA.json
+¦   ¦   ¦       vi-VN.json
+¦   ¦   ¦       zh-CN.json
+¦   ¦   ¦       zh-HK.json
+¦   ¦   ¦       zh-TW.json
+¦   ¦   ¦       
+¦   ¦   +---renderer
+¦   ¦   ¦       easingFunctions.ts
+¦   ¦   ¦       renderElement.ts
+¦   ¦   ¦       renderScene.ts
+¦   ¦   ¦       renderSnaps.ts
+¦   ¦   ¦       roundRect.ts
+¦   ¦   ¦       
+¦   ¦   +---scene
+¦   ¦   ¦       comparisons.ts
+¦   ¦   ¦       export.ts
+¦   ¦   ¦       Fonts.ts
+¦   ¦   ¦       index.ts
+¦   ¦   ¦       Renderer.ts
+¦   ¦   ¦       Scene.ts
+¦   ¦   ¦       scroll.ts
+¦   ¦   ¦       scrollbars.ts
+¦   ¦   ¦       selection.test.ts
+¦   ¦   ¦       selection.ts
+¦   ¦   ¦       Shape.ts
+¦   ¦   ¦       ShapeCache.ts
+¦   ¦   ¦       types.ts
+¦   ¦   ¦       zoom.ts
+¦   ¦   ¦       
+¦   ¦   +---tests
+¦   ¦       ¦   actionStyles.test.tsx
+¦   ¦       ¦   align.test.tsx
+¦   ¦       ¦   App.test.tsx
+¦   ¦       ¦   appState.test.tsx
+¦   ¦       ¦   binding.test.tsx
+¦   ¦       ¦   charts.test.tsx
+¦   ¦       ¦   clients.test.ts
+¦   ¦       ¦   clipboard.test.tsx
+¦   ¦       ¦   contextmenu.test.tsx
+¦   ¦       ¦   dragCreate.test.tsx
+¦   ¦       ¦   elementLocking.test.tsx
+¦   ¦       ¦   excalidraw.test.tsx
+¦   ¦       ¦   export.test.tsx
+¦   ¦       ¦   fitToContent.test.tsx
+¦   ¦       ¦   flip.test.tsx
+¦   ¦       ¦   geometricAlgebra.test.ts
+¦   ¦       ¦   history.test.tsx
+¦   ¦       ¦   library.test.tsx
+¦   ¦       ¦   linearElementEditor.test.tsx
+¦   ¦       ¦   MermaidToExcalidraw.test.tsx
+¦   ¦       ¦   move.test.tsx
+¦   ¦       ¦   multiPointCreate.test.tsx
+¦   ¦       ¦   regressionTests.test.tsx
+¦   ¦       ¦   resize.test.tsx
+¦   ¦       ¦   rotate.test.tsx
+¦   ¦       ¦   scroll.test.tsx
+¦   ¦       ¦   selection.test.tsx
+¦   ¦       ¦   shortcuts.test.tsx
+¦   ¦       ¦   test-utils.ts
+¦   ¦       ¦   tool.test.tsx
+¦   ¦       ¦   utils.test.ts
+¦   ¦       ¦   viewMode.test.tsx
+¦   ¦       ¦   zindex.test.tsx
+¦   ¦       ¦   
+¦   ¦       +---data
+¦   ¦       ¦   ¦   restore.test.ts
+¦   ¦       ¦   ¦   
+¦   ¦       ¦   +---__snapshots__
+¦   ¦       ¦           restore.test.ts.snap
+¦   ¦       ¦           
+¦   ¦       +---fixtures
+¦   ¦       ¦       deer.png
+¦   ¦       ¦       diagramFixture.ts
+¦   ¦       ¦       elementFixture.ts
+¦   ¦       ¦       fixture_library.excalidrawlib
+¦   ¦       ¦       smiley.png
+¦   ¦       ¦       smiley_embedded_v2.png
+¦   ¦       ¦       smiley_embedded_v2.svg
+¦   ¦       ¦       svg-image-exporting-reference.svg
+¦   ¦       ¦       test_embedded_v1.png
+¦   ¦       ¦       test_embedded_v1.svg
+¦   ¦       ¦       
+¦   ¦       +---helpers
+¦   ¦       ¦       api.ts
+¦   ¦       ¦       polyfills.ts
+¦   ¦       ¦       ui.ts
+¦   ¦       ¦       
+¦   ¦       +---packages
+¦   ¦       ¦   ¦   events.test.tsx
+¦   ¦       ¦   ¦   
+¦   ¦       ¦   +---__snapshots__
+¦   ¦       ¦           excalidraw.test.tsx.snap
+¦   ¦       ¦           utils.test.ts.snap
+¦   ¦       ¦           
+¦   ¦       +---queries
+¦   ¦       ¦       dom.ts
+¦   ¦       ¦       toolQueries.ts
+¦   ¦       ¦       
+¦   ¦       +---scene
+¦   ¦       ¦   ¦   export.test.ts
+¦   ¦       ¦   ¦   
+¦   ¦       ¦   +---__snapshots__
+¦   ¦       ¦           export.test.ts.snap
+¦   ¦       ¦           
+¦   ¦       +---__snapshots__
+¦   ¦               App.test.tsx.snap
+¦   ¦               charts.test.tsx.snap
+¦   ¦               contextmenu.test.tsx.snap
+¦   ¦               dragCreate.test.tsx.snap
+¦   ¦               excalidraw.test.tsx.snap
+¦   ¦               export.test.tsx.snap
+¦   ¦               linearElementEditor.test.tsx.snap
+¦   ¦               MermaidToExcalidraw.test.tsx.snap
+¦   ¦               MobileMenu.test.tsx.snap
+¦   ¦               move.test.tsx.snap
+¦   ¦               multiPointCreate.test.tsx.snap
+¦   ¦               regressionTests.test.tsx.snap
+¦   ¦               selection.test.tsx.snap
+¦   ¦               
+¦   +---utils
+¦       ¦   bbox.ts
+¦       ¦   CHANGELOG.md
+¦       ¦   export.test.ts
+¦       ¦   export.ts
+¦       ¦   index.js
+¦       ¦   package.json
+¦       ¦   README.md
+¦       ¦   utils.unmocked.test.ts
+¦       ¦   webpack.prod.config.js
+¦       ¦   withinBounds.test.ts
+¦       ¦   withinBounds.ts
+¦       ¦   
+¦       +---__snapshots__
+¦               export.test.ts.snap
+¦               utils.test.ts.snap
+¦               
++---public
+¦   ¦   android-chrome-192x192.png
+¦   ¦   android-chrome-512x512.png
+¦   ¦   apple-touch-icon.png
+¦   ¦   Assistant-Bold.woff2
+¦   ¦   Assistant-Medium.woff2
+¦   ¦   Assistant-Regular.woff2
+¦   ¦   Assistant-SemiBold.woff2
+¦   ¦   Cascadia.ttf
+¦   ¦   Cascadia.woff2
+¦   ¦   favicon-16x16.png
+¦   ¦   favicon-32x32.png
+¦   ¦   favicon.ico
+¦   ¦   favicon.svg
+¦   ¦   FG_Virgil.ttf
+¦   ¦   FG_Virgil.woff2
+¦   ¦   fonts.css
+¦   ¦   manifest.json
+¦   ¦   maskable_icon_x192.png
+¦   ¦   maskable_icon_x512.png
+¦   ¦   og-image-2.png
+¦   ¦   robots.txt
+¦   ¦   service-worker.js
+¦   ¦   Virgil.woff2
+¦   ¦   _headers
+¦   ¦   
+¦   +---screenshots
+¦           collaboration.png
+¦           export.png
+¦           illustration.png
+¦           shapes.png
+¦           virtual-whiteboard.png
+¦           wireframe.png
+¦           
++---scripts
+        autorelease.js
+        build-locales-coverage.js
+        build-node.js
+        build-version.js
+        buildDocs.js
+        locales-coverage-description.js
+        prerelease.js
+        release.js
+        updateChangelog.js
+        

@@ -2,10 +2,10 @@ import { act, fireEvent, render, waitFor } from "./test-utils";
 import { Excalidraw } from "../index";
 import React from "react";
 import { expect, vi } from "vitest";
-import * as MermaidToExcalidraw from "@zsviczian/mermaid-to-excalidraw";
+import * as MermaidToExcalidraw from "@zsviczian/mermaid-to-excalidraw"; //zsviczian
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 
-vi.mock("@zsviczian/mermaid-to-excalidraw", async (importActual) => {
+vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
   const module = (await importActual()) as any;
 
   return {
