@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Быстрый поиск",
+      "empty": "Пользователи не найдены"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Нажмите на пользователя, чтобы подписаться",
+      "followStatus": "Вы подписаны на этого пользователя"
     }
   }
 }
