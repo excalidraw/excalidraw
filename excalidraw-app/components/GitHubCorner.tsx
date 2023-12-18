@@ -1,6 +1,6 @@
 import oc from "open-color";
 import React from "react";
-import { THEME } from "../../src/constants";
+import { THEME } from "../../packages/excalidraw/constants";
 import { Theme } from "../../src/element/types";
 
 // https://github.com/tholman/github-corners

@@ -1,7 +1,7 @@
 import { vi } from "vitest";
-import { render, updateSceneData, waitFor } from "../../src/tests/test-utils";
+import { render, updateSceneData, waitFor } from "../../packages/excalidraw/tests/test-utils";
 import ExcalidrawApp from "../../excalidraw-app";
-import { API } from "../../src/tests/helpers/api";
+import { API } from "../../packages/excalidraw/tests/helpers/api";
 import { createUndoAction } from "../../src/actions/actionHistory";
 const { h } = window;
 

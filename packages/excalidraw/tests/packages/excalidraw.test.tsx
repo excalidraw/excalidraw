@@ -1,8 +1,8 @@
 import { fireEvent, GlobalTestState, toggleMenu, render } from "../test-utils";
 import { Excalidraw, Footer, MainMenu } from "../../packages/excalidraw/index";
 import { queryByText, queryByTestId } from "@testing-library/react";
-import { GRID_SIZE, THEME } from "../../constants";
-import { t } from "../../i18n";
+import { GRID_SIZE, THEME } from "../../../packages/excalidraw/constants";
+import { t } from "../../../packages/excalidraw/i18n";
 import { useMemo } from "react";
 
 const { h } = window;

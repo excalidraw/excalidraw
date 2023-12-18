@@ -4,11 +4,11 @@ import {
   isRenderThrottlingEnabled,
   isShallowEqual,
   sceneCoordsToViewportCoords,
-} from "../../utils";
-import { CURSOR_TYPE } from "../../constants";
-import { t } from "../../i18n";
+} from "../../../packages/excalidraw/utils";
+import { CURSOR_TYPE } from "../../../packages/excalidraw/constants";
+import { t } from "../../../packages/excalidraw/i18n";
 import type { DOMAttributes } from "react";
-import type { AppState, InteractiveCanvasAppState } from "../../types";
+import type { AppState, InteractiveCanvasAppState } from "../../../packages/excalidraw/types";
 import type {
   InteractiveCanvasRenderConfig,
   RenderInteractiveSceneCallback,

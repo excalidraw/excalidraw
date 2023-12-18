@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { EVENT } from "../../constants";
-import { composeEventHandlers } from "../../utils";
+import { EVENT } from "../../../packages/excalidraw/constants";
+import { composeEventHandlers } from "../../../packages/excalidraw/utils";
 
 export const DropdownMenuContentPropsContext = React.createContext<{
   onSelect?: (event: Event) => void;

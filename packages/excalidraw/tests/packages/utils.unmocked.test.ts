@@ -1,5 +1,5 @@
-import { decodePngMetadata, decodeSvgMetadata } from "../../data/image";
-import { ImportedDataState } from "../../data/types";
+import { decodePngMetadata, decodeSvgMetadata } from "../../../packages/excalidraw/data/image";
+import { ImportedDataState } from "../../../packages/excalidraw/data/types";
 import * as utils from "../../packages/utils";
 import { API } from "../helpers/api";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { DEFAULT_SIDEBAR } from "../../constants";
+import { DEFAULT_SIDEBAR } from "../../../packages/excalidraw/constants";
 import { Excalidraw, Sidebar } from "../../packages/excalidraw/index";
 import {
   fireEvent,

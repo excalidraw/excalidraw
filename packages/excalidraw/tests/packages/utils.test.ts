@@ -3,7 +3,7 @@ import { diagramFactory } from "../fixtures/diagramFixture";
 import { vi } from "vitest";
 import * as mockedSceneExportUtils from "../../scene/export";
 
-import { MIME_TYPES } from "../../constants";
+import { MIME_TYPES } from "../../../packages/excalidraw/constants";
 
 const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
 

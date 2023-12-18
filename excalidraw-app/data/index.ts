@@ -1,23 +1,23 @@
-import { compressData, decompressData } from "../../src/data/encode";
+import { compressData, decompressData } from "../../packages/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../src/data/encryption";
-import { serializeAsJSON } from "../../src/data/json";
-import { restore } from "../../src/data/restore";
-import { ImportedDataState } from "../../src/data/types";
+} from "../../packages/excalidraw/data/encryption";
+import { serializeAsJSON } from "../../packages/excalidraw/data/json";
+import { restore } from "../../packages/excalidraw/data/restore";
+import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { isInvisiblySmallElement } from "../../src/element/sizeHelpers";
 import { isInitializedImageElement } from "../../src/element/typeChecks";
 import { ExcalidrawElement, FileId } from "../../src/element/types";
-import { t } from "../../src/i18n";
+import { t } from "../../packages/excalidraw/i18n";
 import {
   AppState,
   BinaryFileData,
   BinaryFiles,
   UserIdleState,
-} from "../../src/types";
-import { bytesToHexString } from "../../src/utils";
+} from "../../packages/excalidraw/types";
+import { bytesToHexString } from "../../packages/excalidraw/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,

@@ -1,9 +1,9 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import { ExcalidrawImperativeAPI } from "../../src/types";
-import { ErrorDialog } from "../../src/components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "../../src/constants";
-import { ImportedDataState } from "../../src/data/types";
+import { ExcalidrawImperativeAPI } from "../../packages/excalidraw/types";
+import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
+import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
+import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
@@ -12,12 +12,12 @@ import {
   getSceneVersion,
   restoreElements,
 } from "../../src/packages/excalidraw/index";
-import { Collaborator, Gesture } from "../../src/types";
+import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   preventUnload,
   resolvablePromise,
   withBatchedUpdates,
-} from "../../src/utils";
+} from "../../packages/excalidraw/utils";
 import {
   CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
@@ -48,15 +48,15 @@ import {
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
-import { t } from "../../src/i18n";
-import { UserIdleState } from "../../src/types";
-import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../src/constants";
+import { t } from "../../packages/excalidraw/i18n";
+import { UserIdleState } from "../../packages/excalidraw/types";
+import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../packages/excalidraw/constants";
 import {
   encodeFilesForUpload,
   FileManager,
   updateStaleImageStatuses,
 } from "../data/FileManager";
-import { AbortError } from "../../src/errors";
+import { AbortError } from "../../packages/excalidraw/errors";
 import {
   isImageElement,
   isInitializedImageElement,
@@ -66,7 +66,7 @@ import {
   ReconciledElements,
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
-import { decryptData } from "../../src/data/encryption";
+import { decryptData } from "../../packages/excalidraw/data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
