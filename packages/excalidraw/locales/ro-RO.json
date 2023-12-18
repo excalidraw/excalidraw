@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Căutare rapidă",
+      "empty": "Niciun utilizător găsit"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Dă clic pe un utilizator pentru a-l urmări",
+      "followStatus": "În prezent urmărești acest utilizator"
     }
   }
 }
