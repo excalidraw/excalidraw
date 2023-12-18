@@ -13,12 +13,12 @@ import { searchIcon } from "./icons";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
 
-export type GoToCollaboratorComponentProps = [
-  ClientId,
-  Collaborator,
-  boolean,
-  boolean,
-];
+export type GoToCollaboratorComponentProps = {
+  clientId: ClientId;
+  collaborator: Collaborator;
+  withName: boolean;
+  isBeingFollowed: boolean;
+};
 
 /** collaborator user id or socket id (fallback) */
 type ClientId = string & { _brand: "UserId" };
@@ -60,12 +60,12 @@ const renderCollaborator = ({
   shouldWrapWithTooltip?: boolean;
   isBeingFollowed: boolean;
 }) => {
-  const data: GoToCollaboratorComponentProps = [
+  const data: GoToCollaboratorComponentProps = {
     clientId,
     collaborator,
     withName,
     isBeingFollowed,
-  ];
+  };
   const avatarJSX = actionManager.renderAction("goToCollaborator", data);
 
   return (
