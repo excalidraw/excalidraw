@@ -3472,7 +3472,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private maybeUnfollowRemoteUser = () => {
-    console.warn("maybeUnfollowRemoteUser");
     if (this.state.userToFollow) {
       this.setState({ userToFollow: null });
     }
