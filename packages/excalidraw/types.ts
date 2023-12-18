@@ -41,7 +41,7 @@ import { Merge, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
-export type SocketId = string;
+export type SocketId = string & { _brand: "SocketId" };
 
 export type Collaborator = Readonly<{
   pointer?: CollaboratorPointer;
@@ -128,7 +128,7 @@ export type SidebarName = string;
 export type SidebarTabName = string;
 
 export type UserToFollow = {
-  socketId: string;
+  socketId: SocketId;
   username: string;
 };
 
@@ -296,7 +296,7 @@ export interface AppState {
   offsetLeft: number;
 
   fileHandle: FileSystemHandle | null;
-  collaborators: Map<string, Collaborator>;
+  collaborators: Map<SocketId, Collaborator>;
   showStats: boolean;
   currentChartType: ChartType;
   pasteDialog:
@@ -321,7 +321,7 @@ export interface AppState {
   /** the user's clientId & username who is being followed on the canvas */
   userToFollow: UserToFollow | null;
   /** the clientIds of the users following the current user */
-  followedBy: Set<string>;
+  followedBy: Set<SocketId>;
 }
 
 export type UIAppState = Omit<
@@ -474,7 +474,7 @@ export interface ExcalidrawProps {
 export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
-  collaborators?: Map<string, Collaborator>;
+  collaborators?: Map<SocketId, Collaborator>;
   commitToHistory?: boolean;
 };
 

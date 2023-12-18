@@ -22,6 +22,7 @@ import {
   AppState,
   BinaryFileData,
   BinaryFiles,
+  SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
@@ -117,7 +118,7 @@ export type SocketUpdateDataSource = {
   MOUSE_LOCATION: {
     type: WS_SUBTYPES.MOUSE_LOCATION;
     payload: {
-      socketId: string;
+      socketId: SocketId;
       pointer: { x: number; y: number; tool: "pointer" | "laser" };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
@@ -127,7 +128,7 @@ export type SocketUpdateDataSource = {
   USER_VISIBLE_SCENE_BOUNDS: {
     type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS;
     payload: {
-      socketId: string;
+      socketId: SocketId;
       username: string;
       sceneBounds: SceneBounds;
     };
@@ -135,7 +136,7 @@ export type SocketUpdateDataSource = {
   IDLE_STATUS: {
     type: WS_SUBTYPES.IDLE_STATUS;
     payload: {
-      socketId: string;
+      socketId: SocketId;
       userState: UserIdleState;
       username: string;
     };
