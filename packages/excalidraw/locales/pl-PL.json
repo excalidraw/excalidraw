@@ -521,5 +521,15 @@
     "description": "Obecnie wspierane są jedynie <flowchartLink>proste grafy</flowchartLink>, <sequenceLink>sekwencje</sequenceLink> i <classLink>diagramy klas</classLink>. Pozostałe typy będą wyświetlane jako obrazy w Excalidraw.",
     "syntax": "Składnia diagramów Mermaid",
     "preview": "Podgląd"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": ""
+    }
   }
 }
