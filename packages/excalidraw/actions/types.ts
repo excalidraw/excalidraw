@@ -129,7 +129,7 @@ export type ActionName =
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
   appState: AppState;
-  updateData: (formData?: any) => void;
+  updateData: <T = any>(formData?: T) => void;
   appProps: ExcalidrawProps;
   data?: Record<string, any>;
   app: AppClassProperties;
