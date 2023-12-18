@@ -1,7 +1,7 @@
 import { render } from "./test-utils";
 import { API } from "./helpers/api";
 
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { vi } from "vitest";
 
 const { h } = window;

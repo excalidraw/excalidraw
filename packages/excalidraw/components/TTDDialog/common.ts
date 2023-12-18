@@ -5,10 +5,7 @@ import {
   DEFAULT_FONT_SIZE,
   EDITOR_LS_KEYS,
 } from "../../constants";
-import {
-  convertToExcalidrawElements,
-  exportToCanvas,
-} from "../../packages/excalidraw/index";
+import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppClassProperties, BinaryFiles } from "../../types";
 import { canvasToBlob } from "../../data/blob";

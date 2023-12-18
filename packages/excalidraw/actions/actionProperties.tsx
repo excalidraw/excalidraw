@@ -1,4 +1,4 @@
-import { AppState, Primitive } from "../../src/types";
+import { AppState, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,

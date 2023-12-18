@@ -28,7 +28,7 @@ import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
 import { isTextBindableContainer } from "./typeChecks";
-import { getElementAbsoluteCoords } from "../element";
+import { getElementAbsoluteCoords } from ".";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
 import {

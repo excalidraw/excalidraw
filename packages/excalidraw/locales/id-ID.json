@@ -11,6 +11,8 @@
     "copyAsPng": "Salin ke papan klip sebagai PNG",
     "copyAsSvg": "Salin ke papan klip sebagai SVG",
     "copyText": "Salin ke papan klip sebagai teks",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Bawa maju",
     "sendToBack": "Kirim ke belakang",
     "bringToFront": "Bawa ke depan",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Tidak ada",
     "arrowhead_arrow": "Panah",
     "arrowhead_bar": "Batang",
-    "arrowhead_dot": "Titik",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Segitiga",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Biarkan sidebar tetap terbuka",
     "selectAllElementsInFrame": "Pilih semua elemen di bingkai",
     "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
-    "eyeDropper": "Ambil warna dari kanvas"
+    "eyeDropper": "Ambil warna dari kanvas",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Tidak dapat memuat pustaka",
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "Sepertinya Anda menggunkan peramban Brave dengan pengaturan <bold>Blokir Fingerprinting yang Agresif</bold> diaktifkan.",
       "line2": "Ini dapat membuat <bold>Elemen Teks</bold> dalam gambar mu.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Pilihan",
@@ -236,10 +249,13 @@
     "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
     "eraser": "Penghapus",
     "frame": "Alat bingkai",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Tangan (alat panning)",
-    "extraTools": "Alat-alat lain"
+    "extraTools": "Alat-alat lain",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Opsi Kanvas",
@@ -498,5 +514,12 @@
         "description": "Memuat dari file yang akan <bold>menggantikan konten Anda sekarang</bold>.<br></br>Anda dapat mencadangkan gambar anda dulu menggunakan opsi-opsi ini."
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

@@ -26,7 +26,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { elementsOverlappingBBox } from "../packages/withinBounds";
+import { elementsOverlappingBBox } from "../../utils/export";
 import {
   getFrameLikeElements,
   getFrameLikeTitle,
@@ -347,7 +347,7 @@ export const exportToSvg = async (
   if (exportEmbedScene) {
     try {
       metadata = await (
-        await import(/* webpackChunkName: "image" */ "../../src/data/image")
+        await import(/* webpackChunkName: "image" */ "../data/image")
       ).encodeSvgMetadata({
         // when embedding scene, we want to embed the origionally supplied
         // elements which don't contain the temp frame labels.

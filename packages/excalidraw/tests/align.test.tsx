@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import { Excalidraw } from "../../src/packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";

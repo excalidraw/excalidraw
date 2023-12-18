@@ -3,12 +3,22 @@ import { Card } from "../../packages/excalidraw/components/Card";
 import { ToolButton } from "../../packages/excalidraw/components/ToolButton";
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
-import { FileId, NonDeletedExcalidrawElement } from "../../src/element/types";
-import { AppState, BinaryFileData, BinaryFiles } from "../../packages/excalidraw/types";
+import {
+  FileId,
+  NonDeletedExcalidrawElement,
+} from "../../packages/excalidraw/element/types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+} from "../../packages/excalidraw/types";
 import { nanoid } from "nanoid";
 import { useI18n } from "../../packages/excalidraw/i18n";
-import { encryptData, generateEncryptionKey } from "../../packages/excalidraw/data/encryption";
-import { isInitializedImageElement } from "../../src/element/typeChecks";
+import {
+  encryptData,
+  generateEncryptionKey,
+} from "../../packages/excalidraw/data/encryption";
+import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";

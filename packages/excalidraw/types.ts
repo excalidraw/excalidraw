@@ -43,7 +43,9 @@ import { ColorPaletteCustom } from "./colors";
 
 export type Point = Readonly<RoughPoint>;
 
-export type Collaborator = {
+export type SocketId = string;
+
+export type Collaborator = Readonly<{
   pointer?: CollaboratorPointer;
   button?: "up" | "down";
   selectedElementIds?: AppState["selectedElementIds"];
@@ -53,12 +55,14 @@ export type Collaborator = {
     background: string;
     stroke: string;
   };
-  // The url of the collaborator's avatar, defaults to username intials
+  // The url of the collaborator's avatar, defaults to username initials
   // if not present
   avatarUrl?: string;
   // user id. If supplied, we'll filter out duplicates when rendering user avatars.
   id?: string;
-};
+  socketId?: SocketId;
+  isCurrentUser?: boolean;
+}>;
 
 export type CollaboratorPointer = {
   x: number;
@@ -125,6 +129,11 @@ export type ActiveTool =
 
 export type SidebarName = string;
 export type SidebarTabName = string;
+
+export type UserToFollow = {
+  socketId: string;
+  username: string;
+};
 
 type _CommonCanvasAppState = {
   zoom: AppState["zoom"];
@@ -332,13 +341,16 @@ export interface AppState {
   frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
-
   snapLines: readonly SnapLine[];
   originSnapOffset: {
     x: number;
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
+  /** the user's clientId & username who is being followed on the canvas */
+  userToFollow: UserToFollow | null;
+  /** the clientIds of the users following the current user */
+  followedBy: Set<string>;
 }
 
 export type UIAppState = Omit<
@@ -414,6 +426,11 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
+export type OnUserFollowedPayload = {
+  userToFollow: UserToFollow;
+  action: "FOLLOW" | "UNFOLLOW";
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
@@ -484,7 +501,8 @@ export interface ExcalidrawProps {
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
   ) => void;
-  onScrollChange?: (scrollX: number, scrollY: number) => void;
+  onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
+  onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
   validateEmbeddable?:
     | boolean
@@ -541,10 +559,10 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
-// NOTE at the moment, if action name coressponds to canvasAction prop, its
+// NOTE at the moment, if action name corresponds to canvasAction prop, its
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
-// excalidraw package index.tsx.
+// Excalidraw package index.tsx.
 export type CanvasActions = Partial<{
   changeViewBackgroundColor: boolean;
   clearCanvas: boolean;
@@ -745,6 +763,12 @@ export type ExcalidrawImperativeAPI = {
       pointerDownState: PointerDownState,
       event: PointerEvent,
     ) => void,
+  ) => UnsubscribeCallback;
+  onScrollChange: (
+    callback: (scrollX: number, scrollY: number, zoom: Zoom) => void,
+  ) => UnsubscribeCallback;
+  onUserFollow: (
+    callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
 };
 

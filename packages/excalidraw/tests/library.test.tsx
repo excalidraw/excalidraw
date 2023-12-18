@@ -2,7 +2,7 @@ import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
 import { queryByTestId } from "@testing-library/react";
 
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import { LibraryItem, LibraryItems } from "../types";

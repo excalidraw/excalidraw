@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import * as Renderer from "../renderer/renderScene";
 import { setDateTimeForTests } from "../utils";

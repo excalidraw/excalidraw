@@ -7,7 +7,7 @@ import {
 import { DEFAULT_VERSION } from "../packages/excalidraw/constants";
 import { t } from "../packages/excalidraw/i18n";
 import { copyTextToSystemClipboard } from "../packages/excalidraw/clipboard";
-import { NonDeletedExcalidrawElement } from "../src/element/types";
+import { NonDeletedExcalidrawElement } from "../packages/excalidraw/element/types";
 import { UIAppState } from "../packages/excalidraw/types";
 
 type StorageSizes = { scene: number; total: number };

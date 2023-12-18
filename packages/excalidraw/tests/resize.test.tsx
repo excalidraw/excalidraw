@@ -8,7 +8,7 @@ import type {
 } from "../element/types";
 import type { Point } from "../types";
 import { Bounds, getElementPointsCoords } from "../element/bounds";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";

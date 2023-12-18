@@ -112,7 +112,7 @@ module.exports = {
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(
-        path.resolve(__dirname, "../../../.env.production"),
+        path.resolve(__dirname, "../../.env.production"),
       ),
     }),
   ],

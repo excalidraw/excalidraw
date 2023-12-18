@@ -11,6 +11,8 @@
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
     "copyText": "Copia al porta-retalls com a text",
+    "copySource": "Copia l'origen al porta-retalls",
+    "convertToCode": "",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
     "bringToFront": "Porta al davant",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Fletxa",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Punt",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
@@ -109,12 +115,12 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Edita l'enllaç",
-      "editEmbed": "",
+      "editEmbed": "Edita l'enllaç i incrusta-ho",
       "create": "Crea un enllaç",
       "createEmbed": "",
       "label": "Enllaç",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "No s'ha definit cap enllaç"
     },
     "lineEditor": {
       "edit": "Editar línia",
@@ -128,9 +134,11 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Manté la barra lateral oberta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "selectAllElementsInFrame": "Selecciona tots els elements del marc",
+    "removeAllElementsFromFrame": "Eliminat tots els elements del marc",
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -173,7 +181,7 @@
     "publishLibrary": "Publica",
     "submit": "Envia",
     "confirm": "Confirma",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Feu clic per interactuar"
   },
   "alerts": {
     "clearReset": "S'esborrarà tot el llenç. N'esteu segur?",
@@ -209,6 +217,7 @@
     "importLibraryError": "No s'ha pogut carregar la biblioteca",
     "collabSaveFailed": "No s'ha pogut desar a la base de dades de fons. Si els problemes persisteixen, hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
     "collabSaveFailed_sizeExceeded": "No s'ha pogut desar a la base de dades de fons, sembla que el llenç és massa gran. Hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "No s'ha pogut enganxar.",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selecció",
@@ -236,10 +249,13 @@
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "Mà (eina de desplaçament)",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "De Mermaid a Excalidraw",
+    "magicSettings": "Preferències d'IA"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -379,8 +395,8 @@
     "header": "",
     "label": {
       "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
+      "onlySelected": "Només els seleccionats",
+      "darkMode": "Mode fosc",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -389,12 +405,12 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exporta a PNG",
+      "exportToSvg": "Exporta a SVG",
+      "copyPngToClipboard": "Copia el PNG al porta-retalls"
     },
     "button": {
-      "exportToPng": "",
+      "exportToPng": "PNG",
       "exportToSvg": "",
       "copyPngToClipboard": ""
     }
@@ -443,10 +459,10 @@
     "blue": "",
     "cyan": "",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "Verd",
+    "yellow": "Groc",
+    "orange": "Taronja",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -471,13 +487,13 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Exporta com a imatge",
+        "button": "Exporta com a imatge",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Desa al disc",
+        "button": "Desa al disc",
         "description": ""
       },
       "excalidrawPlus": {
@@ -488,15 +504,22 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Carrega des d'un fitxer",
+        "button": "Carrega des d'un fitxer",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "Carrega des d'un enllaç",
         "button": "",
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "De Mermaid a Excalidraw",
+    "button": "Insereix",
+    "description": "",
+    "syntax": "Sintaxi de Mermaid",
+    "preview": "Previsualització"
   }
 }

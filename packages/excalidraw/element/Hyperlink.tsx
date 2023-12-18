@@ -32,7 +32,7 @@ import { Bounds } from "./bounds";
 import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
 import { isPointHittingElementBoundingBox } from "./collision";
-import { getElementAbsoluteCoords } from "./";
+import { getElementAbsoluteCoords } from ".";
 import { isLocalLink, normalizeLink } from "../data/url";
 
 import "./Hyperlink.scss";

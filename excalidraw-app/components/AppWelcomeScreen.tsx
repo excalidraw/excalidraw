@@ -1,7 +1,7 @@
 import React from "react";
 import { PlusPromoIcon } from "../../packages/excalidraw/components/icons";
 import { useI18n } from "../../packages/excalidraw/i18n";
-import { WelcomeScreen } from "../../src/packages/excalidraw/index";
+import { WelcomeScreen } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { POINTER_EVENTS } from "../../packages/excalidraw/constants";
 

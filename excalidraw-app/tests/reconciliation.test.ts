@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
-import { ExcalidrawElement } from "../../src/element/types";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   BroadcastedExcalidrawElement,
   ReconciledElements,

@@ -1,4 +1,4 @@
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { queryByTestId } from "@testing-library/react";
 import { render } from "../tests/test-utils";
 import { UI } from "../tests/helpers/ui";

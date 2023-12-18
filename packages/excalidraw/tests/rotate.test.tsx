@@ -2,7 +2,7 @@ import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI } from "./helpers/ui";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { expect } from "vitest";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);

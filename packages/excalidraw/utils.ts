@@ -771,11 +771,21 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
 
 export const isShallowEqual = <
   T extends Record<string, any>,
-  I extends keyof T,
+  K extends readonly unknown[],
 >(
   objA: T,
   objB: T,
-  comparators?: Record<I, (a: T[I], b: T[I]) => boolean>,
+  comparators?:
+    | { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
+    | (keyof T extends K[number]
+        ? K extends readonly (keyof T)[]
+          ? K
+          : {
+              _error: "keys are either missing or include keys not in compared obj";
+            }
+        : {
+            _error: "keys are either missing or include keys not in compared obj";
+          }),
   debug = false,
 ) => {
   const aKeys = Object.keys(objA);
@@ -783,8 +793,29 @@ export const isShallowEqual = <
   if (aKeys.length !== bKeys.length) {
     return false;
   }
+
+  if (comparators && Array.isArray(comparators)) {
+    for (const key of comparators) {
+      const ret = objA[key] === objB[key];
+      if (!ret) {
+        if (debug) {
+          console.info(
+            `%cisShallowEqual: ${key} not equal ->`,
+            "color: #8B4000",
+            objA[key],
+            objB[key],
+          );
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
   return aKeys.every((key) => {
-    const comparator = comparators?.[key as I];
+    const comparator = (
+      comparators as { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
+    )?.[key as keyof T];
     const ret = comparator
       ? comparator(objA[key], objB[key])
       : objA[key] === objB[key];

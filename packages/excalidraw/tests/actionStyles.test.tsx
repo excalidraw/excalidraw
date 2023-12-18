@@ -1,4 +1,4 @@
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { CODES } from "../keys";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";

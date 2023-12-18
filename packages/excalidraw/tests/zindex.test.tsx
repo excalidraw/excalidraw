@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import {
   actionSendBackward,
