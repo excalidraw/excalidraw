@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Búsqueda rápida",
+      "empty": "No se encontraron usuarios"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Haga clic en el usuario para seguir",
+      "followStatus": "Ya estás siguiendo a este usuario"
     }
   }
 }
