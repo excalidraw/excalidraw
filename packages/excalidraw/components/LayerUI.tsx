@@ -339,7 +339,10 @@ const LayerUI = ({
             )}
           >
             {appState.collaborators.size > 0 && (
-              <UserList collaborators={appState.collaborators} />
+              <UserList
+                collaborators={appState.collaborators}
+                userToFollow={appState.userToFollow?.socketId || null}
+              />
             )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
