@@ -12,6 +12,7 @@ export const actionGoToCollaborator = register({
   trackEvent: { category: "collab" },
   perform: (_elements, appState, collaborator: Collaborator) => {
     if (
+      !collaborator.socketId ||
       appState.userToFollow?.socketId === collaborator.socketId ||
       collaborator.isCurrentUser
     ) {
@@ -28,7 +29,7 @@ export const actionGoToCollaborator = register({
       appState: {
         ...appState,
         userToFollow: {
-          socketId: collaborator.socketId!,
+          socketId: collaborator.socketId,
           username: collaborator.username || "",
         },
         // Close mobile menu

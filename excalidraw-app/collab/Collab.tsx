@@ -123,7 +123,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
-  private collaborators = new Map<string, Collaborator>();
+  private collaborators = new Map<SocketId, Collaborator>();
 
   constructor(props: Props) {
     super(props);
@@ -618,7 +618,7 @@ class Collab extends PureComponent<Props, CollabState> {
 
     this.portal.socket.on(
       WS_EVENTS.USER_FOLLOW_ROOM_CHANGE,
-      (followedBy: string[]) => {
+      (followedBy: SocketId[]) => {
         this.excalidrawAPI.updateScene({
           appState: { followedBy: new Set(followedBy) },
         });
@@ -795,7 +795,7 @@ class Collab extends PureComponent<Props, CollabState> {
     document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
   };
 
-  setCollaborators(sockets: string[]) {
+  setCollaborators(sockets: SocketId[]) {
     const collaborators: InstanceType<typeof Collab>["collaborators"] =
       new Map();
     for (const socketId of sockets) {
