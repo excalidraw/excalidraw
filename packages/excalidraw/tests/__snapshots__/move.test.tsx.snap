@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
+exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -32,7 +32,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
 }
 `;
 
-exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
+exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -64,7 +64,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
 }
 `;
 
-exports[`move element > rectangle 1`] = `
+exports[`move element > rectangle 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -96,7 +96,7 @@ exports[`move element > rectangle 1`] = `
 }
 `;
 
-exports[`move element > rectangles with binding arrow 1`] = `
+exports[`move element > rectangles with binding arrow 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -133,7 +133,7 @@ exports[`move element > rectangles with binding arrow 1`] = `
 }
 `;
 
-exports[`move element > rectangles with binding arrow 2`] = `
+exports[`move element > rectangles with binding arrow 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -170,7 +170,7 @@ exports[`move element > rectangles with binding arrow 2`] = `
 }
 `;
 
-exports[`move element > rectangles with binding arrow 3`] = `
+exports[`move element > rectangles with binding arrow 7`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
