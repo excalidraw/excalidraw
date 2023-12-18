@@ -816,9 +816,18 @@ export const isShallowEqual = <
     const comparator = (
       comparators as { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
     )?.[key as keyof T];
-    const ret = comparator
+    let ret = comparator
       ? comparator(objA[key], objB[key])
       : objA[key] === objB[key];
+    // two empty arrays can be equal
+    if (
+      Array.isArray(objA[key]) &&
+      objA[key].length === 0 &&
+      Array.isArray(objB[key]) &&
+      objB[key].length === 0
+    ) {
+      ret = true;
+    }
     if (!ret && debug) {
       console.info(
         `%cisShallowEqual: ${key} not equal ->`,
