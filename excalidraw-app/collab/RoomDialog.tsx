@@ -20,7 +20,7 @@ import {
 import { TextField } from "../../src/components/TextField";
 import { FilledButton } from "../../src/components/FilledButton";
 
-import { ReactComponent as CollabImage } from "../../src/assets/lock.svg";
+// import { ReactComponent as CollabImage } from "../../src/assets/lock.svg";
 import "./RoomDialog.scss";
 
 const getShareIcon = () => {
@@ -179,9 +179,9 @@ export const RoomModal = ({
 
   return (
     <>
-      <div className="RoomDialog__inactive__illustration">
+      {/* <div className="RoomDialog__inactive__illustration">
         <CollabImage />
-      </div>
+      </div> */}
       <div className="RoomDialog__inactive__header">
         {t("labels.liveCollaboration")}
       </div>
