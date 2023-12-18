@@ -528,7 +528,8 @@
       "empty": "No users found"
     },
     "hint": {
-      "text": "Click on user to follow"
+      "text": "Click on user to follow",
+      "followStatus": "You're currently following this user"
     }
   }
 }

@@ -51,6 +51,13 @@
     color: var(--color-gray-100);
   }
 
+  .UserList__collaborator-follow-status-icon {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 1rem;
+    display: flex;
+  }
+
   --userlist-hint-bg-color: var(--color-gray-10);
   --userlist-hint-heading-color: var(--color-gray-80);
   --userlist-hint-text-color: var(--color-gray-60);

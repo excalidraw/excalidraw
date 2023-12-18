@@ -1,5 +1,8 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
+import { GoToCollaboratorComponentProps } from "../components/UserList";
+import { eyeIcon } from "../components/icons";
+import { t } from "../i18n";
 import { Collaborator } from "../types";
 import { register } from "./register";
 
@@ -35,38 +38,43 @@ export const actionGoToCollaborator = register({
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {
-    const [clientId, collaborator, withName] = data as [
-      string,
-      Collaborator,
-      boolean,
-    ];
+    const [socketId, collaborator, withName, isBeingFollowed] =
+      data as GoToCollaboratorComponentProps;
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(socketId);
 
     return withName ? (
       <div
-        className="dropdown-menu-item dropdown-menu-item-base"
-        onClick={() => updateData({ ...collaborator, clientId })}
+        className="dropdown-menu-item dropdown-menu-item-base UserList__collaborator"
+        onClick={() => updateData({ ...collaborator, socketId })}
       >
         <Avatar
           color={background}
           onClick={() => {}}
           name={collaborator.username || ""}
           src={collaborator.avatarUrl}
-          isBeingFollowed={appState.userToFollow?.socketId === clientId}
+          isBeingFollowed={isBeingFollowed}
           isCurrentUser={collaborator.isCurrentUser === true}
         />
         {collaborator.username}
+        <div
+          className="UserList__collaborator-follow-status-icon"
+          style={{ visibility: isBeingFollowed ? "visible" : "hidden" }}
+          title={isBeingFollowed ? t("userList.hint.followStatus") : undefined}
+          aria-hidden
+        >
+          {eyeIcon}
+        </div>
       </div>
     ) : (
       <Avatar
         color={background}
         onClick={() => {
-          updateData({ ...collaborator, clientId });
+          updateData({ ...collaborator, socketId });
         }}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
-        isBeingFollowed={appState.userToFollow?.socketId === clientId}
+        isBeingFollowed={isBeingFollowed}
         isCurrentUser={collaborator.isCurrentUser === true}
       />
     );
