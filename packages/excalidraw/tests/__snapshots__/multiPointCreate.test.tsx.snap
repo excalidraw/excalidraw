@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`multi point mode in linear elements > arrow 1`] = `
+exports[`multi point mode in linear elements > arrow 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -54,7 +54,7 @@ exports[`multi point mode in linear elements > arrow 1`] = `
 }
 `;
 
-exports[`multi point mode in linear elements > line 1`] = `
+exports[`multi point mode in linear elements > line 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",

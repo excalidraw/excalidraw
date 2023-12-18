@@ -270,6 +270,7 @@ import {
   muteFSAbortError,
   isTestEnv,
   easeOut,
+  updateStable,
 } from "../utils";
 import {
   createSrcDoc,
@@ -5027,13 +5028,31 @@ class App extends React.Component<AppProps, AppState> {
         event,
       );
 
-      this.setState({
-        snapLines,
-        originSnapOffset: originOffset,
+      this.setState((prevState) => {
+        const nextSnapLines = updateStable(prevState.snapLines, snapLines);
+        const nextOriginOffset = prevState.originSnapOffset
+          ? updateStable(prevState.originSnapOffset, originOffset)
+          : originOffset;
+
+        if (
+          prevState.snapLines === nextSnapLines &&
+          prevState.originSnapOffset === nextOriginOffset
+        ) {
+          return null;
+        }
+        return {
+          snapLines: nextSnapLines,
+          originSnapOffset: nextOriginOffset,
+        };
       });
     } else if (!this.state.draggingElement) {
-      this.setState({
-        snapLines: [],
+      this.setState((prevState) => {
+        if (prevState.snapLines.length) {
+          return {
+            snapLines: [],
+          };
+        }
+        return null;
       });
     }
 
@@ -7564,7 +7583,7 @@ class App extends React.Component<AppProps, AppState> {
         isRotating,
       } = this.state;
 
-      this.setState({
+      this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
         resizingElement: null,
@@ -7578,10 +7597,10 @@ class App extends React.Component<AppProps, AppState> {
           multiElement || isTextElement(this.state.editingElement)
             ? this.state.editingElement
             : null,
-        snapLines: [],
+        snapLines: updateStable(prevState.snapLines, []),
 
         originSnapOffset: null,
-      });
+      }));
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);
