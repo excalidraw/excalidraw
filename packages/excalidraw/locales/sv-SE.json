@@ -521,5 +521,15 @@
     "description": "",
     "syntax": "",
     "preview": "Förhandsgranska"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": ""
+    }
   }
 }
