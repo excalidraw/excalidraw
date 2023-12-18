@@ -521,5 +521,15 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": ""
+    }
   }
 }
