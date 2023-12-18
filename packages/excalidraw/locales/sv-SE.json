@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Snabbsök",
+      "empty": "Inga användare hittades"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Klicka på användaren för att följa",
+      "followStatus": "Du följer den här användaren"
     }
   }
 }
