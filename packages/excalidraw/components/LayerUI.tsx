@@ -37,7 +37,7 @@ import { UserList } from "./UserList";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { PenModeButton } from "./PenModeButton";
 import { trackEvent } from "../analytics";
-import { useDevice } from "../components/App";
+import { useDevice } from "./App";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions/actionToggleStats";
 import Footer from "./footer/Footer";
@@ -348,7 +348,9 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList collaborators={appState.collaborators} />
+            {appState.collaborators.size > 0 && (
+              <UserList collaborators={appState.collaborators} />
+            )}
             {!appState.viewModeEnabled && //zsviczian
               renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&

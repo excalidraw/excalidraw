@@ -11,7 +11,7 @@ import {
   waitFor,
   togglePopover,
 } from "./test-utils";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import * as Renderer from "../renderer/renderScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

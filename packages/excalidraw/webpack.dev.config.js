@@ -92,7 +92,7 @@ module.exports = {
     ...(false ? [new BundleAnalyzerPlugin()] : []), //zsviczian has no effect, however, without this I get a build error
     new webpack.DefinePlugin({
       "process.env": parseEnvVariables(
-        path.resolve(__dirname, "../../../.env.development"),
+        path.resolve(__dirname, "../../.env.development"),
       ),
     }),
   ],

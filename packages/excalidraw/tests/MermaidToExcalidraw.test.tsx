@@ -1,5 +1,5 @@
 import { act, fireEvent, render, waitFor } from "./test-utils";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import React from "react";
 import { expect, vi } from "vitest";
 import * as MermaidToExcalidraw from "@zsviczian/mermaid-to-excalidraw";

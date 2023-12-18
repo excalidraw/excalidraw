@@ -2,7 +2,7 @@ import { vi } from "vitest";
 import ReactDOM from "react-dom";
 import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
 import {
   getDefaultLineHeight,

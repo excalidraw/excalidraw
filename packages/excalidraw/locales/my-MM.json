@@ -11,6 +11,8 @@
     "copyAsPng": "PNG အနေဖြင့်ကူး",
     "copyAsSvg": "SVG အနေဖြင့်ကူး",
     "copyText": "",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "ရှေ့ပို့",
     "sendToBack": "နောက်ဆုံးထား",
     "bringToFront": "ရှေ့ဆုံးထား",
@@ -36,8 +38,12 @@
     "arrowhead_none": "ဘာမျှမရှိ",
     "arrowhead_arrow": "မြှား",
     "arrowhead_bar": "",
-    "arrowhead_dot": "အစက်",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
@@ -130,7 +136,9 @@
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "",
@@ -209,6 +217,7 @@
     "importLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "ရွေးချယ်",
@@ -236,10 +249,13 @@
     "link": "",
     "eraser": "",
     "frame": "",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "",
-    "extraTools": ""
+    "extraTools": "",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "ကားချပ်လုပ်ဆောင်ချက်",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

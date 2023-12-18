@@ -11,6 +11,8 @@
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
     "copyText": "클립보드로 텍스트 복사",
+    "copySource": "소스코드를 클립보드로 복사",
+    "convertToCode": "코드로 변환",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -36,8 +38,12 @@
     "arrowhead_none": "없음",
     "arrowhead_arrow": "화살표",
     "arrowhead_bar": "막대",
-    "arrowhead_dot": "점",
+    "arrowhead_circle": "원",
+    "arrowhead_circle_outline": "원 (외곽선)",
     "arrowhead_triangle": "삼각형",
+    "arrowhead_triangle_outline": "삼각형 (외곽선)",
+    "arrowhead_diamond": "마름모",
+    "arrowhead_diamond_outline": "마름모 (외곽선)",
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
     "addWatermark": "\"Made with Excalidraw\" 추가",
@@ -130,7 +136,9 @@
     "sidebarLock": "사이드바 유지",
     "selectAllElementsInFrame": "프레임의 모든 요소 선택",
     "removeAllElementsFromFrame": "프레임의 모든 요소 삭제",
-    "eyeDropper": "캔버스에서 색상 고르기"
+    "eyeDropper": "캔버스에서 색상 고르기",
+    "textToDiagram": "텍스트를 다이어그램으로",
+    "prompt": "프롬프트"
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -209,6 +217,7 @@
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
+    "imageToolNotSupported": "이미지가 비활성화 되었습니다.",
     "brave_measure_text_error": {
       "line1": "귀하께서는 <bold>강력한 지문 차단 설정</bold>이 활성화된 Brave browser를 사용하고 계신 것 같습니다.",
       "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
+      "iframe": "IFrame 요소들은 라이브러리에 추가할 수 없습니다.",
       "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
-    }
+    },
+    "asyncPasteFailedOnRead": "붙여넣는데 실패했습니다. (시스템 클립보드를 읽는데 실패했습니다)",
+    "asyncPasteFailedOnParse": "붙여넣는데 실패했습니다.",
+    "copyToSystemClipboardFailed": "클립보드로 복사하는데 실패했습니다."
   },
   "toolBar": {
     "selection": "선택",
@@ -236,10 +249,13 @@
     "link": "선택한 도형에 대해서 링크를 추가/업데이트",
     "eraser": "지우개",
     "frame": "프레임 도구",
+    "magicframe": "와이어프레임을 코드로",
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
-    "extraTools": "다른 도구"
+    "extraTools": "다른 도구",
+    "mermaidToExcalidraw": "Mermaid에서 불러오기",
+    "magicSettings": "AI 설정"
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -498,5 +514,12 @@
         "description": "외부 작업물을 불러오면 <bold>현재 작성된 데이터를 덮어쓰게 됩니다</bold>.<br></br>다음 옵션 중 하나를 선택하여 작업물을 백업해 둘 수 있습니다."
       }
     }
+  },
+  "mermaid": {
+    "title": "Mermaid에서 불러오기",
+    "button": "삽입하기",
+    "description": "지금은 <flowchartLink>순서도</flowchartLink>,<sequenceLink> 시퀀스</sequenceLink>, <classLink>클래스 </classLink>다이어그램만 지원합니다. 다른 형식들은 Excalidraw에서는 이미지로 표시됩니다.",
+    "syntax": "Mermaid 구문",
+    "preview": "미리보기"
   }
 }

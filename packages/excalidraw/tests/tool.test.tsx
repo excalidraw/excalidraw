@@ -1,4 +1,4 @@
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { ExcalidrawImperativeAPI } from "../types";
 import { resolvablePromise } from "../utils";
 import { render } from "./test-utils";

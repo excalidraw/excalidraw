@@ -16,7 +16,7 @@ import {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
-} from "../element/types";
+} from "./types";
 import {
   arrayToMap,
   getFontString,

@@ -5,7 +5,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
-import { Excalidraw } from "../packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import * as Renderer from "../renderer/renderScene";
 import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";

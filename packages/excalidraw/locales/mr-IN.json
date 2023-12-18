@@ -11,6 +11,8 @@
     "copyAsPng": "PNG रूपे फळी वर कॉपी करा",
     "copyAsSvg": "SVG रूपे फळी वर कॉपी करा",
     "copyText": "लिखित रूपे फळी वर कॉपी करा",
+    "copySource": "स्त्रोत फळी वर कॉपी करा",
+    "convertToCode": "सांकेतिक लिपित रूपांतरित करा",
     "bringForward": "पुढे पुढे आणा",
     "sendToBack": "सर्वात मागे करा",
     "bringToFront": "सर्वात पुढे आणा",
@@ -36,8 +38,12 @@
     "arrowhead_none": "कुठलाहि नाही",
     "arrowhead_arrow": "बाण",
     "arrowhead_bar": "दांडुक",
-    "arrowhead_dot": "ठिपका",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "त्रिकोण",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "अक्षर आकार",
     "fontFamily": "अक्षर समूह",
     "addWatermark": "\"एक्सकेलीड्रॉ ने बनवलेलं\" जोडा",
@@ -109,12 +115,12 @@
     "createContainerFromText": "मजकूर कंटेनर मधे मोडून दाखवा",
     "link": {
       "edit": "दुवा संपादन",
-      "editEmbed": "",
+      "editEmbed": "कड़ी सम्पादित करा आणि रुतवा",
       "create": "दुवा तयार करा",
-      "createEmbed": "",
+      "createEmbed": "नवीन कड़ी बनवा आणि रुतवा",
       "label": "दुवा",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "कड़ी आणि रूतवणे",
+      "empty": "कुठलिही कड़ी दिली नाही"
     },
     "lineEditor": {
       "edit": "रेघ संपादन",
@@ -128,9 +134,11 @@
     },
     "statusPublished": "प्रकाशित करा",
     "sidebarLock": "साइडबार उघडं ठेवा",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": "चित्रफलकातून रंग निवडा"
+    "selectAllElementsInFrame": "चौकटीतले सर्व तत्वांचे चयन करा",
+    "removeAllElementsFromFrame": "चौकटीतून सर्व काढून टाका",
+    "eyeDropper": "चित्रफलकातून रंग निवडा",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
@@ -169,11 +177,11 @@
     "cancel": "रद्द",
     "clear": "स्वछ",
     "remove": "हटवा",
-    "embed": "",
+    "embed": "रुतवणे उलटे करा",
     "publishLibrary": "प्रकाशित करा",
     "submit": "जमा करा",
     "confirm": "पुष्टि करा",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "संवादा साठी क्लिक करा"
   },
   "alerts": {
     "clearReset": "पटल स्वच्छ होणार, तुम्हाला खात्री आहे का?",
@@ -203,12 +211,13 @@
     "imageInsertError": "प्रतिमा आत घालता येत नाही. नंतर पुन्हा प्रयत्न करा...",
     "fileTooBig": "फाइल फार मोठी आहे. आकाराची कमाल परवानगी {{maxSize}} आहे.",
     "svgImageInsertError": "एस-वी-जी प्रतिमा आत घालवू शकलो नाही. एस-वी-जी-मार्क-अप यंत्र अयोग्य आहे.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "प्रतिमा आणणे नाही जमले.",
     "invalidSVGString": "अयोग्य एस-वी-जी.",
     "cannotResolveCollabServer": "कॉलेब-सर्वर हे पोहोचत नाही आहे. पान परत लोड करायचा प्रयत्न करावे.",
     "importLibraryError": "संग्रह प्रतिस्थापित नाही करता आला",
     "collabSaveFailed": "काही कारणा निमित्त आतल्या डेटाबेसमध्ये जतन करू शकत नाही। समस्या तशिस राहिल्यास, तुम्ही तुमचे काम गमावणार नाही याची खात्री करण्यासाठी तुम्ही तुमची फाइल स्थानिक जतन करावी.",
     "collabSaveFailed_sizeExceeded": "लगता है कि पृष्ठ तल काफ़ी बड़ा है, इस्कारण अंदरूनी डेटाबेस में सहेजा नहीं जा सका। किये काम को खोने न देने के लिये अपनी फ़ाइल को स्थानीय रूप से सहेजे।\n\nबॅकएंड डेटाबेसमध्ये जतन करू शकत नाही, कॅनव्हास खूप मोठा असल्याचे दिसते. तुम्ही तुमचे काम गमावणार नाही याची खात्री करण्यासाठी तुम्ही फाइल स्थानिक पातळीवर जतन करावी.",
+    "imageToolNotSupported": "प्रतिमां अक्षम केली गेली आहेत.",
     "brave_measure_text_error": {
       "line1": "असं वाटते की तुम्हीं Brave ब्राउज़र वापरतात आहात आणि त्या बरोबार <bold>आक्रामक पद्धति चें बोटांचे ठसे </bold> हां सेटिंग्स चा विकल्प चयन केलेला आहे.",
       "line2": "हे तुमच्या चित्रांच्या <bold>पाठ तत्वांनां </bold> खंडित करू शकतात.",
@@ -216,9 +225,13 @@
       "line4": "ही सेटिंग अक्षम करूनही पृष्ठ योग्यरित्या प्रदर्शित होत नसल्यास, आमच्या GitHub वर <issueLink>समस्या</issueLink> सबमिट करा, किव्हा <discordLink>डिस्कॉर्ड</discordLink> वर आम्हाला लिहा"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "image": ""
-    }
+      "embeddable": "रुतलेले तत्व समूह कोषात जोडले जाऊ शकत नाही.",
+      "iframe": "आयफ़्रेम तत्व समूहकोषात जोडला जाऊ शकत नाही.",
+      "image": "प्रतिमा समूह कोषात जोड़ायचे लवकरच येत आहेत!"
+    },
+    "asyncPasteFailedOnRead": "चिटकवता नाही जमले ( सिस्टम क्लिप्बॉर्ड पासून वाचणे नाही जमले).",
+    "asyncPasteFailedOnParse": "चिटकवता नाही जमले.",
+    "copyToSystemClipboardFailed": "क्लिपबोर्ड वर प्रतिलिपि करणे नाही जमले."
   },
   "toolBar": {
     "selection": "निवड",
@@ -235,11 +248,14 @@
     "penMode": "पेन चा मोड - स्पर्श टाळा",
     "link": "निवडलेल्या आकारासाठी दुवा जोडा/बदल करा",
     "eraser": "खोड रबर",
-    "frame": "",
-    "embeddable": "",
+    "frame": "चौकट यंत्र",
+    "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
+    "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
     "hand": "हात ( सरकवण्या चे उपकरण)",
-    "extraTools": ""
+    "extraTools": "आणिक यंत्रे",
+    "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
+    "magicSettings": "कृतिम बुद्दिवत्ता सेटिंग्स"
   },
   "headings": {
     "canvasActions": "पटल क्रिया",
@@ -251,7 +267,7 @@
     "linearElement": "अनेक बिंदु साठी क्लिक करा, रेघे साठी ड्रैग करा",
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
-    "embeddable": "",
+    "embeddable": "वेबसाइट रुतोण्या साठी दाबून-खेचा (क्लिक-ड्रैग करा)",
     "text_selected": "लेखन संपादन साठी दुहेरी क्लिक करा किव्हा एंटर दाबा",
     "text_editing": "संपादन संपवायचं असल्यास एस्केप दाबा किव्हा कंट्रोल या कम्मांड बरोबार एंटर दाबा",
     "linearElementMulti": "शेवटच्या बिंदु वर क्लिक करा किव्हा एस्केप या एंटर दाबा",
@@ -376,27 +392,27 @@
     "removeItemsFromLib": "निवडलेले आयटम्स संग्रहातून काढा"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "प्रतिमा निर्यात करा",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "पार्श्वभूमि",
+      "onlySelected": "फक्त चयन केलेले",
+      "darkMode": "अंधारमय स्थिति",
+      "embedScene": "दृश्य रुतवा",
+      "scale": "क़िती पट",
+      "padding": "ग़ादी"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "दृश्य डेटा निर्यात केलेल्या पी-एन-जी किव्हा एस-वी-जी फ़ाईल मधे सुरक्षीत केला जाईल, त्याने दृश्य पुनः परत आणता येईल. निर्यात केलेली फ़ाईल चा आकार त्याने वाढेल."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पी-एन-जी स्वरूपात बाहेर ठेवा",
+      "exportToSvg": "एस-वी-जी स्वरूपात बाहेर ठेवा",
+      "copyPngToClipboard": "पी-एन-जी रूपे फळी वर कॉपी करा"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पीएनजी",
+      "exportToSvg": "एसविज़ी",
+      "copyPngToClipboard": "फळी वर कॉपी करा"
     }
   },
   "encrypted": {
@@ -428,8 +444,8 @@
     "canvas": "पटल",
     "selection": "निवड",
     "pasteAsSingleElement": "एक घटक म्हणून चिपकावण्या साठी {{shortcut}} वापरा,\nकिंवा विद्यमान मजकूर संपादकात चिपकवा",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "युआरेल रूतवणे प्रतिबंधित आहेत. आपली युआरेल श्वेतसूचित आणण्या साठी कृपया एक मुद्दा ग़िटहब वर उठवा",
+    "unrecognizedLinkFormat": "जी युआरेल तुम्हीं रतवली आहे, ती आपेक्षित प्रकारे नाही आहे. कृपया स्त्रोत साइट नी 'रूतवण्या साठी दिलेलि लिपि' चिपकावण्याचा प्रयास करा"
   },
   "colors": {
     "transparent": "पारदर्शक",
@@ -498,5 +514,12 @@
         "description": "बाहरी चित्र लोड केल्या वर ते <bold>तुमचा सध्याचा कामा ठिकाणि एईल </bold><br></br> तुम्हीं तुमचं चित्र एकाधं खाली दिलेलं विकल्प निवडुन पहले सुरक्षीत करु शकता."
       }
     }
+  },
+  "mermaid": {
+    "title": "मर्मेड पासून एक्सकाली मधे",
+    "button": "शिरवा",
+    "description": "",
+    "syntax": "मर्मेड संरचना नियम",
+    "preview": "पूर्वावलोकन"
   }
 }

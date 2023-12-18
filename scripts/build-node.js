@@ -25,7 +25,7 @@ config.output.filename = "static/js/build-node.js";
 // Don't choke on node-specific requires
 config.target = "node";
 // Set the node entrypoint
-config.entry = "./src/index-node";
+config.entry = "../packages/excalidraw/index-node";
 // By default, webpack is going to replace the require of the canvas.node file
 // to just a string with the path of the canvas.node file. We need to tell
 // webpack to avoid rewriting that dependency.

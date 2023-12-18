@@ -3,7 +3,7 @@ import { ActionManager } from "../actions/manager";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, ExcalidrawElementType } from "../element/types";
 import { t } from "../i18n";
-import { useAppProps, useDevice } from "../components/App";
+import { useAppProps, useDevice } from "./App";
 import {
   canChangeRoundness,
   canHaveArrowheads,

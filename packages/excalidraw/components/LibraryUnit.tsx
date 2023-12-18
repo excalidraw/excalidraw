@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { memo, useEffect, useRef, useState } from "react";
-import { useDevice } from "../components/App";
+import { useDevice } from "./App";
 import { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";

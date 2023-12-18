@@ -11,6 +11,8 @@
     "copyAsPng": "PNGلەبەرگرتنەوە بۆ تەختەنووس وەک",
     "copyAsSvg": "SVGلەبەرگرتنەوە بۆ تەختەنووس وەک",
     "copyText": "لەبەرگرتنەوە بۆ تەختەنووس وەک نوسین",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "بهێنە پێشتر",
     "sendToBack": "بنێرە دواوە",
     "bringToFront": "بهێنە پێشەوە",
@@ -36,8 +38,12 @@
     "arrowhead_none": "هیچیان",
     "arrowhead_arrow": "تیر",
     "arrowhead_bar": "هێڵ",
-    "arrowhead_dot": "خاڵ",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "سێگۆشە",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "قەبارەی فۆنت",
     "fontFamily": "خێزانی فۆنت",
     "addWatermark": "زیادبکە \"Made with Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "هێشتنەوەی شریتی لا بە کراوەیی",
     "selectAllElementsInFrame": "هەموو توخمەکانی ناو چوارچێوەکە دیاری بکە",
     "removeAllElementsFromFrame": "هەموو توخمەکانی ناو چوارچێوەکە لابەرە",
-    "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە"
+    "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
@@ -209,6 +217,7 @@
     "importLibraryError": "نەیتوانی کتێبخانە بار بکات",
     "collabSaveFailed": "نەتوانرا لە بنکەدراوەی ڕاژەدا پاشەکەوت بکرێت. ئەگەر کێشەکان بەردەوام بوون، پێویستە فایلەکەت لە ناوخۆدا هەڵبگریت بۆ ئەوەی دڵنیا بیت کە کارەکانت لەدەست نادەیت.",
     "collabSaveFailed_sizeExceeded": "نەتوانرا لە بنکەدراوەی ڕاژەدا پاشەکەوت بکرێت، پێدەچێت تابلۆکە زۆر گەورە بێت. پێویستە فایلەکە لە ناوخۆدا هەڵبگریت بۆ ئەوەی دڵنیا بیت کە کارەکانت لەدەست نادەیت.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "وادیارە وێبگەڕی Brave بەکاردەهێنیت و ڕێکخستنی <bold>Aggressively Block Fingerprinting</bold> ـت چالاک کردووە.",
       "line2": "ئەمە ئەکرێ ببێتە هۆی تێکدانی <bold>دانە دەقییەکان</bold> لە وێنەکێشانەکانتدا.",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "دەستنیشانکردن",
@@ -236,10 +249,13 @@
     "link": "زیادکردن/ نوێکردنەوەی لینک بۆ شێوەی دیاریکراو",
     "eraser": "سڕەر",
     "frame": "ئامرازی چوارچێوە",
+    "magicframe": "",
     "embeddable": "",
     "laser": "",
     "hand": "دەست (ئامرازی پانکردن)",
-    "extraTools": "ئامرازی زیاتر"
+    "extraTools": "ئامرازی زیاتر",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "کردارەکانی تابلۆ",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

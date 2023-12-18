@@ -6,7 +6,7 @@ import {
   rectangleWithLinkFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { exportToCanvas, exportToSvg } from "../../packages/utils";
+import { exportToCanvas, exportToSvg } from "../../../utils";
 import { FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 
@@ -65,7 +65,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      '"_themeFilter_f32792"',
+      '"_themeFilter_1883f3"',
     );
   });
 

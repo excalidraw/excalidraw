@@ -1,8 +1,5 @@
 import { ExcalidrawElement } from "./element/types";
-import {
-  convertToExcalidrawElements,
-  Excalidraw,
-} from "./packages/excalidraw/index";
+import { convertToExcalidrawElements, Excalidraw } from "./index";
 import { API } from "./tests/helpers/api";
 import { Keyboard, Pointer } from "./tests/helpers/ui";
 import { render } from "./tests/test-utils";

@@ -1,23 +1,23 @@
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
-} from "../scene/export";
-import { getDefaultAppState } from "../appState";
-import { AppState, BinaryFiles } from "../types";
+} from "../excalidraw/scene/export";
+import { getDefaultAppState } from "../excalidraw/appState";
+import { AppState, BinaryFiles } from "../excalidraw/types";
 import {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
-} from "../element/types";
-import { restore } from "../data/restore";
-import { MIME_TYPES } from "../constants";
-import { encodePngMetadata } from "../data/image";
-import { serializeAsJSON } from "../data/json";
+} from "../excalidraw/element/types";
+import { restore } from "../excalidraw/data/restore";
+import { MIME_TYPES } from "../excalidraw/constants";
+import { encodePngMetadata } from "../excalidraw/data/image";
+import { serializeAsJSON } from "../excalidraw/data/json";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
   copyToClipboard,
-} from "../clipboard";
+} from "../excalidraw/clipboard";
 
 export { MIME_TYPES };
 
@@ -212,23 +212,26 @@ export {
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
 } from "./withinBounds";
-export { serializeAsJSON, serializeLibraryAsJSON } from "../data/json";
+export {
+  serializeAsJSON,
+  serializeLibraryAsJSON,
+} from "../excalidraw/data/json";
 export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
-} from "../data/blob";
-export { getFreeDrawSvgPath } from "../renderer/renderElement";
-export { getCommonBoundingBox } from "../element/bounds"; //zsviczian
-export { getMaximumGroups } from "../groups"; //zsviczian
-export { intersectElementWithLine } from "../element/collision"; //zsviczian
-export { determineFocusDistance } from "../element/collision"; //zsviczian
+} from "../excalidraw/data/blob";
+export { getFreeDrawSvgPath } from "../excalidraw/renderer/renderElement";
+export { getCommonBoundingBox } from "../excalidraw/element/bounds"; //zsviczian
+export { getMaximumGroups } from "../excalidraw/groups"; //zsviczian
+export { intersectElementWithLine } from "../excalidraw/element/collision"; //zsviczian
+export { determineFocusDistance } from "../excalidraw/element/collision"; //zsviczian
 export {
   measureText,
   wrapText,
   getDefaultLineHeight,
-} from "../element/textElement"; //zsviczian
+} from "../excalidraw/element/textElement"; //zsviczian
 export { getFontString } from "../utils"; //zsviczian
-export { getBoundTextMaxWidth } from "../element/textElement"; //zsviczian
-export { mergeLibraryItems } from "../data/library";
-export { mermaidToExcalidraw } from "../components/TTDDialog/MermaidToExcalidraw"; //zsviczian
+export { getBoundTextMaxWidth } from "../excalidraw/element/textElement"; //zsviczian
+export { mergeLibraryItems } from "../excalidraw/data/library";
+export { mermaidToExcalidraw } from "../excalidraw/components/TTDDialog/MermaidToExcalidraw"; //zsviczian

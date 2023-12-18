@@ -11,6 +11,8 @@
     "copyAsPng": "Copiar no portapapeis como PNG",
     "copyAsSvg": "Copiar no portapapeis como SVG",
     "copyText": "Copia no portapapeis como texto",
+    "copySource": "",
+    "convertToCode": "",
     "bringForward": "Traer cara adiante",
     "sendToBack": "Enviar cara atrás",
     "bringToFront": "Traer á fronte",
@@ -36,8 +38,12 @@
     "arrowhead_none": "Ningunha",
     "arrowhead_arrow": "Frecha",
     "arrowhead_bar": "Barra",
-    "arrowhead_dot": "Punto",
+    "arrowhead_circle": "",
+    "arrowhead_circle_outline": "",
     "arrowhead_triangle": "Triángulo",
+    "arrowhead_triangle_outline": "",
+    "arrowhead_diamond": "",
+    "arrowhead_diamond_outline": "",
     "fontSize": "Tamaño da fonte",
     "fontFamily": "Tipo de fonte",
     "addWatermark": "Engadir \"Feito con Excalidraw\"",
@@ -130,7 +136,9 @@
     "sidebarLock": "Manter a barra lateral aberta",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
-    "eyeDropper": ""
+    "eyeDropper": "",
+    "textToDiagram": "",
+    "prompt": ""
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
@@ -209,6 +217,7 @@
     "importLibraryError": "Non se puido cargar a biblioteca",
     "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
     "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -217,8 +226,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
+      "iframe": "",
       "image": ""
-    }
+    },
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Selección",
@@ -236,10 +249,13 @@
     "link": "Engadir/ Actualizar ligazón para a forma seleccionada",
     "eraser": "Goma de borrar",
     "frame": "",
+    "magicframe": "",
     "embeddable": "Inserir na web",
     "laser": "Punteiro láser",
     "hand": "Man (ferramenta de desprazamento)",
-    "extraTools": "Máis ferramentas"
+    "extraTools": "Máis ferramentas",
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
   },
   "headings": {
     "canvasActions": "Accións do lenzo",
@@ -498,5 +514,12 @@
         "description": ""
       }
     }
+  },
+  "mermaid": {
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
   }
 }

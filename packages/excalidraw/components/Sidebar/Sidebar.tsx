@@ -7,7 +7,7 @@ import React, {
   useImperativeHandle,
   useCallback,
 } from "react";
-import { Island } from ".././Island";
+import { Island } from "../Island";
 import { atom, useSetAtom } from "jotai";
 import { jotaiScope } from "../../jotai";
 import {

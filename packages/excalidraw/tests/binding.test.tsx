@@ -1,5 +1,5 @@
 import { fireEvent, render } from "./test-utils";
-import { Excalidraw } from "../../src/packages/excalidraw/index";
+import { Excalidraw } from "../index";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";

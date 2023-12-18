@@ -20,7 +20,7 @@ import {
 import { TextField } from "../../packages/excalidraw/components/TextField";
 import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
 
-import { ReactComponent as CollabImage } from "../../src/assets/lock.svg";
+import { ReactComponent as CollabImage } from "../../packages/excalidraw/assets/lock.svg";
 import "./RoomDialog.scss";
 
 const getShareIcon = () => {
