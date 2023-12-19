@@ -18,7 +18,15 @@ const base36CharSet = indexCharacterSet({
   mostPositive: "Z",
 });
 
-const base62CharSet = _base62CharSet();
+const { chars, firstPositive, mostPositive, mostNegative } = _base62CharSet();
+
+const base62CharSet = indexCharacterSet({
+  chars,
+  firstPositive,
+  mostPositive,
+  mostNegative,
+  jitterRange: 6,
+});
 
 const isValidFractionalIndex = (
   index: FractionalIndex,
