@@ -43,7 +43,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
-import { restoreFractionalIndicies } from "../fractionalIndex";
+import { restoreFractionalIndices } from "../fractionalIndex";
 
 type RestoredAppState = Omit<
   AppState,
@@ -461,7 +461,7 @@ export const restoreElements = (
     }
   }
 
-  return restoreFractionalIndicies(restoredElements) as ExcalidrawElement[];
+  return restoreFractionalIndices(restoredElements) as ExcalidrawElement[];
 };
 
 const coalesceAppStateValue = <

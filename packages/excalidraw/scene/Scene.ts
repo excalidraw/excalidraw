@@ -13,7 +13,7 @@ import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
 import {
   fixFractionalIndices,
-  validateFractionalIndicies,
+  validateFractionalIndices,
 } from "../fractionalIndex";
 import { arrayToMap } from "../utils";
 
@@ -244,7 +244,7 @@ class Scene {
     }
 
     if (import.meta.env.DEV) {
-      if (!validateFractionalIndicies(_nextElements)) {
+      if (!validateFractionalIndices(_nextElements)) {
         console.error("fractional indices consistency has been compromised");
       }
     }

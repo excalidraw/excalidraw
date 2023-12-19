@@ -159,7 +159,7 @@ const restoreFractionalIndex = (
 };
 
 /**
- * restore the fractional indicies of the elements in the given array such that
+ * restore the fractional indices of the elements in the given array such that
  * every element in the array has a fractional index smaller than its successor's
  *
  * neighboring indices might be updated as well
@@ -167,7 +167,7 @@ const restoreFractionalIndex = (
  * only use this function when restoring or as a fallback to guarantee fractional
  * indices consistency
  */
-export const restoreFractionalIndicies = (
+export const restoreFractionalIndices = (
   allElements: readonly ExcalidrawElement[],
 ) => {
   let suc = 1;
@@ -204,7 +204,7 @@ export const restoreFractionalIndicies = (
   return normalized;
 };
 
-export const validateFractionalIndicies = (
+export const validateFractionalIndices = (
   elements: readonly ExcalidrawElement[],
 ) => {
   for (let i = 0; i < elements.length; i++) {

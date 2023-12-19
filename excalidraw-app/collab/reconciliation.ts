@@ -1,8 +1,8 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
-  restoreFractionalIndicies,
-  validateFractionalIndicies,
+  restoreFractionalIndices,
+  validateFractionalIndices,
 } from "../../packages/excalidraw/fractionalIndex";
 import { AppState } from "../../packages/excalidraw/types";
 import { arrayToMap } from "../../packages/excalidraw/utils";
@@ -85,11 +85,11 @@ export const reconcileElements = (
     }
   }
 
-  const validIndices = validateFractionalIndicies(reconciledElements);
+  const validIndices = validateFractionalIndices(reconciledElements);
 
   return (validIndices
     ? orderByFractionalIndex(reconciledElements)
-    : restoreFractionalIndicies(
+    : restoreFractionalIndices(
         orderByFractionalIndex(reconciledElements),
       )) as readonly ExcalidrawElement[] as ReconciledElements;
 };

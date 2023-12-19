@@ -1,7 +1,7 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
-  validateFractionalIndicies,
+  validateFractionalIndices,
 } from "../../packages/excalidraw/fractionalIndex";
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
@@ -210,7 +210,7 @@ describe("reconcile with fractional indices", () => {
     testReconciled(reconciledEls, expectedEls);
 
     expect(
-      validateFractionalIndicies(reconciledEls as any as ExcalidrawElement[]),
+      validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
     ).toBe(true);
   });
 
@@ -251,7 +251,7 @@ describe("reconcile with fractional indices", () => {
       ) as any as ElementLike[],
     );
     expect(
-      validateFractionalIndicies(reconciledEls as any as ExcalidrawElement[]),
+      validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
     ).toBe(true);
 
     const localEls = local_input.map((ls) =>

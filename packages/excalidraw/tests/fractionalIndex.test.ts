@@ -1,7 +1,7 @@
 import {
   fixFractionalIndices,
-  restoreFractionalIndicies,
-  validateFractionalIndicies,
+  restoreFractionalIndices,
+  validateFractionalIndices,
 } from "../fractionalIndex";
 import { ExcalidrawElement } from "../element/types";
 import { API } from "./helpers/api";
@@ -29,7 +29,7 @@ const testLengthAndOrder = (
 };
 
 const testValidity = (elements: ExcalidrawElement[]) => {
-  expect(validateFractionalIndicies(elements)).toBe(true);
+  expect(validateFractionalIndices(elements)).toBe(true);
 };
 
 const genrateElementsAtLength = (length: number) => {
@@ -42,7 +42,7 @@ const genrateElementsAtLength = (length: number) => {
   return elements;
 };
 
-describe("restoring fractional indicies", () => {
+describe("restoring fractional indices", () => {
   it("restore all null fractional indices", () => {
     const randomNumOfElements = Math.floor(Math.random() * 100);
 
@@ -55,7 +55,7 @@ describe("restoring fractional indicies", () => {
       i++;
     }
 
-    const restoredElements = restoreFractionalIndicies(elements);
+    const restoredElements = restoreFractionalIndices(elements);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
@@ -69,7 +69,7 @@ describe("restoring fractional indicies", () => {
       createElementWithIndex("d0"),
     ];
 
-    const restoredElements = restoreFractionalIndicies(elements);
+    const restoredElements = restoreFractionalIndices(elements);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
@@ -94,7 +94,7 @@ describe("restoring fractional indicies", () => {
       i++;
     }
 
-    const restoredElements = restoreFractionalIndicies(elements);
+    const restoredElements = restoreFractionalIndices(elements);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
@@ -115,7 +115,7 @@ describe("restoring fractional indicies", () => {
       createElementWithIndex(),
     ];
 
-    const restoredElements = restoreFractionalIndicies(elements);
+    const restoredElements = restoreFractionalIndices(elements);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
