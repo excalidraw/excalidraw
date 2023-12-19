@@ -16,7 +16,17 @@ describe("Test MobileMenu", () => {
   });
 
   beforeEach(async () => {
-    await render(<ExcalidrawApp />);
+    await render(
+      <ExcalidrawApp
+        firebaseConfig={{
+          apiKey: "",
+          authDomain: "",
+          databaseURL: "",
+          projectId: "",
+          storageBucket: "",
+        }}
+      />,
+    );
     // @ts-ignore
     h.app.refreshViewportBreakpoints();
     // @ts-ignore

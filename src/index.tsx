@@ -11,6 +11,8 @@ registerSW();
 
 root.render(
   <StrictMode>
-    <ExcalidrawApp />
+    <ExcalidrawApp
+      firebaseConfig={JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG)}
+    />
   </StrictMode>,
 );
