@@ -25,6 +25,7 @@ describe("Test MobileMenu", () => {
           projectId: "",
           storageBucket: "",
         }}
+        collabServerUrl="https://test.com"
       />,
     );
     // @ts-ignore

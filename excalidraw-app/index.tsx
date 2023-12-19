@@ -1,6 +1,6 @@
 import polyfill from "../src/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { trackEvent } from "../src/analytics";
 import { getDefaultAppState } from "../src/appState";
 import { ErrorDialog } from "../src/components/ErrorDialog";
@@ -799,6 +799,8 @@ const ExcalidrawWrapper = () => {
   );
 };
 
+let collabServerUrl: string;
+
 type FirebaseConfig = {
   apiKey: string;
   authDomain: string;
@@ -811,7 +813,9 @@ let firebaseConfig: FirebaseConfig;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
-}> = React.memo((props) => {
+  collabServerUrl: string;
+}> = memo((props) => {
+  collabServerUrl = props.collabServerUrl;
   firebaseConfig = props.firebaseConfig;
   return (
     <TopErrorBoundary>
@@ -822,5 +826,6 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
+export { collabServerUrl };
 export { firebaseConfig };
 export default ExcalidrawApp;

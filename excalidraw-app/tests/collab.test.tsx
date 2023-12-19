@@ -74,6 +74,7 @@ describe("collaboration", () => {
           projectId: "",
           storageBucket: "",
         }}
+        collabServerUrl="https://test.com"
       />,
     );
     // To update the scene with deleted elements before starting collab

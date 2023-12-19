@@ -15,6 +15,7 @@ describe("Test LanguageList", () => {
           projectId: "",
           storageBucket: "",
         }}
+        collabServerUrl="https://test.com"
       />,
     );
 
