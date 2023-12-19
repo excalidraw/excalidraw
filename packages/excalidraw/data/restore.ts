@@ -119,7 +119,6 @@ const restoreElementWithProperties = <
     // newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
-    // TODO: think about this more
     fractionalIndex: element.fractionalIndex ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),

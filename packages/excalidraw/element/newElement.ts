@@ -89,7 +89,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     frameId = null,
-    // TODO: think about this more
     fractionalIndex = null,
     roundness = null,
     boundElements = null,
