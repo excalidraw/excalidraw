@@ -398,7 +398,6 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { fixFractionalIndices } from "../fractionalIndex";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -6940,10 +6939,7 @@ class App extends React.Component<AppProps, AppState> {
                 nextElements.push(element);
               }
             }
-            const nextSceneElements = fixFractionalIndices(
-              [...nextElements, ...elementsToAppend],
-              duplicatedElementsMap,
-            );
+            const nextSceneElements = [...nextElements, ...elementsToAppend];
             bindTextToShapeAfterDuplication(
               nextElements,
               elementsToAppend,
@@ -6960,7 +6956,10 @@ class App extends React.Component<AppProps, AppState> {
               elementsToAppend,
               oldIdToDuplicatedId,
             );
-            this.scene.replaceAllElements(nextSceneElements);
+            this.scene.replaceAllElements(
+              nextSceneElements,
+              duplicatedElementsMap,
+            );
             this.maybeCacheVisibleGaps(event, selectedElements, true);
             this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
