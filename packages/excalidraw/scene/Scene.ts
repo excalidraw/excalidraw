@@ -234,11 +234,11 @@ class Scene {
 
   replaceAllElements(
     nextElements: readonly ExcalidrawElement[],
-    mapOfIndicesToFix?: Map<string, ExcalidrawElement>,
+    reorderedElements?: Map<string, ExcalidrawElement>,
   ) {
     let _nextElements;
-    if (mapOfIndicesToFix) {
-      _nextElements = fixFractionalIndices(nextElements, mapOfIndicesToFix);
+    if (reorderedElements) {
+      _nextElements = fixFractionalIndices(nextElements, reorderedElements);
     } else {
       _nextElements = nextElements;
     }

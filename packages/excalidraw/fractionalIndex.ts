@@ -71,11 +71,11 @@ const getContiguousMovedIndices = (
 
 export const fixFractionalIndices = (
   elements: readonly ExcalidrawElement[],
-  movedElementsMap: Map<string, ExcalidrawElement>,
+  reorderedElements: Map<string, ExcalidrawElement>,
 ) => {
   const contiguousMovedIndices = getContiguousMovedIndices(
     elements,
-    movedElementsMap,
+    reorderedElements,
   );
 
   const generateFn =
