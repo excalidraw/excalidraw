@@ -102,6 +102,7 @@ import { ShareableLinkDialog } from "../src/components/ShareableLinkDialog";
 import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../src/components/Trans";
+import React from "react";
 
 polyfill();
 
@@ -800,10 +801,22 @@ const ExcalidrawWrapper = () => {
 
 let collabServerUrl: string;
 
+type FirebaseConfig = {
+  apiKey: string;
+  authDomain: string;
+  databaseURL: string;
+  projectId: string;
+  storageBucket: string;
+};
+
+let firebaseConfig: FirebaseConfig;
+
 const ExcalidrawApp: React.FC<{
+  firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
 }> = memo((props) => {
   collabServerUrl = props.collabServerUrl;
+  firebaseConfig = props.firebaseConfig;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
@@ -814,5 +827,5 @@ const ExcalidrawApp: React.FC<{
 });
 
 export { collabServerUrl };
-
+export { firebaseConfig };
 export default ExcalidrawApp;

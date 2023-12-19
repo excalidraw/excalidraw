@@ -65,7 +65,18 @@ vi.mock("socket.io-client", () => {
 
 describe("collaboration", () => {
   it("creating room should reset deleted elements", async () => {
-    await render(<ExcalidrawApp collabServerUrl="https://test.com" />);
+    await render(
+      <ExcalidrawApp
+        firebaseConfig={{
+          apiKey: "",
+          authDomain: "",
+          databaseURL: "",
+          projectId: "",
+          storageBucket: "",
+        }}
+        collabServerUrl="https://test.com"
+      />,
+    );
     // To update the scene with deleted elements before starting collab
     updateSceneData({
       elements: [

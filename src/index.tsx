@@ -11,6 +11,9 @@ registerSW();
 
 root.render(
   <StrictMode>
-    <ExcalidrawApp collabServerUrl={import.meta.env.VITE_APP_WS_SERVER_URL} />
+    <ExcalidrawApp
+      firebaseConfig={JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG)}
+      collabServerUrl={import.meta.env.VITE_APP_WS_SERVER_URL}
+    />
   </StrictMode>,
 );

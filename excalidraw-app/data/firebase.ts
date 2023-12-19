@@ -15,22 +15,9 @@ import { MIME_TYPES } from "../../src/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../src/utility-types";
-
+import { firebaseConfig } from "../index";
 // private
 // -----------------------------------------------------------------------------
-
-let FIREBASE_CONFIG: Record<string, any>;
-try {
-  FIREBASE_CONFIG = JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG);
-} catch (error: any) {
-  console.warn(
-    `Error JSON parsing firebase config. Supplied value: ${
-      import.meta.env.VITE_APP_FIREBASE_CONFIG
-    }`,
-  );
-  FIREBASE_CONFIG = {};
-}
-
 let firebasePromise: Promise<typeof import("firebase/app").default> | null =
   null;
 let firestorePromise: Promise<any> | null | true = null;
@@ -45,7 +32,7 @@ const _loadFirebase = async () => {
 
   if (!isFirebaseInitialized) {
     try {
-      firebase.initializeApp(FIREBASE_CONFIG);
+      firebase.initializeApp(firebaseConfig);
     } catch (error: any) {
       // trying initialize again throws. Usually this is harmless, and happens
       // mainly in dev (HMR)
@@ -313,7 +300,7 @@ export const loadFilesFromFirebase = async (
     [...new Set(filesIds)].map(async (id) => {
       try {
         const url = `https://firebasestorage.googleapis.com/v0/b/${
-          FIREBASE_CONFIG.storageBucket
+          firebaseConfig.storageBucket
         }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
         const response = await fetch(`${url}?alt=media`);
         if (response.status < 400) {
