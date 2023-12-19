@@ -244,6 +244,7 @@ import {
   KeyboardModifiersObject,
   CollaboratorPointer,
   ToolType,
+  OnUserFollowedPayload,
 } from "../types";
 import {
   debounce,
@@ -267,6 +268,7 @@ import {
   muteFSAbortError,
   isTestEnv,
   easeOut,
+  updateStable,
 } from "../utils";
 import {
   createSrcDoc,
@@ -396,6 +398,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import FollowMode from "./FollowMode/FollowMode";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -437,7 +440,7 @@ ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
 const ExcalidrawSetAppStateContext = React.createContext<
   React.Component<any, AppState>["setState"]
 >(() => {
-  console.warn("unitialized ExcalidrawSetAppStateContext context!");
+  console.warn("Uninitialized ExcalidrawSetAppStateContext context!");
 });
 ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
 
@@ -551,6 +554,10 @@ class App extends React.Component<AppProps, AppState> {
       event: PointerEvent,
     ]
   >();
+  onUserFollowEmitter = new Emitter<[payload: OnUserFollowedPayload]>();
+  onScrollChangeEmitter = new Emitter<
+    [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
+  >();
 
   constructor(props: AppProps) {
     super(props);
@@ -619,6 +626,8 @@ class App extends React.Component<AppProps, AppState> {
         onChange: (cb) => this.onChangeEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
+        onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
+        onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
@@ -1581,6 +1590,14 @@ class App extends React.Component<AppProps, AppState> {
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
                         />
+                        {this.state.userToFollow && (
+                          <FollowMode
+                            width={this.state.width}
+                            height={this.state.height}
+                            userToFollow={this.state.userToFollow}
+                            onDisconnect={this.maybeUnfollowRemoteUser}
+                          />
+                        )}
                         {this.renderFrameNames()}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
@@ -2530,11 +2547,45 @@ class App extends React.Component<AppProps, AppState> {
       this.refreshEditorBreakpoints();
     }
 
+    const hasFollowedPersonLeft =
+      prevState.userToFollow &&
+      !this.state.collaborators.has(prevState.userToFollow.socketId);
+
+    if (hasFollowedPersonLeft) {
+      this.maybeUnfollowRemoteUser();
+    }
+
     if (
+      prevState.zoom.value !== this.state.zoom.value ||
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
     ) {
-      this.props?.onScrollChange?.(this.state.scrollX, this.state.scrollY);
+      this.props?.onScrollChange?.(
+        this.state.scrollX,
+        this.state.scrollY,
+        this.state.zoom,
+      );
+      this.onScrollChangeEmitter.trigger(
+        this.state.scrollX,
+        this.state.scrollY,
+        this.state.zoom,
+      );
+    }
+
+    if (prevState.userToFollow !== this.state.userToFollow) {
+      if (prevState.userToFollow) {
+        this.onUserFollowEmitter.trigger({
+          userToFollow: prevState.userToFollow,
+          action: "UNFOLLOW",
+        });
+      }
+
+      if (this.state.userToFollow) {
+        this.onUserFollowEmitter.trigger({
+          userToFollow: this.state.userToFollow,
+          action: "FOLLOW",
+        });
+      }
     }
 
     if (
@@ -2816,7 +2867,6 @@ class App extends React.Component<AppProps, AppState> {
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
       let file = event?.clipboardData?.files[0];
-
       const data = await parseClipboard(event, isPlainPaste);
       if (!file && !isPlainPaste) {
         if (data.mixedContent) {
@@ -3319,7 +3369,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private cancelInProgresAnimation: (() => void) | null = null;
+  private cancelInProgressAnimation: (() => void) | null = null;
 
   scrollToContent = (
     target:
@@ -3344,7 +3394,7 @@ class App extends React.Component<AppProps, AppState> {
           duration?: number;
         },
   ) => {
-    this.cancelInProgresAnimation?.();
+    this.cancelInProgressAnimation?.();
 
     // convert provided target into ExcalidrawElement[] if necessary
     const targetElements = Array.isArray(target) ? target : [target];
@@ -3411,12 +3461,18 @@ class App extends React.Component<AppProps, AppState> {
         duration: opts?.duration ?? 500,
       });
 
-      this.cancelInProgresAnimation = () => {
+      this.cancelInProgressAnimation = () => {
         cancel();
-        this.cancelInProgresAnimation = null;
+        this.cancelInProgressAnimation = null;
       };
     } else {
       this.setState({ scrollX, scrollY, zoom });
+    }
+  };
+
+  private maybeUnfollowRemoteUser = () => {
+    if (this.state.userToFollow) {
+      this.setState({ userToFollow: null });
     }
   };
 
@@ -3424,7 +3480,8 @@ class App extends React.Component<AppProps, AppState> {
   private translateCanvas: React.Component<any, AppState>["setState"] = (
     state,
   ) => {
-    this.cancelInProgresAnimation?.();
+    this.cancelInProgressAnimation?.();
+    this.maybeUnfollowRemoteUser();
     this.setState(state);
   };
 
@@ -4679,13 +4736,31 @@ class App extends React.Component<AppProps, AppState> {
         event,
       );
 
-      this.setState({
-        snapLines,
-        originSnapOffset: originOffset,
+      this.setState((prevState) => {
+        const nextSnapLines = updateStable(prevState.snapLines, snapLines);
+        const nextOriginOffset = prevState.originSnapOffset
+          ? updateStable(prevState.originSnapOffset, originOffset)
+          : originOffset;
+
+        if (
+          prevState.snapLines === nextSnapLines &&
+          prevState.originSnapOffset === nextOriginOffset
+        ) {
+          return null;
+        }
+        return {
+          snapLines: nextSnapLines,
+          originSnapOffset: nextOriginOffset,
+        };
       });
     } else if (!this.state.draggingElement) {
-      this.setState({
-        snapLines: [],
+      this.setState((prevState) => {
+        if (prevState.snapLines.length) {
+          return {
+            snapLines: [],
+          };
+        }
+        return null;
       });
     }
 
@@ -5153,6 +5228,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.maybeUnfollowRemoteUser();
+
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
     // close the contextMenu before we update the selection on pointerDown
@@ -7168,7 +7245,7 @@ class App extends React.Component<AppProps, AppState> {
         isRotating,
       } = this.state;
 
-      this.setState({
+      this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
         resizingElement: null,
@@ -7182,10 +7259,10 @@ class App extends React.Component<AppProps, AppState> {
           multiElement || isTextElement(this.state.editingElement)
             ? this.state.editingElement
             : null,
-        snapLines: [],
+        snapLines: updateStable(prevState.snapLines, []),
 
         originSnapOffset: null,
-      });
+      }));
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);
@@ -7719,7 +7796,7 @@ class App extends React.Component<AppProps, AppState> {
                   ),
                 };
               });
-              // if not gragging a linear element point (outside editor)
+              // if not dragging a linear element point (outside editor)
             } else if (!this.state.selectedLinearElement?.isDragging) {
               // remove element from selection while
               // keeping prev elements selected
@@ -8044,7 +8121,10 @@ class App extends React.Component<AppProps, AppState> {
           maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
         });
       } catch (error: any) {
-        console.error("error trying to resing image file on insertion", error);
+        console.error(
+          "Error trying to resizing image file on insertion",
+          error,
+        );
       }
 
       if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
@@ -8587,7 +8667,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (file) {
-      // atetmpt to parse an excalidraw/excalidrawlib file
+      // Attempt to parse an excalidraw/excalidrawlib file
       await this.loadFileToCanvas(file, fileHandle);
     }
 
@@ -8686,13 +8766,13 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const selectedElements = this.scene.getSelectedElements(this.state);
-    const isHittignCommonBoundBox =
+    const isHittingCommonBoundBox =
       this.isHittingCommonBoundingBoxOfSelectedElements(
         { x, y },
         selectedElements,
       );
 
-    const type = element || isHittignCommonBoundBox ? "element" : "canvas";
+    const type = element || isHittingCommonBoundBox ? "element" : "canvas";
 
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =

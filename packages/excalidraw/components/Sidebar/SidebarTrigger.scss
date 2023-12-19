@@ -21,6 +21,10 @@
       width: var(--lg-icon-size);
       height: var(--lg-icon-size);
     }
+
+    &__label-element {
+      align-self: flex-start;
+    }
   }
 
   .default-sidebar-trigger .sidebar-trigger__label {
