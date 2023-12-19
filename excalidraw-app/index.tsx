@@ -56,12 +56,7 @@ import Collab, {
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
-import {
-  exportToBackend,
-  getCollaborationLinkData,
-  isCollaborationLink,
-  loadScene,
-} from "./data";
+import { exportToBackend, isCollaborationLink, loadScene } from "./data";
 import {
   getLibraryItemsFromStorage,
   importFromLocalStorage,
@@ -162,7 +157,7 @@ const initializeScene = async (opts: {
     scrollToContent?: boolean;
   } = await loadScene(null, null, localDataState);
 
-  let roomLinkData = getCollaborationLinkData(window.location.href);
+  let roomLinkData = customRoomLinkData;
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -228,7 +223,7 @@ const initializeScene = async (opts: {
 
   if (roomLinkData && opts.collabAPI) {
     const { excalidrawAPI } = opts;
-
+    opts.collabAPI.setUsername(customUsername);
     const scene = await opts.collabAPI.startCollaboration(roomLinkData);
 
     return {
@@ -799,8 +794,6 @@ const ExcalidrawWrapper = () => {
   );
 };
 
-let collabServerUrl: string;
-
 type FirebaseConfig = {
   apiKey: string;
   authDomain: string;
@@ -809,14 +802,23 @@ type FirebaseConfig = {
   storageBucket: string;
 };
 
-let firebaseConfig: FirebaseConfig;
+type RoomLinkData = { roomId: string; roomKey: string } | null;
+
+let customCollabServerUrl: string;
+let customFirebaseConfig: FirebaseConfig;
+let customRoomLinkData: RoomLinkData;
+let customUsername: string;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
+  roomLinkData: RoomLinkData;
+  username: string;
 }> = memo((props) => {
-  collabServerUrl = props.collabServerUrl;
-  firebaseConfig = props.firebaseConfig;
+  customFirebaseConfig = props.firebaseConfig;
+  customCollabServerUrl = props.collabServerUrl;
+  customRoomLinkData = props.roomLinkData;
+  customUsername = props.username;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
@@ -826,6 +828,5 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { collabServerUrl };
-export { firebaseConfig };
+export { customCollabServerUrl, customFirebaseConfig };
 export default ExcalidrawApp;
