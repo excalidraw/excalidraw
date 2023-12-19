@@ -11,6 +11,6 @@ registerSW();
 
 root.render(
   <StrictMode>
-    <ExcalidrawApp />
+    <ExcalidrawApp collabServerUrl={import.meta.env.VITE_APP_WS_SERVER_URL} />
   </StrictMode>,
 );

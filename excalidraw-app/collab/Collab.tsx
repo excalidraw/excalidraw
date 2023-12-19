@@ -71,6 +71,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+import { collabServerUrl } from "..";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -423,7 +424,7 @@ class Collab extends PureComponent<Props, CollabState> {
     this.fallbackInitializationHandler = fallbackInitializationHandler;
 
     try {
-      const socketServerData = await getCollabServer();
+      const socketServerData = await getCollabServer(collabServerUrl);
 
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {

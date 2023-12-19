@@ -1,6 +1,6 @@
 import polyfill from "../src/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { trackEvent } from "../src/analytics";
 import { getDefaultAppState } from "../src/appState";
 import { ErrorDialog } from "../src/components/ErrorDialog";
@@ -798,7 +798,12 @@ const ExcalidrawWrapper = () => {
   );
 };
 
-const ExcalidrawApp = () => {
+let collabServerUrl: string;
+
+const ExcalidrawApp: React.FC<{
+  collabServerUrl: string;
+}> = memo((props) => {
+  collabServerUrl = props.collabServerUrl;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
@@ -806,6 +811,8 @@ const ExcalidrawApp = () => {
       </Provider>
     </TopErrorBoundary>
   );
-};
+});
+
+export { collabServerUrl };
 
 export default ExcalidrawApp;
