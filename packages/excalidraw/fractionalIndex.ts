@@ -5,10 +5,20 @@ import {
   generateJitteredKeyBetween,
   generateNKeysBetween,
   generateNJitteredKeysBetween,
+  base62CharSet as _base62CharSet,
+  indexCharacterSet,
 } from "fractional-indexing-jittered";
 import { ENV } from "./constants";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
+
+const base36CharSet = indexCharacterSet({
+  chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  firstPositive: "A",
+  mostPositive: "Z",
+});
+
+const base62CharSet = _base62CharSet();
 
 const isValidFractionalIndex = (
   index: FractionalIndex,
@@ -82,6 +92,7 @@ export const fixFractionalIndices = (
     import.meta.env.MODE === ENV.TEST
       ? generateNKeysBetween
       : generateNJitteredKeysBetween;
+  const charSet = import.meta.env.DEV ? base36CharSet : base62CharSet;
 
   for (const movedIndices of contiguousMovedIndices) {
     try {
@@ -91,7 +102,12 @@ export const fixFractionalIndices = (
         elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
         null;
 
-      const newKeys = generateFn(predecessor, successor, movedIndices.length);
+      const newKeys = generateFn(
+        predecessor,
+        successor,
+        movedIndices.length,
+        charSet,
+      );
 
       for (let i = 0; i < movedIndices.length; i++) {
         const element = elements[movedIndices[i]];
@@ -141,21 +157,23 @@ const restoreFractionalIndex = (
       ? generateKeyBetween
       : generateJitteredKeyBetween;
 
+  const chartSet = import.meta.env.DEV ? base36CharSet : base62CharSet;
+
   if (successor && !predecessor) {
     // first element in the array
     // insert before successor
-    return generateFn(null, successor);
+    return generateFn(null, successor, chartSet);
   }
 
   if (predecessor && !successor) {
     // last element in the array
     // insert after predecessor
-    return generateFn(predecessor, null);
+    return generateFn(predecessor, null, chartSet);
   }
 
   // both predecessor and successor exist (or both do not)
   // insert after predecessor
-  return generateFn(predecessor, null);
+  return generateFn(predecessor, null, chartSet);
 };
 
 /**
