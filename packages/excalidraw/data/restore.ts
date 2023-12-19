@@ -444,7 +444,7 @@ export const restoreElements = (
   }, [] as ExcalidrawElement[]);
 
   if (!opts?.repairBindings) {
-    return restoredElements;
+    return restoreFractionalIndices(restoredElements) as ExcalidrawElement[];
   }
 
   // repair binding. Mutates elements.
