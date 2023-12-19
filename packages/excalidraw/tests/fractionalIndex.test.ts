@@ -32,7 +32,7 @@ const testValidity = (elements: ExcalidrawElement[]) => {
   expect(validateFractionalIndices(elements)).toBe(true);
 };
 
-const genrateElementsAtLength = (length: number) => {
+const generateElementsAtLength = (length: number) => {
   const elements: ExcalidrawElement[] = [];
 
   for (let i = 0; i < length; i++) {
@@ -142,15 +142,26 @@ describe("fix fractional indices", () => {
     testValidity(fixedElements);
   });
 
+  it("add each new element properly - long", () => {
+    const elements = generateElementsAtLength(20000);
+
+    const fixedElements = elements.reduce((acc, el) => {
+      return fixFractionalIndices([...acc, el], arrayToMap([el]));
+    }, [] as ExcalidrawElement[]);
+
+    testLengthAndOrder(elements, fixedElements);
+    testValidity(fixedElements);
+  });
+
   it("add multiple new elements properly", () => {
-    const elements = genrateElementsAtLength(Math.floor(Math.random() * 100));
+    const elements = generateElementsAtLength(Math.floor(Math.random() * 100));
 
     const fixedElements = fixFractionalIndices(elements, arrayToMap(elements));
 
     testLengthAndOrder(elements, fixedElements);
     testValidity(fixedElements);
 
-    const elements2 = genrateElementsAtLength(Math.floor(Math.random() * 100));
+    const elements2 = generateElementsAtLength(Math.floor(Math.random() * 100));
 
     const allElements2 = [...elements, ...elements2];
 
@@ -164,7 +175,7 @@ describe("fix fractional indices", () => {
   });
 
   it("fix properly after z-index changes", () => {
-    const elements = genrateElementsAtLength(Math.random() * 100);
+    const elements = generateElementsAtLength(Math.random() * 100);
 
     const fixedElements = fixFractionalIndices(elements, arrayToMap(elements));
 

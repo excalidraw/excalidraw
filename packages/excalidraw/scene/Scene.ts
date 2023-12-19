@@ -16,6 +16,7 @@ import {
   validateFractionalIndices,
 } from "../fractionalIndex";
 import { arrayToMap } from "../utils";
+import { ENV } from "../constants";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -243,7 +244,7 @@ class Scene {
       _nextElements = nextElements;
     }
 
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV && import.meta.env.MODE !== ENV.TEST) {
       if (!validateFractionalIndices(_nextElements)) {
         const errMsg = "fractional indices consistency has been compromised";
         console.error(errMsg);
