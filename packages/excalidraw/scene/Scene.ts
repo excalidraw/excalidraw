@@ -245,7 +245,9 @@ class Scene {
 
     if (import.meta.env.DEV) {
       if (!validateFractionalIndices(_nextElements)) {
-        console.error("fractional indices consistency has been compromised");
+        const errMsg = "fractional indices consistency has been compromised";
+        console.error(errMsg);
+        throw new Error(errMsg);
       }
     }
 
