@@ -16,6 +16,8 @@ describe("Test LanguageList", () => {
           storageBucket: "",
         }}
         collabServerUrl="https://test.com"
+        roomLinkData={null}
+        username={""}
       />,
     );
 

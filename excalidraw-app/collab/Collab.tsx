@@ -69,9 +69,9 @@ import {
 import { decryptData } from "../../src/data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { collabServerUrl } from "..";
+import { customCollabServerUrl } from "..";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -424,7 +424,7 @@ class Collab extends PureComponent<Props, CollabState> {
     this.fallbackInitializationHandler = fallbackInitializationHandler;
 
     try {
-      const socketServerData = await getCollabServer(collabServerUrl);
+      const socketServerData = await getCollabServer(customCollabServerUrl);
 
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {
@@ -863,8 +863,7 @@ if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
 }
 
 const _Collab: React.FC<PublicProps> = (props) => {
-  const [collabDialogShown] = useAtom(collabDialogShownAtom);
-  return <Collab {...props} modalIsShown={collabDialogShown} />;
+  return <Collab {...props} modalIsShown={false} />; // modalIsShown={false} will prevent this modal from ever being shown
 };
 
 export default _Collab;
