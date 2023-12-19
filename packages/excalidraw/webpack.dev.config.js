@@ -5,6 +5,14 @@ const { parseEnvVariables } = require("./env");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 //const outputDir = process.env.EXAMPLE === "true" ? "example/public" : "dist";
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //zsviczian
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin"); //zsviczian
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); //zsviczian
+const cssnano = require("cssnano"); //zsviczian
+const glob = require('glob'); //zsviczian
+const PATHS = { //zsviczian
+  src: path.join(__dirname, '../'), //zsviczian
+}; //zsviczian
 
 module.exports = {
   mode: "development",
@@ -29,7 +37,7 @@ module.exports = {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
         use: [
-          "style-loader",
+          MiniCssExtractPlugin.loader, //zsviczian replacase "style-loader"
           {
             loader: "css-loader",
           },
@@ -37,7 +45,10 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [autoprefixer()],
+                plugins: [
+                  autoprefixer(),
+                  cssnano(), //zsviczian
+                ],
               },
             },
           },
@@ -75,8 +86,11 @@ module.exports = {
       },
     ],
   },
-  optimization: {
-    //sideEffects: false, //zsviczian https://github.com/storybookjs/storybook/issues/15221
+ optimization: {
+    minimizer: [ //zsviczian
+      new CssMinimizerPlugin(),  //minify css
+    ], 
+    /*//sideEffects: false, //zsviczian https://github.com/storybookjs/storybook/issues/15221
     splitChunks: {
       chunks: "async",
       cacheGroups: {
@@ -85,9 +99,15 @@ module.exports = {
           name: "vendor",
         },
       },
-    },
+    },*/ //zsviczian: not required
   },
   plugins: [
+    new PurgeCSSPlugin({ //zsviczian remove duplications
+      paths: glob.sync(`${PATHS.src}/**/*.+(ts|tsx|css|scss)`, { nodir: true }),
+    }),
+    new MiniCssExtractPlugin({ //zsviczian export to file
+      filename: "styles.development.css",
+    }),
     new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }), //zsviczian
     ...(false ? [new BundleAnalyzerPlugin()] : []), //zsviczian has no effect, however, without this I get a build error
     new webpack.DefinePlugin({

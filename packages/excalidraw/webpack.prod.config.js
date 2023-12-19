@@ -5,6 +5,14 @@ const { parseEnvVariables } = require("./env");
 const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //zsviczian
+const { PurgeCSSPlugin } = require("purgecss-webpack-plugin"); //zsviczian
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); //zsviczian
+const cssnano = require("cssnano"); //zsviczian
+const glob = require('glob'); //zsviczian
+const PATHS = { //zsviczian
+  src: path.join(__dirname, '../'), //zsviczian
+}; //zsviczian
 
 module.exports = {
   mode: "production",
@@ -29,7 +37,7 @@ module.exports = {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
         use: [
-          "style-loader",
+          MiniCssExtractPlugin.loader, //zsviczian replacase "style-loader"
           {
             loader: "css-loader",
           },
@@ -37,7 +45,10 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [autoprefixer()],
+                plugins: [
+                  autoprefixer(),
+                  cssnano(), //zsviczian
+                ],
               },
             },
           },
@@ -97,7 +108,7 @@ module.exports = {
         test: /\.js($|\?)/i,
       }),
     ],
-    splitChunks: {
+    /*splitChunks: {
       chunks: "async",
       cacheGroups: {
         vendors: {
@@ -105,9 +116,15 @@ module.exports = {
           name: "vendor",
         },
       },
-    },
+    },*/ //zsviczian: not required
   },
   plugins: [
+    new PurgeCSSPlugin({ //zsviczian remove duplications
+      paths: glob.sync(`${PATHS.src}/**/*.+(ts|tsx|css|scss)`, { nodir: true }),
+    }),
+    new MiniCssExtractPlugin({ //zsviczian export to file
+      filename: "styles.production.css",
+    }),
     new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }), //zsviczian
     ...(process.env.ANALYZER === "true" ? [new BundleAnalyzerPlugin()] : []),
     new webpack.DefinePlugin({
