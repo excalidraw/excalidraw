@@ -8,15 +8,17 @@
   ],
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
+    "@radix-ui/react-popover": "1.0.7",
+    "@radix-ui/react-progress": "1.0.3",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "jotai": "1.13.1",
     "firebase": "8.3.3",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
-    "socket.io-client": "2.3.1",
+    "jotai": "1.13.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "socket.io-client": "2.3.1"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.3",
