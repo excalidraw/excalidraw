@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "빠른 검색",
+      "empty": "검색된 사용자가 없습니다"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "유저를 클릭해서 따라가기",
+      "followStatus": "이 사용자를 따라가고 있습니다"
     }
   }
 }
