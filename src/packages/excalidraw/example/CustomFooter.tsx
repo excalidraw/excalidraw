@@ -1,5 +1,5 @@
 import { ExcalidrawImperativeAPI } from "../../../types";
-import { MIME_TYPES } from "../entry";
+import { MIME_TYPES } from "../";
 import { Button } from "../../../components/Button";
 
 const COMMENT_SVG = (
