@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "त्वरित खोज",
+      "empty": "कोई उपयोक्ता नहीं मिला"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "उपयोक्ता का अनुकरण करने के लिए उसपर क्लिक करें",
+      "followStatus": "आप इस उपयोक्ता का अनुकरण कर रहें हैं."
     }
   }
 }
