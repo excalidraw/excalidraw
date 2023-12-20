@@ -535,6 +535,7 @@ const ExcalidrawWrapper = () => {
 
   const [theme, setTheme] = useState<Theme>(
     () =>
+      customTheme ||
       (localStorage.getItem(
         STORAGE_KEYS.LOCAL_STORAGE_THEME,
       ) as Theme | null) ||
@@ -808,17 +809,21 @@ let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
+let customTheme: Theme;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
   roomLinkData: RoomLinkData;
   username: string;
+  theme: Theme;
+  // apiHook
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
+  customTheme = props.theme;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
