@@ -2,6 +2,7 @@
   "name": "@excalidraw/excalidraw",
   "version": "0.17.1",
   "main": "main.js",
+  "sideEffects": false,
   "type": "module",
   "module": "dist/index.js",
   "types": "types/excalidraw/index.d.ts",
