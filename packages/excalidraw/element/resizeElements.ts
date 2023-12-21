@@ -691,9 +691,6 @@ export const resizeMultipleElements = (
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
 
-  // const originalHeight = maxY - minY;
-  // const originalWidth = maxX - minX;
-
   const direction = transformHandleType;
 
   const mapDirectionsToAnchors: Record<typeof direction, Point> = {

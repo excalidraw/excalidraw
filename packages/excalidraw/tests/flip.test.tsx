@@ -18,7 +18,7 @@ import {
   FileId,
 } from "../element/types";
 import { newLinearElement } from "../element";
-import { Excalidraw } from "../index";
+import { Excalidraw, isLinearElement } from "../index";
 import { mutateElement } from "../element/mutateElement";
 import { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
@@ -198,11 +198,10 @@ const checkElementsBoundingBox = async (
 
   const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2);
 
-  debugger;
   await waitFor(() => {
     // Check if width and height did not change
-    expect(x2 - x1).toBeCloseTo(x22 - x12, -1);
-    expect(y2 - y1).toBeCloseTo(y22 - y12, -1);
+    expect(Math.abs(x2 - x1 - (x22 - x12))).toBeLessThanOrEqual(toleranceInPx);
+    expect(Math.abs(y2 - y1 - (y22 - y12))).toBeLessThanOrEqual(toleranceInPx);
   });
 };
 
