@@ -145,8 +145,9 @@ export const mermaidToExcalidraw = async (
   forceSVG: boolean = false,
 ): Promise<
   | {
-      elements: ExcalidrawElement[];
-      files: any;
+      elements?: ExcalidrawElement[];
+      files?: any;
+      error?: string;
     }
   | undefined
 > => {
@@ -172,6 +173,8 @@ export const mermaidToExcalidraw = async (
       files,
     };
   } catch (e: any) {
-    console.error(e.message);
+    return {
+      error: e.message,
+    }
   }
 };
