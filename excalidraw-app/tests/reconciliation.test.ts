@@ -58,19 +58,19 @@ const testReconciled = (reconciled: ElementLike[], expected: ElementLike[]) => {
 };
 
 const getReconciledAndExpectedElements = (
-  local_input: string[],
-  remote_input: string[],
-  expected_input: string[],
+  local: string[],
+  remote: string[],
+  expected: string[],
   appState?: AppState,
 ) => {
-  const localEls = local_input.map((ls) =>
+  const localEls = local.map((ls) =>
     createElementFromString(ls),
   ) as any as ExcalidrawElement[];
-  const remoteEls = remote_input.map((rs) =>
+  const remoteEls = remote.map((rs) =>
     createElementFromString(rs),
   ) as any as ExcalidrawElement[];
 
-  const expectedEls = expected_input.map((es) => createElementFromString(es));
+  const expectedEls = expected.map((es) => createElementFromString(es));
 
   const reconciledEls = reconcileElements(
     localEls,
@@ -204,6 +204,8 @@ describe("reconcile with fractional indices", () => {
       [`L:1:1:1:${first}`, `L:2:1:1:${second}`, `L:3:1:1:${third}`],
       // simulates a z-index change for (el.id = 1)
       [`R:1:2:x:${third}`],
+      // order by id since R:1 and L:3 have the same fractional index and
+      // id 1 comes before id 3
       [`L:2:1:1${second}`, `R:1:2:x:x`, `L:3:1:1:x`],
     );
 
