@@ -407,6 +407,7 @@ import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
+import { getFontSize } from "../actions/actionProperties";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3258,7 +3259,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       text,
       rawText: text,
-      fontSize: this.state.currentItemFontSize,
+      fontSize: getFontSize(this.state.currentItemFontSize,this.state.zoom.value),//zsviczian
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
@@ -4597,7 +4598,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const lineHeight =
       existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
-    const fontSize = this.state.currentItemFontSize;
+    const fontSize = getFontSize(this.state.currentItemFontSize,this.state.zoom.value); //zsviczian
 
     if (
       !existingTextElement &&
