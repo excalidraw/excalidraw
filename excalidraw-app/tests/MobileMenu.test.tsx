@@ -28,6 +28,7 @@ describe("Test MobileMenu", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+        token=""
       />,
     );
     // @ts-ignore

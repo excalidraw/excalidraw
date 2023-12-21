@@ -11,11 +11,12 @@ import {
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../src/data/encode";
 import { encryptData, decryptData } from "../../src/data/encryption";
-import { MIME_TYPES } from "../../src/constants";
+import { ENV, MIME_TYPES } from "../../src/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../src/utility-types";
 import { customFirebaseConfig, customToken } from "../index";
+
 // private
 // -----------------------------------------------------------------------------
 let firebasePromise: Promise<typeof import("firebase/app").default> | null =
@@ -35,9 +36,16 @@ const _loadFirebase = async () => {
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);
+      let token;
       try {
-        await firebase.auth().signInWithCustomToken(customToken);
-        console.log("User signed in with custom token");
+        if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+          const res = await fetch("https://localhost:8080/devFirebaseToken");
+          const data = await res.json();
+          token = data.token;
+        } else {
+          token = customToken;
+        }
+        await firebase.auth().signInWithCustomToken(token);
       } catch (error) {
         console.error("Error signing in with custom token: ", error);
         throw error;

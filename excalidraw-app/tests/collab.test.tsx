@@ -77,6 +77,7 @@ describe("collaboration", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+        token=""
       />,
     );
     // To update the scene with deleted elements before starting collab
