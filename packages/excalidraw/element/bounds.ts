@@ -649,25 +649,6 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
-const generateLinearElementShape = (
-  element: ExcalidrawLinearElement,
-): Drawable => {
-  const generator = rough.generator();
-  const options = generateRoughOptions(element);
-
-  const method = (() => {
-    if (element.roundness) {
-      return "curve";
-    }
-    if (options.fill) {
-      return "polygon";
-    }
-    return "linearPath";
-  })();
-
-  return generator[method](element.points as Mutable<Point>[], options);
-};
-
 const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
