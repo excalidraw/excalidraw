@@ -1,5 +1,6 @@
 import {
   fixFractionalIndices,
+  generateKeyBetween,
   restoreFractionalIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
@@ -63,10 +64,10 @@ describe("restoring fractional indices", () => {
 
   it("restore out of order fractional indices", () => {
     const elements = [
-      createElementWithIndex("a0"),
-      createElementWithIndex("c0"),
-      createElementWithIndex("b0"),
-      createElementWithIndex("d0"),
+      createElementWithIndex("A0"),
+      createElementWithIndex("C0"),
+      createElementWithIndex("B0"),
+      createElementWithIndex("D0"),
     ];
 
     const restoredElements = restoreFractionalIndices(elements);
@@ -90,7 +91,7 @@ describe("restoring fractional indices", () => {
     let i = 0;
 
     while (i < randomNumOfElements) {
-      elements.push(createElementWithIndex("a0"));
+      elements.push(createElementWithIndex(generateKeyBetween(null, null)));
       i++;
     }
 
@@ -105,12 +106,12 @@ describe("restoring fractional indices", () => {
 
   it("restore a mix of bad fractional indices", () => {
     const elements = [
-      createElementWithIndex("a0"),
-      createElementWithIndex("a0"),
-      createElementWithIndex("a1"),
+      createElementWithIndex("A0"),
+      createElementWithIndex("A0"),
+      createElementWithIndex("A1"),
       createElementWithIndex(),
-      createElementWithIndex("a3"),
-      createElementWithIndex("a2"),
+      createElementWithIndex("A3"),
+      createElementWithIndex("A2"),
       createElementWithIndex(),
       createElementWithIndex(),
     ];

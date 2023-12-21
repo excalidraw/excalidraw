@@ -1,6 +1,7 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
+  restoreFractionalIndices,
   validateFractionalIndices,
 } from "../../packages/excalidraw/fractionalIndex";
 import { randomInteger } from "../../packages/excalidraw/random";
@@ -9,7 +10,7 @@ import { reconcileElements } from "../collab/reconciliation";
 import {
   generateKeyBetween,
   generateJitteredKeyBetween,
-} from "fractional-indexing-jittered";
+} from "../../packages/excalidraw/fractionalIndex";
 
 const SEPARATOR = ":";
 const NULL_PLACEHOLDER = "x";
@@ -88,10 +89,8 @@ describe("reconcile without fractional indices", () => {
       ["R:1:3:x:x"],
       ["R:1:3:x:x", "L:2:1:x:x"],
     );
-
     testReconciled(reconciledEls, expectedEls);
   });
-
   it("take higher version - local", () => {
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
       ["L:1:2:x:x", "L:2:2:x:x"],
@@ -100,42 +99,33 @@ describe("reconcile without fractional indices", () => {
     );
     testReconciled(reconciledEls, expectedEls);
   });
-
   it("take higher version - mix few", () => {
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
       ["L:1:2:x:x", "L:2:3:x:x"],
       ["R:1:3:x:x", "R:2:2:x:x"],
       ["R:1:3:x:x", "L:2:3:x:x"],
     );
-
     testReconciled(reconciledEls, expectedEls);
   });
-
   it("take higher version - mix more", () => {
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
       ["L:1:2:x:x", "L:2:3:x:x", "L:3:10:x:x"],
       ["R:1:3:x:x", "R:2:2:x:x"],
       ["R:1:3:x:x", "L:2:3:x:x", "L:3:10:x:x"],
     );
-
     testReconciled(reconciledEls, expectedEls);
   });
-
   it("take lower versionNonce", () => {
     const length = Math.floor(Math.random() * 100);
-
     const randomLocalVersionNonce: number[] = [];
     const randomRemoteVersionNonce: number[] = [];
-
     for (let i = 0; i < length; i++) {
       randomLocalVersionNonce.push(randomInteger());
       randomRemoteVersionNonce.push(randomInteger());
     }
-
     const local_input: string[] = [];
     const remote_input: string[] = [];
     const expected_input: string[] = [];
-
     for (let i = 0; i < length; i++) {
       local_input.push(`L:${i}:1:${randomLocalVersionNonce[i]}:x`);
       remote_input.push(`R:${i}:1:${randomRemoteVersionNonce[i]}:x`);
@@ -149,26 +139,21 @@ describe("reconcile without fractional indices", () => {
         }:x`,
       );
     }
-
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
       local_input,
       remote_input,
       expected_input,
     );
-
     testReconciled(reconciledEls, expectedEls);
   });
-
   it("identical elements", () => {
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
       ["L:1:1:1:x", "L:2:2:2:x"],
       ["R:1:1:1:x", "R:2:2:2:x"],
       ["R:1:1:1:x", "R:2:2:2:x"],
     );
-
     testReconciled(reconciledEls, expectedEls);
   });
-
   it("identical elements, different order", () => {
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
       ["L:1:1:1:x", "L:2:2:2:x"],

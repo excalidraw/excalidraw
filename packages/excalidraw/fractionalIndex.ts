@@ -1,10 +1,10 @@
 import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import {
-  generateKeyBetween,
-  generateJitteredKeyBetween,
-  generateNKeysBetween,
-  generateNJitteredKeysBetween,
+  generateKeyBetween as _generateKeyBetween,
+  generateJitteredKeyBetween as _generateJitteredKeyBetween,
+  generateNKeysBetween as _generateNKeysBetween,
+  generateNJitteredKeysBetween as _generateNJitteredKeysBetween,
   base62CharSet as _base62CharSet,
   indexCharacterSet,
 } from "fractional-indexing-jittered";
@@ -12,7 +12,7 @@ import { ENV } from "./constants";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
-const base36CharSet = indexCharacterSet({
+export const base36CharSet = indexCharacterSet({
   chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   firstPositive: "A",
   mostPositive: "Z",
@@ -20,13 +20,37 @@ const base36CharSet = indexCharacterSet({
 
 const { chars, firstPositive, mostPositive, mostNegative } = _base62CharSet();
 
-const base62CharSet = indexCharacterSet({
+export const base62CharSet = indexCharacterSet({
   chars,
   firstPositive,
   mostPositive,
   mostNegative,
   jitterRange: 6,
 });
+
+const charSet =
+  import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
+    ? base36CharSet
+    : base62CharSet;
+
+export const generateKeyBetween = (
+  lower: string | null,
+  upper: string | null,
+) => _generateKeyBetween(lower, upper, charSet);
+export const generateJitteredKeyBetween = (
+  lower: string | null,
+  upper: string | null,
+) => _generateJitteredKeyBetween(lower, upper, charSet);
+export const generateNKeysBetween = (
+  lower: string | null,
+  upper: string | null,
+  n: number,
+) => _generateNKeysBetween(lower, upper, n, charSet);
+export const generateNJitteredKeysBetween = (
+  lower: string | null,
+  upper: string | null,
+  n: number,
+) => _generateNJitteredKeysBetween(lower, upper, n, charSet);
 
 const isValidFractionalIndex = (
   index: FractionalIndex,
@@ -100,7 +124,6 @@ export const fixFractionalIndices = (
     import.meta.env.MODE === ENV.TEST
       ? generateNKeysBetween
       : generateNJitteredKeysBetween;
-  const charSet = import.meta.env.DEV ? base36CharSet : base62CharSet;
 
   for (const movedIndices of contiguousMovedIndices) {
     try {
@@ -110,12 +133,7 @@ export const fixFractionalIndices = (
         elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
         null;
 
-      const newKeys = generateFn(
-        predecessor,
-        successor,
-        movedIndices.length,
-        charSet,
-      );
+      const newKeys = generateFn(predecessor, successor, movedIndices.length);
 
       for (let i = 0; i < movedIndices.length; i++) {
         const element = elements[movedIndices[i]];
@@ -165,23 +183,21 @@ const restoreFractionalIndex = (
       ? generateKeyBetween
       : generateJitteredKeyBetween;
 
-  const chartSet = import.meta.env.DEV ? base36CharSet : base62CharSet;
-
   if (successor && !predecessor) {
     // first element in the array
     // insert before successor
-    return generateFn(null, successor, chartSet);
+    return generateFn(null, successor);
   }
 
   if (predecessor && !successor) {
     // last element in the array
     // insert after predecessor
-    return generateFn(predecessor, null, chartSet);
+    return generateFn(predecessor, null);
   }
 
   // both predecessor and successor exist (or both do not)
   // insert after predecessor
-  return generateFn(predecessor, null, chartSet);
+  return generateFn(predecessor, null);
 };
 
 /**
@@ -219,6 +235,7 @@ export const restoreFractionalIndices = (
           fractionalIndex: nextFractionalIndex,
         });
       } catch (e) {
+        console.error(e);
         normalized.push(element);
       }
     } else {
