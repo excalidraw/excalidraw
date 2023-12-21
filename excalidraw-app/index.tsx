@@ -808,17 +808,20 @@ let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
+let customToken: string;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
   roomLinkData: RoomLinkData;
   username: string;
+  token: string;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
+  customToken = props.token;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
@@ -828,5 +831,5 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { customCollabServerUrl, customFirebaseConfig };
+export { customCollabServerUrl, customFirebaseConfig, customToken };
 export default ExcalidrawApp;

@@ -19,7 +19,7 @@ root.render(
         roomKey: "yx8WgrzkcceYyZFXAo4_9g", // arbitrary constant key
       }}
       username={"Karat Engineer"}
-      customToken="aflkasjlfja"
+      token="aflkasjlfja"
     />
   </StrictMode>,
 );
