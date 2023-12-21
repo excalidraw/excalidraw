@@ -299,6 +299,11 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
+  const setExcalidrawAPI: SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => {
+    excalidrawRefCallback(api);
+    externalExcalidrawRefCallback(api);
+  };
+
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
@@ -592,6 +597,8 @@ const ExcalidrawWrapper = () => {
         }
       });
     }
+
+    externalOnChange(elements, appState, files);
   };
 
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
@@ -688,7 +695,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        excalidrawAPI={excalidrawRefCallback}
+        excalidrawAPI={setExcalidrawAPI}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
@@ -805,11 +812,21 @@ type FirebaseConfig = {
 
 type RoomLinkData = { roomId: string; roomKey: string } | null;
 
+type SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => void;
+
+type OnChange = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+) => void;
+
 let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
+let externalExcalidrawRefCallback: SetExcalidrawAPI;
+let externalOnChange: OnChange;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
@@ -817,13 +834,16 @@ const ExcalidrawApp: React.FC<{
   roomLinkData: RoomLinkData;
   username: string;
   theme: Theme;
-  // apiHook
+  excalidrawAPIRefCallback: SetExcalidrawAPI;
+  onChange: OnChange;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
   customTheme = props.theme;
+  externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
+  externalOnChange = props.onChange;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>

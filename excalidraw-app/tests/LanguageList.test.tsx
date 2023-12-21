@@ -19,6 +19,8 @@ describe("Test LanguageList", () => {
         roomLinkData={null}
         username={""}
         theme="dark"
+        excalidrawAPIRefCallback={() => {}}
+        onChange={() => {}}
       />,
     );
 
