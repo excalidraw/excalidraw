@@ -738,7 +738,10 @@ const findIndex = (values: number[][], value: number):number|null => {
 //zsviczian
 export const getFontSize = (size:number, zoom: number):number => {
   zoom = scaleFontSize ? zoom : 1;
-  const normalizedSizeIdx = findIndex(useFibonacci?fibonacciValues:normalValues, size);
+  let normalizedSizeIdx = findIndex(fibonacciValues, size);
+  if(!normalizedSizeIdx) {
+    normalizedSizeIdx = findIndex(normalValues, size);
+  }
   if(normalizedSizeIdx === null) return size;
   size = [16,20,28,36][normalizedSizeIdx];
   const nextValue = useFibonacci
