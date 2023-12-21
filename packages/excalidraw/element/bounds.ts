@@ -701,14 +701,45 @@ const getLinearElementRotatedBounds = (
     return coords;
   }
 
-  // first element is always the curve
-  const cachedShape = ShapeCache.get(element)?.[0];
-  const shape = cachedShape ?? generateLinearElementShape(element);
-  const ops = getCurvePathOps(shape);
-  const transformXY = (x: number, y: number) =>
-    rotate(element.x + x, element.y + y, cx, cy, element.angle);
-  const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
-  let coords: Bounds = [res[0], res[1], res[2], res[3]];
+  const cachedShape =
+    ShapeCache.get(element) ?? ShapeCache.generateElementShape(element, null);
+
+  const [arrowCurve, ...arrowhead] = cachedShape;
+
+  let coords = getMinMaxXYFromCurvePathOps(
+    getCurvePathOps(arrowCurve),
+    (x: number, y: number) =>
+      rotate(element.x + x, element.y + y, cx, cy, element.angle),
+  );
+
+  for (const shape of arrowhead) {
+    let [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(
+      getCurvePathOps(shape),
+    );
+
+    [minX, minY] = rotate(
+      minX + element.x,
+      minY + element.y,
+      cx,
+      cy,
+      element.angle,
+    );
+    [maxX, maxY] = rotate(
+      maxX + element.x,
+      maxY + element.y,
+      cx,
+      cy,
+      element.angle,
+    );
+
+    coords = [
+      Math.min(minX, coords[0]),
+      Math.min(minY, coords[1]),
+      Math.max(maxX, coords[2]),
+      Math.max(maxY, coords[3]),
+    ];
+  }
+
   const boundTextElement = getBoundTextElement(element);
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(

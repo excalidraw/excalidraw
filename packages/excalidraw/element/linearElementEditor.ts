@@ -1421,10 +1421,10 @@ export class LinearElementEditor {
     includeBoundText: boolean = false,
   ): [number, number, number, number, number, number] => {
     let coords: [number, number, number, number, number, number];
-    let x1;
-    let y1;
-    let x2;
-    let y2;
+    let x1 = Infinity;
+    let y1 = Infinity;
+    let x2 = -Infinity;
+    let y2 = -Infinity;
     if (element.points.length < 2 || !ShapeCache.get(element)) {
       // XXX this is just a poor estimate and not very useful
       const { minX, minY, maxX, maxY } = element.points.reduce(
@@ -1446,14 +1446,15 @@ export class LinearElementEditor {
     } else {
       const shape = ShapeCache.generateElementShape(element, null);
 
-      // first element is always the curve
-      const ops = getCurvePathOps(shape[0]);
+      for (const s of shape) {
+        const ops = getCurvePathOps(s);
 
-      const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
-      x1 = minX + element.x;
-      y1 = minY + element.y;
-      x2 = maxX + element.x;
-      y2 = maxY + element.y;
+        const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+        x1 = Math.min(minX + element.x, x1);
+        y1 = Math.min(minY + element.y, y1);
+        x2 = Math.max(maxX + element.x, x2);
+        y2 = Math.max(maxY + element.y, y2);
+      }
     }
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
