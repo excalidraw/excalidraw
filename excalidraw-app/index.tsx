@@ -5,13 +5,7 @@ import { trackEvent } from "../src/analytics";
 import { getDefaultAppState } from "../src/appState";
 import { ErrorDialog } from "../src/components/ErrorDialog";
 import { TopErrorBoundary } from "../src/components/TopErrorBoundary";
-import {
-  APP_NAME,
-  EVENT,
-  THEME,
-  TITLE_TIMEOUT,
-  VERSION_TIMEOUT,
-} from "../src/constants";
+import { APP_NAME, EVENT, THEME, VERSION_TIMEOUT } from "../src/constants";
 import { loadFromBlob } from "../src/data/blob";
 import {
   ExcalidrawElement,
@@ -299,6 +293,11 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
+  const setExcalidrawAPI: SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => {
+    excalidrawRefCallback(api);
+    externalExcalidrawRefCallback(api);
+  };
+
   const [collabAPI] = useAtom(collabAPIAtom);
   const [, setCollabDialogShown] = useAtom(collabDialogShownAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
@@ -412,11 +411,6 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
-    );
-
     const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
@@ -506,7 +500,6 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
-      clearTimeout(titleTimeout);
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode]);
 
@@ -535,6 +528,7 @@ const ExcalidrawWrapper = () => {
 
   const [theme, setTheme] = useState<Theme>(
     () =>
+      customTheme ||
       (localStorage.getItem(
         STORAGE_KEYS.LOCAL_STORAGE_THEME,
       ) as Theme | null) ||
@@ -687,7 +681,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        excalidrawAPI={excalidrawRefCallback}
+        excalidrawAPI={setExcalidrawAPI}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
@@ -804,10 +798,14 @@ type FirebaseConfig = {
 
 type RoomLinkData = { roomId: string; roomKey: string } | null;
 
+type SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => void;
+
 let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
+let customTheme: Theme;
+let externalExcalidrawRefCallback: SetExcalidrawAPI;
 let customToken: string;
 
 const ExcalidrawApp: React.FC<{
@@ -815,12 +813,16 @@ const ExcalidrawApp: React.FC<{
   collabServerUrl: string;
   roomLinkData: RoomLinkData;
   username: string;
+  theme: Theme;
+  excalidrawAPIRefCallback: SetExcalidrawAPI;
   token: string;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
+  customTheme = props.theme;
+  externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
   customToken = props.token;
   return (
     <TopErrorBoundary>

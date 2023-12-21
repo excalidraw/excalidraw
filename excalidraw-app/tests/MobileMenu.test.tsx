@@ -29,6 +29,8 @@ describe("Test MobileMenu", () => {
         roomLinkData={null}
         username={""}
         token=""
+        theme="dark"
+        excalidrawAPIRefCallback={() => {}}
       />,
     );
     // @ts-ignore

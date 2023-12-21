@@ -78,6 +78,8 @@ describe("collaboration", () => {
         roomLinkData={null}
         username={""}
         token=""
+        theme="dark"
+        excalidrawAPIRefCallback={() => {}}
       />,
     );
     // To update the scene with deleted elements before starting collab
