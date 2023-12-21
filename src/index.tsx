@@ -4,29 +4,20 @@ import ExcalidrawApp from "../excalidraw-app";
 import { registerSW } from "virtual:pwa-register";
 
 import "../excalidraw-app/sentry";
-import { AppState, BinaryFiles, ExcalidrawImperativeAPI } from "./types";
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawImperativeAPI } from "./types";
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
 registerSW();
 
 function App() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
   const excalidrawAPIRefCallback = useCallback(
     (value: ExcalidrawImperativeAPI) => setExcalidrawAPI(value),
     [],
   );
-
-  const onChange = (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    // eslint-disable-next-line no-console
-    console.log({ excalidrawAPI, elements, appState, files });
-  };
 
   return (
     <StrictMode>
@@ -40,7 +31,6 @@ function App() {
         username={"Karat Engineer"}
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
-        onChange={onChange}
       />
     </StrictMode>
   );

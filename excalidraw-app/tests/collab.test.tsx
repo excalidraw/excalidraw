@@ -79,7 +79,6 @@ describe("collaboration", () => {
         username={""}
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
-        onChange={() => {}}
       />,
     );
     // To update the scene with deleted elements before starting collab

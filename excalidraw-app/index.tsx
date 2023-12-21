@@ -5,13 +5,7 @@ import { trackEvent } from "../src/analytics";
 import { getDefaultAppState } from "../src/appState";
 import { ErrorDialog } from "../src/components/ErrorDialog";
 import { TopErrorBoundary } from "../src/components/TopErrorBoundary";
-import {
-  APP_NAME,
-  EVENT,
-  THEME,
-  TITLE_TIMEOUT,
-  VERSION_TIMEOUT,
-} from "../src/constants";
+import { APP_NAME, EVENT, THEME, VERSION_TIMEOUT } from "../src/constants";
 import { loadFromBlob } from "../src/data/blob";
 import {
   ExcalidrawElement,
@@ -417,11 +411,6 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
-    );
-
     const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
@@ -511,7 +500,6 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
-      clearTimeout(titleTimeout);
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode]);
 
@@ -597,8 +585,6 @@ const ExcalidrawWrapper = () => {
         }
       });
     }
-
-    externalOnChange(elements, appState, files);
   };
 
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
@@ -814,19 +800,12 @@ type RoomLinkData = { roomId: string; roomKey: string } | null;
 
 type SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => void;
 
-type OnChange = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  files: BinaryFiles,
-) => void;
-
 let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
 let externalExcalidrawRefCallback: SetExcalidrawAPI;
-let externalOnChange: OnChange;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
@@ -835,7 +814,6 @@ const ExcalidrawApp: React.FC<{
   username: string;
   theme: Theme;
   excalidrawAPIRefCallback: SetExcalidrawAPI;
-  onChange: OnChange;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
@@ -843,7 +821,6 @@ const ExcalidrawApp: React.FC<{
   customUsername = props.username;
   customTheme = props.theme;
   externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
-  externalOnChange = props.onChange;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>

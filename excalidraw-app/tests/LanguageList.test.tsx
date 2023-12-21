@@ -20,7 +20,6 @@ describe("Test LanguageList", () => {
         username={""}
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
-        onChange={() => {}}
       />,
     );
 
