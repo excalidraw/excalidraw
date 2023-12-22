@@ -85,11 +85,7 @@ export const reconcileElements = (
     }
   }
 
-  const validIndices = validateFractionalIndices(reconciledElements);
-
-  return (validIndices
-    ? orderByFractionalIndex(reconciledElements)
-    : restoreFractionalIndices(
-        orderByFractionalIndex(reconciledElements),
-      )) as readonly ExcalidrawElement[] as ReconciledElements;
+  return orderByFractionalIndex(
+    reconciledElements,
+  ) as readonly ExcalidrawElement[] as ReconciledElements;
 };

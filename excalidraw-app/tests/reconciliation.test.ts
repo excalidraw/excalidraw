@@ -195,9 +195,11 @@ describe("reconcile with fractional indices", () => {
 
     testReconciled(reconciledEls, expectedEls);
 
+    // we do not restore in reconciliation
+    // elements are instead restored in updateScene
     expect(
       validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("order by fractional indices - longer", () => {

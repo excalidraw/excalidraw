@@ -399,7 +399,10 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { restoreFractionalIndices } from "../fractionalIndex";
+import {
+  restoreFractionalIndices,
+  validateFractionalIndices,
+} from "../fractionalIndex";
 import FollowMode from "./FollowMode/FollowMode";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -3556,8 +3559,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
+        const validIndices = validateFractionalIndices(sceneData.elements);
+
         this.scene.replaceAllElements(
-          restoreFractionalIndices(sceneData.elements),
+          validIndices
+            ? sceneData.elements
+            : restoreFractionalIndices(sceneData.elements),
         );
       }
 
