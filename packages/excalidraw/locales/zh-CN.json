@@ -524,12 +524,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "快速搜索",
+      "empty": "未找到用户"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "点击关注用户",
+      "followStatus": "您已关注此用户"
     }
   }
 }
