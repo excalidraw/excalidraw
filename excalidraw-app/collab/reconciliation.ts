@@ -1,9 +1,5 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
-import {
-  orderByFractionalIndex,
-  restoreFractionalIndices,
-  validateFractionalIndices,
-} from "../../packages/excalidraw/fractionalIndex";
+import { orderByFractionalIndex } from "../../packages/excalidraw/fractionalIndex";
 import { AppState } from "../../packages/excalidraw/types";
 import { arrayToMap } from "../../packages/excalidraw/utils";
 
