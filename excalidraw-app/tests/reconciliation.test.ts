@@ -1,7 +1,6 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
-  restoreFractionalIndices,
   validateFractionalIndices,
 } from "../../packages/excalidraw/fractionalIndex";
 import { randomInteger } from "../../packages/excalidraw/random";
