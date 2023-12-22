@@ -524,8 +524,8 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Rýchle vyhľadávanie",
+      "empty": "Nenašli sa žiadni používatelia"
     },
     "hint": {
       "text": "",
