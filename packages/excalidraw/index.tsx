@@ -216,7 +216,7 @@ export {
   getFreeDrawSvgPath,
   exportToClipboard,
   mergeLibraryItems,
-} from "../utils";
+} from "../utils/export";
 export { isLinearElement } from "./element/typeChecks";
 
 export { FONT_FAMILY, THEME, MIME_TYPES } from "./constants";
@@ -247,11 +247,12 @@ export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
 
 export { normalizeLink } from "./data/url";
+export { zoomToFitBounds } from "./actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";
-export { getCommonBounds } from "./element/bounds";
+export { getCommonBounds, getVisibleSceneBounds } from "./element/bounds";
 
 export {
   elementsOverlappingBBox,
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
-} from "../withinBounds";
+} from "../utils/export";

@@ -1,6 +1,8 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import { centerScrollOn } from "../scene/scroll";
+import { GoToCollaboratorComponentProps } from "../components/UserList";
+import { eyeIcon } from "../components/icons";
+import { t } from "../i18n";
 import { Collaborator } from "../types";
 import { register } from "./register";
 
@@ -8,40 +10,73 @@ export const actionGoToCollaborator = register({
   name: "goToCollaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
-  perform: (_elements, appState, value) => {
-    const point = value as Collaborator["pointer"];
-    if (!point) {
-      return { appState, commitToHistory: false };
+  perform: (_elements, appState, collaborator: Collaborator) => {
+    if (
+      !collaborator.socketId ||
+      appState.userToFollow?.socketId === collaborator.socketId ||
+      collaborator.isCurrentUser
+    ) {
+      return {
+        appState: {
+          ...appState,
+          userToFollow: null,
+        },
+        commitToHistory: false,
+      };
     }
 
     return {
       appState: {
         ...appState,
-        ...centerScrollOn({
-          scenePoint: point,
-          viewportDimensions: {
-            width: appState.width,
-            height: appState.height,
-          },
-          zoom: appState.zoom,
-        }),
+        userToFollow: {
+          socketId: collaborator.socketId,
+          username: collaborator.username || "",
+        },
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, data }) => {
-    const [clientId, collaborator] = data as [string, Collaborator];
+  PanelComponent: ({ updateData, data, appState }) => {
+    const { clientId, collaborator, withName, isBeingFollowed } =
+      data as GoToCollaboratorComponentProps;
 
     const background = getClientColor(clientId);
 
-    return (
+    return withName ? (
+      <div
+        className="dropdown-menu-item dropdown-menu-item-base UserList__collaborator"
+        onClick={() => updateData<Collaborator>(collaborator)}
+      >
+        <Avatar
+          color={background}
+          onClick={() => {}}
+          name={collaborator.username || ""}
+          src={collaborator.avatarUrl}
+          isBeingFollowed={isBeingFollowed}
+          isCurrentUser={collaborator.isCurrentUser === true}
+        />
+        {collaborator.username}
+        <div
+          className="UserList__collaborator-follow-status-icon"
+          style={{ visibility: isBeingFollowed ? "visible" : "hidden" }}
+          title={isBeingFollowed ? t("userList.hint.followStatus") : undefined}
+          aria-hidden
+        >
+          {eyeIcon}
+        </div>
+      </div>
+    ) : (
       <Avatar
         color={background}
-        onClick={() => updateData(collaborator.pointer)}
+        onClick={() => {
+          updateData(collaborator);
+        }}
         name={collaborator.username || ""}
         src={collaborator.avatarUrl}
+        isBeingFollowed={isBeingFollowed}
+        isCurrentUser={collaborator.isCurrentUser === true}
       />
     );
   },

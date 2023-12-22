@@ -80,6 +80,7 @@ type TooltipProps = {
   label: string;
   long?: boolean;
   style?: React.CSSProperties;
+  disabled?: boolean;
 };
 
 export const Tooltip = ({
@@ -87,11 +88,15 @@ export const Tooltip = ({
   label,
   long = false,
   style,
+  disabled,
 }: TooltipProps) => {
   useEffect(() => {
     return () =>
       getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
   }, []);
+  if (disabled) {
+    return null;
+  }
   return (
     <div
       className="excalidraw-tooltip-wrapper"
