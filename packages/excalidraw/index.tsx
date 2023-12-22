@@ -5,7 +5,7 @@ import { isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
-import "../../public/fonts.css";
+import "../../public/fonts/fonts.css";
 import polyfill from "./polyfill";
 
 import { AppProps, ExcalidrawProps } from "./types";

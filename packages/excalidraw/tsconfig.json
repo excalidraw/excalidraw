@@ -3,10 +3,9 @@
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,
-    "outDir": "types",
+    "outDir": "dist/packages",
     "skipLibCheck": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "allowSyntheticDefaultImports": true,
     "module": "ESNext",
     "moduleResolution": "Node",

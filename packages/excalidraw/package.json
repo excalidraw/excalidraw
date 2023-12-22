@@ -4,11 +4,10 @@
   "main": "main.js",
   "sideEffects": false,
   "type": "module",
-  "module": "dist/index.js",
-  "types": "types/excalidraw/index.d.ts",
+  "module": "dist/packages/excalidraw/index.js",
+  "types": "dist/packages/excalidraw/index.d.ts",
   "files": [
-    "dist/*",
-    "types/*"
+    "dist/*"
   ],
   "publishConfig": {
     "access": "public"
