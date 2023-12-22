@@ -10,6 +10,7 @@ import {
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
+import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
 import {
@@ -21,6 +22,7 @@ import {
   AppState,
   BinaryFileData,
   BinaryFiles,
+  SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
@@ -28,6 +30,7 @@ import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
+  WS_SUBTYPES,
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
@@ -97,32 +100,43 @@ export type EncryptedData = {
 };
 
 export type SocketUpdateDataSource = {
+  INVALID_RESPONSE: {
+    type: WS_SUBTYPES.INVALID_RESPONSE;
+  };
   SCENE_INIT: {
-    type: "SCENE_INIT";
+    type: WS_SUBTYPES.INIT;
     payload: {
       elements: readonly ExcalidrawElement[];
     };
   };
   SCENE_UPDATE: {
-    type: "SCENE_UPDATE";
+    type: WS_SUBTYPES.UPDATE;
     payload: {
       elements: readonly ExcalidrawElement[];
     };
   };
   MOUSE_LOCATION: {
-    type: "MOUSE_LOCATION";
+    type: WS_SUBTYPES.MOUSE_LOCATION;
     payload: {
-      socketId: string;
+      socketId: SocketId;
       pointer: { x: number; y: number; tool: "pointer" | "laser" };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
       username: string;
     };
   };
-  IDLE_STATUS: {
-    type: "IDLE_STATUS";
+  USER_VISIBLE_SCENE_BOUNDS: {
+    type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS;
     payload: {
-      socketId: string;
+      socketId: SocketId;
+      username: string;
+      sceneBounds: SceneBounds;
+    };
+  };
+  IDLE_STATUS: {
+    type: WS_SUBTYPES.IDLE_STATUS;
+    payload: {
+      socketId: SocketId;
       userState: UserIdleState;
       username: string;
     };
@@ -130,10 +144,7 @@ export type SocketUpdateDataSource = {
 };
 
 export type SocketUpdateDataIncoming =
-  | SocketUpdateDataSource[keyof SocketUpdateDataSource]
-  | {
-      type: "INVALID_RESPONSE";
-    };
+  SocketUpdateDataSource[keyof SocketUpdateDataSource];
 
 export type SocketUpdateData =
   SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
