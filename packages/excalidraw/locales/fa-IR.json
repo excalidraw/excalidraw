@@ -11,8 +11,8 @@
     "copyAsPng": "کپی در حافطه موقت به صورت PNG",
     "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
     "copyText": "کپی در حافطه موقت به صورت متن",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "کپی Png در حافظه موقت",
+    "convertToCode": "تبدیل به کد",
     "bringForward": "جلو آوردن",
     "sendToBack": "پس فرستادن",
     "bringToFront": "جلو آوردن",
@@ -38,12 +38,12 @@
     "arrowhead_none": "هیچ کدام",
     "arrowhead_arrow": "پیکان",
     "arrowhead_bar": "میله ای",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "دایره",
+    "arrowhead_circle_outline": "دایره (پیرامون)",
     "arrowhead_triangle": "مثلث",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "مثلث (پیرامون)",
+    "arrowhead_diamond": "الماس",
+    "arrowhead_diamond_outline": "الماس (پیرامون)",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
@@ -115,12 +115,12 @@
     "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
-      "editEmbed": "",
+      "editEmbed": "ویرایش لینک و افزونه",
       "create": "ایجاد پیوند",
-      "createEmbed": "",
+      "createEmbed": "ساخت لینک و افزونه",
       "label": "لینک",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "لینک و افزونه",
+      "empty": "هیچ لینکی ست نشده"
     },
     "lineEditor": {
       "edit": "ویرایش لینک",
@@ -134,11 +134,11 @@
     },
     "statusPublished": "منتشر شده",
     "sidebarLock": "باز نگه داشتن سایدبار",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "همه آیتم های در فریم را انتخاب کنید",
+    "removeAllElementsFromFrame": "حذف همه آیتم های داخل فریم",
     "eyeDropper": "انتخاب رنگ از کرباس",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "متن به دیاگرام",
+    "prompt": "فوری"
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -172,16 +172,16 @@
     "darkMode": "حالت تیره",
     "lightMode": "حالت روشن",
     "zenMode": "حالت ذن",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "به اشیاء ضربه بزنید",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
     "clear": "پاک کردن",
     "remove": "پاک کردن",
-    "embed": "",
+    "embed": "تغییر افزونه",
     "publishLibrary": "انتشار",
     "submit": "ارسال",
     "confirm": "تایید",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "کلیک برای تعامل"
   },
   "alerts": {
     "clearReset": "این کار کل صفحه را پاک میکند. آیا مطمئنید؟",
@@ -211,13 +211,13 @@
     "imageInsertError": "عکس ارسال نشد. بعداً دوباره تلاش کنید...",
     "fileTooBig": "فایل خیلی بزرگ است حداکثر اندازه مجاز {{maxSize}}.",
     "svgImageInsertError": "تصویر SVG وارد نشد. نشانه گذاری SVG نامعتبر به نظر می رسد.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "گرفتن تصویر ناموفق بود.",
     "invalidSVGString": "SVG نادرست.",
     "cannotResolveCollabServer": "به سرور collab متصل نشد. لطفا صفحه را مجددا بارگذاری کنید و دوباره تلاش کنید.",
     "importLibraryError": "داده‌ها بارگذاری نشدند",
     "collabSaveFailed": "در پایگاه داده باطن ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
     "collabSaveFailed_sizeExceeded": "در پایگاه داده بکند ذخیره نشد. اگر مشکلات همچنان ادامه داشت، باید فایل خود را به صورت محلی ذخیره کنید تا مطمئن شوید کار خود را از دست نمی دهید.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "تصاویر غیر فعال شدند.",
     "brave_measure_text_error": {
       "line1": "به نظر می‌رسد از مرورگر Brave با تنظیم <bold> مسدود کردن شدید اثرانگشت</bold> استفاده می‌کنید.",
       "line2": "این می تواند منجر به شکستن <bold>عناصر متن</bold> در نقاشی های شما شود.",
@@ -225,13 +225,13 @@
       "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید."
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "عناصر افزوده شده نمی توانند به کتابخانه افزوده شوند.",
+      "iframe": "عناصر IFrame نمی توانند به کتابخانه افزوده شوند.",
+      "image": "پشتیبانی از افزودن تصاویر به کتابخانه به زودی اضافه خواهد شد!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "نمی تواند جاگذاری شود (نمی تواند از کلیپبورد بخواند).",
+    "asyncPasteFailedOnParse": "نمیتواند جایگذاری شود.",
+    "copyToSystemClipboardFailed": "نمی تواند در کلیپبورد کپی شود."
   },
   "toolBar": {
     "selection": "گزینش",
@@ -248,14 +248,14 @@
     "penMode": "حالت قلم - جلوگیری از تماس",
     "link": "افزودن/به‌روزرسانی پیوند برای شکل انتخابی",
     "eraser": "پاک کن",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "laser": "",
+    "frame": "ابزار فریم",
+    "magicframe": "وایرفریم به کد",
+    "embeddable": "افزونه وب",
+    "laser": "اشاره گر لیزری",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "مرمید به excalidraw",
+    "magicSettings": "تنظیمات هوش مصنوعی"
   },
   "headings": {
     "canvasActions": "عملیات روی بوم",
@@ -267,7 +267,7 @@
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
-    "embeddable": "",
+    "embeddable": "کلیک-درگ برای ساخت افزونه وب",
     "text_selected": "دوبار کلیک کنید یا Enter را فشار دهید تا نقاط را ویرایش کنید",
     "text_editing": "Escape یا CtrlOrCmd+ENTER را فشار دهید تا ویرایش تمام شود",
     "linearElementMulti": "روی آخرین نقطه کلیک کنید یا کلید ESC را بزنید یا کلید Enter را بزنید برای اتمام کار",
@@ -284,7 +284,7 @@
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
     "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
-    "disableSnapping": ""
+    "disableSnapping": "نگه داشتن کنترل یا کامند برای غیر فعال شدن چفت شدن"
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -292,11 +292,11 @@
     "canvasTooBigTip": "نکته: سعی کنید دورترین عناصر را کمی به همدیگر نزدیک کنید."
   },
   "errorSplash": {
-    "headingMain": "",
+    "headingMain": "مشکلی رخ داده. امتحان کنید <button> بارگذاری مجدد صفحه </button>.",
     "clearCanvasMessage": "اگر بازنشانی صفحه مشکل را حل نکرد این را امتحان کنید ",
     "clearCanvasCaveat": " این باعث میشود کارهای شما ذخیره نشود ",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
+    "trackedToSentry": "خطا با شناسه {{eventId}} در سیستم ما رهگیری شد.",
+    "openIssueMessage": "ما بسیار محتاط بودیم که اطلاعات صحنه شما را در خطا لحاظ نکنیم. اگر صحنه شما خصوصی نیست، لطفاً ما را دنبال کنید\n<button> رد یابی خطا </button>. لطفاً اطلاعات زیر را با کپی و جایگذاری در مشکل GitHub وارد کنید.",
     "sceneContent": "محتوای صحنه:"
   },
   "roomDialog": {
@@ -376,9 +376,9 @@
       "required": "لازم",
       "website": "وارد کردن آدرس درست"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "کتابخانه خود را ارسال کنید تا در <link/> مخرن کتابخانه عمومی <link> برای بقیه مردم گنجانده شود تا در طرح هایشان استفاده کنند.",
+    "noteGuidelines": "کتابخانه باید ابتدا به صورت دستی تأیید شود. لطفا قبل انتشار <link>راهنما</link> را مطالعه کنید. برای برقراری ارتباط و ایجاد تغییرات در صورت درخواست، به یک حساب GitHub نیاز دارید، اما خیلی الزامی نیست.",
+    "noteLicense": "با ارسال، موافقت می کنید که کتابخانه تحت عنوان <link>MIT License</link> منتشر شود،که به طور خلاصه به این معنی است که هر کسی می تواند بدون محدودیت از آنها استفاده کند.",
     "noteItems": "هر مورد کتابخانه باید نام خاص خود را داشته باشد تا قابل فیلتر باشد. اقلام کتابخانه زیر شامل خواهد شد:",
     "atleastOneLibItem": "لطفاً حداقل یک مورد از کتابخانه را برای شروع انتخاب کنید",
     "republishWarning": "توجه: برخی از موارد انتخاب شده به عنوان قبلاً منتشر شده/ارسال شده علامت گذاری شده اند. شما فقط باید هنگام به‌روزرسانی یک کتابخانه موجود یا ارسال، موارد را دوباره ارسال کنید."
@@ -392,22 +392,22 @@
     "removeItemsFromLib": "موارد انتخاب شده از موارد پسندیده حذف شوند"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "خروجی گرفتن از تصویر",
     "label": {
       "withBackground": "پس زمینه",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "onlySelected": "فقط انتخاب شده ها",
+      "darkMode": "حالت تاریک",
+      "embedScene": "صحنه افزونه",
+      "scale": "نسبت",
+      "padding": "فاصله"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "داده های صحنه در فایل PNG/SVG صادر شده ذخیره می شود تا صحنه را بتوان از آن بازیابی کرد.\nاندازه فایل خروجی را افزایش می دهد."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "تبدیل به PNG",
+      "exportToSvg": "تبدیل به SVG",
+      "copyPngToClipboard": "کپی PNG در حافظه موقت"
     },
     "button": {
       "exportToPng": "",
