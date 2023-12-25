@@ -120,7 +120,6 @@ export const actionZoomIn = register({
         type="button"
         className="zoom-in-button zoom-button"
         icon={ZoomInIcon}
-        // title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
         aria-label={t("buttons.zoomIn")}
         onClick={() => {
           updateData(null);
