@@ -453,7 +453,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     return text;
   }
 
-  const lines: Array<string> = [];
+  const lines: string[] = [];
   const originalLines = text.split("\n");
   const spaceWidth = getLineWidth(" ", font);
 
@@ -577,7 +577,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 };
 
 export const charWidth = (() => {
-  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
+  const cachedCharWidth: { [key: FontString]: number[] } = {};
 
   const calculate = (char: string, font: FontString) => {
     const ascii = char.charCodeAt(0);

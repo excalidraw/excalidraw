@@ -11,7 +11,7 @@ import {
   viewportCoordsToSceneCoords,
 } from "../utils";
 
-const isOutsideViewPort = (appState: AppState, cords: Array<number>) => {
+const isOutsideViewPort = (appState: AppState, cords: number[]) => {
   const [x1, y1, x2, y2] = cords;
   const { x: viewportX1, y: viewportY1 } = sceneCoordsToViewportCoords(
     { sceneX: x1, sceneY: y1 },

@@ -42,7 +42,7 @@ export namespace OpenAIInput {
     /**
      * The contents of the user message.
      */
-    content: string | Array<ChatCompletionContentPart> | null;
+    content: string | ChatCompletionContentPart[] | null;
 
     /**
      * The role of the messages author, in this case `user`.
@@ -67,9 +67,10 @@ export namespace OpenAIInput {
      * A list of messages comprising the conversation so far.
      * [Example Python code](https://cookbook.openai.com/examples/how_to_format_inputs_to_chatgpt_models).
      */
-    messages: Array<
-      ChatCompletionUserMessageParam | ChatCompletionSystemMessageParam
-    >;
+    messages: (
+      | ChatCompletionUserMessageParam
+      | ChatCompletionSystemMessageParam
+    )[];
 
     /**
      * ID of the model to use. See the
@@ -149,7 +150,7 @@ export namespace OpenAIInput {
     /**
      * Up to 4 sequences where the API will stop generating further tokens.
      */
-    stop?: string | null | Array<string>;
+    stop?: string | null | string[];
 
     /**
      * If set, partial message deltas will be sent, like in ChatGPT. Tokens will be
@@ -199,7 +200,7 @@ export namespace OpenAIOutput {
      * A list of chat completion choices. Can be more than one if `n` is greater
      * than 1.
      */
-    choices: Array<Choice>;
+    choices: Choice[];
 
     /**
      * The Unix timestamp (in seconds) of when the chat completion was created.
