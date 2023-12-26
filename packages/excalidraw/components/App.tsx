@@ -5272,9 +5272,9 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: makeNextSelectedElementIds(
             Object.keys(this.state.selectedElementIds)
               .filter((key) => key !== element.id)
-              .reduce((obj: { [id: string]: true }, key) => {
-                obj[key] = this.state.selectedElementIds[key];
-                return obj;
+              .reduce((object: { [id: string]: true }, key) => {
+                object[key] = this.state.selectedElementIds[key];
+                return object;
               }, {}),
             this.state,
           ),
