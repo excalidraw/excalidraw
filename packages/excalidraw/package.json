@@ -2,7 +2,10 @@
   "name": "@excalidraw/excalidraw",
   "version": "0.17.1",
   "main": "main.js",
-  "sideEffects": false,
+  "sideEffects": [
+    "*.scss",
+    "*.css"
+  ],
   "type": "module",
   "module": "dist/packages/excalidraw/index.js",
   "types": "dist/packages/excalidraw/index.d.ts",
