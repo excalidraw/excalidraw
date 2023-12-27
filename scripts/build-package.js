@@ -2,40 +2,40 @@ const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
 
-const fs = require("fs");
-const path = require("path");
+//const fs = require("fs");
+// const path = require("path");
 
-function getFiles(dir, files = []) {
-  const fileList = fs.readdirSync(dir);
-  for (const file of fileList) {
-    const name = `${dir}/${file}`;
-    if (
-      name.includes("node_modules") ||
-      name.includes("config") ||
-      name.includes("package.json") ||
-      name.includes("main.js") ||
-      name.includes("index-node.ts") ||
-      name.endsWith(".d.ts")
-    ) {
-      continue;
-    }
+// function getFiles(dir, files = []) {
+//   const fileList = fs.readdirSync(dir);
+//   for (const file of fileList) {
+//     const name = `${dir}/${file}`;
+//     if (
+//       name.includes("node_modules") ||
+//       name.includes("config") ||
+//       name.includes("package.json") ||
+//       name.includes("main.js") ||
+//       name.includes("index-node.ts") ||
+//       name.endsWith(".d.ts")
+//     ) {
+//       continue;
+//     }
 
-    if (fs.statSync(name).isDirectory()) {
-      getFiles(name, files);
-    } else if (
-      !(
-        name.match(/\.(sa|sc|c)ss$/) ||
-        name.match(/\.(woff|woff2|eot|ttf|otf)$/) ||
-        name.match(/locales\/[^/]+\.json$/)
-      )
-    ) {
-      continue;
-    } else {
-      files.push(name);
-    }
-  }
-  return files;
-}
+//     if (fs.statSync(name).isDirectory()) {
+//       getFiles(name, files);
+//     } else if (
+//       !(
+//         name.match(/\.(sa|sc|c)ss$/) ||
+//         name.match(/\.(woff|woff2|eot|ttf|otf)$/) ||
+//         name.match(/locales\/[^/]+\.json$/)
+//       )
+//     ) {
+//       continue;
+//     } else {
+//       files.push(name);
+//     }
+//   }
+//   return files;
+// }
 
 const createESMBrowserBuild = async () => {
   await build({
@@ -62,22 +62,22 @@ const createESMBrowserBuild = async () => {
   });
 };
 
-const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;
-const filesinExcalidrawPackage = [
-  ...getFiles(`${BASE_PATH}/packages/excalidraw`),
-  `${BASE_PATH}/packages/utils/export.ts`,
-  `${BASE_PATH}/packages/utils/bbox.ts`,
-  ...getFiles(`${BASE_PATH}/public/fonts`),
-];
+// const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;
+// const filesinExcalidrawPackage = [
+//   ...getFiles(`${BASE_PATH}/packages/excalidraw`),
+//   `${BASE_PATH}/packages/utils/export.ts`,
+//   `${BASE_PATH}/packages/utils/bbox.ts`,
+//   ...getFiles(`${BASE_PATH}/public/fonts`),
+// ];
 
-const filesToTransform = filesinExcalidrawPackage.filter((file) => {
-  return !(
-    file.includes("/__tests__/") ||
-    file.includes(".test.") ||
-    file.includes("/tests/") ||
-    file.includes("example")
-  );
-});
+// const filesToTransform = filesinExcalidrawPackage.filter((file) => {
+//   return !(
+//     file.includes("/__tests__/") ||
+//     file.includes(".test.") ||
+//     file.includes("/tests/") ||
+//     file.includes("example")
+//   );
+// });
 
 const createESMRawBuild = async () => {
   await build({
