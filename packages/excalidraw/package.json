@@ -118,6 +118,7 @@
     "pack": "yarn build:umd && yarn pack",
     "start": "rm -rf example/public/dist && yarn build:esm && cp -r dist example/public && vite serve example",
     "build:example": "rm -rf example/public/dist && yarn build:esm && cp -r dist example/public && vite build example",
+    "preview":"yarn build:example && vite preview example",
     "size": "yarn build:umd && size-limit"
   }
 }

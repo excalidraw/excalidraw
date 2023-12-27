@@ -1,4 +1,4 @@
 {
-  "outputDirectory": "example/public",
+  "outputDirectory": "example/dist",
   "installCommand": "yarn install"
 }
