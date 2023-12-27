@@ -10,19 +10,21 @@ export const CheckboxItem: React.FC<{
   className?: string;
   children?: React.ReactNode;
 }> = ({ children, checked, onChange, className }) => {
+  const btnRef = React.useRef<HTMLButtonElement>(null);
+
   return (
     <div
       className={clsx("Checkbox", className, { "is-checked": checked })}
-      onClick={(event) => {
-        onChange(!checked, event);
-        (
-          (event.currentTarget as HTMLDivElement).querySelector(
-            ".Checkbox-box",
-          ) as HTMLButtonElement
-        ).focus();
+      onClick={() => {
+        btnRef.current?.focus();
       }}
     >
-      <button className="Checkbox-box" role="checkbox" aria-checked={checked}>
+      <button
+        className="Checkbox-box"
+        role="checkbox"
+        aria-checked={checked}
+        ref={btnRef}
+      >
         {checkIcon}
       </button>
       <div className="Checkbox-label">{children}</div>
