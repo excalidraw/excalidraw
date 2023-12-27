@@ -1,4 +1,5 @@
 const { StrictMode } = window.React;
+//@ts-ignore
 const { createRoot } = window.ReactDOM;
 
 import App from "./App";
