@@ -56,7 +56,8 @@ const createESMBrowserBuild = async () => {
     splitting: true,
     chunkNames: "excalidraw-assets/[name]-[hash]",
     loader: {
-      ".woff2": "dataurl",
+      ".woff2": "copy",
+      ".ttf": "copy",
     },
   });
 };
@@ -79,25 +80,23 @@ const filesToTransform = filesinExcalidrawPackage.filter((file) => {
 });
 
 const createESMRawBuild = async () => {
-  const result = await build({
-    entryPoints: filesToTransform,
-    bundle: false,
+  await build({
+    entryPoints: ["index.tsx"],
+    bundle: true,
     format: "esm",
     outdir: "dist",
+    plugins: [sassPlugin()],
     define: {
       "import.meta.env": "{}",
     },
     loader: {
       ".woff2": "copy",
       ".ttf": "copy",
-      ".scss": "copy",
-      ".css": "copy",
       ".json": "copy",
     },
+    chunkNames: "excalidraw-assets/[name]-[hash]",
     packages: "external",
-    metafile: true,
   });
-  fs.writeFileSync("meta.json", JSON.stringify(result.metafile));
 };
 
 createESMRawBuild();

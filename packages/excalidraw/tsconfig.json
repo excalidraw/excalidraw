@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,
-    "outDir": "dist/packages",
+    "outDir": "dist",
     "skipLibCheck": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
