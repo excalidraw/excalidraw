@@ -45,31 +45,20 @@ export const reconcileElements = (
   // process remote elements
   for (const remoteElement of remoteElements) {
     if (!added.has(remoteElement.id)) {
-      // 'same' element and remote has made some changes
-      if (localElementsData.has(remoteElement.id)) {
-        const localElement = localElementsData.get(remoteElement.id);
+      const localElement = localElementsData.get(remoteElement.id);
+      const discardRemoteElement = shouldDiscardRemoteElement(
+        localAppState,
+        localElement,
+        remoteElement,
+      );
 
-        if (localElement) {
-          if (
-            shouldDiscardRemoteElement(
-              localAppState,
-              localElement,
-              remoteElement,
-            )
-          ) {
-            reconciledElements.push(localElement);
-            added.add(localElement.id);
-          } else {
-            reconciledElements.push(remoteElement);
-            added.add(remoteElement.id);
-          }
-
-          continue;
-        }
+      if (localElement && discardRemoteElement) {
+        reconciledElements.push(localElement);
+        added.add(localElement.id);
+      } else {
+        reconciledElements.push(remoteElement);
+        added.add(remoteElement.id);
       }
-
-      reconciledElements.push(remoteElement);
-      added.add(remoteElement.id);
     }
   }
 
