@@ -37,6 +37,7 @@ import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import Scene from "./Scene";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
+import { restoreFractionalIndices } from "../fractionalIndex";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -59,7 +60,7 @@ const __createSceneForElementsHack__ = (
   // ids to Scene instances so that we don't override the editor elements
   // mapping.
   // We still need to clone the objects themselves to regen references.
-  scene.replaceAllElements(cloneJSON(elements));
+  scene.replaceAllElements(restoreFractionalIndices(cloneJSON(elements)));
   return scene;
 };
 

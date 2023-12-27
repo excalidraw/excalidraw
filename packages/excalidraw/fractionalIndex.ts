@@ -9,10 +9,11 @@ import {
   indexCharacterSet,
 } from "fractional-indexing-jittered";
 import { ENV } from "./constants";
+import { Mutable } from "./utility-types";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
-export const base36CharSet = indexCharacterSet({
+const base36CharSet = indexCharacterSet({
   chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   firstPositive: "A",
   mostPositive: "Z",
@@ -20,7 +21,7 @@ export const base36CharSet = indexCharacterSet({
 
 const { chars, firstPositive, mostPositive, mostNegative } = _base62CharSet();
 
-export const base62CharSet = indexCharacterSet({
+const base62CharSet = indexCharacterSet({
   chars,
   firstPositive,
   mostPositive,
@@ -37,80 +38,68 @@ export const generateKeyBetween = (
   lower: string | null,
   upper: string | null,
 ) => _generateKeyBetween(lower, upper, charSet);
+
 export const generateJitteredKeyBetween = (
   lower: string | null,
   upper: string | null,
 ) => _generateJitteredKeyBetween(lower, upper, charSet);
+
 export const generateNKeysBetween = (
   lower: string | null,
   upper: string | null,
   n: number,
 ) => _generateNKeysBetween(lower, upper, n, charSet);
+
 export const generateNJitteredKeysBetween = (
   lower: string | null,
   upper: string | null,
   n: number,
 ) => _generateNJitteredKeysBetween(lower, upper, n, charSet);
 
-const isValidFractionalIndex = (
-  index: FractionalIndex,
-  predecessor: FractionalIndex,
-  successor: FractionalIndex,
-) => {
-  if (index) {
-    if (predecessor && successor) {
-      return predecessor < index && index < successor;
+export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
+  return allElements.sort((a, b) => {
+    if (a.fractionalIndex && b.fractionalIndex) {
+      if (a.fractionalIndex < b.fractionalIndex) {
+        return -1;
+      } else if (a.fractionalIndex > b.fractionalIndex) {
+        return 1;
+      }
+      return compareStrings(a.id, b.id);
     }
 
-    if (successor && !predecessor) {
-      // first element
-      return index < successor;
-    }
-
-    if (predecessor && !successor) {
-      // last element
-      return predecessor < index;
-    }
-
-    if (!predecessor && !successor) {
-      return index.length > 0;
-    }
-  }
-
-  return false;
+    // respect the order of the array
+    return 1;
+  });
 };
 
-const getContiguousMovedIndices = (
+export const validateFractionalIndices = (
   elements: readonly ExcalidrawElement[],
-  movedElementsMap: Map<string, ExcalidrawElement>,
 ) => {
-  const result: number[][] = [];
-  const contiguous: number[] = [];
-
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
-    if (movedElementsMap.has(element.id)) {
-      if (contiguous.length) {
-        if (contiguous[contiguous.length - 1] + 1 === i) {
-          contiguous.push(i);
-        } else {
-          result.push(contiguous.slice());
-          contiguous.length = 0;
-          contiguous.push(i);
-        }
-      } else {
-        contiguous.push(i);
+    const successor = elements[i + 1];
+
+    if (element.fractionalIndex) {
+      if (
+        successor &&
+        successor.fractionalIndex &&
+        element.fractionalIndex >= successor.fractionalIndex
+      ) {
+        return false;
       }
+    } else {
+      return false;
     }
   }
 
-  if (contiguous.length > 0) {
-    result.push(contiguous.slice());
-  }
-
-  return result;
+  return true;
 };
 
+/**
+ * Fix fractional indices by mutating element of @param elements, which were passed inside @param reorderedElements.
+ *
+ * As opposed to @function restoreFractionalIndices, this one does not alter neighboring indices.
+ */
 export const fixFractionalIndices = (
   elements: readonly ExcalidrawElement[],
   reorderedElements: Map<string, ExcalidrawElement>,
@@ -154,24 +143,72 @@ export const fixFractionalIndices = (
   return elements as ExcalidrawElement[];
 };
 
-const compareStrings = (a: string, b: string) => {
-  return a < b ? -1 : 1;
+/**
+ * Restore the fractional indices by mutating @param elements such that
+ * every element in the array has a fractional index smaller than its successor's.
+ *
+ * Neighboring indices (altough correct) might get updated as well.
+ *
+ * Only use this function when restoring or as a fallback to guarantee fractional
+ * indices consistency.
+ */
+export const restoreFractionalIndices = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  for (const [index, element] of elements.entries()) {
+    const predecessor = elements[index - 1]?.fractionalIndex || null;
+    const successor = elements[index + 1]?.fractionalIndex || null;
+
+    if (
+      !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
+    ) {
+      try {
+        const fractionalIndex = restoreFractionalIndex(predecessor, successor);
+        // Mutate in situ, without modifying version, versionNonce and etc.
+        (element as Mutable<ExcalidrawElement>).fractionalIndex =
+          fractionalIndex;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+
+  return elements as ExcalidrawElement[];
 };
 
-export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
-  return allElements.sort((a, b) => {
-    if (a.fractionalIndex && b.fractionalIndex) {
-      if (a.fractionalIndex < b.fractionalIndex) {
-        return -1;
-      } else if (a.fractionalIndex > b.fractionalIndex) {
-        return 1;
-      }
-      return compareStrings(a.id, b.id);
-    }
+const getContiguousMovedIndices = (
+  elements: readonly ExcalidrawElement[],
+  movedElementsMap: Map<string, ExcalidrawElement>,
+) => {
+  const result: number[][] = [];
+  const contiguous: number[] = [];
 
-    // respect the order of the array
-    return 1;
-  });
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+    if (movedElementsMap.has(element.id)) {
+      if (contiguous.length) {
+        if (contiguous[contiguous.length - 1] + 1 === i) {
+          contiguous.push(i);
+        } else {
+          result.push(contiguous.slice());
+          contiguous.length = 0;
+          contiguous.push(i);
+        }
+      } else {
+        contiguous.push(i);
+      }
+    }
+  }
+
+  if (contiguous.length > 0) {
+    result.push(contiguous.slice());
+  }
+
+  return result;
+};
+
+const compareStrings = (a: string, b: string) => {
+  return a < b ? -1 : 1;
 };
 
 const restoreFractionalIndex = (
@@ -200,72 +237,30 @@ const restoreFractionalIndex = (
   return generateFn(predecessor, null);
 };
 
-/**
- * restore the fractional indices of the elements in the given array such that
- * every element in the array has a fractional index smaller than its successor's
- *
- * neighboring indices might be updated as well
- *
- * only use this function when restoring or as a fallback to guarantee fractional
- * indices consistency
- */
-export const restoreFractionalIndices = (
-  allElements: readonly ExcalidrawElement[],
+const isValidFractionalIndex = (
+  index: FractionalIndex,
+  predecessor: FractionalIndex,
+  successor: FractionalIndex,
 ) => {
-  let suc = 1;
-
-  const normalized: ExcalidrawElement[] = [];
-
-  for (const element of allElements) {
-    const predecessor =
-      normalized[normalized.length - 1]?.fractionalIndex || null;
-    const successor = allElements[suc]?.fractionalIndex || null;
-
-    if (
-      !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
-    ) {
-      try {
-        const nextFractionalIndex = restoreFractionalIndex(
-          predecessor,
-          successor,
-        );
-
-        normalized.push({
-          ...element,
-          fractionalIndex: nextFractionalIndex,
-        });
-      } catch (e) {
-        console.error(e);
-        normalized.push(element);
-      }
-    } else {
-      normalized.push(element);
+  if (index) {
+    if (predecessor && successor) {
+      return predecessor < index && index < successor;
     }
-    suc++;
-  }
 
-  return normalized;
-};
+    if (successor && !predecessor) {
+      // first element
+      return index < successor;
+    }
 
-export const validateFractionalIndices = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  for (let i = 0; i < elements.length; i++) {
-    const element = elements[i];
-    const successor = elements[i + 1];
+    if (predecessor && !successor) {
+      // last element
+      return predecessor < index;
+    }
 
-    if (element.fractionalIndex) {
-      if (
-        successor &&
-        successor.fractionalIndex &&
-        element.fractionalIndex >= successor.fractionalIndex
-      ) {
-        return false;
-      }
-    } else {
-      return false;
+    if (!predecessor && !successor) {
+      return index.length > 0;
     }
   }
 
-  return true;
+  return false;
 };

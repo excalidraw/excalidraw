@@ -236,10 +236,11 @@ const duplicateElements = (
   }
 
   // step (3)
+  const finalElements = finalElementsReversed.reverse();
 
-  const finalElements = fixFractionalIndices(
-    finalElementsReversed.reverse(),
-    duplicatedElementsMap,
+  fixFractionalIndices(
+    finalElements,
+    arrayToMap([...oldElements, ...newElements]),
   );
 
   // ---------------------------------------------------------------------------

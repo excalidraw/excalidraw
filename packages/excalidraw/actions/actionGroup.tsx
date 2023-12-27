@@ -27,6 +27,7 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
+import { fixFractionalIndices } from "../fractionalIndex";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -139,11 +140,11 @@ export const actionGroup = register({
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    nextElements = [
-      ...elementsBeforeGroup,
-      ...elementsInGroup,
-      ...elementsAfterGroup,
-    ];
+
+    nextElements = fixFractionalIndices(
+      [...elementsBeforeGroup, ...elementsInGroup, ...elementsAfterGroup],
+      arrayToMap(elementsInGroup),
+    );
 
     return {
       appState: {

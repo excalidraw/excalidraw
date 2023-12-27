@@ -237,31 +237,30 @@ class Scene {
     nextElements: readonly ExcalidrawElement[],
     reorderedElements?: Map<string, ExcalidrawElement>,
   ) {
-    let _nextElements;
     if (reorderedElements) {
-      _nextElements = fixFractionalIndices(nextElements, reorderedElements);
-    } else {
-      _nextElements = nextElements;
+      fixFractionalIndices(nextElements, reorderedElements);
     }
 
-    if (import.meta.env.DEV && import.meta.env.MODE !== ENV.TEST) {
-      if (!validateFractionalIndices(_nextElements)) {
+    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (!validateFractionalIndices(nextElements)) {
         const message = "Fractional indices invariant has been compromised";
-        console.error(message, _nextElements);
+        console.error(message, nextElements);
         throw new Error(message);
       }
     }
 
-    this.elements = _nextElements;
+    this.elements = nextElements;
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
     this.elementsMap.clear();
-    _nextElements.forEach((element) => {
+
+    nextElements.forEach((element) => {
       if (isFrameLikeElement(element)) {
         nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
       Scene.mapElementToScene(element, this);
     });
+
     this.nonDeletedElements = getNonDeletedElements(this.elements);
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames);

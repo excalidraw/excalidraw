@@ -442,8 +442,11 @@ export const restoreElements = (
     return elements;
   }, [] as ExcalidrawElement[]);
 
+  // mutate to restore fractional indices
+  restoreFractionalIndices(restoredElements);
+
   if (!opts?.repairBindings) {
-    return restoreFractionalIndices(restoredElements) as ExcalidrawElement[];
+    return restoredElements;
   }
 
   // repair binding. Mutates elements.
@@ -460,7 +463,7 @@ export const restoreElements = (
     }
   }
 
-  return restoreFractionalIndices(restoredElements) as ExcalidrawElement[];
+  return restoredElements;
 };
 
 const coalesceAppStateValue = <

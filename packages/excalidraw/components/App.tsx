@@ -9355,7 +9355,9 @@ if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
         return this.app?.scene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return this.app?.scene.replaceAllElements(elements);
+        return this.app?.scene.replaceAllElements(
+          restoreFractionalIndices(elements),
+        );
       },
     },
   });

@@ -56,7 +56,7 @@ describe("restoring fractional indices", () => {
       i++;
     }
 
-    const restoredElements = restoreFractionalIndices(elements);
+    const restoredElements = restoreFractionalIndices([...elements]);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
@@ -70,14 +70,12 @@ describe("restoring fractional indices", () => {
       createElementWithIndex("D0"),
     ];
 
-    const restoredElements = restoreFractionalIndices(elements);
+    const restoredElements = restoreFractionalIndices([...elements]);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
     // should only fix the second element's fractional index
-    expect(elements[1].fractionalIndex).not.toEqual(
-      restoredElements[1].fractionalIndex,
-    );
+    expect(elements[1].fractionalIndex).not.toEqual("C0");
     expect(elements.filter((value, index) => index !== 1)).deep.equal(
       restoredElements.filter((value, index) => index !== 1),
     );
@@ -95,7 +93,7 @@ describe("restoring fractional indices", () => {
       i++;
     }
 
-    const restoredElements = restoreFractionalIndices(elements);
+    const restoredElements = restoreFractionalIndices([...elements]);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
@@ -116,7 +114,7 @@ describe("restoring fractional indices", () => {
       createElementWithIndex(),
     ];
 
-    const restoredElements = restoreFractionalIndices(elements);
+    const restoredElements = restoreFractionalIndices([...elements]);
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
@@ -156,18 +154,18 @@ describe("fix fractional indices", () => {
 
   it("add multiple new elements properly", () => {
     const elements = generateElementsAtLength(Math.floor(Math.random() * 100));
-
-    const fixedElements = fixFractionalIndices(elements, arrayToMap(elements));
+    const fixedElements = fixFractionalIndices(
+      [...elements],
+      arrayToMap(elements),
+    );
 
     testLengthAndOrder(elements, fixedElements);
     testValidity(fixedElements);
 
     const elements2 = generateElementsAtLength(Math.floor(Math.random() * 100));
-
     const allElements2 = [...elements, ...elements2];
-
     const fixedElements2 = fixFractionalIndices(
-      allElements2,
+      [...allElements2],
       arrayToMap(elements2),
     );
 
@@ -177,8 +175,10 @@ describe("fix fractional indices", () => {
 
   it("fix properly after z-index changes", () => {
     const elements = generateElementsAtLength(Math.random() * 100);
-
-    const fixedElements = fixFractionalIndices(elements, arrayToMap(elements));
+    const fixedElements = fixFractionalIndices(
+      [...elements],
+      arrayToMap(elements),
+    );
 
     let randomlySelected = [
       ...new Set([
