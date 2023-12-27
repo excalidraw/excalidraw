@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+const { useEffect, useState, useRef, useCallback } = window.React;
 
 import ExampleSidebar from "./sidebar/ExampleSidebar";
 
@@ -78,6 +78,7 @@ const {
   TTDDialog,
   TTDDialogTrigger,
 } = window.ExcalidrawLib;
+
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
@@ -87,7 +88,7 @@ export interface AppProps {
   useCustom: (api: ExcalidrawImperativeAPI | null, customArgs?: any[]) => void;
   customArgs?: any[];
 }
-
+console.log("HEY");
 export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
