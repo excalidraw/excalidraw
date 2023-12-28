@@ -92,23 +92,35 @@ const createESMBrowserBuild = async () => {
 //   );
 // });
 
+const rawConfig = {
+  entryPoints: ["index.tsx"],
+  bundle: true,
+  format: "esm",
+  plugins: [sassPlugin()],
+  define: {
+    "import.meta.env": "{}",
+  },
+  loader: {
+    ".woff2": "copy",
+    ".ttf": "copy",
+    ".json": "copy",
+  },
+  packages: "external",
+};
+
 const createESMRawBuild = async () => {
+  // Development unminified build with source maps
   await build({
-    entryPoints: ["index.tsx"],
-    bundle: true,
-    format: "esm",
-    outdir: "dist",
-    plugins: [sassPlugin()],
-    define: {
-      "import.meta.env": "{}",
-    },
-    loader: {
-      ".woff2": "copy",
-      ".ttf": "copy",
-      ".json": "copy",
-    },
-    chunkNames: "excalidraw-assets/[name]-[hash]",
-    packages: "external",
+    ...rawConfig,
+    sourcemap: true,
+    outdir: "dist/dev",
+  });
+
+  // production minified build without sourcemaps
+  await build({
+    ...rawConfig,
+    minify: true,
+    outdir: "dist/prod",
   });
 };
 

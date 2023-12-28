@@ -3,7 +3,7 @@
   "version": "0.17.1",
   "main": "main.js",
   "type": "module",
-  "module": "dist/index.js",
+  "module":"entry.mjs",
   "types": "dist/excalidraw/index.d.ts",
   "files": [
     "dist/*"
