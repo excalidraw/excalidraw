@@ -37,28 +37,41 @@ const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
 //   return files;
 // }
 
+const browserConfig = {
+  entryPoints: ["index.tsx"],
+  bundle: true,
+  format: "esm",
+  plugins: [
+    sassPlugin(),
+    externalGlobalPlugin({
+      react: "React",
+      "react-dom": "ReactDOM",
+    }),
+  ],
+  define: {
+    "import.meta.env": "{}",
+  },
+  splitting: true,
+  loader: {
+    ".woff2": "copy",
+    ".ttf": "copy",
+  },
+};
 const createESMBrowserBuild = async () => {
+  // Development unminified build with source maps
   await build({
-    entryPoints: ["index.tsx"],
-    bundle: true,
-    format: "esm",
-    outdir: "dist/browser",
-    plugins: [
-      sassPlugin(),
-      externalGlobalPlugin({
-        react: "React",
-        "react-dom": "ReactDOM",
-      }),
-    ],
-    define: {
-      "import.meta.env": "{}",
-    },
-    splitting: true,
+    ...browserConfig,
+    outdir: "dist/browser/dev",
+    sourcemap: true,
+    chunkNames: "excalidraw-assets-dev/[name]-[hash]",
+  });
+
+  // production minified build without sourcemaps
+  await build({
+    ...browserConfig,
+    outdir: "dist/browser/prod",
+    minify: true,
     chunkNames: "excalidraw-assets/[name]-[hash]",
-    loader: {
-      ".woff2": "copy",
-      ".ttf": "copy",
-    },
   });
 };
 

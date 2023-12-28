@@ -114,7 +114,7 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/build-package.js && yarn gen:types",
+    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types",
     "pack": "yarn build:umd && yarn pack",
     "start": "node ../../scripts/buildExample.mjs && vite",
     "build:example": "node ../../scripts/buildExample.mjs",
