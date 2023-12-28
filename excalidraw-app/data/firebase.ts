@@ -1,7 +1,5 @@
-import {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
+import type { Socket } from "socket.io-client";
+
 import { getSceneVersion } from "../../packages/excalidraw/element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../packages/excalidraw/data/restore";
@@ -20,8 +18,13 @@ import {
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { ResolutionType } from "../../packages/excalidraw/utility-types";
-import type { Socket } from "socket.io-client";
+
+// local types
+import type {
+  ExcalidrawElement,
+  FileId,
+} from "../../packages/excalidraw/element/types";
+import type { ResolutionType } from "../../packages/excalidraw/utility-types";
 
 // private
 // -----------------------------------------------------------------------------

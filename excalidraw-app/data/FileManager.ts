@@ -8,7 +8,8 @@ import {
   InitializedExcalidrawImageElement,
 } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
-import {
+
+import type {
   BinaryFileData,
   BinaryFileMetadata,
   ExcalidrawImperativeAPI,

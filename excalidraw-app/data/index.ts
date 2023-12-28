@@ -13,18 +13,7 @@ import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
-import {
-  AppState,
-  BinaryFileData,
-  BinaryFiles,
-  SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
@@ -34,6 +23,18 @@ import {
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+
+import {
+  ExcalidrawElement,
+  FileId,
+} from "../../packages/excalidraw/element/types";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+  SocketId,
+  UserIdleState,
+} from "../../packages/excalidraw/types";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
