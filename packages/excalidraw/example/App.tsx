@@ -1,5 +1,3 @@
-const { useEffect, useState, useRef, useCallback } = window.React;
-
 import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import type * as TExcalidraw from "../index";
@@ -56,6 +54,9 @@ type PointerDownState = {
     y: number;
   };
 };
+
+const { useEffect, useState, useRef, useCallback } = window.React;
+
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
 const {

@@ -1,5 +1,7 @@
-const React = window.React;
 import "./ExampleSidebar.scss";
+
+const React = window.React;
+
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
 

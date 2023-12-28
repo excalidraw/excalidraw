@@ -1,8 +1,8 @@
+import App from "./App";
+
 const { StrictMode } = window.React;
 //@ts-ignore
 const { createRoot } = window.ReactDOM;
-
-import App from "./App";
 
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
