@@ -116,9 +116,8 @@
     "gen:types": "rm -rf types && tsc",
     "build:esm": "rm -rf dist && node ../../scripts/build-package.js && yarn gen:types",
     "pack": "yarn build:umd && yarn pack",
-    "start": "rm -rf example/public/dist && yarn build:esm && cp -r dist example/public && vite serve example",
-    "build:example": "rm -rf example/public/dist && yarn build:esm && cp -r dist example/public && vite build example",
-    "preview":"yarn build:example && vite preview example",
+    "start": "node ../../scripts/buildExample.mjs && vite",
+    "build:example": "node ../../scripts/buildExample.mjs",
     "size": "yarn build:umd && size-limit"
   }
 }

@@ -12,8 +12,8 @@
     <script>
       window.name = "codesandbox";
     </script>
-    <link rel="stylesheet" href="./dist/browser/index.css" />
-    <link rel="stylesheet" href="/bundle.css" />
+    <link rel="stylesheet" href="/dist/browser/index.css" />
+    <link rel="stylesheet" href="bundle.css" />
   </head>
 
   <body>
@@ -24,9 +24,9 @@
     <!-- This is so that we use the bundled excalidraw.development.js file instead
     of the actual source code -->
     <script type="module">
-      import * as ExcalidrawLib from "/dist/browser/index.js?url";
+      import * as ExcalidrawLib from "/dist/browser/index.js";
       window.ExcalidrawLib = ExcalidrawLib;
     </script>
-    <script type="module" src="index.tsx"></script>
+    <script type="module" src="bundle.js"></script>
   </body>
 </html>
