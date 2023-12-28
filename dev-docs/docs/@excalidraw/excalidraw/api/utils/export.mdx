@@ -54,44 +54,50 @@ This function returns the canvas with the exported elements, appState and dimens
 
 ```jsx live
 function App() {
-  const [canvasUrl, setCanvasUrl] = useState("");
-  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const [bindaryData, setBindaryData] = useState(
+    JSON.parse(localStorage.getItem("binaryData") || "[]")
+  );
+  const [elementData, setElementData] = useState(
+    JSON.parse(localStorage.getItem("elementData") || "[]")
+  );
+const [canvasUrl, setCanvasUrl] = useState("");
+const getExport = async () => {
+    const canvas = await exportToCanvas({
+      elements: elementData,
+      files: bindaryData,
+      appState: {
+        exportWithDarkMode: false,
+      },
+      maxWidthOrHeight: 1000,
+    });
+
+    // Use spread operator to maintain the previous canvasUrl values
+    setCanvasUrl(canvas.toDataURL());
+    
+  };
 
   return  (
     <>
-      <button
-        className="custom-button"
-        onClick={async () => {
-          if (!excalidrawAPI) {
-            return
-          }
-          const elements = excalidrawAPI.getSceneElements();
-          if (!elements || !elements.length) {
-            return
-          }
-          const canvas = await exportToCanvas({
-            elements,
-            appState: {
-              ...initialData.appState,
-              exportWithDarkMode: false,
-            },
-            files: excalidrawAPI.getFiles(),
-            getDimensions: () => { return {width: 350, height: 350}}
-          });
-          const ctx = canvas.getContext("2d");
-          ctx.font = "30px Virgil";
-          ctx.strokeText("My custom text", 50, 60);
-          setCanvasUrl(canvas.toDataURL());
-        }}
-      >
+      <button onClick={getExport}
+        className="custom-button">
         Export to Canvas
       </button>
       <div className="export export-canvas">
-        <img src={canvasUrl} alt="" />
+        <img src={canvasUrl} alt="canvasUrl" />
       </div>
       <div style={{ height: "400px" }}>
-        <Excalidraw ref={(api) => setExcalidrawAPI(api)}
-/>
+      <Excalidraw
+          initialData={{
+            elements: elementData,
+            files: bindaryData,
+          }}
+          onChange={(elements: any, b: any, binary: any) => {
+            localStorage.setItem("binaryData", JSON.stringify(binary));
+            localStorage.setItem("elementData", JSON.stringify(elements));
+            setBindaryData(binary);
+            setElementData(elements);
+          }}
+        />
       </div>
     </>
   )
