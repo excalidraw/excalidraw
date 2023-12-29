@@ -14,7 +14,6 @@
       "default": "./dist/prod/index.css"
     },
     "./types": "./dist/excalidraw/index.d.ts"
-
   },
   "types": "./dist/excalidraw/index.d.ts",
   "files": [
