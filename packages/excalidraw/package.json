@@ -8,13 +8,15 @@
     ".": {
       "development": "./dist/dev/index.js",
       "default": "./dist/prod/index.js",
-      "types": "./dist/excalidraw/index.d.ts"
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
       "default": "./dist/prod/index.css"
-    }
+    },
+    "./types": "./dist/excalidraw/index.d.ts"
+
   },
+  "types": "./dist/excalidraw/index.d.ts",
   "files": [
     "dist/*"
   ],
