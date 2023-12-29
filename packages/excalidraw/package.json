@@ -4,6 +4,16 @@
   "main": "./dist/prod/index.js",
   "type": "module",
   "module": "./dist/prod/index.js",
+  "exports": {
+    ".": {
+      "development": "./dist/dev/index.js",
+      "default": "./dist/prod/index.js"
+    },
+    "./index.css": {
+      "development": "./dist/dev/index.css",
+      "default": "./dist/prod/index.css"
+    }
+  },
   "types": "dist/excalidraw/index.d.ts",
   "files": [
     "dist/*"

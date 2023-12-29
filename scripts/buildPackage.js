@@ -109,11 +109,18 @@ const rawConfig = {
 };
 
 const createESMRawBuild = async () => {
+  // Development unminified build with source maps
+  await build({
+    ...rawConfig,
+    sourcemap: true,
+    outdir: "dist/dev",
+  });
+
   // production minified build without sourcemaps
   await build({
     ...rawConfig,
     minify: true,
-    outdir: "dist",
+    outdir: "dist/prod",
   });
 };
 
