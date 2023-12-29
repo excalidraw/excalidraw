@@ -48,9 +48,6 @@ const browserConfig = {
       "react-dom": "ReactDOM",
     }),
   ],
-  // define: {
-  //   "import.meta.env": "{}",
-  // },
   splitting: true,
   loader: {
     ".woff2": "copy",
@@ -64,6 +61,9 @@ const createESMBrowserBuild = async () => {
     outdir: "dist/browser/dev",
     sourcemap: true,
     chunkNames: "excalidraw-assets-dev/[name]-[hash]",
+    define: {
+      "import.meta.env": JSON.stringify({ DEV: true }),
+    },
   });
 
   // production minified build without sourcemaps
@@ -72,6 +72,9 @@ const createESMBrowserBuild = async () => {
     outdir: "dist/browser/prod",
     minify: true,
     chunkNames: "excalidraw-assets/[name]-[hash]",
+    define: {
+      "import.meta.env": JSON.stringify({ PROD: true }),
+    },
   });
 };
 
@@ -97,9 +100,7 @@ const rawConfig = {
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
-  // define: {
-  //   "import.meta.env": "{}",
-  // },
+
   loader: {
     ".woff2": "copy",
     ".ttf": "copy",
@@ -114,6 +115,9 @@ const createESMRawBuild = async () => {
     ...rawConfig,
     sourcemap: true,
     outdir: "dist/dev",
+    define: {
+      "import.meta.env": JSON.stringify({ DEV: true }),
+    },
   });
 
   // production minified build without sourcemaps
@@ -121,6 +125,9 @@ const createESMRawBuild = async () => {
     ...rawConfig,
     minify: true,
     outdir: "dist/prod",
+    define: {
+      "import.meta.env": JSON.stringify({ PROD: true }),
+    },
   });
 };
 
