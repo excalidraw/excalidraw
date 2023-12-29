@@ -48,9 +48,9 @@ const browserConfig = {
       "react-dom": "ReactDOM",
     }),
   ],
-  define: {
-    "import.meta.env": "{}",
-  },
+  // define: {
+  //   "import.meta.env": "{}",
+  // },
   splitting: true,
   loader: {
     ".woff2": "copy",
@@ -97,9 +97,9 @@ const rawConfig = {
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
-  define: {
-    "import.meta.env": "{}",
-  },
+  // define: {
+  //   "import.meta.env": "{}",
+  // },
   loader: {
     ".woff2": "copy",
     ".ttf": "copy",
