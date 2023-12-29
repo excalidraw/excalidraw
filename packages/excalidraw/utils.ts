@@ -769,13 +769,41 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
     : [];
 };
 
+/** use as a fallback after identity check (for perf reasons) */
+const _defaultIsShallowComparatorFallback = (a: any, b: any): boolean => {
+  // consider two empty arrays equal
+  if (
+    Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === 0 &&
+    b.length === 0
+  ) {
+    return true;
+  }
+  return a === b;
+};
+
+/**
+ * Returns whether object/array is shallow equal.
+ * Considers empty object/arrays as equal (whether top-level or second-level).
+ */
 export const isShallowEqual = <
   T extends Record<string, any>,
-  I extends keyof T,
+  K extends readonly unknown[],
 >(
   objA: T,
   objB: T,
-  comparators?: Record<I, (a: T[I], b: T[I]) => boolean>,
+  comparators?:
+    | { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
+    | (keyof T extends K[number]
+        ? K extends readonly (keyof T)[]
+          ? K
+          : {
+              _error: "keys are either missing or include keys not in compared obj";
+            }
+        : {
+            _error: "keys are either missing or include keys not in compared obj";
+          }),
   debug = false,
 ) => {
   const aKeys = Object.keys(objA);
@@ -783,13 +811,38 @@ export const isShallowEqual = <
   if (aKeys.length !== bKeys.length) {
     return false;
   }
+
+  if (comparators && Array.isArray(comparators)) {
+    for (const key of comparators) {
+      const ret =
+        objA[key] === objB[key] ||
+        _defaultIsShallowComparatorFallback(objA[key], objB[key]);
+      if (!ret) {
+        if (debug) {
+          console.warn(
+            `%cisShallowEqual: ${key} not equal ->`,
+            "color: #8B4000",
+            objA[key],
+            objB[key],
+          );
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
   return aKeys.every((key) => {
-    const comparator = comparators?.[key as I];
+    const comparator = (
+      comparators as { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
+    )?.[key as keyof T];
     const ret = comparator
       ? comparator(objA[key], objB[key])
-      : objA[key] === objB[key];
+      : objA[key] === objB[key] ||
+        _defaultIsShallowComparatorFallback(objA[key], objB[key]);
+
     if (!ret && debug) {
-      console.info(
+      console.warn(
         `%cisShallowEqual: ${key} not equal ->`,
         "color: #8B4000",
         objA[key],
@@ -928,4 +981,14 @@ export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
 export const isFiniteNumber = (value: any): value is number => {
   return typeof value === "number" && Number.isFinite(value);
+};
+
+export const updateStable = <T extends any[] | Record<string, any>>(
+  prevValue: T,
+  nextValue: T,
+) => {
+  if (isShallowEqual(prevValue, nextValue)) {
+    return prevValue;
+  }
+  return nextValue;
 };
