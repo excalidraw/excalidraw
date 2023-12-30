@@ -613,6 +613,7 @@ export type PointerDownState = Readonly<{
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
   withCmdOrCtrl: boolean;
+  tool: ActiveTool;
   drag: {
     // Might change during the pointer interaction
     hasOccurred: boolean;
