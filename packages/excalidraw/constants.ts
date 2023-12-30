@@ -13,6 +13,10 @@ export const isFirefox =
 export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
 export const isSafari =
   !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
+export const isIOS =
+  /iPad|iPhone/.test(navigator.platform) ||
+  // iPadOS 13+
+  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 // keeping function so it can be mocked in test
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
