@@ -245,6 +245,7 @@ import {
   CollaboratorPointer,
   ToolType,
   OnUserFollowedPayload,
+  UnsubscribeCallback,
 } from "../types";
 import {
   debounce,
@@ -560,6 +561,7 @@ class App extends React.Component<AppProps, AppState> {
     [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
   >();
 
+  onPointerEventCleanupEmitter = new Emitter<[]>();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
   constructor(props: AppProps) {
@@ -2464,6 +2466,9 @@ class App extends React.Component<AppProps, AppState> {
         this.onGestureEnd as any,
         false,
       ),
+      addEventListener(window, EVENT.FOCUS, () => {
+        this.maybeCleanupAfterMissingPointerUp(null);
+      }),
     );
 
     if (this.state.viewModeEnabled) {
@@ -5203,6 +5208,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.maybeCleanupAfterMissingPointerUp(event);
     this.maybeUnfollowRemoteUser();
 
     // since contextMenu options are potentially evaluated on each render,
@@ -5265,7 +5271,6 @@ class App extends React.Component<AppProps, AppState> {
       selection.removeAllRanges();
     }
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
-    this.maybeCleanupAfterMissingPointerUp(event);
 
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
@@ -5304,10 +5309,59 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
+    if (
+      event.button === POINTER_BUTTON.ERASER &&
+      this.state.activeTool.type !== TOOL_TYPE.eraser
+    ) {
+      this.setState(
+        {
+          activeTool: updateActiveTool(this.state, {
+            type: TOOL_TYPE.eraser,
+            lastActiveToolBeforeEraser: this.state.activeTool,
+          }),
+        },
+        () => {
+          this.handleCanvasPointerDown(event);
+          const onPointerUp = () => {
+            unsubPointerUp();
+            unsubCleanup?.();
+            if (isEraserActive(this.state)) {
+              this.setState({
+                activeTool: updateActiveTool(this.state, {
+                  ...(this.state.activeTool.lastActiveTool || {
+                    type: TOOL_TYPE.selection,
+                  }),
+                  lastActiveToolBeforeEraser: null,
+                }),
+              });
+            }
+          };
+
+          const unsubPointerUp = addEventListener(
+            window,
+            EVENT.POINTER_UP,
+            onPointerUp,
+            {
+              once: true,
+            },
+          );
+          let unsubCleanup: UnsubscribeCallback | undefined;
+          // subscribe inside rAF lest it'd be triggered on the same pointerdown
+          // if we start erasing while coming from blurred document since
+          // we cleanup pointer events on focus
+          requestAnimationFrame(() => {
+            unsubCleanup = this.onPointerEventCleanupEmitter.once(onPointerUp);
+          });
+        },
+      );
+      return;
+    }
+
     // only handle left mouse button or touch
     if (
       event.button !== POINTER_BUTTON.MAIN &&
-      event.button !== POINTER_BUTTON.TOUCH
+      event.button !== POINTER_BUTTON.TOUCH &&
+      event.button !== POINTER_BUTTON.ERASER
     ) {
       return;
     }
@@ -5546,16 +5600,19 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = false;
   };
 
-  private maybeCleanupAfterMissingPointerUp(
-    event: React.PointerEvent<HTMLElement>,
-  ): void {
-    if (lastPointerUp !== null) {
-      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
-      // this can happen when a contextual menu or alert is triggered. In order to avoid
-      // being in a weird state, we clean up on the next pointerdown
-      lastPointerUp(event);
+  private maybeCleanupAfterMissingPointerUp = (
+    event: React.PointerEvent<HTMLElement> | PointerEvent | null,
+  ) => {
+    if (event) {
+      if (lastPointerUp !== null) {
+        // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
+        // this can happen when a contextual menu or alert is triggered. In order to avoid
+        // being in a weird state, we clean up on the next pointerdown
+        lastPointerUp(event);
+      }
     }
-  }
+    this.onPointerEventCleanupEmitter.trigger();
+  };
 
   // Returns whether the event is a panning
   private handleCanvasPanUsingWheelOrSpaceDrag = (
