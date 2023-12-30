@@ -7,7 +7,13 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { ActiveTool, AppState, ToolType, Zoom } from "./types";
+import {
+  ActiveTool,
+  AppState,
+  ToolType,
+  UnsubscribeCallback,
+  Zoom,
+} from "./types";
 import { unstable_batchedUpdates } from "react-dom";
 import { ResolutionType } from "./utility-types";
 import React from "react";
@@ -992,3 +998,76 @@ export const updateStable = <T extends any[] | Record<string, any>>(
   }
   return nextValue;
 };
+
+// Window
+export function addEventListener<K extends keyof WindowEventMap>(
+  target: Window & typeof globalThis,
+  type: K,
+  listener: (this: Window, ev: WindowEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+export function addEventListener(
+  target: Window & typeof globalThis,
+  type: string,
+  listener: (this: Window, ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// Document
+export function addEventListener<K extends keyof DocumentEventMap>(
+  target: Document,
+  type: K,
+  listener: (this: Document, ev: DocumentEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+export function addEventListener(
+  target: Document,
+  type: string,
+  listener: (this: Document, ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// FontFaceSet (document.fonts)
+export function addEventListener<K extends keyof FontFaceSetEventMap>(
+  target: FontFaceSet,
+  type: K,
+  listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// HTMLElement / mix
+export function addEventListener<K extends keyof HTMLElementEventMap>(
+  target:
+    | Document
+    | (Window & typeof globalThis)
+    | HTMLElement
+    | undefined
+    | null
+    | false,
+  type: K,
+  listener: (this: HTMLDivElement, ev: HTMLElementEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// implem
+export function addEventListener(
+  /**
+   * allows for falsy values so you don't have to type check when adding
+   * event listeners to optional elements
+   */
+  target:
+    | Document
+    | (Window & typeof globalThis)
+    | FontFaceSet
+    | HTMLElement
+    | undefined
+    | null
+    | false,
+  type: keyof WindowEventMap | keyof DocumentEventMap | string,
+  listener: (ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback {
+  if (!target) {
+    return () => {};
+  }
+  target?.addEventListener?.(type, listener, options);
+  return () => {
+    target?.removeEventListener?.(type, listener, options);
+  };
+}
