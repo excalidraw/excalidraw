@@ -11,8 +11,8 @@
     "copyAsPng": "Copier dans le presse-papier en PNG",
     "copyAsSvg": "Copier dans le presse-papier en SVG",
     "copyText": "Copier dans le presse-papier en tant que texte",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copier la source dans le presse-papiers",
+    "convertToCode": "Convertir en code",
     "bringForward": "Envoyer vers l'avant",
     "sendToBack": "Déplacer à l'arrière-plan",
     "bringToFront": "Mettre au premier plan",
@@ -38,25 +38,25 @@
     "arrowhead_none": "Sans",
     "arrowhead_arrow": "Flèche",
     "arrowhead_bar": "Barre",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
-    "arrowhead_triangle": "",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_circle": "Cercle",
+    "arrowhead_circle_outline": "Cercle (contour)",
+    "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "Triangle (contour)",
+    "arrowhead_diamond": "Losange",
+    "arrowhead_diamond_outline": "Losange (contour)",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
     "handDrawn": "À main levée",
     "normal": "Normale",
-    "code": "",
+    "code": "Code",
     "small": "Petite",
     "medium": "Moyenne",
     "large": "Grande",
     "veryLarge": "Très grande",
     "solid": "Solide",
     "hachure": "Hachures",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Hachures croisées",
     "thin": "Fine",
     "bold": "Épaisse",
@@ -73,7 +73,7 @@
     "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Zone de dessin",
     "layers": "Disposition",
-    "actions": "",
+    "actions": "Actions",
     "language": "Langue",
     "liveCollaboration": "Collaboration en direct...",
     "duplicateSelection": "Dupliquer",
@@ -119,7 +119,7 @@
       "create": "Ajouter un lien",
       "createEmbed": "Créer un lien & intégrer",
       "label": "Lien",
-      "labelEmbed": "",
+      "labelEmbed": "Lier & intégrer",
       "empty": "Aucun lien défini"
     },
     "lineEditor": {
@@ -136,9 +136,9 @@
     "sidebarLock": "Maintenir la barre latérale ouverte",
     "selectAllElementsInFrame": "Sélectionner tous les éléments du cadre",
     "removeAllElementsFromFrame": "Supprimer tous les éléments du cadre",
-    "eyeDropper": "",
-    "textToDiagram": "",
-    "prompt": ""
+    "eyeDropper": "Choisir la couleur depuis le canevas",
+    "textToDiagram": "Texte vers diagramme",
+    "prompt": "Demander"
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -161,7 +161,7 @@
     "zoomIn": "Zoomer",
     "zoomOut": "Dézoomer",
     "resetZoom": "Réinitialiser le zoom",
-    "menu": "",
+    "menu": "Menu",
     "done": "Terminé",
     "edit": "Modifier",
     "undo": "Annuler",
@@ -211,13 +211,13 @@
     "imageInsertError": "Impossible d'insérer l'image. Réessayez plus tard...",
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Échec de récupération de l'image.",
     "invalidSVGString": "SVG invalide.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
     "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Les images sont désactivées.",
     "brave_measure_text_error": {
       "line1": "On dirait que vous utilisez le navigateur Brave avec l'option <bold>Bloquer agressivement le fichage</bold> activée.",
       "line2": "Cela pourrait entraîner des problèmes avec les <bold>Éléments Textuels</bold> dans vos dessins.",
@@ -226,19 +226,19 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Les éléments intégrés ne peuvent pas être ajoutés à la librairie.",
-      "iframe": "",
+      "iframe": "Les éléments IFrame ne peuvent pas être ajoutés à la bibliothèque.",
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Impossible de coller (impossible de lire le presse-papiers système).",
+    "asyncPasteFailedOnParse": "Impossible de coller.",
+    "copyToSystemClipboardFailed": "Échec de la copie dans le presse-papiers."
   },
   "toolBar": {
     "selection": "Sélection",
     "image": "Insérer une image",
-    "rectangle": "",
+    "rectangle": "Rectangle",
     "diamond": "Losange",
-    "ellipse": "",
+    "ellipse": "Ellipse",
     "arrow": "Flèche",
     "line": "Ligne",
     "freedraw": "Dessiner",
@@ -249,13 +249,13 @@
     "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
     "eraser": "Gomme",
     "frame": "Outil de cadre",
-    "magicframe": "",
+    "magicframe": "Modèle en fil de fer vers code",
     "embeddable": "Intégration Web",
-    "laser": "",
+    "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "De Mermaid à Excalidraw",
+    "magicSettings": "Paramètres IA"
   },
   "headings": {
     "canvasActions": "Actions du canevas",
@@ -330,7 +330,7 @@
     "deepBoxSelect": "Sélectionner dans les groupes, et empêcher le déplacement",
     "curvedArrow": "Flèche courbée",
     "curvedLine": "Ligne courbée",
-    "documentation": "",
+    "documentation": "Documentation",
     "doubleClick": "double-clic",
     "drag": "glisser",
     "editor": "Éditeur",
@@ -399,7 +399,7 @@
       "darkMode": "Mode sombre",
       "embedScene": "Intégrer la scène",
       "scale": "Échelle",
-      "padding": ""
+      "padding": "Marge interne"
     },
     "tooltip": {
       "embedScene": "Les données de la scène seront sauvegardées dans le fichier PNG/SVG exporté afin que la scène puisse être restaurée depuis celui-ci.\nCela augmentera la taille du fichier exporté."
@@ -410,8 +410,8 @@
       "copyPngToClipboard": "Copier le PNG dans le presse-papier"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Copier dans le presse-papier"
     }
   },
@@ -420,7 +420,7 @@
     "link": "Article de blog sur le chiffrement de bout en bout dans Excalidraw"
   },
   "stats": {
-    "angle": "",
+    "angle": "Angle",
     "element": "Élément",
     "elements": "Éléments",
     "height": "Hauteur",
@@ -428,8 +428,8 @@
     "selected": "Sélection",
     "storage": "Stockage",
     "title": "Stats pour les nerds",
-    "total": "",
-    "version": "",
+    "total": "Total",
+    "version": "Version",
     "versionCopy": "Cliquer pour copier",
     "versionNotAvailable": "Version non disponible",
     "width": "Largeur"
@@ -448,21 +448,21 @@
     "unrecognizedLinkFormat": "Le lien que vous avez intégré ne correspond pas au format attendu. Veuillez essayer de coller la chaîne d'intégration fournie par le site source"
   },
   "colors": {
-    "transparent": "",
+    "transparent": "Transparent",
     "black": "Noir",
     "white": "Blanc",
     "red": "Rouge",
     "pink": "Rose",
     "grape": "Mauve",
-    "violet": "",
+    "violet": "Violet",
     "gray": "Gris",
     "blue": "Bleu",
-    "cyan": "",
+    "cyan": "Cyan",
     "teal": "Turquoise",
     "green": "Vert",
     "yellow": "Jaune",
-    "orange": "",
-    "bronze": ""
+    "orange": "Orange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -497,7 +497,7 @@
         "description": "Exporter les données de la scène comme un fichier que vous pourrez importer ultérieurement."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Exporter vers Excalidraw+",
         "description": "Enregistrer la scène dans votre espace de travail Excalidraw+."
       }
@@ -516,20 +516,20 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "De Mermaid à Excalidraw",
+    "button": "Insérer",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Syntaxe Mermaid",
+    "preview": "Prévisualisation"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Recherche rapide",
+      "empty": "Aucun utilisateurs trouvé"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Cliquez sur l'utilisateur pour le suivre",
+      "followStatus": "Vous suivez actuellement cet utilisateur"
     }
   }
 }
