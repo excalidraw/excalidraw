@@ -67,7 +67,6 @@ import {
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
-  isAndroid,
   isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
@@ -90,6 +89,7 @@ import {
   POINTER_EVENTS,
   TOOL_TYPE,
   EDITOR_LS_KEYS,
+  isIOS,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -2756,9 +2756,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onTouchStart = (event: TouchEvent) => {
-    // fix for Apple Pencil Scribble
-    // On Android, preventing the event would disable contextMenu on tap-hold
-    if (!isAndroid) {
+    // fix for Apple Pencil Scribble (do not prevent for other devices)
+    if (isIOS) {
       event.preventDefault();
     }
 
@@ -2782,9 +2781,6 @@ class App extends React.Component<AppProps, AppState> {
       });
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
-    }
-    if (isAndroid) {
-      event.preventDefault();
     }
 
     if (event.touches.length === 2) {
