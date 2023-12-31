@@ -529,6 +529,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
+  lastPointerMoveEvent: PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
   laserPathManager: LaserPathManager = new LaserPathManager(this);
@@ -4623,6 +4624,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+    this.lastPointerMoveEvent = event.nativeEvent;
 
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
@@ -7751,19 +7753,23 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-      if (isEraserActive(this.state)) {
+
+      const pointerStart = this.lastPointerDownEvent;
+      const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
+
+      if (isEraserActive(this.state) && pointerStart && pointerEnd) {
         const draggedDistance = distance2d(
-          this.lastPointerDownEvent!.clientX,
-          this.lastPointerDownEvent!.clientY,
-          this.lastPointerUpEvent!.clientX,
-          this.lastPointerUpEvent!.clientY,
+          pointerStart.clientX,
+          pointerStart.clientY,
+          pointerEnd.clientX,
+          pointerEnd.clientY,
         );
 
         if (draggedDistance === 0) {
           const scenePointer = viewportCoordsToSceneCoords(
             {
-              clientX: this.lastPointerUpEvent!.clientX,
-              clientY: this.lastPointerUpEvent!.clientY,
+              clientX: pointerEnd.clientX,
+              clientY: pointerEnd.clientY,
             },
             this.state,
           );
