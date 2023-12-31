@@ -2374,7 +2374,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     this.library.destroy();
     this.laserPathManager.destroy();
-    this.onChangeEmitter.destroy();
+    this.onChangeEmitter.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
