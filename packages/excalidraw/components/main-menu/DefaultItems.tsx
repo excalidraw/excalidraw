@@ -195,6 +195,32 @@ export const ToggleTheme = () => {
 };
 ToggleTheme.displayName = "ToggleTheme";
 
+export const ToggleScrollWheel = () => {
+  // const { t } = useI18n();
+  // const appState = useUIAppState();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleTheme)) {
+    return null;
+  }
+  return (
+    <DropdownMenuItem
+      onSelect={(event) => {
+        // do not close the menu when changing theme
+        event.preventDefault();
+        return actionManager.executeAction(actionToggleTheme);
+      }}
+      icon={MoonIcon}
+      data-testid="toggle-dark-mode"
+      // shortcut={getShortcutFromShortcutName("toggleTheme")}
+      aria-label={"test"}
+    >
+      Wheel Scroll Disable
+    </DropdownMenuItem>
+  );
+};
+ToggleScrollWheel.displayName = "ToggleScrollWheel";
+
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
   const appState = useUIAppState();

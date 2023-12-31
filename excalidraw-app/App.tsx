@@ -691,6 +691,10 @@ const ExcalidrawWrapper = () => {
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
       })}
+      //TODO - prop to disable wheel event handling
+      onWheelCapture={(e) => {
+        // e.stopPropagation();
+      }}
     >
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
