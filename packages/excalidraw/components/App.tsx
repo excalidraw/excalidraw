@@ -489,7 +489,7 @@ let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
-let lastPointerUp: ((event: any) => void) | null = null;
+let lastPointerUp: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -561,7 +561,9 @@ class App extends React.Component<AppProps, AppState> {
     [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
   >();
 
-  onPointerEventCleanupEmitter = new Emitter<[]>();
+  missingPointerEventCleanupEmitter = new Emitter<
+    [event: PointerEvent | null]
+  >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
   constructor(props: AppProps) {
@@ -5208,7 +5210,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    this.maybeCleanupAfterMissingPointerUp(event);
+    this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
     // since contextMenu options are potentially evaluated on each render,
@@ -5350,7 +5352,8 @@ class App extends React.Component<AppProps, AppState> {
           // if we start erasing while coming from blurred document since
           // we cleanup pointer events on focus
           requestAnimationFrame(() => {
-            unsubCleanup = this.onPointerEventCleanupEmitter.once(onPointerUp);
+            unsubCleanup =
+              this.missingPointerEventCleanupEmitter.once(onPointerUp);
           });
         },
       );
@@ -5489,7 +5492,9 @@ class App extends React.Component<AppProps, AppState> {
     const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
     const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
 
-    lastPointerUp = onPointerUp;
+    this.missingPointerEventCleanupEmitter.once((_event) =>
+      onPointerUp(_event || event.nativeEvent),
+    );
 
     if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
@@ -5600,18 +5605,14 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = false;
   };
 
-  private maybeCleanupAfterMissingPointerUp = (
-    event: React.PointerEvent<HTMLElement> | PointerEvent | null,
-  ) => {
-    if (event) {
-      if (lastPointerUp !== null) {
-        // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
-        // this can happen when a contextual menu or alert is triggered. In order to avoid
-        // being in a weird state, we clean up on the next pointerdown
-        lastPointerUp(event);
-      }
-    }
-    this.onPointerEventCleanupEmitter.trigger();
+  /**
+   * pointerup may not fire in certian cases (user tabs away...), so in order
+   * to properly cleanup pointerdown state, we need to fire any hanging
+   * pointerup handlers manually
+   */
+  private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
+    lastPointerUp?.();
+    this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
 
   // Returns whether the event is a panning
@@ -5815,11 +5816,10 @@ class App extends React.Component<AppProps, AppState> {
 
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
     });
-
     const onPointerUp = withBatchedUpdates(() => {
+      lastPointerUp = null;
       isDraggingScrollBar = false;
       setCursorForShape(this.interactiveCanvas, this.state);
-      lastPointerUp = null;
       this.setState({
         cursorButton: "up",
       });
@@ -7367,7 +7367,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      lastPointerUp = null;
+      this.missingPointerEventCleanupEmitter.clear();
 
       window.removeEventListener(
         EVENT.POINTER_MOVE,
