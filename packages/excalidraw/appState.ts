@@ -5,6 +5,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
+  SCROLL_BEHAVIOR,
   THEME,
 } from "./constants";
 import { t } from "./i18n";
@@ -22,6 +23,7 @@ export const getDefaultAppState = (): Omit<
   return {
     showWelcomeScreen: false,
     theme: THEME.LIGHT,
+    scrollBehavior: SCROLL_BEHAVIOR.DEFAULT,
     collaborators: new Map(),
     currentChartType: "bar",
     currentItemBackgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor,
@@ -128,6 +130,7 @@ const APP_STATE_STORAGE_CONF = (<
   config)({
   showWelcomeScreen: { browser: true, export: false, server: false },
   theme: { browser: true, export: false, server: false },
+  scrollBehavior: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
   currentChartType: { browser: true, export: false, server: false },
   currentItemBackgroundColor: { browser: true, export: false, server: false },

@@ -19,6 +19,7 @@ import {
   ExcalidrawMagicFrameElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
+  ScrollBehavior,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -282,6 +283,7 @@ export interface AppState {
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
   theme: Theme;
+  scrollBehavior: ScrollBehavior;
   gridSize: number | null;
   viewModeEnabled: boolean;
 
@@ -434,6 +436,7 @@ export interface ExcalidrawProps {
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
+  scrollBehavior?: ScrollBehavior;
   name?: string;
   renderCustomStats?: (
     elements: readonly NonDeletedExcalidrawElement[],
@@ -511,6 +514,7 @@ export type CanvasActions = Partial<{
   loadScene: boolean;
   saveToActiveFile: boolean;
   toggleTheme: boolean | null;
+  toggleScrollBehavior: boolean | null;
   saveAsImage: boolean;
 }>;
 

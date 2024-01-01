@@ -118,6 +118,11 @@ export const THEME = {
   DARK: "dark",
 } as const;
 
+export const SCROLL_BEHAVIOR = {
+  DISABLE: "disable",
+  DEFAULT: "default",
+} as const;
+
 export const FRAME_STYLE = {
   strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
   strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
@@ -225,6 +230,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     loadScene: true,
     saveToActiveFile: true,
     toggleTheme: null,
+    toggleScrollBehavior: null,
     saveAsImage: true,
   },
   tools: {

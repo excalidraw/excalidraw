@@ -1,6 +1,6 @@
 import polyfill from "../packages/excalidraw/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
@@ -8,6 +8,7 @@ import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import {
   APP_NAME,
   EVENT,
+  SCROLL_BEHAVIOR,
   THEME,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
@@ -17,6 +18,7 @@ import {
   ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
+  ScrollBehavior,
   Theme,
 } from "../packages/excalidraw/element/types";
 import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
@@ -549,12 +551,25 @@ const ExcalidrawWrapper = () => {
       THEME.LIGHT,
   );
 
+  const [scrollBehavior, setScrollBehavior] = useState<ScrollBehavior>(
+    () =>
+      (localStorage.getItem(
+        STORAGE_KEYS.LOCAL_STORAGE_SCROLL_BEHAVIOR,
+      ) as ScrollBehavior | null) ||
+      importFromLocalStorage().appState?.scrollBehavior ||
+      SCROLL_BEHAVIOR.DEFAULT,
+  );
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, theme);
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_SCROLL_BEHAVIOR,
+      scrollBehavior,
+    );
     // currently only used for body styling during init (see public/index.html),
     // but may change in the future
     document.documentElement.classList.toggle("dark", theme === THEME.DARK);
-  }, [theme]);
+  }, [theme, scrollBehavior]);
 
   const onChange = (
     elements: readonly ExcalidrawElement[],
@@ -566,6 +581,7 @@ const ExcalidrawWrapper = () => {
     }
 
     setTheme(appState.theme);
+    setScrollBehavior(appState.scrollBehavior);
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
@@ -684,6 +700,11 @@ const ExcalidrawWrapper = () => {
       </div>
     );
   }
+   const handleWheelCapture = (e: React.WheelEvent<HTMLDivElement>) => {
+      if (scrollBehavior === 'disable') {
+        e.stopPropagation();
+      }
+    };
 
   return (
     <div
@@ -691,10 +712,7 @@ const ExcalidrawWrapper = () => {
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
       })}
-      //TODO - prop to disable wheel event handling
-      onWheelCapture={(e) => {
-        // e.stopPropagation();
-      }}
+      onWheelCapture={handleWheelCapture}
     >
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
@@ -705,6 +723,7 @@ const ExcalidrawWrapper = () => {
         UIOptions={{
           canvasActions: {
             toggleTheme: true,
+            toggleScrollBehavior: true,
             export: {
               onExportToBackend,
               renderCustomUI: (elements, appState, files) => {
