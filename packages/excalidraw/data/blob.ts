@@ -19,9 +19,7 @@ const parseFileContents = async (blob: Blob | File) => {
 
   if (blob.type === MIME_TYPES.png) {
     try {
-      return await (
-        await import(/* webpackChunkName: "image" */ "./image")
-      ).decodePngMetadata(blob);
+      return await (await import("./image")).decodePngMetadata(blob);
     } catch (error: any) {
       if (error.message === "INVALID") {
         throw new ImageSceneDataError(
@@ -49,7 +47,7 @@ const parseFileContents = async (blob: Blob | File) => {
     if (blob.type === MIME_TYPES.svg) {
       try {
         return await (
-          await import(/* webpackChunkName: "image" */ "./image")
+          await import("./image")
         ).decodeSvgMetadata({
           svg: contents,
         });

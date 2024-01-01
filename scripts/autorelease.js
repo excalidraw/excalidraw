@@ -16,8 +16,7 @@ const publish = () => {
 
   try {
     execSync(`yarn  --frozen-lockfile`);
-    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
-    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
+    execSync(`yarn run build:esm`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish --tag ${tag}`);
     console.info(`Published ${pkg.name}@${tag}🎉`);
     core.setOutput(
@@ -41,7 +40,10 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
   const changedFiles = stdout.trim().split("\n");
 
   const excalidrawPackageFiles = changedFiles.filter((file) => {
-    return file.indexOf("packages/excalidraw") >= 0;
+    return (
+      file.indexOf("packages/excalidraw") >= 0 ||
+      file.indexOf("buildPackage.js") > 0
+    );
   });
   if (!excalidrawPackageFiles.length) {
     console.info("Skipping release as no valid diff found");

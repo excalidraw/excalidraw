@@ -1,5 +1,5 @@
 import { KEYS } from "../keys";
-import { Excalidraw } from "../entry";
+import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { fireEvent, render, waitFor } from "./test-utils";

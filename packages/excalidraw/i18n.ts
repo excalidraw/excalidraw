@@ -96,9 +96,7 @@ export const setLanguage = async (lang: Language) => {
     currentLangData = {};
   } else {
     try {
-      currentLangData = await import(
-        /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
-      );
+      currentLangData = await import(`./locales/${currentLang.code}.json`);
     } catch (error: any) {
       console.error(`Failed to load language ${lang.code}:`, error.message);
       currentLangData = fallbackLangData;

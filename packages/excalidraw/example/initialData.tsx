@@ -1,5 +1,5 @@
-import { ExcalidrawElementSkeleton } from "../data/transform";
-import { FileId } from "../element/types";
+import type { ExcalidrawElementSkeleton } from "../data/transform";
+import type { FileId } from "../element/types";
 
 const elements: ExcalidrawElementSkeleton[] = [
   {

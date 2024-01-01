@@ -1,4 +1,4 @@
-import { ExcalidrawImperativeAPI } from "../types";
+import type { ExcalidrawImperativeAPI } from "../types";
 import CustomFooter from "./CustomFooter";
 const { useDevice, Footer } = window.ExcalidrawLib;
 

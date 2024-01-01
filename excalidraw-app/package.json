@@ -21,9 +21,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {
-    "packages/excalidraw": "*"
-  },
+  "dependencies": {},
   "homepage": ".",
   "name": "excalidraw-app",
   "prettier": "@excalidraw/prettier-config",
