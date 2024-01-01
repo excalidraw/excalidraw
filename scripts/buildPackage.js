@@ -1,7 +1,7 @@
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
-
+// Will be used later for treeshaking
 //const fs = require("fs");
 // const path = require("path");
 
