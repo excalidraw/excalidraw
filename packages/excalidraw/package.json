@@ -1,11 +1,23 @@
 {
   "name": "@excalidraw/excalidraw",
   "version": "0.17.1",
-  "main": "main.js",
-  "types": "types/excalidraw/index.d.ts",
+  "main": "./dist/prod/index.js",
+  "type": "module",
+  "module": "./dist/prod/index.js",
+  "exports": {
+    ".": {
+      "development": "./dist/dev/index.js",
+      "default": "./dist/prod/index.js",
+      "types": "./dist/excalidraw/index.d.ts"
+    },
+    "./index.css": {
+      "development": "./dist/dev/index.css",
+      "default": "./dist/prod/index.css"
+    }
+  },
+  "types": "./dist/excalidraw/index.d.ts",
   "files": [
-    "dist/*",
-    "types/*"
+    "dist/*"
   ],
   "publishConfig": {
     "access": "public"
@@ -50,15 +62,11 @@
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-tabs": "1.0.2",
-    "@testing-library/jest-dom": "5.16.2",
-    "@testing-library/react": "12.1.5",
     "@tldraw/vec": "1.7.1",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",
-    "eslint-plugin-react": "7.32.2",
-    "fake-indexeddb": "3.1.7",
     "image-blob-reduce": "3.0.1",
     "jotai": "1.13.1",
     "lodash.throttle": "4.1.1",
@@ -95,30 +103,32 @@
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
     "dotenv": "16.0.1",
+    "esbuild": "0.19.10",
+    "esbuild-plugin-external-global": "1.0.1",
+    "esbuild-sass-plugin": "2.16.0",
+    "eslint-plugin-react": "7.32.2",
+    "fake-indexeddb": "3.1.7",
     "import-meta-loader": "1.1.0",
     "mini-css-extract-plugin": "2.6.1",
     "postcss-loader": "7.0.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "sass-loader": "13.0.2",
     "size-limit": "9.0.0",
     "style-loader": "3.3.3",
-    "terser-webpack-plugin": "5.3.3",
+    "@testing-library/jest-dom": "5.16.2",
+    "@testing-library/react": "12.1.5",
     "ts-loader": "9.3.1",
-    "typescript": "4.9.4",
-    "webpack": "5.76.0",
-    "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.10.0",
-    "webpack-dev-server": "4.9.3",
-    "webpack-merge": "5.8.0"
+    "typescript": "4.9.4"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
-    "gen:types": "tsc --project tsconfig-types.json",
-    "build:umd": "rm -rf dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && cross-env NODE_ENV=development webpack --config webpack.preact.config.js && cross-env NODE_ENV=production webpack --config webpack.preact.config.js && yarn gen:types",
-    "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
+    "gen:types": "rm -rf types && tsc",
+    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types",
     "pack": "yarn build:umd && yarn pack",
-    "start": "webpack serve --config webpack.dev-server.config.js",
-    "build:example": "EXAMPLE=true webpack --config webpack.dev-server.config.js && yarn gen:types",
+    "start": "node ../../scripts/buildExample.mjs && vite",
+    "build:example": "node ../../scripts/buildExample.mjs",
     "size": "yarn build:umd && size-limit"
   }
 }
