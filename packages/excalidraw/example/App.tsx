@@ -1,5 +1,3 @@
-import { useEffect, useState, useRef, useCallback } from "react";
-
 import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import type * as TExcalidraw from "../index";
@@ -17,7 +15,7 @@ import { EVENT, ROUNDNESS } from "../constants";
 import { distance2d } from "../math";
 import { fileOpen } from "../data/filesystem";
 import { loadSceneOrLibraryFromBlob } from "../../utils";
-import {
+import type {
   AppState,
   BinaryFileData,
   ExcalidrawImperativeAPI,
@@ -26,7 +24,7 @@ import {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "../types";
-import { NonDeletedExcalidrawElement, Theme } from "../element/types";
+import type { NonDeletedExcalidrawElement, Theme } from "../element/types";
 import { ImportedLibraryData } from "../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
@@ -56,6 +54,8 @@ type PointerDownState = {
     y: number;
   };
 };
+
+const { useEffect, useState, useRef, useCallback } = window.React;
 
 // This is so that we use the bundled excalidraw.development.js file instead
 // of the actual source code
@@ -89,7 +89,6 @@ export interface AppProps {
   useCustom: (api: ExcalidrawImperativeAPI | null, customArgs?: any[]) => void;
   customArgs?: any[];
 }
-
 export default function App({ appTitle, useCustom, customArgs }: AppProps) {
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
