@@ -4,13 +4,6 @@ type Subscriber<T extends any[]> = (...payload: T) => void;
 
 export class Emitter<T extends any[] = []> {
   public subscribers: Subscriber<T>[] = [];
-  public value: T | undefined;
-  private updateOnChangeOnly: boolean;
-
-  constructor(opts?: { initialState?: T; updateOnChangeOnly?: boolean }) {
-    this.updateOnChangeOnly = opts?.updateOnChangeOnly ?? false;
-    this.value = opts?.initialState;
-  }
 
   /**
    * Attaches subscriber
@@ -45,16 +38,14 @@ export class Emitter<T extends any[] = []> {
     );
   }
 
-  trigger(...payload: T): any[] {
-    if (this.updateOnChangeOnly && this.value === payload) {
-      return [];
+  trigger(...payload: T) {
+    for (const handler of this.subscribers) {
+      handler(...payload);
     }
-    this.value = payload;
-    return this.subscribers.map((handler) => handler(...payload));
+    return this;
   }
 
-  destroy() {
+  clear() {
     this.subscribers = [];
-    this.value = undefined;
   }
 }
