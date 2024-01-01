@@ -8,6 +8,7 @@ export const AppMainMenu: React.FC<{
   isCollaborating: boolean;
   isCollabEnabled: boolean;
 }> = React.memo((props) => {
+  const deviceInfo = useDevice();
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -36,7 +37,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Socials />
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme />
-      {!useDevice().isTouchScreen && !useDevice().viewport.isMobile && (
+      {!deviceInfo.isTouchScreen && !deviceInfo.viewport.isMobile && (
         <MainMenu.DefaultItems.ToggleScrollWheel />
       )}
       <MainMenu.ItemCustom>
