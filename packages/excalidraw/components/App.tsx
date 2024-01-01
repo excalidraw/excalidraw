@@ -245,6 +245,7 @@ import {
   CollaboratorPointer,
   ToolType,
   OnUserFollowedPayload,
+  UnsubscribeCallback,
 } from "../types";
 import {
   debounce,
@@ -488,7 +489,7 @@ let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
-let lastPointerUp: ((event: any) => void) | null = null;
+let lastPointerUp: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -528,6 +529,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
+  lastPointerMoveEvent: PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
   laserPathManager: LaserPathManager = new LaserPathManager(this);
@@ -560,6 +562,9 @@ class App extends React.Component<AppProps, AppState> {
     [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
   >();
 
+  missingPointerEventCleanupEmitter = new Emitter<
+    [event: PointerEvent | null]
+  >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
   constructor(props: AppProps) {
@@ -2372,7 +2377,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     this.library.destroy();
     this.laserPathManager.destroy();
-    this.onChangeEmitter.destroy();
+    this.onChangeEmitter.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
@@ -2464,6 +2469,9 @@ class App extends React.Component<AppProps, AppState> {
         this.onGestureEnd as any,
         false,
       ),
+      addEventListener(window, EVENT.FOCUS, () => {
+        this.maybeCleanupAfterMissingPointerUp(null);
+      }),
     );
 
     if (this.state.viewModeEnabled) {
@@ -4616,6 +4624,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+    this.lastPointerMoveEvent = event.nativeEvent;
 
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
@@ -5203,6 +5212,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
     // since contextMenu options are potentially evaluated on each render,
@@ -5265,7 +5275,6 @@ class App extends React.Component<AppProps, AppState> {
       selection.removeAllRanges();
     }
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
-    this.maybeCleanupAfterMissingPointerUp(event);
 
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
@@ -5304,10 +5313,60 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
+    if (
+      event.button === POINTER_BUTTON.ERASER &&
+      this.state.activeTool.type !== TOOL_TYPE.eraser
+    ) {
+      this.setState(
+        {
+          activeTool: updateActiveTool(this.state, {
+            type: TOOL_TYPE.eraser,
+            lastActiveToolBeforeEraser: this.state.activeTool,
+          }),
+        },
+        () => {
+          this.handleCanvasPointerDown(event);
+          const onPointerUp = () => {
+            unsubPointerUp();
+            unsubCleanup?.();
+            if (isEraserActive(this.state)) {
+              this.setState({
+                activeTool: updateActiveTool(this.state, {
+                  ...(this.state.activeTool.lastActiveTool || {
+                    type: TOOL_TYPE.selection,
+                  }),
+                  lastActiveToolBeforeEraser: null,
+                }),
+              });
+            }
+          };
+
+          const unsubPointerUp = addEventListener(
+            window,
+            EVENT.POINTER_UP,
+            onPointerUp,
+            {
+              once: true,
+            },
+          );
+          let unsubCleanup: UnsubscribeCallback | undefined;
+          // subscribe inside rAF lest it'd be triggered on the same pointerdown
+          // if we start erasing while coming from blurred document since
+          // we cleanup pointer events on focus
+          requestAnimationFrame(() => {
+            unsubCleanup =
+              this.missingPointerEventCleanupEmitter.once(onPointerUp);
+          });
+        },
+      );
+      return;
+    }
+
     // only handle left mouse button or touch
     if (
       event.button !== POINTER_BUTTON.MAIN &&
-      event.button !== POINTER_BUTTON.TOUCH
+      event.button !== POINTER_BUTTON.TOUCH &&
+      event.button !== POINTER_BUTTON.ERASER
     ) {
       return;
     }
@@ -5435,7 +5494,9 @@ class App extends React.Component<AppProps, AppState> {
     const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
     const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
 
-    lastPointerUp = onPointerUp;
+    this.missingPointerEventCleanupEmitter.once((_event) =>
+      onPointerUp(_event || event.nativeEvent),
+    );
 
     if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
@@ -5546,16 +5607,15 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = false;
   };
 
-  private maybeCleanupAfterMissingPointerUp(
-    event: React.PointerEvent<HTMLElement>,
-  ): void {
-    if (lastPointerUp !== null) {
-      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
-      // this can happen when a contextual menu or alert is triggered. In order to avoid
-      // being in a weird state, we clean up on the next pointerdown
-      lastPointerUp(event);
-    }
-  }
+  /**
+   * pointerup may not fire in certian cases (user tabs away...), so in order
+   * to properly cleanup pointerdown state, we need to fire any hanging
+   * pointerup handlers manually
+   */
+  private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
+    lastPointerUp?.();
+    this.missingPointerEventCleanupEmitter.trigger(event).clear();
+  };
 
   // Returns whether the event is a panning
   private handleCanvasPanUsingWheelOrSpaceDrag = (
@@ -5758,11 +5818,10 @@ class App extends React.Component<AppProps, AppState> {
 
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
     });
-
     const onPointerUp = withBatchedUpdates(() => {
+      lastPointerUp = null;
       isDraggingScrollBar = false;
       setCursorForShape(this.interactiveCanvas, this.state);
-      lastPointerUp = null;
       this.setState({
         cursorButton: "up",
       });
@@ -7208,6 +7267,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
+      this.removePointer(childEvent);
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
@@ -7310,7 +7370,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      lastPointerUp = null;
+      this.missingPointerEventCleanupEmitter.clear();
 
       window.removeEventListener(
         EVENT.POINTER_MOVE,
@@ -7693,19 +7753,23 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-      if (isEraserActive(this.state)) {
+
+      const pointerStart = this.lastPointerDownEvent;
+      const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
+
+      if (isEraserActive(this.state) && pointerStart && pointerEnd) {
         const draggedDistance = distance2d(
-          this.lastPointerDownEvent!.clientX,
-          this.lastPointerDownEvent!.clientY,
-          this.lastPointerUpEvent!.clientX,
-          this.lastPointerUpEvent!.clientY,
+          pointerStart.clientX,
+          pointerStart.clientY,
+          pointerEnd.clientX,
+          pointerEnd.clientY,
         );
 
         if (draggedDistance === 0) {
           const scenePointer = viewportCoordsToSceneCoords(
             {
-              clientX: this.lastPointerUpEvent!.clientX,
-              clientY: this.lastPointerUpEvent!.clientY,
+              clientX: pointerEnd.clientX,
+              clientY: pointerEnd.clientY,
             },
             this.state,
           );
