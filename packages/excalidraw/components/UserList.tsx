@@ -13,6 +13,16 @@ import { searchIcon } from "./icons";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
 
+export type GoToCollaboratorComponentProps = {
+  clientId: ClientId;
+  collaborator: Collaborator;
+  withName: boolean;
+  isBeingFollowed: boolean;
+};
+
+/** collaborator user id or socket id (fallback) */
+type ClientId = string & { _brand: "UserId" };
+
 const FIRST_N_AVATARS = 3;
 const SHOW_COLLABORATORS_FILTER_AT = 8;
 
@@ -25,7 +35,7 @@ const ConditionalTooltipWrapper = ({
   shouldWrap: boolean;
   children: React.ReactNode;
   username?: string | null;
-  clientId: string;
+  clientId: ClientId;
 }) =>
   shouldWrap ? (
     <Tooltip label={username || "Unknown user"} key={clientId}>
@@ -41,18 +51,22 @@ const renderCollaborator = ({
   clientId,
   withName = false,
   shouldWrapWithTooltip = false,
+  isBeingFollowed,
 }: {
   actionManager: ActionManager;
   collaborator: Collaborator;
-  clientId: string;
+  clientId: ClientId;
   withName?: boolean;
   shouldWrapWithTooltip?: boolean;
+  isBeingFollowed: boolean;
 }) => {
-  const avatarJSX = actionManager.renderAction("goToCollaborator", [
+  const data: GoToCollaboratorComponentProps = {
     clientId,
     collaborator,
     withName,
-  ]);
+    isBeingFollowed,
+  };
+  const avatarJSX = actionManager.renderAction("goToCollaborator", data);
 
   return (
     <ConditionalTooltipWrapper
@@ -75,6 +89,7 @@ type UserListProps = {
   className?: string;
   mobile?: boolean;
   collaborators: Map<SocketId, UserListUserObject>;
+  userToFollow: SocketId | null;
 };
 
 const collaboratorComparatorKeys = [
@@ -85,20 +100,20 @@ const collaboratorComparatorKeys = [
 ] as const;
 
 export const UserList = React.memo(
-  ({ className, mobile, collaborators }: UserListProps) => {
+  ({ className, mobile, collaborators, userToFollow }: UserListProps) => {
     const actionManager = useExcalidrawActionManager();
 
-    const uniqueCollaboratorsMap = new Map<string, Collaborator>();
+    const uniqueCollaboratorsMap = new Map<ClientId, Collaborator>();
 
     collaborators.forEach((collaborator, socketId) => {
+      const userId = (collaborator.id || socketId) as ClientId;
       uniqueCollaboratorsMap.set(
         // filter on user id, else fall back on unique socketId
-        collaborator.id || socketId,
+        userId,
         { ...collaborator, socketId },
       );
     });
 
-    // const uniqueCollaboratorsMap = sampleCollaborators;
     const uniqueCollaboratorsArray = Array.from(uniqueCollaboratorsMap).filter(
       ([_, collaborator]) => collaborator.username?.trim(),
     );
@@ -129,6 +144,7 @@ export const UserList = React.memo(
           collaborator,
           clientId,
           shouldWrapWithTooltip: true,
+          isBeingFollowed: collaborator.socketId === userToFollow,
         }),
     );
 
@@ -140,6 +156,7 @@ export const UserList = React.memo(
             collaborator,
             clientId,
             shouldWrapWithTooltip: true,
+            isBeingFollowed: collaborator.socketId === userToFollow,
           }),
         )}
       </div>
@@ -161,7 +178,7 @@ export const UserList = React.memo(
             <Popover.Content
               style={{
                 zIndex: 2,
-                width: "12rem",
+                width: "13rem",
                 textAlign: "left",
               }}
               align="end"
@@ -198,6 +215,7 @@ export const UserList = React.memo(
                       collaborator,
                       clientId,
                       withName: true,
+                      isBeingFollowed: collaborator.socketId === userToFollow,
                     }),
                   )}
                 </div>
@@ -212,7 +230,8 @@ export const UserList = React.memo(
     if (
       prev.collaborators.size !== next.collaborators.size ||
       prev.mobile !== next.mobile ||
-      prev.className !== next.className
+      prev.className !== next.className ||
+      prev.userToFollow !== next.userToFollow
     ) {
       return false;
     }

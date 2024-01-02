@@ -347,7 +347,7 @@ export const exportToSvg = async (
   if (exportEmbedScene) {
     try {
       metadata = await (
-        await import(/* webpackChunkName: "image" */ "../data/image")
+        await import("../data/image")
       ).encodeSvgMetadata({
         // when embedding scene, we want to embed the origionally supplied
         // elements which don't contain the temp frame labels.

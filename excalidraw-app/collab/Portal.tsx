@@ -10,6 +10,7 @@ import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
 import {
   OnUserFollowedPayload,
+  SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
 import { trackEvent } from "../../packages/excalidraw/analytics";
@@ -51,7 +52,7 @@ class Portal {
         /* syncAll */ true,
       );
     });
-    this.socket.on("room-user-change", (clients: string[]) => {
+    this.socket.on("room-user-change", (clients: SocketId[]) => {
       this.collab.setCollaborators(clients);
     });
 
@@ -186,7 +187,7 @@ class Portal {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
         type: WS_SUBTYPES.IDLE_STATUS,
         payload: {
-          socketId: this.socket.id,
+          socketId: this.socket.id as SocketId,
           userState,
           username: this.collab.state.username,
         },
@@ -206,7 +207,7 @@ class Portal {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: WS_SUBTYPES.MOUSE_LOCATION,
         payload: {
-          socketId: this.socket.id,
+          socketId: this.socket.id as SocketId,
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
@@ -232,7 +233,7 @@ class Portal {
       const data: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"] = {
         type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS,
         payload: {
-          socketId: this.socket.id,
+          socketId: this.socket.id as SocketId,
           username: this.collab.state.username,
           sceneBounds: payload.sceneBounds,
         },
