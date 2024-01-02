@@ -36,12 +36,17 @@ const _loadFirebase = async () => {
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);
-      if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
-        await firebase
-          .auth()
-          .signInWithEmailAndPassword("test@test.com", "karat123");
-      } else {
-        await firebase.auth().signInWithCustomToken(customToken);
+      try {
+        if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+          await firebase
+            .auth()
+            .signInWithEmailAndPassword("test@test.com", "karat123");
+        } else {
+          await firebase.auth().signInWithCustomToken(customToken);
+        }
+      } catch (error) {
+        console.error("Error signing in with custom token: ", error);
+        throw error;
       }
     } catch (error: any) {
       // trying initialize again throws. Usually this is harmless, and happens
