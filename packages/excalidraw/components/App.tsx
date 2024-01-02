@@ -67,7 +67,6 @@ import {
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
-  isAndroid,
   isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
@@ -90,6 +89,7 @@ import {
   POINTER_EVENTS,
   TOOL_TYPE,
   EDITOR_LS_KEYS,
+  isIOS,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -245,6 +245,7 @@ import {
   CollaboratorPointer,
   ToolType,
   OnUserFollowedPayload,
+  UnsubscribeCallback,
 } from "../types";
 import {
   debounce,
@@ -270,6 +271,7 @@ import {
   easeOut,
   arrayToMap,
   updateStable,
+  addEventListener,
 } from "../utils";
 import {
   createSrcDoc,
@@ -489,7 +491,7 @@ let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
-let lastPointerUp: ((event: any) => void) | null = null;
+let lastPointerUp: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -529,6 +531,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
+  lastPointerMoveEvent: PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
   laserPathManager: LaserPathManager = new LaserPathManager(this);
@@ -561,6 +564,11 @@ class App extends React.Component<AppProps, AppState> {
     [scrollX: number, scrollY: number, zoom: AppState["zoom"]]
   >();
 
+  missingPointerEventCleanupEmitter = new Emitter<
+    [event: PointerEvent | null]
+  >();
+  onRemoveEventListenersEmitter = new Emitter<[]>();
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -588,7 +596,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -2371,7 +2378,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.destroy();
     this.library.destroy();
     this.laserPathManager.destroy();
-    this.onChangeEmitter.destroy();
+    this.onChangeEmitter.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
@@ -2392,63 +2399,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({});
   });
 
-  private removeEventListeners() {
-    document.removeEventListener(EVENT.POINTER_UP, this.removePointer);
-    document.removeEventListener(EVENT.COPY, this.onCopy);
-    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.removeEventListener(EVENT.CUT, this.onCut);
-    this.excalidrawContainerRef.current?.removeEventListener(
-      EVENT.WHEEL,
-      this.onWheel,
-    );
-    this.nearestScrollableContainer?.removeEventListener(
-      EVENT.SCROLL,
-      this.onScroll,
-    );
-    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
-    document.removeEventListener(
-      EVENT.MOUSE_MOVE,
-      this.updateCurrentCursorPosition,
-      false,
-    );
-    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
-    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
-    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
-    this.excalidrawContainerRef.current?.removeEventListener(
-      EVENT.DRAG_OVER,
-      this.disableEvent,
-      false,
-    );
-    this.excalidrawContainerRef.current?.removeEventListener(
-      EVENT.DROP,
-      this.disableEvent,
-      false,
-    );
-
-    document.removeEventListener(
-      EVENT.GESTURE_START,
-      this.onGestureStart as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.GESTURE_CHANGE,
-      this.onGestureChange as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.GESTURE_END,
-      this.onGestureEnd as any,
-      false,
-    );
-    document.removeEventListener(
-      EVENT.FULLSCREENCHANGE,
-      this.onFullscreenChange,
-    );
-
-    window.removeEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
-  }
-
   /** generally invoked only if fullscreen was invoked programmatically */
   private onFullscreenChange = () => {
     if (
@@ -2462,76 +2412,111 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private removeEventListeners() {
+    this.onRemoveEventListenersEmitter.trigger();
+  }
+
   private addEventListeners() {
+    // remove first as we can add event listeners multiple times
     this.removeEventListeners();
-    window.addEventListener(EVENT.MESSAGE, this.onWindowMessage, false);
-    document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
-    document.addEventListener(EVENT.COPY, this.onCopy);
-    this.excalidrawContainerRef.current?.addEventListener(
-      EVENT.WHEEL,
-      this.onWheel,
-      { passive: false },
-    );
+
+    // -------------------------------------------------------------------------
+    //                        view+edit mode listeners
+    // -------------------------------------------------------------------------
 
     if (this.props.handleKeyboardGlobally) {
-      document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+      this.onRemoveEventListenersEmitter.once(
+        addEventListener(document, EVENT.KEYDOWN, this.onKeyDown, false),
+      );
     }
-    document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
-    document.addEventListener(
-      EVENT.MOUSE_MOVE,
-      this.updateCurrentCursorPosition,
-    );
-    // rerender text elements on font load to fix #637 && #1553
-    document.fonts?.addEventListener?.("loadingdone", (event) => {
-      const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-      this.fonts.onFontsLoaded(loadedFontFaces);
-    });
 
-    // Safari-only desktop pinch zoom
-    document.addEventListener(
-      EVENT.GESTURE_START,
-      this.onGestureStart as any,
-      false,
+    this.onRemoveEventListenersEmitter.once(
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.WHEEL,
+        this.onWheel,
+        { passive: false },
+      ),
+      addEventListener(window, EVENT.MESSAGE, this.onWindowMessage, false),
+      addEventListener(document, EVENT.POINTER_UP, this.removePointer), // #3553
+      addEventListener(document, EVENT.COPY, this.onCopy),
+      addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
+      addEventListener(
+        document,
+        EVENT.MOUSE_MOVE,
+        this.updateCurrentCursorPosition,
+      ),
+      // rerender text elements on font load to fix #637 && #1553
+      addEventListener(document.fonts, "loadingdone", (event) => {
+        const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+        this.fonts.onFontsLoaded(loadedFontFaces);
+      }),
+      // Safari-only desktop pinch zoom
+      addEventListener(
+        document,
+        EVENT.GESTURE_START,
+        this.onGestureStart as any,
+        false,
+      ),
+      addEventListener(
+        document,
+        EVENT.GESTURE_CHANGE,
+        this.onGestureChange as any,
+        false,
+      ),
+      addEventListener(
+        document,
+        EVENT.GESTURE_END,
+        this.onGestureEnd as any,
+        false,
+      ),
+      addEventListener(window, EVENT.FOCUS, () => {
+        this.maybeCleanupAfterMissingPointerUp(null);
+      }),
     );
-    document.addEventListener(
-      EVENT.GESTURE_CHANGE,
-      this.onGestureChange as any,
-      false,
-    );
-    document.addEventListener(
-      EVENT.GESTURE_END,
-      this.onGestureEnd as any,
-      false,
-    );
+
     if (this.state.viewModeEnabled) {
       return;
     }
 
-    document.addEventListener(EVENT.FULLSCREENCHANGE, this.onFullscreenChange);
-    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.addEventListener(EVENT.CUT, this.onCut);
+    // -------------------------------------------------------------------------
+    //                        edit-mode listeners only
+    // -------------------------------------------------------------------------
+
+    this.onRemoveEventListenersEmitter.once(
+      addEventListener(
+        document,
+        EVENT.FULLSCREENCHANGE,
+        this.onFullscreenChange,
+      ),
+      addEventListener(document, EVENT.PASTE, this.pasteFromClipboard),
+      addEventListener(document, EVENT.CUT, this.onCut),
+      addEventListener(window, EVENT.RESIZE, this.onResize, false),
+      addEventListener(window, EVENT.UNLOAD, this.onUnload, false),
+      addEventListener(window, EVENT.BLUR, this.onBlur, false),
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.DRAG_OVER,
+        this.disableEvent,
+        false,
+      ),
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.DROP,
+        this.disableEvent,
+        false,
+      ),
+    );
+
     if (this.props.detectScroll) {
-      this.nearestScrollableContainer = getNearestScrollableContainer(
-        this.excalidrawContainerRef.current!,
-      );
-      this.nearestScrollableContainer.addEventListener(
-        EVENT.SCROLL,
-        this.onScroll,
+      this.onRemoveEventListenersEmitter.once(
+        addEventListener(
+          getNearestScrollableContainer(this.excalidrawContainerRef.current!),
+          EVENT.SCROLL,
+          this.onScroll,
+        ),
       );
     }
-    window.addEventListener(EVENT.RESIZE, this.onResize, false);
-    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.addEventListener(EVENT.BLUR, this.onBlur, false);
-    this.excalidrawContainerRef.current?.addEventListener(
-      EVENT.DRAG_OVER,
-      this.disableEvent,
-      false,
-    );
-    this.excalidrawContainerRef.current?.addEventListener(
-      EVENT.DROP,
-      this.disableEvent,
-      false,
-    );
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -2780,9 +2765,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onTouchStart = (event: TouchEvent) => {
-    // fix for Apple Pencil Scribble
-    // On Android, preventing the event would disable contextMenu on tap-hold
-    if (!isAndroid) {
+    // fix for Apple Pencil Scribble (do not prevent for other devices)
+    if (isIOS) {
       event.preventDefault();
     }
 
@@ -2806,9 +2790,6 @@ class App extends React.Component<AppProps, AppState> {
       });
       didTapTwice = false;
       clearTimeout(tappedTwiceTimer);
-    }
-    if (isAndroid) {
-      event.preventDefault();
     }
 
     if (event.touches.length === 2) {
@@ -4646,6 +4627,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+    this.lastPointerMoveEvent = event.nativeEvent;
 
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
@@ -5233,6 +5215,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
     // since contextMenu options are potentially evaluated on each render,
@@ -5295,7 +5278,6 @@ class App extends React.Component<AppProps, AppState> {
       selection.removeAllRanges();
     }
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
-    this.maybeCleanupAfterMissingPointerUp(event);
 
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
@@ -5334,10 +5316,60 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
+    if (
+      event.button === POINTER_BUTTON.ERASER &&
+      this.state.activeTool.type !== TOOL_TYPE.eraser
+    ) {
+      this.setState(
+        {
+          activeTool: updateActiveTool(this.state, {
+            type: TOOL_TYPE.eraser,
+            lastActiveToolBeforeEraser: this.state.activeTool,
+          }),
+        },
+        () => {
+          this.handleCanvasPointerDown(event);
+          const onPointerUp = () => {
+            unsubPointerUp();
+            unsubCleanup?.();
+            if (isEraserActive(this.state)) {
+              this.setState({
+                activeTool: updateActiveTool(this.state, {
+                  ...(this.state.activeTool.lastActiveTool || {
+                    type: TOOL_TYPE.selection,
+                  }),
+                  lastActiveToolBeforeEraser: null,
+                }),
+              });
+            }
+          };
+
+          const unsubPointerUp = addEventListener(
+            window,
+            EVENT.POINTER_UP,
+            onPointerUp,
+            {
+              once: true,
+            },
+          );
+          let unsubCleanup: UnsubscribeCallback | undefined;
+          // subscribe inside rAF lest it'd be triggered on the same pointerdown
+          // if we start erasing while coming from blurred document since
+          // we cleanup pointer events on focus
+          requestAnimationFrame(() => {
+            unsubCleanup =
+              this.missingPointerEventCleanupEmitter.once(onPointerUp);
+          });
+        },
+      );
+      return;
+    }
+
     // only handle left mouse button or touch
     if (
       event.button !== POINTER_BUTTON.MAIN &&
-      event.button !== POINTER_BUTTON.TOUCH
+      event.button !== POINTER_BUTTON.TOUCH &&
+      event.button !== POINTER_BUTTON.ERASER
     ) {
       return;
     }
@@ -5465,7 +5497,9 @@ class App extends React.Component<AppProps, AppState> {
     const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
     const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
 
-    lastPointerUp = onPointerUp;
+    this.missingPointerEventCleanupEmitter.once((_event) =>
+      onPointerUp(_event || event.nativeEvent),
+    );
 
     if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
@@ -5576,16 +5610,15 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = false;
   };
 
-  private maybeCleanupAfterMissingPointerUp(
-    event: React.PointerEvent<HTMLElement>,
-  ): void {
-    if (lastPointerUp !== null) {
-      // Unfortunately, sometimes we don't get a pointerup after a pointerdown,
-      // this can happen when a contextual menu or alert is triggered. In order to avoid
-      // being in a weird state, we clean up on the next pointerdown
-      lastPointerUp(event);
-    }
-  }
+  /**
+   * pointerup may not fire in certian cases (user tabs away...), so in order
+   * to properly cleanup pointerdown state, we need to fire any hanging
+   * pointerup handlers manually
+   */
+  private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
+    lastPointerUp?.();
+    this.missingPointerEventCleanupEmitter.trigger(event).clear();
+  };
 
   // Returns whether the event is a panning
   private handleCanvasPanUsingWheelOrSpaceDrag = (
@@ -5788,11 +5821,10 @@ class App extends React.Component<AppProps, AppState> {
 
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
     });
-
     const onPointerUp = withBatchedUpdates(() => {
+      lastPointerUp = null;
       isDraggingScrollBar = false;
       setCursorForShape(this.interactiveCanvas, this.state);
-      lastPointerUp = null;
       this.setState({
         cursorButton: "up",
       });
@@ -7246,6 +7278,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
+      this.removePointer(childEvent);
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
@@ -7348,7 +7381,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      lastPointerUp = null;
+      this.missingPointerEventCleanupEmitter.clear();
 
       window.removeEventListener(
         EVENT.POINTER_MOVE,
@@ -7731,19 +7764,23 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-      if (isEraserActive(this.state)) {
+
+      const pointerStart = this.lastPointerDownEvent;
+      const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
+
+      if (isEraserActive(this.state) && pointerStart && pointerEnd) {
         const draggedDistance = distance2d(
-          this.lastPointerDownEvent!.clientX,
-          this.lastPointerDownEvent!.clientY,
-          this.lastPointerUpEvent!.clientX,
-          this.lastPointerUpEvent!.clientY,
+          pointerStart.clientX,
+          pointerStart.clientY,
+          pointerEnd.clientX,
+          pointerEnd.clientY,
         );
 
         if (draggedDistance === 0) {
           const scenePointer = viewportCoordsToSceneCoords(
             {
-              clientX: this.lastPointerUpEvent!.clientX,
-              clientY: this.lastPointerUpEvent!.clientY,
+              clientX: pointerEnd.clientX,
+              clientY: pointerEnd.clientY,
             },
             this.state,
           );
