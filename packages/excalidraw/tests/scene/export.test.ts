@@ -9,14 +9,25 @@ import { API } from "../helpers/api";
 import { exportToCanvas, exportToSvg } from "../../../utils";
 import { FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
+import { restoreFractionalIndices } from "../../fractionalIndex";
 
 describe("exportToSvg", () => {
   window.EXCALIDRAW_ASSET_PATH = "/";
   const ELEMENT_HEIGHT = 100;
   const ELEMENT_WIDTH = 100;
   const ELEMENTS = [
-    { ...diamondFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
-    { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
+    {
+      ...diamondFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      fractionalIndex: "A0",
+    },
+    {
+      ...ellipseFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      fractionalIndex: "A1",
+    },
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_OPTIONS = {
@@ -124,7 +135,7 @@ describe("exportToSvg", () => {
 
   it("with elements that have a link", async () => {
     const svgElement = await exportUtils.exportToSvg(
-      [rectangleWithLinkFixture],
+      restoreFractionalIndices([rectangleWithLinkFixture]),
       DEFAULT_OPTIONS,
       null,
     );

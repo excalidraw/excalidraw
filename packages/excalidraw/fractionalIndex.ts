@@ -9,7 +9,6 @@ import {
   indexCharacterSet,
 } from "fractional-indexing-jittered";
 import { ENV } from "./constants";
-import { Mutable } from "./utility-types";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
@@ -114,28 +113,23 @@ export const fixFractionalIndices = (
       : generateNJitteredKeysBetween;
 
   for (const movedIndices of contiguousMovedIndices) {
-    try {
-      const predecessor =
-        elements[movedIndices[0] - 1]?.fractionalIndex || null;
-      const successor =
-        elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
-        null;
+    const predecessor = elements[movedIndices[0] - 1]?.fractionalIndex || null;
+    const successor =
+      elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
+      null;
 
-      const newKeys = generateFn(predecessor, successor, movedIndices.length);
+    const newKeys = generateFn(predecessor, successor, movedIndices.length);
 
-      for (let i = 0; i < movedIndices.length; i++) {
-        const element = elements[movedIndices[i]];
+    for (let i = 0; i < movedIndices.length; i++) {
+      const element = elements[movedIndices[i]];
 
-        mutateElement(
-          element,
-          {
-            fractionalIndex: newKeys[i],
-          },
-          false,
-        );
-      }
-    } catch (e) {
-      console.error("error fixing fractional indices", e);
+      mutateElement(
+        element,
+        {
+          fractionalIndex: newKeys[i],
+        },
+        false,
+      );
     }
   }
 
@@ -161,14 +155,14 @@ export const restoreFractionalIndices = (
     if (
       !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
     ) {
-      try {
-        const fractionalIndex = restoreFractionalIndex(predecessor, successor);
-        // Mutate in situ, without modifying version, versionNonce and etc.
-        (element as Mutable<ExcalidrawElement>).fractionalIndex =
-          fractionalIndex;
-      } catch (e) {
-        console.error(e);
-      }
+      const fractionalIndex = restoreFractionalIndex(predecessor, successor);
+      mutateElement(
+        element,
+        {
+          fractionalIndex,
+        },
+        false,
+      );
     }
   }
 
