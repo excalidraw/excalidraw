@@ -209,9 +209,7 @@ export const TTDDialogBase = withInternalFallback(
     const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
       useState<MermaidToExcalidrawLibProps>({
         loaded: false,
-        api: import(
-          /* webpackChunkName:"mermaid-to-excalidraw" */ "@zsviczian/mermaid-to-excalidraw"
-        ),
+        api: import("@zsviczian/mermaid-to-excalidraw"), //zsviczian
       });
 
     useEffect(() => {

@@ -5,6 +5,8 @@ import { isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
+import "../../public/fonts/fonts.css";
+import polyfill from "./polyfill";
 
 import { AppProps, ExcalidrawProps } from "./types";
 import { defaultLang } from "./i18n";
@@ -15,6 +17,8 @@ import Footer from "./components/footer/FooterCenter";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
+
+polyfill();
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {

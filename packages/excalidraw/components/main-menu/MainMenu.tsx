@@ -63,6 +63,7 @@ const MainMenu = Object.assign(
                   <UserList
                     mobile={true}
                     collaborators={appState.collaborators}
+                    userToFollow={appState.userToFollow?.socketId || null}
                   />
                 </fieldset>
               )}

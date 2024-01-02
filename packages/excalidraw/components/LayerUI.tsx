@@ -349,7 +349,10 @@ const LayerUI = ({
             )}
           >
             {appState.collaborators.size > 0 && (
-              <UserList collaborators={appState.collaborators} />
+              <UserList
+                collaborators={appState.collaborators}
+                userToFollow={appState.userToFollow?.socketId || null}
+              />
             )}
             {!appState.viewModeEnabled && //zsviczian
               renderTopRightUI?.(device.editor.isMobile, appState)}

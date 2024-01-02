@@ -1,16 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface Document {
-  fonts?: {
-    ready?: Promise<void>;
-    check?: (font: string, text?: string) => boolean;
-    load?: (font: string, text?: string) => Promise<FontFace[]>;
-    addEventListener?(
-      type: "loading" | "loadingdone" | "loadingerror",
-      listener: (this: Document, ev: Event) => any,
-    ): void;
-  };
-}
-
 interface Window {
   ClipboardItem: any;
   __EXCALIDRAW_SHA__: string | undefined;
