@@ -26,7 +26,6 @@ const base62CharSet = indexCharacterSet({
   firstPositive,
   mostPositive,
   mostNegative,
-  jitterRange: 6,
 });
 
 const charSet =
