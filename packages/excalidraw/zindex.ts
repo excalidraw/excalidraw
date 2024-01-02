@@ -1,6 +1,6 @@
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
-import { fixFractionalIndices } from "./fractionalIndex";
+import { updateFractionalIndices } from "./fractionalIndex";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
@@ -312,7 +312,7 @@ const shiftElementsByOne = (
           ];
   });
 
-  return fixFractionalIndices(elements, targetElementsMap);
+  return updateFractionalIndices(elements, targetElementsMap);
 };
 
 const shiftElementsToEnd = (
@@ -383,7 +383,7 @@ const shiftElementsToEnd = (
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
 
-  return fixFractionalIndices(
+  return updateFractionalIndices(
     direction === "left"
       ? [
           ...leadingElements,

@@ -9,10 +9,11 @@ import {
   indexCharacterSet,
 } from "fractional-indexing-jittered";
 import { ENV } from "./constants";
+import { InvalidFractionalIndexError } from "./errors";
 
 type FractionalIndex = ExcalidrawElement["fractionalIndex"];
 
-const base36CharSet = indexCharacterSet({
+export const base36CharSet = indexCharacterSet({
   chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   firstPositive: "A",
   mostPositive: "Z",
@@ -35,105 +36,41 @@ const charSet =
 export const generateKeyBetween = (
   lower: string | null,
   upper: string | null,
-) => _generateKeyBetween(lower, upper, charSet);
-
-export const generateJitteredKeyBetween = (
-  lower: string | null,
-  upper: string | null,
-) => _generateJitteredKeyBetween(lower, upper, charSet);
+) =>
+  import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
+    ? _generateKeyBetween(lower, upper, charSet)
+    : _generateJitteredKeyBetween(lower, upper, charSet);
 
 export const generateNKeysBetween = (
   lower: string | null,
   upper: string | null,
   n: number,
-) => _generateNKeysBetween(lower, upper, n, charSet);
+) =>
+  import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
+    ? _generateNKeysBetween(lower, upper, n, charSet)
+    : _generateNJitteredKeysBetween(lower, upper, n, charSet);
 
-export const generateNJitteredKeysBetween = (
-  lower: string | null,
-  upper: string | null,
-  n: number,
-) => _generateNJitteredKeysBetween(lower, upper, n, charSet);
-
-export const orderByFractionalIndex = (allElements: ExcalidrawElement[]) => {
-  return allElements.sort((a, b) => {
+/**
+ * Order the elements based on the fractional indices.
+ * - when fractional indices are identical (in prod only during jitter collisions), break the tie based on the element.id.
+ * - when there is no fractional index in one of the elements, respect the order of the array.
+ */
+export const orderByFractionalIndex = (elements: ExcalidrawElement[]) => {
+  return elements.sort((a, b) => {
     if (a.fractionalIndex && b.fractionalIndex) {
       if (a.fractionalIndex < b.fractionalIndex) {
         return -1;
       } else if (a.fractionalIndex > b.fractionalIndex) {
         return 1;
       }
-      return compareStrings(a.id, b.id);
+
+      // break ties based on the element id
+      return a.id < b.id ? -1 : 1;
     }
 
     // respect the order of the array
     return 1;
   });
-};
-
-export const validateFractionalIndices = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  for (let i = 0; i < elements.length; i++) {
-    const element = elements[i];
-    const successor = elements[i + 1];
-
-    if (element.fractionalIndex) {
-      if (
-        successor &&
-        successor.fractionalIndex &&
-        element.fractionalIndex >= successor.fractionalIndex
-      ) {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-/**
- * Fix fractional indices by mutating element of @param elements, which were passed inside @param reorderedElements.
- *
- * As opposed to @function restoreFractionalIndices, this one does not alter neighboring indices.
- */
-export const fixFractionalIndices = (
-  elements: readonly ExcalidrawElement[],
-  reorderedElements: Map<string, ExcalidrawElement>,
-) => {
-  const contiguousMovedIndices = getContiguousMovedIndices(
-    elements,
-    reorderedElements,
-  );
-
-  const generateFn =
-    import.meta.env.MODE === ENV.TEST
-      ? generateNKeysBetween
-      : generateNJitteredKeysBetween;
-
-  for (const movedIndices of contiguousMovedIndices) {
-    const predecessor = elements[movedIndices[0] - 1]?.fractionalIndex || null;
-    const successor =
-      elements[movedIndices[movedIndices.length - 1] + 1]?.fractionalIndex ||
-      null;
-
-    const newKeys = generateFn(predecessor, successor, movedIndices.length);
-
-    for (let i = 0; i < movedIndices.length; i++) {
-      const element = elements[movedIndices[i]];
-
-      mutateElement(
-        element,
-        {
-          fractionalIndex: newKeys[i],
-        },
-        false,
-      );
-    }
-  }
-
-  return elements as ExcalidrawElement[];
 };
 
 /**
@@ -149,13 +86,20 @@ export const restoreFractionalIndices = (
   elements: readonly ExcalidrawElement[],
 ) => {
   for (const [index, element] of elements.entries()) {
-    const predecessor = elements[index - 1]?.fractionalIndex || null;
-    const successor = elements[index + 1]?.fractionalIndex || null;
+    const predecessorIndex = elements[index - 1]?.fractionalIndex || null;
+    const successorIndex = elements[index + 1]?.fractionalIndex || null;
 
     if (
-      !isValidFractionalIndex(element.fractionalIndex, predecessor, successor)
+      !isValidFractionalIndex(
+        element.fractionalIndex,
+        predecessorIndex,
+        successorIndex,
+      )
     ) {
-      const fractionalIndex = restoreFractionalIndex(predecessor, successor);
+      const fractionalIndex = restoreFractionalIndex(
+        predecessorIndex,
+        successorIndex,
+      );
       mutateElement(
         element,
         {
@@ -169,16 +113,88 @@ export const restoreFractionalIndices = (
   return elements as ExcalidrawElement[];
 };
 
+/**
+ * Ensure that @param elements have valid fractional indices.
+ *
+ * @throws `InvalidFractionalIndexError` if invalid index is detected.
+ */
+export const validateFractionalIndices = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  for (const [index, element] of elements.entries()) {
+    const predecessorIndex = elements[index - 1]?.fractionalIndex || null;
+    const successorIndex = elements[index + 1]?.fractionalIndex || null;
+
+    if (
+      !isValidFractionalIndex(
+        element.fractionalIndex,
+        predecessorIndex,
+        successorIndex,
+      )
+    ) {
+      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+        console.error(
+          `Fractional index of element, predecessor and successor respectively: "${element.fractionalIndex}", "${predecessorIndex}", "${successorIndex}"`,
+        );
+        throw new InvalidFractionalIndexError(
+          `Fractional indices invariant for element "${element.id}" has been compromised.`,
+        );
+      }
+    }
+  }
+};
+
+/**
+ * Update fractional indices by mutating elements passed as @param reorderedElements.
+ *
+ * As opposed to `restoreFractionalIndices`, this one does not alter neighboring indices.
+ */
+export const updateFractionalIndices = (
+  elements: readonly ExcalidrawElement[],
+  reorderedElements: Map<string, ExcalidrawElement>,
+) => {
+  const contiguousMovedIndices = getContiguousMovedIndices(
+    elements,
+    reorderedElements,
+  );
+
+  for (const indices of contiguousMovedIndices) {
+    const lowerBoundIndex = elements[indices[0] - 1]?.fractionalIndex || null;
+    const upperBoundIndex =
+      elements[indices[indices.length - 1] + 1]?.fractionalIndex || null;
+
+    const fractionalIndices = generateNKeysBetween(
+      lowerBoundIndex,
+      upperBoundIndex,
+      indices.length,
+    );
+
+    for (let i = 0; i < indices.length; i++) {
+      const element = elements[indices[i]];
+
+      mutateElement(
+        element,
+        {
+          fractionalIndex: fractionalIndices[i],
+        },
+        false,
+      );
+    }
+  }
+
+  return elements as ExcalidrawElement[];
+};
+
 const getContiguousMovedIndices = (
   elements: readonly ExcalidrawElement[],
-  movedElementsMap: Map<string, ExcalidrawElement>,
+  reorderedElements: Map<string, ExcalidrawElement>,
 ) => {
   const result: number[][] = [];
   let contiguous: number[] = [];
 
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
-    if (movedElementsMap.has(element.id)) {
+    if (reorderedElements.has(element.id)) {
       if (contiguous.length) {
         if (contiguous[contiguous.length - 1] + 1 === i) {
           contiguous.push(i);
@@ -199,34 +215,25 @@ const getContiguousMovedIndices = (
   return result;
 };
 
-const compareStrings = (a: string, b: string) => {
-  return a < b ? -1 : 1;
-};
-
 const restoreFractionalIndex = (
   predecessor: FractionalIndex,
   successor: FractionalIndex,
 ) => {
-  const generateFn =
-    import.meta.env.MODE === ENV.TEST
-      ? generateKeyBetween
-      : generateJitteredKeyBetween;
-
   if (successor && !predecessor) {
     // first element in the array
     // insert before successor
-    return generateFn(null, successor);
+    return generateKeyBetween(null, successor);
   }
 
   if (predecessor && !successor) {
     // last element in the array
     // insert after predecessor
-    return generateFn(predecessor, null);
+    return generateKeyBetween(predecessor, null);
   }
 
   // both predecessor and successor exist (or both do not)
   // insert after predecessor
-  return generateFn(predecessor, null);
+  return generateKeyBetween(predecessor, null);
 };
 
 const isValidFractionalIndex = (
@@ -234,25 +241,24 @@ const isValidFractionalIndex = (
   predecessor: FractionalIndex,
   successor: FractionalIndex,
 ) => {
-  if (index) {
-    if (predecessor && successor) {
-      return predecessor < index && index < successor;
-    }
-
-    if (successor && !predecessor) {
-      // first element
-      return index < successor;
-    }
-
-    if (predecessor && !successor) {
-      // last element
-      return predecessor < index;
-    }
-
-    if (!predecessor && !successor) {
-      return index.length > 0;
-    }
+  if (!index) {
+    return false;
   }
 
-  return false;
+  if (predecessor && successor) {
+    return predecessor < index && index < successor;
+  }
+
+  if (!predecessor && successor) {
+    // first element
+    return index < successor;
+  }
+
+  if (predecessor && !successor) {
+    // last element
+    return predecessor < index;
+  }
+
+  // only element in the scene
+  return !!index;
 };

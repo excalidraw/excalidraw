@@ -29,7 +29,7 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { fixFractionalIndices } from "../fractionalIndex";
+import { updateFractionalIndices } from "../fractionalIndex";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
@@ -291,7 +291,7 @@ export const actionWrapTextInContainer = register({
           textElement,
         );
 
-        fixFractionalIndices(
+        updateFractionalIndices(
           updatedElements,
           arrayToMap([container, textElement]),
         );

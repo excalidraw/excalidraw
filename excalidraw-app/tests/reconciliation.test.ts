@@ -1,15 +1,15 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
+  base36CharSet,
+  generateKeyBetween,
   orderByFractionalIndex,
   validateFractionalIndices,
 } from "../../packages/excalidraw/fractionalIndex";
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
 import { reconcileElements } from "../collab/reconciliation";
-import {
-  generateKeyBetween,
-  generateJitteredKeyBetween,
-} from "../../packages/excalidraw/fractionalIndex";
+import { InvalidFractionalIndexError } from "../../packages/excalidraw/errors";
+import { generateJitteredKeyBetween } from "fractional-indexing-jittered";
 
 const SEPARATOR = ":";
 const NULL_PLACEHOLDER = "x";
@@ -179,29 +179,6 @@ describe("reconcile with fractional indices", () => {
     testReconciled(reconciledEls, expectedEls);
   });
 
-  it("restore when fractional indices duplicate", () => {
-    const first = generateKeyBetween(null, null);
-    const second = generateKeyBetween(first, null);
-    const third = generateKeyBetween(second, null);
-
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      [`L:1:1:1:${first}`, `L:2:1:1:${second}`, `L:3:1:1:${third}`],
-      // simulates a z-index change for (el.id = 1)
-      [`R:1:2:x:${third}`],
-      // order by id since R:1 and L:3 have the same fractional index and
-      // id 1 comes before id 3
-      [`L:2:1:1${second}`, `R:1:2:x:x`, `L:3:1:1:x`],
-    );
-
-    testReconciled(reconciledEls, expectedEls);
-
-    // we do not restore in reconciliation
-    // elements are instead restored in updateScene
-    expect(
-      validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
-    ).toBe(false);
-  });
-
   it("order by fractional indices - longer", () => {
     const totalCount = Math.floor(Math.random() * 100 + 10);
     let nextKey = generateKeyBetween(null, null);
@@ -218,6 +195,7 @@ describe("reconcile with fractional indices", () => {
         const remoteStr = `R:${i}:2:x:${generateJitteredKeyBetween(
           nextKey,
           null,
+          base36CharSet,
         )}`;
         remote_input.push(remoteStr);
         expected_input.push(remoteStr);
@@ -238,9 +216,9 @@ describe("reconcile with fractional indices", () => {
         expectedEls as any as ExcalidrawElement[],
       ) as any as ElementLike[],
     );
-    expect(
+    expect(() =>
       validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
-    ).toBe(true);
+    ).not.toThrowError(InvalidFractionalIndexError);
 
     const localEls = local_input.map((ls) =>
       createElementFromString(ls),
@@ -261,5 +239,28 @@ describe("reconcile with fractional indices", () => {
     }
 
     expect(actualDiffCount).toBe(remote_input.length);
+  });
+
+  it("should throw on duplicate indices as we don't update indices in reconciliation", () => {
+    const first = generateKeyBetween(null, null);
+    const second = generateKeyBetween(first, null);
+    const third = generateKeyBetween(second, null);
+
+    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
+      [`L:1:1:1:${first}`, `L:2:1:1:${second}`, `L:3:1:1:${third}`],
+      // simulates a z-index change for (el.id = 1)
+      [`R:1:2:x:${third}`],
+      // order by id since R:1 and L:3 have the same fractional index and
+      // id 1 comes before id 3
+      [`L:2:1:1${second}`, `R:1:2:x:x`, `L:3:1:1:x`],
+    );
+
+    testReconciled(reconciledEls, expectedEls);
+
+    // // we do not restore in reconciliation
+    // // elements are instead restored in updateScene
+    expect(() =>
+      validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
+    ).toThrowError(InvalidFractionalIndexError);
   });
 });

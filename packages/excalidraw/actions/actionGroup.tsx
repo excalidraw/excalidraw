@@ -27,7 +27,7 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
-import { fixFractionalIndices } from "../fractionalIndex";
+import { updateFractionalIndices } from "../fractionalIndex";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -141,7 +141,7 @@ export const actionGroup = register({
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
 
-    nextElements = fixFractionalIndices(
+    nextElements = updateFractionalIndices(
       [...elementsBeforeGroup, ...elementsInGroup, ...elementsAfterGroup],
       arrayToMap(elementsInGroup),
     );

@@ -31,7 +31,7 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
-import { fixFractionalIndices } from "../fractionalIndex";
+import { updateFractionalIndices } from "../fractionalIndex";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -238,7 +238,7 @@ const duplicateElements = (
   // step (3)
   const finalElements = finalElementsReversed.reverse();
 
-  fixFractionalIndices(
+  updateFractionalIndices(
     finalElements,
     arrayToMap([...oldElements, ...newElements]),
   );
