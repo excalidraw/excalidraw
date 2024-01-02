@@ -7024,10 +7024,7 @@ class App extends React.Component<AppProps, AppState> {
                   groupIdMap,
                   element,
                 );
-                duplicatedElementsMap.set(
-                  duplicatedElement.id,
-                  duplicatedElement,
-                );
+                duplicatedElementsMap.set(element.id, element);
                 const origElement = pointerDownState.originalElements.get(
                   element.id,
                 )!;
