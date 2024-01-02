@@ -181,7 +181,7 @@ const getContiguousMovedIndices = (
   movedElementsMap: Map<string, ExcalidrawElement>,
 ) => {
   const result: number[][] = [];
-  const contiguous: number[] = [];
+  let contiguous: number[] = [];
 
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
@@ -190,9 +190,8 @@ const getContiguousMovedIndices = (
         if (contiguous[contiguous.length - 1] + 1 === i) {
           contiguous.push(i);
         } else {
-          result.push(contiguous.slice());
-          contiguous.length = 0;
-          contiguous.push(i);
+          result.push(contiguous);
+          contiguous = [i];
         }
       } else {
         contiguous.push(i);
@@ -201,7 +200,7 @@ const getContiguousMovedIndices = (
   }
 
   if (contiguous.length > 0) {
-    result.push(contiguous.slice());
+    result.push(contiguous);
   }
 
   return result;
