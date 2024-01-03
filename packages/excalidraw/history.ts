@@ -1,6 +1,6 @@
 import { AppState } from "./types";
 import { ExcalidrawElement } from "./element/types";
-import { isLinearElement } from "./element/typeChecks";
+import { isLinearElement, isImageElement } from "./element/typeChecks";
 import { deepCopyElement } from "./element/newElement";
 import { Mutable } from "./utility-types";
 
@@ -128,6 +128,12 @@ class History {
                 ? element.points.slice(0, -1)
                 : element.points,
           });
+        } else if (isImageElement(element)) {
+          // don't store uninitialized image
+          if (!element.fileId) {
+            return elements;
+          }
+          elements.push(element);
         } else {
           elements.push(element);
         }

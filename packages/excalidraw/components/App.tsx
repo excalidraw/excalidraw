@@ -8387,6 +8387,8 @@ class App extends React.Component<AppProps, AppState> {
     imageElement: ExcalidrawImageElement,
     forceNaturalSize = false,
   ) => {
+    this.history.resumeRecording();
+
     const image =
       isInitializedImageElement(imageElement) &&
       this.imageCache.get(imageElement.fileId)?.image;
