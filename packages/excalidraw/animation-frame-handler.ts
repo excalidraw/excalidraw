@@ -6,14 +6,14 @@ export type AnimationTarget = {
 };
 
 export class AnimationFrameHandler {
-  private targets = new WeakMap<WeakKey, AnimationTarget>();
-  private rafIds = new WeakMap<WeakKey, number>();
+  private targets = new WeakMap<object, AnimationTarget>();
+  private rafIds = new WeakMap<object, number>();
 
-  register(key: WeakKey, callback: AnimationCallback) {
+  register(key: object, callback: AnimationCallback) {
     this.targets.set(key, { callback, stopped: true });
   }
 
-  start(key: WeakKey) {
+  start(key: object) {
     const target = this.targets.get(key);
 
     if (!target) {
@@ -28,7 +28,7 @@ export class AnimationFrameHandler {
     this.scheduleFrame(key, target);
   }
 
-  stop(key: WeakKey) {
+  stop(key: object) {
     if (this.targets.has(key)) {
       const target = this.targets.get(key)!;
       this.targets.set(key, { ...target, stopped: true });
@@ -37,7 +37,7 @@ export class AnimationFrameHandler {
     this.cancelFrame(key);
   }
 
-  private constructFrame(key: WeakKey): FrameRequestCallback {
+  private constructFrame(key: object): FrameRequestCallback {
     return (timestamp: number) => {
       const target = this.targets.get(key);
 
@@ -55,13 +55,13 @@ export class AnimationFrameHandler {
     };
   }
 
-  private scheduleFrame(key: WeakKey, target: AnimationTarget) {
+  private scheduleFrame(key: object, target: AnimationTarget) {
     const rafId = requestAnimationFrame(this.constructFrame(key));
 
     this.rafIds.set(key, rafId);
   }
 
-  private cancelFrame(key: WeakKey) {
+  private cancelFrame(key: object) {
     if (this.rafIds.has(key)) {
       const rafId = this.rafIds.get(key)!;
 
