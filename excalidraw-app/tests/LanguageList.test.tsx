@@ -18,6 +18,7 @@ describe("Test LanguageList", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+        token=""
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
       />,

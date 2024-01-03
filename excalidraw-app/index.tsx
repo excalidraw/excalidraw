@@ -806,6 +806,7 @@ let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
 let externalExcalidrawRefCallback: SetExcalidrawAPI;
+let customToken: string;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
@@ -814,6 +815,7 @@ const ExcalidrawApp: React.FC<{
   username: string;
   theme: Theme;
   excalidrawAPIRefCallback: SetExcalidrawAPI;
+  token: string;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
@@ -821,6 +823,7 @@ const ExcalidrawApp: React.FC<{
   customUsername = props.username;
   customTheme = props.theme;
   externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
+  customToken = props.token;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
@@ -830,5 +833,5 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { customCollabServerUrl, customFirebaseConfig };
+export { customCollabServerUrl, customFirebaseConfig, customToken };
 export default ExcalidrawApp;

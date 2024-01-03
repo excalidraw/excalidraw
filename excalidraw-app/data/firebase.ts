@@ -11,11 +11,12 @@ import {
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../src/data/encode";
 import { encryptData, decryptData } from "../../src/data/encryption";
-import { MIME_TYPES } from "../../src/constants";
+import { ENV, MIME_TYPES } from "../../src/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../src/utility-types";
-import { customFirebaseConfig } from "../index";
+import { customFirebaseConfig, customToken } from "../index";
+
 // private
 // -----------------------------------------------------------------------------
 let firebasePromise: Promise<typeof import("firebase/app").default> | null =
@@ -30,9 +31,23 @@ const _loadFirebase = async () => {
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
 
+  await import(/* webpackChunkName: "firebase" */ "firebase/auth");
+
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);
+      try {
+        if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+          await firebase
+            .auth()
+            .signInWithEmailAndPassword("test@test.com", "karat123");
+        } else {
+          await firebase.auth().signInWithCustomToken(customToken);
+        }
+      } catch (error) {
+        console.error("Error signing in with custom token: ", error);
+        throw error;
+      }
     } catch (error: any) {
       // trying initialize again throws. Usually this is harmless, and happens
       // mainly in dev (HMR)
