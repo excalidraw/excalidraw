@@ -758,7 +758,12 @@ export const actionChangeFontSize = register({
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     //zsviczian
-    const selectedElements = getSelectedElements(elements, appState).filter(el=>isTextElement(el)) as ExcalidrawTextElement[];
+    let selectedElements = getSelectedElements(elements, appState).filter(el=>isTextElement(el)) as ExcalidrawTextElement[];
+    if(selectedElements.length === 0) {
+      selectedElements = (
+        appState.editingElement?.type === "text" ? [appState.editingElement] : []
+      ) as ExcalidrawTextElement[];
+    }
     const size = selectedElements[0]?.fontSize;
     let idx:number|null = null;
     if (size && selectedElements.every(el=>el.fontSize===size)) {
