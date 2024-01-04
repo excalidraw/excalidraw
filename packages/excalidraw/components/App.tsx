@@ -911,13 +911,6 @@ class App extends React.Component<AppProps, AppState> {
           }
           const shouldRender = isVisible || hasBeenInitialized;
 
-          const isActive =
-            this.state.activeEmbeddable?.element === el &&
-            this.state.activeEmbeddable?.state === "active";
-          const isHovered =
-            this.state.activeEmbeddable?.element === el &&
-            this.state.activeEmbeddable?.state === "hover";
-
           if (!shouldRender) {
             return null;
           }
@@ -1062,6 +1055,13 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             src = getEmbedLink(toValidURL(el.link || ""));
           }
+
+          const isActive =
+            this.state.activeEmbeddable?.element === el &&
+            this.state.activeEmbeddable?.state === "active";
+          const isHovered =
+            this.state.activeEmbeddable?.element === el &&
+            this.state.activeEmbeddable?.state === "hover";
 
           return (
             <div
