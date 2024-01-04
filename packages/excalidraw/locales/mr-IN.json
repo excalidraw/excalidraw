@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "चौकटीतून सर्व काढून टाका",
     "eyeDropper": "चित्रफलकातून रंग निवडा",
     "textToDiagram": "लिपि पासून चित्र",
-    "prompt": "प्रश्न"
+    "prompt": "प्रश्न",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
