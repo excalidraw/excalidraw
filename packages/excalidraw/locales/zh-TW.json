@@ -139,8 +139,8 @@
     "eyeDropper": "從畫布中選取顏色",
     "textToDiagram": "文字轉圖表",
     "prompt": "提示詞",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "追蹤我們",
+    "discordChat": "Discord 聊天室"
   },
   "library": {
     "noItems": "尚未加入任何物件...",
