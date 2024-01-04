@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Remover todos os elementos do quadro",
     "eyeDropper": "Escolher cor da tela",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
