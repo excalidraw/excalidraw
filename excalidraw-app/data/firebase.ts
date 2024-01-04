@@ -11,7 +11,7 @@ import {
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../src/data/encode";
 import { encryptData, decryptData } from "../../src/data/encryption";
-import { ENV, MIME_TYPES } from "../../src/constants";
+import { MIME_TYPES } from "../../src/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../src/utility-types";
@@ -37,12 +37,16 @@ const _loadFirebase = async () => {
     try {
       firebase.initializeApp(customFirebaseConfig);
       try {
-        if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
-          await firebase
-            .auth()
-            .signInWithEmailAndPassword("test@test.com", "karat123");
-        } else {
+        try {
           await firebase.auth().signInWithCustomToken(customToken);
+        } catch (tokenError) {
+          try {
+            await firebase
+              .auth()
+              .signInWithEmailAndPassword("test@test.com", "karat123");
+          } catch (emailPasswordError) {
+            throw tokenError;
+          }
         }
       } catch (error) {
         console.error("Error signing in with custom token: ", error);
