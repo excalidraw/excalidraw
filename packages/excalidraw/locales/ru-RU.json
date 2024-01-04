@@ -139,8 +139,8 @@
     "eyeDropper": "Взять образец цвета с холста",
     "textToDiagram": "",
     "prompt": "",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Подписаться",
+    "discordChat": "Чат в Discord"
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
