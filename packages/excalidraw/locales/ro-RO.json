@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Elimină toate elementele din cadru",
     "eyeDropper": "Alegere culoare din pânză",
     "textToDiagram": "Text la diagramă",
-    "prompt": "Mesaj sistem"
+    "prompt": "Mesaj sistem",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
