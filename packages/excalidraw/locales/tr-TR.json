@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Çerçevedeki tüm bileşenleri sil",
     "eyeDropper": "Tuvalden renk seç",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
