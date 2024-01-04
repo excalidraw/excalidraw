@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "حذف همه آیتم های داخل فریم",
     "eyeDropper": "انتخاب رنگ از کرباس",
     "textToDiagram": "متن به دیاگرام",
-    "prompt": "فوری"
+    "prompt": "فوری",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
