@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap, isTestEnv } from "../utils";
+import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawElementType,
@@ -39,15 +39,13 @@ import { ExtractSetType } from "../utility-types";
 
 export const normalizeText = (text: string) => {
   return (
-    text
+    normalizeEOL(text)
       // replace tabs with spaces so they render and measure correctly
       .replace(/\t/g, "        ")
-      // normalize newlines
-      .replace(/\r?\n|\r/g, "\n")
   );
 };
 
-export const splitIntoLines = (text: string) => {
+const splitIntoLines = (text: string) => {
   return normalizeText(text).split("\n");
 };
 
