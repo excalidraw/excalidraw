@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "フレーム内のすべての要素を削除",
     "eyeDropper": "キャンバスから色を選択",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
