@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Fjern alle elementer fra rammen",
     "eyeDropper": "Velg farge fra lerretet",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
