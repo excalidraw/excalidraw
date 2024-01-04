@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "هەموو توخمەکانی ناو چوارچێوەکە لابەرە",
     "eyeDropper": "ڕەنگێک لەسەر تابلۆکە هەڵبژێرە",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
