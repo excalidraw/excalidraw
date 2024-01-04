@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "分离出画框中的所有元素",
     "eyeDropper": "从画布上取色",
     "textToDiagram": "文字至图表",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "尚未添加任何项目……",
