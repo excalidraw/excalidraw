@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
