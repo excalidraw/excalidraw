@@ -32,9 +32,9 @@ const RE_GH_GIST_EMBED =
   /^<script[\s\S]*?\ssrc=["'](https:\/\/gist.github.com\/.*?)\.js["']/i;
 
 // not anchored to start to allow <blockquote> twitter embeds
-const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:twitter|x).com/;
 const RE_TWITTER_EMBED =
-  /^<blockquote[\s\S]*?\shref=["'](https:\/\/twitter.com\/[^"']*)/i;
+  /^<blockquote[\s\S]*?\shref=["'](https:\/\/(?:twitter|x).com\/[^"']*)/i;
 
 const RE_VALTOWN =
   /^https:\/\/(?:www\.)?val.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
@@ -54,6 +54,7 @@ const ALLOWED_DOMAINS = new Set([
   "link.excalidraw.com",
   "gist.github.com",
   "twitter.com",
+  "x.com",
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
@@ -155,6 +156,9 @@ export const getEmbedLink = (
   }
 
   if (RE_TWITTER.test(link)) {
+    // the embed srcdoc still supports twitter.com domain only
+    link = link.replace(/\bx.com\b/, "twitter.com");
+
     let ret: IframeData;
     // assume embed code
     if (/<blockquote/.test(link)) {
