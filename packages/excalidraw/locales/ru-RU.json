@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Взять образец цвета с холста",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
