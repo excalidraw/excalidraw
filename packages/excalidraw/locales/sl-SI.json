@@ -139,8 +139,8 @@
     "eyeDropper": "Izberi barvo s platna",
     "textToDiagram": "Besedilo v diagram",
     "prompt": "Poziv",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Sledi nas",
+    "discordChat": "Klepet v Discordu"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
