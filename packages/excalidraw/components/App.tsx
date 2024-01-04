@@ -526,6 +526,7 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
+  private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -897,6 +898,23 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
+          const isVisible = isElementInViewport(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+          );
+          const hasBeenInitialized = this.initializedEmbeds.has(el.id);
+
+          if (isVisible && !hasBeenInitialized) {
+            this.initializedEmbeds.add(el.id);
+          }
+          const shouldRender = isVisible || hasBeenInitialized;
+
+          if (!shouldRender) {
+            return null;
+          }
+
           let src: IframeData | null;
 
           if (isIframeElement(el)) {
@@ -1038,14 +1056,6 @@ class App extends React.Component<AppProps, AppState> {
             src = getEmbedLink(toValidURL(el.link || ""));
           }
 
-          // console.log({ src });
-
-          const isVisible = isElementInViewport(
-            el,
-            normalizedWidth,
-            normalizedHeight,
-            this.state,
-          );
           const isActive =
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "active";
