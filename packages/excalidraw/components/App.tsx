@@ -898,6 +898,30 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
+          const isVisible = isElementInViewport(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+          );
+          const hasBeenInitialized = this.initializedEmbeds.has(el.id);
+
+          if (isVisible && !hasBeenInitialized) {
+            this.initializedEmbeds.add(el.id);
+          }
+          const shouldRender = isVisible || hasBeenInitialized;
+
+          const isActive =
+            this.state.activeEmbeddable?.element === el &&
+            this.state.activeEmbeddable?.state === "active";
+          const isHovered =
+            this.state.activeEmbeddable?.element === el &&
+            this.state.activeEmbeddable?.state === "hover";
+
+          if (!shouldRender) {
+            return null;
+          }
+
           let src: IframeData | null;
 
           if (isIframeElement(el)) {
@@ -1037,32 +1061,6 @@ class App extends React.Component<AppProps, AppState> {
             }
           } else {
             src = getEmbedLink(toValidURL(el.link || ""));
-          }
-
-          // console.log({ src });
-
-          const isVisible = isElementInViewport(
-            el,
-            normalizedWidth,
-            normalizedHeight,
-            this.state,
-          );
-          const hasBeenInitialized = this.initializedEmbeds.has(el.id);
-
-          if (isVisible && !hasBeenInitialized) {
-            this.initializedEmbeds.add(el.id);
-          }
-          const shouldRender = isVisible || hasBeenInitialized;
-
-          const isActive =
-            this.state.activeEmbeddable?.element === el &&
-            this.state.activeEmbeddable?.state === "active";
-          const isHovered =
-            this.state.activeEmbeddable?.element === el &&
-            this.state.activeEmbeddable?.state === "hover";
-
-          if (!shouldRender) {
-            return null;
           }
 
           return (
