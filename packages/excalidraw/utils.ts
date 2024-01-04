@@ -1071,3 +1071,7 @@ export function addEventListener(
     target?.removeEventListener?.(type, listener, options);
   };
 }
+
+export const normalizeEOL = (str: string) => {
+  return str.replace(/\r?\n|\r/g, "\n");
+};
