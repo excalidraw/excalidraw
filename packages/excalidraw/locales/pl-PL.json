@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Usuń wszystkie elementy z ramki",
     "eyeDropper": "Wybierz kolor z płótna",
     "textToDiagram": "Generuj diagram z opisu",
-    "prompt": "Opis"
+    "prompt": "Opis",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
