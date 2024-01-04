@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "चौखट से सर्व अवयव हटायें",
     "eyeDropper": "चित्रफलक से रंग चुने",
     "textToDiagram": "पाठ से रेखाचित्र",
-    "prompt": "प्रश्न"
+    "prompt": "प्रश्न",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "अभी तक कोई अवयव जोडा नहीं गया.",
