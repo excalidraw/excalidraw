@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
     "eyeDropper": "Ambil warna dari kanvas",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
