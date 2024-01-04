@@ -254,18 +254,18 @@ export const Socials = () => {
         GitHub
       </DropdownMenuItemLink>
       <DropdownMenuItemLink
-        icon={DiscordIcon}
-        href="https://discord.gg/UexuTaE"
-        aria-label="Discord"
-      >
-        {t("labels.discordChat")}
-      </DropdownMenuItemLink>
-      <DropdownMenuItemLink
         icon={XBrandIcon}
         href="https://x.com/excalidraw"
         aria-label="X"
       >
         {t("labels.followUs")}
+      </DropdownMenuItemLink>
+      <DropdownMenuItemLink
+        icon={DiscordIcon}
+        href="https://discord.gg/UexuTaE"
+        aria-label="Discord"
+      >
+        {t("labels.discordChat")}
       </DropdownMenuItemLink>
     </>
   );
