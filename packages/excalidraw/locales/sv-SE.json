@@ -139,8 +139,8 @@
     "eyeDropper": "Välj färg från canvas",
     "textToDiagram": "Text till diagram",
     "prompt": "",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Följ oss",
+    "discordChat": "Discord chat"
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
