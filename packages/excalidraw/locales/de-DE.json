@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
     "eyeDropper": "Farbe von der Zeichenfläche auswählen",
     "textToDiagram": "Text zu Diagramm",
-    "prompt": "Eingabe"
+    "prompt": "Eingabe",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
