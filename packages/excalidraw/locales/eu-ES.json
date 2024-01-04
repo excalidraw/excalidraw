@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
     "eyeDropper": "Aukeratu kolorea oihaletik",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
