@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
     "eyeDropper": "Izberi barvo s platna",
     "textToDiagram": "Besedilo v diagram",
-    "prompt": "Poziv"
+    "prompt": "Poziv",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
