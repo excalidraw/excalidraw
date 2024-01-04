@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Supprimer tous les éléments du cadre",
     "eyeDropper": "Choisir la couleur depuis le canevas",
     "textToDiagram": "Texte vers diagramme",
-    "prompt": "Demander"
+    "prompt": "Demander",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
