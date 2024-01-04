@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Odstrániť všetky prvky z rámu",
     "eyeDropper": "Vybrať farbu z plátna",
     "textToDiagram": "Text na diagram",
-    "prompt": "Inštrukcia"
+    "prompt": "Inštrukcia",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
