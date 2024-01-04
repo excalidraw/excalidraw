@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Eliminar todos los elementos del marco",
     "eyeDropper": "Seleccionar un color del lienzo",
     "textToDiagram": "Texto a diagrama",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
