@@ -1,32 +1,20 @@
+import { isArrowElement } from "../../shared/element/typeChecks";
 import { ROUNDNESS } from "../constants";
 import { ElementOrToolType } from "../types";
 import { MarkNonNullable } from "../utility-types";
-import { assertNever } from "../utils";
 import {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
-  ExcalidrawFreeDrawElement,
-  InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
-  ExcalidrawTextElementWithContainer,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
   RoundnessType,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawElementType,
   ExcalidrawIframeElement,
   ExcalidrawIframeLikeElement,
   ExcalidrawMagicFrameElement,
 } from "./types";
-
-export const isInitializedImageElement = (
-  element: ExcalidrawElement | null,
-): element is InitializedExcalidrawImageElement => {
-  return !!element && element.type === "image" && !!element.fileId;
-};
 
 export const isImageElement = (
   element: ExcalidrawElement | null,
@@ -54,12 +42,6 @@ export const isIframeLikeElement = (
   );
 };
 
-export const isTextElement = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawTextElement => {
-  return element != null && element.type === "text";
-};
-
 export const isFrameElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawFrameElement => {
@@ -70,47 +52,6 @@ export const isMagicFrameElement = (
   element: ExcalidrawElement | null,
 ): element is ExcalidrawMagicFrameElement => {
   return element != null && element.type === "magicframe";
-};
-
-export const isFrameLikeElement = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawFrameLikeElement => {
-  return (
-    element != null &&
-    (element.type === "frame" || element.type === "magicframe")
-  );
-};
-
-export const isFreeDrawElement = (
-  element?: ExcalidrawElement | null,
-): element is ExcalidrawFreeDrawElement => {
-  return element != null && isFreeDrawElementType(element.type);
-};
-
-export const isFreeDrawElementType = (
-  elementType: ExcalidrawElementType,
-): boolean => {
-  return elementType === "freedraw";
-};
-
-export const isLinearElement = (
-  element?: ExcalidrawElement | null,
-): element is ExcalidrawLinearElement => {
-  return element != null && isLinearElementType(element.type);
-};
-
-export const isArrowElement = (
-  element?: ExcalidrawElement | null,
-): element is ExcalidrawLinearElement => {
-  return element != null && element.type === "arrow";
-};
-
-export const isLinearElementType = (
-  elementType: ElementOrToolType,
-): boolean => {
-  return (
-    elementType === "arrow" || elementType === "line" // || elementType === "freedraw"
-  );
 };
 
 export const isBindingElement = (
@@ -163,53 +104,12 @@ export const isTextBindableContainer = (
   );
 };
 
-export const isExcalidrawElement = (
-  element: any,
-): element is ExcalidrawElement => {
-  const type: ExcalidrawElementType | undefined = element?.type;
-  if (!type) {
-    return false;
-  }
-  switch (type) {
-    case "text":
-    case "diamond":
-    case "rectangle":
-    case "iframe":
-    case "embeddable":
-    case "ellipse":
-    case "arrow":
-    case "freedraw":
-    case "line":
-    case "frame":
-    case "magicframe":
-    case "image":
-    case "selection": {
-      return true;
-    }
-    default: {
-      assertNever(type, null);
-      return false;
-    }
-  }
-};
-
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
 ): element is MarkNonNullable<ExcalidrawBindableElement, "boundElements"> => {
   return (
     isTextBindableContainer(element) &&
     !!element.boundElements?.some(({ type }) => type === "text")
-  );
-};
-
-export const isBoundToContainer = (
-  element: ExcalidrawElement | null,
-): element is ExcalidrawTextElementWithContainer => {
-  return (
-    element !== null &&
-    "containerId" in element &&
-    element.containerId !== null &&
-    isTextElement(element)
   );
 };
 
@@ -259,3 +159,5 @@ export const getDefaultRoundnessTypeForElement = (
 
   return null;
 };
+
+export * from "../../shared/element/typeChecks";

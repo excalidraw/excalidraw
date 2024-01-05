@@ -10,7 +10,7 @@ import {
   NonDeleted,
 } from "../excalidraw/element/types";
 import { restore } from "../excalidraw/data/restore";
-import { MIME_TYPES } from "../excalidraw/constants";
+import { MIME_TYPES } from "../shared/constants";
 import { encodePngMetadata } from "../excalidraw/data/image";
 import { serializeAsJSON } from "../excalidraw/data/json";
 import {
@@ -18,8 +18,6 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "../excalidraw/clipboard";
-
-export { MIME_TYPES };
 
 type ExportOpts = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
