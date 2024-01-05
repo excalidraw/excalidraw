@@ -81,6 +81,7 @@ export const THEME = {
   DARK: "dark",
 } as const;
 
+// roundness type (algorithm)
 export const ROUNDNESS = {
   // Used for legacy rounding (rectangles), which currently works the same
   // as PROPORTIONAL_RADIUS, but we need to differentiate for UI purposes and
@@ -100,6 +101,9 @@ export const ROUNDNESS = {
   ADAPTIVE_RADIUS: 3,
 } as const;
 
+// Radius represented as 25% of element's largest side (width/height).
+// Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
+// below the cutoff size.
 export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
 
 // Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
