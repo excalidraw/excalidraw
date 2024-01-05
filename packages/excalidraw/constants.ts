@@ -1,4 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
+import { ExcalidrawElement } from "./element/types";
 import { AppProps } from "./types";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
