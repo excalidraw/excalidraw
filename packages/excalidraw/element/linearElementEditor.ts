@@ -42,7 +42,7 @@ import {
   isBindingEnabled,
 } from "./binding";
 import { tupleToCoors } from "../utils";
-import { isBindingElement, isFreeDrawElement } from "./typeChecks";
+import { isBindingElement } from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
@@ -344,10 +344,7 @@ export class LinearElementEditor {
           selectedPoint === 0 ||
           selectedPoint === element.points.length - 1
         ) {
-          if (
-            !isFreeDrawElement(element) &&
-            isPathALoop(element.points, appState.zoom.value)
-          ) {
+          if (isPathALoop(element.points, appState.zoom.value)) {
             LinearElementEditor.movePoints(element, [
               {
                 index: selectedPoint,
