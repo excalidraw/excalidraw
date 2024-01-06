@@ -344,10 +344,7 @@ export class LinearElementEditor {
           selectedPoint === 0 ||
           selectedPoint === element.points.length - 1
         ) {
-          if (
-            !isFreeDrawElement(element) && //zsviczian #6303
-            isPathALoop(element.points, appState.zoom.value)
-          ) {
+          if (isPathALoop(element.points, appState.zoom.value)) {
             LinearElementEditor.movePoints(element, [
               {
                 index: selectedPoint,

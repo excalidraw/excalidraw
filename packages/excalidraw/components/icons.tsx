@@ -1533,6 +1533,7 @@ export const FontFamilyLocalFontIcon = createIcon(
   <>
     <g
       stroke="var(--icon-fill-color)"
+      fill="var(--icon-fill-color)"
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
