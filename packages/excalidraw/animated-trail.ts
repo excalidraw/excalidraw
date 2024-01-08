@@ -44,6 +44,7 @@ export class AnimatedTrail {
     this.currentTrail = new LaserPointer({
       streamline: 0.4,
       size: 7,
+      keepHead: true,
       sizeMapping: (c) => {
         const t = Math.max(
           0,
