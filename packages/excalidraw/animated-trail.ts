@@ -7,7 +7,7 @@ import {
   sceneCoordsToViewportCoords,
 } from "./utils";
 import type App from "./components/App";
-import { SVG_NS } from "./constants";
+import { SVG_NS, THEME } from "./constants";
 
 const DECAY_TIME = 200;
 const DECAY_LENGTH = 10;
@@ -42,8 +42,8 @@ export class AnimatedTrail {
 
   startPath(x: number, y: number) {
     this.currentTrail = new LaserPointer({
-      streamline: 0.4,
-      size: 7,
+      streamline: 0.2,
+      size: 5,
       keepHead: true,
       sizeMapping: (c) => {
         const t = Math.max(
@@ -110,7 +110,12 @@ export class AnimatedTrail {
     const svgPaths = paths.join(" ").trim();
 
     this.trailElement.setAttribute("d", svgPaths);
-    this.trailElement.setAttribute("fill", "rgba(0, 0, 0, 0.25)");
+    this.trailElement.setAttribute(
+      "fill",
+      this.app.state.theme === THEME.LIGHT
+        ? "rgba(0, 0, 0, 0.2)"
+        : "rgba(255, 255, 255, 0.2)",
+    );
   }
 
   private drawTrail(trail: LaserPointer, state: AppState): string {
