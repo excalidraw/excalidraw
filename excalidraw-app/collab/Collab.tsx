@@ -22,7 +22,6 @@ import {
   preventUnload,
   resolvablePromise,
   throttleRAF,
-  withBatchedUpdates,
 } from "../../packages/excalidraw/utils";
 import {
   CURSOR_SYNC_TIMEOUT,
@@ -83,6 +82,7 @@ import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
 import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
+import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);

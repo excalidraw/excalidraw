@@ -5,12 +5,7 @@ import type * as TExcalidraw from "../index";
 import "./App.scss";
 import initialData from "./initialData";
 import { nanoid } from "nanoid";
-import {
-  resolvablePromise,
-  ResolvablePromise,
-  withBatchedUpdates,
-  withBatchedUpdatesThrottled,
-} from "../utils";
+import { resolvablePromise, ResolvablePromise } from "../utils";
 import { EVENT, ROUNDNESS } from "../constants";
 import { distance2d } from "../math";
 import { fileOpen } from "../data/filesystem";
@@ -29,6 +24,7 @@ import { ImportedLibraryData } from "../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
 import { KEYS } from "../keys";
+import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 
 declare global {
   interface Window {
