@@ -2607,6 +2607,10 @@ class App extends React.Component<AppProps, AppState> {
       this.updateLanguage();
     }
 
+    if (isEraserActive(prevState) && !isEraserActive(this.state)) {
+      this.eraserTrail.endPath();
+    }
+
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
       this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
     }

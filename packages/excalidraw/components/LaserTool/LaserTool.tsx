@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { LaserPathManager } from "./LaserPathManager";
 import "./LaserToolOverlay.scss";
 import { AnimatedTrail } from "../../animated-trail";
@@ -14,14 +14,11 @@ export const LaserToolOverlay = ({
 }: LaserToolOverlayProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const memoTrails = useMemo(() => trails, trails);
-
   useEffect(() => {
     if (svgRef.current) {
       manager.start(svgRef.current);
 
-      for (const trail of memoTrails) {
+      for (const trail of trails) {
         trail.start(svgRef.current);
       }
     }
@@ -29,7 +26,8 @@ export const LaserToolOverlay = ({
     return () => {
       manager.stop();
     };
-  }, [manager, memoTrails]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manager, ...trails]);
 
   return (
     <div className="LaserToolOverlay">
