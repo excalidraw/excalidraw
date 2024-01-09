@@ -32,9 +32,9 @@ const RE_GH_GIST_EMBED =
   /^<script[\s\S]*?\ssrc=["'](https:\/\/gist.github.com\/.*?)\.js["']/i;
 
 // not anchored to start to allow <blockquote> twitter embeds
-const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:twitter|x).com/;
 const RE_TWITTER_EMBED =
-  /^<blockquote[\s\S]*?\shref=["'](https:\/\/twitter.com\/[^"']*)/i;
+  /^<blockquote[\s\S]*?\shref=["'](https:\/\/(?:twitter|x).com\/[^"']*)/i;
 
 const RE_VALTOWN =
   /^https:\/\/(?:www\.)?val.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
@@ -54,6 +54,7 @@ const ALLOWED_DOMAINS = new Set([
   "link.excalidraw.com",
   "gist.github.com",
   "twitter.com",
+  "x.com",
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
@@ -155,6 +156,9 @@ export const getEmbedLink = (
   }
 
   if (RE_TWITTER.test(link)) {
+    // the embed srcdoc still supports twitter.com domain only
+    link = link.replace(/\bx.com\b/, "twitter.com");
+
     let ret: IframeData;
     // assume embed code
     if (/<blockquote/.test(link)) {
@@ -321,26 +325,26 @@ const validateHostname = (
   return false;
 };
 
-export const extractSrc = (htmlString: string): string => {
-  const twitterMatch = htmlString.match(RE_TWITTER_EMBED);
+export const maybeParseEmbedSrc = (str: string): string => {
+  const twitterMatch = str.match(RE_TWITTER_EMBED);
   if (twitterMatch && twitterMatch.length === 2) {
     return twitterMatch[1];
   }
 
-  const gistMatch = htmlString.match(RE_GH_GIST_EMBED);
+  const gistMatch = str.match(RE_GH_GIST_EMBED);
   if (gistMatch && gistMatch.length === 2) {
     return gistMatch[1];
   }
 
-  if (RE_GIPHY.test(htmlString)) {
-    return `https://giphy.com/embed/${RE_GIPHY.exec(htmlString)![1]}`;
+  if (RE_GIPHY.test(str)) {
+    return `https://giphy.com/embed/${RE_GIPHY.exec(str)![1]}`;
   }
 
-  const match = htmlString.match(RE_GENERIC_EMBED);
+  const match = str.match(RE_GENERIC_EMBED);
   if (match && match.length === 2) {
     return match[1];
   }
-  return htmlString;
+  return str;
 };
 
 export const embeddableURLValidator = (

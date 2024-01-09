@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Remove all elements from frame",
     "eyeDropper": "Pick color from canvas",
     "textToDiagram": "Text to diagram",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "followUs": "Follow us",
+    "discordChat": "Discord chat"
   },
   "library": {
     "noItems": "No items added yet...",
