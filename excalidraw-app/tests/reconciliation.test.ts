@@ -21,11 +21,11 @@ type ElementLike = {
   version: number;
   versionNonce: number;
   source: Source;
-  fractionalIndex: string | null;
+  index: string | null;
 };
 
 const createElementFromString = (stringEl: string): ElementLike => {
-  const [_source, id, _version, _versionNonce, _fractionalIndex] =
+  const [_source, id, _version, _versionNonce, _index] =
     stringEl.split(SEPARATOR);
 
   const source = _source as Source;
@@ -35,15 +35,14 @@ const createElementFromString = (stringEl: string): ElementLike => {
     _versionNonce === NULL_PLACEHOLDER
       ? randomInteger()
       : parseInt(_versionNonce);
-  const fractionalIndex =
-    _fractionalIndex === NULL_PLACEHOLDER ? null : _fractionalIndex;
+  const index = _index === NULL_PLACEHOLDER ? null : _index;
 
   return {
     id,
     version,
     versionNonce,
     source,
-    fractionalIndex,
+    index,
   };
 };
 
@@ -224,11 +223,9 @@ describe("reconcile with fractional indices", () => {
       createElementFromString(ls),
     ) as any as ExcalidrawElement[];
 
-    const localFractionalIndices = new Set(
-      localEls.map((e) => e.fractionalIndex),
-    );
+    const localFractionalIndices = new Set(localEls.map((e) => e.index));
     const reconciledFractionalIndices = new Set(
-      reconciledEls.map((e) => e.fractionalIndex),
+      reconciledEls.map((e) => e.index),
     );
 
     let actualDiffCount = 0;

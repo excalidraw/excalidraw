@@ -50,7 +50,7 @@ type _ExcalidrawElementBase = Readonly<{
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */
   versionNonce: number;
-  fractionalIndex: string | null;
+  index: string | null;
   isDeleted: boolean;
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */

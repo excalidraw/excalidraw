@@ -428,7 +428,7 @@ describe("contextMenu element", () => {
       seed: _seed0,
       x: _x0,
       y: _y0,
-      fractionalIndex: _fractionalIndex0,
+      index: _fractionalIndex0,
       version: _version0,
       versionNonce: _versionNonce0,
       ...rect1
@@ -438,7 +438,7 @@ describe("contextMenu element", () => {
       seed: _seed1,
       x: _x1,
       y: _y1,
-      fractionalIndex: _fractionalIndex1,
+      index: _fractionalIndex1,
       version: _version1,
       versionNonce: _versionNonce1,
       ...rect2

@@ -20,13 +20,13 @@ describe("exportToSvg", () => {
       ...diamondFixture,
       height: ELEMENT_HEIGHT,
       width: ELEMENT_WIDTH,
-      fractionalIndex: "A0",
+      index: "A0",
     },
     {
       ...ellipseFixture,
       height: ELEMENT_HEIGHT,
       width: ELEMENT_WIDTH,
-      fractionalIndex: "A1",
+      index: "A1",
     },
   ] as NonDeletedExcalidrawElement[];
 

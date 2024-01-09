@@ -119,7 +119,7 @@ const restoreElementWithProperties = <
     // newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
-    fractionalIndex: element.fractionalIndex ?? null,
+    index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
     fillStyle: element.fillStyle || DEFAULT_ELEMENT_PROPS.fillStyle,

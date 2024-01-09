@@ -16,7 +16,7 @@ const createElementWithIndex = (
 ): ExcalidrawElement => {
   return API.createElement({
     type: "rectangle",
-    fractionalIndex,
+    index: fractionalIndex,
   });
 };
 
@@ -102,7 +102,7 @@ describe("restoring fractional indices", () => {
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
     // should only fix the second element's fractional index
-    expect(elements[1].fractionalIndex).not.toEqual("C0");
+    expect(elements[1].index).not.toEqual("C0");
     expect(elements.filter((value, index) => index !== 1)).deep.equal(
       restoredElements.filter((value, index) => index !== 1),
     );
@@ -124,7 +124,7 @@ describe("restoring fractional indices", () => {
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
-    expect(new Set(restoredElements.map((e) => e.fractionalIndex)).size).toBe(
+    expect(new Set(restoredElements.map((e) => e.index)).size).toBe(
       randomNumOfElements,
     );
   });
@@ -145,7 +145,7 @@ describe("restoring fractional indices", () => {
 
     testLengthAndOrder(elements, restoredElements);
     testValidity(restoredElements);
-    expect(new Set(restoredElements.map((e) => e.fractionalIndex)).size).toBe(
+    expect(new Set(restoredElements.map((e) => e.index)).size).toBe(
       elements.length,
     );
   });

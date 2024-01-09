@@ -11,7 +11,7 @@ import {
 import { ENV } from "./constants";
 import { InvalidFractionalIndexError } from "./errors";
 
-type FractionalIndex = ExcalidrawElement["fractionalIndex"];
+type FractionalIndex = ExcalidrawElement["index"];
 
 export const base36CharSet = indexCharacterSet({
   chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -57,10 +57,10 @@ export const generateNKeysBetween = (
  */
 export const orderByFractionalIndex = (elements: ExcalidrawElement[]) => {
   return elements.sort((a, b) => {
-    if (a.fractionalIndex && b.fractionalIndex) {
-      if (a.fractionalIndex < b.fractionalIndex) {
+    if (a.index && b.index) {
+      if (a.index < b.index) {
         return -1;
-      } else if (a.fractionalIndex > b.fractionalIndex) {
+      } else if (a.index > b.index) {
         return 1;
       }
 
@@ -86,15 +86,11 @@ export const restoreFractionalIndices = (
   elements: readonly ExcalidrawElement[],
 ) => {
   for (const [index, element] of elements.entries()) {
-    const predecessorIndex = elements[index - 1]?.fractionalIndex || null;
-    const successorIndex = elements[index + 1]?.fractionalIndex || null;
+    const predecessorIndex = elements[index - 1]?.index || null;
+    const successorIndex = elements[index + 1]?.index || null;
 
     if (
-      !isValidFractionalIndex(
-        element.fractionalIndex,
-        predecessorIndex,
-        successorIndex,
-      )
+      !isValidFractionalIndex(element.index, predecessorIndex, successorIndex)
     ) {
       const fractionalIndex = restoreFractionalIndex(
         predecessorIndex,
@@ -103,7 +99,7 @@ export const restoreFractionalIndices = (
       mutateElement(
         element,
         {
-          fractionalIndex,
+          index: fractionalIndex,
         },
         false,
       );
@@ -122,19 +118,15 @@ export const validateFractionalIndices = (
   elements: readonly ExcalidrawElement[],
 ) => {
   for (const [index, element] of elements.entries()) {
-    const predecessorIndex = elements[index - 1]?.fractionalIndex || null;
-    const successorIndex = elements[index + 1]?.fractionalIndex || null;
+    const predecessorIndex = elements[index - 1]?.index || null;
+    const successorIndex = elements[index + 1]?.index || null;
 
     if (
-      !isValidFractionalIndex(
-        element.fractionalIndex,
-        predecessorIndex,
-        successorIndex,
-      )
+      !isValidFractionalIndex(element.index, predecessorIndex, successorIndex)
     ) {
       if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
         console.error(
-          `Fractional index of element, predecessor and successor respectively: "${element.fractionalIndex}", "${predecessorIndex}", "${successorIndex}"`,
+          `Fractional index of element, predecessor and successor respectively: "${element.index}", "${predecessorIndex}", "${successorIndex}"`,
         );
         throw new InvalidFractionalIndexError(
           `Fractional indices invariant for element "${element.id}" has been compromised.`,
@@ -159,9 +151,9 @@ export const updateFractionalIndices = (
   );
 
   for (const indices of contiguousMovedIndices) {
-    const lowerBoundIndex = elements[indices[0] - 1]?.fractionalIndex || null;
+    const lowerBoundIndex = elements[indices[0] - 1]?.index || null;
     const upperBoundIndex =
-      elements[indices[indices.length - 1] + 1]?.fractionalIndex || null;
+      elements[indices[indices.length - 1] + 1]?.index || null;
 
     const fractionalIndices = generateNKeysBetween(
       lowerBoundIndex,
@@ -175,7 +167,7 @@ export const updateFractionalIndices = (
       mutateElement(
         element,
         {
-          fractionalIndex: fractionalIndices[i],
+          index: fractionalIndices[i],
         },
         false,
       );

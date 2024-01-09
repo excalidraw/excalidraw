@@ -46,7 +46,7 @@ const populateElements = (
     height?: number;
     containerId?: string;
     frameId?: ExcalidrawFrameElement["id"];
-    fractionalIndex?: ExcalidrawElement["fractionalIndex"];
+    index?: ExcalidrawElement["index"];
   }[],
   appState?: Partial<AppState>,
 ) => {
