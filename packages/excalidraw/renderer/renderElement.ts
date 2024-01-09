@@ -40,6 +40,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
@@ -595,6 +596,12 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  // doing it like this as a crude hack to bust cache. Should be ok perf-wise
+  // since erasing is a transient state & edge case
+  if (renderConfig.elementsPendingErasure.has(element.id)) {
+    element = { ...element, opacity: ELEMENT_READY_TO_ERASE_OPACITY };
+  }
+
   switch (element.type) {
     case "magicframe":
     case "frame": {

@@ -247,6 +247,7 @@ import {
   ToolType,
   OnUserFollowedPayload,
   UnsubscribeCallback,
+  ElementsPendingErasure,
 } from "../types";
 import {
   debounce,
@@ -526,6 +527,8 @@ class App extends React.Component<AppProps, AppState> {
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+
+  private elementsPendingErasure: ElementsPendingErasure = new Set();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -1583,6 +1586,7 @@ class App extends React.Component<AppProps, AppState> {
                             renderGrid: true,
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
+                            elementsPendingErasure: this.elementsPendingErasure,
                           }}
                         />
                         <InteractiveCanvas
@@ -5062,30 +5066,24 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     scenePointer: { x: number; y: number },
   ) => {
-    const updateElementIds = (elements: ExcalidrawElement[]) => {
-      elements.forEach((element) => {
+    let didChange = false;
+
+    const processElements = (elements: ExcalidrawElement[]) => {
+      for (const element of elements) {
         if (element.locked) {
           return;
         }
 
-        idsToUpdate.push(element.id);
         if (event.altKey) {
-          if (
-            pointerDownState.elementIdsToErase[element.id] &&
-            pointerDownState.elementIdsToErase[element.id].erase
-          ) {
-            pointerDownState.elementIdsToErase[element.id].erase = false;
+          if (this.elementsPendingErasure.delete(element.id)) {
+            didChange = true;
           }
-        } else if (!pointerDownState.elementIdsToErase[element.id]) {
-          pointerDownState.elementIdsToErase[element.id] = {
-            erase: true,
-            opacity: element.opacity,
-          };
+        } else if (!this.elementsPendingErasure.has(element.id)) {
+          didChange = true;
+          this.elementsPendingErasure.add(element.id);
         }
-      });
+      }
     };
-
-    const idsToUpdate: Array<string> = [];
 
     const distance = distance2d(
       pointerDownState.lastCoords.x,
@@ -5098,7 +5096,7 @@ class App extends React.Component<AppProps, AppState> {
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
       const hitElements = this.getElementsAtPosition(point.x, point.y);
-      updateElementIds(hitElements);
+      processElements(hitElements);
 
       // Exit since we reached current point
       if (samplingInterval === distance) {
@@ -5117,35 +5115,31 @@ class App extends React.Component<AppProps, AppState> {
       point.y = nextY;
     }
 
-    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
-      const id =
-        isBoundToContainer(ele) && idsToUpdate.includes(ele.containerId)
-          ? ele.containerId
-          : ele.id;
-      if (idsToUpdate.includes(id)) {
-        if (event.altKey) {
-          if (
-            pointerDownState.elementIdsToErase[id] &&
-            pointerDownState.elementIdsToErase[id].erase === false
-          ) {
-            return newElementWith(ele, {
-              opacity: pointerDownState.elementIdsToErase[id].opacity,
-            });
-          }
-        } else {
-          return newElementWith(ele, {
-            opacity: ELEMENT_READY_TO_ERASE_OPACITY,
-          });
-        }
-      }
-      return ele;
-    });
-
-    this.scene.replaceAllElements(elements);
-
     pointerDownState.lastCoords.x = scenePointer.x;
     pointerDownState.lastCoords.y = scenePointer.y;
+
+    if (didChange) {
+      for (const element of this.scene.getNonDeletedElements()) {
+        if (
+          isBoundToContainer(element) &&
+          (this.elementsPendingErasure.has(element.id) ||
+            this.elementsPendingErasure.has(element.containerId))
+        ) {
+          if (event.altKey) {
+            this.elementsPendingErasure.delete(element.id);
+            this.elementsPendingErasure.delete(element.containerId);
+          } else {
+            this.elementsPendingErasure.add(element.id);
+            this.elementsPendingErasure.add(element.containerId);
+          }
+        }
+      }
+
+      this.elementsPendingErasure = new Set(this.elementsPendingErasure);
+      this.onSceneUpdated();
+    }
   };
+
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
     invalidateContextMenu = true;
@@ -5831,7 +5825,6 @@ class App extends React.Component<AppProps, AppState> {
       boxSelection: {
         hasOccurred: false,
       },
-      elementIdsToErase: {},
     };
   }
 
@@ -7815,18 +7808,14 @@ class App extends React.Component<AppProps, AppState> {
             scenePointer.x,
             scenePointer.y,
           );
-          hitElements.forEach(
-            (hitElement) =>
-              (pointerDownState.elementIdsToErase[hitElement.id] = {
-                erase: true,
-                opacity: hitElement.opacity,
-              }),
+          hitElements.forEach((hitElement) =>
+            this.elementsPendingErasure.add(hitElement.id),
           );
         }
-        this.eraseElements(pointerDownState);
+        this.eraseElements();
         return;
-      } else if (Object.keys(pointerDownState.elementIdsToErase).length) {
-        this.restoreReadyToEraseElements(pointerDownState);
+      } else if (this.elementsPendingErasure.size) {
+        this.restoreReadyToEraseElements();
       }
 
       if (
@@ -8087,65 +8076,32 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private restoreReadyToEraseElements = (
-    pointerDownState: PointerDownState,
-  ) => {
-    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
-      if (
-        pointerDownState.elementIdsToErase[ele.id] &&
-        pointerDownState.elementIdsToErase[ele.id].erase
-      ) {
-        return newElementWith(ele, {
-          opacity: pointerDownState.elementIdsToErase[ele.id].opacity,
-        });
-      } else if (
-        isBoundToContainer(ele) &&
-        pointerDownState.elementIdsToErase[ele.containerId] &&
-        pointerDownState.elementIdsToErase[ele.containerId].erase
-      ) {
-        return newElementWith(ele, {
-          opacity: pointerDownState.elementIdsToErase[ele.containerId].opacity,
-        });
-      } else if (
-        ele.frameId &&
-        pointerDownState.elementIdsToErase[ele.frameId] &&
-        pointerDownState.elementIdsToErase[ele.frameId].erase
-      ) {
-        return newElementWith(ele, {
-          opacity: pointerDownState.elementIdsToErase[ele.frameId].opacity,
-        });
-      }
-      return ele;
-    });
-
-    this.scene.replaceAllElements(elements);
+  private restoreReadyToEraseElements = () => {
+    this.elementsPendingErasure = new Set();
+    this.onSceneUpdated();
   };
 
-  private eraseElements = (pointerDownState: PointerDownState) => {
+  private eraseElements = () => {
+    let didChange = false;
     const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
       if (
-        pointerDownState.elementIdsToErase[ele.id] &&
-        pointerDownState.elementIdsToErase[ele.id].erase
+        this.elementsPendingErasure.has(ele.id) ||
+        (ele.frameId && this.elementsPendingErasure.has(ele.frameId)) ||
+        (isBoundToContainer(ele) &&
+          this.elementsPendingErasure.has(ele.containerId))
       ) {
-        return newElementWith(ele, { isDeleted: true });
-      } else if (
-        isBoundToContainer(ele) &&
-        pointerDownState.elementIdsToErase[ele.containerId] &&
-        pointerDownState.elementIdsToErase[ele.containerId].erase
-      ) {
-        return newElementWith(ele, { isDeleted: true });
-      } else if (
-        ele.frameId &&
-        pointerDownState.elementIdsToErase[ele.frameId] &&
-        pointerDownState.elementIdsToErase[ele.frameId].erase
-      ) {
+        didChange = true;
         return newElementWith(ele, { isDeleted: true });
       }
       return ele;
     });
 
-    this.history.resumeRecording();
-    this.scene.replaceAllElements(elements);
+    this.elementsPendingErasure = new Set();
+
+    if (didChange) {
+      this.history.resumeRecording();
+      this.scene.replaceAllElements(elements);
+    }
   };
 
   private initializeImage = async ({
