@@ -1,4 +1,4 @@
-import "../ToolIcon.scss";
+import "./ToolIcon.scss";
 
 import clsx from "clsx";
 import { ToolButtonSize } from "./ToolButton";
