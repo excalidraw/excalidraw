@@ -593,14 +593,19 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  const containingFrame = getContainingFrame(element);
   context.globalAlpha =
     // multiplying frame opacity with element opacity to combine them
     // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
-    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
+    ((containingFrame?.opacity ?? 100) * element.opacity) / 10000;
 
   // if pending erasure, multiply again to combine further
   // (so that erasing always results in lower opacity than original)
-  if (renderConfig.elementsPendingErasure.has(element.id)) {
+  if (
+    renderConfig.elementsPendingErasure.has(element.id) ||
+    (containingFrame &&
+      renderConfig.elementsPendingErasure.has(containingFrame.id))
+  ) {
     context.globalAlpha *= ELEMENT_READY_TO_ERASE_OPACITY / 100;
   }
 
