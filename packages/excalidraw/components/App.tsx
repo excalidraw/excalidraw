@@ -384,7 +384,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
-import { SVGLayer } from "./LaserTool/SVGLayer";
+import { SVGLayer } from "./SVGLayer";
 import {
   setEraserCursor,
   setCursor,
