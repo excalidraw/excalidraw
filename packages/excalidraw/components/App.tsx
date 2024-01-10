@@ -402,6 +402,7 @@ import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
+import { getRenderOpacity } from "../renderer/renderElement";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1077,7 +1078,11 @@ class App extends React.Component<AppProps, AppState> {
                     }px) scale(${scale})`
                   : "none",
                 display: isVisible ? "block" : "none",
-                opacity: el.opacity / 100,
+                opacity: getRenderOpacity(
+                  el,
+                  getContainingFrame(el),
+                  this.elementsPendingErasure,
+                ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
                   el,

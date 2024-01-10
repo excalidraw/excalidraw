@@ -5,6 +5,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawFrameLikeElement,
 } from "../element/types";
 import {
   isTextElement,
@@ -36,6 +37,7 @@ import {
   BinaryFiles,
   Zoom,
   InteractiveCanvasAppState,
+  ElementsPendingErasure,
 } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
@@ -94,6 +96,27 @@ const shouldResetImageFilter = (
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
   element.type === "freedraw" ? element.strokeWidth * 12 : 20;
+
+export const getRenderOpacity = (
+  element: ExcalidrawElement,
+  containingFrame: ExcalidrawFrameLikeElement | null,
+  elementsPendingErasure: ElementsPendingErasure,
+) => {
+  // multiplying frame opacity with element opacity to combine them
+  // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
+  let opacity = ((containingFrame?.opacity ?? 100) * element.opacity) / 10000;
+
+  // if pending erasure, multiply again to combine further
+  // (so that erasing always results in lower opacity than original)
+  if (
+    elementsPendingErasure.has(element.id) ||
+    (containingFrame && elementsPendingErasure.has(containingFrame.id))
+  ) {
+    opacity *= ELEMENT_READY_TO_ERASE_OPACITY / 100;
+  }
+
+  return opacity;
+};
 
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
@@ -593,21 +616,11 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
-  const containingFrame = getContainingFrame(element);
-  context.globalAlpha =
-    // multiplying frame opacity with element opacity to combine them
-    // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
-    ((containingFrame?.opacity ?? 100) * element.opacity) / 10000;
-
-  // if pending erasure, multiply again to combine further
-  // (so that erasing always results in lower opacity than original)
-  if (
-    renderConfig.elementsPendingErasure.has(element.id) ||
-    (containingFrame &&
-      renderConfig.elementsPendingErasure.has(containingFrame.id))
-  ) {
-    context.globalAlpha *= ELEMENT_READY_TO_ERASE_OPACITY / 100;
-  }
+  context.globalAlpha = getRenderOpacity(
+    element,
+    getContainingFrame(element),
+    renderConfig.elementsPendingErasure,
+  );
 
   switch (element.type) {
     case "magicframe":
