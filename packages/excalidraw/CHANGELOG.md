@@ -18,7 +18,7 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking Changes
 
-- `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateEmbeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
+- `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
 
 ## 0.17.1 (2023-11-28)
@@ -235,7 +235,7 @@ define: {
 
 - Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
 - Introducing Web-Embeds (alias iframe element)[#6691](https://github.com/excalidraw/excalidraw/pull/6691)
-- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateEmbeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
+- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
 - Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)
