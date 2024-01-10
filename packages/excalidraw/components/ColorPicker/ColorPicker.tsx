@@ -10,7 +10,12 @@ import {
   ColorPickerType,
 } from "./colorPickerUtils";
 import { useDevice, useExcalidrawContainer } from "../App";
-import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
+import {
+  ColorTuple,
+  COLOR_PALETTE,
+  ColorPaletteCustom,
+  isTransparent,
+} from "../../colors";
 import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
 import clsx from "clsx";
