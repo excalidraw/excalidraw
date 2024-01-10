@@ -1046,7 +1046,7 @@ export function getSvgPathFromStroke(points: number[][], closed = true) {
 
   return result;
 }
-  
+
 export const normalizeEOL = (str: string) => {
   return str.replace(/\r?\n|\r/g, "\n");
 };
