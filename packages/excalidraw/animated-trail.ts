@@ -1,18 +1,24 @@
-import { LaserPointer } from "@excalidraw/laser-pointer";
+import { LaserPointer, LaserPointerOptions } from "@excalidraw/laser-pointer";
 import { AnimationFrameHandler } from "./animation-frame-handler";
 import { AppState } from "./types";
-import {
-  easeOut,
-  getSvgPathFromStroke,
-  sceneCoordsToViewportCoords,
-} from "./utils";
+import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
 import type App from "./components/App";
-import { SVG_NS, THEME } from "./constants";
+import { SVG_NS } from "./constants";
 
-const DECAY_TIME = 200;
-const DECAY_LENGTH = 10;
+export interface Trail {
+  start(container: SVGSVGElement): void;
+  stop(): void;
 
-export class AnimatedTrail {
+  startPath(x: number, y: number): void;
+  addPointToPath(x: number, y: number): void;
+  endPath(): void;
+}
+
+export interface AnimatedTrailOptions {
+  fill: (trail: AnimatedTrail) => string;
+}
+
+export class AnimatedTrail implements Trail {
   private currentTrail?: LaserPointer;
   private pastTrails: LaserPointer[] = [];
 
@@ -22,42 +28,52 @@ export class AnimatedTrail {
   constructor(
     private animationFrameHandler: AnimationFrameHandler,
     private app: App,
+    private options: Partial<LaserPointerOptions> &
+      Partial<AnimatedTrailOptions>,
   ) {
     this.animationFrameHandler.register(this, this.onFrame.bind(this));
 
     this.trailElement = document.createElementNS(SVG_NS, "path");
   }
 
-  start(container: SVGSVGElement) {
-    this.container = container;
+  get hasCurrentTrail() {
+    return !!this.currentTrail;
+  }
 
-    this.container.appendChild(this.trailElement);
+  hasLastPoint(x: number, y: number) {
+    if (this.currentTrail) {
+      const len = this.currentTrail.originalPoints.length;
+      return (
+        this.currentTrail.originalPoints[len - 1][0] === x &&
+        this.currentTrail.originalPoints[len - 1][1] === y
+      );
+    }
+
+    return false;
+  }
+
+  start(container?: SVGSVGElement) {
+    if (container) {
+      this.container = container;
+    }
+
+    if (this.trailElement.parentNode !== this.container && this.container) {
+      this.container.appendChild(this.trailElement);
+    }
 
     this.animationFrameHandler.start(this);
   }
 
   stop() {
     this.animationFrameHandler.stop(this);
+
+    if (this.trailElement.parentNode === this.container) {
+      this.container?.removeChild(this.trailElement);
+    }
   }
 
   startPath(x: number, y: number) {
-    this.currentTrail = new LaserPointer({
-      streamline: 0.2,
-      size: 5,
-      keepHead: true,
-      sizeMapping: (c) => {
-        const t = Math.max(
-          0,
-          1 - (performance.now() - c.pressure) / DECAY_TIME,
-        );
-        const l =
-          (DECAY_LENGTH -
-            Math.min(DECAY_LENGTH, c.totalLength - c.currentIndex)) /
-          DECAY_LENGTH;
-
-        return Math.min(easeOut(l), easeOut(t));
-      },
-    });
+    this.currentTrail = new LaserPointer(this.options);
 
     this.currentTrail.addPoint([x, y, performance.now()]);
 
@@ -74,6 +90,7 @@ export class AnimatedTrail {
   endPath() {
     if (this.currentTrail) {
       this.currentTrail.close();
+      this.currentTrail.options.keepHead = false;
       this.pastTrails.push(this.currentTrail);
       this.currentTrail = undefined;
       this.update();
@@ -81,7 +98,7 @@ export class AnimatedTrail {
   }
 
   private update() {
-    this.animationFrameHandler.start(this);
+    this.start();
   }
 
   private onFrame() {
@@ -98,9 +115,7 @@ export class AnimatedTrail {
     }
 
     this.pastTrails = this.pastTrails.filter((trail) => {
-      const lastPoint = trail.originalPoints[trail.originalPoints.length - 1];
-
-      return !(lastPoint && lastPoint[2] < performance.now() - DECAY_TIME);
+      return trail.getStrokeOutline().length !== 0;
     });
 
     if (paths.length === 0) {
@@ -112,9 +127,7 @@ export class AnimatedTrail {
     this.trailElement.setAttribute("d", svgPaths);
     this.trailElement.setAttribute(
       "fill",
-      this.app.state.theme === THEME.LIGHT
-        ? "rgba(0, 0, 0, 0.2)"
-        : "rgba(255, 255, 255, 0.2)",
+      (this.options.fill ?? (() => "black"))(this),
     );
   }
 
