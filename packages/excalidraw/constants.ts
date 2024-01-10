@@ -1,7 +1,6 @@
 import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
-import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -333,8 +332,9 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
-  strokeColor: COLOR_PALETTE.black,
-  backgroundColor: COLOR_PALETTE.transparent,
+  // Not importing from color palette as it imports open color package and these colors don't belong to open color package
+  strokeColor: "#1e1e1e",
+  backgroundColor: "transparent",
   fillStyle: "solid",
   strokeWidth: 2,
   strokeStyle: "solid",

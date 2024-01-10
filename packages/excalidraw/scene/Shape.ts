@@ -11,7 +11,7 @@ import type {
 } from "../element/types";
 import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
-import { isTransparent, assertNever } from "../utils";
+import { assertNever } from "../utils";
 import { simplify } from "points-on-curve";
 import { ROUGHNESS } from "../constants";
 import {
@@ -21,6 +21,7 @@ import {
   isLinearElement,
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
+import { isTransparent } from "../colors";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 

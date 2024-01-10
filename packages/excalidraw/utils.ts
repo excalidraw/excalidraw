@@ -1,4 +1,3 @@
-import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
   EVENT,
@@ -525,16 +524,6 @@ export const findLastIndex = <T>(
     }
   }
   return -1;
-};
-
-export const isTransparent = (color: string) => {
-  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
-  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
-  return (
-    isRGBTransparent ||
-    isRRGGBBTransparent ||
-    color === COLOR_PALETTE.transparent
-  );
 };
 
 export type ResolvablePromise<T> = Promise<T> & {

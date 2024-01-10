@@ -1,4 +1,4 @@
-import { isInteractive, isTransparent, isWritableElement } from "../../utils";
+import { isInteractive, isWritableElement } from "../../utils";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";

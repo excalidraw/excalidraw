@@ -14,7 +14,7 @@ import {
 } from "../scene";
 import { SHAPES } from "../shapes";
 import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
-import { capitalizeString, isTransparent } from "../utils";
+import { capitalizeString } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
@@ -41,6 +41,7 @@ import {
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
+import { isTransparent } from "../colors";
 
 export const SelectedShapeActions = ({
   appState,

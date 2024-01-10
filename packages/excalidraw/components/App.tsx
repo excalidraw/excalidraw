@@ -263,7 +263,6 @@ import {
   updateObject,
   updateActiveTool,
   getShortcutKey,
-  isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
   isTestEnv,
@@ -396,7 +395,7 @@ import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
 import { MagicCacheData, diagramToHTML } from "../data/magic";
 import { elementsOverlappingBBox, exportToBlob } from "../../utils/export";
-import { COLOR_PALETTE } from "../colors";
+import { COLOR_PALETTE, isTransparent } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";

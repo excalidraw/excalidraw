@@ -46,11 +46,11 @@ import {
   isImageElement,
 } from "./typeChecks";
 import { isTextElement } from ".";
-import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
 import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { isTransparent } from "../colors";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,

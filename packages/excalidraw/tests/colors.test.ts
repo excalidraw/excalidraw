@@ -1,4 +1,4 @@
-import * as utils from "../utils";
+import * as utils from "../colors";
 
 describe("Test isTransparent", () => {
   it("should return true when color is rgb transparent", () => {
