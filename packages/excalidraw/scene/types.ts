@@ -7,6 +7,7 @@ import {
 import {
   AppClassProperties,
   AppState,
+  EmbedsValidationStatus,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
@@ -20,6 +21,7 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+  embedsValidationStatus: EmbedsValidationStatus;
 };
 
 export type SVGRenderConfig = {
@@ -30,6 +32,7 @@ export type SVGRenderConfig = {
   renderEmbeddables: boolean;
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  embedsValidationStatus: EmbedsValidationStatus;
 };
 
 export type InteractiveCanvasRenderConfig = {
