@@ -884,9 +884,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const embeddableElements = this.scene
       .getNonDeletedElements()
-      .filter(
-        (el): el is NonDeleted<ExcalidrawIframeLikeElement> =>
-          (isEmbeddableElement(el) && !!el.validated) || isIframeElement(el),
+      .filter((el): el is NonDeleted<ExcalidrawIframeLikeElement> =>
+        isEmbeddableElement(el),
       );
 
     return (
