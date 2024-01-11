@@ -25,7 +25,7 @@ export class AnimationFrameHandler {
     }
 
     this.targets.set(key, { ...target, stopped: false });
-    this.scheduleFrame(key, target);
+    this.scheduleFrame(key);
   }
 
   stop(key: object) {
@@ -48,14 +48,14 @@ export class AnimationFrameHandler {
       const shouldAbort = this.onFrame(target, timestamp);
 
       if (!target.stopped && !shouldAbort) {
-        this.scheduleFrame(key, target);
+        this.scheduleFrame(key);
       } else {
         this.cancelFrame(key);
       }
     };
   }
 
-  private scheduleFrame(key: object, target: AnimationTarget) {
+  private scheduleFrame(key: object) {
     const rafId = requestAnimationFrame(this.constructFrame(key));
 
     this.rafIds.set(key, rafId);
