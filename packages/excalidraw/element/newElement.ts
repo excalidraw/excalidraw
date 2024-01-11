@@ -138,12 +138,10 @@ export const newElement = (
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
-    validated: ExcalidrawEmbeddableElement["validated"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawEmbeddableElement> => {
   return {
     ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
-    validated: opts.validated,
     scale: [1, 1],
   };
 };

@@ -205,7 +205,6 @@ export class API {
         element = newEmbeddableElement({
           type: "embeddable",
           ...base,
-          validated: null,
         });
         break;
       case "iframe":
