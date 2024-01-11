@@ -17,6 +17,38 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking Changes
 
+- Create an `ESM` build for `@excalidraw/excalidraw`. The API is in progress and subject to change before stable release. There are some changes on how the package will be consumed
+
+  #### Bundler
+
+  - CSS needs to be imported so you will need to import the css along with the excalidraw component
+
+  ```js
+  import { Excalidraw } from "@excalidraw/excalidraw";
+  import "@excalidraw/excalidraw/index.css";
+  ```
+
+  - The `types` path is updated
+
+  Instead of importing from `@excalidraw/excalidraw/types/`, you will need to import from `@excalidraw/excalidraw/dist/excalidraw` or `@excalidraw/excalidraw/dist/utils` depending on the types you are using.
+
+  However this we will be fixing before stable release, so in case you want to try it out you will need to update the types for now.
+
+  #### Browser
+
+  - Since its `ESM` so now script type `module` can be used to load it and css needs to be loaded as well.
+
+  ```html
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.css"
+  />
+  <script type="module">
+    import * as ExcalidrawLib from "https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.js";
+    window.ExcalidrawLib = ExcalidrawLib;
+  </script>
+  ```
+
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
 
 ## 0.17.1 (2023-11-28)
