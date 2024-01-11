@@ -285,6 +285,7 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      elementsPendingErasure: new Set(),
     },
   });
 

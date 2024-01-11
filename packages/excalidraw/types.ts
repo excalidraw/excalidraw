@@ -693,12 +693,6 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     hasOccurred: boolean;
   };
-  elementIdsToErase: {
-    [key: ExcalidrawElement["id"]]: {
-      opacity: ExcalidrawElement["opacity"];
-      erase: boolean;
-    };
-  };
 }>;
 
 export type UnsubscribeCallback = () => void;
@@ -822,3 +816,5 @@ export type Primitive =
   | undefined;
 
 export type JSONValue = string | number | boolean | null | object;
+
+export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
