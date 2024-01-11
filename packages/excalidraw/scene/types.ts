@@ -7,6 +7,7 @@ import {
 import {
   AppClassProperties,
   AppState,
+  ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
@@ -20,6 +21,7 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+  elementsPendingErasure: ElementsPendingErasure;
 };
 
 export type SVGRenderConfig = {
