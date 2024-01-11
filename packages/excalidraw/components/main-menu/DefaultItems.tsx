@@ -12,10 +12,11 @@ import {
   HelpIcon,
   LoadIcon,
   MoonIcon,
+  MouseIcon,
   save,
   SunIcon,
   TrashIcon,
-  usersIcon,
+  usersIcon
 } from "../icons";
 import { GithubIcon, DiscordIcon, XBrandIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
@@ -36,6 +37,10 @@ import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
+import { actionToggleScrollBehavior } from "../../actions/actionCanvas";
+import { values } from "idb-keyval";
+import firebase from "firebase";
+import apps = firebase.apps;
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -194,6 +199,31 @@ export const ToggleTheme = () => {
   );
 };
 ToggleTheme.displayName = "ToggleTheme";
+
+export const ToggleScrollWheel = () => {
+  //TODO: Implement after PR is determined to be viable
+  // const { t } = useI18n();
+  const appState = useUIAppState();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleScrollBehavior)) {
+    return null;
+  }
+  return (
+    <DropdownMenuItem
+      onSelect={(event) => {
+        // do not close the menu when changing theme
+        event.preventDefault();
+        return actionManager.executeAction(actionToggleScrollBehavior);
+      }}
+      icon={MouseIcon}
+      aria-label=  { appState.scrollBehavior === "default" ? "Scroll disable" : "Scroll default" }
+    >
+      Scroll {appState.scrollBehavior === "default" ? "disable" : "default"}
+    </DropdownMenuItem>
+  );
+};
+ToggleScrollWheel.displayName = "ToggleScrollWheel";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();

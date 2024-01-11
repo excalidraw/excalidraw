@@ -1,7 +1,7 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
+import { CURSOR_TYPE, MIN_ZOOM, SCROLL_BEHAVIOR, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
@@ -420,6 +420,24 @@ export const actionToggleTheme = register({
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
   predicate: (elements, appState, props, app) => {
     return !!app.props.UIOptions.canvasActions.toggleTheme;
+  },
+});
+
+export const actionToggleScrollBehavior = register({
+  name: "toggleScrollBehavior",
+  viewMode: true,
+  trackEvent: { category: "canvas" },
+  perform: (_, appState, value) => {
+    return {
+      appState: {
+        ...appState,
+        scrollBehavior: value || (appState.scrollBehavior === SCROLL_BEHAVIOR.DISABLE ? SCROLL_BEHAVIOR.DEFAULT : SCROLL_BEHAVIOR.DISABLE),
+      },
+      commitToHistory: false,
+    };
+  },
+  predicate: (elements, appState, props, app) => {
+    return !!app.props.UIOptions.canvasActions.toggleScrollBehavior;
   },
 });
 

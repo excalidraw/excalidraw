@@ -1,6 +1,6 @@
 import React from "react";
 import { PlusPromoIcon } from "../../packages/excalidraw/components/icons";
-import { MainMenu } from "../../packages/excalidraw/index";
+import { MainMenu, useDevice } from "../../packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
 
 export const AppMainMenu: React.FC<{
@@ -8,6 +8,7 @@ export const AppMainMenu: React.FC<{
   isCollaborating: boolean;
   isCollabEnabled: boolean;
 }> = React.memo((props) => {
+  const deviceInfo = useDevice();
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -36,6 +37,9 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Socials />
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme />
+      {!deviceInfo.isTouchScreen && !deviceInfo.viewport.isMobile && (
+        <MainMenu.DefaultItems.ToggleScrollWheel />
+      )}
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>

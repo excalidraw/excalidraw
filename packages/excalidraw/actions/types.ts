@@ -124,7 +124,8 @@ export type ActionName =
   | "setFrameAsActiveTool"
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
-  | "wrapTextInContainer";
+  | "wrapTextInContainer"
+  | "toggleScrollBehavior";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
