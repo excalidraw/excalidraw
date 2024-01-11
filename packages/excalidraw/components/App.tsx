@@ -5129,6 +5129,9 @@ class App extends React.Component<AppProps, AppState> {
 
     let didChange = false;
 
+    const processedGroups = new Set<ExcalidrawElement["id"]>();
+    const nonDeletedElements = this.scene.getNonDeletedElements();
+
     const processElements = (elements: ExcalidrawElement[]) => {
       for (const element of elements) {
         if (element.locked) {
@@ -5142,6 +5145,25 @@ class App extends React.Component<AppProps, AppState> {
         } else if (!this.elementsPendingErasure.has(element.id)) {
           didChange = true;
           this.elementsPendingErasure.add(element.id);
+        }
+
+        // (un)erase groups atomically
+        if (didChange && element.groupIds?.length) {
+          const shallowestGroupId = element.groupIds.at(-1)!;
+          if (!processedGroups.has(shallowestGroupId)) {
+            processedGroups.add(shallowestGroupId);
+            const elems = getElementsInGroup(
+              nonDeletedElements,
+              shallowestGroupId,
+            );
+            for (const elem of elems) {
+              if (event.altKey) {
+                this.elementsPendingErasure.delete(elem.id);
+              } else {
+                this.elementsPendingErasure.add(elem.id);
+              }
+            }
+          }
         }
       }
     };
