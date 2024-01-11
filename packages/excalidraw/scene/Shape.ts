@@ -21,6 +21,7 @@ import {
   isLinearElement,
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
+import { EmbedsValidationStatus } from "../types";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -118,10 +119,13 @@ export const generateRoughOptions = (
 const modifyIframeLikeForRoughOptions = (
   element: NonDeletedExcalidrawElement,
   isExporting: boolean,
+  embedsValidationStatus: EmbedsValidationStatus | null,
 ) => {
   if (
     isIframeLikeElement(element) &&
-    (isExporting || (isEmbeddableElement(element) && !element.validated)) &&
+    (isExporting ||
+      (isEmbeddableElement(element) &&
+        embedsValidationStatus?.get(element.id) !== true)) &&
     isTransparent(element.backgroundColor) &&
     isTransparent(element.strokeColor)
   ) {
@@ -278,7 +282,12 @@ export const _generateElementShape = (
   {
     isExporting,
     canvasBackgroundColor,
-  }: { isExporting: boolean; canvasBackgroundColor: string },
+    embedsValidationStatus,
+  }: {
+    isExporting: boolean;
+    canvasBackgroundColor: string;
+    embedsValidationStatus: EmbedsValidationStatus | null;
+  },
 ): Drawable | Drawable[] | null => {
   switch (element.type) {
     case "rectangle":
@@ -299,7 +308,11 @@ export const _generateElementShape = (
             h - r
           } L 0 ${r} Q 0 0, ${r} 0`,
           generateRoughOptions(
-            modifyIframeLikeForRoughOptions(element, isExporting),
+            modifyIframeLikeForRoughOptions(
+              element,
+              isExporting,
+              embedsValidationStatus,
+            ),
             true,
           ),
         );
@@ -310,7 +323,11 @@ export const _generateElementShape = (
           element.width,
           element.height,
           generateRoughOptions(
-            modifyIframeLikeForRoughOptions(element, isExporting),
+            modifyIframeLikeForRoughOptions(
+              element,
+              isExporting,
+              embedsValidationStatus,
+            ),
             false,
           ),
         );
