@@ -266,6 +266,8 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      // empty disables embeddable rendering
+      embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
     },
   });
@@ -288,6 +290,9 @@ export const exportToSvg = async (
   },
   files: BinaryFiles | null,
   opts?: {
+    /**
+     * if true, all embeddables passed in will be rendered when possible.
+     */
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
   },
@@ -428,14 +433,24 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
+
+  const renderEmbeddables = opts?.renderEmbeddables ?? false;
+
   renderSceneToSvg(elementsForRender, rsvg, svgRoot, files || {}, {
     offsetX,
     offsetY,
     isExporting: true,
     exportWithDarkMode,
-    renderEmbeddables: opts?.renderEmbeddables ?? false,
+    renderEmbeddables,
     frameRendering,
     canvasBackgroundColor: viewBackgroundColor,
+    embedsValidationStatus: renderEmbeddables
+      ? new Map(
+          elementsForRender
+            .filter((element) => isFrameLikeElement(element))
+            .map((element) => [element.id, true]),
+        )
+      : new Map(),
   });
 
   tempScene.destroy();
