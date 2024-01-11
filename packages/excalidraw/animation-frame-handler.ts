@@ -29,8 +29,8 @@ export class AnimationFrameHandler {
   }
 
   stop(key: object) {
-    if (this.targets.has(key)) {
-      const target = this.targets.get(key)!;
+    const target = this.targets.get(key);
+    if (target && !target.stopped) {
       this.targets.set(key, { ...target, stopped: true });
     }
 
