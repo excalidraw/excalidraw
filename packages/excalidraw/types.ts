@@ -634,12 +634,6 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     hasOccurred: boolean;
   };
-  elementIdsToErase: {
-    [key: ExcalidrawElement["id"]]: {
-      opacity: ExcalidrawElement["opacity"];
-      erase: boolean;
-    };
-  };
 }>;
 
 export type UnsubscribeCallback = () => void;
@@ -757,3 +751,5 @@ export type EmbedsValidationStatus = Map<
   ExcalidrawIframeLikeElement["id"],
   boolean
 >;
+
+export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;

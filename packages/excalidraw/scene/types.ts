@@ -8,6 +8,7 @@ import {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
@@ -22,6 +23,7 @@ export type StaticCanvasRenderConfig = {
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
+  elementsPendingErasure: ElementsPendingErasure;
 };
 
 export type SVGRenderConfig = {

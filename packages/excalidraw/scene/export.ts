@@ -268,6 +268,7 @@ export const exportToCanvas = async (
       isExporting: true,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
+      elementsPendingErasure: new Set(),
     },
   });
 
