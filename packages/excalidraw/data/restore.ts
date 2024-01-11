@@ -298,13 +298,9 @@ const restoreElement = (
     case "diamond":
       return restoreElementWithProperties(element, {});
     case "iframe": //zsviczian
-      return restoreElementWithProperties(element, {
-        scale: element.scale ?? [1, 1],
-      });
     case "embeddable":
       return restoreElementWithProperties(element, {
-        validated: null,
-        scale: element.scale ?? [1, 1],
+        scale: element.scale ?? [1, 1], //zsviczian
       });
     case "magicframe":
     case "frame":

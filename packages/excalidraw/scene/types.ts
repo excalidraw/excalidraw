@@ -7,6 +7,7 @@ import {
 import {
   AppClassProperties,
   AppState,
+  EmbedsValidationStatus,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -21,6 +22,7 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+  embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
 };
 
@@ -33,6 +35,7 @@ export type SVGRenderConfig = {
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   frameColor?: AppState["frameColor"]; //zsviczian
+  embedsValidationStatus: EmbedsValidationStatus;
 };
 
 export type InteractiveCanvasRenderConfig = {
