@@ -2247,10 +2247,10 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/eslint-config/-/eslint-config-1.0.3.tgz#2122ef7413ae77874ae9848ce0f1c6b3f0d8bbbd"
   integrity sha512-GemHNF5Z6ga0BWBSX7GJaNBUchLu6RwTcAB84eX1MeckRNhNasAsPCdelDlFalz27iS4RuYEQh0bPE8SRxJgbQ==
 
-"@excalidraw/laser-pointer@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@excalidraw/laser-pointer/-/laser-pointer-1.2.0.tgz#cd34ea7d24b11743c726488cc1fcb28c161cacba"
-  integrity sha512-WjFFwLk9ahmKRKku7U0jqYpeM3fe9ZS1K43pfwPREHk4/FYU3iKDKVeS8m4tEAASnRlBt3hhLCBQLBF2uvgOnw==
+"@excalidraw/laser-pointer@1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@excalidraw/laser-pointer/-/laser-pointer-1.3.1.tgz#7c40836598e8e6ad91f01057883ed8b88fb9266c"
+  integrity sha512-psA1z1N2qeAfsORdXc9JmD2y4CmDwmuMRxnNdJHZexIcPwaNEyIpNcelw+QkL9rz9tosaN9krXuKaRqYpRAR6g==
 
 "@excalidraw/markdown-to-text@0.1.2":
   version "0.1.2"
