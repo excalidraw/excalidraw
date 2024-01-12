@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 const envVars = loadEnv("", `../../`);
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: "example/public",
+  root: "examples/with-script-in-browser/public",
   server: {
     port: 3001,
     // open the browser

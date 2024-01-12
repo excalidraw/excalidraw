@@ -1,4 +1,4 @@
-import type { ExcalidrawImperativeAPI } from "../types";
+import type { ExcalidrawImperativeAPI } from "../../types";
 
 const { Button, MIME_TYPES } = window.ExcalidrawLib;
 const COMMENT_SVG = (
