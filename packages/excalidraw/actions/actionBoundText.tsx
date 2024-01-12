@@ -9,7 +9,6 @@ import { mutateElement } from "../element/mutateElement";
 import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
-  getBoundTextElement,
   measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
@@ -29,6 +28,7 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
+import Scene from "../scene/Scene";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
 import { getFontString } from "../utils";
@@ -46,7 +46,7 @@ export const actionUnbindText = register({
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     selectedElements.forEach((element) => {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = Scene.getBoundTextElement(element);
       if (boundTextElement) {
         const { width, height, baseline } = measureText(
           boundTextElement.originalText,
@@ -106,7 +106,7 @@ export const actionBindText = register({
       if (
         textElement &&
         bindingContainer &&
-        getBoundTextElement(bindingContainer) === null
+        Scene.getBoundTextElement(bindingContainer) === null
       ) {
         return true;
       }

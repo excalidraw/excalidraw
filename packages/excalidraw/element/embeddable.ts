@@ -5,7 +5,7 @@ import { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { getContainerElement, wrapText } from "./textElement";
+import { wrapText } from "./textElement";
 import {
   isFrameLikeElement,
   isIframeElement,
@@ -17,6 +17,7 @@ import {
   IframeData,
   NonDeletedExcalidrawElement,
 } from "./types";
+import Scene from "../scene/Scene";
 
 const embeddedLinkCache = new Map<string, IframeData>();
 
@@ -224,7 +225,7 @@ export const isIframeLikeOrItsLabel = (
     return true;
   }
   if (element.type === "text") {
-    const container = getContainerElement(element);
+    const container = Scene.getContainerElement(element);
     if (container && isFrameLikeElement(container)) {
       return true;
     }

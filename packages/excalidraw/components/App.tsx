@@ -313,9 +313,7 @@ import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
-  getBoundTextElement,
   getContainerCenter,
-  getContainerElement,
   getDefaultLineHeight,
   getLineHeightInPx,
   getTextBindableContainerAtPosition,
@@ -3108,7 +3106,7 @@ class App extends React.Component<AppProps, AppState> {
 
     newElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
-        const container = getContainerElement(newElement);
+        const container = Scene.getContainerElement(newElement);
         redrawTextBoundingBox(newElement, container);
       }
     });
@@ -4378,7 +4376,7 @@ class App extends React.Component<AppProps, AppState> {
         container,
       );
     if (container && parentCenterPosition) {
-      const boundTextElementToContainer = getBoundTextElement(container);
+      const boundTextElementToContainer = Scene.getBoundTextElement(container);
       if (!boundTextElementToContainer) {
         shouldBindToContainer = true;
       }
@@ -4391,7 +4389,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (container) {
-        existingTextElement = getBoundTextElement(selectedElements[0]);
+        existingTextElement = Scene.getBoundTextElement(selectedElements[0]);
       } else {
         existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
@@ -5237,7 +5235,7 @@ class App extends React.Component<AppProps, AppState> {
       linearElementEditor.elementId,
     );
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = Scene.getBoundTextElement(element);
 
     if (!element) {
       return;

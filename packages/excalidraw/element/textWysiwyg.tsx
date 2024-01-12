@@ -22,8 +22,6 @@ import {
 import { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import {
-  getBoundTextElementId,
-  getContainerElement,
   getTextElementAngle,
   getTextWidth,
   normalizeText,
@@ -43,6 +41,7 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import { getBoundTextElementId } from "../../utils/textElement";
 
 const getTransform = (
   width: number,
@@ -153,7 +152,7 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      const container = getContainerElement(updatedTextElement);
+      const container = Scene.getContainerElement(updatedTextElement);
       let maxWidth = updatedTextElement.width;
 
       let maxHeight = updatedTextElement.height;
@@ -348,7 +347,7 @@ export const textWysiwyg = ({
       if (!data) {
         return;
       }
-      const container = getContainerElement(element);
+      const container = Scene.getContainerElement(element);
 
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
@@ -528,7 +527,7 @@ export const textWysiwyg = ({
       return;
     }
     let text = editable.value;
-    const container = getContainerElement(updateElement);
+    const container = Scene.getContainerElement(updateElement);
 
     if (container) {
       text = updateElement.text;

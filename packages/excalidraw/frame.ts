@@ -10,10 +10,7 @@ import {
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { isPointWithinBounds } from "./math";
-import {
-  getBoundTextElement,
-  getContainerElement,
-} from "./element/textElement";
+
 import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
 import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
@@ -405,7 +402,7 @@ export const addElementsToFrame = (
       finalElementsToAdd.push(element);
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = Scene.getBoundTextElement(element);
     if (
       boundTextElement &&
       !suppliedElementsToAddSet.has(boundTextElement.id) &&
@@ -449,7 +446,7 @@ export const removeElementsFromFrame = (
       const arr = toRemoveElementsByFrame.get(element.frameId) || [];
       arr.push(element);
 
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = Scene.getBoundTextElement(element);
       if (boundTextElement) {
         _elementsToRemove.set(boundTextElement.id, boundTextElement);
         arr.push(boundTextElement);
@@ -580,7 +577,7 @@ export const getTargetFrame = (
   appState: StaticCanvasAppState,
 ) => {
   const _element = isTextElement(element)
-    ? getContainerElement(element) || element
+    ? Scene.getContainerElement(element) || element
     : element;
 
   return appState.selectedElementIds[_element.id] &&
@@ -598,7 +595,7 @@ export const isElementInFrame = (
 ) => {
   const frame = getTargetFrame(element, appState);
   const _element = isTextElement(element)
-    ? getContainerElement(element) || element
+    ? Scene.getContainerElement(element) || element
     : element;
 
   if (frame) {

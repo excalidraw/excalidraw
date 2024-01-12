@@ -44,7 +44,7 @@ import {
 import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -272,7 +272,7 @@ export class LinearElementEditor {
         );
       }
 
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = Scene.getBoundTextElement(element);
       if (boundTextElement) {
         handleBindTextResize(element, false);
       }
@@ -406,7 +406,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: InteractiveCanvasAppState,
   ): typeof editorMidPointsCache["points"] => {
-    const boundText = getBoundTextElement(element);
+    const boundText = Scene.getBoundTextElement(element);
 
     // Since its not needed outside editor unless 2 pointer lines or bound text
     if (
@@ -1462,7 +1462,7 @@ export class LinearElementEditor {
     if (!includeBoundText) {
       return coords;
     }
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = Scene.getBoundTextElement(element);
     if (boundTextElement) {
       coords = LinearElementEditor.getMinMaxXYWithBoundText(
         element,

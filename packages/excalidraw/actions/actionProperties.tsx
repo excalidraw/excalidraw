@@ -64,11 +64,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import {
-  getBoundTextElement,
-  getContainerElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+import { getDefaultLineHeight } from "../element/textElement";
 import {
   isBoundToContainer,
   isLinearElement,
@@ -96,6 +92,7 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
+import Scene from "../scene/Scene";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -206,7 +203,10 @@ const changeFontSize = (
           let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
             fontSize: newFontSize,
           });
-          redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+          redrawTextBoundingBox(
+            newElement,
+            Scene.getContainerElement(oldElement),
+          );
 
           newElement = offsetElementAfterFontResize(oldElement, newElement);
 
@@ -641,14 +641,15 @@ export const actionChangeFontSize = register({
             if (isTextElement(element)) {
               return element.fontSize;
             }
-            const boundTextElement = getBoundTextElement(element);
+            const boundTextElement = Scene.getBoundTextElement(element);
             if (boundTextElement) {
               return boundTextElement.fontSize;
             }
             return null;
           },
           (element) =>
-            isTextElement(element) || getBoundTextElement(element) !== null,
+            isTextElement(element) ||
+            Scene.getBoundTextElement(element) !== null,
           (hasSelection) =>
             hasSelection
               ? null
@@ -717,7 +718,10 @@ export const actionChangeFontFamily = register({
                 lineHeight: getDefaultLineHeight(value),
               },
             );
-            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            redrawTextBoundingBox(
+              newElement,
+              Scene.getContainerElement(oldElement),
+            );
             return newElement;
           }
 
@@ -772,14 +776,15 @@ export const actionChangeFontFamily = register({
               if (isTextElement(element)) {
                 return element.fontFamily;
               }
-              const boundTextElement = getBoundTextElement(element);
+              const boundTextElement = Scene.getBoundTextElement(element);
               if (boundTextElement) {
                 return boundTextElement.fontFamily;
               }
               return null;
             },
             (element) =>
-              isTextElement(element) || getBoundTextElement(element) !== null,
+              isTextElement(element) ||
+              Scene.getBoundTextElement(element) !== null,
             (hasSelection) =>
               hasSelection
                 ? null
@@ -806,7 +811,10 @@ export const actionChangeTextAlign = register({
               oldElement,
               { textAlign: value },
             );
-            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            redrawTextBoundingBox(
+              newElement,
+              Scene.getContainerElement(oldElement),
+            );
             return newElement;
           }
 
@@ -854,14 +862,15 @@ export const actionChangeTextAlign = register({
               if (isTextElement(element)) {
                 return element.textAlign;
               }
-              const boundTextElement = getBoundTextElement(element);
+              const boundTextElement = Scene.getBoundTextElement(element);
               if (boundTextElement) {
                 return boundTextElement.textAlign;
               }
               return null;
             },
             (element) =>
-              isTextElement(element) || getBoundTextElement(element) !== null,
+              isTextElement(element) ||
+              Scene.getBoundTextElement(element) !== null,
             (hasSelection) =>
               hasSelection ? null : appState.currentItemTextAlign,
           )}
@@ -887,7 +896,10 @@ export const actionChangeVerticalAlign = register({
               { verticalAlign: value },
             );
 
-            redrawTextBoundingBox(newElement, getContainerElement(oldElement));
+            redrawTextBoundingBox(
+              newElement,
+              Scene.getContainerElement(oldElement),
+            );
             return newElement;
           }
 
@@ -933,14 +945,15 @@ export const actionChangeVerticalAlign = register({
               if (isTextElement(element) && element.containerId) {
                 return element.verticalAlign;
               }
-              const boundTextElement = getBoundTextElement(element);
+              const boundTextElement = Scene.getBoundTextElement(element);
               if (boundTextElement) {
                 return boundTextElement.verticalAlign;
               }
               return null;
             },
             (element) =>
-              isTextElement(element) || getBoundTextElement(element) !== null,
+              isTextElement(element) ||
+              Scene.getBoundTextElement(element) !== null,
             (hasSelection) => (hasSelection ? null : VERTICAL_ALIGN.MIDDLE),
           )}
           onChange={(value) => updateData(value)}

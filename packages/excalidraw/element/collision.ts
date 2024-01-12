@@ -48,9 +48,9 @@ import {
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
 import { shouldShowBoundingBox } from "./transformHandles";
-import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import Scene from "../scene/Scene";
 
 const isElementDraggableFromInside = (
   element: NonDeletedExcalidrawElement,
@@ -95,7 +95,7 @@ export const hitTest = (
     );
   }
 
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = Scene.getBoundTextElement(element);
   if (boundTextElement) {
     const isHittingBoundTextElement = hitTest(
       boundTextElement,
@@ -127,7 +127,7 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
 
   // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
   // eg for linear elements text can be outside the element bounding box
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = Scene.getBoundTextElement(element);
   if (
     boundTextElement &&
     hitTest(boundTextElement, appState, frameNameBoundsCache, x, y)

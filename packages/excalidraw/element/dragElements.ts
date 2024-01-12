@@ -4,7 +4,6 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
-import { getBoundTextElement } from "./textElement";
 import { isSelectedViaGroup } from "../groups";
 import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
@@ -71,7 +70,7 @@ export const dragSelectedElements = (
         // container is part of a group, but we're dragging the container directly
         (appState.editingGroupId && !isSelectedViaGroup(appState, element)))
     ) {
-      const textElement = getBoundTextElement(element);
+      const textElement = Scene.getBoundTextElement(element);
       if (textElement) {
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }

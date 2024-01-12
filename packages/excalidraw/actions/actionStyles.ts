@@ -12,10 +12,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import {
-  getBoundTextElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+import { getDefaultLineHeight } from "../element/textElement";
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
@@ -25,6 +22,7 @@ import {
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 import { ExcalidrawTextElement } from "../element/types";
+import Scene from "../scene/Scene";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -37,7 +35,7 @@ export const actionCopyStyles = register({
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
     elementsCopied.push(element);
     if (element && hasBoundTextElement(element)) {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = Scene.getBoundTextElement(element);
       elementsCopied.push(boundTextElement);
     }
     if (element) {

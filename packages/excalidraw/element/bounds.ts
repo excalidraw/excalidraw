@@ -19,7 +19,6 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { rescalePoints } from "../points";
-import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -161,7 +160,7 @@ export const getElementAbsoluteCoords = (
       includeBoundText,
     );
   } else if (isTextElement(element)) {
-    const container = getContainerElement(element);
+    const container = Scene.getContainerElement(element);
     if (isArrowElement(container)) {
       const coords = LinearElementEditor.getBoundTextElementPosition(
         container,
@@ -684,7 +683,7 @@ const getLinearElementRotatedBounds = (
     );
 
     let coords: Bounds = [x, y, x, y];
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = Scene.getBoundTextElement(element);
     if (boundTextElement) {
       const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
         element,
@@ -709,7 +708,7 @@ const getLinearElementRotatedBounds = (
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
   const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
   let coords: Bounds = [res[0], res[1], res[2], res[3]];
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = Scene.getBoundTextElement(element);
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
       element,

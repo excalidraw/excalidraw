@@ -31,7 +31,6 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
-  getContainerElement,
   measureText,
   normalizeText,
   wrapText,
@@ -47,6 +46,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { MarkOptional, Merge, Mutable } from "../utility-types";
+import Scene from "../scene/Scene";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -338,7 +338,7 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  const container = getContainerElement(textElement);
+  const container = Scene.getContainerElement(textElement);
   if (container) {
     text = wrapText(
       text,

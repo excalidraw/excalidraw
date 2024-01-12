@@ -50,9 +50,7 @@ import {
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
-  getBoundTextElement,
   getContainerCoords,
-  getContainerElement,
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
@@ -65,6 +63,7 @@ import {
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
 import { ShapeCache } from "../scene/ShapeCache";
+import Scene from "../scene/Scene";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -243,7 +242,8 @@ const generateElementCanvas = (
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
-    boundTextElementVersion: getBoundTextElement(element)?.version || null,
+    boundTextElementVersion:
+      Scene.getBoundTextElement(element)?.version || null,
     containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
   };
 };
@@ -412,7 +412,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
-  const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+  const boundTextElementVersion =
+    Scene.getBoundTextElement(element)?.version || null;
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
@@ -460,7 +461,7 @@ const drawElementFromCanvas = (
 
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = Scene.getBoundTextElement(element);
 
   if (isArrowElement(element) && boundTextElement) {
     const tempCanvas = document.createElement("canvas");
@@ -567,7 +568,7 @@ const drawElementFromCanvas = (
         "true" &&
       hasBoundTextElement(element)
     ) {
-      const textElement = getBoundTextElement(
+      const textElement = Scene.getBoundTextElement(
         element,
       ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
@@ -715,7 +716,7 @@ export const renderElement = (
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
-          const container = getContainerElement(element);
+          const container = Scene.getContainerElement(element);
           if (isArrowElement(container)) {
             const boundTextCoords =
               LinearElementEditor.getBoundTextElementPosition(
@@ -732,7 +733,7 @@ export const renderElement = (
         if (shouldResetImageFilter(element, renderConfig, appState)) {
           context.filter = "none";
         }
-        const boundTextElement = getBoundTextElement(element);
+        const boundTextElement = Scene.getBoundTextElement(element);
 
         if (isArrowElement(element) && boundTextElement) {
           const tempCanvas = document.createElement("canvas");
@@ -912,7 +913,7 @@ export const renderElementToSvg = (
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
   if (isTextElement(element)) {
-    const container = getContainerElement(element);
+    const container = Scene.getContainerElement(element);
     if (isArrowElement(container)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
 
@@ -1089,7 +1090,7 @@ export const renderElementToSvg = (
     }
     case "line":
     case "arrow": {
-      const boundText = getBoundTextElement(element);
+      const boundText = Scene.getBoundTextElement(element);
       const maskPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
       if (boundText) {
         maskPath.setAttribute("id", `mask-${element.id}`);

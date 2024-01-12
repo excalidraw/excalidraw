@@ -45,9 +45,6 @@ import { AppState, Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextElementId,
-  getContainerElement,
   handleBindTextResize,
   getBoundTextMaxWidth,
   getApproxMinLineHeight,
@@ -55,6 +52,7 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { getBoundTextElementId } from "../../utils/textElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -215,7 +213,7 @@ const measureFontSizeFromWidth = (
 
   const hasContainer = isBoundToContainer(element);
   if (hasContainer) {
-    const container = getContainerElement(element);
+    const container = Scene.getContainerElement(element);
     if (container) {
       width = getBoundTextMaxWidth(container);
     }
@@ -385,7 +383,7 @@ export const resizeSingleElement = (
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
   let boundTextFont: { fontSize?: number; baseline?: number } = {};
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = Scene.getBoundTextElement(element);
 
   if (transformHandleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
@@ -866,7 +864,7 @@ export const resizeMultipleElements = (
       newSize: { width, height },
     });
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = Scene.getBoundTextElement(element);
     if (boundTextElement && boundTextFontSize) {
       mutateElement(
         boundTextElement,
@@ -926,7 +924,7 @@ const rotateMultipleElements = (
       );
       updateBoundElements(element, { simultaneouslyUpdated: elements });
 
-      const boundText = getBoundTextElement(element);
+      const boundText = Scene.getBoundTextElement(element);
       if (boundText && !isArrowElement(element)) {
         mutateElement(
           boundText,

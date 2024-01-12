@@ -26,7 +26,7 @@ import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { handleBindTextResize } from "./textElement";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -362,7 +362,7 @@ export const updateBoundElements = (
       endBinding,
       changedElement as ExcalidrawBindableElement,
     );
-    const boundText = getBoundTextElement(element);
+    const boundText = Scene.getBoundTextElement(element);
     if (boundText) {
       handleBindTextResize(element, false);
     }

@@ -3,6 +3,7 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawFrameLikeElement,
+  ExcalidrawTextElementWithContainer,
 } from "../element/types";
 import { getNonDeletedElements, isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -11,6 +12,7 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
+import { getBoundTextElementId } from "../../utils/textElement";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -94,6 +96,37 @@ class Scene {
     }
     return this.sceneMapByElement.get(elementKey) || null;
   }
+
+  static getContainerElement = (
+    element:
+      | (ExcalidrawElement & {
+          containerId: ExcalidrawElement["id"] | null;
+        })
+      | null,
+  ) => {
+    if (!element) {
+      return null;
+    }
+    if (element.containerId) {
+      return Scene.getScene(element)?.getElement(element.containerId) || null;
+    }
+    return null;
+  };
+
+  static getBoundTextElement = (element: ExcalidrawElement | null) => {
+    if (!element) {
+      return null;
+    }
+    const boundTextElementId = getBoundTextElementId(element);
+    if (boundTextElementId) {
+      return (
+        (Scene.getScene(element)?.getElement(
+          boundTextElementId,
+        ) as ExcalidrawTextElementWithContainer) || null
+      );
+    }
+    return null;
+  };
 
   // ---------------------------------------------------------------------------
   // instance methods/props

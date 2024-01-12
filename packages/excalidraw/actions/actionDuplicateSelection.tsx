@@ -16,10 +16,7 @@ import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
-import {
-  bindTextToShapeAfterDuplication,
-  getBoundTextElement,
-} from "../element/textElement";
+import { bindTextToShapeAfterDuplication } from "../element/textElement";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
@@ -31,6 +28,7 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
+import Scene from "../scene/Scene";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -139,7 +137,7 @@ const duplicateElements = (
       continue;
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = Scene.getBoundTextElement(element);
     const isElementAFrameLike = isFrameLikeElement(element);
 
     if (idsOfElementsToDuplicate.get(element.id)) {

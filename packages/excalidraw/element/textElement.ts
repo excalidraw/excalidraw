@@ -36,6 +36,7 @@ import {
   updateOriginalContainerCache,
 } from "./textWysiwyg";
 import { ExtractSetType } from "../utility-types";
+import { getBoundTextElementId } from "../../utils/textElement";
 
 export const normalizeText = (text: string) => {
   return (
@@ -659,44 +660,6 @@ export const getApproxCharsToFitInWidth = (font: FontString, width: number) => {
   return str.length;
 };
 
-export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
-  return container?.boundElements?.length
-    ? container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id ||
-        null
-    : null;
-};
-
-export const getBoundTextElement = (element: ExcalidrawElement | null) => {
-  if (!element) {
-    return null;
-  }
-  const boundTextElementId = getBoundTextElementId(element);
-  if (boundTextElementId) {
-    return (
-      (Scene.getScene(element)?.getElement(
-        boundTextElementId,
-      ) as ExcalidrawTextElementWithContainer) || null
-    );
-  }
-  return null;
-};
-
-export const getContainerElement = (
-  element:
-    | (ExcalidrawElement & {
-        containerId: ExcalidrawElement["id"] | null;
-      })
-    | null,
-) => {
-  if (!element) {
-    return null;
-  }
-  if (element.containerId) {
-    return Scene.getScene(element)?.getElement(element.containerId) || null;
-  }
-  return null;
-};
-
 export const getContainerCenter = (
   container: ExcalidrawElement,
   appState: AppState,
@@ -753,7 +716,7 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
 };
 
 export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
-  const container = getContainerElement(textElement);
+  const container = Scene.getContainerElement(textElement);
   if (!container || isArrowElement(container)) {
     return textElement.angle;
   }
@@ -763,7 +726,7 @@ export const getTextElementAngle = (textElement: ExcalidrawTextElement) => {
 export const getBoundTextElementOffset = (
   boundTextElement: ExcalidrawTextElement | null,
 ) => {
-  const container = getContainerElement(boundTextElement);
+  const container = Scene.getContainerElement(boundTextElement);
   if (!container || !boundTextElement) {
     return 0;
   }
@@ -792,7 +755,7 @@ export const shouldAllowVerticalAlign = (
   return selectedElements.some((element) => {
     const hasBoundContainer = isBoundToContainer(element);
     if (hasBoundContainer) {
-      const container = getContainerElement(element);
+      const container = Scene.getContainerElement(element);
       if (isTextElement(element) && isArrowElement(container)) {
         return false;
       }
@@ -808,7 +771,7 @@ export const suppportsHorizontalAlign = (
   return selectedElements.some((element) => {
     const hasBoundContainer = isBoundToContainer(element);
     if (hasBoundContainer) {
-      const container = getContainerElement(element);
+      const container = Scene.getContainerElement(element);
       if (isTextElement(element) && isArrowElement(container)) {
         return false;
       }
@@ -890,7 +853,7 @@ export const computeContainerDimensionForBoundText = (
 
 export const getBoundTextMaxWidth = (
   container: ExcalidrawElement,
-  boundTextElement: ExcalidrawTextElement | null = getBoundTextElement(
+  boundTextElement: ExcalidrawTextElement | null = Scene.getBoundTextElement(
     container,
   ),
 ) => {
