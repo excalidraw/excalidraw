@@ -639,7 +639,7 @@ const _renderInteractiveScene = ({
           elementX2,
           elementY1,
           elementY2,
-          selectionColors: [oc.black],
+          selectionColors: [selectionColor],
           dashed: true,
           cx: elementX1 + (elementX2 - elementX1) / 2,
           cy: elementY1 + (elementY2 - elementY1) / 2,
