@@ -42,6 +42,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  DEFAULT_ADAPTIVE_RADIUS,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
@@ -337,6 +338,11 @@ const drawElementOnCanvas = (
         ? renderConfig.imageCache.get(element.fileId)?.image
         : undefined;
       if (img != null && !(img instanceof Promise)) {
+        // Apply Clipping
+        if (context.roundRect) {
+          context.roundRect(0, 0, element.width, element.height, DEFAULT_ADAPTIVE_RADIUS);
+          context.clip();
+        }
         context.drawImage(
           img,
           0 /* hardcoded for the selection box*/,
