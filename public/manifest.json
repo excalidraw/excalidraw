@@ -1,7 +1,7 @@
 {
-  "short_name": "Excalidraw",
-  "name": "Excalidraw",
-  "description": "Excalidraw is a whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
+  "short_name": "Avei Draw",
+  "name": "Avei Draw",
+  "description": "Avei Draw is a fork from Excalidraw with whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
   "icons": [
     {
       "src": "android-chrome-192x192.png",
