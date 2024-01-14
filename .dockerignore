@@ -6,3 +6,4 @@
 !yarn.lock
 !index.html
 !vite.config.ts
+!nginx.conf
