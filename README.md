@@ -14,9 +14,9 @@
 
 ## To Do's 
 
-[ ] Integrating with Google Drive / GCS 
-[ ] Collaboration Mode using `excalidraw/room`
-[ ] Removing firebase support
+- [ ] Integrating with Google Drive / GCS 
+- [ ] Collaboration Mode using `excalidraw/room`
+- [ ] Removing firebase support
 
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
