@@ -1,1 +1,8 @@
-.env
+!package.json
+!public/
+!src/
+!excalidraw-app/
+!tsconfig.json
+!yarn.lock
+!index.html
+!vite.config.ts
