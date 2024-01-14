@@ -17,6 +17,7 @@ RUN yarn build:app:docker
 
 FROM nginxinc/nginx-unprivileged:1.25-alpine-slim as production
 
+COPY nginx.conf /etc/nginx/conf.d/configfile.template
 COPY --from=production_buildstage /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
 ENV PORT 8080
