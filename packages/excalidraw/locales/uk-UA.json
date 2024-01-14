@@ -11,8 +11,8 @@
     "copyAsPng": "Копіювати як PNG",
     "copyAsSvg": "Копіювати як SVG",
     "copyText": "Копіювати в буфер обміну як текст",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Скопіювати джерело в буфер обміну",
+    "convertToCode": "Перетворити на код",
     "bringForward": "Перемістити вперед",
     "sendToBack": "На задній план",
     "bringToFront": "На передній план",
@@ -38,12 +38,12 @@
     "arrowhead_none": "Жоден",
     "arrowhead_arrow": "Стрілка",
     "arrowhead_bar": "Колона",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Коло",
+    "arrowhead_circle_outline": "Коло (контур)",
     "arrowhead_triangle": "Трикутник",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Трикутник (контур)",
+    "arrowhead_diamond": "Ромб",
+    "arrowhead_diamond_outline": "Ромб (контур)",
     "fontSize": "Розмір шрифту",
     "fontFamily": "Шрифт",
     "addWatermark": "Додати «Накреслене в Excalidraw»",
@@ -137,10 +137,10 @@
     "selectAllElementsInFrame": "Обрати всі елементи у фреймі",
     "removeAllElementsFromFrame": "Видалити всі елементи з фрейму",
     "eyeDropper": "Вибрати колір з полотна",
-    "textToDiagram": "",
-    "prompt": "",
-    "followUs": "",
-    "discordChat": ""
+    "textToDiagram": "Діаграма з тексту",
+    "prompt": "Запит",
+    "followUs": "Підписатися",
+    "discordChat": "Чат в Discord"
   },
   "library": {
     "noItems": "Тут поки пусто...",
@@ -174,7 +174,7 @@
     "darkMode": "Темна тема",
     "lightMode": "Світла тема",
     "zenMode": "Режим Дзен",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Прив'язати до об'єктів",
     "exitZenMode": "Вийти з дзен-режиму",
     "cancel": "Скасувати",
     "clear": "Очистити",
@@ -213,13 +213,13 @@
     "imageInsertError": "Не вдалося вставити зображення. Повторіть спробу пізніше...",
     "fileTooBig": "Занадто великий розмір файлу, максимальний розмір файлу {{maxSize}}.",
     "svgImageInsertError": "Не вдалося вставити SVG-зображення. Помилка розмітки SVG.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Не вдалося отримати зображення.",
     "invalidSVGString": "Недійсний SVG.",
     "cannotResolveCollabServer": "Не вдалося приєднатися до сервера. Перезавантажте сторінку та повторіть спробу.",
     "importLibraryError": "Не вдалося завантажити бібліотеку",
     "collabSaveFailed": "Не вдалося зберегти у базу даних сервера. Якщо проблеми не зникнуть, Вам слід зберегти файл локально, щоб не втратити роботу.",
     "collabSaveFailed_sizeExceeded": "Полотно завелике! Не вдалося зберегти у базу даних сервера. Вам слід зберегти файл локально, щоб не втратити свою роботу.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Зображення відключені.",
     "brave_measure_text_error": {
       "line1": "Ви використовуєте браузер Brave з увімкненим налаштуванням <bold>Агресивного Блокування Розпізнавання Пристрою</bold>.",
       "line2": "Це може нашкодити <bold>текстовим елементам</bold> у ваших малюнках.",
@@ -228,12 +228,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Вбудовані елементи не можна додати в бібліотеку.",
-      "iframe": "",
+      "iframe": "Елементи iFrame не можна додати до бібліотеки.",
       "image": "Підтримка додавання зображень в бібліотеку найближчим часом!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Не вдалося вставити (неможливо прочитати з буфера обміну).",
+    "asyncPasteFailedOnParse": "Не вдалося вставити.",
+    "copyToSystemClipboardFailed": "Не вдалося скопіювати до буфера обміну."
   },
   "toolBar": {
     "selection": "Виділення",
@@ -251,13 +251,13 @@
     "link": "Додати/Оновити посилання для вибраної форми",
     "eraser": "Очищувач",
     "frame": "Інструмент фрейму",
-    "magicframe": "",
+    "magicframe": "Перетворити у код",
     "embeddable": "Веб вкладення",
-    "laser": "",
+    "laser": "Лазерний вказівник",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "Mermaid у Excalidraw",
+    "magicSettings": "Налаштування AI"
   },
   "headings": {
     "canvasActions": "Дії з полотном",
@@ -286,7 +286,7 @@
     "deepBoxSelect": "Втримуйте Ctrl/Cmd для глибокого виділення та щоб попередити перетягування",
     "eraserRevert": "Втримуйте клавішу Alt, щоб повернути елементи позначені для видалення",
     "firefox_clipboard_write": "Цю функцію можна ввімкнути, встановивши значення \"true\" для налаштування \"dom.events.asyncClipboard.clipboardItem\". Перейдіть на сторінку «about:config», щоб змінити налаштування браузера у Firefox.",
-    "disableSnapping": ""
+    "disableSnapping": "Утримуйте Ctrl чи Cmd, щоб відключити прив'язку"
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -412,8 +412,8 @@
       "copyPngToClipboard": "Скопіювати PNG в буфер обміну"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Копіювати в буфер обміну"
     }
   },
@@ -499,7 +499,7 @@
         "description": "Експорт даних сцени в файл, з якого можна імпортувати пізніше."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Експортувати до Excalidraw+",
         "description": "Зберегти сцену до робочого простору Excalidraw+."
       }
@@ -518,20 +518,20 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid у Excalidraw",
+    "button": "Вставити",
+    "description": "Наразі підтримується тільки <flowchartLink>блок-схеми</flowchartLink><sequenceLink>діаграми послідовностей</sequenceLink> та <classLink>діаграми класів</classLink>. Інші типи будуть відображатися як зображення в Excalidraw.",
+    "syntax": "Синтаксис Mermaid",
+    "preview": "Попередній перегляд"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Швидкий пошук",
+      "empty": "Користувачів не знайдено"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Натисніть на користувача, щоб підписатися",
+      "followStatus": "Ви вже підписані на цього користувача"
     }
   }
 }
