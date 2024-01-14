@@ -27,6 +27,6 @@ EXPOSE 8080
 # Substitute $PORT variable in config file with the one passed via "docker run"
 CMD sh -c "envsubst '\$PORT' < /etc/nginx/conf.d/configfile.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+# HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
 
-FROM build as development
+# FROM build as development
