@@ -1,3 +1,23 @@
+<h1 align="center">  Avei Draw </h1>
+
+<div align="center">
+  <h2>
+    Forked from Excalidraw and ready to serve on self-hosting in Google Cloud Run
+  </h2>
+</div>
+
+## Changes
+
+- `Dockerfile` to fix build images step and `package.json` for adjusting some sccipt in excalidraw repos
+- `manifest.json` on `/public/manifest.json` to changing PWA configuration
+- 
+
+## To Do's 
+
+[ ] Integrating with Google Drive / GCS 
+[ ] Collaboration Mode using `excalidraw/room`
+[ ] Removing firebase support
+
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
     <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
