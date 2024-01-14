@@ -69,6 +69,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "roundness"
   | "locked"
   | "opacity"
+  | "enablePressure"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -83,6 +84,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness = DEFAULT_ELEMENT_PROPS.roughness,
     opacity = DEFAULT_ELEMENT_PROPS.opacity,
+    enablePressure = true,
     width = 0,
     height = 0,
     angle = 0,
@@ -122,6 +124,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     updated: getUpdatedTimestamp(),
     link,
     locked,
+    enablePressure,
   };
   return element;
 };
@@ -374,6 +377,7 @@ export const newFreeDrawElement = (
     type: "freedraw";
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
+    enablePressure: boolean;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
   return {
@@ -381,6 +385,7 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: [],
     simulatePressure: opts.simulatePressure,
+    enablePressure: opts.enablePressure,
     lastCommittedPoint: null,
   };
 };
