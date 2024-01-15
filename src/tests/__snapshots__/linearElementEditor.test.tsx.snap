@@ -1,3 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Test Linear Elements > Test bound text element > should match styles for text editor 1`] = `null`;

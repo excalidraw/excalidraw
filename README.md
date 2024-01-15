@@ -25,6 +25,9 @@
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
     <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  />
   </a>
+  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
+    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  />
+  </a>
   <a href="https://docs.excalidraw.com/docs/introduction/contributing">
     <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  />
   </a>
@@ -70,7 +73,7 @@ The Excalidraw editor (npm package) supports:
 
 ## Excalidraw.com
 
-The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/src/excalidraw-app) is part of this repository as well, and the app features:
+The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
 
 - 📡&nbsp;PWA support (works offline).
 - 🤼&nbsp;Real-time collaboration.
@@ -82,7 +85,7 @@ We'll be adding these features as drop-in plugins for the npm package in the fut
 
 ## Quick start
 
-Install the [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
+**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
 
 ```
 npm install react react-dom @excalidraw/excalidraw
@@ -94,7 +97,7 @@ or via yarn
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-Don't forget to check out our [Documentation](https://docs.excalidraw.com)!
+Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
 ## Contributing
 

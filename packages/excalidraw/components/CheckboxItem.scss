@@ -1,0 +1,91 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .Checkbox {
+    margin: 4px 0.3em;
+    display: flex;
+    align-items: center;
+
+    cursor: pointer;
+    user-select: none;
+
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
+      box-shadow: 0 0 0 2px #{$oc-blue-4};
+    }
+
+    &:hover:not(.is-checked) .Checkbox-box:not(:focus) {
+      svg {
+        display: block;
+        opacity: 0.3;
+      }
+    }
+
+    &:active {
+      .Checkbox-box {
+        box-shadow: 0 0 2px 1px inset #{$oc-blue-7} !important;
+      }
+    }
+
+    &:hover {
+      .Checkbox-box {
+        background-color: fade-out($oc-blue-1, 0.8);
+      }
+    }
+
+    &.is-checked {
+      .Checkbox-box {
+        background-color: #{$oc-blue-1};
+        svg {
+          display: block;
+        }
+      }
+      &:hover .Checkbox-box {
+        background-color: #{$oc-blue-2};
+      }
+    }
+
+    .Checkbox-box {
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      flex: 0 0 auto;
+
+      margin: 0 1em;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      box-shadow: 0 0 0 2px #{$oc-blue-7};
+      background-color: transparent;
+      border-radius: 4px;
+
+      color: #{$oc-blue-7};
+
+      border: 0;
+
+      &:focus {
+        box-shadow: 0 0 0 3px #{$oc-blue-7};
+      }
+
+      svg {
+        display: none;
+        width: 16px;
+        height: 16px;
+        stroke-width: 3px;
+      }
+    }
+
+    .Checkbox-label {
+      display: flex;
+      align-items: center;
+    }
+
+    .excalidraw-tooltip-icon {
+      width: 1em;
+      height: 1em;
+    }
+  }
+}

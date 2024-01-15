@@ -23,7 +23,11 @@ const sidebars = {
       },
       items: ["introduction/development", "introduction/contributing"],
     },
-    { type: "category", label: "Codebase", items: ["codebase/json-schema"] },
+    {
+      type: "category",
+      label: "Codebase",
+      items: ["codebase/json-schema", "codebase/frames"],
+    },
     {
       type: "category",
       label: "@excalidraw/excalidraw",
@@ -49,7 +53,7 @@ const sidebars = {
               },
               items: [
                 "@excalidraw/excalidraw/api/props/initialdata",
-                "@excalidraw/excalidraw/api/props/ref",
+                "@excalidraw/excalidraw/api/props/excalidraw-api",
                 "@excalidraw/excalidraw/api/props/render-props",
                 "@excalidraw/excalidraw/api/props/ui-options",
               ],

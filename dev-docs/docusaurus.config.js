@@ -1,6 +1,11 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
+// Set the env variable to false so the excalidraw npm package doesn't throw
+// process undefined as docusaurus doesn't expose env variables by default
+
+process.env.IS_PREACT = "false";
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Excalidraw developer docs",
@@ -36,10 +41,7 @@ const config = {
           showLastUpdateTime: true,
         },
         theme: {
-          customCss: [
-            require.resolve("./src/css/custom.scss"),
-            require.resolve("../src/packages/excalidraw/example/App.scss"),
-          ],
+          customCss: [require.resolve("./src/css/custom.scss")],
         },
       }),
     ],
@@ -139,7 +141,15 @@ const config = {
       },
     }),
   themes: ["@docusaurus/theme-live-codeblock"],
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: [
+    "docusaurus-plugin-sass",
+    [
+      "docusaurus2-dotenv",
+      {
+        systemvars: true,
+      },
+    ],
+  ],
 };
 
 module.exports = config;

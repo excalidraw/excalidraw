@@ -1,0 +1,129 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .ExportDialog__preview {
+    --preview-padding: calc(var(--space-factor) * 4);
+
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+      left center;
+    text-align: center;
+    padding: var(--preview-padding);
+    margin-bottom: calc(var(--space-factor) * 3);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ExportDialog__preview canvas {
+    max-width: calc(100% - var(--preview-padding) * 2);
+    max-height: 25rem;
+  }
+
+  &.theme--dark .ExportDialog__preview canvas {
+    filter: none;
+  }
+
+  .ExportDialog__actions {
+    width: 100%;
+    display: flex;
+    grid-gap: calc(var(--space-factor) * 2);
+    align-items: top;
+    justify-content: space-between;
+  }
+
+  @include isMobile {
+    .ExportDialog {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ExportDialog__actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ExportDialog__actions > * {
+      margin-bottom: calc(var(--space-factor) * 3);
+    }
+
+    .ExportDialog__preview canvas {
+      max-height: 30vh;
+    }
+
+    .ExportDialog__dialog,
+    .ExportDialog__dialog .Island {
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .ExportDialog__dialog .Island {
+      overflow-y: auto;
+    }
+  }
+
+  .ExportDialog--json {
+    .ExportDialog-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      justify-items: center;
+      row-gap: 2em;
+
+      @media (max-width: 460px) {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        .Card-details {
+          min-height: 40px;
+        }
+      }
+
+      .ProjectName {
+        width: fit-content;
+        margin: 1em auto;
+        align-items: flex-start;
+        flex-direction: column;
+
+        .TextInput {
+          width: auto;
+        }
+      }
+
+      .ProjectName-label {
+        margin: 0.625em 0;
+        font-weight: bold;
+      }
+    }
+  }
+
+  button.ExportDialog-imageExportButton {
+    border: 0;
+
+    width: 5rem;
+    height: 5rem;
+    margin: 0 0.2em;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 1rem;
+    background-color: var(--button-color);
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.28),
+      0 6px 10px 0 rgba(0, 0, 0, 0.14);
+
+    font-family: Cascadia;
+    font-size: 1.8em;
+    color: $oc-white;
+
+    &:hover {
+      background-color: var(--button-color-darker);
+    }
+    &:active {
+      background-color: var(--button-color-darkest);
+      box-shadow: none;
+    }
+
+    svg {
+      width: 0.9em;
+    }
+  }
+}
