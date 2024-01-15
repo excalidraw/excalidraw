@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import dynamic from "next/dynamic";
 import "@excalidraw/excalidraw/index.css";
