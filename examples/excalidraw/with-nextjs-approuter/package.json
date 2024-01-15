@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm",
-    "dev": "yarn build:workspace && next dev -p 3005",
-    "build1": "yarn build:workspace && next build",
+    "preinstall": "yarn workspace @excalidraw/excalidraw run build:esm",
+    "dev": "next dev -p 3005",
+    "build1": "next build",
     "start": "next start -p 3006",
     "lint": "next lint"
   },
   "dependencies": {
-    "@excalidraw/excalidraw": "../../packages/excalidraw/dist",
+    "@excalidraw/excalidraw": "../excalidraw/packages/excalidraw/dist",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18"
