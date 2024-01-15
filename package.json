@@ -4,7 +4,8 @@
   "workspaces": [
     "excalidraw-app",
     "packages/excalidraw",
-    "packages/utils"
+    "packages/utils",
+    "examples/excalidraw/with-nextjs-approuter"
   ],
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
