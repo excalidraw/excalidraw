@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import ExcalidrawWithClientOnly from "./excalidraw";
 
 export default function Page() {
