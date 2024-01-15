@@ -1,4 +1,4 @@
 {
-  "outputDirectory": "example/public",
+  "outputDirectory": "examples/with-script-in-browser/public",
   "installCommand": "yarn install"
 }
