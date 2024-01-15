@@ -1,13 +1,10 @@
-"use client";
+import ExcalidrawWithClientOnly from "./excalidraw";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
-
-import "@excalidraw/excalidraw/index.css";
-
-export default function Home() {
+export default function Page() {
   return (
-    <div style={{ height: "800px", margin: "40px" }}>
-      <Excalidraw />
-    </div>
+    <>
+      <h1 style={{ textAlign: "center" }}>Excalidraw With Next JS</h1>
+      <ExcalidrawWithClientOnly />
+    </>
   );
 }
