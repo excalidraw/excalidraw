@@ -1,15 +1,18 @@
 import ExampleSidebar from "./sidebar/ExampleSidebar";
 
-import type * as TExcalidraw from "../../index";
+import type * as TExcalidraw from "../../../packages/excalidraw/index";
 
 import "./App.scss";
 import initialData from "./initialData";
 import { nanoid } from "nanoid";
-import { resolvablePromise, ResolvablePromise } from "../../utils";
-import { EVENT, ROUNDNESS } from "../../constants";
-import { distance2d } from "../../math";
-import { fileOpen } from "../../data/filesystem";
-import { loadSceneOrLibraryFromBlob } from "../../../utils/export";
+import {
+  resolvablePromise,
+  ResolvablePromise,
+} from "../../../packages/excalidraw/utils";
+import { EVENT, ROUNDNESS } from "../../../packages/excalidraw/constants";
+import { distance2d } from "../../../packages/excalidraw/math";
+import { fileOpen } from "../../../packages/excalidraw/data/filesystem";
+import { loadSceneOrLibraryFromBlob } from "../../../packages/utils/export";
 import type {
   AppState,
   BinaryFileData,
@@ -18,16 +21,19 @@ import type {
   Gesture,
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
-} from "../../types";
-import type { NonDeletedExcalidrawElement, Theme } from "../../element/types";
-import { ImportedLibraryData } from "../../data/types";
+} from "../../../packages/excalidraw/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from ".../../../packages/excalidraw/element/types";
+import { ImportedLibraryData } from "../../../packages/excalidraw/data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
-import { KEYS } from "../../keys";
+import { KEYS } from "../../../packages/excalidraw/keys";
 import {
   withBatchedUpdates,
   withBatchedUpdatesThrottled,
-} from "../../reactUtils";
+} from "../../../packages/excalidraw/reactUtils";
 
 declare global {
   interface Window {
