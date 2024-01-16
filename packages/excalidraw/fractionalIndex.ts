@@ -2,10 +2,9 @@ import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
 import {
   generateKeyBetween as _generateKeyBetween,
-  generateJitteredKeyBetween as _generateJitteredKeyBetween,
   generateNKeysBetween as _generateNKeysBetween,
-  generateNJitteredKeysBetween as _generateNJitteredKeysBetween,
-  base62CharSet as _base62CharSet,
+  generateJitteredKeyBetween,
+  generateNJitteredKeysBetween,
   indexCharacterSet,
 } from "fractional-indexing-jittered";
 import { ENV } from "./constants";
@@ -19,27 +18,13 @@ export const base36CharSet = indexCharacterSet({
   mostPositive: "Z",
 });
 
-const { chars, firstPositive, mostPositive, mostNegative } = _base62CharSet();
-
-const base62CharSet = indexCharacterSet({
-  chars,
-  firstPositive,
-  mostPositive,
-  mostNegative,
-});
-
-const charSet =
-  import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
-    ? base36CharSet
-    : base62CharSet;
-
 export const generateKeyBetween = (
   lower: string | null,
   upper: string | null,
 ) =>
   import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
-    ? _generateKeyBetween(lower, upper, charSet)
-    : _generateJitteredKeyBetween(lower, upper, charSet);
+    ? _generateKeyBetween(lower, upper, base36CharSet)
+    : generateJitteredKeyBetween(lower, upper);
 
 export const generateNKeysBetween = (
   lower: string | null,
@@ -47,8 +32,8 @@ export const generateNKeysBetween = (
   n: number,
 ) =>
   import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
-    ? _generateNKeysBetween(lower, upper, n, charSet)
-    : _generateNJitteredKeysBetween(lower, upper, n, charSet);
+    ? _generateNKeysBetween(lower, upper, n, base36CharSet)
+    : generateNJitteredKeysBetween(lower, upper, n);
 
 /**
  * Order the elements based on the fractional indices.
