@@ -1,20 +1,19 @@
-// @ts-nocheck
 "use client";
 import dynamic from "next/dynamic";
 import "@excalidraw/excalidraw/index.css";
 
-const Excalidraw = dynamic(
+const Excalidraw: any = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {
     ssr: false,
   },
 );
-function ExcalidrawWithClientOnly() {
+const ExcalidrawWithClientOnly = () => {
   return (
     <div style={{ height: "800px", margin: "40px" }}>
       <Excalidraw />
     </div>
   );
-}
+};
 
 export default ExcalidrawWithClientOnly;
