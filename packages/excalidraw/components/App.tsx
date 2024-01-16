@@ -57,7 +57,6 @@ import {
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
-  ELEMENT_READY_TO_ERASE_OPACITY,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
@@ -182,6 +181,7 @@ import {
   ExcalidrawIframeLikeElement,
   IframeData,
   ExcalidrawIframeElement,
+  ExcalidrawEmbeddableElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -246,6 +246,8 @@ import {
   ToolType,
   OnUserFollowedPayload,
   UnsubscribeCallback,
+  EmbedsValidationStatus,
+  ElementsPendingErasure,
 } from "../types";
 import {
   debounce,
@@ -258,9 +260,7 @@ import {
   sceneCoordsToViewportCoords,
   tupleToCoors,
   viewportCoordsToSceneCoords,
-  withBatchedUpdates,
   wrapEvent,
-  withBatchedUpdatesThrottled,
   updateObject,
   updateActiveTool,
   getShortcutKey,
@@ -272,11 +272,12 @@ import {
   arrayToMap,
   updateStable,
   addEventListener,
+  normalizeEOL,
 } from "../utils";
 import {
   createSrcDoc,
   embeddableURLValidator,
-  extractSrc,
+  maybeParseEmbedSrc,
   getEmbedLink,
 } from "../element/embeddable";
 import {
@@ -385,8 +386,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
-import { LaserToolOverlay } from "./LaserTool/LaserTool";
-import { LaserPathManager } from "./LaserTool/LaserPathManager";
+import { SVGLayer } from "./SVGLayer";
 import {
   setEraserCursor,
   setCursor,
@@ -403,6 +403,12 @@ import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { restoreFractionalIndices } from "../fractionalIndex";
 import FollowMode from "./FollowMode/FollowMode";
+
+import { AnimationFrameHandler } from "../animation-frame-handler";
+import { AnimatedTrail } from "../animated-trail";
+import { LaserTrails } from "../laser-trails";
+import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
+import { getRenderOpacity } from "../renderer/renderElement";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -526,6 +532,18 @@ class App extends React.Component<AppProps, AppState> {
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
+  /**
+   * Indicates whether the embeddable's url has been validated for rendering.
+   * If value not set, indicates that the validation is pending.
+   * Initially or on url change the flag is not reset so that we can guarantee
+   * the validation came from a trusted source (the editor).
+   **/
+  private embedsValidationStatus: EmbedsValidationStatus = new Map();
+  /** embeds that have been inserted to DOM (as a perf optim, we don't want to
+   * insert to DOM before user initially scrolls to them) */
+  private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+
+  private elementsPendingErasure: ElementsPendingErasure = new Set();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -534,7 +552,29 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerMoveEvent: PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
-  laserPathManager: LaserPathManager = new LaserPathManager(this);
+  animationFrameHandler = new AnimationFrameHandler();
+
+  laserTrails = new LaserTrails(this.animationFrameHandler, this);
+  eraserTrail = new AnimatedTrail(this.animationFrameHandler, this, {
+    streamline: 0.2,
+    size: 5,
+    keepHead: true,
+    sizeMapping: (c) => {
+      const DECAY_TIME = 200;
+      const DECAY_LENGTH = 10;
+      const t = Math.max(0, 1 - (performance.now() - c.pressure) / DECAY_TIME);
+      const l =
+        (DECAY_LENGTH -
+          Math.min(DECAY_LENGTH, c.totalLength - c.currentIndex)) /
+        DECAY_LENGTH;
+
+      return Math.min(easeOut(l), easeOut(t));
+    },
+    fill: () =>
+      this.state.theme === THEME.LIGHT
+        ? "rgba(0, 0, 0, 0.2)"
+        : "rgba(255, 255, 255, 0.2)",
+  });
 
   onChangeEmitter = new Emitter<
     [
@@ -841,6 +881,14 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private updateEmbedValidationStatus = (
+    element: ExcalidrawEmbeddableElement,
+    status: boolean,
+  ) => {
+    this.embedsValidationStatus.set(element.id, status);
+    ShapeCache.delete(element);
+  };
+
   private updateEmbeddables = () => {
     const iframeLikes = new Set<ExcalidrawIframeLikeElement["id"]>();
 
@@ -848,7 +896,7 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.getNonDeletedElements().filter((element) => {
       if (isEmbeddableElement(element)) {
         iframeLikes.add(element.id);
-        if (element.validated == null) {
+        if (!this.embedsValidationStatus.has(element.id)) {
           updated = true;
 
           const validated = embeddableURLValidator(
@@ -856,8 +904,7 @@ class App extends React.Component<AppProps, AppState> {
             this.props.validateEmbeddable,
           );
 
-          mutateElement(element, { validated }, false);
-          ShapeCache.delete(element);
+          this.updateEmbedValidationStatus(element, validated);
         }
       } else if (isIframeElement(element)) {
         iframeLikes.add(element.id);
@@ -886,7 +933,9 @@ class App extends React.Component<AppProps, AppState> {
       .getNonDeletedElements()
       .filter(
         (el): el is NonDeleted<ExcalidrawIframeLikeElement> =>
-          (isEmbeddableElement(el) && !!el.validated) || isIframeElement(el),
+          (isEmbeddableElement(el) &&
+            this.embedsValidationStatus.get(el.id) === true) ||
+          isIframeElement(el),
       );
 
     return (
@@ -896,6 +945,23 @@ class App extends React.Component<AppProps, AppState> {
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
+
+          const isVisible = isElementInViewport(
+            el,
+            normalizedWidth,
+            normalizedHeight,
+            this.state,
+          );
+          const hasBeenInitialized = this.initializedEmbeds.has(el.id);
+
+          if (isVisible && !hasBeenInitialized) {
+            this.initializedEmbeds.add(el.id);
+          }
+          const shouldRender = isVisible || hasBeenInitialized;
+
+          if (!shouldRender) {
+            return null;
+          }
 
           let src: IframeData | null;
 
@@ -1038,14 +1104,6 @@ class App extends React.Component<AppProps, AppState> {
             src = getEmbedLink(toValidURL(el.link || ""));
           }
 
-          // console.log({ src });
-
-          const isVisible = isElementInViewport(
-            el,
-            normalizedWidth,
-            normalizedHeight,
-            this.state,
-          );
           const isActive =
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "active";
@@ -1066,7 +1124,11 @@ class App extends React.Component<AppProps, AppState> {
                     }px) scale(${scale})`
                   : "none",
                 display: isVisible ? "block" : "none",
-                opacity: el.opacity / 100,
+                opacity: getRenderOpacity(
+                  el,
+                  getContainingFrame(el),
+                  this.elementsPendingErasure,
+                ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
                   el,
@@ -1455,7 +1517,9 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-textEditorContainer" />
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
-                        <LaserToolOverlay manager={this.laserPathManager} />
+                        <SVGLayer
+                          trails={[this.laserTrails, this.eraserTrail]}
+                        />
                         {selectedElements.length === 1 &&
                           this.state.showHyperlinkPopup && (
                             <Hyperlink
@@ -1464,6 +1528,9 @@ class App extends React.Component<AppProps, AppState> {
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
                               setToast={this.setToast}
+                              updateEmbedValidationStatus={
+                                this.updateEmbedValidationStatus
+                              }
                             />
                           )}
                         {this.props.aiEnabled !== false &&
@@ -1574,6 +1641,8 @@ class App extends React.Component<AppProps, AppState> {
                             renderGrid: true,
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
+                            embedsValidationStatus: this.embedsValidationStatus,
+                            elementsPendingErasure: this.elementsPendingErasure,
                           }}
                         />
                         <InteractiveCanvas
@@ -2377,7 +2446,8 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.scene.destroy();
     this.library.destroy();
-    this.laserPathManager.destroy();
+    this.laserTrails.stop();
+    this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
@@ -2600,6 +2670,10 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (prevProps.langCode !== this.props.langCode) {
       this.updateLanguage();
+    }
+
+    if (isEraserActive(prevState) && !isEraserActive(this.state)) {
+      this.eraserTrail.endPath();
     }
 
     if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
@@ -2926,21 +3000,49 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
-        const maybeUrl = extractSrc(data.text);
+        const nonEmptyLines = normalizeEOL(data.text)
+          .split(/\n+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        const embbeddableUrls = nonEmptyLines
+          .map((str) => maybeParseEmbedSrc(str))
+          .filter((string) => {
+            return (
+              embeddableURLValidator(string, this.props.validateEmbeddable) &&
+              (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(string) ||
+                getEmbedLink(string)?.type === "video")
+            );
+          });
 
         if (
-          !isPlainPaste &&
-          embeddableURLValidator(maybeUrl, this.props.validateEmbeddable) &&
-          (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(maybeUrl) ||
-            getEmbedLink(maybeUrl)?.type === "video")
+          !IS_PLAIN_PASTE &&
+          embbeddableUrls.length > 0 &&
+          // if there were non-embeddable text (lines) mixed in with embeddable
+          // urls, ignore and paste as text
+          embbeddableUrls.length === nonEmptyLines.length
         ) {
-          const embeddable = this.insertEmbeddableElement({
-            sceneX,
-            sceneY,
-            link: normalizeLink(maybeUrl),
-          });
-          if (embeddable) {
-            this.setState({ selectedElementIds: { [embeddable.id]: true } });
+          const embeddables: NonDeleted<ExcalidrawEmbeddableElement>[] = [];
+          for (const url of embbeddableUrls) {
+            const prevEmbeddable: ExcalidrawEmbeddableElement | undefined =
+              embeddables[embeddables.length - 1];
+            const embeddable = this.insertEmbeddableElement({
+              sceneX: prevEmbeddable
+                ? prevEmbeddable.x + prevEmbeddable.width + 20
+                : sceneX,
+              sceneY,
+              link: normalizeLink(url),
+            });
+            if (embeddable) {
+              embeddables.push(embeddable);
+            }
+          }
+          if (embeddables.length) {
+            this.setState({
+              selectedElementIds: Object.fromEntries(
+                embeddables.map((embeddable) => [embeddable.id, true]),
+              ),
+            });
           }
           return;
         }
@@ -5027,30 +5129,48 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     scenePointer: { x: number; y: number },
   ) => {
-    const updateElementIds = (elements: ExcalidrawElement[]) => {
-      elements.forEach((element) => {
+    this.eraserTrail.addPointToPath(scenePointer.x, scenePointer.y);
+
+    let didChange = false;
+
+    const processedGroups = new Set<ExcalidrawElement["id"]>();
+    const nonDeletedElements = this.scene.getNonDeletedElements();
+
+    const processElements = (elements: ExcalidrawElement[]) => {
+      for (const element of elements) {
         if (element.locked) {
           return;
         }
 
-        idsToUpdate.push(element.id);
         if (event.altKey) {
-          if (
-            pointerDownState.elementIdsToErase[element.id] &&
-            pointerDownState.elementIdsToErase[element.id].erase
-          ) {
-            pointerDownState.elementIdsToErase[element.id].erase = false;
+          if (this.elementsPendingErasure.delete(element.id)) {
+            didChange = true;
           }
-        } else if (!pointerDownState.elementIdsToErase[element.id]) {
-          pointerDownState.elementIdsToErase[element.id] = {
-            erase: true,
-            opacity: element.opacity,
-          };
+        } else if (!this.elementsPendingErasure.has(element.id)) {
+          didChange = true;
+          this.elementsPendingErasure.add(element.id);
         }
-      });
-    };
 
-    const idsToUpdate: Array<string> = [];
+        // (un)erase groups atomically
+        if (didChange && element.groupIds?.length) {
+          const shallowestGroupId = element.groupIds.at(-1)!;
+          if (!processedGroups.has(shallowestGroupId)) {
+            processedGroups.add(shallowestGroupId);
+            const elems = getElementsInGroup(
+              nonDeletedElements,
+              shallowestGroupId,
+            );
+            for (const elem of elems) {
+              if (event.altKey) {
+                this.elementsPendingErasure.delete(elem.id);
+              } else {
+                this.elementsPendingErasure.add(elem.id);
+              }
+            }
+          }
+        }
+      }
+    };
 
     const distance = distance2d(
       pointerDownState.lastCoords.x,
@@ -5063,7 +5183,7 @@ class App extends React.Component<AppProps, AppState> {
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
       const hitElements = this.getElementsAtPosition(point.x, point.y);
-      updateElementIds(hitElements);
+      processElements(hitElements);
 
       // Exit since we reached current point
       if (samplingInterval === distance) {
@@ -5082,35 +5202,31 @@ class App extends React.Component<AppProps, AppState> {
       point.y = nextY;
     }
 
-    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
-      const id =
-        isBoundToContainer(ele) && idsToUpdate.includes(ele.containerId)
-          ? ele.containerId
-          : ele.id;
-      if (idsToUpdate.includes(id)) {
-        if (event.altKey) {
-          if (
-            pointerDownState.elementIdsToErase[id] &&
-            pointerDownState.elementIdsToErase[id].erase === false
-          ) {
-            return newElementWith(ele, {
-              opacity: pointerDownState.elementIdsToErase[id].opacity,
-            });
-          }
-        } else {
-          return newElementWith(ele, {
-            opacity: ELEMENT_READY_TO_ERASE_OPACITY,
-          });
-        }
-      }
-      return ele;
-    });
-
-    this.scene.replaceAllElements(elements);
-
     pointerDownState.lastCoords.x = scenePointer.x;
     pointerDownState.lastCoords.y = scenePointer.y;
+
+    if (didChange) {
+      for (const element of this.scene.getNonDeletedElements()) {
+        if (
+          isBoundToContainer(element) &&
+          (this.elementsPendingErasure.has(element.id) ||
+            this.elementsPendingErasure.has(element.containerId))
+        ) {
+          if (event.altKey) {
+            this.elementsPendingErasure.delete(element.id);
+            this.elementsPendingErasure.delete(element.containerId);
+          } else {
+            this.elementsPendingErasure.add(element.id);
+            this.elementsPendingErasure.add(element.containerId);
+          }
+        }
+      }
+
+      this.elementsPendingErasure = new Set(this.elementsPendingErasure);
+      this.onSceneUpdated();
+    }
   };
+
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
     invalidateContextMenu = true;
@@ -5467,7 +5583,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
       );
     } else if (this.state.activeTool.type === "laser") {
-      this.laserPathManager.startPath(
+      this.laserTrails.startPath(
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
@@ -5487,6 +5603,13 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState,
       event,
     );
+
+    if (this.state.activeTool.type === "eraser") {
+      this.eraserTrail.startPath(
+        pointerDownState.lastCoords.x,
+        pointerDownState.lastCoords.y,
+      );
+    }
 
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
@@ -5796,7 +5919,6 @@ class App extends React.Component<AppProps, AppState> {
       boxSelection: {
         hasOccurred: false,
       },
-      elementIdsToErase: {},
     };
   }
 
@@ -6352,7 +6474,6 @@ class App extends React.Component<AppProps, AppState> {
       width: embedLink.intrinsicSize.w,
       height: embedLink.intrinsicSize.h,
       link,
-      validated: null,
     });
 
     this.scene.replaceAllElements(
@@ -6586,7 +6707,6 @@ class App extends React.Component<AppProps, AppState> {
     if (elementType === "embeddable") {
       element = newEmbeddableElement({
         type: "embeddable",
-        validated: null,
         ...baseElementAttributes,
       });
     } else {
@@ -6752,7 +6872,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.activeTool.type === "laser") {
-        this.laserPathManager.addPointToPath(pointerCoords.x, pointerCoords.y);
+        this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
       const [gridX, gridY] = getGridPoint(
@@ -7766,6 +7886,8 @@ class App extends React.Component<AppProps, AppState> {
       const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
 
       if (isEraserActive(this.state) && pointerStart && pointerEnd) {
+        this.eraserTrail.endPath();
+
         const draggedDistance = distance2d(
           pointerStart.clientX,
           pointerStart.clientY,
@@ -7785,18 +7907,14 @@ class App extends React.Component<AppProps, AppState> {
             scenePointer.x,
             scenePointer.y,
           );
-          hitElements.forEach(
-            (hitElement) =>
-              (pointerDownState.elementIdsToErase[hitElement.id] = {
-                erase: true,
-                opacity: hitElement.opacity,
-              }),
+          hitElements.forEach((hitElement) =>
+            this.elementsPendingErasure.add(hitElement.id),
           );
         }
-        this.eraseElements(pointerDownState);
+        this.eraseElements();
         return;
-      } else if (Object.keys(pointerDownState.elementIdsToErase).length) {
-        this.restoreReadyToEraseElements(pointerDownState);
+      } else if (this.elementsPendingErasure.size) {
+        this.restoreReadyToEraseElements();
       }
 
       if (
@@ -8018,7 +8136,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (activeTool.type === "laser") {
-        this.laserPathManager.endPath();
+        this.laserTrails.endPath();
         return;
       }
 
@@ -8057,65 +8175,32 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private restoreReadyToEraseElements = (
-    pointerDownState: PointerDownState,
-  ) => {
-    const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
-      if (
-        pointerDownState.elementIdsToErase[ele.id] &&
-        pointerDownState.elementIdsToErase[ele.id].erase
-      ) {
-        return newElementWith(ele, {
-          opacity: pointerDownState.elementIdsToErase[ele.id].opacity,
-        });
-      } else if (
-        isBoundToContainer(ele) &&
-        pointerDownState.elementIdsToErase[ele.containerId] &&
-        pointerDownState.elementIdsToErase[ele.containerId].erase
-      ) {
-        return newElementWith(ele, {
-          opacity: pointerDownState.elementIdsToErase[ele.containerId].opacity,
-        });
-      } else if (
-        ele.frameId &&
-        pointerDownState.elementIdsToErase[ele.frameId] &&
-        pointerDownState.elementIdsToErase[ele.frameId].erase
-      ) {
-        return newElementWith(ele, {
-          opacity: pointerDownState.elementIdsToErase[ele.frameId].opacity,
-        });
-      }
-      return ele;
-    });
-
-    this.scene.replaceAllElements(elements);
+  private restoreReadyToEraseElements = () => {
+    this.elementsPendingErasure = new Set();
+    this.onSceneUpdated();
   };
 
-  private eraseElements = (pointerDownState: PointerDownState) => {
+  private eraseElements = () => {
+    let didChange = false;
     const elements = this.scene.getElementsIncludingDeleted().map((ele) => {
       if (
-        pointerDownState.elementIdsToErase[ele.id] &&
-        pointerDownState.elementIdsToErase[ele.id].erase
+        this.elementsPendingErasure.has(ele.id) ||
+        (ele.frameId && this.elementsPendingErasure.has(ele.frameId)) ||
+        (isBoundToContainer(ele) &&
+          this.elementsPendingErasure.has(ele.containerId))
       ) {
-        return newElementWith(ele, { isDeleted: true });
-      } else if (
-        isBoundToContainer(ele) &&
-        pointerDownState.elementIdsToErase[ele.containerId] &&
-        pointerDownState.elementIdsToErase[ele.containerId].erase
-      ) {
-        return newElementWith(ele, { isDeleted: true });
-      } else if (
-        ele.frameId &&
-        pointerDownState.elementIdsToErase[ele.frameId] &&
-        pointerDownState.elementIdsToErase[ele.frameId].erase
-      ) {
+        didChange = true;
         return newElementWith(ele, { isDeleted: true });
       }
       return ele;
     });
 
-    this.history.resumeRecording();
-    this.scene.replaceAllElements(elements);
+    this.elementsPendingErasure = new Set();
+
+    if (didChange) {
+      this.history.resumeRecording();
+      this.scene.replaceAllElements(elements);
+    }
   };
 
   private initializeImage = async ({

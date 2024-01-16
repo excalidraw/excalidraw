@@ -288,11 +288,8 @@ const restoreElement = (
     case "rectangle":
     case "diamond":
     case "iframe":
-      return restoreElementWithProperties(element, {});
     case "embeddable":
-      return restoreElementWithProperties(element, {
-        validated: null,
-      });
+      return restoreElementWithProperties(element, {});
     case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {

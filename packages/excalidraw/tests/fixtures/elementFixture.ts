@@ -35,7 +35,6 @@ export const rectangleFixture: ExcalidrawElement = {
 export const embeddableFixture: ExcalidrawElement = {
   ...elementBase,
   type: "embeddable",
-  validated: null,
 };
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,
