@@ -52,7 +52,7 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { getBoundTextElementId } from "../../utils/textElement";
+import { getBoundTextElementId } from "./textElement";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {

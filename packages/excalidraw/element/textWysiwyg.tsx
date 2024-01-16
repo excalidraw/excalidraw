@@ -41,7 +41,7 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
-import { getBoundTextElementId } from "../../utils/textElement";
+import { getBoundTextElementId } from "./textElement";
 
 const getTransform = (
   width: number,

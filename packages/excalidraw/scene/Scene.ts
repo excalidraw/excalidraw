@@ -12,7 +12,7 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
-import { getBoundTextElementId } from "../../utils/textElement";
+import { getBoundTextElementId } from "../element/textElement";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
