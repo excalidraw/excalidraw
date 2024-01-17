@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from "react";
 import { InitializeApp } from "./components/InitializeApp";
 import App from "./components/App";
@@ -80,6 +81,13 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }
 
   useEffect(() => {
+    const importPolyfill = async () => {
+      //@ts-ignore
+      await import("canvas-roundrect-polyfill");
+    };
+
+    importPolyfill();
+
     // Block pinch-zooming on iOS outside of the content area
     const handleTouchMove = (event: TouchEvent) => {
       // @ts-ignore

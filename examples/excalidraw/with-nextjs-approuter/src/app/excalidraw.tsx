@@ -1,36 +1,29 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import dynamic from "next/dynamic";
 import "@excalidraw/excalidraw/index.css";
 
 import "../../../with-script-in-browser/App.scss";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw/types";
 
-// This Hack is needed until the canvas round rect polyfil is supported in nextjs, currently it throws Path2D not found error
-const Excalidraw: any = dynamic(
-  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
-  {
-    ssr: false,
-  },
-);
-
 const ExcalidrawWithClientOnly = () => {
-  const excalidrawUtils = useRef<any>(null);
+  const excalidrawLib = useRef<any>(null);
+  const [ExcalidrawComp, setExcalidrawComp] = useState<any>(null);
 
-  // This Hack is needed until the canvas round rect polyfil is supported in nextjs, currently it throws Path2D not found error
+  // This Hack is needed until since Excalidraw doesn't support SSR
+  // If you want to use only Excalidraw comp, you can use nextjs dynamic syntax to import Excalidraw
   useEffect(() => {
-    const importExcalidrawUtils = async () => {
-      const { Excalidraw, ...rest } = await import("@excalidraw/excalidraw");
-      excalidrawUtils.current = rest;
+    const importExcalidraw = async () => {
+      excalidrawLib.current = await import("@excalidraw/excalidraw");
+      setExcalidrawComp(excalidrawLib.current.Excalidraw);
     };
-    importExcalidrawUtils();
+    importExcalidraw();
   }, []);
 
   const updateScene = async () => {
-    if (!excalidrawUtils.current) {
+    if (!excalidrawLib.current) {
       return;
     }
-    const elements = excalidrawUtils.current.convertToExcalidrawElements([
+    const elements = excalidrawLib.current.convertToExcalidrawElements([
       {
         type: "rectangle",
         id: "rect-1",
@@ -66,7 +59,7 @@ const ExcalidrawWithClientOnly = () => {
     ]);
 
     const sceneData = {
-      elements: excalidrawUtils.current.restoreElements(elements, null),
+      elements: excalidrawLib.current.restoreElements(elements, null),
       appState: {
         viewBackgroundColor: "#edf2ff",
       },
@@ -81,11 +74,13 @@ const ExcalidrawWithClientOnly = () => {
         <button onClick={updateScene}>update scene</button>
       </div>
       <div style={{ height: "800px", margin: "40px" }}>
-        <Excalidraw
-          excalidrawAPI={(api: ExcalidrawImperativeAPI) =>
-            setExcalidrawAPI(api)
-          }
-        />
+        {ExcalidrawComp && (
+          <ExcalidrawComp
+            excalidrawAPI={(api: ExcalidrawImperativeAPI) =>
+              setExcalidrawAPI(api)
+            }
+          />
+        )}
       </div>
     </>
   );
