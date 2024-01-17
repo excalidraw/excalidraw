@@ -1,12 +1,10 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import "@excalidraw/excalidraw/index.css";
-import { useState } from "react";
-import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw/types";
 
 import "../../../with-script-in-browser/App.scss";
-import { useRef } from "react";
-import { useEffect } from "react";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw/types";
 
 // This Hack is needed until the canvas round rect polyfil is supported in nextjs, currently it throws Path2D not found error
 const Excalidraw: any = dynamic(
@@ -17,7 +15,7 @@ const Excalidraw: any = dynamic(
 );
 
 const ExcalidrawWithClientOnly = () => {
-  const excalidrawUtils = useRef<ExcalidrawImperativeAPI | null>(null);
+  const excalidrawUtils = useRef<any>(null);
 
   // This Hack is needed until the canvas round rect polyfil is supported in nextjs, currently it throws Path2D not found error
   useEffect(() => {
@@ -29,6 +27,9 @@ const ExcalidrawWithClientOnly = () => {
   }, []);
 
   const updateScene = async () => {
+    if (!excalidrawUtils.current) {
+      return;
+    }
     const elements = excalidrawUtils.current.convertToExcalidrawElements([
       {
         type: "rectangle",
