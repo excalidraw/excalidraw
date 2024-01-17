@@ -51,6 +51,12 @@
     color: var(--color-gray-100);
   }
 
+  .UserList__collaborator-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   .UserList__collaborator-follow-status-icon {
     margin-left: auto;
     flex: 0 0 auto;
