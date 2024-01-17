@@ -254,3 +254,13 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
 export type FileId = string & { _brand: "FileId" };
 
 export type ExcalidrawElementType = ExcalidrawElement["type"];
+
+export type ElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement>;
+export type NonDeletedElementsMap = Map<
+  ExcalidrawElement["id"],
+  NonDeletedExcalidrawElement
+> & { _brand: "NonDeletedElementsMap" };
+
+export type ElementsMapOrArray =
+  | readonly ExcalidrawElement[]
+  | Readonly<ElementsMap>;
