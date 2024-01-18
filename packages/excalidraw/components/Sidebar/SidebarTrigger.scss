@@ -29,6 +29,7 @@
 
   .default-sidebar-trigger .sidebar-trigger__label {
     display: block;
+    white-space: nowrap;
   }
 
   &.excalidraw--mobile .default-sidebar-trigger .sidebar-trigger__label {
