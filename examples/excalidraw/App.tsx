@@ -242,6 +242,7 @@ export default function App({
         >
           Toggle Custom Sidebar
         </Sidebar.Trigger>
+        {renderMenu()}
         {excalidrawAPI && (
           <TTDDialogTrigger icon={<span>😀</span>}>
             Text to diagram
