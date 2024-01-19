@@ -13,7 +13,7 @@ To start the example app using the `@excalidraw/excalidraw` package, follow the 
 1. Install the dependencies
 
    ```bash
-   cd src/packages/excalidraw && yarn
+   cd packages/excalidraw && yarn
    ```
 
 2. Start the example app
@@ -43,7 +43,7 @@ Once the version is released `@excalibot` will post a comment with the release v
 To release the next stable version follow the below steps:
 
 ```bash
-yarn prerelease version
+yarn prerelease:excalidraw
 ```
 
 You need to pass the `version` for which you want to create the release. This will make the changes needed before making the release like updating `package.json`, `changelog` and more.
@@ -51,7 +51,7 @@ You need to pass the `version` for which you want to create the release. This wi
 The next step is to run the `release` script:
 
 ```bash
-yarn release
+yarn release:excalidraw
 ```
 
 This will publish the package.

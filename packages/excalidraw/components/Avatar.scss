@@ -1,0 +1,7 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .Avatar {
+    @include avatarStyles;
+  }
+}

@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: "18.x"
       - name: "Install Deps"
-        run: yarn --frozen-lockfile
+        run: yarn install
       - name: "Test Coverage"
         run: yarn test:coverage
       - name: "Report Coverage"
