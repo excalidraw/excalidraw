@@ -1,6 +1,6 @@
-import type { ExcalidrawImperativeAPI } from "../../types";
+import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw/types";
 
-const { Button, MIME_TYPES } = window.ExcalidrawLib;
 const COMMENT_SVG = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -19,9 +19,13 @@ const COMMENT_SVG = (
 );
 const CustomFooter = ({
   excalidrawAPI,
+  excalidrawLib,
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
+  excalidrawLib: typeof TExcalidraw;
 }) => {
+  const { Button, MIME_TYPES } = excalidrawLib;
+
   return (
     <>
       <Button

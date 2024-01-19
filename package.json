@@ -5,7 +5,7 @@
     "excalidraw-app",
     "packages/excalidraw",
     "packages/utils",
-    "examples/excalidraw/with-nextjs-approuter"
+    "examples/excalidraw/*"
   ],
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",

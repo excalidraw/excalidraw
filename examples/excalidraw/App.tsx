@@ -1,18 +1,30 @@
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  Children,
+  cloneElement,
+} from "react";
 import ExampleSidebar from "./sidebar/ExampleSidebar";
 
-import type * as TExcalidraw from "../../../packages/excalidraw/index";
+import type * as TExcalidraw from "@excalidraw/excalidraw";
 
-import "./App.scss";
-import initialData from "./initialData";
 import { nanoid } from "nanoid";
+
 import {
   resolvablePromise,
   ResolvablePromise,
-} from "../../../packages/excalidraw/utils";
-import { EVENT, ROUNDNESS } from "../../../packages/excalidraw/constants";
-import { distance2d } from "../../../packages/excalidraw/math";
-import { fileOpen } from "../../../packages/excalidraw/data/filesystem";
-import { loadSceneOrLibraryFromBlob } from "../../../packages/utils/export";
+  distance2d,
+  fileOpen,
+  withBatchedUpdates,
+  withBatchedUpdatesThrottled,
+} from "./utils";
+
+import CustomFooter from "./CustomFooter";
+import MobileFooter from "./MobileFooter";
+import initialData from "./initialData";
+
 import type {
   AppState,
   BinaryFileData,
@@ -21,25 +33,14 @@ import type {
   Gesture,
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
-} from "../../../packages/excalidraw/types";
+} from "@excalidraw/excalidraw/dist/excalidraw/types";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
-} from ".../../../packages/excalidraw/element/types";
-import { ImportedLibraryData } from "../../../packages/excalidraw/data/types";
-import CustomFooter from "./CustomFooter";
-import MobileFooter from "./MobileFooter";
-import { KEYS } from "../../../packages/excalidraw/keys";
-import {
-  withBatchedUpdates,
-  withBatchedUpdatesThrottled,
-} from "../../../packages/excalidraw/reactUtils";
+} from "@excalidraw/excalidraw/dist/excalidraw/element/types";
+import type { ImportedLibraryData } from "@excalidraw/excalidraw/dist/excalidraw/data/types";
 
-declare global {
-  interface Window {
-    ExcalidrawLib: typeof TExcalidraw;
-  }
-}
+import "./App.scss";
 
 type Comment = {
   x: number;
@@ -60,31 +61,6 @@ type PointerDownState = {
   };
 };
 
-const { useEffect, useState, useRef, useCallback } = window.React;
-
-// This is so that we use the bundled excalidraw.development.js file instead
-// of the actual source code
-const {
-  exportToCanvas,
-  exportToSvg,
-  exportToBlob,
-  exportToClipboard,
-  Excalidraw,
-  useHandleLibrary,
-  MIME_TYPES,
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
-  restoreElements,
-  Sidebar,
-  Footer,
-  WelcomeScreen,
-  MainMenu,
-  LiveCollaborationTrigger,
-  convertToExcalidrawElements,
-  TTDDialog,
-  TTDDialogTrigger,
-} = window.ExcalidrawLib;
-
 const COMMENT_ICON_DIMENSION = 32;
 const COMMENT_INPUT_HEIGHT = 50;
 const COMMENT_INPUT_WIDTH = 150;
@@ -93,8 +69,38 @@ export interface AppProps {
   appTitle: string;
   useCustom: (api: ExcalidrawImperativeAPI | null, customArgs?: any[]) => void;
   customArgs?: any[];
+  children: React.ReactNode;
+  excalidrawLib: typeof TExcalidraw;
 }
-export default function App({ appTitle, useCustom, customArgs }: AppProps) {
+
+export default function App({
+  appTitle,
+  useCustom,
+  customArgs,
+  children,
+  excalidrawLib,
+}: AppProps) {
+  const {
+    exportToCanvas,
+    exportToSvg,
+    exportToBlob,
+    exportToClipboard,
+    useHandleLibrary,
+    MIME_TYPES,
+    sceneCoordsToViewportCoords,
+    viewportCoordsToSceneCoords,
+    restoreElements,
+    Sidebar,
+    Footer,
+    WelcomeScreen,
+    MainMenu,
+    LiveCollaborationTrigger,
+    convertToExcalidrawElements,
+    TTDDialog,
+    TTDDialogTrigger,
+    ROUNDNESS,
+    loadSceneOrLibraryFromBlob,
+  } = excalidrawLib;
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
@@ -156,8 +162,104 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
       };
     };
     fetchData();
-  }, [excalidrawAPI]);
+  }, [excalidrawAPI, convertToExcalidrawElements, MIME_TYPES]);
 
+  const renderExcalidraw = (children: React.ReactNode) => {
+    const Excalidraw: any = Children.toArray(children).find(
+      (child) =>
+        React.isValidElement(child) &&
+        typeof child.type !== "string" &&
+        //@ts-ignore
+        child.type.displayName === "Excalidraw",
+    );
+    if (!Excalidraw) {
+      return;
+    }
+    const newElement = cloneElement(
+      Excalidraw,
+      {
+        excalidrawAPI: (api: ExcalidrawImperativeAPI) => setExcalidrawAPI(api),
+        initialData: initialStatePromiseRef.current.promise,
+        onChange: (
+          elements: NonDeletedExcalidrawElement[],
+          state: AppState,
+        ) => {
+          console.info("Elements :", elements, "State : ", state);
+        },
+        onPointerUpdate: (payload: {
+          pointer: { x: number; y: number };
+          button: "down" | "up";
+          pointersMap: Gesture["pointers"];
+        }) => setPointerData(payload),
+        viewModeEnabled,
+        zenModeEnabled,
+        gridModeEnabled,
+        theme,
+        name: "Custom name of drawing",
+        UIOptions: {
+          canvasActions: {
+            loadScene: false,
+          },
+          tools: { image: !disableImageTool },
+        },
+        renderTopRightUI,
+        onLinkOpen,
+        onPointerDown,
+        onScrollChange: rerenderCommentIcons,
+        validateEmbeddable: true,
+      },
+      <>
+        {excalidrawAPI && (
+          <Footer>
+            <CustomFooter
+              excalidrawAPI={excalidrawAPI}
+              excalidrawLib={excalidrawLib}
+            />
+          </Footer>
+        )}
+        <WelcomeScreen />
+        <Sidebar name="custom">
+          <Sidebar.Tabs>
+            <Sidebar.Header />
+            <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
+            <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
+            <Sidebar.TabTriggers>
+              <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
+              <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
+            </Sidebar.TabTriggers>
+          </Sidebar.Tabs>
+        </Sidebar>
+        <Sidebar.Trigger
+          name="custom"
+          tab="one"
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            bottom: "20px",
+            zIndex: 9999999999999999,
+          }}
+        >
+          Toggle Custom Sidebar
+        </Sidebar.Trigger>
+        {excalidrawAPI && (
+          <TTDDialogTrigger icon={<span>😀</span>}>
+            Text to diagram
+          </TTDDialogTrigger>
+        )}
+        <TTDDialog
+          onTextSubmit={async (_) => {
+            console.info("submit");
+            // sleep for 2s
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            throw new Error("error, go away now");
+            // return "dummy";
+          }}
+        />
+      </>,
+    );
+    return newElement;
+  };
   const renderTopRightUI = (isMobile: boolean) => {
     return (
       <>
@@ -341,8 +443,8 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
     pointerDownState: PointerDownState,
   ) => {
     return withBatchedUpdates((event) => {
-      window.removeEventListener(EVENT.POINTER_MOVE, pointerDownState.onMove);
-      window.removeEventListener(EVENT.POINTER_UP, pointerDownState.onUp);
+      window.removeEventListener("pointermove", pointerDownState.onMove);
+      window.removeEventListener("pointerup", pointerDownState.onUp);
       excalidrawAPI?.setActiveTool({ type: "selection" });
       const distance = distance2d(
         pointerDownState.x,
@@ -406,8 +508,8 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
               onPointerMoveFromPointerDownHandler(pointerDownState);
             const onPointerUp =
               onPointerUpFromPointerDownHandler(pointerDownState);
-            window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-            window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+            window.addEventListener("pointermove", onPointerMove);
+            window.addEventListener("pointerup", onPointerUp);
 
             pointerDownState.onMove = onPointerMove;
             pointerDownState.onUp = onPointerUp;
@@ -499,7 +601,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         }}
         onBlur={saveComment}
         onKeyDown={(event) => {
-          if (!event.shiftKey && event.key === KEYS.ENTER) {
+          if (!event.shiftKey && event.key === "Enter") {
             event.preventDefault();
             saveComment();
           }
@@ -532,7 +634,12 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
         </MainMenu.ItemCustom>
         <MainMenu.DefaultItems.Help />
 
-        {excalidrawAPI && <MobileFooter excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && (
+          <MobileFooter
+            excalidrawLib={excalidrawLib}
+            excalidrawAPI={excalidrawAPI}
+          />
+        )}
       </MainMenu>
     );
   };
@@ -681,83 +788,7 @@ export default function App({ appTitle, useCustom, customArgs }: AppProps) {
           </div>
         </div>
         <div className="excalidraw-wrapper">
-          <Excalidraw
-            excalidrawAPI={(api: ExcalidrawImperativeAPI) =>
-              setExcalidrawAPI(api)
-            }
-            initialData={initialStatePromiseRef.current.promise}
-            onChange={(elements, state) => {
-              // console.info("Elements :", elements, "State : ", state);
-            }}
-            onPointerUpdate={(payload: {
-              pointer: { x: number; y: number };
-              button: "down" | "up";
-              pointersMap: Gesture["pointers"];
-            }) => setPointerData(payload)}
-            viewModeEnabled={viewModeEnabled}
-            zenModeEnabled={zenModeEnabled}
-            gridModeEnabled={gridModeEnabled}
-            theme={theme}
-            name="Custom name of drawing"
-            UIOptions={{
-              canvasActions: {
-                loadScene: false,
-              },
-              tools: { image: !disableImageTool },
-            }}
-            renderTopRightUI={renderTopRightUI}
-            onLinkOpen={onLinkOpen}
-            onPointerDown={onPointerDown}
-            onScrollChange={rerenderCommentIcons}
-            // allow all urls
-            validateEmbeddable={true}
-          >
-            {excalidrawAPI && (
-              <Footer>
-                <CustomFooter excalidrawAPI={excalidrawAPI} />
-              </Footer>
-            )}
-            <WelcomeScreen />
-            <Sidebar name="custom">
-              <Sidebar.Tabs>
-                <Sidebar.Header />
-                <Sidebar.Tab tab="one">Tab one!</Sidebar.Tab>
-                <Sidebar.Tab tab="two">Tab two!</Sidebar.Tab>
-                <Sidebar.TabTriggers>
-                  <Sidebar.TabTrigger tab="one">One</Sidebar.TabTrigger>
-                  <Sidebar.TabTrigger tab="two">Two</Sidebar.TabTrigger>
-                </Sidebar.TabTriggers>
-              </Sidebar.Tabs>
-            </Sidebar>
-            <Sidebar.Trigger
-              name="custom"
-              tab="one"
-              style={{
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)",
-                bottom: "20px",
-                zIndex: 9999999999999999,
-              }}
-            >
-              Toggle Custom Sidebar
-            </Sidebar.Trigger>
-            {renderMenu()}
-            {excalidrawAPI && (
-              <TTDDialogTrigger icon={<span>😀</span>}>
-                Text to diagram
-              </TTDDialogTrigger>
-            )}
-            <TTDDialog
-              onTextSubmit={async (_) => {
-                console.info("submit");
-                // sleep for 2s
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-                throw new Error("error, go away now");
-                // return "dummy";
-              }}
-            />
-          </Excalidraw>
+          {renderExcalidraw(children)}
           {Object.keys(commentIcons || []).length > 0 && renderCommentIcons()}
           {comment && renderComment()}
         </div>

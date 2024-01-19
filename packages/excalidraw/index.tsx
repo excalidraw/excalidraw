@@ -231,7 +231,7 @@ export {
 } from "../utils/export";
 export { isLinearElement } from "./element/typeChecks";
 
-export { FONT_FAMILY, THEME, MIME_TYPES } from "./constants";
+export { FONT_FAMILY, THEME, MIME_TYPES, ROUNDNESS } from "./constants";
 
 export {
   mutateElement,
