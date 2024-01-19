@@ -11,7 +11,6 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { t } from "../i18n";
-import { elementsOverlappingBBox } from "../../utils/export";
 import { isSomeElementSelected, getSelectedElements } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
@@ -20,6 +19,7 @@ import { cloneJSON } from "../utils";
 import { canvasToBlob } from "./blob";
 import { fileSave, FileSystemHandle } from "./filesystem";
 import { serializeAsJSON } from "./json";
+import { getElementsOverlappingFrame } from "../frame";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
@@ -56,11 +56,7 @@ export const prepareElementsForExport = (
       isFrameLikeElement(exportedElements[0])
     ) {
       exportingFrame = exportedElements[0];
-      exportedElements = elementsOverlappingBBox({
-        elements,
-        bounds: exportingFrame,
-        type: "overlap",
-      });
+      exportedElements = getElementsOverlappingFrame(elements, exportingFrame);
     } else if (exportedElements.length > 1) {
       exportedElements = getSelectedElements(
         elements,

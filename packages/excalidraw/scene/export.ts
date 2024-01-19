@@ -26,8 +26,8 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { elementsOverlappingBBox } from "../../utils/export";
 import {
+  getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
@@ -168,11 +168,7 @@ const prepareElementsForRender = ({
   let nextElements: readonly ExcalidrawElement[];
 
   if (exportingFrame) {
-    nextElements = elementsOverlappingBBox({
-      elements,
-      bounds: exportingFrame,
-      type: "overlap",
-    });
+    nextElements = getElementsOverlappingFrame(elements, exportingFrame);
   } else if (frameRendering.enabled && frameRendering.name) {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,

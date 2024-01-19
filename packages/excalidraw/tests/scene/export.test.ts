@@ -406,5 +406,67 @@ describe("exporting frames", () => {
         (frame.height + getFrameNameHeight("svg")).toString(),
       );
     });
+
+    it("should not export frame-overlapping elements belonging to different frame", async () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 200,
+        y: 0,
+      });
+
+      const frame1Child = API.createElement({
+        type: "rectangle",
+        width: 150,
+        height: 100,
+        x: 0,
+        y: 50,
+        frameId: frame1.id,
+      });
+      const frame2Child = API.createElement({
+        type: "rectangle",
+        width: 150,
+        height: 100,
+        x: 50,
+        y: 0,
+        frameId: frame2.id,
+      });
+
+      // low-level exportToSvg api expects elements to be pre-filtered, so let's
+      // use the filter we use in the editor
+      const { exportedElements, exportingFrame } = prepareElementsForExport(
+        [frame1Child, frame1, frame2Child, frame2],
+        {
+          selectedElementIds: { [frame1.id]: true },
+        },
+        true,
+      );
+
+      const svg = await exportToSvg({
+        elements: exportedElements,
+        files: null,
+        exportPadding: 0,
+        exportingFrame,
+      });
+
+      // frame shouldn't be exported
+      expect(svg.querySelector(`[data-id="${frame1.id}"]`)).toBeNull();
+      // frame1 child should be epxorted
+      expect(svg.querySelector(`[data-id="${frame1Child.id}"]`)).not.toBeNull();
+      // frame2 child should not be exported even if it physically overlaps with
+      // frame1
+      expect(svg.querySelector(`[data-id="${frame2Child.id}"]`)).toBeNull();
+
+      expect(svg.getAttribute("width")).toBe(frame1.width.toString());
+      expect(svg.getAttribute("height")).toBe(frame1.height.toString());
+    });
   });
 });
