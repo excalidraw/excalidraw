@@ -21,7 +21,10 @@ import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
-import { doLineSegmentsIntersect } from "../utils/export";
+import {
+  doLineSegmentsIntersect,
+  elementsOverlappingBBox,
+} from "../utils/export";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 
 // --------------------------- Frame State ------------------------------------
@@ -663,4 +666,20 @@ export const getFrameLikeTitle = (
   }
   // TODO name frames AI only is specific to AI frames
   return isFrameElement(element) ? `Frame ${frameIdx}` : `AI Frame ${frameIdx}`;
+};
+
+export const getElementsOverlappingFrame = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameLikeElement,
+) => {
+  return (
+    elementsOverlappingBBox({
+      elements,
+      bounds: frame,
+      type: "overlap",
+    })
+      // removes elements who are overlapping, but are in a different frame,
+      // and thus invisible in target frame
+      .filter((el) => !el.frameId || el.frameId === frame.id)
+  );
 };
