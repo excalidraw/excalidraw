@@ -5,6 +5,7 @@
     "excalidraw-app",
     "packages/excalidraw",
     "packages/utils",
+    "examples/excalidraw",
     "examples/excalidraw/*"
   ],
   "dependencies": {

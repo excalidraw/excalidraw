@@ -1,5 +1,5 @@
 {
-  "name": "with-script-in-browser",
+  "name": "examples",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -8,10 +8,6 @@
     "@excalidraw/excalidraw": "*"
   },
   "devDependencies": {
-    "vite": "5.0.6",
     "typescript": "^5"
-  },
-  "scripts": {
-    "start": "vite"
   }
 }
