@@ -133,7 +133,7 @@ const shareableLinkConfirmDialog = {
   description: (
     <Trans
       i18nKey="overwriteConfirm.modal.shareableLink.description"
-      bold={(text) => <strong>{text}</strong>}
+      bold={(text: any) => <strong>{text}</strong>}
       br={() => <br />}
     />
   ),

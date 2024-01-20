@@ -148,7 +148,7 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
         <>{renderAction("changeArrowhead")}</>
       )}
-
+      {renderAction("pressureSensitivity")}
       {renderAction("changeOpacity")}
 
       <fieldset>

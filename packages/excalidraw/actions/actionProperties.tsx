@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AppState, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -1165,6 +1166,80 @@ export const actionChangeArrowhead = register({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+function calculateAdjustedStrokeWidth(
+  speed: any,
+  pressureSimulationEnabled: boolean,
+) {
+  const pressureFactor = pressureSimulationEnabled ? 0.5 : 1;
+  return pressureFactor * speed;
+}
+
+export const actionPressureSensitivity = register({
+  name: "pressureSensitivity",
+  trackEvent: false,
+  perform: (elements, appState, value, drawingSpeed) => {
+    const adjustedStrokeWidth = calculateAdjustedStrokeWidth(
+      drawingSpeed,
+      appState.pressureSimulationEnabled,
+    );
+
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          strokeWidth: adjustedStrokeWidth,
+        }),
+      ),
+      appState: { ...appState, currentItemStrokeWidth: adjustedStrokeWidth },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const [pressureSimulationEnabled, setPressureSimulationEnabled] =
+      useState(false);
+
+    const togglePressureSimulation = () => {
+      setPressureSimulationEnabled((prev: boolean) => !prev);
+      const newStrokeWidth = pressureSimulationEnabled
+        ? STROKE_WIDTH.thin
+        : appState.currentItemStrokeWidth;
+      updateData({
+        ...appState,
+        currentItemStrokeWidth: newStrokeWidth,
+      });
+    };
+    return (
+      <div className="pressure-container">
+        <label className="pressure-label">
+          {t("labels.pressureSensitivity")}
+        </label>
+        <div className="pressure-button-container">
+          <div
+            onClick={togglePressureSimulation}
+            className={`pressure-button-toggle-ball ${
+              pressureSimulationEnabled ? "active" : ""
+            }`}
+          ></div>
+          <button
+            className="pressure-button"
+            onClick={togglePressureSimulation}
+            value={getFormValue(
+              elements,
+              appState,
+              (element) =>
+                calculateAdjustedStrokeWidth(
+                  element,
+                  appState.pressureSimulationEnabled,
+                ),
+              true,
+              appState.currentItemStrokeWidth,
+            )}
+          ></button>
+        </div>
+      </div>
     );
   },
 });
