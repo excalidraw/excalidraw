@@ -107,17 +107,16 @@ export const elementsAreInFrameBounds = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
 ) => {
-  const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(frame);
+  const [frameX1, frameY1, frameX2, frameY2] = getElementAbsoluteCoords(frame);
 
   const [elementX1, elementY1, elementX2, elementY2] =
     getCommonBounds(elements);
 
   return (
-    selectionX1 <= elementX1 &&
-    selectionY1 <= elementY1 &&
-    selectionX2 >= elementX2 &&
-    selectionY2 >= elementY2
+    frameX1 <= elementX1 &&
+    frameY1 <= elementY1 &&
+    frameX2 >= elementX2 &&
+    frameY2 >= elementY2
   );
 };
 
@@ -371,6 +370,56 @@ export const getContainingFrame = (
 };
 
 // --------------------------- Frame Operations -------------------------------
+
+/** */
+export const filterElementsEligibleAsFrameChildren = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameLikeElement,
+) => {
+  const otherFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
+
+  elements = omitGroupsContainingFrameLikes(elements);
+
+  for (const element of elements) {
+    if (isFrameLikeElement(element) && element.id !== frame.id) {
+      otherFrames.add(element.id);
+    }
+  }
+
+  const processedGroups = new Set<ExcalidrawElement["id"]>();
+
+  const eligibleElements: ExcalidrawElement[] = [];
+
+  for (const element of elements) {
+    // don't add frames or their children
+    if (
+      isFrameLikeElement(element) ||
+      (element.frameId && otherFrames.has(element.frameId))
+    ) {
+      continue;
+    }
+
+    if (element.groupIds.length) {
+      const shallowestGroupId = element.groupIds.at(-1)!;
+      if (!processedGroups.has(shallowestGroupId)) {
+        processedGroups.add(shallowestGroupId);
+        const groupElements = getElementsInGroup(elements, shallowestGroupId);
+        if (groupElements.some((el) => elementOverlapsWithFrame(el, frame))) {
+          for (const child of groupElements) {
+            eligibleElements.push(child);
+          }
+        }
+      }
+    } else {
+      const overlaps = elementOverlapsWithFrame(element, frame);
+      if (overlaps) {
+        eligibleElements.push(element);
+      }
+    }
+  }
+
+  return eligibleElements;
+};
 
 /**
  * Retains (or repairs for target frame) the ordering invriant where children

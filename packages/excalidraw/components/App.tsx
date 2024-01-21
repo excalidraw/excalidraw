@@ -349,6 +349,7 @@ import {
   isElementInFrame,
   getFrameLikeTitle,
   getElementsOverlappingFrame,
+  filterElementsEligibleAsFrameChildren,
 } from "../frame";
 import {
   excludeElementsInFramesFromSelection,
@@ -3107,7 +3108,11 @@ class App extends React.Component<AppProps, AppState> {
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
     if (topLayerFrame) {
-      addElementsToFrame(allElements, newElements, topLayerFrame);
+      const eligibleElements = filterElementsEligibleAsFrameChildren(
+        newElements,
+        topLayerFrame,
+      );
+      addElementsToFrame(allElements, eligibleElements, topLayerFrame);
     }
 
     this.scene.replaceAllElements(allElements);
