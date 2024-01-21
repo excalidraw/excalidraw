@@ -5,6 +5,7 @@ import {
   ExcalidrawFreeDrawElement,
   NonDeleted,
   ExcalidrawTextElementWithContainer,
+  ElementsMapOrArray,
 } from "./types";
 import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
@@ -161,7 +162,11 @@ export const getElementAbsoluteCoords = (
       includeBoundText,
     );
   } else if (isTextElement(element)) {
-    const container = getContainerElement(element);
+    const elementsMap =
+      Scene.getScene(element)?.getElementsMapIncludingDeleted();
+    const container = elementsMap
+      ? getContainerElement(element, elementsMap)
+      : null;
     if (isArrowElement(container)) {
       const coords = LinearElementEditor.getBoundTextElementPosition(
         container,
@@ -729,10 +734,8 @@ const getLinearElementRotatedBounds = (
 export const getElementBounds = (element: ExcalidrawElement): Bounds => {
   return ElementBounds.getBounds(element);
 };
-export const getCommonBounds = (
-  elements: readonly ExcalidrawElement[],
-): Bounds => {
-  if (!elements.length) {
+export const getCommonBounds = (elements: ElementsMapOrArray): Bounds => {
+  if ("size" in elements ? !elements.size : !elements.length) {
     return [0, 0, 0, 0];
   }
 
