@@ -6,8 +6,9 @@ import {
 } from "../element/types";
 import { cancelRender } from "../renderer/renderScene";
 import { AppState } from "../types";
-import { memoize } from "../utils";
+import { memoize, toBrandedType } from "../utils";
 import Scene from "./Scene";
+import { RenderableElementsMap } from "./types";
 
 export class Renderer {
   private scene: Scene;
@@ -62,7 +63,7 @@ export class Renderer {
       editingElement: AppState["editingElement"];
       pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
-      const elementsMap = new Map() as NonDeletedElementsMap;
+      const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
 
       for (const element of elements) {
         if (isImageElement(element)) {

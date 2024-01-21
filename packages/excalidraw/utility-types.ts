@@ -57,3 +57,8 @@ export type NestedKeyOf<T, K = keyof T> = K extends keyof T & (string | number)
 
 export type SetLike<T> = Set<T> | T[];
 export type ReadonlySetLike<T> = ReadonlySet<T> | readonly T[];
+
+export type MakeBrand<T extends string> = {
+  /** @private using ~ to sort last in intellisense */
+  [K in `~brand~${T}`]: T;
+};

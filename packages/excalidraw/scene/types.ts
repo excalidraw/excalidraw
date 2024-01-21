@@ -13,8 +13,10 @@ import {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
+import { MakeBrand } from "../utility-types";
 
-export type RenderableElementsMap = Readonly<NonDeletedElementsMap>;
+export type RenderableElementsMap = NonDeletedElementsMap &
+  MakeBrand<"RenderableElementsMap">;
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];

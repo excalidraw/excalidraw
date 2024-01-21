@@ -3,10 +3,9 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawFrameLikeElement,
-  ExcalidrawTextElementWithContainer,
   ElementsMapOrArray,
-  ElementsMap,
   NonDeletedElementsMap,
+  SceneElementsMap,
 } from "../element/types";
 import { isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -15,7 +14,7 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
-import { getBoundTextElementId } from "../element/textElement";
+import { toBrandedType } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -127,7 +126,7 @@ class Scene {
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
-  private elementsMap: ElementsMap = new Map();
+  private elementsMap = toBrandedType<SceneElementsMap>(new Map());
   private selectedElementsCache: {
     selectedElementIds: AppState["selectedElementIds"] | null;
     elements: readonly NonDeletedExcalidrawElement[] | null;

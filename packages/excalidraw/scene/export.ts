@@ -3,7 +3,6 @@ import {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
-  NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import {
@@ -12,7 +11,13 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { arrayToMap, cloneJSON, distance, getFontString } from "../utils";
+import {
+  arrayToMap,
+  cloneJSON,
+  distance,
+  getFontString,
+  toBrandedType,
+} from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -38,6 +43,7 @@ import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import Scene from "./Scene";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
+import { RenderableElementsMap } from "./types";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -242,7 +248,9 @@ export const exportToCanvas = async (
     files,
   });
 
-  const elementsMap = arrayToMap(elementsForRender) as NonDeletedElementsMap;
+  const elementsMap = toBrandedType<RenderableElementsMap>(
+    arrayToMap(elementsForRender),
+  );
 
   renderStaticScene({
     canvas,
@@ -437,7 +445,7 @@ export const exportToSvg = async (
 
   renderSceneToSvg(
     elementsForRender,
-    arrayToMap(elementsForRender) as NonDeletedElementsMap,
+    toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
     rsvg,
     svgRoot,
     files || {},
