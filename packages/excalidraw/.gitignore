@@ -1,4 +1,4 @@
 node_modules
-dist
-example
 types
+bundle.js
+bundle.css

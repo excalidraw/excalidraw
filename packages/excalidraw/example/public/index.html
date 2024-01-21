@@ -12,6 +12,8 @@
     <script>
       window.name = "codesandbox";
     </script>
+    <link rel="stylesheet" href="/dist/browser/dev/index.css" />
+    <link rel="stylesheet" href="bundle.css" />
   </head>
 
   <body>
@@ -19,11 +21,12 @@
     <div id="root"></div>
     <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
-
     <!-- This is so that we use the bundled excalidraw.development.js file instead
     of the actual source code -->
-    <script src="./excalidraw.development.js"></script>
-
-    <script src="./bundle.js"></script>
+    <script type="module">
+      import * as ExcalidrawLib from "/dist/browser/dev/index.js";
+      window.ExcalidrawLib = ExcalidrawLib;
+    </script>
+    <script type="module" src="bundle.js"></script>
   </body>
 </html>

@@ -7,10 +7,14 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { ActiveTool, AppState, ToolType, Zoom } from "./types";
-import { unstable_batchedUpdates } from "react-dom";
+import {
+  ActiveTool,
+  AppState,
+  ToolType,
+  UnsubscribeCallback,
+  Zoom,
+} from "./types";
 import { ResolutionType } from "./utility-types";
-import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -549,33 +553,6 @@ export const resolvablePromise = <T>() => {
   return promise as ResolvablePromise<T>;
 };
 
-/**
- * @param func handler taking at most single parameter (event).
- */
-export const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void),
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) =>
-  ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
-
-/**
- * barches React state updates and throttles the calls to a single call per
- * animation frame
- */
-export const withBatchedUpdatesThrottled = <
-  TFunction extends ((event: any) => void) | (() => void),
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) => {
-  // @ts-ignore
-  return throttleRAF<Parameters<TFunction>>(((event) => {
-    unstable_batchedUpdates(func, event);
-  }) as TFunction);
-};
-
 //https://stackoverflow.com/a/9462382/8418
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
@@ -933,36 +910,6 @@ export const memoize = <T extends Record<string, any>, R extends any>(
   return ret as typeof func & { clear: () => void };
 };
 
-export const isRenderThrottlingEnabled = (() => {
-  // we don't want to throttle in react < 18 because of #5439 and it was
-  // getting more complex to maintain the fix
-  let IS_REACT_18_AND_UP: boolean;
-  try {
-    const version = React.version.split(".");
-    IS_REACT_18_AND_UP = Number(version[0]) > 17;
-  } catch {
-    IS_REACT_18_AND_UP = false;
-  }
-
-  let hasWarned = false;
-
-  return () => {
-    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
-      if (!IS_REACT_18_AND_UP) {
-        if (!hasWarned) {
-          hasWarned = true;
-          console.warn(
-            "Excalidraw: render throttling is disabled on React versions < 18.",
-          );
-        }
-        return false;
-      }
-      return true;
-    }
-    return false;
-  };
-})();
-
 /** Checks if value is inside given collection. Useful for type-safety. */
 export const isMemberOf = <T extends string>(
   /** Set/Map/Array/Object */
@@ -991,4 +938,115 @@ export const updateStable = <T extends any[] | Record<string, any>>(
     return prevValue;
   }
   return nextValue;
+};
+
+// Window
+export function addEventListener<K extends keyof WindowEventMap>(
+  target: Window & typeof globalThis,
+  type: K,
+  listener: (this: Window, ev: WindowEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+export function addEventListener(
+  target: Window & typeof globalThis,
+  type: string,
+  listener: (this: Window, ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// Document
+export function addEventListener<K extends keyof DocumentEventMap>(
+  target: Document,
+  type: K,
+  listener: (this: Document, ev: DocumentEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+export function addEventListener(
+  target: Document,
+  type: string,
+  listener: (this: Document, ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// FontFaceSet (document.fonts)
+export function addEventListener<K extends keyof FontFaceSetEventMap>(
+  target: FontFaceSet,
+  type: K,
+  listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// HTMLElement / mix
+export function addEventListener<K extends keyof HTMLElementEventMap>(
+  target:
+    | Document
+    | (Window & typeof globalThis)
+    | HTMLElement
+    | undefined
+    | null
+    | false,
+  type: K,
+  listener: (this: HTMLDivElement, ev: HTMLElementEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// implem
+export function addEventListener(
+  /**
+   * allows for falsy values so you don't have to type check when adding
+   * event listeners to optional elements
+   */
+  target:
+    | Document
+    | (Window & typeof globalThis)
+    | FontFaceSet
+    | HTMLElement
+    | undefined
+    | null
+    | false,
+  type: keyof WindowEventMap | keyof DocumentEventMap | string,
+  listener: (ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback {
+  if (!target) {
+    return () => {};
+  }
+  target?.addEventListener?.(type, listener, options);
+  return () => {
+    target?.removeEventListener?.(type, listener, options);
+  };
+}
+
+const average = (a: number, b: number) => (a + b) / 2;
+export function getSvgPathFromStroke(points: number[][], closed = true) {
+  const len = points.length;
+
+  if (len < 4) {
+    return ``;
+  }
+
+  let a = points[0];
+  let b = points[1];
+  const c = points[2];
+
+  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
+    2,
+  )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
+    b[1],
+    c[1],
+  ).toFixed(2)} T`;
+
+  for (let i = 2, max = len - 1; i < max; i++) {
+    a = points[i];
+    b = points[i + 1];
+    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(
+      2,
+    )} `;
+  }
+
+  if (closed) {
+    result += "Z";
+  }
+
+  return result;
+}
+
+export const normalizeEOL = (str: string) => {
+  return str.replace(/\r?\n|\r/g, "\n");
 };
