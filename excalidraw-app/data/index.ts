@@ -1,4 +1,13 @@
 import {
+  DELETED_ELEMENT_TIMEOUT,
+  FILE_UPLOAD_MAX_BYTES,
+  ROOM_ID_BYTES,
+  WS_SUBTYPES,
+} from "../app_constants";
+import { encodeFilesForUpload } from "./FileManager";
+import { saveFilesToFirebase } from "./firebase";
+
+import {
   compressData,
   decompressData,
 } from "../../packages/excalidraw/data/encode";
@@ -15,16 +24,7 @@ import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeH
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
 import { t } from "../../packages/excalidraw/i18n";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
-import {
-  DELETED_ELEMENT_TIMEOUT,
-  FILE_UPLOAD_MAX_BYTES,
-  ROOM_ID_BYTES,
-  WS_SUBTYPES,
-} from "../app_constants";
-import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
-
-import {
+import type {
   ExcalidrawElement,
   FileId,
 } from "../../packages/excalidraw/element/types";

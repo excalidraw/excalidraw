@@ -1,16 +1,15 @@
-import {
+import { Bounds, getElementAbsoluteCoords } from "./bounds";
+import { rotate } from "../math";
+import { isTextElement } from ".";
+import { DEFAULT_SPACING } from "../renderer/renderScene";
+
+import { isFrameLikeElement, isLinearElement } from "./typeChecks";
+import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   PointerType,
 } from "./types";
-
-import { Bounds, getElementAbsoluteCoords } from "./bounds";
-import { rotate } from "../math";
-import { InteractiveCanvasAppState, Zoom } from "../types";
-import { isTextElement } from ".";
-import { isFrameLikeElement, isLinearElement } from "./typeChecks";
-import { DEFAULT_SPACING } from "../renderer/renderScene";
-
+import type { InteractiveCanvasAppState, Zoom } from "../types";
 export type TransformHandleDirection =
   | "n"
   | "s"
