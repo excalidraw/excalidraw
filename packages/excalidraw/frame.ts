@@ -676,12 +676,12 @@ export const getFrameLikeTitle = (
   element: ExcalidrawFrameLikeElement,
   frameIdx: number,
 ) => {
-  const existingName = element.name?.trim();
-  if (existingName) {
-    return existingName;
-  }
   // TODO name frames AI only is specific to AI frames
-  return isFrameElement(element) ? `Frame ${frameIdx}` : `AI Frame ${frameIdx}`;
+  return element.name === null
+    ? isFrameElement(element)
+      ? `Frame ${frameIdx}`
+      : `AI Frame $${frameIdx}`
+    : element.name;
 };
 
 export const getElementsOverlappingFrame = (
