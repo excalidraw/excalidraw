@@ -3,6 +3,7 @@ import {
   ExcalidrawElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
+  ElementsMapOrArray,
 } from "./element/types";
 import {
   AppClassProperties,
@@ -270,9 +271,17 @@ export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
   element.groupIds.includes(groupId);
 
 export const getElementsInGroup = (
-  elements: readonly ExcalidrawElement[],
+  elements: ElementsMapOrArray,
   groupId: string,
-) => elements.filter((element) => isElementInGroup(element, groupId));
+) => {
+  const elementsInGroup: ExcalidrawElement[] = [];
+  for (const element of elements.values()) {
+    if (isElementInGroup(element, groupId)) {
+      elementsInGroup.push(element);
+    }
+  }
+  return elementsInGroup;
+};
 
 export const getSelectedGroupIdForElement = (
   element: ExcalidrawElement,

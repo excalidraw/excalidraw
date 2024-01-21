@@ -11,7 +11,13 @@ import {
   getElementAbsoluteCoords,
 } from "../element/bounds";
 import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { cloneJSON, distance, getFontString } from "../utils";
+import {
+  arrayToMap,
+  cloneJSON,
+  distance,
+  getFontString,
+  toBrandedType,
+} from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -37,6 +43,7 @@ import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import Scene from "./Scene";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
+import { RenderableElementsMap } from "./types";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -59,7 +66,7 @@ const __createSceneForElementsHack__ = (
   // ids to Scene instances so that we don't override the editor elements
   // mapping.
   // We still need to clone the objects themselves to regen references.
-  scene.replaceAllElements(cloneJSON(elements), false);
+  scene.replaceAllElements(cloneJSON(elements));
   return scene;
 };
 
@@ -241,10 +248,14 @@ export const exportToCanvas = async (
     files,
   });
 
+  const elementsMap = toBrandedType<RenderableElementsMap>(
+    arrayToMap(elementsForRender),
+  );
+
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
-    elements: elementsForRender,
+    elementsMap,
     visibleElements: elementsForRender,
     scale,
     appState: {
@@ -432,22 +443,29 @@ export const exportToSvg = async (
 
   const renderEmbeddables = opts?.renderEmbeddables ?? false;
 
-  renderSceneToSvg(elementsForRender, rsvg, svgRoot, files || {}, {
-    offsetX,
-    offsetY,
-    isExporting: true,
-    exportWithDarkMode,
-    renderEmbeddables,
-    frameRendering,
-    canvasBackgroundColor: viewBackgroundColor,
-    embedsValidationStatus: renderEmbeddables
-      ? new Map(
-          elementsForRender
-            .filter((element) => isFrameLikeElement(element))
-            .map((element) => [element.id, true]),
-        )
-      : new Map(),
-  });
+  renderSceneToSvg(
+    elementsForRender,
+    toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
+    rsvg,
+    svgRoot,
+    files || {},
+    {
+      offsetX,
+      offsetY,
+      isExporting: true,
+      exportWithDarkMode,
+      renderEmbeddables,
+      frameRendering,
+      canvasBackgroundColor: viewBackgroundColor,
+      embedsValidationStatus: renderEmbeddables
+        ? new Map(
+            elementsForRender
+              .filter((element) => isFrameLikeElement(element))
+              .map((element) => [element.id, true]),
+          )
+        : new Map(),
+    },
+  );
 
   tempScene.destroy();
 
