@@ -183,7 +183,7 @@ export const MobileMenu = ({
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
                 appState={appState}
-                elements={elements}
+                elementsMap={app.scene.getNonDeletedElementsMap()}
                 renderAction={actionManager.renderAction}
               />
             </Section>

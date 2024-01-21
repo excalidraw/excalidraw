@@ -31,7 +31,6 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
-  getContainerElement,
   measureText,
   normalizeText,
   wrapText,
@@ -333,12 +332,12 @@ const getAdjustedDimensions = (
 
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
+  container: ExcalidrawTextContainer | null,
   text = textElement.text,
 ) => {
   if (textElement.isDeleted) {
     return;
   }
-  const container = getContainerElement(textElement);
   if (container) {
     text = wrapText(
       text,
@@ -352,6 +351,7 @@ export const refreshTextDimensions = (
 
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
+  container: ExcalidrawTextContainer | null,
   {
     text,
     isDeleted,
@@ -365,7 +365,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, originalText),
+    ...refreshTextDimensions(textElement, container, originalText),
   });
 };
 
