@@ -263,3 +263,33 @@ describe("Paste bound text container", () => {
     });
   });
 });
+
+describe("pasting & frames", () => {
+  it("should add pasted elements to frame under cursor", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({ type: "rectangle" });
+
+    h.elements = [frame];
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect],
+      files: null,
+    });
+
+    mouse.moveTo(50, 50);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(frame.id);
+    });
+  });
+});
