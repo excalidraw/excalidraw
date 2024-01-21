@@ -3099,12 +3099,18 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
 
-    const nextElements = [
+    const allElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ];
 
-    this.scene.replaceAllElements(nextElements);
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
+
+    if (topLayerFrame) {
+      addElementsToFrame(allElements, newElements, topLayerFrame);
+    }
+
+    this.scene.replaceAllElements(allElements);
 
     newElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
