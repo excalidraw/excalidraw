@@ -7,7 +7,6 @@ import { distributeElements, Distribution } from "../distribute";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
@@ -36,10 +35,8 @@ const distributeSelectedElements = (
 
   const updatedElementsMap = arrayToMap(updatedElements);
 
-  return updateFrameMembershipOfSelectedElements(
-    elements.map((element) => updatedElementsMap.get(element.id) || element),
-    appState,
-    app,
+  return elements.map(
+    (element) => updatedElementsMap.get(element.id) || element,
   );
 };
 

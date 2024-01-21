@@ -267,6 +267,7 @@ import {
   isTransparent,
   easeToValuesRAF,
   muteFSAbortError,
+  arrayToMap,
   isTestEnv,
   easeOut,
   updateStable,
@@ -2178,6 +2179,13 @@ class App extends React.Component<AppProps, AppState> {
           },
         );
       }
+
+      // update frame membership if needed
+      updateFrameMembershipOfSelectedElements(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+        this,
+      );
     },
   );
 
@@ -4351,11 +4359,13 @@ class App extends React.Component<AppProps, AppState> {
                   !(isTextElement(element) && element.containerId)),
             );
 
+    const elementsMap = arrayToMap(elements);
+
     return getElementsAtPosition(elements, (element) =>
       hitTest(element, this.state, this.frameNameBoundsCache, x, y),
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
-      const containingFrame = getContainingFrame(element);
+      const containingFrame = getContainingFrame(element, elementsMap);
       return containingFrame &&
         this.state.frameRendering.enabled &&
         this.state.frameRendering.clip
@@ -7690,7 +7700,10 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             if (linearElement?.frameId) {
-              const frame = getContainingFrame(linearElement);
+              const frame = getContainingFrame(
+                linearElement,
+                arrayToMap(this.scene.getElementsIncludingDeleted()),
+              );
 
               if (frame && linearElement) {
                 if (!elementOverlapsWithFrame(linearElement, frame)) {

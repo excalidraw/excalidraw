@@ -104,8 +104,8 @@ const duplicateElements = (
 
   const idsOfElementsToDuplicate = arrayToMap(
     getSelectedElements(sortedElements, appState, {
-      includeBoundTextElement: true,
-      includeElementsInFrames: true,
+      includeBoundTextElement: false,
+      includeElementsInFrames: false,
     }),
   );
 

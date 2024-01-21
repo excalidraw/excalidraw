@@ -11,6 +11,7 @@ import {
   getFrameChildren,
 } from "../frame";
 import { isShallowEqual } from "../utils";
+import { arrayToMap } from "../utils";
 import { isElementInViewport } from "../element/sizeHelpers";
 
 /**
@@ -48,11 +49,13 @@ export const getElementsWithinSelection = (
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection);
 
+  const elementsMap = arrayToMap(elements);
+
   let elementsInSelection = elements.filter((element) => {
     let [elementX1, elementY1, elementX2, elementY2] =
       getElementBounds(element);
 
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
     if (containingFrame) {
       const [fx1, fy1, fx2, fy2] = getElementBounds(containingFrame);
 
@@ -78,7 +81,7 @@ export const getElementsWithinSelection = (
     : elementsInSelection;
 
   elementsInSelection = elementsInSelection.filter((element) => {
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
 
     if (containingFrame) {
       return elementOverlapsWithFrame(element, containingFrame);
