@@ -416,6 +416,7 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
+import { isExcaliBrainView } from "../obsidianUtils";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -4790,7 +4791,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.viewModeEnabled) {
+    //zsviczian
+    if (this.state.viewModeEnabled && !isExcaliBrainView()) {
       if (this.state.activeTool.type === "laser") {
         this.setActiveTool({ type: "selection" });
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);

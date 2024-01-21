@@ -67,6 +67,7 @@ import easingsFunctions from "./easingFunctions";
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
 import { ShapeCache } from "../scene/ShapeCache";
+import { getAreaLimit, getWidthHeightLimit } from "../obsidianUtils";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -146,9 +147,9 @@ const cappedElementCanvasSize = (
   // on zoom.
   //
   // ~ safari mobile canvas area limit
-  const AREA_LIMIT = 16777216;
+  const AREA_LIMIT = getAreaLimit(); //zsviczian
   // ~ safari width/height limit based on developer.mozilla.org.
-  const WIDTH_HEIGHT_LIMIT = 32767;
+  const WIDTH_HEIGHT_LIMIT = getWidthHeightLimit(); //zsviczian
 
   const padding = getCanvasPadding(element);
 

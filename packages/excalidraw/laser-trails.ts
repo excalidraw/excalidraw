@@ -1,5 +1,5 @@
 import { LaserPointerOptions } from "@excalidraw/laser-pointer";
-import { AnimatedTrail, AnimatedTrailOptions, Trail } from "./animated-trail";
+import { AnimatedTrail, Trail } from "./animated-trail";
 import { AnimationFrameHandler } from "./animation-frame-handler";
 import type App from "./components/App";
 import { SocketId } from "./types";
@@ -33,7 +33,7 @@ export class LaserTrails implements Trail {
 
     this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
-      fill: () => "red",
+      fill: () => getColor(), //zsviczian
     });
   }
 
@@ -55,8 +55,7 @@ export class LaserTrails implements Trail {
 
         return Math.min(easeOut(l), easeOut(t));
       },
-      fill: () => getColor(), //zsviczian
-    } as Partial<LaserPointerOptions> & Partial<AnimatedTrailOptions>;
+    } as Partial<LaserPointerOptions>;
   }
 
   startPath(x: number, y: number): void {
