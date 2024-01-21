@@ -398,12 +398,28 @@ export const addElementsToFrame = (
 
   const finalElementsToAdd: ExcalidrawElement[] = [];
 
+  const otherFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
+
+  for (const element of elementsToAdd) {
+    if (isFrameLikeElement(element) && element.id !== frame.id) {
+      otherFrames.add(element.id);
+    }
+  }
+
   // - add bound text elements if not already in the array
   // - filter out elements that are already in the frame
   for (const element of omitGroupsContainingFrameLikes(
     allElements,
     elementsToAdd,
   )) {
+    // don't add frames or their children
+    if (
+      isFrameLikeElement(element) ||
+      (element.frameId && otherFrames.has(element.frameId))
+    ) {
+      continue;
+    }
+
     if (!currTargetFrameChildrenMap.has(element.id)) {
       finalElementsToAdd.push(element);
     }
