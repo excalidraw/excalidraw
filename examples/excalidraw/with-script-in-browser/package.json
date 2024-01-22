@@ -12,6 +12,8 @@
     "typescript": "^5"
   },
   "scripts": {
-    "start": "vite"
+    "start": "vite",
+    "build": "yarn workspace @excalidraw/excalidraw run build:esm && vite build",
+    "build:preview": "yarn build && vite preview --port 5002"
   }
 }
