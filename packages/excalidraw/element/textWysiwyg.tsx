@@ -153,7 +153,10 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      const container = getContainerElement(updatedTextElement);
+      const container = getContainerElement(
+        updatedTextElement,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
       let maxWidth = updatedTextElement.width;
 
       let maxHeight = updatedTextElement.height;
@@ -277,7 +280,7 @@ export const textWysiwyg = ({
         transform: getTransform(
           textElementWidth,
           textElementHeight,
-          getTextElementAngle(updatedTextElement),
+          getTextElementAngle(updatedTextElement, container),
           appState,
           maxWidth,
           editorMaxHeight,
@@ -348,7 +351,10 @@ export const textWysiwyg = ({
       if (!data) {
         return;
       }
-      const container = getContainerElement(element);
+      const container = getContainerElement(
+        element,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
 
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
@@ -528,7 +534,10 @@ export const textWysiwyg = ({
       return;
     }
     let text = editable.value;
-    const container = getContainerElement(updateElement);
+    const container = getContainerElement(
+      updateElement,
+      app.scene.getElementsMapIncludingDeleted(),
+    );
 
     if (container) {
       text = updateElement.text;

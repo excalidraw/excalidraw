@@ -21,7 +21,11 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
-import { SVGRenderConfig, StaticCanvasRenderConfig } from "../scene/types";
+import {
+  SVGRenderConfig,
+  StaticCanvasRenderConfig,
+  RenderableElementsMap,
+} from "../scene/types";
 import {
   distance,
   getFontString,
@@ -611,6 +615,7 @@ export const renderSelectionElement = (
 
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -715,7 +720,7 @@ export const renderElement = (
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
-          const container = getContainerElement(element);
+          const container = getContainerElement(element, elementsMap);
           if (isArrowElement(container)) {
             const boundTextCoords =
               LinearElementEditor.getBoundTextElementPosition(
@@ -900,6 +905,7 @@ const maybeWrapNodesInFrameClipPath = (
 
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   files: BinaryFiles,
@@ -912,7 +918,7 @@ export const renderElementToSvg = (
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
   if (isTextElement(element)) {
-    const container = getContainerElement(element);
+    const container = getContainerElement(element, elementsMap);
     if (isArrowElement(container)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
 
@@ -1013,6 +1019,7 @@ export const renderElementToSvg = (
         createPlaceholderEmbeddableLabel(element);
       renderElementToSvg(
         label,
+        elementsMap,
         rsvg,
         root,
         files,

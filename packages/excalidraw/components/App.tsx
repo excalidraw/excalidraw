@@ -349,6 +349,8 @@ import {
   updateFrameMembershipOfSelectedElements,
   isElementInFrame,
   getFrameLikeTitle,
+  getElementsOverlappingFrame,
+  filterElementsEligibleAsFrameChildren,
 } from "../frame";
 import {
   excludeElementsInFramesFromSelection,
@@ -396,7 +398,7 @@ import {
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
 import { MagicCacheData, diagramToHTML } from "../data/magic";
-import { elementsOverlappingBBox, exportToBlob } from "../../utils/export";
+import { exportToBlob } from "../../utils/export";
 import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
@@ -1417,7 +1419,7 @@ class App extends React.Component<AppProps, AppState> {
     const { renderTopRightUI, renderCustomStats } = this.props;
 
     const versionNonce = this.scene.getVersionNonce();
-    const { canvasElements, visibleElements } =
+    const { elementsMap, visibleElements } =
       this.renderer.getRenderableElements({
         versionNonce,
         zoom: this.state.zoom,
@@ -1627,7 +1629,7 @@ class App extends React.Component<AppProps, AppState> {
                         <StaticCanvas
                           canvas={this.canvas}
                           rc={this.rc}
-                          elements={canvasElements}
+                          elementsMap={elementsMap}
                           visibleElements={visibleElements}
                           versionNonce={versionNonce}
                           selectionNonce={
@@ -1648,7 +1650,7 @@ class App extends React.Component<AppProps, AppState> {
                         <InteractiveCanvas
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
-                          elements={canvasElements}
+                          elementsMap={elementsMap}
                           visibleElements={visibleElements}
                           selectedElements={selectedElements}
                           versionNonce={versionNonce}
@@ -1805,11 +1807,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const magicFrameChildren = elementsOverlappingBBox({
-      elements: this.scene.getNonDeletedElements(),
-      bounds: magicFrame,
-      type: "overlap",
-    }).filter((el) => !isMagicFrameElement(el));
+    const magicFrameChildren = getElementsOverlappingFrame(
+      this.scene.getNonDeletedElements(),
+      magicFrame,
+    ).filter((el) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
       if (source === "button") {
@@ -2781,7 +2782,7 @@ class App extends React.Component<AppProps, AppState> {
   private renderInteractiveSceneCallback = ({
     atLeastOneVisibleElement,
     scrollBars,
-    elements,
+    elementsMap,
   }: RenderInteractiveSceneCallback) => {
     if (scrollBars) {
       currentScrollBars = scrollBars;
@@ -2790,7 +2791,7 @@ class App extends React.Component<AppProps, AppState> {
       // hide when editing text
       isTextElement(this.state.editingElement)
         ? false
-        : !atLeastOneVisibleElement && elements.length > 0;
+        : !atLeastOneVisibleElement && elementsMap.size > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
       this.setState({ scrolledOutside });
     }
@@ -3101,16 +3102,29 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
 
-    const nextElements = [
+    const allElements = [
       ...this.scene.getElementsIncludingDeleted(),
       ...newElements,
     ];
 
-    this.scene.replaceAllElements(nextElements, arrayToMap(newElements));
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
+
+    if (topLayerFrame) {
+      const eligibleElements = filterElementsEligibleAsFrameChildren(
+        newElements,
+        topLayerFrame,
+      );
+      addElementsToFrame(allElements, eligibleElements, topLayerFrame);
+    }
+
+    this.scene.replaceAllElements(allElements, arrayToMap(newElements));
 
     newElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
-        const container = getContainerElement(newElement);
+        const container = getContainerElement(
+          newElement,
+          this.scene.getElementsMapIncludingDeleted(),
+        );
         redrawTextBoundingBox(newElement, container);
       }
     });
@@ -4176,11 +4190,18 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(_element, {
-              text,
-              isDeleted,
-              originalText,
-            });
+            return updateTextElement(
+              _element,
+              getContainerElement(
+                _element,
+                this.scene.getElementsMapIncludingDeleted(),
+              ),
+              {
+                text,
+                isDeleted,
+                originalText,
+              },
+            );
           }
           return _element;
         }),
@@ -7698,13 +7719,9 @@ class App extends React.Component<AppProps, AppState> {
                     groupIds: [],
                   });
 
-                  this.scene.replaceAllElements(
-                    removeElementsFromFrame(
-                      this.scene.getElementsIncludingDeleted(),
-                      [linearElement],
-                      this.state,
-                    ),
-                  );
+                  removeElementsFromFrame([linearElement]);
+
+                  this.scene.informMutation();
                 }
               }
             }
@@ -7714,7 +7731,7 @@ class App extends React.Component<AppProps, AppState> {
               this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
             const selectedElements = this.scene.getSelectedElements(this.state);
-            let nextElements = this.scene.getElementsIncludingDeleted();
+            let nextElements = this.scene.getElementsMapIncludingDeleted();
 
             const updateGroupIdsAfterEditingGroup = (
               elements: ExcalidrawElement[],
@@ -7807,7 +7824,7 @@ class App extends React.Component<AppProps, AppState> {
 
           this.scene.replaceAllElements(
             addElementsToFrame(
-              this.scene.getElementsIncludingDeleted(),
+              this.scene.getElementsMapIncludingDeleted(),
               elementsInsideFrame,
               draggingElement,
             ),
@@ -7855,7 +7872,6 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             ),
             frame,
-            this.state,
           );
         }
 
@@ -9135,10 +9151,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       transformElements(
-        pointerDownState,
+        pointerDownState.originalElements,
         transformHandleType,
         selectedElements,
-        pointerDownState.resize.arrowDirection,
+        this.scene.getElementsMapIncludingDeleted(),
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
         selectedElements.length === 1 && isImageElement(selectedElements[0])
@@ -9148,7 +9164,6 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
-        this.state,
       )
     ) {
       this.maybeSuggestBindingForAll(selectedElements);

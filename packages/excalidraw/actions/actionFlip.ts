@@ -1,9 +1,13 @@
 import { register } from "./register";
 import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeleted,
+  NonDeletedElementsMap,
+} from "../element/types";
 import { resizeMultipleElements } from "../element/resizeElements";
-import { AppState, PointerDownState } from "../types";
+import { AppState } from "../types";
 import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
@@ -20,7 +24,12 @@ export const actionFlipHorizontal = register({
   perform: (elements, appState, _, app) => {
     return {
       elements: updateFrameMembershipOfSelectedElements(
-        flipSelectedElements(elements, appState, "horizontal"),
+        flipSelectedElements(
+          elements,
+          app.scene.getNonDeletedElementsMap(),
+          appState,
+          "horizontal",
+        ),
         appState,
         app,
       ),
@@ -38,7 +47,12 @@ export const actionFlipVertical = register({
   perform: (elements, appState, _, app) => {
     return {
       elements: updateFrameMembershipOfSelectedElements(
-        flipSelectedElements(elements, appState, "vertical"),
+        flipSelectedElements(
+          elements,
+          app.scene.getNonDeletedElementsMap(),
+          appState,
+          "vertical",
+        ),
         appState,
         app,
       ),
@@ -53,6 +67,7 @@ export const actionFlipVertical = register({
 
 const flipSelectedElements = (
   elements: readonly ExcalidrawElement[],
+  elementsMap: NonDeletedElementsMap,
   appState: Readonly<AppState>,
   flipDirection: "horizontal" | "vertical",
 ) => {
@@ -67,6 +82,7 @@ const flipSelectedElements = (
 
   const updatedElements = flipElements(
     selectedElements,
+    elementsMap,
     appState,
     flipDirection,
   );
@@ -79,15 +95,17 @@ const flipSelectedElements = (
 };
 
 const flipElements = (
-  elements: NonDeleted<ExcalidrawElement>[],
+  selectedElements: NonDeleted<ExcalidrawElement>[],
+  elementsMap: NonDeletedElementsMap,
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
 ): ExcalidrawElement[] => {
-  const { minX, minY, maxX, maxY } = getCommonBoundingBox(elements);
+  const { minX, minY, maxX, maxY } = getCommonBoundingBox(selectedElements);
 
   resizeMultipleElements(
-    { originalElements: arrayToMap(elements) } as PointerDownState,
-    elements,
+    elementsMap,
+    selectedElements,
+    elementsMap,
     "nw",
     true,
     flipDirection === "horizontal" ? maxX : minX,
@@ -96,7 +114,7 @@ const flipElements = (
 
   (isBindingEnabled(appState)
     ? bindOrUnbindSelectedElements
-    : unbindLinearElements)(elements);
+    : unbindLinearElements)(selectedElements);
 
-  return elements;
+  return selectedElements;
 };
