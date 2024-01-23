@@ -1,34 +1,20 @@
 "use client";
+import * as excalidrawLib from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw";
 import App from "../../../App";
 
-import { useState, useEffect, useRef } from "react";
 import "@excalidraw/excalidraw/index.css";
 
-const ExcalidrawWithClientOnly = () => {
-  const excalidrawLib = useRef<any>(null);
-  const [ExcalidrawComp, setExcalidrawComp] = useState<any>(null);
-
-  // This Hack is needed until since Excalidraw doesn't support SSR
-  // If you want to use only Excalidraw comp, you can use nextjs dynamic syntax to import Excalidraw
-  useEffect(() => {
-    const importExcalidraw = async () => {
-      excalidrawLib.current = await import("@excalidraw/excalidraw");
-      setExcalidrawComp(excalidrawLib.current.Excalidraw);
-    };
-    importExcalidraw();
-  }, []);
-
+const ExcalidrawWithClientOnly: React.FC = () => {
   return (
     <>
-      {ExcalidrawComp && (
-        <App
-          appTitle={"Excalidraw with Nextjs Example"}
-          useCustom={(api: any, args?: any[]) => {}}
-          excalidrawLib={excalidrawLib.current}
-        >
-          <ExcalidrawComp />
-        </App>
-      )}
+      <App
+        appTitle={"Excalidraw with Nextjs Example in App router"}
+        useCustom={(api: any, args?: any[]) => {}}
+        excalidrawLib={excalidrawLib}
+      >
+        <Excalidraw />
+      </App>
     </>
   );
 };
