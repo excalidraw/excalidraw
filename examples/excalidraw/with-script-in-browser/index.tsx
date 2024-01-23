@@ -4,6 +4,8 @@ import { createRoot } from "react-dom/client";
 
 import type * as TExcalidraw from "@excalidraw/excalidraw";
 
+import "@excalidraw/excalidraw/index.css";
+
 declare global {
   interface Window {
     ExcalidrawLib: typeof TExcalidraw;
