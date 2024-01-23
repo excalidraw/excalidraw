@@ -1,4 +1,0 @@
-{
-  "outputDirectory": "../../examples/excalidraw/with-script-in-browser/public",
-  "installCommand": "yarn install"
-}
