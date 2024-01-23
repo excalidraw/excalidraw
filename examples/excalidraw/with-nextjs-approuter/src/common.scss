@@ -1,3 +1,8 @@
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
 a {
   color: #1c7ed6;
   font-size: 20px;
@@ -7,6 +12,4 @@ a {
 
 .page-title {
   text-align: center;
-  margin-block-start: 0.67em;
-  margin-block-end: 0.67em;
 }
