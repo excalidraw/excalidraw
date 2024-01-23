@@ -3112,7 +3112,7 @@ class App extends React.Component<AppProps, AppState> {
         newElements,
         topLayerFrame,
       );
-      addElementsToFrame(allElements, eligibleElements, topLayerFrame);
+      addElementsToFrame(allElements, eligibleElements, topLayerFrame, this);
     }
 
     this.scene.replaceAllElements(allElements);
@@ -4399,7 +4399,10 @@ class App extends React.Component<AppProps, AppState> {
         container,
       );
     if (container && parentCenterPosition) {
-      const boundTextElementToContainer = getBoundTextElement(container);
+      const boundTextElementToContainer = getBoundTextElement(
+        container,
+        this.scene.getNonDeletedElementsMap(),
+      );
       if (!boundTextElementToContainer) {
         shouldBindToContainer = true;
       }
@@ -4412,7 +4415,10 @@ class App extends React.Component<AppProps, AppState> {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (container) {
-        existingTextElement = getBoundTextElement(selectedElements[0]);
+        existingTextElement = getBoundTextElement(
+          selectedElements[0],
+          this.scene.getNonDeletedElementsMap(),
+        );
       } else {
         existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
@@ -5258,7 +5264,10 @@ class App extends React.Component<AppProps, AppState> {
       linearElementEditor.elementId,
     );
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(
+      element,
+      this.scene.getNonDeletedElementsMap(),
+    );
 
     if (!element) {
       return;
@@ -6992,6 +7001,7 @@ class App extends React.Component<AppProps, AppState> {
             );
           },
           linearElementEditor,
+          this.scene.getNonDeletedElementsMap(),
         );
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -7485,6 +7495,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.selectedLinearElement,
             this.state,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           const { startBindingElement, endBindingElement } =

@@ -32,12 +32,15 @@ export let copiedStyles: string = "{}";
 export const actionCopyStyles = register({
   name: "copyStyles",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     const elementsCopied = [];
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
     elementsCopied.push(element);
     if (element && hasBoundTextElement(element)) {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      );
       elementsCopied.push(boundTextElement);
     }
     if (element) {

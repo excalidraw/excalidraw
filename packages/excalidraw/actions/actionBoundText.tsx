@@ -46,7 +46,10 @@ export const actionUnbindText = register({
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     selectedElements.forEach((element) => {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      );
       if (boundTextElement) {
         const { width, height, baseline } = measureText(
           boundTextElement.originalText,
@@ -106,7 +109,10 @@ export const actionBindText = register({
       if (
         textElement &&
         bindingContainer &&
-        getBoundTextElement(bindingContainer) === null
+        getBoundTextElement(
+          bindingContainer,
+          app.scene.getNonDeletedElementsMap(),
+        ) === null
       ) {
         return true;
       }

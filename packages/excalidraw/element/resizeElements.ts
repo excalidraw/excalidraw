@@ -126,6 +126,7 @@ export const transformElements = (
       rotateMultipleElements(
         originalElements,
         selectedElements,
+        elementsMap,
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
@@ -394,7 +395,7 @@ export const resizeSingleElement = (
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
   let boundTextFont: { fontSize?: number; baseline?: number } = {};
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (transformHandleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
@@ -882,7 +883,7 @@ export const resizeMultipleElements = (
       newSize: { width, height },
     });
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement && boundTextFontSize) {
       mutateElement(
         boundTextElement,
@@ -902,6 +903,7 @@ export const resizeMultipleElements = (
 const rotateMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -941,7 +943,7 @@ const rotateMultipleElements = (
       );
       updateBoundElements(element, { simultaneouslyUpdated: elements });
 
-      const boundText = getBoundTextElement(element);
+      const boundText = getBoundTextElement(element, elementsMap);
       if (boundText && !isArrowElement(element)) {
         mutateElement(
           boundText,

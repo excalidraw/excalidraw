@@ -5,6 +5,7 @@ import {
   PointBinding,
   ExcalidrawBindableElement,
   ExcalidrawTextElementWithContainer,
+  ElementsMap,
 } from "./types";
 import {
   distance2d,
@@ -193,6 +194,7 @@ export class LinearElementEditor {
       pointSceneCoords: { x: number; y: number }[],
     ) => void,
     linearElementEditor: LinearElementEditor,
+    elementsMap: ElementsMap,
   ): boolean {
     if (!linearElementEditor) {
       return false;
@@ -272,7 +274,7 @@ export class LinearElementEditor {
         );
       }
 
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
         handleBindTextResize(element, false);
       }
@@ -404,9 +406,10 @@ export class LinearElementEditor {
 
   static getEditorMidPoints = (
     element: NonDeleted<ExcalidrawLinearElement>,
+    elementsMap: ElementsMap,
     appState: InteractiveCanvasAppState,
   ): typeof editorMidPointsCache["points"] => {
-    const boundText = getBoundTextElement(element);
+    const boundText = getBoundTextElement(element, elementsMap);
 
     // Since its not needed outside editor unless 2 pointer lines or bound text
     if (

@@ -190,6 +190,7 @@ const cappedElementCanvasSize = (
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -247,7 +248,8 @@ const generateElementCanvas = (
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
-    boundTextElementVersion: getBoundTextElement(element)?.version || null,
+    boundTextElementVersion:
+      getBoundTextElement(element, elementsMap)?.version || null,
     containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
   };
 };
@@ -407,6 +409,7 @@ export const elementWithCanvasCache = new WeakMap<
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
@@ -416,7 +419,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
-  const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+  const boundTextElementVersion =
+    getBoundTextElement(element, elementsMap)?.version || null;
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
@@ -428,6 +432,7 @@ const generateElementWithCanvas = (
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
+      elementsMap,
       zoom,
       renderConfig,
       appState,
@@ -442,6 +447,7 @@ const generateElementWithCanvas = (
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
+  elementsMap: RenderableElementsMap,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -464,7 +470,7 @@ const drawElementFromCanvas = (
 
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (isArrowElement(element) && boundTextElement) {
     const tempCanvas = document.createElement("canvas");
@@ -573,6 +579,7 @@ const drawElementFromCanvas = (
     ) {
       const textElement = getBoundTextElement(
         element,
+        elementsMap,
       ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
@@ -687,11 +694,13 @@ export const renderElement = (
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
+          elementsMap,
           renderConfig,
           appState,
         );
         drawElementFromCanvas(
           elementWithCanvas,
+          elementsMap,
           context,
           renderConfig,
           appState,
@@ -737,7 +746,7 @@ export const renderElement = (
         if (shouldResetImageFilter(element, renderConfig, appState)) {
           context.filter = "none";
         }
-        const boundTextElement = getBoundTextElement(element);
+        const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
           const tempCanvas = document.createElement("canvas");
@@ -1096,7 +1105,7 @@ export const renderElementToSvg = (
     }
     case "line":
     case "arrow": {
-      const boundText = getBoundTextElement(element);
+      const boundText = getBoundTextElement(element, elementsMap);
       const maskPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
       if (boundText) {
         maskPath.setAttribute("id", `mask-${element.id}`);

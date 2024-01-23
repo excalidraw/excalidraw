@@ -14,6 +14,7 @@ import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
 import { Mutable } from "./utility-types";
+import { arrayToMap } from "./utils";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -334,7 +335,7 @@ export const getMaximumGroups = (
     String,
     ExcalidrawElement[]
   >();
-
+  const elementsMap = arrayToMap(elements);
   elements.forEach((element: ExcalidrawElement) => {
     const groupId =
       element.groupIds.length === 0
@@ -344,7 +345,7 @@ export const getMaximumGroups = (
     const currentGroupMembers = groups.get(groupId) || [];
 
     // Include bound text if present when grouping
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       currentGroupMembers.push(boundTextElement);
     }

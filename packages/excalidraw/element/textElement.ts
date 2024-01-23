@@ -667,17 +667,17 @@ export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
     : null;
 };
 
-export const getBoundTextElement = (element: ExcalidrawElement | null) => {
+export const getBoundTextElement = (
+  element: ExcalidrawElement | null,
+  elementsMap: ElementsMap,
+) => {
   if (!element) {
     return null;
   }
   const boundTextElementId = getBoundTextElementId(element);
   if (boundTextElementId) {
-    return (
-      (Scene.getScene(element)?.getElement(
-        boundTextElementId,
-      ) as ExcalidrawTextElementWithContainer) || null
-    );
+    return (elementsMap.get(boundTextElementId) ||
+      null) as ExcalidrawTextElementWithContainer | null;
   }
   return null;
 };

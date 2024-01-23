@@ -29,6 +29,7 @@ import {
 } from "../utils/export";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import { ReadonlySetLike } from "./utility-types";
+import App from "./components/App";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -443,6 +444,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  app: App,
 ): T => {
   const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
   for (const element of allElements.values()) {
@@ -481,7 +483,10 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       finalElementsToAdd.push(element);
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(
+      element,
+      app.scene.getNonDeletedElementsMap(),
+    );
     if (
       boundTextElement &&
       !suppliedElementsToAddSet.has(boundTextElement.id) &&
@@ -516,7 +521,9 @@ export const removeElementsFromFrame = (
     ExcalidrawFrameLikeElement["id"],
     ExcalidrawElement[]
   >();
-
+  const elementMap = new Map(
+    Array.from(elementsToRemove, (value) => [value.id, value]),
+  );
   for (const element of elementsToRemove) {
     if (element.frameId) {
       _elementsToRemove.set(element.id, element);
@@ -524,7 +531,7 @@ export const removeElementsFromFrame = (
       const arr = toRemoveElementsByFrame.get(element.frameId) || [];
       arr.push(element);
 
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(element, elementMap);
       if (boundTextElement) {
         _elementsToRemove.set(boundTextElement.id, boundTextElement);
         arr.push(boundTextElement);

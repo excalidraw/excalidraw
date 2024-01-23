@@ -139,7 +139,10 @@ const duplicateElements = (
       continue;
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(
+      element,
+      app.scene.getNonDeletedElementsMap(),
+    );
     const isElementAFrameLike = isFrameLikeElement(element);
 
     if (idsOfElementsToDuplicate.get(element.id)) {
