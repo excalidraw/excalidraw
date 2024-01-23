@@ -3,7 +3,7 @@ import "../common.scss";
 
 // Since client components get prerenderd on server as well hence importing the excalidraw stuff dynamically
 // with ssr false
-const ExcalidrawWithClientOnly = dynamic(
+const Excalidraw = dynamic(
   async () => (await import("../excalidraw")).default,
   {
     ssr: false,
@@ -13,11 +13,10 @@ const ExcalidrawWithClientOnly = dynamic(
 export default function Page() {
   return (
     <>
-      <a href="/excalidraw-in-pages">Switch to Pages router</a>
-      <h1 className="page-title">App Router</h1>
-
+      <a href="/">Switch to App router</a>
+      <h1 className="page-title">Pages Router</h1>
       {/* @ts-expect-error - https://github.com/vercel/next.js/issues/42292 */}
-      <ExcalidrawWithClientOnly />
+      <Excalidraw />
     </>
   );
 }
