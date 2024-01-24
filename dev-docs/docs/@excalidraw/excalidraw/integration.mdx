@@ -52,9 +52,9 @@ export default function App() {
 However the above component only works for named component exports. If you want to import some util / constant or something else apart from Excalidraw, then this approach will not work. Instead you can write a wrapper over Excalidraw and import the wrapper dynamically.
 Here is an example for wrapper - [excalidrawWrapper](https://github.com/excalidraw/excalidraw/blob/master/examples/excalidraw/with-nextjs/src/excalidrawWrapper.tsx).
 
-If you are using `pages router` - importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper.
+If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper.
 
-Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/excalidraw/with-nextjs) for the example and you can try it out [here](https://excalidraw-package-example-with-nextjs-gh6smrdnq-excalidraw.vercel.app/).
+Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/excalidraw/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs-gh6smrdnq-excalidraw.vercel.app/).
 
 
 The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
