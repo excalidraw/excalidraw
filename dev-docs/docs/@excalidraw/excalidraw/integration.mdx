@@ -32,15 +32,7 @@ function App() {
 
 ### Next.js
 
-Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
-
-Here are two ways on how you can render **Excalidraw** on **Next.js**.
-
-
-
-1. Using **Next.js Dynamic** import [Recommended].
-
-Since Excalidraw doesn't support server side rendering so it should be rendered only on client. The way to achieve this in next.js is using next.js dynamic import.
+Since Excalidraw doesn't support `server side rendering` so it should be rendered only on `client`. The way to achieve this in next.js is using `next.js dynamic import`.
 
 If you want to only import `Excalidraw` component you can do :point_down:
 
@@ -60,7 +52,7 @@ export default function App() {
 However the above component only works for named component exports. If you want to import some util / constant or something else apart from Excalidraw, then this approach will not work. Instead you can write a wrapper over Excalidraw and import the wrapper dynamically.
 Here is an example for wrapper - [excalidrawWrapper](https://github.com/excalidraw/excalidraw/blob/master/examples/excalidraw/with-nextjs/src/excalidrawWrapper.tsx).
 
-If you are using pages router - importing the wrapper dynamically would work, where as if you are using app router then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper.
+If you are using `pages router` - importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper.
 
 Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/excalidraw/with-nextjs) for the example and you can try it out [here](https://excalidraw-package-example-with-nextjs-gh6smrdnq-excalidraw.vercel.app/).
 
