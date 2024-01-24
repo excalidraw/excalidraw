@@ -29,7 +29,6 @@ import {
 } from "../utils/export";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import { ReadonlySetLike } from "./utility-types";
-import App from "./components/App";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -444,8 +443,8 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
-  app: App,
 ): T => {
+  const elementsMap = arrayToMap(allElements);
   const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
   for (const element of allElements.values()) {
     if (element.frameId === frame.id) {
@@ -483,10 +482,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       finalElementsToAdd.push(element);
     }
 
-    const boundTextElement = getBoundTextElement(
-      element,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (
       boundTextElement &&
       !suppliedElementsToAddSet.has(boundTextElement.id) &&
@@ -565,6 +561,7 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
   allElements: readonly T[],
   nextElementsInFrame: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  app: AppClassProperties,
 ): T[] => {
   return addElementsToFrame(
     removeAllElementsFromFrame(allElements, frame),

@@ -62,7 +62,7 @@ export const actionCopyStyles = register({
 export const actionPasteStyles = register({
   name: "pasteStyles",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     const elementsCopied = JSON.parse(copiedStyles);
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];
@@ -128,7 +128,11 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
-            redrawTextBoundingBox(newElement, container);
+            redrawTextBoundingBox(
+              newElement,
+              container,
+              app.scene.getNonDeletedElementsMap(),
+            );
           }
 
           if (

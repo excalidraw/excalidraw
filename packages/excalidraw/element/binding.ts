@@ -367,7 +367,7 @@ export const updateBoundElements = (
       scene.getNonDeletedElementsMap(),
     );
     if (boundText) {
-      handleBindTextResize(element, false);
+      handleBindTextResize(element, scene.getNonDeletedElementsMap(), false);
     }
   });
 };

@@ -225,6 +225,7 @@ export const actionUngroup = register({
           nextElements,
           getElementsInResizingFrame(nextElements, frame, appState),
           frame,
+          app,
         );
       }
     });

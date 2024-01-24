@@ -64,6 +64,7 @@ export class Fonts {
               element,
               this.scene.getElementsMapIncludingDeleted(),
             ),
+            this.scene.getNonDeletedElementsMap(),
           ),
         });
       }

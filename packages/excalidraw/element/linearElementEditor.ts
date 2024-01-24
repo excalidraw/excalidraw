@@ -276,7 +276,7 @@ export class LinearElementEditor {
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        handleBindTextResize(element, false);
+        handleBindTextResize(element, elementsMap, false);
       }
 
       // suggest bindings for first and last point if selected
@@ -468,6 +468,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor,
     scenePointer: { x: number; y: number },
     appState: AppState,
+    elementsMap: ElementsMap,
   ) => {
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId);
@@ -506,7 +507,7 @@ export class LinearElementEditor {
     }
     let index = 0;
     const midPoints: typeof editorMidPointsCache["points"] =
-      LinearElementEditor.getEditorMidPoints(element, appState);
+      LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
         const distance = distance2d(
@@ -584,6 +585,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor,
     appState: AppState,
     midPoint: Point,
+    elementsMap: ElementsMap,
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
@@ -591,7 +593,11 @@ export class LinearElementEditor {
     if (!element) {
       return -1;
     }
-    const midPoints = LinearElementEditor.getEditorMidPoints(element, appState);
+    const midPoints = LinearElementEditor.getEditorMidPoints(
+      element,
+      elementsMap,
+      appState,
+    );
     let index = 0;
     while (index < midPoints.length) {
       if (LinearElementEditor.arePointsEqual(midPoint, midPoints[index])) {
@@ -608,6 +614,7 @@ export class LinearElementEditor {
     history: History,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
+    elementsMap: ElementsMap,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
@@ -633,6 +640,7 @@ export class LinearElementEditor {
       linearElementEditor,
       scenePointer,
       appState,
+      elementsMap,
     );
     let segmentMidpointIndex = null;
     if (segmentMidpoint) {
@@ -640,6 +648,7 @@ export class LinearElementEditor {
         linearElementEditor,
         appState,
         segmentMidpoint,
+        elementsMap,
       );
     }
     if (event.altKey && appState.editingLinearElement) {
@@ -1421,6 +1430,7 @@ export class LinearElementEditor {
 
   static getElementAbsoluteCoords = (
     element: ExcalidrawLinearElement,
+    elementsMap: ElementsMap,
     includeBoundText: boolean = false,
   ): [number, number, number, number, number, number] => {
     let coords: [number, number, number, number, number, number];
@@ -1465,7 +1475,7 @@ export class LinearElementEditor {
     if (!includeBoundText) {
       return coords;
     }
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       coords = LinearElementEditor.getMinMaxXYWithBoundText(
         element,

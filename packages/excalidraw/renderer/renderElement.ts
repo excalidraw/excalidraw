@@ -587,7 +587,8 @@ const drawElementFromCanvas = (
       context.strokeRect(
         (coords.x + appState.scrollX) * window.devicePixelRatio,
         (coords.y + appState.scrollY) * window.devicePixelRatio,
-        getBoundTextMaxWidth(element) * window.devicePixelRatio,
+        getBoundTextMaxWidth(element, null, elementsMap) *
+          window.devicePixelRatio,
         getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }
@@ -829,6 +830,7 @@ export const renderElement = (
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
+          elementsMap,
           renderConfig,
           appState,
         );
@@ -857,6 +859,7 @@ export const renderElement = (
 
         drawElementFromCanvas(
           elementWithCanvas,
+          elementsMap,
           context,
           renderConfig,
           appState,

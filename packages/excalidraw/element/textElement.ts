@@ -53,6 +53,7 @@ const splitIntoLines = (text: string) => {
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
+  elementsMap: ElementsMap,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -67,7 +68,7 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.text = textElement.text;
 
   if (container) {
-    maxWidth = getBoundTextMaxWidth(container, textElement);
+    maxWidth = getBoundTextMaxWidth(container, textElement, elementsMap);
     boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
@@ -89,7 +90,11 @@ export const redrawTextBoundingBox = (
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
-    const maxContainerWidth = getBoundTextMaxWidth(container);
+    const maxContainerWidth = getBoundTextMaxWidth(
+      container,
+      null,
+      elementsMap,
+    );
 
     if (!isArrowElement(container) && metrics.height > maxContainerHeight) {
       const nextHeight = computeContainerDimensionForBoundText(
@@ -110,7 +115,11 @@ export const redrawTextBoundingBox = (
       ...textElement,
       ...boundTextUpdates,
     } as ExcalidrawTextElementWithContainer;
-    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+    const { x, y } = computeBoundTextPosition(
+      container,
+      updatedTextElement,
+      elementsMap,
+    );
     boundTextUpdates.x = x;
     boundTextUpdates.y = y;
   }
@@ -162,6 +171,7 @@ export const bindTextToShapeAfterDuplication = (
 
 export const handleBindTextResize = (
   container: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
 ) => {
@@ -170,7 +180,8 @@ export const handleBindTextResize = (
     return;
   }
   resetOriginalContainerCache(container.id);
-  let textElement = Scene.getScene(container)!.getElement(
+  const scene = Scene.getScene(container)!;
+  let textElement = scene.getElement(
     boundTextElementId,
   ) as ExcalidrawTextElement;
   if (textElement && textElement.text) {
@@ -178,13 +189,15 @@ export const handleBindTextResize = (
       return;
     }
 
-    textElement = Scene.getScene(container)!.getElement(
-      boundTextElementId,
-    ) as ExcalidrawTextElement;
+    textElement = scene.getElement(boundTextElementId) as ExcalidrawTextElement;
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
-    const maxWidth = getBoundTextMaxWidth(container);
+    const maxWidth = getBoundTextMaxWidth(
+      container,
+      null,
+      scene.getNonDeletedElementsMap(),
+    );
     const maxHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
@@ -246,6 +259,7 @@ export const handleBindTextResize = (
         computeBoundTextPosition(
           container,
           textElement as ExcalidrawTextElementWithContainer,
+          elementsMap,
         ),
       );
     }
@@ -255,6 +269,7 @@ export const handleBindTextResize = (
 export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
+  elementsMap: ElementsMap,
 ) => {
   if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
@@ -264,7 +279,7 @@ export const computeBoundTextPosition = (
   }
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getBoundTextMaxHeight(container, boundTextElement);
-  const maxContainerWidth = getBoundTextMaxWidth(container);
+  const maxContainerWidth = getBoundTextMaxWidth(container, null, elementsMap);
 
   let x;
   let y;
@@ -699,6 +714,7 @@ export const getContainerElement = (
 export const getContainerCenter = (
   container: ExcalidrawElement,
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   if (!isArrowElement(container)) {
     return {
@@ -718,6 +734,7 @@ export const getContainerCenter = (
   const index = container.points.length / 2 - 1;
   let midSegmentMidpoint = LinearElementEditor.getEditorMidPoints(
     container,
+    elementsMap,
     appState,
   )[index];
   if (!midSegmentMidpoint) {
@@ -877,10 +894,12 @@ export const computeContainerDimensionForBoundText = (
 
 export const getBoundTextMaxWidth = (
   container: ExcalidrawElement,
-  boundTextElement: ExcalidrawTextElement | null = getBoundTextElement(
-    container,
-  ),
+  boundTextElement: ExcalidrawTextElement | null,
+  elementsMap: ElementsMap = new Map(),
 ) => {
+  if (!boundTextElement) {
+    boundTextElement = getBoundTextElement(container, elementsMap);
+  }
   const { width } = container;
   if (isArrowElement(container)) {
     const minWidth =

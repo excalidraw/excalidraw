@@ -536,6 +536,7 @@ const _renderInteractiveScene = ({
       context,
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
+      elementsMap,
     );
   }
 
@@ -561,6 +562,7 @@ const _renderInteractiveScene = ({
         context,
         appState,
         selectedElements[0] as ExcalidrawLinearElement,
+        elementsMap,
       );
     }
     const selectionColor = renderConfig.selectionColor || oc.black;

@@ -220,7 +220,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element, elementsMap);
     if (container) {
-      width = getBoundTextMaxWidth(container);
+      width = getBoundTextMaxWidth(container, null, elementsMap);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -459,7 +459,7 @@ export const resizeSingleElement = (
       const nextFont = measureFontSizeFromWidth(
         boundTextElement,
         elementsMap,
-        getBoundTextMaxWidth(updatedElement),
+        getBoundTextMaxWidth(updatedElement, null, elementsMap),
         getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
@@ -641,6 +641,7 @@ export const resizeSingleElement = (
     }
     handleBindTextResize(
       element,
+      elementsMap,
       transformHandleDirection,
       shouldMaintainAspectRatio,
     );
@@ -893,7 +894,7 @@ export const resizeMultipleElements = (
         },
         false,
       );
-      handleBindTextResize(element, transformHandleType, true);
+      handleBindTextResize(element, elementsMap, transformHandleType, true);
     }
   }
 

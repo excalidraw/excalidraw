@@ -196,7 +196,11 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getBoundTextMaxWidth(container);
+        maxWidth = getBoundTextMaxWidth(
+          container,
+          null,
+          app.scene.getNonDeletedElementsMap(),
+        );
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -227,6 +231,7 @@ export const textWysiwyg = ({
           const { y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
+            app.scene.getNonDeletedElementsMap(),
           );
           coordY = y;
         }
@@ -364,7 +369,11 @@ export const textWysiwyg = ({
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getBoundTextMaxWidth(container),
+          getBoundTextMaxWidth(
+            container,
+            null,
+            app.scene.getNonDeletedElementsMap(),
+          ),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -564,7 +573,11 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(updateElement, container);
+      redrawTextBoundingBox(
+        updateElement,
+        container,
+        app.scene.getNonDeletedElementsMap(),
+      );
     }
 
     onSubmit({
