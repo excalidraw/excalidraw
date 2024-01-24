@@ -848,6 +848,7 @@ export const actionChangeTextAlign = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     return (
       <fieldset>
         <legend>{t("labels.textAlign")}</legend>
@@ -882,7 +883,7 @@ export const actionChangeTextAlign = register({
               }
               const boundTextElement = getBoundTextElement(
                 element,
-                app.scene.getNonDeletedElementsMap(),
+                elementsMap,
               );
               if (boundTextElement) {
                 return boundTextElement.textAlign;
@@ -891,10 +892,7 @@ export const actionChangeTextAlign = register({
             },
             (element) =>
               isTextElement(element) ||
-              getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              ) !== null,
+              getBoundTextElement(element, elementsMap) !== null,
             (hasSelection) =>
               hasSelection ? null : appState.currentItemTextAlign,
           )}
