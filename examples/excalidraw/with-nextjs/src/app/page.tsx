@@ -4,7 +4,7 @@ import "../common.scss";
 // Since client components get prerenderd on server as well hence importing the excalidraw stuff dynamically
 // with ssr false
 const ExcalidrawWithClientOnly = dynamic(
-  async () => (await import("../excalidraw")).default,
+  async () => (await import("../excalidrawWrapper")).default,
   {
     ssr: false,
   },

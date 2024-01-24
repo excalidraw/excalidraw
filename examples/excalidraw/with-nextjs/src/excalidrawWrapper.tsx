@@ -1,11 +1,11 @@
 "use client";
 import * as excalidrawLib from "@excalidraw/excalidraw";
 import { Excalidraw } from "@excalidraw/excalidraw";
-import App from "../../App";
+import App from "../../components/App";
 
 import "@excalidraw/excalidraw/index.css";
 
-const ExcalidrawWithClientOnly: React.FC = () => {
+const ExcalidrawWrapper: React.FC = () => {
   return (
     <>
       <App
@@ -19,4 +19,4 @@ const ExcalidrawWithClientOnly: React.FC = () => {
   );
 };
 
-export default ExcalidrawWithClientOnly;
+export default ExcalidrawWrapper;

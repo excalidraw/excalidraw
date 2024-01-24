@@ -19,11 +19,11 @@ import {
   fileOpen,
   withBatchedUpdates,
   withBatchedUpdatesThrottled,
-} from "./utils";
+} from "../utils";
 
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
-import initialData from "./initialData";
+import initialData from "../initialData";
 
 import type {
   AppState,
