@@ -15,14 +15,23 @@
       border-radius: 50%;
     }
   }
+  .app-title {
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+  }
 }
 
-.button-wrapper button {
-  z-index: 1;
-  height: 40px;
-  max-width: 200px;
-  margin: 10px;
-  padding: 5px;
+.button-wrapper {
+  input[type="checkbox"] {
+    margin: 5px;
+  }
+  button {
+    z-index: 1;
+    height: 40px;
+    max-width: 200px;
+    margin: 10px;
+    padding: 5px;
+  }
 }
 
 .excalidraw .App-menu_top .buttonList {

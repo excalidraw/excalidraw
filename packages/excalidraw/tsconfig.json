@@ -1,5 +1,5 @@
 {
-  "exclude": ["**/*.test.*", "tests", "types", "example", "dist"],
+  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"],
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,

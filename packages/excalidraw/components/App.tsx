@@ -5780,7 +5780,10 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
 
     let nextPastePrevented = false;
-    const isLinux = /Linux/.test(window.navigator.platform);
+    const isLinux =
+      typeof window === undefined
+        ? false
+        : /Linux/.test(window.navigator.platform);
 
     setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;

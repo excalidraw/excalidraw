@@ -4,8 +4,9 @@ import { execSync } from "child_process";
 
 const createDevBuild = async () => {
   return await esbuild.build({
-    entryPoints: ["example/index.tsx"],
-    outfile: "example/public/bundle.js",
+    entryPoints: ["../../examples/excalidraw/with-script-in-browser/index.tsx"],
+    outfile:
+      "../../examples/excalidraw/with-script-in-browser/public/bundle.js",
     define: {
       "import.meta.env": "{}",
     },
@@ -26,7 +27,7 @@ const startServer = async (ctx) => {
   });
 };
 execSync(
-  `rm -rf example/public/dist && yarn build:esm && cp -r dist example/public`,
+  `rm -rf ../../examples/excalidraw/with-script-in-browser/public/dist && yarn build:esm && cp -r dist ../../examples/excalidraw/with-script-in-browser/public`,
 );
 
 const ctx = await createDevBuild();

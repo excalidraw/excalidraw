@@ -1,6 +1,6 @@
-import type { ExcalidrawImperativeAPI } from "../types";
+import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw/types";
 
-const { Button, MIME_TYPES } = window.ExcalidrawLib;
 const COMMENT_SVG = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -17,24 +17,28 @@ const COMMENT_SVG = (
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
   </svg>
 );
+
 const CustomFooter = ({
   excalidrawAPI,
+  excalidrawLib,
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
+  excalidrawLib: typeof TExcalidraw;
 }) => {
+  const { Button, MIME_TYPES } = excalidrawLib;
+
   return (
     <>
       <Button
         onSelect={() => alert("General Kenobi!")}
-        className="you are a bold one"
-        style={{ marginLeft: "1rem" }}
+        style={{ marginLeft: "1rem", width: "auto" }}
         title="Hello there!"
       >
-        {COMMENT_SVG}
+        Hit me
       </Button>
-      <button
+      <Button
         className="custom-element"
-        onClick={() => {
+        onSelect={() => {
           excalidrawAPI?.setActiveTool({
             type: "custom",
             customType: "comment",
@@ -57,15 +61,10 @@ const CustomFooter = ({
           )}`;
           excalidrawAPI?.setCursor(`url(${url}), auto`);
         }}
+        title="Comments!"
       >
         {COMMENT_SVG}
-      </button>
-      <button
-        className="custom-footer"
-        onClick={() => alert("This is dummy footer")}
-      >
-        custom footer
-      </button>
+      </Button>
     </>
   );
 };
