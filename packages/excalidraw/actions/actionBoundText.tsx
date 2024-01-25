@@ -58,11 +58,7 @@ export const actionUnbindText = register({
           element.id,
         );
         resetOriginalContainerCache(element.id);
-        const { x, y } = computeBoundTextPosition(
-          element,
-          boundTextElement,
-          elementsMap,
-        );
+        const { x, y } = computeBoundTextPosition(element, boundTextElement);
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
@@ -149,11 +145,7 @@ export const actionBindText = register({
       }),
     });
     const originalContainerHeight = container.height;
-    redrawTextBoundingBox(
-      textElement,
-      container,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    redrawTextBoundingBox(textElement, container);
     // overwritting the cache with original container height so
     // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
@@ -294,11 +286,7 @@ export const actionWrapTextInContainer = register({
           },
           false,
         );
-        redrawTextBoundingBox(
-          textElement,
-          container,
-          app.scene.getNonDeletedElementsMap(),
-        );
+        redrawTextBoundingBox(textElement, container);
 
         updatedElements = pushContainerBelowText(
           [...updatedElements, container],

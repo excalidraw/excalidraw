@@ -23,7 +23,6 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
-import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -53,7 +52,6 @@ const splitIntoLines = (text: string) => {
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
-  elementsMap: ElementsMap,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -111,11 +109,7 @@ export const redrawTextBoundingBox = (
       ...textElement,
       ...boundTextUpdates,
     } as ExcalidrawTextElementWithContainer;
-    const { x, y } = computeBoundTextPosition(
-      container,
-      updatedTextElement,
-      elementsMap,
-    );
+    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
     boundTextUpdates.x = x;
     boundTextUpdates.y = y;
   }
@@ -176,24 +170,17 @@ export const handleBindTextResize = (
     return;
   }
   resetOriginalContainerCache(container.id);
-  const scene = Scene.getScene(container)!;
-  let textElement = scene.getElement(
-    boundTextElementId,
-  ) as ExcalidrawTextElement;
+  const textElement = getBoundTextElement(container, elementsMap);
   if (textElement && textElement.text) {
     if (!container) {
       return;
     }
 
-    textElement = scene.getElement(boundTextElementId) as ExcalidrawTextElement;
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
     const maxWidth = getBoundTextMaxWidth(container, textElement);
-    const maxHeight = getBoundTextMaxHeight(
-      container,
-      textElement as ExcalidrawTextElementWithContainer,
-    );
+    const maxHeight = getBoundTextMaxHeight(container, textElement);
     let containerHeight = container.height;
     let nextBaseLine = textElement.baseline;
     if (
@@ -248,11 +235,7 @@ export const handleBindTextResize = (
     if (!isArrowElement(container)) {
       mutateElement(
         textElement,
-        computeBoundTextPosition(
-          container,
-          textElement as ExcalidrawTextElementWithContainer,
-          elementsMap,
-        ),
+        computeBoundTextPosition(container, textElement),
       );
     }
   }
@@ -261,7 +244,6 @@ export const handleBindTextResize = (
 export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
-  elementsMap: ElementsMap,
 ) => {
   if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(

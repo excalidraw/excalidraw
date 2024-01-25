@@ -229,7 +229,6 @@ export const textWysiwyg = ({
           const { y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
-            app.scene.getNonDeletedElementsMap(),
           );
           coordY = y;
         }
@@ -571,11 +570,7 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(
-        updateElement,
-        container,
-        app.scene.getNonDeletedElementsMap(),
-      );
+      redrawTextBoundingBox(updateElement, container);
     }
 
     onSubmit({

@@ -222,7 +222,7 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container, elementsMap);
+  redrawTextBoundingBox(textElement, container);
   return [container, textElement] as const;
 };
 

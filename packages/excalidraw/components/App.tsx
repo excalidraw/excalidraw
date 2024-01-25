@@ -3126,11 +3126,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(
-          newElement,
-          container,
-          this.scene.getNonDeletedElementsMap(),
-        );
+        redrawTextBoundingBox(newElement, container);
       }
     });
 
