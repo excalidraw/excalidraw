@@ -507,6 +507,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
 
 export const removeElementsFromFrame = (
   elementsToRemove: ReadonlySetLike<NonDeletedExcalidrawElement>,
+  elementsMap: ElementsMap,
 ) => {
   const _elementsToRemove = new Map<
     ExcalidrawElement["id"],
@@ -517,9 +518,7 @@ export const removeElementsFromFrame = (
     ExcalidrawFrameLikeElement["id"],
     ExcalidrawElement[]
   >();
-  const elementMap = new Map(
-    Array.from(elementsToRemove, (value) => [value.id, value]),
-  );
+
   for (const element of elementsToRemove) {
     if (element.frameId) {
       _elementsToRemove.set(element.id, element);
@@ -527,7 +526,7 @@ export const removeElementsFromFrame = (
       const arr = toRemoveElementsByFrame.get(element.frameId) || [];
       arr.push(element);
 
-      const boundTextElement = getBoundTextElement(element, elementMap);
+      const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
         _elementsToRemove.set(boundTextElement.id, boundTextElement);
         arr.push(boundTextElement);
@@ -553,7 +552,7 @@ export const removeAllElementsFromFrame = <T extends ExcalidrawElement>(
   frame: ExcalidrawFrameLikeElement,
 ) => {
   const elementsInFrame = getFrameChildren(allElements, frame.id);
-  removeElementsFromFrame(elementsInFrame);
+  removeElementsFromFrame(elementsInFrame, arrayToMap(allElements));
   return allElements;
 };
 
@@ -612,7 +611,7 @@ export const updateFrameMembershipOfSelectedElements = <
   });
 
   if (elementsToRemove.size > 0) {
-    removeElementsFromFrame(elementsToRemove);
+    removeElementsFromFrame(elementsToRemove, elementsMap);
   }
   return allElements;
 };

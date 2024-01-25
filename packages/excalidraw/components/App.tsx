@@ -7744,7 +7744,10 @@ class App extends React.Component<AppProps, AppState> {
                     groupIds: [],
                   });
 
-                  removeElementsFromFrame([linearElement]);
+                  removeElementsFromFrame(
+                    [linearElement],
+                    this.scene.getNonDeletedElementsMap(),
+                  );
 
                   this.scene.informMutation();
                 }

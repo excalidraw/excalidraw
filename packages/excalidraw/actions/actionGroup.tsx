@@ -105,7 +105,10 @@ export const actionGroup = register({
       const frameElementsMap = groupByFrameLikes(selectedElements);
 
       frameElementsMap.forEach((elementsInFrame, frameId) => {
-        removeElementsFromFrame(elementsInFrame);
+        removeElementsFromFrame(
+          elementsInFrame,
+          app.scene.getNonDeletedElementsMap(),
+        );
       });
     }
 
