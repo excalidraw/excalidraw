@@ -50,9 +50,84 @@ export default function App() {
 ```
 
 However the above component only works for named component exports. If you want to import some util / constant or something else apart from Excalidraw, then this approach will not work. Instead you can write a wrapper over Excalidraw and import the wrapper dynamically.
-Here is an example for wrapper - [excalidrawWrapper](https://github.com/excalidraw/excalidraw/blob/master/examples/excalidraw/with-nextjs/src/excalidrawWrapper.tsx).
 
-If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper.
+If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper. 
+
+<Tabs>
+  <TabItem value="Excalidraw Wrapper" label="Excalidraw Wrapper" >
+
+  ```jsx showLineNumbers
+  "use client";
+  import { Excalidraw. convertToExcalidrawElements } from "@excalidraw/excalidraw";
+
+  import "@excalidraw/excalidraw/index.css";
+
+  const ExcalidrawWrapper: React.FC = () => {
+    console.info(convertToExcalidrawElements([{
+      type: "rectangle",
+      id: "rect-1",
+      width: 186.47265625,
+      height: 141.9765625,
+    },]));
+    return (
+      <div style={{height:"500px", width:"500px"}}  
+        <Excalidraw />
+      </div> 
+    );
+  };
+  export default ExcalidrawWrapper;
+  ```
+
+  </TabItem>
+
+  <TabItem value="pages" label="Pages router">
+
+  ```jsx showLineNumbers
+  import dynamic from "next/dynamic";
+  
+  // Since client components get prerenderd on server as well hence importing 
+  // the excalidraw stuff dynamically with ssr false
+
+  const ExcalidrawWrapper = dynamic(
+    async () => (await import("../excalidrawWrapper")).default,
+    {
+      ssr: false,
+    },
+  );
+
+  export default function Page() {
+    return (
+      <ExcalidrawWrapper />      
+    );
+  }
+  ```
+  </TabItem>
+
+  <TabItem value="app" label="App router">
+
+  ```jsx showLineNumbers
+  import dynamic from "next/dynamic";
+
+  // Since client components get prerenderd on server as well hence importing 
+  // the excalidraw stuff dynamically with ssr false
+
+  const ExcalidrawWrapper = dynamic(
+    async () => (await import("../excalidrawWrapper")).default,
+    {
+      ssr: false,
+    },
+  );
+
+  export default function Page() {
+    return (
+      <ExcalidrawWrapper />
+    );
+  }
+  ```
+
+  </TabItem>
+</Tabs>
+
 
 Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/excalidraw/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs-gh6smrdnq-excalidraw.vercel.app/).
 
