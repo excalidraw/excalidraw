@@ -900,6 +900,7 @@ const _renderStaticScene = ({
   canvas,
   rc,
   elementsMap,
+  allElementsMap,
   visibleElements,
   scale,
   appState,
@@ -981,6 +982,7 @@ const _renderStaticScene = ({
           renderElement(
             element,
             elementsMap,
+            allElementsMap,
             rc,
             context,
             renderConfig,
@@ -991,6 +993,7 @@ const _renderStaticScene = ({
           renderElement(
             element,
             elementsMap,
+            allElementsMap,
             rc,
             context,
             renderConfig,
@@ -1014,6 +1017,7 @@ const _renderStaticScene = ({
           renderElement(
             element,
             elementsMap,
+            allElementsMap,
             rc,
             context,
             renderConfig,
@@ -1033,6 +1037,7 @@ const _renderStaticScene = ({
             renderElement(
               label,
               elementsMap,
+              allElementsMap,
               rc,
               context,
               renderConfig,

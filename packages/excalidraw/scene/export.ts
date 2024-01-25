@@ -251,11 +251,12 @@ export const exportToCanvas = async (
   const elementsMap = toBrandedType<RenderableElementsMap>(
     arrayToMap(elementsForRender),
   );
-
+  const allElementsMap = arrayToMap(elements);
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
     elementsMap,
+    allElementsMap,
     visibleElements: elementsForRender,
     scale,
     appState: {

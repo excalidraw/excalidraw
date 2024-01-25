@@ -1431,6 +1431,8 @@ class App extends React.Component<AppProps, AppState> {
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
+    const allElementsMap = this.scene.getNonDeletedElementsMap();
+
     const shouldBlockPointerEvents =
       !(
         this.state.editingElement && isLinearElement(this.state.editingElement)
@@ -1628,6 +1630,7 @@ class App extends React.Component<AppProps, AppState> {
                           canvas={this.canvas}
                           rc={this.rc}
                           elementsMap={elementsMap}
+                          allElementsMap={allElementsMap}
                           visibleElements={visibleElements}
                           versionNonce={versionNonce}
                           selectionNonce={

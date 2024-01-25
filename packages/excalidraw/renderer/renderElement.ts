@@ -6,6 +6,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
+  ElementsMap,
 } from "../element/types";
 import {
   isTextElement,
@@ -452,14 +453,12 @@ const drawElementFromCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
+  allElementsMap: ElementsMap,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
   const zoom = elementWithCanvas.scale;
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-  // need to use scene here since elementsMap is outdated when passed via args and breaks labelled arrows
-  const elementsMap = Scene.getScene(element)!.getNonDeletedElementsMap();
 
   // Free draw elements will otherwise "shuffle" as the min x and y change
   if (isFreeDrawElement(element)) {
@@ -475,7 +474,7 @@ const drawElementFromCanvas = (
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
 
-  const boundTextElement = getBoundTextElement(element, elementsMap);
+  const boundTextElement = getBoundTextElement(element, allElementsMap);
 
   if (isArrowElement(element) && boundTextElement) {
     const tempCanvas = document.createElement("canvas");
@@ -583,7 +582,7 @@ const drawElementFromCanvas = (
     ) {
       const textElement = getBoundTextElement(
         element,
-        elementsMap,
+        allElementsMap,
       ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
@@ -627,6 +626,7 @@ export const renderSelectionElement = (
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,
+  allElementsMap: ElementsMap,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -707,6 +707,7 @@ export const renderElement = (
           context,
           renderConfig,
           appState,
+          allElementsMap,
         );
       }
 
@@ -864,6 +865,7 @@ export const renderElement = (
           context,
           renderConfig,
           appState,
+          allElementsMap,
         );
 
         // reset
