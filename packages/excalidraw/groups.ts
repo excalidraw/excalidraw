@@ -15,7 +15,6 @@ import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
 import { Mutable } from "./utility-types";
-import { arrayToMap } from "./utils";
 
 export const selectGroup = (
   groupId: GroupId,

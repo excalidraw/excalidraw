@@ -17,7 +17,6 @@ export const alignElements = (
     selectedElements,
     elementsMap,
   );
-  console.log("selected elements", selectedElements);
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 
   return groups.flatMap((group) => {
