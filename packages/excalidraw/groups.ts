@@ -4,6 +4,7 @@ import {
   NonDeleted,
   NonDeletedExcalidrawElement,
   ElementsMapOrArray,
+  ElementsMap,
 } from "./element/types";
 import {
   AppClassProperties,
@@ -330,12 +331,12 @@ export const removeFromSelectedGroups = (
 
 export const getMaximumGroups = (
   elements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): ExcalidrawElement[][] => {
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
   >();
-  const elementsMap = arrayToMap(elements);
   elements.forEach((element: ExcalidrawElement) => {
     const groupId =
       element.groupIds.length === 0
