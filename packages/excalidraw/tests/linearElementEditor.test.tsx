@@ -800,15 +800,7 @@ describe("Test Linear Elements", () => {
         type: "text",
         x: 0,
         y: 0,
-        text: wrapText(
-          text,
-          font,
-          getBoundTextMaxWidth(
-            container,
-            null,
-            h.app.scene.getNonDeletedElementsMap(),
-          ),
-        ),
+        text: wrapText(text, font, getBoundTextMaxWidth(container, null)),
         containerId: container.id,
         width: 30,
         height: 20,
@@ -1180,11 +1172,7 @@ describe("Test Linear Elements", () => {
         wrapText(
           textElement.originalText,
           font,
-          getBoundTextMaxWidth(
-            arrow,
-            null,
-            h.app.scene.getNonDeletedElementsMap(),
-          ),
+          getBoundTextMaxWidth(arrow, null),
         ),
       ).toMatchInlineSnapshot(`
         "Online whiteboard 
@@ -1213,11 +1201,7 @@ describe("Test Linear Elements", () => {
         wrapText(
           textElement.originalText,
           font,
-          getBoundTextMaxWidth(
-            arrow,
-            null,
-            h.app.scene.getNonDeletedElementsMap(),
-          ),
+          getBoundTextMaxWidth(arrow, null),
         ),
       ).toMatchInlineSnapshot(`
         "Online whiteboard 

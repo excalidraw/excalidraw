@@ -587,8 +587,7 @@ const drawElementFromCanvas = (
       context.strokeRect(
         (coords.x + appState.scrollX) * window.devicePixelRatio,
         (coords.y + appState.scrollY) * window.devicePixelRatio,
-        getBoundTextMaxWidth(element, null, elementsMap) *
-          window.devicePixelRatio,
+        getBoundTextMaxWidth(element, textElement) * window.devicePixelRatio,
         getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }

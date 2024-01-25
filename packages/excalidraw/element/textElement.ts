@@ -68,7 +68,7 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.text = textElement.text;
 
   if (container) {
-    maxWidth = getBoundTextMaxWidth(container, textElement, elementsMap);
+    maxWidth = getBoundTextMaxWidth(container, textElement);
     boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
@@ -90,11 +90,7 @@ export const redrawTextBoundingBox = (
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
-    const maxContainerWidth = getBoundTextMaxWidth(
-      container,
-      null,
-      elementsMap,
-    );
+    const maxContainerWidth = getBoundTextMaxWidth(container, textElement);
 
     if (!isArrowElement(container) && metrics.height > maxContainerHeight) {
       const nextHeight = computeContainerDimensionForBoundText(
@@ -193,11 +189,7 @@ export const handleBindTextResize = (
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
-    const maxWidth = getBoundTextMaxWidth(
-      container,
-      null,
-      scene.getNonDeletedElementsMap(),
-    );
+    const maxWidth = getBoundTextMaxWidth(container, textElement);
     const maxHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
@@ -279,7 +271,7 @@ export const computeBoundTextPosition = (
   }
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getBoundTextMaxHeight(container, boundTextElement);
-  const maxContainerWidth = getBoundTextMaxWidth(container, null, elementsMap);
+  const maxContainerWidth = getBoundTextMaxWidth(container, boundTextElement);
 
   let x;
   let y;
@@ -895,11 +887,7 @@ export const computeContainerDimensionForBoundText = (
 export const getBoundTextMaxWidth = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElement | null,
-  elementsMap: ElementsMap = new Map(),
 ) => {
-  if (!boundTextElement) {
-    boundTextElement = getBoundTextElement(container, elementsMap);
-  }
   const { width } = container;
   if (isArrowElement(container)) {
     const minWidth =

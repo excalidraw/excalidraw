@@ -220,7 +220,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element, elementsMap);
     if (container) {
-      width = getBoundTextMaxWidth(container, null, elementsMap);
+      width = getBoundTextMaxWidth(container, element);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -459,7 +459,7 @@ export const resizeSingleElement = (
       const nextFont = measureFontSizeFromWidth(
         boundTextElement,
         elementsMap,
-        getBoundTextMaxWidth(updatedElement, null, elementsMap),
+        getBoundTextMaxWidth(updatedElement, boundTextElement),
         getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {

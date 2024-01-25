@@ -334,7 +334,6 @@ const getAdjustedDimensions = (
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
-  elementsMap: ElementsMap,
   text = textElement.text,
 ) => {
   if (textElement.isDeleted) {
@@ -344,7 +343,7 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container, null, elementsMap),
+      getBoundTextMaxWidth(container, textElement),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);
@@ -354,7 +353,6 @@ export const refreshTextDimensions = (
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
-  elementsMap: ElementsMap,
   {
     text,
     isDeleted,
@@ -368,7 +366,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
+    ...refreshTextDimensions(textElement, container, originalText),
   });
 };
 
