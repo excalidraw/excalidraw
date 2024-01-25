@@ -70,7 +70,6 @@ import {
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
 import { ShapeCache } from "../scene/ShapeCache";
-import Scene from "../scene/Scene";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
