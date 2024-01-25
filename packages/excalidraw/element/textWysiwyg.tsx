@@ -367,7 +367,7 @@ export const textWysiwyg = ({
         const boundTextElement = getBoundTextElement(
           container,
           app.scene.getNonDeletedElementsMap(),
-        )!;
+        );
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
