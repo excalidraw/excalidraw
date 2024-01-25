@@ -422,11 +422,7 @@ const generateElementWithCanvas = (
     !appState?.shouldCacheIgnoreZoom;
   const boundTextElementVersion =
     getBoundTextElement(element, elementsMap)?.version || null;
-  console.log(
-    boundTextElementVersion,
-    "versions",
-    prevElementWithCanvas?.boundTextElementVersion,
-  );
+
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (

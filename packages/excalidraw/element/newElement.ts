@@ -16,7 +16,6 @@ import {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
-  ElementsMap,
 } from "./types";
 import {
   arrayToMap,
