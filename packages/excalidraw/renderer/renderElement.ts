@@ -69,6 +69,7 @@ import {
 import { getContainingFrame } from "../frame";
 import { normalizeLink, toValidURL } from "../data/url";
 import { ShapeCache } from "../scene/ShapeCache";
+import Scene from "../scene/Scene";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -421,6 +422,11 @@ const generateElementWithCanvas = (
     !appState?.shouldCacheIgnoreZoom;
   const boundTextElementVersion =
     getBoundTextElement(element, elementsMap)?.version || null;
+  console.log(
+    boundTextElementVersion,
+    "versions",
+    prevElementWithCanvas?.boundTextElementVersion,
+  );
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
@@ -447,7 +453,6 @@ const generateElementWithCanvas = (
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
-  elementsMap: RenderableElementsMap,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -456,6 +461,9 @@ const drawElementFromCanvas = (
   const padding = getCanvasPadding(element);
   const zoom = elementWithCanvas.scale;
   let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+
+  // need to use scene here since elementsMap is outdated when passed via args and breaks labelled arrows
+  const elementsMap = Scene.getScene(element)!.getNonDeletedElementsMap();
 
   // Free draw elements will otherwise "shuffle" as the min x and y change
   if (isFreeDrawElement(element)) {
@@ -470,6 +478,7 @@ const drawElementFromCanvas = (
 
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (isArrowElement(element) && boundTextElement) {
@@ -517,7 +526,6 @@ const drawElementFromCanvas = (
       offsetY -
       padding * zoom;
     tempCanvasContext.translate(-shiftX, -shiftY);
-
     // Clear the bound text area
     tempCanvasContext.clearRect(
       -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
@@ -700,7 +708,6 @@ export const renderElement = (
         );
         drawElementFromCanvas(
           elementWithCanvas,
-          elementsMap,
           context,
           renderConfig,
           appState,
@@ -858,7 +865,6 @@ export const renderElement = (
 
         drawElementFromCanvas(
           elementWithCanvas,
-          elementsMap,
           context,
           renderConfig,
           appState,

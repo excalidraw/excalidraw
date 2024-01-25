@@ -682,6 +682,7 @@ export const getBoundTextElement = (
     return null;
   }
   const boundTextElementId = getBoundTextElementId(element);
+
   if (boundTextElementId) {
     return (elementsMap.get(boundTextElementId) ||
       null) as ExcalidrawTextElementWithContainer | null;
