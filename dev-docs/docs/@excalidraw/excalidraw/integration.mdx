@@ -51,7 +51,7 @@ export default function App() {
 
 However the above component only works for named component exports. If you want to import some util / constant or something else apart from Excalidraw, then this approach will not work. Instead you can write a wrapper over Excalidraw and import the wrapper dynamically.
 
-If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper. 
+If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper as shown :point_down:
 
 <Tabs>
   <TabItem value="Excalidraw Wrapper" label="Excalidraw Wrapper" >
