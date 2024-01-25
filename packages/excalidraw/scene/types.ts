@@ -1,10 +1,10 @@
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import {
-  ElementsMap,
   ExcalidrawTextElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   AppClassProperties,
@@ -67,7 +67,7 @@ export type StaticSceneRenderConfig = {
   canvas: HTMLCanvasElement;
   rc: RoughCanvas;
   elementsMap: RenderableElementsMap;
-  allElementsMap: ElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   scale: number;
   appState: StaticCanvasAppState;

@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { ActionManager } from "../actions/manager";
-import { ExcalidrawElementType, NonDeletedElementsMap } from "../element/types";
+import {
+  ExcalidrawElementType,
+  NonDeletedElementsMap,
+  NonDeletedSceneElementsMap,
+} from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "./App";
 import {
@@ -47,7 +51,7 @@ export const SelectedShapeActions = ({
   renderAction,
 }: {
   appState: UIAppState;
-  elementsMap: NonDeletedElementsMap;
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);

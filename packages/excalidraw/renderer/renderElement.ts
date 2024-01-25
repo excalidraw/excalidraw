@@ -6,7 +6,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
-  ElementsMap,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   isTextElement,
@@ -452,7 +452,7 @@ const drawElementFromCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
-  allElementsMap: ElementsMap,
+  allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -625,7 +625,7 @@ export const renderSelectionElement = (
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,
-  allElementsMap: ElementsMap,
+  allElementsMap: NonDeletedSceneElementsMap,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
