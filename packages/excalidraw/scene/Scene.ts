@@ -4,8 +4,8 @@ import {
   NonDeleted,
   ExcalidrawFrameLikeElement,
   ElementsMapOrArray,
-  NonDeletedElementsMap,
   SceneElementsMap,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import { isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -27,7 +27,7 @@ type SelectionHash = string & { __brand: "selectionHash" };
 const getNonDeletedElements = <T extends ExcalidrawElement>(
   allElements: readonly T[],
 ) => {
-  const elementsMap = new Map() as NonDeletedElementsMap;
+  const elementsMap = new Map() as NonDeletedSceneElementsMap;
   const elements: T[] = [];
   for (const element of allElements) {
     if (!element.isDeleted) {
@@ -120,8 +120,9 @@ class Scene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
-  private nonDeletedElementsMap: NonDeletedElementsMap =
-    new Map() as NonDeletedElementsMap;
+  private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
+    new Map(),
+  );
   private elements: readonly ExcalidrawElement[] = [];
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];

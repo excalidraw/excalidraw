@@ -444,6 +444,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
 ): T => {
+  const elementsMap = arrayToMap(allElements);
   const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
   for (const element of allElements.values()) {
     if (element.frameId === frame.id) {
@@ -481,7 +482,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       finalElementsToAdd.push(element);
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (
       boundTextElement &&
       !suppliedElementsToAddSet.has(boundTextElement.id) &&
@@ -506,6 +507,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
 
 export const removeElementsFromFrame = (
   elementsToRemove: ReadonlySetLike<NonDeletedExcalidrawElement>,
+  elementsMap: ElementsMap,
 ) => {
   const _elementsToRemove = new Map<
     ExcalidrawElement["id"],
@@ -524,7 +526,7 @@ export const removeElementsFromFrame = (
       const arr = toRemoveElementsByFrame.get(element.frameId) || [];
       arr.push(element);
 
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
         _elementsToRemove.set(boundTextElement.id, boundTextElement);
         arr.push(boundTextElement);
@@ -550,7 +552,7 @@ export const removeAllElementsFromFrame = <T extends ExcalidrawElement>(
   frame: ExcalidrawFrameLikeElement,
 ) => {
   const elementsInFrame = getFrameChildren(allElements, frame.id);
-  removeElementsFromFrame(elementsInFrame);
+  removeElementsFromFrame(elementsInFrame, arrayToMap(allElements));
   return allElements;
 };
 
@@ -558,6 +560,7 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
   allElements: readonly T[],
   nextElementsInFrame: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  app: AppClassProperties,
 ): T[] => {
   return addElementsToFrame(
     removeAllElementsFromFrame(allElements, frame),
@@ -608,7 +611,7 @@ export const updateFrameMembershipOfSelectedElements = <
   });
 
   if (elementsToRemove.size > 0) {
-    removeElementsFromFrame(elementsToRemove);
+    removeElementsFromFrame(elementsToRemove, elementsMap);
   }
   return allElements;
 };

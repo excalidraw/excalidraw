@@ -6,6 +6,7 @@ import {
   NonDeleted,
   ExcalidrawTextElementWithContainer,
   ElementsMapOrArray,
+  ElementsMap,
 } from "./types";
 import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
@@ -74,13 +75,16 @@ export class ElementBounds {
     ) {
       return cachedBounds.bounds;
     }
-
-    const bounds = ElementBounds.calculateBounds(element);
+    const scene = Scene.getScene(element);
+    const bounds = ElementBounds.calculateBounds(
+      element,
+      scene?.getNonDeletedElementsMap() || new Map(),
+    );
 
     // hack to ensure that downstream checks could retrieve element Scene
     // so as to have correctly calculated bounds
     // FIXME remove when we get rid of all the id:Scene / element:Scene mapping
-    const shouldCache = Scene.getScene(element);
+    const shouldCache = !!scene;
 
     if (shouldCache) {
       ElementBounds.boundsCache.set(element, {
@@ -92,7 +96,10 @@ export class ElementBounds {
     return bounds;
   }
 
-  private static calculateBounds(element: ExcalidrawElement): Bounds {
+  private static calculateBounds(
+    element: ExcalidrawElement,
+    elementsMap: ElementsMap,
+  ): Bounds {
     let bounds: Bounds;
 
     const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
@@ -111,7 +118,7 @@ export class ElementBounds {
         maxY + element.y,
       ];
     } else if (isLinearElement(element)) {
-      bounds = getLinearElementRotatedBounds(element, cx, cy);
+      bounds = getLinearElementRotatedBounds(element, cx, cy, elementsMap);
     } else if (element.type === "diamond") {
       const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
       const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
@@ -154,16 +161,17 @@ export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
   includeBoundText: boolean = false,
 ): [number, number, number, number, number, number] => {
+  const elementsMap =
+    Scene.getScene(element)?.getElementsMapIncludingDeleted() || new Map();
   if (isFreeDrawElement(element)) {
     return getFreeDrawElementAbsoluteCoords(element);
   } else if (isLinearElement(element)) {
     return LinearElementEditor.getElementAbsoluteCoords(
       element,
+      elementsMap,
       includeBoundText,
     );
   } else if (isTextElement(element)) {
-    const elementsMap =
-      Scene.getScene(element)?.getElementsMapIncludingDeleted();
     const container = elementsMap
       ? getContainerElement(element, elementsMap)
       : null;
@@ -677,7 +685,10 @@ const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
   cy: number,
+  elementsMap: ElementsMap,
 ): Bounds => {
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+
   if (element.points.length < 2) {
     const [pointX, pointY] = element.points[0];
     const [x, y] = rotate(
@@ -689,7 +700,6 @@ const getLinearElementRotatedBounds = (
     );
 
     let coords: Bounds = [x, y, x, y];
-    const boundTextElement = getBoundTextElement(element);
     if (boundTextElement) {
       const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
         element,
@@ -714,7 +724,6 @@ const getLinearElementRotatedBounds = (
     rotate(element.x + x, element.y + y, cx, cy, element.angle);
   const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
   let coords: Bounds = [res[0], res[1], res[2], res[3]];
-  const boundTextElement = getBoundTextElement(element);
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
       element,

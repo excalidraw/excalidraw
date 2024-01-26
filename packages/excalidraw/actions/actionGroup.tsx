@@ -105,7 +105,10 @@ export const actionGroup = register({
       const frameElementsMap = groupByFrameLikes(selectedElements);
 
       frameElementsMap.forEach((elementsInFrame, frameId) => {
-        removeElementsFromFrame(elementsInFrame);
+        removeElementsFromFrame(
+          elementsInFrame,
+          app.scene.getNonDeletedElementsMap(),
+        );
       });
     }
 
@@ -225,6 +228,7 @@ export const actionUngroup = register({
           nextElements,
           getElementsInResizingFrame(nextElements, frame, appState),
           frame,
+          app,
         );
       }
     });

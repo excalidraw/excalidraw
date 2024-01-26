@@ -34,6 +34,7 @@ import {
   computeContainerDimensionForBoundText,
   detectLineHeight,
   computeBoundTextPosition,
+  getBoundTextElement,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -196,7 +197,8 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getBoundTextMaxWidth(container);
+        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -361,10 +363,14 @@ export const textWysiwyg = ({
         fontFamily: app.state.currentItemFontFamily,
       });
       if (container) {
+        const boundTextElement = getBoundTextElement(
+          container,
+          app.scene.getNonDeletedElementsMap(),
+        );
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getBoundTextMaxWidth(container),
+          getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
