@@ -4,6 +4,7 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   Bounds,
@@ -248,14 +249,15 @@ export const exportToCanvas = async (
     files,
   });
 
-  const elementsMap = toBrandedType<RenderableElementsMap>(
-    arrayToMap(elementsForRender),
-  );
-
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
-    elementsMap,
+    elementsMap: toBrandedType<RenderableElementsMap>(
+      arrayToMap(elementsForRender),
+    ),
+    allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
+      arrayToMap(elements),
+    ),
     visibleElements: elementsForRender,
     scale,
     appState: {

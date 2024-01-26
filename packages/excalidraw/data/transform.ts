@@ -24,6 +24,7 @@ import {
   normalizeText,
 } from "../element/textElement";
 import {
+  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -42,7 +43,7 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, cloneJSON, getFontString } from "../utils";
+import { arrayToMap, assertNever, cloneJSON, getFontString } from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 
@@ -202,6 +203,7 @@ const DEFAULT_DIMENSION = 100;
 const bindTextToContainer = (
   container: ExcalidrawElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  elementsMap: ElementsMap,
 ) => {
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
@@ -623,6 +625,7 @@ export const convertToExcalidrawElements = (
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
+            arrayToMap(elementStore.getElements()),
           );
           elementStore.add(container);
           elementStore.add(text);

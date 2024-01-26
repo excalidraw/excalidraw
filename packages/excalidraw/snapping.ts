@@ -16,6 +16,7 @@ import { KEYS } from "./keys";
 import { rangeIntersection, rangesOverlap, rotatePoint } from "./math";
 import { getVisibleAndNonSelectedElements } from "./scene/selection";
 import { AppState, KeyboardModifiersObject, Point } from "./types";
+import { arrayToMap } from "./utils";
 
 const SNAP_DISTANCE = 8;
 
@@ -286,7 +287,10 @@ export const getVisibleGaps = (
     appState,
   );
 
-  const referenceBounds = getMaximumGroups(referenceElements)
+  const referenceBounds = getMaximumGroups(
+    referenceElements,
+    arrayToMap(elements),
+  )
     .filter(
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
@@ -572,7 +576,7 @@ export const getReferenceSnapPoints = (
     appState,
   );
 
-  return getMaximumGroups(referenceElements)
+  return getMaximumGroups(referenceElements, arrayToMap(elements))
     .filter(
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),

@@ -7,13 +7,17 @@ import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
 } from "../../scene/types";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 
 type StaticCanvasProps = {
   canvas: HTMLCanvasElement;
   rc: RoughCanvas;
   elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   versionNonce: number | undefined;
   selectionNonce: number | undefined;
@@ -67,6 +71,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         rc: props.rc,
         scale: props.scale,
         elementsMap: props.elementsMap,
+        allElementsMap: props.allElementsMap,
         visibleElements: props.visibleElements,
         appState: props.appState,
         renderConfig: props.renderConfig,

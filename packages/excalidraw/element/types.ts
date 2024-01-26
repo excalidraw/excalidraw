@@ -279,6 +279,16 @@ export type NonDeletedElementsMap = Map<
 export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
   MakeBrand<"SceneElementsMap">;
 
+/**
+ * Map of all non-deleted Scene elements.
+ * Not a subset. Use this type when you need access to current Scene elements.
+ */
+export type NonDeletedSceneElementsMap = Map<
+  ExcalidrawElement["id"],
+  NonDeletedExcalidrawElement
+> &
+  MakeBrand<"NonDeletedSceneElementsMap">;
+
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;

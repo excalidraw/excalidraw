@@ -4,6 +4,7 @@ import {
   NonDeleted,
   NonDeletedExcalidrawElement,
   ElementsMapOrArray,
+  ElementsMap,
 } from "./element/types";
 import {
   AppClassProperties,
@@ -329,12 +330,12 @@ export const removeFromSelectedGroups = (
 
 export const getMaximumGroups = (
   elements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): ExcalidrawElement[][] => {
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
   >();
-
   elements.forEach((element: ExcalidrawElement) => {
     const groupId =
       element.groupIds.length === 0
@@ -344,7 +345,7 @@ export const getMaximumGroups = (
     const currentGroupMembers = groups.get(groupId) || [];
 
     // Include bound text if present when grouping
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       currentGroupMembers.push(boundTextElement);
     }

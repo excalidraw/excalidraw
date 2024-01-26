@@ -126,6 +126,7 @@ export const transformElements = (
       rotateMultipleElements(
         originalElements,
         selectedElements,
+        elementsMap,
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
@@ -219,7 +220,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element, elementsMap);
     if (container) {
-      width = getBoundTextMaxWidth(container);
+      width = getBoundTextMaxWidth(container, element);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -394,7 +395,7 @@ export const resizeSingleElement = (
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
   let boundTextFont: { fontSize?: number; baseline?: number } = {};
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (transformHandleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
@@ -458,7 +459,7 @@ export const resizeSingleElement = (
       const nextFont = measureFontSizeFromWidth(
         boundTextElement,
         elementsMap,
-        getBoundTextMaxWidth(updatedElement),
+        getBoundTextMaxWidth(updatedElement, boundTextElement),
         getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
@@ -640,6 +641,7 @@ export const resizeSingleElement = (
     }
     handleBindTextResize(
       element,
+      elementsMap,
       transformHandleDirection,
       shouldMaintainAspectRatio,
     );
@@ -882,7 +884,7 @@ export const resizeMultipleElements = (
       newSize: { width, height },
     });
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement && boundTextFontSize) {
       mutateElement(
         boundTextElement,
@@ -892,7 +894,7 @@ export const resizeMultipleElements = (
         },
         false,
       );
-      handleBindTextResize(element, transformHandleType, true);
+      handleBindTextResize(element, elementsMap, transformHandleType, true);
     }
   }
 
@@ -902,6 +904,7 @@ export const resizeMultipleElements = (
 const rotateMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -941,7 +944,7 @@ const rotateMultipleElements = (
       );
       updateBoundElements(element, { simultaneouslyUpdated: elements });
 
-      const boundText = getBoundTextElement(element);
+      const boundText = getBoundTextElement(element, elementsMap);
       if (boundText && !isArrowElement(element)) {
         mutateElement(
           boundText,

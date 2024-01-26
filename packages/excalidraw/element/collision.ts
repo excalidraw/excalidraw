@@ -28,6 +28,7 @@ import {
   StrokeRoundness,
   ExcalidrawFrameLikeElement,
   ExcalidrawIframeLikeElement,
+  ElementsMap,
 } from "./types";
 
 import {
@@ -78,6 +79,7 @@ export const hitTest = (
   frameNameBoundsCache: FrameNameBoundsCache,
   x: number,
   y: number,
+  elementsMap: ElementsMap,
 ): boolean => {
   // How many pixels off the shape boundary we still consider a hit
   const threshold = 10 / appState.zoom.value;
@@ -95,7 +97,7 @@ export const hitTest = (
     );
   }
 
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = getBoundTextElement(element, elementsMap);
   if (boundTextElement) {
     const isHittingBoundTextElement = hitTest(
       boundTextElement,
@@ -103,6 +105,7 @@ export const hitTest = (
       frameNameBoundsCache,
       x,
       y,
+      elementsMap,
     );
     if (isHittingBoundTextElement) {
       return true;
@@ -122,15 +125,16 @@ export const isHittingElementBoundingBoxWithoutHittingElement = (
   frameNameBoundsCache: FrameNameBoundsCache,
   x: number,
   y: number,
+  elementsMap: ElementsMap,
 ): boolean => {
   const threshold = 10 / appState.zoom.value;
 
   // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
   // eg for linear elements text can be outside the element bounding box
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = getBoundTextElement(element, elementsMap);
   if (
     boundTextElement &&
-    hitTest(boundTextElement, appState, frameNameBoundsCache, x, y)
+    hitTest(boundTextElement, appState, frameNameBoundsCache, x, y, elementsMap)
   ) {
     return false;
   }
