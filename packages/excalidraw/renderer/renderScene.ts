@@ -246,6 +246,7 @@ const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
+  elementsMap: RenderableElementsMap,
 ) => {
   if (!appState.selectedLinearElement) {
     return;
@@ -269,6 +270,7 @@ const renderLinearPointHandles = (
   //Rendering segment mid points
   const midPoints = LinearElementEditor.getEditorMidPoints(
     element,
+    elementsMap,
     appState,
   ).filter((midPoint) => midPoint !== null) as Point[];
 
@@ -485,7 +487,12 @@ const _renderInteractiveScene = ({
   });
 
   if (editingLinearElement) {
-    renderLinearPointHandles(context, appState, editingLinearElement);
+    renderLinearPointHandles(
+      context,
+      appState,
+      editingLinearElement,
+      elementsMap,
+    );
   }
 
   // Paint selection element
@@ -528,6 +535,7 @@ const _renderInteractiveScene = ({
       context,
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
+      elementsMap,
     );
   }
 
@@ -553,6 +561,7 @@ const _renderInteractiveScene = ({
         context,
         appState,
         selectedElements[0] as ExcalidrawLinearElement,
+        elementsMap,
       );
     }
     const selectionColor = renderConfig.selectionColor || oc.black;
@@ -891,6 +900,7 @@ const _renderStaticScene = ({
   canvas,
   rc,
   elementsMap,
+  allElementsMap,
   visibleElements,
   scale,
   appState,
@@ -972,6 +982,7 @@ const _renderStaticScene = ({
           renderElement(
             element,
             elementsMap,
+            allElementsMap,
             rc,
             context,
             renderConfig,
@@ -982,6 +993,7 @@ const _renderStaticScene = ({
           renderElement(
             element,
             elementsMap,
+            allElementsMap,
             rc,
             context,
             renderConfig,
@@ -1005,6 +1017,7 @@ const _renderStaticScene = ({
           renderElement(
             element,
             elementsMap,
+            allElementsMap,
             rc,
             context,
             renderConfig,
@@ -1024,6 +1037,7 @@ const _renderStaticScene = ({
             renderElement(
               label,
               elementsMap,
+              allElementsMap,
               rc,
               context,
               renderConfig,

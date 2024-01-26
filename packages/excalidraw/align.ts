@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "./element/types";
+import { ElementsMap, ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
 import { BoundingBox, getCommonBoundingBox } from "./element/bounds";
 import { getMaximumGroups } from "./groups";
@@ -10,10 +10,13 @@ export interface Alignment {
 
 export const alignElements = (
   selectedElements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
   alignment: Alignment,
 ): ExcalidrawElement[] => {
-  const groups: ExcalidrawElement[][] = getMaximumGroups(selectedElements);
-
+  const groups: ExcalidrawElement[][] = getMaximumGroups(
+    selectedElements,
+    elementsMap,
+  );
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 
   return groups.flatMap((group) => {

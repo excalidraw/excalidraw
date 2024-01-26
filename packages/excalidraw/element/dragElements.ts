@@ -57,7 +57,10 @@ export const dragSelectedElements = (
       // skip arrow labels since we calculate its position during render
       !isArrowElement(element)
     ) {
-      const textElement = getBoundTextElement(element);
+      const textElement = getBoundTextElement(
+        element,
+        scene.getNonDeletedElementsMap(),
+      );
       if (textElement) {
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }

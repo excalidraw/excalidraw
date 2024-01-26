@@ -1431,6 +1431,8 @@ class App extends React.Component<AppProps, AppState> {
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
+    const allElementsMap = this.scene.getNonDeletedElementsMap();
+
     const shouldBlockPointerEvents =
       !(
         this.state.editingElement && isLinearElement(this.state.editingElement)
@@ -1628,6 +1630,7 @@ class App extends React.Component<AppProps, AppState> {
                           canvas={this.canvas}
                           rc={this.rc}
                           elementsMap={elementsMap}
+                          allElementsMap={allElementsMap}
                           visibleElements={visibleElements}
                           versionNonce={versionNonce}
                           selectionNonce={
@@ -3869,7 +3872,11 @@ class App extends React.Component<AppProps, AppState> {
             if (!isTextElement(selectedElement)) {
               container = selectedElement as ExcalidrawTextContainer;
             }
-            const midPoint = getContainerCenter(selectedElement, this.state);
+            const midPoint = getContainerCenter(
+              selectedElement,
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
             const sceneX = midPoint.x;
             const sceneY = midPoint.y;
             this.startTextEditing({
@@ -4333,6 +4340,7 @@ class App extends React.Component<AppProps, AppState> {
         this.frameNameBoundsCache,
         x,
         y,
+        this.scene.getNonDeletedElementsMap(),
       )
         ? allHitElements[allHitElements.length - 2]
         : elementWithHighestZIndex;
@@ -4362,7 +4370,14 @@ class App extends React.Component<AppProps, AppState> {
             );
 
     return getElementsAtPosition(elements, (element) =>
-      hitTest(element, this.state, this.frameNameBoundsCache, x, y),
+      hitTest(
+        element,
+        this.state,
+        this.frameNameBoundsCache,
+        x,
+        y,
+        this.scene.getNonDeletedElementsMap(),
+      ),
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
       const containingFrame = getContainingFrame(element);
@@ -4399,7 +4414,10 @@ class App extends React.Component<AppProps, AppState> {
         container,
       );
     if (container && parentCenterPosition) {
-      const boundTextElementToContainer = getBoundTextElement(container);
+      const boundTextElementToContainer = getBoundTextElement(
+        container,
+        this.scene.getNonDeletedElementsMap(),
+      );
       if (!boundTextElementToContainer) {
         shouldBindToContainer = true;
       }
@@ -4412,7 +4430,10 @@ class App extends React.Component<AppProps, AppState> {
       if (isTextElement(selectedElements[0])) {
         existingTextElement = selectedElements[0];
       } else if (container) {
-        existingTextElement = getBoundTextElement(selectedElements[0]);
+        existingTextElement = getBoundTextElement(
+          selectedElements[0],
+          this.scene.getNonDeletedElementsMap(),
+        );
       } else {
         existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
       }
@@ -4621,7 +4642,11 @@ class App extends React.Component<AppProps, AppState> {
             [sceneX, sceneY],
           )
         ) {
-          const midPoint = getContainerCenter(container, this.state);
+          const midPoint = getContainerCenter(
+            container,
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
 
           sceneX = midPoint.x;
           sceneY = midPoint.y;
@@ -5257,8 +5282,8 @@ class App extends React.Component<AppProps, AppState> {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
     );
-
-    const boundTextElement = getBoundTextElement(element);
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const boundTextElement = getBoundTextElement(element, elementsMap);
 
     if (!element) {
       return;
@@ -5285,6 +5310,7 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor,
             { x: scenePointerX, y: scenePointerY },
             this.state,
+            this.scene.getNonDeletedElementsMap(),
           );
 
         if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
@@ -5300,6 +5326,7 @@ class App extends React.Component<AppProps, AppState> {
           this.frameNameBoundsCache,
           scenePointerX,
           scenePointerY,
+          elementsMap,
         )
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
@@ -5311,6 +5338,7 @@ class App extends React.Component<AppProps, AppState> {
           this.frameNameBoundsCache,
           scenePointerX,
           scenePointerY,
+          this.scene.getNonDeletedElementsMap(),
         )
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
@@ -6060,6 +6088,7 @@ class App extends React.Component<AppProps, AppState> {
             this.history,
             pointerDownState.origin,
             linearElementEditor,
+            this.scene.getNonDeletedElementsMap(),
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -6995,6 +7024,7 @@ class App extends React.Component<AppProps, AppState> {
             );
           },
           linearElementEditor,
+          this.scene.getNonDeletedElementsMap(),
         );
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -7713,7 +7743,10 @@ class App extends React.Component<AppProps, AppState> {
                     groupIds: [],
                   });
 
-                  removeElementsFromFrame([linearElement]);
+                  removeElementsFromFrame(
+                    [linearElement],
+                    this.scene.getNonDeletedElementsMap(),
+                  );
 
                   this.scene.informMutation();
                 }
@@ -7866,6 +7899,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
             ),
             frame,
+            this,
           );
         }
 
@@ -8093,6 +8127,7 @@ class App extends React.Component<AppProps, AppState> {
             this.frameNameBoundsCache,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
+            this.scene.getNonDeletedElementsMap(),
           )) ||
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
@@ -9334,7 +9369,11 @@ class App extends React.Component<AppProps, AppState> {
       let elementCenterX = container.x + container.width / 2;
       let elementCenterY = container.y + container.height / 2;
 
-      const elementCenter = getContainerCenter(container, appState);
+      const elementCenter = getContainerCenter(
+        container,
+        appState,
+        this.scene.getNonDeletedElementsMap(),
+      );
       if (elementCenter) {
         elementCenterX = elementCenter.x;
         elementCenterY = elementCenter.y;

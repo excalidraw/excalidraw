@@ -342,7 +342,7 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container),
+      getBoundTextMaxWidth(container, textElement),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);
