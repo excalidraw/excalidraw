@@ -139,8 +139,8 @@
     "eyeDropper": "",
     "textToDiagram": "",
     "prompt": "",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Seguiu-nos",
+    "discordChat": "Xat de Discord"
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -232,19 +232,19 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "No s'ha pogut enganxar.",
+    "copyToSystemClipboardFailed": "No s'ha pogut copiar al porta-retalls."
   },
   "toolBar": {
     "selection": "Selecció",
     "image": "Insereix imatge",
-    "rectangle": "",
+    "rectangle": "Rectangle",
     "diamond": "Rombe",
     "ellipse": "El·lipse",
     "arrow": "Fletxa",
     "line": "Línia",
     "freedraw": "Dibuix",
-    "text": "",
+    "text": "Text",
     "library": "Biblioteca",
     "lock": "Mantenir activa l'eina seleccionada desprès de dibuixar",
     "penMode": "Mode de llapis - evita tocar",
@@ -253,11 +253,11 @@
     "frame": "",
     "magicframe": "",
     "embeddable": "",
-    "laser": "",
+    "laser": "Punter làser",
     "hand": "Mà (eina de desplaçament)",
-    "extraTools": "",
+    "extraTools": "Més eines",
     "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "magicSettings": "Configuració d'IA"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -312,7 +312,7 @@
     "shareTitle": "Uniu-vos a una sessió de col·laboració en directe a Excalidraw"
   },
   "errorDialog": {
-    "title": ""
+    "title": "Error"
   },
   "exportDialog": {
     "disk_title": "Desa al disc",
@@ -335,7 +335,7 @@
     "documentation": "Documentació",
     "doubleClick": "doble clic",
     "drag": "arrossega",
-    "editor": "",
+    "editor": "Editor",
     "editLineArrowPoints": "",
     "editText": "",
     "github": "Hi heu trobat un problema? Informeu-ne",
@@ -394,27 +394,27 @@
     "removeItemsFromLib": "Suprimeix els elements seleccionats de la llibreria"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exporteu la imatge",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
+      "withBackground": "Fons",
+      "onlySelected": "Només seleccionat",
+      "darkMode": "Mode fosc",
       "embedScene": "",
-      "scale": "",
+      "scale": "Escala",
       "padding": ""
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exporteu a PNG",
+      "exportToSvg": "Exporteu a SVG",
+      "copyPngToClipboard": "Copieu el PNG al porta-retalls"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copieu al porta-retalls"
     }
   },
   "encrypted": {
@@ -422,15 +422,15 @@
     "link": "Article del blog sobre encriptació d'extrem a extrem a Excalidraw"
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
+    "angle": "Angle",
+    "element": "Element",
+    "elements": "Elements",
     "height": "Altura",
     "scene": "Escena",
     "selected": "Seleccionat",
     "storage": "Emmagatzematge",
     "title": "Estadístiques per nerds",
-    "total": "",
+    "total": "Total",
     "version": "Versió",
     "versionCopy": "Feu clic per a copiar",
     "versionNotAvailable": "Versió no disponible",
@@ -451,20 +451,20 @@
   },
   "colors": {
     "transparent": "",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "Negre",
+    "white": "Blanc",
+    "red": "Vermell",
+    "pink": "Rosa",
     "grape": "",
     "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
+    "gray": "Gris",
+    "blue": "Blau",
+    "cyan": "Cian",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "Verd",
+    "yellow": "Groc",
+    "orange": "Taronja",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -481,7 +481,7 @@
   },
   "colorPicker": {
     "mostUsedCustomColors": "",
-    "colors": "",
+    "colors": "Colors",
     "shades": "",
     "hexCode": "",
     "noShades": ""
@@ -489,17 +489,17 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Exporteu com a imatge",
+        "button": "Exporteu com a imatge",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Deseu al disc",
+        "button": "Deseu al disc",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "",
         "description": ""
       }
@@ -519,15 +519,15 @@
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "Inseriu",
     "description": "",
     "syntax": "",
     "preview": ""
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Cerca ràpida",
+      "empty": "No s'han trobat usuaris"
     },
     "hint": {
       "text": "",
