@@ -1303,6 +1303,10 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(f, { name: null });
         }
 
+        if (f?.customData?.changing) {
+          mutateElement(f, { customData: { changing: false } });
+        }
+
         this.setState({ editingFrame: null });
       };
 
@@ -1314,7 +1318,10 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       if (f.id === this.state.editingFrame) {
-        const frameNameInEdit = frameName;
+        // allow editing frame name with empty string if it's under changing
+        const frameNameInEdit = f?.customData?.changing
+          ? f.name || ""
+          : frameName;
 
         frameNameJSX = (
           <input
@@ -1323,6 +1330,9 @@ class App extends React.Component<AppProps, AppState> {
             onChange={(e) => {
               mutateElement(f, {
                 name: e.target.value,
+                customData: {
+                  changing: true,
+                },
               });
             }}
             onBlur={() => reset()}
