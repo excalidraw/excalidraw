@@ -2,7 +2,9 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import {
   ExcalidrawTextElement,
+  NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   AppClassProperties,
@@ -12,6 +14,10 @@ import {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
+import { MakeBrand } from "../utility-types";
+
+export type RenderableElementsMap = NonDeletedElementsMap &
+  MakeBrand<"RenderableElementsMap">;
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
@@ -54,14 +60,15 @@ export type InteractiveCanvasRenderConfig = {
 
 export type RenderInteractiveSceneCallback = {
   atLeastOneVisibleElement: boolean;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 
 export type StaticSceneRenderConfig = {
   canvas: HTMLCanvasElement;
   rc: RoughCanvas;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   scale: number;
   appState: StaticCanvasAppState;
@@ -70,7 +77,7 @@ export type StaticSceneRenderConfig = {
 
 export type InteractiveSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
   scale: number;
