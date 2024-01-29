@@ -198,7 +198,6 @@ const checkElementsBoundingBox = async (
 
   const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2);
 
-  debugger;
   await waitFor(() => {
     // Check if width and height did not change
     expect(x2 - x1).toBeCloseTo(x22 - x12, -1);

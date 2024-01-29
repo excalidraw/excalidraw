@@ -34,6 +34,7 @@ import {
   computeContainerDimensionForBoundText,
   detectLineHeight,
   computeBoundTextPosition,
+  getBoundTextElement,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -153,7 +154,10 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      const container = getContainerElement(updatedTextElement);
+      const container = getContainerElement(
+        updatedTextElement,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
       let maxWidth = updatedTextElement.width;
 
       let maxHeight = updatedTextElement.height;
@@ -193,7 +197,8 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getBoundTextMaxWidth(container);
+        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -277,7 +282,7 @@ export const textWysiwyg = ({
         transform: getTransform(
           textElementWidth,
           textElementHeight,
-          getTextElementAngle(updatedTextElement),
+          getTextElementAngle(updatedTextElement, container),
           appState,
           maxWidth,
           editorMaxHeight,
@@ -348,17 +353,24 @@ export const textWysiwyg = ({
       if (!data) {
         return;
       }
-      const container = getContainerElement(element);
+      const container = getContainerElement(
+        element,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
 
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
       });
       if (container) {
+        const boundTextElement = getBoundTextElement(
+          container,
+          app.scene.getNonDeletedElementsMap(),
+        );
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getBoundTextMaxWidth(container),
+          getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -528,7 +540,10 @@ export const textWysiwyg = ({
       return;
     }
     let text = editable.value;
-    const container = getContainerElement(updateElement);
+    const container = getContainerElement(
+      updateElement,
+      app.scene.getElementsMapIncludingDeleted(),
+    );
 
     if (container) {
       text = updateElement.text;

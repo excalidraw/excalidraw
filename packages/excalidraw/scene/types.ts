@@ -2,14 +2,22 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import {
   ExcalidrawTextElement,
+  NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   AppClassProperties,
   AppState,
+  EmbedsValidationStatus,
+  ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
 } from "../types";
+import { MakeBrand } from "../utility-types";
+
+export type RenderableElementsMap = NonDeletedElementsMap &
+  MakeBrand<"RenderableElementsMap">;
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
@@ -20,6 +28,8 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+  embedsValidationStatus: EmbedsValidationStatus;
+  elementsPendingErasure: ElementsPendingErasure;
 };
 
 export type SVGRenderConfig = {
@@ -30,6 +40,7 @@ export type SVGRenderConfig = {
   renderEmbeddables: boolean;
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  embedsValidationStatus: EmbedsValidationStatus;
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -48,14 +59,15 @@ export type InteractiveCanvasRenderConfig = {
 
 export type RenderInteractiveSceneCallback = {
   atLeastOneVisibleElement: boolean;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 
 export type StaticSceneRenderConfig = {
   canvas: HTMLCanvasElement;
   rc: RoughCanvas;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   scale: number;
   appState: StaticCanvasAppState;
@@ -64,7 +76,7 @@ export type StaticSceneRenderConfig = {
 
 export type InteractiveSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
   scale: number;

@@ -5,6 +5,8 @@ import { isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
+import "../../public/fonts/fonts.css";
+import polyfill from "./polyfill";
 
 import { AppProps, ExcalidrawProps } from "./types";
 import { defaultLang } from "./i18n";
@@ -15,6 +17,8 @@ import Footer from "./components/footer/FooterCenter";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
+
+polyfill();
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -76,6 +80,13 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }
 
   useEffect(() => {
+    const importPolyfill = async () => {
+      //@ts-ignore
+      await import("canvas-roundrect-polyfill");
+    };
+
+    importPolyfill();
+
     // Block pinch-zooming on iOS outside of the content area
     const handleTouchMove = (event: TouchEvent) => {
       // @ts-ignore
@@ -219,7 +230,7 @@ export {
 } from "../utils/export";
 export { isLinearElement } from "./element/typeChecks";
 
-export { FONT_FAMILY, THEME, MIME_TYPES } from "./constants";
+export { FONT_FAMILY, THEME, MIME_TYPES, ROUNDNESS } from "./constants";
 
 export {
   mutateElement,

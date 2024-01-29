@@ -63,11 +63,7 @@ export const actionRemoveAllElementsFromFrame = register({
 
     if (isFrameLikeElement(selectedElement)) {
       return {
-        elements: removeAllElementsFromFrame(
-          elements,
-          selectedElement,
-          appState,
-        ),
+        elements: removeAllElementsFromFrame(elements, selectedElement),
         appState: {
           ...appState,
           selectedElementIds: {

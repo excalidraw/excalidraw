@@ -2,7 +2,6 @@ import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
-
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
@@ -13,6 +12,10 @@ export const isFirefox =
 export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
 export const isSafari =
   !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
+export const isIOS =
+  /iPad|iPhone/.test(navigator.platform) ||
+  // iPadOS 13+
+  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 // keeping function so it can be mocked in test
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
@@ -39,6 +42,7 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
+  ERASER: 5,
 } as const;
 
 export const POINTER_EVENTS = {

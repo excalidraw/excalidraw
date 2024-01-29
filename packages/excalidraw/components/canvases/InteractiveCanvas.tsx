@@ -1,24 +1,22 @@
 import React, { useEffect, useRef } from "react";
 import { renderInteractiveScene } from "../../renderer/renderScene";
-import {
-  isRenderThrottlingEnabled,
-  isShallowEqual,
-  sceneCoordsToViewportCoords,
-} from "../../utils";
+import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
 import type { DOMAttributes } from "react";
 import type { AppState, InteractiveCanvasAppState } from "../../types";
 import type {
   InteractiveCanvasRenderConfig,
+  RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
 
 type InteractiveCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement>;
   canvas: HTMLCanvasElement | null;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
   versionNonce: number | undefined;
@@ -116,7 +114,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
     renderInteractiveScene(
       {
         canvas: props.canvas,
-        elements: props.elements,
+        elementsMap: props.elementsMap,
         visibleElements: props.visibleElements,
         selectedElements: props.selectedElements,
         scale: window.devicePixelRatio,
@@ -204,10 +202,10 @@ const areEqual = (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
     prevProps.versionNonce !== nextProps.versionNonce ||
     prevProps.scale !== nextProps.scale ||
-    // we need to memoize on element arrays because they may have renewed
+    // we need to memoize on elementsMap because they may have renewed
     // even if versionNonce didn't change (e.g. we filter elements out based
     // on appState)
-    prevProps.elements !== nextProps.elements ||
+    prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||
     prevProps.selectedElements !== nextProps.selectedElements
   ) {
