@@ -3,14 +3,18 @@ import {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawFrameLikeElement,
+  ElementsMapOrArray,
+  SceneElementsMap,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
-import { getNonDeletedElements, isNonDeletedElement } from "../element";
+import { isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
+import { toBrandedType } from "../utils";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -19,6 +23,20 @@ type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
 
 type SelectionHash = string & { __brand: "selectionHash" };
+
+const getNonDeletedElements = <T extends ExcalidrawElement>(
+  allElements: readonly T[],
+) => {
+  const elementsMap = new Map() as NonDeletedSceneElementsMap;
+  const elements: T[] = [];
+  for (const element of allElements) {
+    if (!element.isDeleted) {
+      elements.push(element as NonDeleted<T>);
+      elementsMap.set(element.id, element as NonDeletedExcalidrawElement);
+    }
+  }
+  return { elementsMap, elements };
+};
 
 const hashSelectionOpts = (
   opts: Parameters<InstanceType<typeof Scene>["getSelectedElements"]>[0],
@@ -102,11 +120,14 @@ class Scene {
   private callbacks: Set<SceneStateCallback> = new Set();
 
   private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
+  private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
+    new Map(),
+  );
   private elements: readonly ExcalidrawElement[] = [];
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
-  private elementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
+  private elementsMap = toBrandedType<SceneElementsMap>(new Map());
   private selectedElementsCache: {
     selectedElementIds: AppState["selectedElementIds"] | null;
     elements: readonly NonDeletedExcalidrawElement[] | null;
@@ -117,6 +138,14 @@ class Scene {
     cache: new Map(),
   };
   private versionNonce: number | undefined;
+
+  getElementsMapIncludingDeleted() {
+    return this.elementsMap;
+  }
+
+  getNonDeletedElementsMap() {
+    return this.nonDeletedElementsMap;
+  }
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -138,7 +167,7 @@ class Scene {
      * scene state. This in effect will likely result in cache-miss, and
      * the cache won't be updated in this case.
      */
-    elements?: readonly ExcalidrawElement[];
+    elements?: ElementsMapOrArray;
     // selection-related options
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;
@@ -227,23 +256,27 @@ class Scene {
     return didChange;
   }
 
-  replaceAllElements(
-    nextElements: readonly ExcalidrawElement[],
-    mapElementIds = true,
-  ) {
-    this.elements = nextElements;
+  replaceAllElements(nextElements: ElementsMapOrArray, mapElementIds = true) {
+    this.elements =
+      // ts doesn't like `Array.isArray` of `instanceof Map`
+      nextElements instanceof Array
+        ? nextElements
+        : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
     this.elementsMap.clear();
-    nextElements.forEach((element) => {
+    this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
         nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
-      Scene.mapElementToScene(element, this);
+      Scene.mapElementToScene(element, this, mapElementIds);
     });
-    this.nonDeletedElements = getNonDeletedElements(this.elements);
+    const nonDeletedElements = getNonDeletedElements(this.elements);
+    this.nonDeletedElements = nonDeletedElements.elements;
+    this.nonDeletedElementsMap = nonDeletedElements.elementsMap;
+
     this.frames = nextFrameLikes;
-    this.nonDeletedFramesLikes = getNonDeletedElements(this.frames);
+    this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
 
     this.informMutation();
   }
@@ -332,6 +365,22 @@ class Scene {
   getElementIndex(elementId: string) {
     return this.elements.findIndex((element) => element.id === elementId);
   }
+
+  getContainerElement = (
+    element:
+      | (ExcalidrawElement & {
+          containerId: ExcalidrawElement["id"] | null;
+        })
+      | null,
+  ) => {
+    if (!element) {
+      return null;
+    }
+    if (element.containerId) {
+      return this.getElement(element.containerId) || null;
+    }
+    return null;
+  };
 }
 
 export default Scene;

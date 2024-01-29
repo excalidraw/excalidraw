@@ -6,6 +6,7 @@ import {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   isTextElement,
@@ -21,7 +22,11 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
-import { SVGRenderConfig, StaticCanvasRenderConfig } from "../scene/types";
+import {
+  SVGRenderConfig,
+  StaticCanvasRenderConfig,
+  RenderableElementsMap,
+} from "../scene/types";
 import {
   distance,
   getFontString,
@@ -187,6 +192,7 @@ const cappedElementCanvasSize = (
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -244,7 +250,8 @@ const generateElementCanvas = (
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
-    boundTextElementVersion: getBoundTextElement(element)?.version || null,
+    boundTextElementVersion:
+      getBoundTextElement(element, elementsMap)?.version || null,
     containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
   };
 };
@@ -415,6 +422,7 @@ export const elementWithCanvasCache = new WeakMap<
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
@@ -424,7 +432,9 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
-  const boundTextElementVersion = getBoundTextElement(element)?.version || null;
+  const boundTextElementVersion =
+    getBoundTextElement(element, elementsMap)?.version || null;
+
   const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
 
   if (
@@ -436,6 +446,7 @@ const generateElementWithCanvas = (
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
+      elementsMap,
       zoom,
       renderConfig,
       appState,
@@ -453,6 +464,7 @@ const drawElementFromCanvas = (
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
+  allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
@@ -472,7 +484,8 @@ const drawElementFromCanvas = (
 
   context.save();
   context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
-  const boundTextElement = getBoundTextElement(element);
+
+  const boundTextElement = getBoundTextElement(element, allElementsMap);
 
   if (isArrowElement(element) && boundTextElement) {
     const tempCanvas = document.createElement("canvas");
@@ -519,7 +532,6 @@ const drawElementFromCanvas = (
       offsetY -
       padding * zoom;
     tempCanvasContext.translate(-shiftX, -shiftY);
-
     // Clear the bound text area
     tempCanvasContext.clearRect(
       -(boundTextElement.width / 2 + BOUND_TEXT_PADDING) *
@@ -581,6 +593,7 @@ const drawElementFromCanvas = (
     ) {
       const textElement = getBoundTextElement(
         element,
+        allElementsMap,
       ) as ExcalidrawTextElementWithContainer;
       const coords = getContainerCoords(element);
       context.strokeStyle = "#c92a2a";
@@ -588,7 +601,7 @@ const drawElementFromCanvas = (
       context.strokeRect(
         (coords.x + appState.scrollX) * window.devicePixelRatio,
         (coords.y + appState.scrollY) * window.devicePixelRatio,
-        getBoundTextMaxWidth(element) * window.devicePixelRatio,
+        getBoundTextMaxWidth(element, textElement) * window.devicePixelRatio,
         getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
       );
     }
@@ -623,6 +636,8 @@ export const renderSelectionElement = (
 
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
+  allElementsMap: NonDeletedSceneElementsMap,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
@@ -694,6 +709,7 @@ export const renderElement = (
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
+          elementsMap,
           renderConfig,
           appState,
         );
@@ -702,6 +718,7 @@ export const renderElement = (
           context,
           renderConfig,
           appState,
+          allElementsMap,
         );
       }
 
@@ -727,7 +744,7 @@ export const renderElement = (
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
-          const container = getContainerElement(element);
+          const container = getContainerElement(element, elementsMap);
           if (isArrowElement(container)) {
             const boundTextCoords =
               LinearElementEditor.getBoundTextElementPosition(
@@ -744,7 +761,7 @@ export const renderElement = (
         if (shouldResetImageFilter(element, renderConfig, appState)) {
           context.filter = "none";
         }
-        const boundTextElement = getBoundTextElement(element);
+        const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
           const tempCanvas = document.createElement("canvas");
@@ -827,6 +844,7 @@ export const renderElement = (
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
+          elementsMap,
           renderConfig,
           appState,
         );
@@ -858,6 +876,7 @@ export const renderElement = (
           context,
           renderConfig,
           appState,
+          allElementsMap,
         );
 
         // reset
@@ -912,6 +931,7 @@ const maybeWrapNodesInFrameClipPath = (
 
 export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   files: BinaryFiles,
@@ -924,7 +944,7 @@ export const renderElementToSvg = (
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
   if (isTextElement(element)) {
-    const container = getContainerElement(element);
+    const container = getContainerElement(element, elementsMap);
     if (isArrowElement(container)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
 
@@ -1025,6 +1045,7 @@ export const renderElementToSvg = (
         createPlaceholderEmbeddableLabel(element);
       renderElementToSvg(
         label,
+        elementsMap,
         rsvg,
         root,
         files,
@@ -1101,7 +1122,7 @@ export const renderElementToSvg = (
     }
     case "line":
     case "arrow": {
-      const boundText = getBoundTextElement(element);
+      const boundText = getBoundTextElement(element, elementsMap);
       const maskPath = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
       if (boundText) {
         maskPath.setAttribute("id", `mask-${element.id}`);

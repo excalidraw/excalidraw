@@ -5,17 +5,12 @@ import { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { getContainerElement, wrapText } from "./textElement";
-import {
-  isFrameLikeElement,
-  isIframeElement,
-  isIframeLikeElement,
-} from "./typeChecks";
+import { wrapText } from "./textElement";
+import { isIframeElement } from "./typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawIframeLikeElement,
   IframeData,
-  NonDeletedExcalidrawElement,
 } from "./types";
 
 const embeddedLinkCache = new Map<string, IframeData>();
@@ -215,21 +210,6 @@ export const getEmbedLink = (
 
   embeddedLinkCache.set(link, { link, intrinsicSize: aspectRatio, type });
   return { link, intrinsicSize: aspectRatio, type };
-};
-
-export const isIframeLikeOrItsLabel = (
-  element: NonDeletedExcalidrawElement,
-): Boolean => {
-  if (isIframeLikeElement(element)) {
-    return true;
-  }
-  if (element.type === "text") {
-    const container = getContainerElement(element);
-    if (container && isFrameLikeElement(container)) {
-      return true;
-    }
-  }
-  return false;
 };
 
 export const createPlaceholderEmbeddableLabel = (
