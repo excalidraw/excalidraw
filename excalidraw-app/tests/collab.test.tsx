@@ -1,12 +1,15 @@
 import { vi } from "vitest";
+
+import ExcalidrawApp from "../App";
+
 import {
   render,
   updateSceneData,
   waitFor,
 } from "../../packages/excalidraw/tests/test-utils";
-import ExcalidrawApp from "../App";
 import { API } from "../../packages/excalidraw/tests/helpers/api";
 import { createUndoAction } from "../../packages/excalidraw/actions/actionHistory";
+
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {

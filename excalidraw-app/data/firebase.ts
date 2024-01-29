@@ -1,9 +1,10 @@
-import {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
-import { getSceneVersion } from "../../packages/excalidraw/element";
+import type { Socket } from "socket.io-client";
+
 import Portal from "../collab/Portal";
+import { reconcileElements } from "../collab/reconciliation";
+import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
+
+import { getSceneVersion } from "../../packages/excalidraw/element";
 import { restoreElements } from "../../packages/excalidraw/data/restore";
 import {
   AppState,
@@ -11,17 +12,20 @@ import {
   BinaryFileMetadata,
   DataURL,
 } from "../../packages/excalidraw/types";
-import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../packages/excalidraw/data/encode";
 import {
   encryptData,
   decryptData,
 } from "../../packages/excalidraw/data/encryption";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { ResolutionType } from "../../packages/excalidraw/utility-types";
-import type { Socket } from "socket.io-client";
+
+// local types
+import type {
+  ExcalidrawElement,
+  FileId,
+} from "../../packages/excalidraw/element/types";
+import type { ResolutionType } from "../../packages/excalidraw/utility-types";
 
 // private
 // -----------------------------------------------------------------------------

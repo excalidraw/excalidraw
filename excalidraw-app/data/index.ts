@@ -1,4 +1,13 @@
 import {
+  DELETED_ELEMENT_TIMEOUT,
+  FILE_UPLOAD_MAX_BYTES,
+  ROOM_ID_BYTES,
+  WS_SUBTYPES,
+} from "../app_constants";
+import { encodeFilesForUpload } from "./FileManager";
+import { saveFilesToFirebase } from "./firebase";
+
+import {
   compressData,
   decompressData,
 } from "../../packages/excalidraw/data/encode";
@@ -13,11 +22,12 @@ import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
+import { t } from "../../packages/excalidraw/i18n";
+import { bytesToHexString } from "../../packages/excalidraw/utils";
+import type {
   ExcalidrawElement,
   FileId,
 } from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
 import {
   AppState,
   BinaryFileData,
@@ -25,15 +35,6 @@ import {
   SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
-import { bytesToHexString } from "../../packages/excalidraw/utils";
-import {
-  DELETED_ELEMENT_TIMEOUT,
-  FILE_UPLOAD_MAX_BYTES,
-  ROOM_ID_BYTES,
-  WS_SUBTYPES,
-} from "../app_constants";
-import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";

@@ -11,22 +11,25 @@
  */
 
 import { createStore, entries, del, getMany, set, setMany } from "idb-keyval";
+
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
-import {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
-import {
-  AppState,
-  BinaryFileData,
-  BinaryFiles,
-} from "../../packages/excalidraw/types";
 import { debounce } from "../../packages/excalidraw/utils";
+
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
+
+import type {
+  ExcalidrawElement,
+  FileId,
+} from "../../packages/excalidraw/element/types";
+import type {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+} from "../../packages/excalidraw/types";
 
 const filesStore = createStore("files-db", "files-store");
 

@@ -1,6 +1,9 @@
-import polyfill from "../packages/excalidraw/polyfill";
-import LanguageDetector from "i18next-browser-languagedetector";
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import { atom, Provider, useAtom, useAtomValue } from "jotai";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+import polyfill from "../packages/excalidraw/polyfill";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
@@ -46,6 +49,7 @@ import {
   resolvablePromise,
   isRunningInIframe,
 } from "../packages/excalidraw/utils";
+
 import {
   FIREBASE_STORAGE_PREFIXES,
   STORAGE_KEYS,
@@ -85,7 +89,6 @@ import { isInitializedImageElement } from "../packages/excalidraw/element/typeCh
 import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
-import clsx from "clsx";
 import { reconcileElements } from "./collab/reconciliation";
 import {
   parseLibraryTokensFromUrl,
@@ -94,16 +97,16 @@ import {
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
-import { atom, Provider, useAtom, useAtomValue } from "jotai";
-import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { appJotaiStore } from "./app-jotai";
 
-import "./index.scss";
+import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { ResolutionType } from "../packages/excalidraw/utility-types";
 import { ShareableLinkDialog } from "../packages/excalidraw/components/ShareableLinkDialog";
 import { openConfirmModal } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
+
+import "./index.scss";
 
 polyfill();
 
