@@ -602,20 +602,6 @@ const pointRelativeToDivElement = (
   return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
 };
 
-// Returns point in absolute coordinates
-export const pointInAbsoluteCoords = (
-  element: ExcalidrawElement,
-  // Point relative to the element position
-  point: Point,
-): Point => {
-  const [x, y] = point;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const cx = (x2 - x1) / 2;
-  const cy = (y2 - y1) / 2;
-  const [rotatedX, rotatedY] = rotate(x, y, cx, cy, element.angle);
-  return [element.x + rotatedX, element.y + rotatedY];
-};
-
 const relativizationToElementCenter = (
   element: ExcalidrawElement,
 ): GA.Transform => {
