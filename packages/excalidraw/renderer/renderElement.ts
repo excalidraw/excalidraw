@@ -47,7 +47,6 @@ import {
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
-  DEFAULT_ADAPTIVE_RADIUS,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
@@ -352,7 +351,7 @@ const drawElementOnCanvas = (
             0,
             element.width,
             element.height,
-            DEFAULT_ADAPTIVE_RADIUS,
+            getCornerRadius(Math.min(element.width, element.height), element),
           );
           context.clip();
         }
@@ -1324,10 +1323,14 @@ export const renderElementToSvg = (
             SVG_NS,
             "rect",
           );
+          const radius = getCornerRadius(
+            Math.min(element.width, element.height),
+            element,
+          );
           clipRect.setAttribute("width", `${element.width}`);
           clipRect.setAttribute("height", `${element.height}`);
-          clipRect.setAttribute("rx", `${DEFAULT_ADAPTIVE_RADIUS}`);
-          clipRect.setAttribute("ry", `${DEFAULT_ADAPTIVE_RADIUS}`);
+          clipRect.setAttribute("rx", `${radius}`);
+          clipRect.setAttribute("ry", `${radius}`);
           clipPath.appendChild(clipRect);
           addToRoot(clipPath, element);
 
