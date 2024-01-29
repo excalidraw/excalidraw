@@ -139,8 +139,8 @@
     "eyeDropper": "Choisir la couleur depuis le canevas",
     "textToDiagram": "Texte vers diagramme",
     "prompt": "Demander",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Suivez-nous",
+    "discordChat": "Salon Discord"
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -520,7 +520,7 @@
   "mermaid": {
     "title": "De Mermaid à Excalidraw",
     "button": "Insérer",
-    "description": "",
+    "description": "Actuellement, seuls les diagrammes <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> et <classLink>de classe </classLink>sont pris en charge. Les autres types seront rendus en tant qu'image dans Excalidraw.",
     "syntax": "Syntaxe Mermaid",
     "preview": "Prévisualisation"
   },
