@@ -36,7 +36,6 @@ import {
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
-  getCollabServer,
   getSyncableElements,
   SocketUpdateDataSource,
   SyncableExcalidrawElement,
@@ -452,13 +451,9 @@ class Collab extends PureComponent<Props, CollabState> {
     this.fallbackInitializationHandler = fallbackInitializationHandler;
 
     try {
-      const socketServerData = await getCollabServer();
-
       this.portal.socket = this.portal.open(
-        socketIOClient(socketServerData.url, {
-          transports: socketServerData.polling
-            ? ["websocket", "polling"]
-            : ["websocket"],
+        socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
+          transports: ["websocket", "polling"],
         }),
         roomId,
         roomKey,
