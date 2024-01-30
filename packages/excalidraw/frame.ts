@@ -746,7 +746,7 @@ export const getFrameLikeTitle = (
   element: ExcalidrawFrameLikeElement,
   frameIdx: number,
 ) => {
-  // TODO name frames AI only is specific to AI frames
+  // TODO name frames "AI" only if specific to AI frames
   return element.name === null
     ? isFrameElement(element)
       ? `Frame ${frameIdx}`
