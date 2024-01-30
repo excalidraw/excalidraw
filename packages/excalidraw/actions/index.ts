@@ -14,16 +14,16 @@ export {
   actionChangeFillStyle,
   actionChangeSloppiness,
   actionChangeOpacity,
-  actionChangeFontSize,
   actionChangeFontFamily,
   actionChangeTextAlign,
   actionChangeVerticalAlign,
 } from "./actionProperties";
 
-export {
-  actionDecreaseFontSize,
-  actionIncreaseFontSize,
-} from "./actionFontSize";
+export { actionDecreaseFontSize } from "./actionDecreaseFontSize";
+
+export { actionIncreaseFontSize } from "./actionIncreaseFontSize";
+
+export { actionChangeFontSize } from "./actionChangeFontSize";
 
 export {
   actionChangeViewBackgroundColor,

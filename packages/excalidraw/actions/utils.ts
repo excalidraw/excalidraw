@@ -1,12 +1,11 @@
-import { newElementWith } from "..";
+import { mutateElement, newElementWith } from "..";
 import { isTextElement, redrawTextBoundingBox } from "../element";
+import { isBoundToContainer } from "../element/typeChecks";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { KEYS } from "../keys";
 import { AppClassProperties, AppState } from "../types";
 import { changeProperty } from "./actionProperties";
-import { register } from "./register";
 
-const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
+export const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
 const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
@@ -32,7 +31,7 @@ const offsetElementAfterFontResize = (
   );
 };
 
-const changeFontSize = (
+export const changeFontSize = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   app: AppClassProperties,
@@ -79,43 +78,3 @@ const changeFontSize = (
     commitToHistory: true,
   };
 };
-
-export const actionDecreaseFontSize = register({
-  name: "decreaseFontSize",
-  trackEvent: false,
-  perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(
-        // get previous value before relative increase (doesn't work fully
-        // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
-      ),
-    );
-  },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      // KEYS.COMMA needed for MacOS
-      (event.key === KEYS.CHEVRON_LEFT || event.key === KEYS.COMMA)
-    );
-  },
-});
-
-export const actionIncreaseFontSize = register({
-  name: "increaseFontSize",
-  trackEvent: false,
-  perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
-    );
-  },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      // KEYS.PERIOD needed for MacOS
-      (event.key === KEYS.CHEVRON_RIGHT || event.key === KEYS.PERIOD)
-    );
-  },
-});

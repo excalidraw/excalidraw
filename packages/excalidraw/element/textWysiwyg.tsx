@@ -36,14 +36,12 @@ import {
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
-import {
-  actionDecreaseFontSize,
-  actionIncreaseFontSize,
-} from "../actions/actionFontSize";
+import { actionDecreaseFontSize } from "../actions/actionDecreaseFontSize";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import { actionIncreaseFontSize } from "../actions";
 
 const getTransform = (
   width: number,
