@@ -951,6 +951,11 @@ export const file = createIcon(
   { width: 384, height: 512 },
 );
 
+export const alert = createIcon(
+  "M12 7h1v7h-1zm1.5 9.5a1 1 0 1 0-1 1 1.002 1.002 0 0 0 1-1zm9.3-4A10.3 10.3 0 1 1 12.5 2.2a10.297 10.297 0 0 1 10.3 10.3zm-1 0a9.3 9.3 0 1 0-9.3 9.3 9.31 9.31 0 0 0 9.3-9.3z",
+  { width: 24 },
+);
+
 // TODO barnabasmolnar/editor-redesign
 // couldn't find a new icon for this
 export const GroupIcon = React.memo(({ theme }: { theme: Theme }) =>

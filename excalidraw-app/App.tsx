@@ -57,6 +57,7 @@ import Collab, {
   collabDialogShownAtom,
   isCollaboratingAtom,
   isOfflineAtom,
+  maxSizeExceededAtom,
 } from "./collab/Collab";
 import {
   exportToBackend,
@@ -310,6 +311,7 @@ const ExcalidrawWrapper = () => {
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
+  const [maxSizeExceeded] = useAtom(maxSizeExceededAtom);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -774,7 +776,7 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter />
+        <AppFooter maxSizeExceeded={maxSizeExceeded} />
         <TTDDialog
           onTextSubmit={async (input) => {
             try {
