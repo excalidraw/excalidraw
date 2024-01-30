@@ -32,10 +32,6 @@ import {
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
-  FontSizeSmallIcon,
-  FontSizeMediumIcon,
-  FontSizeLargeIcon,
-  FontSizeExtraLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   FreedrawIcon,
@@ -52,7 +48,6 @@ import {
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
   STROKE_WIDTH,
@@ -63,16 +58,12 @@ import {
   isTextElement,
   redrawTextBoundingBox,
 } from "../element";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { newElementWith } from "../element/mutateElement";
 import {
   getBoundTextElement,
   getDefaultLineHeight,
 } from "../element/textElement";
-import {
-  isBoundToContainer,
-  isLinearElement,
-  isUsingAdaptiveRadius,
-} from "../element/typeChecks";
+import { isLinearElement, isUsingAdaptiveRadius } from "../element/typeChecks";
 import {
   Arrowhead,
   ExcalidrawElement,
