@@ -96,8 +96,6 @@ import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
-const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
-
 export const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -183,54 +181,6 @@ const offsetElementAfterFontResize = (
     },
     false,
   );
-};
-
-const changeFontSize = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  app: AppClassProperties,
-  getNewFontSize: (element: ExcalidrawTextElement) => number,
-  fallbackValue?: ExcalidrawTextElement["fontSize"],
-) => {
-  const newFontSizes = new Set<number>();
-
-  return {
-    elements: changeProperty(
-      elements,
-      appState,
-      (oldElement) => {
-        if (isTextElement(oldElement)) {
-          const newFontSize = getNewFontSize(oldElement);
-          newFontSizes.add(newFontSize);
-
-          let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
-            fontSize: newFontSize,
-          });
-          redrawTextBoundingBox(
-            newElement,
-            app.scene.getContainerElement(oldElement),
-          );
-
-          newElement = offsetElementAfterFontResize(oldElement, newElement);
-
-          return newElement;
-        }
-
-        return oldElement;
-      },
-      true,
-    ),
-    appState: {
-      ...appState,
-      // update state only if we've set all select text elements to
-      // the same font size
-      currentItemFontSize:
-        newFontSizes.size === 1
-          ? [...newFontSizes][0]
-          : fallbackValue ?? appState.currentItemFontSize,
-    },
-    commitToHistory: true,
-  };
 };
 
 // -----------------------------------------------------------------------------
@@ -668,46 +618,6 @@ export const actionChangeFontSize = register({
       />
     </fieldset>
   ),
-});
-
-export const actionDecreaseFontSize = register({
-  name: "decreaseFontSize",
-  trackEvent: false,
-  perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(
-        // get previous value before relative increase (doesn't work fully
-        // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
-      ),
-    );
-  },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      // KEYS.COMMA needed for MacOS
-      (event.key === KEYS.CHEVRON_LEFT || event.key === KEYS.COMMA)
-    );
-  },
-});
-
-export const actionIncreaseFontSize = register({
-  name: "increaseFontSize",
-  trackEvent: false,
-  perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
-    );
-  },
-  keyTest: (event) => {
-    return (
-      event[KEYS.CTRL_OR_CMD] &&
-      event.shiftKey &&
-      // KEYS.PERIOD needed for MacOS
-      (event.key === KEYS.CHEVRON_RIGHT || event.key === KEYS.PERIOD)
-    );
-  },
 });
 
 export const actionChangeFontFamily = register({

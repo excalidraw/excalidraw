@@ -21,6 +21,11 @@ export {
 } from "./actionProperties";
 
 export {
+  actionDecreaseFontSize,
+  actionIncreaseFontSize,
+} from "./actionFontSize";
+
+export {
   actionChangeViewBackgroundColor,
   actionClearCanvas,
   actionZoomIn,
