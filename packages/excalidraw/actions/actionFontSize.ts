@@ -1,9 +1,36 @@
+import { newElementWith } from "..";
+import { isTextElement, redrawTextBoundingBox } from "../element";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
 import { KEYS } from "../keys";
 import { AppClassProperties, AppState } from "../types";
+import { changeProperty } from "./actionProperties";
 import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
+
+const offsetElementAfterFontResize = (
+  prevElement: ExcalidrawTextElement,
+  nextElement: ExcalidrawTextElement,
+) => {
+  if (isBoundToContainer(nextElement)) {
+    return nextElement;
+  }
+  return mutateElement(
+    nextElement,
+    {
+      x:
+        prevElement.textAlign === "left"
+          ? prevElement.x
+          : prevElement.x +
+            (prevElement.width - nextElement.width) /
+              (prevElement.textAlign === "center" ? 2 : 1),
+      // centering vertically is non-standard, but for Excalidraw I think
+      // it makes sense
+      y: prevElement.y + (prevElement.height - nextElement.height) / 2,
+    },
+    false,
+  );
+};
 
 const changeFontSize = (
   elements: readonly ExcalidrawElement[],

@@ -1,4 +1,4 @@
-import { AppClassProperties, AppState, Primitive } from "../types";
+import { AppState, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -83,7 +83,6 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { getLanguage, t } from "../i18n";
-import { KEYS } from "../keys";
 import { randomInteger } from "../random";
 import {
   canHaveArrowheads,
@@ -157,30 +156,6 @@ export const getFormValue = function <T extends Primitive>(
   }
 
   return ret;
-};
-
-const offsetElementAfterFontResize = (
-  prevElement: ExcalidrawTextElement,
-  nextElement: ExcalidrawTextElement,
-) => {
-  if (isBoundToContainer(nextElement)) {
-    return nextElement;
-  }
-  return mutateElement(
-    nextElement,
-    {
-      x:
-        prevElement.textAlign === "left"
-          ? prevElement.x
-          : prevElement.x +
-            (prevElement.width - nextElement.width) /
-              (prevElement.textAlign === "center" ? 2 : 1),
-      // centering vertically is non-standard, but for Excalidraw I think
-      // it makes sense
-      y: prevElement.y + (prevElement.height - nextElement.height) / 2,
-    },
-    false,
-  );
 };
 
 // -----------------------------------------------------------------------------
