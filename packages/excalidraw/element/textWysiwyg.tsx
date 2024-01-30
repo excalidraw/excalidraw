@@ -39,7 +39,7 @@ import {
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
-} from "../actions/actionProperties";
+} from "../actions/actionFontSize";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
