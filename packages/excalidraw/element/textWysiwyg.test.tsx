@@ -17,7 +17,7 @@ import {
 } from "./types";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
-import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
+import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
 
 // Unmount ReactDOM from root

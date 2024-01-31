@@ -17,7 +17,6 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
-  ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
@@ -44,6 +43,10 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import {
+  originalContainerCache,
+  updateOriginalContainerCache,
+} from "./containerCache";
 
 const getTransform = (
   width: number,
@@ -64,38 +67,6 @@ const getTransform = (
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
-};
-
-const originalContainerCache: {
-  [id: ExcalidrawTextContainer["id"]]:
-    | {
-        height: ExcalidrawTextContainer["height"];
-      }
-    | undefined;
-} = {};
-
-export const updateOriginalContainerCache = (
-  id: ExcalidrawTextContainer["id"],
-  height: ExcalidrawTextContainer["height"],
-) => {
-  const data =
-    originalContainerCache[id] || (originalContainerCache[id] = { height });
-  data.height = height;
-  return data;
-};
-
-export const resetOriginalContainerCache = (
-  id: ExcalidrawTextContainer["id"],
-) => {
-  if (originalContainerCache[id]) {
-    delete originalContainerCache[id];
-  }
-};
-
-export const getOriginalContainerHeightFromCache = (
-  id: ExcalidrawTextContainer["id"],
-) => {
-  return originalContainerCache[id]?.height ?? null;
 };
 
 export const textWysiwyg = ({
