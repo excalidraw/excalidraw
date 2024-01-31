@@ -9,7 +9,7 @@ import { rotate } from "../math";
 import { InteractiveCanvasAppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
-import { DEFAULT_SPACING } from "../renderer/renderScene";
+import { DEFAULT_SPACING } from "../constants";
 
 export type TransformHandleDirection =
   | "n"

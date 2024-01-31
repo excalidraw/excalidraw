@@ -64,7 +64,7 @@ import {
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
 import { UserIdleState } from "../types";
-import { FRAME_STYLE, THEME_FILTER } from "../constants";
+import { DEFAULT_SPACING, FRAME_STYLE, THEME_FILTER } from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
@@ -82,8 +82,6 @@ import {
   getTargetFrame,
   isElementInFrame,
 } from "../frame";
-
-export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
