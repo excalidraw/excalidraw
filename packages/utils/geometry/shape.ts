@@ -9,6 +9,7 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
@@ -114,7 +115,10 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 };
 
 // linear
-export const getCurveShape = (roughShape: Drawable) => {
+export const getCurveShape = (
+  roughShape: Drawable,
+  startingPoint: Point = [0, 0],
+) => {
   const ops = getCurvePathOps(roughShape);
   const polycurves: Polycurve = [];
   let p0: Point = [0, 0];
@@ -132,5 +136,11 @@ export const getCurveShape = (roughShape: Drawable) => {
     }
   }
 
-  return polycurves;
+  return polycurves.map(
+    (curve) =>
+      curve.map((p) => [
+        p[0] + startingPoint[0],
+        p[1] + startingPoint[1],
+      ]) as Curve,
+  );
 };

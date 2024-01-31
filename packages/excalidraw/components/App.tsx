@@ -206,6 +206,7 @@ import {
 } from "../keys";
 import { isElementInViewport } from "../element/sizeHelpers";
 import {
+  centerPoint,
   distance2d,
   getCornerRadius,
   getGridPoint,
@@ -4364,7 +4365,7 @@ class App extends React.Component<AppProps, AppState> {
 
         return {
           type: "polycurve",
-          data: getCurveShape(roughShape),
+          data: getCurveShape(roughShape, [element.x, element.y]),
         };
       }
 
@@ -4380,7 +4381,9 @@ class App extends React.Component<AppProps, AppState> {
           ShapeCache.generateElementShape(element, null);
         return {
           type: "polycurve",
-          data: roughShape ? getCurveShape(roughShape) : [],
+          data: roughShape
+            ? getCurveShape(roughShape, [element.x, element.y])
+            : [],
         };
       }
     }
