@@ -1,8 +1,5 @@
+import { Ellipse, Point, Polygon, Shape } from "./geometry/shape";
 import {
-  Ellipse,
-  Point,
-  Polygon,
-  Shape,
   pointInEllipse,
   pointInPolygon,
   pointOnCurve,
@@ -11,7 +8,7 @@ import {
   pointOnPolycurve,
   pointOnPolygon,
   pointOnPolylines,
-} from "./geometry";
+} from "./geometry/geometry";
 
 // check if the given point is considered on the given shape's border
 export const isPointOnShape = (point: Point, shape: Shape, tolerance = 0) => {

@@ -119,6 +119,7 @@ import {
   transformElements,
   updateTextElement,
   redrawTextBoundingBox,
+  getElementBounds,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -209,6 +210,7 @@ import {
   getCornerRadius,
   getGridPoint,
   isPathALoop,
+  isPointWithinBounds,
 } from "../math";
 import {
   calculateScrollCenter,
@@ -224,6 +226,13 @@ import Scene from "../scene/Scene";
 import { RenderInteractiveSceneCallback, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
+import {
+  Shape,
+  getCurveShape,
+  getEllipseShape,
+  getPolygonShape,
+} from "../../utils/geometry/shape";
+import { isPointOnShape, isPointInShape } from "../../utils/collision";
 import {
   AppClassProperties,
   AppProps,
@@ -407,6 +416,8 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
+import { Drawable } from "roughjs/bin/core";
+import { pointsOnBezierCurves } from "points-on-curve";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -4294,6 +4305,14 @@ class App extends React.Component<AppProps, AppState> {
       opts?.includeBoundTextElement,
       opts?.includeLockedElements,
     );
+
+    const _allHitElements = this._getElementsAtPosition(
+      x,
+      y,
+      opts?.includeBoundTextElement,
+      opts?.includeLockedElements,
+    );
+
     if (allHitElements.length > 1) {
       if (opts?.preferSelected) {
         for (let index = allHitElements.length - 1; index > -1; index--) {
@@ -4320,6 +4339,171 @@ class App extends React.Component<AppProps, AppState> {
       return allHitElements[0];
     }
     return null;
+  }
+
+  private getElementShape(element: ExcalidrawElement): Shape {
+    switch (element.type) {
+      case "rectangle":
+      case "diamond":
+      case "frame":
+      case "magicframe":
+      case "embeddable":
+      case "image":
+      case "iframe":
+      case "text":
+      case "selection":
+        return {
+          type: "polygon",
+          data: getPolygonShape(element),
+        };
+      case "arrow":
+      case "line": {
+        const roughShape =
+          ShapeCache.get(element)?.[0] ??
+          ShapeCache.generateElementShape(element, null)[0];
+
+        return {
+          type: "polycurve",
+          data: getCurveShape(roughShape),
+        };
+      }
+
+      case "ellipse":
+        return {
+          type: "ellipse",
+          data: getEllipseShape(element),
+        };
+
+      case "freedraw": {
+        const roughShape =
+          ShapeCache.get(element) ??
+          ShapeCache.generateElementShape(element, null);
+        return {
+          type: "polycurve",
+          data: roughShape ? getCurveShape(roughShape) : [],
+        };
+      }
+    }
+  }
+
+  private shouldTestInside(element: ExcalidrawElement) {
+    if (element.type === "arrow") {
+      return false;
+    }
+
+    const isDraggableFromInside =
+      !isTransparent(element.backgroundColor) ||
+      hasBoundTextElement(element) ||
+      isIframeLikeElement(element);
+
+    if (element.type === "line") {
+      return isDraggableFromInside && isPathALoop(element.points);
+    }
+
+    if (element.type === "freedraw") {
+      return isDraggableFromInside && isPathALoop(element.points);
+    }
+
+    return isDraggableFromInside || isImageElement(element);
+  }
+
+  private _getElementAtPosition(
+    x: number,
+    y: number,
+    opts?: {
+      preferSelected?: boolean;
+      includeBoundTextElement?: boolean;
+      includeLockedElements?: boolean;
+    },
+  ): NonDeleted<ExcalidrawElement> | null {
+    const allHitElements = this._getElementsAtPosition(
+      x,
+      y,
+      opts?.includeBoundTextElement,
+      opts?.includeLockedElements,
+    );
+
+    if (allHitElements.length > 1) {
+      if (opts?.preferSelected) {
+        for (let index = allHitElements.length - 1; index > -1; index--) {
+          if (this.state.selectedElementIds[allHitElements[index].id]) {
+            return allHitElements[index];
+          }
+        }
+      }
+      const elementWithHighestZIndex =
+        allHitElements[allHitElements.length - 1];
+      // If we're hitting element with highest z-index only on its bounding box
+      // while also hitting other element figure, the latter should be considered.
+      return isPointInShape(
+        [x, y],
+        this.getElementShape(elementWithHighestZIndex),
+      )
+        ? elementWithHighestZIndex
+        : allHitElements[allHitElements.length - 2];
+    }
+    if (allHitElements.length === 1) {
+      return allHitElements[0];
+    }
+
+    return null;
+  }
+
+  private _getElementsAtPosition(
+    x: number,
+    y: number,
+    includeBoundTextElement: boolean = false,
+    includeLockedElements: boolean = false,
+  ): NonDeleted<ExcalidrawElement>[] {
+    const tolerance = 10 / this.state.zoom.value;
+
+    const elements = (
+      includeBoundTextElement && includeLockedElements
+        ? this.scene.getNonDeletedElements()
+        : this.scene
+            .getNonDeletedElements()
+            .filter(
+              (element) =>
+                (includeLockedElements || !element.locked) &&
+                (includeBoundTextElement ||
+                  !(isTextElement(element) && element.containerId)),
+            )
+    )
+      .filter((el) => {
+        let hit = false;
+
+        // if the element is selected
+        if (
+          this.state.selectedElementIds[el.id] &&
+          shouldShowBoundingBox([el], this.state)
+        ) {
+          const [x1, y1, x2, y2] = getElementBounds(el);
+
+          hit = isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
+        } else {
+          const shape = this.getElementShape(el);
+          hit = this.shouldTestInside(el)
+            ? isPointInShape([x, y], shape)
+            : isPointOnShape([x, y], shape, tolerance);
+        }
+
+        if (hit) {
+          console.log(hit, el.type);
+        }
+
+        return hit;
+      })
+      .filter((element) => {
+        // hitting a frame's element from outside the frame is not considered a hit
+        const containingFrame = getContainingFrame(element);
+        return containingFrame &&
+          this.state.frameRendering.enabled &&
+          this.state.frameRendering.clip
+          ? isCursorInFrame({ x, y }, containingFrame)
+          : true;
+      }) as NonDeleted<ExcalidrawElement>[];
+
+    return elements;
   }
 
   private getElementsAtPosition(

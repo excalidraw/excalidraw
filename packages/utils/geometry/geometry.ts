@@ -1,51 +1,13 @@
 import {
-  ExcalidrawDiamondElement,
-  ExcalidrawEmbeddableElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawImageElement,
-  ExcalidrawRectangleElement,
-} from "../excalidraw/element/types";
-
-export type Point = [number, number];
-export type Vector = Point;
-export type Line = [Point, Point];
-export type Polyline = Line[];
-// cubic bezier curve with four control points
-export type Curve = [Point, Point, Point, Point];
-export type Polycurve = Curve[];
-export type Polygon = Point[];
-export type Ellipse = {
-  center: Point;
-  angle: number;
-  majorAxis: number;
-  minorAxis: number;
-};
-export type Bounds = [Point, Point];
-export type Shape =
-  | {
-      type: "line";
-      data: Line;
-    }
-  | {
-      type: "polygon";
-      data: Polygon;
-    }
-  | {
-      type: "curve";
-      data: Curve;
-    }
-  | {
-      type: "ellipse";
-      data: Ellipse;
-    }
-  | {
-      type: "polyline";
-      data: Polyline;
-    }
-  | {
-      type: "polycurve";
-      data: Polycurve;
-    };
+  Point,
+  Vector as TVector,
+  Line,
+  Polygon,
+  Curve,
+  Ellipse,
+  Polycurve,
+  Polyline,
+} from "./shape";
 
 /**
  * utils
@@ -352,8 +314,6 @@ export const cubicBezierDistance = (point: Point, controlPoints: Curve) => {
   // Calculate the closest point on the Bezier curve to the given point
   const t = findClosestParameter(point, controlPoints);
 
-  console.log(t, point, controlPoints);
-
   // Calculate the coordinates of the closest point on the curve
   const [closestX, closestY] = cubicBezierPoint(t, controlPoints);
 
@@ -399,7 +359,7 @@ export const polygonBounds = (polygon: Polygon) => {
   return [
     [xMin, yMin],
     [xMax, yMax],
-  ] as Bounds;
+  ] as [Point, Point];
 };
 
 export const polygonCentroid = (vertices: Point[]) => {
@@ -600,18 +560,45 @@ export const pointRightofLine = (point: Point, line: Line) => {
   return cross(point, t[1], t[0]) > 0;
 };
 
-// tests if the given point is colinear with the given line
-export const pointWithLine = (point: Point, line: Line, tolerance = 0) => {
-  return Math.abs(cross(point, line[0], line[1])) <= tolerance;
+export const distanceToSegment = (point: Point, line: Line) => {
+  const [x, y] = point;
+  const [[x1, y1], [x2, y2]] = line;
+
+  const A = x - x1;
+  const B = y - y1;
+  const C = x2 - x1;
+  const D = y2 - y1;
+
+  const dot = A * C + B * D;
+  const len_sq = C * C + D * D;
+  let param = -1;
+  if (len_sq !== 0) {
+    param = dot / len_sq;
+  }
+
+  let xx;
+  let yy;
+
+  if (param < 0) {
+    xx = x1;
+    yy = y1;
+  } else if (param > 1) {
+    xx = x2;
+    yy = y2;
+  } else {
+    xx = x1 + param * C;
+    yy = y1 + param * D;
+  }
+
+  var dx = x - xx;
+  var dy = y - yy;
+  return Math.sqrt(dx * dx + dy * dy);
 };
 
 export const pointOnLine = (point: Point, line: Line, tolerance = 0) => {
-  const l = lineLength(line);
-  return (
-    pointWithLine(point, line, tolerance) &&
-    lineLength([line[0], point]) <= l &&
-    lineLength([line[1], point]) <= l
-  );
+  const distance = distanceToSegment(point, line);
+
+  return distance <= tolerance;
 };
 
 export const pointOnPolylines = (
@@ -859,40 +846,3 @@ export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
 };
 
 export const lineIntersectsEllipse = () => {};
-
-/**
- * editor related geometry
- */
-
-type RectangularElement =
-  | ExcalidrawRectangleElement
-  | ExcalidrawDiamondElement
-  | ExcalidrawFrameLikeElement
-  | ExcalidrawEmbeddableElement
-  | ExcalidrawImageElement;
-
-export const getPolygonFromRectangularElement = (
-  element: RectangularElement,
-) => {
-  const { angle, width, height, x, y } = element;
-  const angleInDegrees = angleToDegrees(angle);
-
-  if (element.type === "diamond") {
-    const cx = x + width / 2;
-    const cy = y + height / 2;
-
-    return [
-      pointRotate([cx, y], angleInDegrees),
-      pointRotate([x + width, cy], angleInDegrees),
-      pointRotate([cx, y + height], angleInDegrees),
-      pointRotate([x, cy], angleInDegrees),
-    ] as Polygon;
-  } else {
-    return [
-      pointRotate([x, y], angleInDegrees),
-      pointRotate([x + width, y], angleInDegrees),
-      pointRotate([x + width, y + height], angleInDegrees),
-      pointRotate([x, y + height], angleInDegrees),
-    ] as Polygon;
-  }
-};
