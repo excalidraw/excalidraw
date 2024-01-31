@@ -93,10 +93,6 @@ export const pointAdd = (pointA: Point, pointB: Point) => {
   return [pointA[0] + pointB[0], pointA[1] + pointB[1]];
 };
 
-export const pointDistanceToLine = (pointA: Point, line: Line) => {
-  // TODO: implement this
-};
-
 /**
  * lines
  */
@@ -536,12 +532,6 @@ export const ellipseExtremes = (ellipse: Ellipse) => {
   ];
 };
 
-// TODO: implement the following
-// rotate
-// scaleX
-// scaleY
-// translate
-
 /**
  * relationships
  */
@@ -844,5 +834,3 @@ export const pointOnEllipse = (point: Point, ellipse: Ellipse) => {
 export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
   return ellipsePointCheck(point, ellipse) < 1;
 };
-
-export const lineIntersectsEllipse = () => {};
