@@ -116,7 +116,6 @@ import {
   newLinearElement,
   newTextElement,
   newImageElement,
-  textWysiwyg,
   transformElements,
   updateTextElement,
   redrawTextBoundingBox,
@@ -419,6 +418,7 @@ import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import { isExcaliBrainView } from "../obsidianUtils";
+import { textWysiwyg } from "../element/textWysiwyg";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1354,10 +1354,7 @@ class App extends React.Component<AppProps, AppState> {
       const FRAME_NAME_EDIT_PADDING = 6;
 
       const reset = () => {
-        if (f.name?.trim() === "") {
-          mutateElement(f, { name: null });
-        }
-
+        mutateElement(f, { name: f.name?.trim() || null });
         this.setState({ editingFrame: null });
       };
 
@@ -1380,6 +1377,7 @@ class App extends React.Component<AppProps, AppState> {
                 name: e.target.value,
               });
             }}
+            onFocus={(e) => e.target.select()}
             onBlur={() => reset()}
             onKeyDown={(event) => {
               // for some inexplicable reason, `onBlur` triggered on ESC

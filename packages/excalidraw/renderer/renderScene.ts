@@ -64,7 +64,11 @@ import {
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
 import { UserIdleState } from "../types";
-import { FRAME_STYLE, THEME_FILTER } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  FRAME_STYLE,
+  THEME_FILTER,
+} from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
@@ -82,8 +86,6 @@ import {
   getTargetFrame,
   isElementInFrame,
 } from "../frame";
-
-export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -677,7 +679,8 @@ const _renderInteractiveScene = ({
         );
       }
     } else if (selectedElements.length > 1 && !appState.isRotating) {
-      const dashedLinePadding = (DEFAULT_SPACING * 2) / appState.zoom.value;
+      const dashedLinePadding =
+        (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;
       const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
       const initialLineDash = context.getLineDash();
@@ -1193,7 +1196,7 @@ const renderSelectionBorder = (
     cy: number;
     activeEmbeddable: boolean;
   },
-  padding = DEFAULT_SPACING * 2,
+  padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2,
 ) => {
   const {
     angle,

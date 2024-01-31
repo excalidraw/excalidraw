@@ -31,12 +31,12 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from ".";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
+import { hostPlugin } from "../components/App";
+import { ExtractSetType } from "../utility-types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "./textWysiwyg";
-import { ExtractSetType } from "../utility-types";
-import { hostPlugin } from "../components/App";
+} from "./containerCache";
 
 export const normalizeText = (text: string) => {
   return (
