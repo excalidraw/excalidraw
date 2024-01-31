@@ -17,7 +17,7 @@ import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "../element/textWysiwyg";
+} from "../element/containerCache";
 import {
   hasBoundTextElement,
   isTextBindableContainer,
