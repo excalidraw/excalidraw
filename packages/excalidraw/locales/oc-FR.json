@@ -11,8 +11,8 @@
     "copyAsPng": "Copiar al quichapapièrs coma PNG",
     "copyAsSvg": "Copiar al quichapapièrs coma SVG",
     "copyText": "Copiar al quichapapièrs coma tèxt",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiar la font al quichapapièrs",
+    "convertToCode": "Convertir lo còdi",
     "bringForward": "En avant",
     "sendToBack": "En arrièr",
     "bringToFront": "A l’endavant",
@@ -38,12 +38,12 @@
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Sageta",
     "arrowhead_bar": "Barra",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
-    "arrowhead_triangle": "",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_circle": "Cèrcle",
+    "arrowhead_circle_outline": "Cèrcle (contorn)",
+    "arrowhead_triangle": "Triangle",
+    "arrowhead_triangle_outline": "Triangle (contirn)",
+    "arrowhead_diamond": "Lausange",
+    "arrowhead_diamond_outline": "Lausange (contorn)",
     "fontSize": "Talha polissa",
     "fontFamily": "Familha de polissa",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
@@ -56,7 +56,7 @@
     "veryLarge": "Gradassa",
     "solid": "Solide",
     "hachure": "Raia",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Raia crosada",
     "thin": "Fin",
     "bold": "Espés",
@@ -83,7 +83,7 @@
     "madeWithExcalidraw": "Fabricat amb Excalidraw",
     "group": "Gropar la seleccion",
     "ungroup": "Desunir la seleccion",
-    "collaborators": "",
+    "collaborators": "Collaborators",
     "showGrid": "Afichar la gresilha",
     "addToLibrary": "Apondre a la bibliotèca",
     "removeFromLibrary": "Suprimir de la bibliotèca",
@@ -112,15 +112,15 @@
     "increaseFontSize": "Aumentar talha polissa",
     "unbindText": "Dessociar lo tèxte",
     "bindText": "Ligar lo tèxt al contenidor",
-    "createContainerFromText": "",
+    "createContainerFromText": "Envelopar lo tèxte dins un contenedor",
     "link": {
       "edit": "Modificar lo ligam",
-      "editEmbed": "",
+      "editEmbed": "Modificar lo ligam e l’integracion",
       "create": "Crear un ligam",
-      "createEmbed": "",
+      "createEmbed": "Crear un ligam e son integracion",
       "label": "Ligam",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Ligam e integracion",
+      "empty": "Cap de ligam pas definit"
     },
     "lineEditor": {
       "edit": "Modificar la linha",
@@ -134,13 +134,13 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Gardar la barra laterala dobèrta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": "",
-    "textToDiagram": "",
-    "prompt": "",
-    "followUs": "",
-    "discordChat": ""
+    "selectAllElementsInFrame": "Seleccionar totes los elements del quadre",
+    "removeAllElementsFromFrame": "Tirar totes los elements d’al quadre",
+    "eyeDropper": "Prendre la color a partir d’un canabàs",
+    "textToDiagram": "Tèxte pel diagram",
+    "prompt": "Fenèstra de dialòg",
+    "followUs": "Seguissètz-nos",
+    "discordChat": "Chat Discord"
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -174,16 +174,16 @@
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
     "zenMode": "Mòde escur",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Ancorar als objèctes",
     "exitZenMode": "Sortir del mòde zen",
     "cancel": "Anullar",
     "clear": "Escafar",
     "remove": "Tirar",
-    "embed": "",
+    "embed": "Alternar l’integracion",
     "publishLibrary": "Publicar",
     "submit": "Enviar",
     "confirm": "Confirmar",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Clicar per interagir"
   },
   "alerts": {
     "clearReset": "Aquò suprimirà lo canabàs complèt. O volètz vertadièrament ?",
@@ -213,7 +213,7 @@
     "imageInsertError": "Insercion d’imatge impossibla. Tornatz ensajar mai tard...",
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Fracàs de la recuperacion de l’imatge.",
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
@@ -232,13 +232,13 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Empegatge impossible.",
+    "copyToSystemClipboardFailed": "Còpia impossibla al quichapapièrs."
   },
   "toolBar": {
     "selection": "Seleccion",
     "image": "Inserir imatge",
-    "rectangle": "",
+    "rectangle": "Rectangle",
     "diamond": "Lausange",
     "ellipse": "Ellipsa",
     "arrow": "Sageta",
@@ -250,14 +250,14 @@
     "penMode": "Mòde estilo - empachar lo contact",
     "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
     "eraser": "Goma",
-    "frame": "",
+    "frame": "Esplech quadre",
     "magicframe": "",
     "embeddable": "",
-    "laser": "",
+    "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "extraTools": "Mai d’aisinas",
+    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
+    "magicSettings": "Paramètres IA"
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -458,13 +458,13 @@
     "grape": "",
     "violet": "",
     "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "blue": "Blau",
+    "cyan": "Cian",
+    "teal": "Sarcèla",
+    "green": "Verd",
+    "yellow": "Jaune",
+    "orange": "Irange",
+    "bronze": "Bronze"
   },
   "welcomeScreen": {
     "app": {
@@ -480,58 +480,58 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "mostUsedCustomColors": "Colors personalizadas mai utilizadas",
+    "colors": "Colors",
+    "shades": "Nuanças",
+    "hexCode": "Còdi exadecimal",
+    "noShades": "Cap de nuança pas disponibla per aquesta color"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Exportar coma imatge",
+        "button": "Exportar coma imatge",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Salvar al disc",
+        "button": "Salvar al disc",
+        "description": "Exportar las donadas de la scèna cap a un fichièr que podètz importar mai tard."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportar dins Excalidraw+",
+        "description": "Enregistrar la scèna dins vòstre espaci de trabalh Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Cargar d’un fichièr",
+        "button": "Cargar d’un fichièr",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
+        "title": "Cargar d’un ligam",
+        "button": "Remplaçar mon contengut",
         "description": ""
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "De Mermaid cap a Excalidraw",
+    "button": "Inserir",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Sintaxi Mermaid",
+    "preview": "Apercebut"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Recèrca rapida",
+      "empty": "Cap d’utilizaire pas trobat"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Clicar l’utilizaire per lo seguir",
+      "followStatus": "Seguissètz actualament aqueste utilizaire"
     }
   }
 }
