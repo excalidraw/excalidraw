@@ -9,12 +9,10 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
-  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "../../excalidraw/element/types";
-import { Bounds } from "../../excalidraw/element/bounds";
 import { angleToDegrees, pointRotate } from "./geometry";
 import { Drawable, Op } from "roughjs/bin/core";
 
@@ -118,29 +116,32 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 export const getCurveShape = (
   roughShape: Drawable,
   startingPoint: Point = [0, 0],
+  angleInRadian: number,
+  center: Point,
 ) => {
+  const transform = (p: Point) =>
+    pointRotate(
+      [p[0] + startingPoint[0], p[1] + startingPoint[1]],
+      angleToDegrees(angleInRadian),
+      center,
+    );
+
   const ops = getCurvePathOps(roughShape);
   const polycurves: Polycurve = [];
   let p0: Point = [0, 0];
 
   for (const op of ops) {
     if (op.op === "move") {
-      p0 = op.data as Point;
+      p0 = transform(op.data as Point);
     }
     if (op.op === "bcurveTo") {
-      const p1: Point = [op.data[0], op.data[1]];
-      const p2: Point = [op.data[2], op.data[3]];
-      const p3: Point = [op.data[4], op.data[5]];
+      const p1: Point = transform([op.data[0], op.data[1]]);
+      const p2: Point = transform([op.data[2], op.data[3]]);
+      const p3: Point = transform([op.data[4], op.data[5]]);
       polycurves.push([p0, p1, p2, p3]);
       p0 = p3;
     }
   }
 
-  return polycurves.map(
-    (curve) =>
-      curve.map((p) => [
-        p[0] + startingPoint[0],
-        p[1] + startingPoint[1],
-      ]) as Curve,
-  );
+  return polycurves;
 };

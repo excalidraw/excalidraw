@@ -1,6 +1,5 @@
 import {
   Point,
-  Vector as TVector,
   Line,
   Polygon,
   Curve,
@@ -52,7 +51,7 @@ export const angleReflect = (incidenceAngle: number, surfaceAngle: number) => {
  * points
  */
 
-const rotate = (point: Point, angle: number) => {
+const rotate = (point: Point, angle: number): Point => {
   return [
     point[0] * Math.cos(angle) - point[1] * Math.sin(angle),
     point[0] * Math.sin(angle) + point[1] * Math.cos(angle),
@@ -64,7 +63,11 @@ const isOrigin = (point: Point) => {
 };
 
 // rotate a given point about a given origin at the given angle
-export const pointRotate = (point: Point, angle: number, origin?: Point) => {
+export const pointRotate = (
+  point: Point,
+  angle: number,
+  origin?: Point,
+): Point => {
   const r = angleToRadians(angle);
 
   if (!origin || isOrigin(origin)) {
@@ -72,7 +75,7 @@ export const pointRotate = (point: Point, angle: number, origin?: Point) => {
   } else {
     return rotate(point.map((c, i) => c - origin[i]) as Point, r).map(
       (c, i) => c + origin[i],
-    );
+    ) as Point;
   }
 };
 

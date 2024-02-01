@@ -120,6 +120,7 @@ import {
   updateTextElement,
   redrawTextBoundingBox,
   getElementBounds,
+  getElementAbsoluteCoords,
 } from "../element";
 import {
   bindOrUnbindLinearElement,
@@ -4362,10 +4363,16 @@ class App extends React.Component<AppProps, AppState> {
         const roughShape =
           ShapeCache.get(element)?.[0] ??
           ShapeCache.generateElementShape(element, null)[0];
+        const [, , , , cx, cy] = getElementAbsoluteCoords(element);
 
         return {
           type: "polycurve",
-          data: getCurveShape(roughShape, [element.x, element.y]),
+          data: getCurveShape(
+            roughShape,
+            [element.x, element.y],
+            element.angle,
+            [cx, cy],
+          ),
         };
       }
 
@@ -4379,10 +4386,14 @@ class App extends React.Component<AppProps, AppState> {
         const roughShape =
           ShapeCache.get(element) ??
           ShapeCache.generateElementShape(element, null);
+        const [, , , , cx, cy] = getElementAbsoluteCoords(element);
         return {
           type: "polycurve",
           data: roughShape
-            ? getCurveShape(roughShape, [element.x, element.y])
+            ? getCurveShape(roughShape, [element.x, element.y], element.angle, [
+                cx,
+                cy,
+              ])
             : [],
         };
       }
@@ -4475,13 +4486,11 @@ class App extends React.Component<AppProps, AppState> {
       .filter((el) => {
         let hit = false;
 
-        // if the element is selected
         if (
           this.state.selectedElementIds[el.id] &&
           shouldShowBoundingBox([el], this.state)
         ) {
           const [x1, y1, x2, y2] = getElementBounds(el);
-
           hit = isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
         } else {
           const shape = this.getElementShape(el);
