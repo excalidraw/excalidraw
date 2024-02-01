@@ -7564,6 +7564,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ pendingImageElementId: null });
       }
 
+      this.props?.onPointerUp?.(activeTool, pointerDownState);
       this.onPointerUpEmitter.trigger(
         this.state.activeTool,
         pointerDownState,

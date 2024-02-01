@@ -456,6 +456,10 @@ export interface ExcalidrawProps {
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
   ) => void;
+  onPointerUp?: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+  ) => void;
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
