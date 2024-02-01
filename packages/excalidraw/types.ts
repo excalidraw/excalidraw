@@ -32,7 +32,7 @@ import type { throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
-import { isOverScrollBars } from "./scene";
+import { isOverScrollBars } from "./scene/scrollbars";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
@@ -499,6 +499,10 @@ export interface ExcalidrawProps {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => void; //zsviczian
   onPointerDown?: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+  ) => void;
+  onPointerUp?: (
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
   ) => void;

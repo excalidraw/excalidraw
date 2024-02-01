@@ -51,6 +51,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkHover, //zsviczian
     onViewModeChange, //zsviczian
     onPointerDown,
+    onPointerUp,
     onScrollChange,
     children,
     validateEmbeddable,
@@ -150,6 +151,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkHover={onLinkHover} //zsviczian
           onViewModeChange={onViewModeChange} //zsviczian
           onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
