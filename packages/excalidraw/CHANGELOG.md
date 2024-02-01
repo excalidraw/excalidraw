@@ -21,7 +21,7 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking Changes
 
-- - Remove `ExcalidrawEmbeddableElement.validated` attribute. [#7539](https://github.com/excalidraw/excalidraw/pull/7539). `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
+- `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
 - Create an `ESM` build for `@excalidraw/excalidraw`. The API is in progress and subject to change before stable release. There are some changes on how the package will be consumed
 
