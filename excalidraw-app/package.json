@@ -34,6 +34,7 @@
     "build": "yarn build:app && yarn build:version",
     "install:deps": "yarn install --frozen-lockfile && yarn --cwd ../",
     "start": "yarn && vite",
+    "start:docker": "yarn && vite --config vite-docker.config.mts",
     "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "build:preview": "yarn build && vite preview --port 5000"
   }
