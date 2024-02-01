@@ -1,6 +1,5 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
-import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
@@ -107,8 +106,8 @@ export const getEmbedLink = (
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
-    const warning = !/^\d+$/.test(target)
-      ? t("toast.unrecognizedLinkFormat")
+    const error = !/^\d+$/.test(target)
+      ? new URIError("Invalid embed link format")
       : undefined;
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
@@ -120,7 +119,7 @@ export const getEmbedLink = (
       intrinsicSize: aspectRatio,
       type,
     });
-    return { link, intrinsicSize: aspectRatio, type, warning };
+    return { link, intrinsicSize: aspectRatio, type, error };
   }
 
   const figmaLink = link.match(RE_FIGMA);
