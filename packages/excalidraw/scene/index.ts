@@ -1,4 +1,3 @@
-export { isOverScrollBars } from "./scrollbars";
 export {
   isSomeElementSelected,
   getElementsWithinSelection,
