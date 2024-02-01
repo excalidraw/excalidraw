@@ -13,8 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
+- Add `onPointerUp` prop [#7638](https://github.com/excalidraw/excalidraw/pull/7638).
+
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
-- Remove `ExcalidrawEmbeddableElement.validated` attribute. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
 ### Breaking Changes
 
