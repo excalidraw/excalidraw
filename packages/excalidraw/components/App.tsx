@@ -232,6 +232,7 @@ import {
   Shape,
   getCurveShape,
   getEllipseShape,
+  getFreedrawShape,
   getPolygonShape,
 } from "../../utils/geometry/shape";
 import { isPointOnShape, isPointInShape } from "../../utils/collision";
@@ -4354,10 +4355,7 @@ class App extends React.Component<AppProps, AppState> {
       case "iframe":
       case "text":
       case "selection":
-        return {
-          type: "polygon",
-          data: getPolygonShape(element),
-        };
+        return getPolygonShape(element);
       case "arrow":
       case "line": {
         const roughShape =
@@ -4365,37 +4363,24 @@ class App extends React.Component<AppProps, AppState> {
           ShapeCache.generateElementShape(element, null)[0];
         const [, , , , cx, cy] = getElementAbsoluteCoords(element);
 
-        return {
-          type: "polycurve",
-          data: getCurveShape(
-            roughShape,
-            [element.x, element.y],
-            element.angle,
-            [cx, cy],
-          ),
-        };
+        return getCurveShape(
+          roughShape,
+          [element.x, element.y],
+          element.angle,
+          [cx, cy],
+        );
       }
 
       case "ellipse":
-        return {
-          type: "ellipse",
-          data: getEllipseShape(element),
-        };
+        return getEllipseShape(element);
 
       case "freedraw": {
-        const roughShape =
-          ShapeCache.get(element) ??
-          ShapeCache.generateElementShape(element, null);
         const [, , , , cx, cy] = getElementAbsoluteCoords(element);
-        return {
-          type: "polycurve",
-          data: roughShape
-            ? getCurveShape(roughShape, [element.x, element.y], element.angle, [
-                cx,
-                cy,
-              ])
-            : [],
-        };
+        return getFreedrawShape(
+          element,
+          [cx, cy],
+          this.shouldTestInside(element),
+        );
       }
     }
   }

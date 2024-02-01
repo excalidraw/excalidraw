@@ -7,13 +7,14 @@ import {
   ExcalidrawEllipseElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawFrameLikeElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "../../excalidraw/element/types";
-import { angleToDegrees, pointRotate } from "./geometry";
+import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
 import { Drawable, Op } from "roughjs/bin/core";
 
 export type Point = [number, number];
@@ -67,7 +68,7 @@ type RectangularElement =
   | ExcalidrawSelectionElement;
 
 // polygon
-export const getPolygonShape = (element: RectangularElement) => {
+export const getPolygonShape = (element: RectangularElement): Shape => {
   const { angle, width, height, x, y } = element;
   const angleInDegrees = angleToDegrees(angle);
   const cx = x + width / 2;
@@ -75,31 +76,42 @@ export const getPolygonShape = (element: RectangularElement) => {
 
   const center: Point = [cx, cy];
 
+  let data: Polygon = [];
+
   if (element.type === "diamond") {
-    return [
+    data = [
       pointRotate([cx, y], angleInDegrees, center),
       pointRotate([x + width, cy], angleInDegrees, center),
       pointRotate([cx, y + height], angleInDegrees, center),
       pointRotate([x, cy], angleInDegrees, center),
     ] as Polygon;
   } else {
-    return [
+    data = [
       pointRotate([x, y], angleInDegrees, center),
       pointRotate([x + width, y], angleInDegrees, center),
       pointRotate([x + width, y + height], angleInDegrees, center),
       pointRotate([x, y + height], angleInDegrees, center),
     ] as Polygon;
   }
+
+  return {
+    type: "polygon",
+    data,
+  };
 };
 
 // ellipse
-export const getEllipseShape = (element: ExcalidrawEllipseElement): Ellipse => {
+export const getEllipseShape = (element: ExcalidrawEllipseElement): Shape => {
   const { width, height, angle, x, y } = element;
+
   return {
-    center: [x + width / 2, y + height / 2],
-    angle,
-    majorAxis: width > height ? width : height,
-    minorAxis: width > height ? height : width,
+    type: "ellipse",
+    data: {
+      center: [x + width / 2, y + height / 2],
+      angle,
+      majorAxis: width > height ? width : height,
+      minorAxis: width > height ? height : width,
+    },
   };
 };
 
@@ -118,7 +130,7 @@ export const getCurveShape = (
   startingPoint: Point = [0, 0],
   angleInRadian: number,
   center: Point,
-) => {
+): Shape => {
   const transform = (p: Point) =>
     pointRotate(
       [p[0] + startingPoint[0], p[1] + startingPoint[1]],
@@ -127,7 +139,7 @@ export const getCurveShape = (
     );
 
   const ops = getCurvePathOps(roughShape);
-  const polycurves: Polycurve = [];
+  const polycurve: Polycurve = [];
   let p0: Point = [0, 0];
 
   for (const op of ops) {
@@ -138,10 +150,50 @@ export const getCurveShape = (
       const p1: Point = transform([op.data[0], op.data[1]]);
       const p2: Point = transform([op.data[2], op.data[3]]);
       const p3: Point = transform([op.data[4], op.data[5]]);
-      polycurves.push([p0, p1, p2, p3]);
+      polycurve.push([p0, p1, p2, p3]);
       p0 = p3;
     }
   }
 
-  return polycurves;
+  return {
+    type: "polycurve",
+    data: polycurve,
+  };
+};
+
+const polylineFromPoints = (points: Point[]) => {
+  let previousPoint = points[0];
+  const polyline: Polyline = [];
+
+  for (let i = 1; i < points.length; i++) {
+    const nextPoint = points[i];
+    polyline.push([previousPoint, nextPoint]);
+    previousPoint = nextPoint;
+  }
+
+  return polyline;
+};
+
+export const getFreedrawShape = (
+  element: ExcalidrawFreeDrawElement,
+  center: Point,
+  isClosed: boolean = false,
+): Shape => {
+  const angle = angleToDegrees(element.angle);
+  const transform = (p: Point) =>
+    pointRotate(pointAdd(p, [element.x, element.y] as Point), angle, center);
+
+  const polyline = polylineFromPoints(
+    element.points.map((p) => transform(p as Point)),
+  );
+
+  return isClosed
+    ? {
+        type: "polygon",
+        data: close(polyline.flat()) as Polygon,
+      }
+    : {
+        type: "polyline",
+        data: polyline,
+      };
 };
