@@ -6501,7 +6501,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (embedLink.warning) {
+    if (embedLink.error instanceof URIError) {
       this.setToast({
         message: t("toast.unrecognizedLinkFormat"),
         closable: true,

@@ -120,7 +120,7 @@ export const Hyperlink = ({
       } else {
         const { width, height } = element;
         const embedLink = getEmbedLink(link);
-        if (embedLink?.warning) {
+        if (embedLink?.error instanceof URIError) {
           setToast({
             message: t("toast.unrecognizedLinkFormat"),
             closable: true,

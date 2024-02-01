@@ -106,7 +106,9 @@ export const getEmbedLink = (
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
-    const warning = !/^\d+$/.test(target);
+    const error = !/^\d+$/.test(target)
+      ? new URIError("Invalid embed link format")
+      : undefined;
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
     aspectRatio = { w: 560, h: 315 };
@@ -117,7 +119,7 @@ export const getEmbedLink = (
       intrinsicSize: aspectRatio,
       type,
     });
-    return { link, intrinsicSize: aspectRatio, type, warning };
+    return { link, intrinsicSize: aspectRatio, type, error };
   }
 
   const figmaLink = link.match(RE_FIGMA);
