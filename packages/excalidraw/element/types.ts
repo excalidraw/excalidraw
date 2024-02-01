@@ -104,7 +104,7 @@ export type ExcalidrawIframeLikeElement =
 export type IframeData =
   | {
       intrinsicSize: { w: number; h: number };
-      warning?: string;
+      warning?: boolean;
     } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
