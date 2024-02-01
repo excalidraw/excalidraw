@@ -1,3 +1,4 @@
+import { distance2d } from "../../excalidraw/math";
 import {
   Point,
   Line,
@@ -94,6 +95,10 @@ export const pointInverse = (point: Point) => {
 
 export const pointAdd = (pointA: Point, pointB: Point): Point => {
   return [pointA[0] + pointB[0], pointA[1] + pointB[1]];
+};
+
+export const distanceToPoint = (p1: Point, p2: Point) => {
+  return distance2d(...p1, ...p2);
 };
 
 /**
@@ -535,6 +540,65 @@ export const ellipseExtremes = (ellipse: Ellipse) => {
   ];
 };
 
+const pointRelativeToEllipse = (
+  point: Point,
+  center: Point,
+  angle: number,
+): Point => {
+  const [pointX, pointY] = point;
+  const [ellipseX, ellipseY] = center;
+
+  // Translate the point and ellipse so the ellipse is centered at the origin
+  const translatedPointX = pointX - ellipseX;
+  const translatedPointY = pointY - ellipseY;
+
+  // Rotate the point coordinates according to the negative rotation angle of the ellipse
+  const rotatedPointX =
+    translatedPointX * Math.cos(-angle) - translatedPointY * Math.sin(-angle);
+  const rotatedPointY =
+    translatedPointX * Math.sin(-angle) + translatedPointY * Math.cos(-angle);
+
+  return [rotatedPointX, rotatedPointY];
+};
+
+export const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
+  const { center, angle, majorAxis, minorAxis } = ellipse;
+  const semiMajorAxis = majorAxis / 2;
+  const semiMinorAxis = minorAxis / 2;
+  const rotationAngle = angleToDegrees(angle);
+  const [ellipseX, ellipseY] = center;
+  const [pointX, pointY] = point;
+  const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
+    point,
+    center,
+    rotationAngle,
+  );
+
+  // Calculate the distance between the rotated point and the origin
+  const distanceToOrigin = distanceToPoint(
+    [rotatedPointX, rotatedPointY],
+    [0, 0],
+  );
+
+  // Calculate the closest point on the rotated ellipse to the rotated point
+  const closestPointX = (semiMajorAxis * rotatedPointX) / distanceToOrigin;
+  const closestPointY = (semiMinorAxis * rotatedPointY) / distanceToOrigin;
+
+  // Translate the closest point back to the original coordinates
+  const [actualClosestPointX, actualClosestPointY] = pointAdd(
+    pointRotate([closestPointX, closestPointY], rotationAngle),
+    center,
+  );
+
+  // Calculate the distance between the original point and the closest point on the rotated ellipse
+  const distance = Math.sqrt(
+    (pointX - actualClosestPointX) * (pointX - actualClosestPointX) +
+      (pointY - actualClosestPointY) * (pointY - actualClosestPointY),
+  );
+
+  return distance;
+};
+
 /**
  * relationships
  */
@@ -695,7 +759,7 @@ export const cubicBezierEquation = (curve: Curve) => {
     p0[idx] * Math.pow(t, 3);
 };
 
-const polyLineFromCurve = (curve: Curve, segments = 10) => {
+export const polyLineFromCurve = (curve: Curve, segments = 10): Polyline => {
   const equation = cubicBezierEquation(curve);
   let startingPoint = [equation(0, 0), equation(0, 1)] as Point;
   const lineSegments: Polyline = [];
@@ -816,24 +880,28 @@ export const polygonIntersectPolygon = (
   return intersects;
 };
 
-const ellipsePointCheck = (point: Point, ellipse: Ellipse) => {
-  const { majorAxis, minorAxis, center } = ellipse;
-
-  const a = majorAxis / 2;
-  const b = minorAxis / 2;
-
-  const [x, y] = point;
-  const [h, k] = center;
-
-  return (
-    Math.pow(x - h, 2) / Math.pow(a, 2) + Math.pow(y - k, 2) / Math.pow(b, 2)
-  );
-};
-
-export const pointOnEllipse = (point: Point, ellipse: Ellipse) => {
-  return ellipsePointCheck(point, ellipse) === 1;
+export const pointOnEllipse = (
+  point: Point,
+  ellipse: Ellipse,
+  tolerance = 0,
+) => {
+  return distanceToEllipse(point, ellipse) <= tolerance;
 };
 
 export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
-  return ellipsePointCheck(point, ellipse) < 1;
+  const { center, angle, majorAxis, minorAxis } = ellipse;
+  const semiMajorAxis = majorAxis / 2;
+  const semiMinorAxis = minorAxis / 2;
+  const rotationAngle = angleToDegrees(angle);
+  const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
+    point,
+    center,
+    rotationAngle,
+  );
+
+  return (
+    (rotatedPointX / semiMajorAxis) * (rotatedPointX / semiMajorAxis) +
+      (rotatedPointY / semiMinorAxis) * (rotatedPointY / semiMinorAxis) <=
+    1
+  );
 };
