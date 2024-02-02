@@ -412,8 +412,8 @@
       "copyPngToClipboard": "Copiar PNG ao portapapeis"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Copiar ao portapapeis"
     }
   },
@@ -430,7 +430,7 @@
     "selected": "Seleccionado",
     "storage": "Almacenamento",
     "title": "Estadísticas para nerds",
-    "total": "",
+    "total": "Total",
     "version": "Versión",
     "versionCopy": "Faga clic para copiar",
     "versionNotAvailable": "Versión non dispoñible",
@@ -499,7 +499,7 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Exportar a Excalidraw+",
         "description": ""
       }
@@ -519,14 +519,14 @@
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "Inserir",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "Vista previa"
   },
   "userList": {
     "search": {
-      "placeholder": "",
+      "placeholder": "Busca rápida",
       "empty": ""
     },
     "hint": {
