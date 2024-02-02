@@ -230,6 +230,7 @@ import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
   Shape,
+  getClosedCurveShape,
   getCurveShape,
   getEllipseShape,
   getFreedrawShape,
@@ -419,8 +420,6 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
-import { Drawable } from "roughjs/bin/core";
-import { pointsOnBezierCurves } from "points-on-curve";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -4363,12 +4362,17 @@ class App extends React.Component<AppProps, AppState> {
           ShapeCache.generateElementShape(element, null)[0];
         const [, , , , cx, cy] = getElementAbsoluteCoords(element);
 
-        return getCurveShape(
-          roughShape,
-          [element.x, element.y],
-          element.angle,
-          [cx, cy],
-        );
+        return this.shouldTestInside(element)
+          ? getClosedCurveShape(
+              roughShape,
+              [element.x, element.y],
+              element.angle,
+              [cx, cy],
+            )
+          : getCurveShape(roughShape, [element.x, element.y], element.angle, [
+              cx,
+              cy,
+            ]);
       }
 
       case "ellipse":
@@ -4470,7 +4474,6 @@ class App extends React.Component<AppProps, AppState> {
     )
       .filter((el) => {
         let hit = false;
-
         if (
           this.state.selectedElementIds[el.id] &&
           shouldShowBoundingBox([el], this.state)

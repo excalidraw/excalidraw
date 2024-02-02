@@ -10,7 +10,6 @@ import {
   pointOnPolylines,
   close,
 } from "./geometry/geometry";
-import { pointsOnBezierCurves } from "points-on-curve";
 
 // check if the given point is considered on the given shape's border
 export const isPointOnShape = (point: Point, shape: Shape, tolerance = 0) => {
@@ -40,9 +39,9 @@ export const isPointInShape = (point: Point, shape: Shape) => {
     case "polygon":
       return pointInPolygon(point, shape.data);
     case "line":
-      return pointOnLine(point, shape.data);
+      return false;
     case "curve":
-      return pointOnCurve(point, shape.data);
+      return false;
     case "ellipse":
       return pointInEllipse(point, shape.data);
     case "polyline": {
@@ -50,8 +49,7 @@ export const isPointInShape = (point: Point, shape: Shape) => {
       return pointInPolygon(point, polygon);
     }
     case "polycurve": {
-      const polygon = pointsOnBezierCurves(shape.data.flat(), 10, 5);
-      return pointInPolygon(point, polygon);
+      return false;
     }
     default:
       throw Error(`shape ${shape} is not implemented`);

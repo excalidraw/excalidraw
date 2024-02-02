@@ -560,7 +560,7 @@ export const ellipseExtremes = (ellipse: Ellipse) => {
   ];
 };
 
-const pointRelativeToEllipse = (
+export const pointRelativeToCenter = (
   point: Point,
   center: Point,
   angle: number,
@@ -856,7 +856,7 @@ const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
   const { angle, halfWidth, halfHeight, center } = ellipse;
   const a = halfWidth;
   const b = halfHeight;
-  const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
+  const [rotatedPointX, rotatedPointY] = pointRelativeToCenter(
     point,
     center,
     angle,
@@ -909,7 +909,7 @@ export const pointOnEllipse = (
 
 export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
   const { center, angle, halfWidth, halfHeight } = ellipse;
-  const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
+  const [rotatedPointX, rotatedPointY] = pointRelativeToCenter(
     point,
     center,
     angle,

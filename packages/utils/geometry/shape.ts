@@ -15,6 +15,7 @@ import {
   ExcalidrawTextElement,
 } from "../../excalidraw/element/types";
 import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
+import { pointsOnBezierCurves } from "points-on-curve";
 import { Drawable, Op } from "roughjs/bin/core";
 
 export type Point = [number, number];
@@ -196,4 +197,49 @@ export const getFreedrawShape = (
         type: "polyline",
         data: polyline,
       };
+};
+
+export const getClosedCurveShape = (
+  roughShape: Drawable,
+  startingPoint: Point = [0, 0],
+  angleInRadian: number,
+  center: Point,
+): Shape => {
+  const ops = getCurvePathOps(roughShape);
+  const transform = (p: Point) =>
+    pointRotate(
+      [p[0] + startingPoint[0], p[1] + startingPoint[1]],
+      angleToDegrees(angleInRadian),
+      center,
+    );
+
+  const points: Point[] = [];
+  let odd = false;
+  for (const operation of ops) {
+    if (operation.op === "move") {
+      odd = !odd;
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+      }
+    } else if (operation.op === "bcurveTo") {
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+        points.push([operation.data[2], operation.data[3]]);
+        points.push([operation.data[4], operation.data[5]]);
+      }
+    } else if (operation.op === "lineTo") {
+      if (odd) {
+        points.push([operation.data[0], operation.data[1]]);
+      }
+    }
+  }
+
+  const polygonPoints = pointsOnBezierCurves(points, 10, 5).map((p) =>
+    transform(p),
+  );
+
+  return {
+    type: "polygon",
+    data: polygonPoints,
+  };
 };
