@@ -545,58 +545,10 @@ const pointRelativeToEllipse = (
   center: Point,
   angle: number,
 ): Point => {
-  const [pointX, pointY] = point;
-  const [ellipseX, ellipseY] = center;
+  const translated = pointAdd(point, pointInverse(center));
+  const rotated = pointRotate(translated, -angleToDegrees(angle));
 
-  // Translate the point and ellipse so the ellipse is centered at the origin
-  const translatedPointX = pointX - ellipseX;
-  const translatedPointY = pointY - ellipseY;
-
-  // Rotate the point coordinates according to the negative rotation angle of the ellipse
-  const rotatedPointX =
-    translatedPointX * Math.cos(-angle) - translatedPointY * Math.sin(-angle);
-  const rotatedPointY =
-    translatedPointX * Math.sin(-angle) + translatedPointY * Math.cos(-angle);
-
-  return [rotatedPointX, rotatedPointY];
-};
-
-export const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
-  const { center, angle, majorAxis, minorAxis } = ellipse;
-  const semiMajorAxis = majorAxis / 2;
-  const semiMinorAxis = minorAxis / 2;
-  const rotationAngle = angleToDegrees(angle);
-  const [ellipseX, ellipseY] = center;
-  const [pointX, pointY] = point;
-  const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
-    point,
-    center,
-    rotationAngle,
-  );
-
-  // Calculate the distance between the rotated point and the origin
-  const distanceToOrigin = distanceToPoint(
-    [rotatedPointX, rotatedPointY],
-    [0, 0],
-  );
-
-  // Calculate the closest point on the rotated ellipse to the rotated point
-  const closestPointX = (semiMajorAxis * rotatedPointX) / distanceToOrigin;
-  const closestPointY = (semiMinorAxis * rotatedPointY) / distanceToOrigin;
-
-  // Translate the closest point back to the original coordinates
-  const [actualClosestPointX, actualClosestPointY] = pointAdd(
-    pointRotate([closestPointX, closestPointY], rotationAngle),
-    center,
-  );
-
-  // Calculate the distance between the original point and the closest point on the rotated ellipse
-  const distance = Math.sqrt(
-    (pointX - actualClosestPointX) * (pointX - actualClosestPointX) +
-      (pointY - actualClosestPointY) * (pointY - actualClosestPointY),
-  );
-
-  return distance;
+  return rotated;
 };
 
 /**
@@ -885,23 +837,22 @@ export const pointOnEllipse = (
   ellipse: Ellipse,
   tolerance = 0,
 ) => {
-  return distanceToEllipse(point, ellipse) <= tolerance;
+  return false;
 };
 
 export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
   const { center, angle, majorAxis, minorAxis } = ellipse;
   const semiMajorAxis = majorAxis / 2;
   const semiMinorAxis = minorAxis / 2;
-  const rotationAngle = angleToDegrees(angle);
   const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
     point,
     center,
-    rotationAngle,
+    angle,
   );
 
   return (
-    (rotatedPointX / semiMajorAxis) * (rotatedPointX / semiMajorAxis) +
-      (rotatedPointY / semiMinorAxis) * (rotatedPointY / semiMinorAxis) <=
+    (rotatedPointX / semiMinorAxis) * (rotatedPointX / semiMinorAxis) +
+      (rotatedPointY / semiMajorAxis) * (rotatedPointY / semiMajorAxis) <=
     1
   );
 };

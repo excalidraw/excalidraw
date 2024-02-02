@@ -379,7 +379,7 @@ const distanceToDiamond = (
   return GAPoint.distanceToLine(pointRel, side);
 };
 
-const distanceToEllipse = (
+export const distanceToEllipse = (
   element: ExcalidrawEllipseElement,
   point: Point,
 ): number => {
