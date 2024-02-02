@@ -40,6 +40,7 @@ import { arrayToMap } from "../utils";
 import { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
+  getContainerElement,
   getDefaultLineHeight,
   measureBaseline,
 } from "../element/textElement";
@@ -179,7 +180,6 @@ const restoreElementWithProperties = <
 
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
-  refreshDimensions = false,
 ): typeof element | null => {
   switch (element.type) {
     case "text":
@@ -230,10 +230,6 @@ const restoreElement = (
       if (!text && !element.isDeleted) {
         element = { ...element, originalText: text, isDeleted: true };
         element = bumpVersion(element);
-      }
-
-      if (refreshDimensions) {
-        element = { ...element, ...refreshTextDimensions(element) };
       }
 
       return element;
@@ -295,11 +291,8 @@ const restoreElement = (
     case "rectangle":
     case "diamond":
     case "iframe":
-      return restoreElementWithProperties(element, {});
     case "embeddable":
-      return restoreElementWithProperties(element, {
-        validated: null,
-      });
+      return restoreElementWithProperties(element, {});
     case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
@@ -429,10 +422,7 @@ export const restoreElements = (
     // filtering out selection, which is legacy, no longer kept in elements,
     // and causing issues if retained
     if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      let migratedElement: ExcalidrawElement | null = restoreElement(
-        element,
-        opts?.refreshDimensions,
-      );
+      let migratedElement: ExcalidrawElement | null = restoreElement(element);
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);
         if (localElement && localElement.version > migratedElement.version) {
@@ -464,6 +454,16 @@ export const restoreElements = (
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {
       repairContainerElement(element, restoredElementsMap);
+    }
+
+    if (opts.refreshDimensions && isTextElement(element)) {
+      Object.assign(
+        element,
+        refreshTextDimensions(
+          element,
+          getContainerElement(element, restoredElementsMap),
+        ),
+      );
     }
   }
 

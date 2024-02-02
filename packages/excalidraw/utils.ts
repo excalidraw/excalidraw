@@ -14,9 +14,7 @@ import {
   UnsubscribeCallback,
   Zoom,
 } from "./types";
-import { unstable_batchedUpdates } from "react-dom";
 import { ResolutionType } from "./utility-types";
-import React from "react";
 
 let mockDateTime: string | null = null;
 
@@ -555,33 +553,6 @@ export const resolvablePromise = <T>() => {
   return promise as ResolvablePromise<T>;
 };
 
-/**
- * @param func handler taking at most single parameter (event).
- */
-export const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void),
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) =>
-  ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
-
-/**
- * barches React state updates and throttles the calls to a single call per
- * animation frame
- */
-export const withBatchedUpdatesThrottled = <
-  TFunction extends ((event: any) => void) | (() => void),
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) => {
-  // @ts-ignore
-  return throttleRAF<Parameters<TFunction>>(((event) => {
-    unstable_batchedUpdates(func, event);
-  }) as TFunction);
-};
-
 //https://stackoverflow.com/a/9462382/8418
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
@@ -679,8 +650,11 @@ export const getUpdatedTimestamp = () => (isTestEnv() ? 1 : Date.now());
  * or array of ids (strings), into a Map, keyd by `id`.
  */
 export const arrayToMap = <T extends { id: string } | string>(
-  items: readonly T[],
+  items: readonly T[] | Map<string, T>,
 ) => {
+  if (items instanceof Map) {
+    return items;
+  }
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
@@ -939,36 +913,6 @@ export const memoize = <T extends Record<string, any>, R extends any>(
   return ret as typeof func & { clear: () => void };
 };
 
-export const isRenderThrottlingEnabled = (() => {
-  // we don't want to throttle in react < 18 because of #5439 and it was
-  // getting more complex to maintain the fix
-  let IS_REACT_18_AND_UP: boolean;
-  try {
-    const version = React.version.split(".");
-    IS_REACT_18_AND_UP = Number(version[0]) > 17;
-  } catch {
-    IS_REACT_18_AND_UP = false;
-  }
-
-  let hasWarned = false;
-
-  return () => {
-    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
-      if (!IS_REACT_18_AND_UP) {
-        if (!hasWarned) {
-          hasWarned = true;
-          console.warn(
-            "Excalidraw: render throttling is disabled on React versions < 18.",
-          );
-        }
-        return false;
-      }
-      return true;
-    }
-    return false;
-  };
-})();
-
 /** Checks if value is inside given collection. Useful for type-safety. */
 export const isMemberOf = <T extends string>(
   /** Set/Map/Array/Object */
@@ -1071,3 +1015,78 @@ export function addEventListener(
     target?.removeEventListener?.(type, listener, options);
   };
 }
+
+const average = (a: number, b: number) => (a + b) / 2;
+export function getSvgPathFromStroke(points: number[][], closed = true) {
+  const len = points.length;
+
+  if (len < 4) {
+    return ``;
+  }
+
+  let a = points[0];
+  let b = points[1];
+  const c = points[2];
+
+  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
+    2,
+  )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
+    b[1],
+    c[1],
+  ).toFixed(2)} T`;
+
+  for (let i = 2, max = len - 1; i < max; i++) {
+    a = points[i];
+    b = points[i + 1];
+    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(
+      2,
+    )} `;
+  }
+
+  if (closed) {
+    result += "Z";
+  }
+
+  return result;
+}
+
+export const normalizeEOL = (str: string) => {
+  return str.replace(/\r?\n|\r/g, "\n");
+};
+
+// -----------------------------------------------------------------------------
+type HasBrand<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  [K in keyof T]: K extends `~brand${infer _}` ? true : never;
+}[keyof T];
+
+type RemoveAllBrands<T> = HasBrand<T> extends true
+  ? {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+    }
+  : never;
+
+// adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
+// currently does not cover all types (e.g. tuples, promises...)
+type Unbrand<T> = T extends Map<infer E, infer F>
+  ? Map<E, F>
+  : T extends Set<infer E>
+  ? Set<E>
+  : T extends Array<infer E>
+  ? Array<E>
+  : RemoveAllBrands<T>;
+
+/**
+ * Makes type into a branded type, ensuring that value is assignable to
+ * the base ubranded type. Optionally you can explicitly supply current value
+ * type to combine both (useful for composite branded types. Make sure you
+ * compose branded types which are not composite themselves.)
+ */
+export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
+  value: Unbrand<BrandedType>,
+) => {
+  return value as CurrentType & BrandedType;
+};
+
+// -----------------------------------------------------------------------------

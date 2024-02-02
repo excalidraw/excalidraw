@@ -39,7 +39,6 @@ import "./Hyperlink.scss";
 import { trackEvent } from "../analytics";
 import { useAppProps, useExcalidrawAppState } from "../components/App";
 import { isEmbeddableElement } from "./typeChecks";
-import { ShapeCache } from "../scene/ShapeCache";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -64,12 +63,17 @@ export const Hyperlink = ({
   setAppState,
   onLinkOpen,
   setToast,
+  updateEmbedValidationStatus,
 }: {
   element: NonDeletedExcalidrawElement;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
   setToast: (
     toast: { message: string; closable?: boolean; duration?: number } | null,
+  ) => void;
+  updateEmbedValidationStatus: (
+    element: ExcalidrawEmbeddableElement,
+    status: boolean,
   ) => void;
 }) => {
   const appState = useExcalidrawAppState();
@@ -98,9 +102,9 @@ export const Hyperlink = ({
       }
       if (!link) {
         mutateElement(element, {
-          validated: false,
           link: null,
         });
+        updateEmbedValidationStatus(element, false);
         return;
       }
 
@@ -110,15 +114,17 @@ export const Hyperlink = ({
         }
         element.link && embeddableLinkCache.set(element.id, element.link);
         mutateElement(element, {
-          validated: false,
           link,
         });
-        ShapeCache.delete(element);
+        updateEmbedValidationStatus(element, false);
       } else {
         const { width, height } = element;
         const embedLink = getEmbedLink(link);
-        if (embedLink?.warning) {
-          setToast({ message: embedLink.warning, closable: true });
+        if (embedLink?.error instanceof URIError) {
+          setToast({
+            message: t("toast.unrecognizedLinkFormat"),
+            closable: true,
+          });
         }
         const ar = embedLink
           ? embedLink.intrinsicSize.w / embedLink.intrinsicSize.h
@@ -142,10 +148,9 @@ export const Hyperlink = ({
                     : height,
               }
             : {}),
-          validated: true,
           link,
         });
-        ShapeCache.delete(element);
+        updateEmbedValidationStatus(element, true);
         if (embeddableLinkCache.has(element.id)) {
           embeddableLinkCache.delete(element.id);
         }
@@ -159,6 +164,7 @@ export const Hyperlink = ({
     appProps.validateEmbeddable,
     appState.activeEmbeddable,
     setAppState,
+    updateEmbedValidationStatus,
   ]);
 
   useLayoutEffect(() => {

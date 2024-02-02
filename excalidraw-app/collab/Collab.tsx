@@ -22,7 +22,6 @@ import {
   preventUnload,
   resolvablePromise,
   throttleRAF,
-  withBatchedUpdates,
 } from "../../packages/excalidraw/utils";
 import {
   CURSOR_SYNC_TIMEOUT,
@@ -37,7 +36,6 @@ import {
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
-  getCollabServer,
   getSyncableElements,
   SocketUpdateDataSource,
   SyncableExcalidrawElement,
@@ -83,6 +81,7 @@ import { atom, useAtom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
 import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
+import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -452,13 +451,9 @@ class Collab extends PureComponent<Props, CollabState> {
     this.fallbackInitializationHandler = fallbackInitializationHandler;
 
     try {
-      const socketServerData = await getCollabServer();
-
       this.portal.socket = this.portal.open(
-        socketIOClient(socketServerData.url, {
-          transports: socketServerData.polling
-            ? ["websocket", "polling"]
-            : ["websocket"],
+        socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
+          transports: ["websocket", "polling"],
         }),
         roomId,
         roomKey,

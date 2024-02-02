@@ -19,6 +19,7 @@ import {
   ExcalidrawMagicFrameElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
+  ExcalidrawIframeLikeElement,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -30,7 +31,7 @@ import type { throttleRAF } from "./utils";
 import { Spreadsheet } from "./charts";
 import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
-import { isOverScrollBars } from "./scene";
+import { isOverScrollBars } from "./scene/scrollbars";
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
@@ -455,6 +456,10 @@ export interface ExcalidrawProps {
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
   ) => void;
+  onPointerUp?: (
+    activeTool: AppState["activeTool"],
+    pointerDownState: PointerDownState,
+  ) => void;
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
@@ -633,12 +638,6 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     hasOccurred: boolean;
   };
-  elementIdsToErase: {
-    [key: ExcalidrawElement["id"]]: {
-      opacity: ExcalidrawElement["opacity"];
-      erase: boolean;
-    };
-  };
 }>;
 
 export type UnsubscribeCallback = () => void;
@@ -751,3 +750,10 @@ export type Primitive =
   | undefined;
 
 export type JSONValue = string | number | boolean | null | object;
+
+export type EmbedsValidationStatus = Map<
+  ExcalidrawIframeLikeElement["id"],
+  boolean
+>;
+
+export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;

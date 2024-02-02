@@ -4,7 +4,9 @@
   "workspaces": [
     "excalidraw-app",
     "packages/excalidraw",
-    "packages/utils"
+    "packages/utils",
+    "examples/excalidraw",
+    "examples/excalidraw/*"
   ],
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
@@ -43,7 +45,7 @@
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "5.0.6",
+    "vite": "5.0.12",
     "vite-plugin-checker": "0.6.1",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",

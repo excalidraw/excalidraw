@@ -13,9 +13,47 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
+- Add `onPointerUp` prop [#7638](https://github.com/excalidraw/excalidraw/pull/7638).
+
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
 
 ### Breaking Changes
+
+- `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
+
+- Create an `ESM` build for `@excalidraw/excalidraw`. The API is in progress and subject to change before stable release. There are some changes on how the package will be consumed
+
+  #### Bundler
+
+  - CSS needs to be imported so you will need to import the css along with the excalidraw component
+
+  ```js
+  import { Excalidraw } from "@excalidraw/excalidraw";
+  import "@excalidraw/excalidraw/index.css";
+  ```
+
+  - The `types` path is updated
+
+  Instead of importing from `@excalidraw/excalidraw/types/`, you will need to import from `@excalidraw/excalidraw/dist/excalidraw` or `@excalidraw/excalidraw/dist/utils` depending on the types you are using.
+
+  However this we will be fixing before stable release, so in case you want to try it out you will need to update the types for now.
+
+  #### Browser
+
+  - Since its `ESM` so now script type `module` can be used to load it and css needs to be loaded as well.
+
+  ```html
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.css"
+  />
+  <script type="module">
+    import * as ExcalidrawLib from "https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.js";
+    window.ExcalidrawLib = ExcalidrawLib;
+  </script>
+  ```
 
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
 
@@ -233,7 +271,7 @@ define: {
 
 - Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
 - Introducing Web-Embeds (alias iframe element)[#6691](https://github.com/excalidraw/excalidraw/pull/6691)
-- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateEmbeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
+- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
 - Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)

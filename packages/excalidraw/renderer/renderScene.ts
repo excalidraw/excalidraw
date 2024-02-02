@@ -33,6 +33,7 @@ import {
   SVGRenderConfig,
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
+  RenderableElementsMap,
 } from "../scene/types";
 import {
   getScrollBars,
@@ -61,9 +62,13 @@ import {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
-import { throttleRAF } from "../utils";
+import { arrayToMap, throttleRAF } from "../utils";
 import { UserIdleState } from "../types";
-import { FRAME_STYLE, THEME_FILTER } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  FRAME_STYLE,
+  THEME_FILTER,
+} from "../constants";
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
@@ -75,18 +80,12 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
-import {
-  isIframeLikeOrItsLabel,
-  createPlaceholderEmbeddableLabel,
-} from "../element/embeddable";
+import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
   isElementInFrame,
 } from "../frame";
-import "canvas-roundrect-polyfill";
-
-export const DEFAULT_SPACING = 2;
 
 const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
@@ -249,6 +248,7 @@ const renderLinearPointHandles = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
+  elementsMap: RenderableElementsMap,
 ) => {
   if (!appState.selectedLinearElement) {
     return;
@@ -272,6 +272,7 @@ const renderLinearPointHandles = (
   //Rendering segment mid points
   const midPoints = LinearElementEditor.getEditorMidPoints(
     element,
+    elementsMap,
     appState,
   ).filter((midPoint) => midPoint !== null) as Point[];
 
@@ -446,7 +447,7 @@ const bootstrapCanvas = ({
 
 const _renderInteractiveScene = ({
   canvas,
-  elements,
+  elementsMap,
   visibleElements,
   selectedElements,
   scale,
@@ -454,7 +455,7 @@ const _renderInteractiveScene = ({
   renderConfig,
 }: InteractiveSceneRenderConfig) => {
   if (canvas === null) {
-    return { atLeastOneVisibleElement: false, elements };
+    return { atLeastOneVisibleElement: false, elementsMap };
   }
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
@@ -488,7 +489,12 @@ const _renderInteractiveScene = ({
   });
 
   if (editingLinearElement) {
-    renderLinearPointHandles(context, appState, editingLinearElement);
+    renderLinearPointHandles(
+      context,
+      appState,
+      editingLinearElement,
+      elementsMap,
+    );
   }
 
   // Paint selection element
@@ -531,6 +537,7 @@ const _renderInteractiveScene = ({
       context,
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
+      elementsMap,
     );
   }
 
@@ -556,81 +563,71 @@ const _renderInteractiveScene = ({
         context,
         appState,
         selectedElements[0] as ExcalidrawLinearElement,
+        elementsMap,
       );
     }
     const selectionColor = renderConfig.selectionColor || oc.black;
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
-      const locallySelectedIds = selectedElements.reduce(
-        (acc: Record<string, boolean>, element) => {
-          acc[element.id] = true;
-          return acc;
-        },
-        {},
-      );
+      const locallySelectedIds = arrayToMap(selectedElements);
 
-      const selections = elements.reduce(
-        (
-          acc: {
-            angle: number;
-            elementX1: number;
-            elementY1: number;
-            elementX2: number;
-            elementY2: number;
-            selectionColors: string[];
-            dashed?: boolean;
-            cx: number;
-            cy: number;
-            activeEmbeddable: boolean;
-          }[],
-          element,
-        ) => {
-          const selectionColors = [];
-          // local user
-          if (
-            locallySelectedIds[element.id] &&
-            !isSelectedViaGroup(appState, element)
-          ) {
-            selectionColors.push(selectionColor);
-          }
-          // remote users
-          if (renderConfig.remoteSelectedElementIds[element.id]) {
-            selectionColors.push(
-              ...renderConfig.remoteSelectedElementIds[element.id].map(
-                (socketId: string) => {
-                  const background = getClientColor(socketId);
-                  return background;
-                },
-              ),
-            );
-          }
+      const selections: {
+        angle: number;
+        elementX1: number;
+        elementY1: number;
+        elementX2: number;
+        elementY2: number;
+        selectionColors: string[];
+        dashed?: boolean;
+        cx: number;
+        cy: number;
+        activeEmbeddable: boolean;
+      }[] = [];
 
-          if (selectionColors.length) {
-            const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
-              getElementAbsoluteCoords(element, true);
-            acc.push({
-              angle: element.angle,
-              elementX1,
-              elementY1,
-              elementX2,
-              elementY2,
-              selectionColors,
-              dashed: !!renderConfig.remoteSelectedElementIds[element.id],
-              cx,
-              cy,
-              activeEmbeddable:
-                appState.activeEmbeddable?.element === element &&
-                appState.activeEmbeddable.state === "active",
-            });
-          }
-          return acc;
-        },
-        [],
-      );
+      for (const element of elementsMap.values()) {
+        const selectionColors = [];
+        // local user
+        if (
+          locallySelectedIds.has(element.id) &&
+          !isSelectedViaGroup(appState, element)
+        ) {
+          selectionColors.push(selectionColor);
+        }
+        // remote users
+        if (renderConfig.remoteSelectedElementIds[element.id]) {
+          selectionColors.push(
+            ...renderConfig.remoteSelectedElementIds[element.id].map(
+              (socketId: string) => {
+                const background = getClientColor(socketId);
+                return background;
+              },
+            ),
+          );
+        }
+
+        if (selectionColors.length) {
+          const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
+            getElementAbsoluteCoords(element, true);
+          selections.push({
+            angle: element.angle,
+            elementX1,
+            elementY1,
+            elementX2,
+            elementY2,
+            selectionColors,
+            dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+            cx,
+            cy,
+            activeEmbeddable:
+              appState.activeEmbeddable?.element === element &&
+              appState.activeEmbeddable.state === "active",
+          });
+        }
+      }
 
       const addSelectionForGroupId = (groupId: GroupId) => {
-        const groupElements = getElementsInGroup(elements, groupId);
+        const groupElements = getElementsInGroup(elementsMap, groupId);
         const [elementX1, elementY1, elementX2, elementY2] =
           getCommonBounds(groupElements);
         selections.push({
@@ -681,7 +678,8 @@ const _renderInteractiveScene = ({
         );
       }
     } else if (selectedElements.length > 1 && !appState.isRotating) {
-      const dashedLinePadding = (DEFAULT_SPACING * 2) / appState.zoom.value;
+      const dashedLinePadding =
+        (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;
       const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
       const initialLineDash = context.getLineDash();
@@ -870,7 +868,7 @@ const _renderInteractiveScene = ({
   let scrollBars;
   if (renderConfig.renderScrollbars) {
     scrollBars = getScrollBars(
-      elements,
+      elementsMap,
       normalizedWidth,
       normalizedHeight,
       appState,
@@ -897,14 +895,15 @@ const _renderInteractiveScene = ({
   return {
     scrollBars,
     atLeastOneVisibleElement: visibleElements.length > 0,
-    elements,
+    elementsMap,
   };
 };
 
 const _renderStaticScene = ({
   canvas,
   rc,
-  elements,
+  elementsMap,
+  allElementsMap,
   visibleElements,
   scale,
   appState,
@@ -965,7 +964,7 @@ const _renderStaticScene = ({
 
   // Paint visible elements
   visibleElements
-    .filter((el) => !isIframeLikeOrItsLabel(el))
+    .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
         const frameId = element.frameId || appState.frameToHighlight?.id;
@@ -977,16 +976,32 @@ const _renderStaticScene = ({
         ) {
           context.save();
 
-          const frame = getTargetFrame(element, appState);
+          const frame = getTargetFrame(element, elementsMap, appState);
 
           // TODO do we need to check isElementInFrame here?
-          if (frame && isElementInFrame(element, elements, appState)) {
+          if (frame && isElementInFrame(element, elementsMap, appState)) {
             frameClip(frame, context, renderConfig, appState);
           }
-          renderElement(element, rc, context, renderConfig, appState);
+          renderElement(
+            element,
+            elementsMap,
+            allElementsMap,
+            rc,
+            context,
+            renderConfig,
+            appState,
+          );
           context.restore();
         } else {
-          renderElement(element, rc, context, renderConfig, appState);
+          renderElement(
+            element,
+            elementsMap,
+            allElementsMap,
+            rc,
+            context,
+            renderConfig,
+            appState,
+          );
         }
         if (!isExporting) {
           renderLinkIcon(element, context, appState);
@@ -998,21 +1013,39 @@ const _renderStaticScene = ({
 
   // render embeddables on top
   visibleElements
-    .filter((el) => isIframeLikeOrItsLabel(el))
+    .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       try {
         const render = () => {
-          renderElement(element, rc, context, renderConfig, appState);
+          renderElement(
+            element,
+            elementsMap,
+            allElementsMap,
+            rc,
+            context,
+            renderConfig,
+            appState,
+          );
 
           if (
             isIframeLikeElement(element) &&
             (isExporting ||
-              (isEmbeddableElement(element) && !element.validated)) &&
+              (isEmbeddableElement(element) &&
+                renderConfig.embedsValidationStatus.get(element.id) !==
+                  true)) &&
             element.width &&
             element.height
           ) {
             const label = createPlaceholderEmbeddableLabel(element);
-            renderElement(label, rc, context, renderConfig, appState);
+            renderElement(
+              label,
+              elementsMap,
+              allElementsMap,
+              rc,
+              context,
+              renderConfig,
+              appState,
+            );
           }
           if (!isExporting) {
             renderLinkIcon(element, context, appState);
@@ -1030,9 +1063,9 @@ const _renderStaticScene = ({
         ) {
           context.save();
 
-          const frame = getTargetFrame(element, appState);
+          const frame = getTargetFrame(element, elementsMap, appState);
 
-          if (frame && isElementInFrame(element, elements, appState)) {
+          if (frame && isElementInFrame(element, elementsMap, appState)) {
             frameClip(frame, context, renderConfig, appState);
           }
           render();
@@ -1161,7 +1194,7 @@ const renderSelectionBorder = (
     cy: number;
     activeEmbeddable: boolean;
   },
-  padding = DEFAULT_SPACING * 2,
+  padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2,
 ) => {
   const {
     angle,
@@ -1446,6 +1479,7 @@ const renderLinkIcon = (
 // This should be only called for exporting purposes
 export const renderSceneToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: RenderableElementsMap,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
   files: BinaryFiles,
@@ -1457,12 +1491,13 @@ export const renderSceneToSvg = (
 
   // render elements
   elements
-    .filter((el) => !isIframeLikeOrItsLabel(el))
+    .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
           renderElementToSvg(
             element,
+            elementsMap,
             rsvg,
             svgRoot,
             files,
@@ -1484,6 +1519,7 @@ export const renderSceneToSvg = (
         try {
           renderElementToSvg(
             element,
+            elementsMap,
             rsvg,
             svgRoot,
             files,

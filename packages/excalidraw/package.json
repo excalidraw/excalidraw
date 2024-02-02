@@ -7,8 +7,8 @@
   "exports": {
     ".": {
       "development": "./dist/dev/index.js",
-      "default": "./dist/prod/index.js",
-      "types": "./dist/excalidraw/index.d.ts"
+      "types": "./dist/excalidraw/index.d.ts",
+      "default": "./dist/prod/index.js"
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
-    "@excalidraw/laser-pointer": "1.2.0",
+    "@excalidraw/laser-pointer": "1.3.1",
     "@excalidraw/mermaid-to-excalidraw": "0.2.0",
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",

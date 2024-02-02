@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ActionManager } from "../actions/manager";
-import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement, ExcalidrawElementType } from "../element/types";
+import {
+  ExcalidrawElementType,
+  NonDeletedElementsMap,
+  NonDeletedSceneElementsMap,
+} from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "./App";
 import {
@@ -44,17 +47,14 @@ import { useTunnels } from "../context/tunnels";
 
 export const SelectedShapeActions = ({
   appState,
-  elements,
+  elementsMap,
   renderAction,
 }: {
   appState: UIAppState;
-  elements: readonly ExcalidrawElement[];
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
 }) => {
-  const targetElements = getTargetElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
+  const targetElements = getTargetElements(elementsMap, appState);
 
   let isSingleElementBoundContainer = false;
   if (
@@ -137,12 +137,12 @@ export const SelectedShapeActions = ({
           {renderAction("changeFontFamily")}
 
           {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements)) &&
+            suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
         </>
       )}
 
-      {shouldAllowVerticalAlign(targetElements) &&
+      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (

@@ -6,7 +6,7 @@ import {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkNonNullable, ValueOf } from "../utility-types";
+import { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
 import { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
@@ -88,14 +88,6 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
 export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
   Readonly<{
     type: "embeddable";
-    /**
-     * indicates whether the embeddable src (url) has been validated for rendering.
-     * null value indicates that the validation is pending. We reset the
-     * value on each restore (or url change) so that we can guarantee
-     * the validation came from a trusted source (the editor). Also because we
-     * may not have access to host-app supplied url validator during restore.
-     */
-    validated: boolean | null;
   }>;
 
 export type ExcalidrawIframeElement = _ExcalidrawElementBase &
@@ -112,7 +104,7 @@ export type ExcalidrawIframeLikeElement =
 export type IframeData =
   | {
       intrinsicSize: { w: number; h: number };
-      warning?: string;
+      error?: Error;
     } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
@@ -262,3 +254,41 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
 export type FileId = string & { _brand: "FileId" };
 
 export type ExcalidrawElementType = ExcalidrawElement["type"];
+
+/**
+ * Map of excalidraw elements.
+ * Unspecified whether deleted or non-deleted.
+ * Can be a subset of Scene elements.
+ */
+export type ElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement>;
+
+/**
+ * Map of non-deleted elements.
+ * Can be a subset of Scene elements.
+ */
+export type NonDeletedElementsMap = Map<
+  ExcalidrawElement["id"],
+  NonDeletedExcalidrawElement
+> &
+  MakeBrand<"NonDeletedElementsMap">;
+
+/**
+ * Map of all excalidraw Scene elements, including deleted.
+ * Not a subset. Use this type when you need access to current Scene elements.
+ */
+export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
+  MakeBrand<"SceneElementsMap">;
+
+/**
+ * Map of all non-deleted Scene elements.
+ * Not a subset. Use this type when you need access to current Scene elements.
+ */
+export type NonDeletedSceneElementsMap = Map<
+  ExcalidrawElement["id"],
+  NonDeletedExcalidrawElement
+> &
+  MakeBrand<"NonDeletedSceneElementsMap">;
+
+export type ElementsMapOrArray =
+  | readonly ExcalidrawElement[]
+  | Readonly<ElementsMap>;
