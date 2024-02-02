@@ -1,5 +1,5 @@
 import { defineConfig, mergeConfig, loadEnv } from "vite";
-import viteConfig from "./vite.config.mts";
+import viteConfig from "./vite.config.mjs";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
