@@ -217,13 +217,13 @@
     "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
-    "imageToolNotSupported": "",
+    "collabSaveFailed": "Enregistrament impossible dins la basa de donada del backend. Se lo problèma persistís, deuriatz enregistrar lo fichièr localament per vos assegurar que perdretz pas vòstre trabalh.",
+    "collabSaveFailed_sizeExceeded": "Enregistrament impossible dins la basa de donada del backend, lo canabàs sembla tròp pesuc. Deuriatz enregistrar lo fichièr localament per vos assegurar que perdretz pas vòstre trabalh.",
+    "imageToolNotSupported": "Los imatges son desactivats.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
+      "line1": "Semblatz utilizar lo navegador Brave amb lo paramètre <bold>Blocatge agressiu de las emprentas numericas</bold> activat.",
+      "line2": "Aquò pòt menar a copar <bold>l’element Tèxte</bold> de vòstres dessenhs.",
+      "line3": "Recomandam fòrt de desactivar aqueste paramètre. Podètz seguir <link>aquestas etapas</link> per veire cossí o far.",
       "line4": ""
     },
     "libraryElementTypeError": {
@@ -252,7 +252,7 @@
     "eraser": "Goma",
     "frame": "Esplech quadre",
     "magicframe": "",
-    "embeddable": "",
+    "embeddable": "Integracion Web",
     "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
@@ -312,7 +312,7 @@
     "shareTitle": "Rejonhètz una session collaborativa sus Excalidraw"
   },
   "errorDialog": {
-    "title": ""
+    "title": "Error"
   },
   "exportDialog": {
     "disk_title": "Salvar al disc",
@@ -335,7 +335,7 @@
     "documentation": "Documentacion",
     "doubleClick": "doble clic",
     "drag": "lisar",
-    "editor": "",
+    "editor": "Editor",
     "editLineArrowPoints": "",
     "editText": "",
     "github": "Problèma trobat ? Senhalatz-lo",
@@ -394,27 +394,27 @@
     "removeItemsFromLib": "Tirar los elements seleccionats de la bibliotèca"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Exportar imatges",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "Rèireplan",
+      "onlySelected": "Seleccion sonque",
+      "darkMode": "Mòde escur",
+      "embedScene": "Embarcar la scèna",
+      "scale": "Escala",
+      "padding": "Espaçament"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exportar en PNG",
+      "exportToSvg": "Exportar en SVG",
+      "copyPngToClipboard": "Copiar PNG al quichapapièrs"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Copiar al quichapapièrs"
     }
   },
   "encrypted": {
@@ -422,16 +422,16 @@
     "link": "Article de blòg sul chiframent del cap a la fin dins Excalidraw"
   },
   "stats": {
-    "angle": "",
-    "element": "",
-    "elements": "",
+    "angle": "Angle",
+    "element": "Element",
+    "elements": "Elements",
     "height": "Nautor",
     "scene": "Scèna",
     "selected": "Seleccionat",
     "storage": "Emmagazinatge",
     "title": "Estatisticas pels nerds",
-    "total": "",
-    "version": "",
+    "total": "Total",
+    "version": "Version",
     "versionCopy": "Clicar per copiar",
     "versionNotAvailable": "Version pas disponibla",
     "width": "Largor"
@@ -451,13 +451,13 @@
   },
   "colors": {
     "transparent": "Transparéncia",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
+    "black": "Negre",
+    "white": "Blanc",
+    "red": "Roge",
+    "pink": "Ròse",
+    "grape": "Bordèu",
+    "violet": "Violet",
+    "gray": "Gris",
     "blue": "Blau",
     "cyan": "Cian",
     "teal": "Sarcèla",
@@ -491,7 +491,7 @@
       "exportToImage": {
         "title": "Exportar coma imatge",
         "button": "Exportar coma imatge",
-        "description": ""
+        "description": "Exportar las donadas de la scèna coma un imatge que podètz importar mai tard."
       },
       "saveToDisk": {
         "title": "Salvar al disc",
