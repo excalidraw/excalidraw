@@ -249,7 +249,7 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
   );
 };
 
-const _ShareDialog = (props: ShareDialogProps) => {
+const ShareDialogInner = (props: ShareDialogProps) => {
   const activeRoomLink = useAtomValue(activeRoomLinkAtom);
 
   return (
@@ -280,11 +280,11 @@ export const ShareDialog = (props: {
   }
 
   return (
-    <_ShareDialog
+    <ShareDialogInner
       handleClose={() => setShareDialogState({ isOpen: false })}
       collabAPI={props.collabAPI}
       onExportToBackend={props.onExportToBackend}
       type={shareDialogState.type}
-    ></_ShareDialog>
+    ></ShareDialogInner>
   );
 };
