@@ -28,8 +28,8 @@ export type Polygon = Point[];
 export type Ellipse = {
   center: Point;
   angle: number;
-  majorAxis: number;
-  minorAxis: number;
+  halfWidth: number;
+  halfHeight: number;
 };
 export type Shape =
   | {
@@ -109,8 +109,8 @@ export const getEllipseShape = (element: ExcalidrawEllipseElement): Shape => {
     data: {
       center: [x + width / 2, y + height / 2],
       angle,
-      majorAxis: width > height ? width : height,
-      minorAxis: width > height ? height : width,
+      halfWidth: width / 2,
+      halfHeight: height / 2,
     },
   };
 };

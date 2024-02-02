@@ -510,12 +510,32 @@ export const polygonTranslate = (
  * ellipses
  */
 
+export const ellipseAxes = (ellipse: Ellipse) => {
+  const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
+
+  const majorAxis = widthGreaterThanHeight
+    ? ellipse.halfWidth * 2
+    : ellipse.halfHeight * 2;
+  const minorAxis = widthGreaterThanHeight
+    ? ellipse.halfHeight * 2
+    : ellipse.halfWidth * 2;
+
+  return {
+    majorAxis,
+    minorAxis,
+  };
+};
+
 export const ellipseFocusToCenter = (ellipse: Ellipse) => {
-  return Math.sqrt(ellipse.majorAxis ** 2 - ellipse.minorAxis ** 2);
+  const { majorAxis, minorAxis } = ellipseAxes(ellipse);
+
+  return Math.sqrt(majorAxis ** 2 - minorAxis ** 2);
 };
 
 export const ellipseExtremes = (ellipse: Ellipse) => {
-  const { majorAxis, minorAxis, center, angle } = ellipse;
+  const { center, angle } = ellipse;
+  const { majorAxis, minorAxis } = ellipseAxes(ellipse);
+
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
 
@@ -832,18 +852,63 @@ export const polygonIntersectPolygon = (
   return intersects;
 };
 
+const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
+  const { angle, halfWidth, halfHeight, center } = ellipse;
+  const a = halfWidth;
+  const b = halfHeight;
+  const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
+    point,
+    center,
+    angle,
+  );
+
+  const px = Math.abs(rotatedPointX);
+  const py = Math.abs(rotatedPointY);
+
+  let tx = 0.707;
+  let ty = 0.707;
+
+  for (let i = 0; i < 3; i++) {
+    const x = a * tx;
+    const y = b * ty;
+
+    const ex = ((a * a - b * b) * tx ** 3) / a;
+    const ey = ((b * b - a * a) * ty ** 3) / b;
+
+    const rx = x - ex;
+    const ry = y - ey;
+
+    const qx = px - ex;
+    const qy = py - ey;
+
+    const r = Math.hypot(ry, rx);
+    const q = Math.hypot(qy, qx);
+
+    tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
+    ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
+    const t = Math.hypot(ty, tx);
+    tx /= t;
+    ty /= t;
+  }
+
+  const [minX, minY] = [
+    a * tx * Math.sign(rotatedPointX),
+    b * ty * Math.sign(rotatedPointY),
+  ];
+
+  return distanceToPoint([rotatedPointX, rotatedPointY], [minX, minY]);
+};
+
 export const pointOnEllipse = (
   point: Point,
   ellipse: Ellipse,
   tolerance = 0,
 ) => {
-  return false;
+  return distanceToEllipse(point, ellipse) <= tolerance;
 };
 
 export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
-  const { center, angle, majorAxis, minorAxis } = ellipse;
-  const semiMajorAxis = majorAxis / 2;
-  const semiMinorAxis = minorAxis / 2;
+  const { center, angle, halfWidth, halfHeight } = ellipse;
   const [rotatedPointX, rotatedPointY] = pointRelativeToEllipse(
     point,
     center,
@@ -851,8 +916,8 @@ export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
   );
 
   return (
-    (rotatedPointX / semiMinorAxis) * (rotatedPointX / semiMinorAxis) +
-      (rotatedPointY / semiMajorAxis) * (rotatedPointY / semiMajorAxis) <=
+    (rotatedPointX / halfWidth) * (rotatedPointX / halfWidth) +
+      (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
     1
   );
 };
