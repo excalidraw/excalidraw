@@ -13,7 +13,7 @@ export type FilledButtonProps = {
   label: string;
 
   children?: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent) => void;
 
   variant?: ButtonVariant;
   color?: ButtonColor;
@@ -42,7 +42,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
     const [isLoading, setIsLoading] = useState(false);
 
     const _onClick = async (event: React.MouseEvent) => {
-      const ret = onClick?.();
+      const ret = onClick?.(event);
 
       if (ret && "then" in ret) {
         try {
