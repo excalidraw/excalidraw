@@ -18,7 +18,9 @@ type Props = {
 
 export const ProjectName = (props: Props) => {
   const { id } = useExcalidrawContainer();
-  const [fileName, setFileName] = useState<string>(props.value);
+  const [fileName, setFileName] = useState<string>(
+    props.value || `${t("labels.untitled")}-${getDateTime()}`,
+  );
 
   const handleBlur = (event: any) => {
     if (!props.ignoreFocus) {
