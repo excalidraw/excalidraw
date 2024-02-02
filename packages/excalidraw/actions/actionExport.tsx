@@ -19,6 +19,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
+import { getDateTime } from "../utils";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -29,7 +30,7 @@ export const actionChangeProjectName = register({
   PanelComponent: ({ appState, updateData, appProps, data }) => (
     <ProjectName
       label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
+      value={appState.name || `${t("labels.untitled")}-${getDateTime()}`}
       onChange={(name: string) => updateData(name)}
       isNameEditable={
         typeof appProps.name === "undefined" && !appState.viewModeEnabled
