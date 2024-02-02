@@ -77,9 +77,10 @@ describe("collaboration", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
-        token=""
+        firebaseToken=""
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
+        onCollabRoomSave={() => Promise.resolve()}
       />,
     );
     // To update the scene with deleted elements before starting collab

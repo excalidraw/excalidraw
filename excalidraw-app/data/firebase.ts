@@ -15,7 +15,7 @@ import { MIME_TYPES } from "../../src/constants";
 import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../src/utility-types";
-import { customFirebaseConfig, customToken } from "../index";
+import { customFirebaseConfig, customFirebaseToken } from "../index";
 
 // private
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ const _loadFirebase = async () => {
       firebase.initializeApp(customFirebaseConfig);
       try {
         try {
-          await firebase.auth().signInWithCustomToken(customToken);
+          await firebase.auth().signInWithCustomToken(customFirebaseToken);
         } catch (tokenError) {
           try {
             await firebase

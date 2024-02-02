@@ -71,7 +71,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { customCollabServerUrl } from "..";
+import { customCollabServerUrl, onCollabRoomSave } from "..";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const collabDialogShownAtom = atom(false);
@@ -259,6 +259,7 @@ class Collab extends PureComponent<Props, CollabState> {
       });
       console.error(error);
     }
+    await onCollabRoomSave(syncableElements, this.excalidrawAPI.getAppState());
   };
 
   stopCollaboration = (keepRemoteState = true) => {

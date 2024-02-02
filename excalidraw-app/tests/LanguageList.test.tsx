@@ -18,9 +18,10 @@ describe("Test LanguageList", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
-        token=""
+        firebaseToken=""
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
+        onCollabRoomSave={() => Promise.resolve()}
       />,
     );
 

@@ -50,7 +50,12 @@ import Collab, {
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
-import { exportToBackend, isCollaborationLink, loadScene } from "./data";
+import {
+  SyncableExcalidrawElement,
+  exportToBackend,
+  isCollaborationLink,
+  loadScene,
+} from "./data";
 import {
   getLibraryItemsFromStorage,
   importFromLocalStorage,
@@ -782,7 +787,11 @@ let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
 let externalExcalidrawRefCallback: SetExcalidrawAPI;
-let customToken: string;
+let onCollabRoomSave: (
+  elements: readonly SyncableExcalidrawElement[],
+  appState: AppState,
+) => Promise<void>;
+let customFirebaseToken: string;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
@@ -791,7 +800,11 @@ const ExcalidrawApp: React.FC<{
   username: string;
   theme: Theme;
   excalidrawAPIRefCallback: SetExcalidrawAPI;
-  token: string;
+  firebaseToken: string;
+  onCollabRoomSave: (
+    elements: readonly SyncableExcalidrawElement[],
+    appState: AppState,
+  ) => Promise<void>;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
@@ -799,7 +812,8 @@ const ExcalidrawApp: React.FC<{
   customUsername = props.username;
   customTheme = props.theme;
   externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
-  customToken = props.token;
+  customFirebaseToken = props.firebaseToken;
+  onCollabRoomSave = props.onCollabRoomSave;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
@@ -809,5 +823,10 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { customCollabServerUrl, customFirebaseConfig, customToken };
+export {
+  customCollabServerUrl,
+  customFirebaseConfig,
+  customFirebaseToken,
+  onCollabRoomSave,
+};
 export default ExcalidrawApp;

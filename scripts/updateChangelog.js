@@ -27,7 +27,7 @@ const getCommitHashForLastVersion = async () => {
     const { stdout } = await exec(
       `git log --format=format:"%H" --grep=${commitMessage}`,
     );
-    return stdout;
+    return stdout.slice(0, 6);
   } catch (error) {
     console.error(error);
   }

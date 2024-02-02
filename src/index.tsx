@@ -4,7 +4,8 @@ import ExcalidrawApp from "../excalidraw-app";
 import { registerSW } from "virtual:pwa-register";
 
 import "../excalidraw-app/sentry";
-import { ExcalidrawImperativeAPI } from "./types";
+import { AppState, ExcalidrawImperativeAPI } from "./types";
+import { SyncableExcalidrawElement } from "../excalidraw-app/data";
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
@@ -19,6 +20,16 @@ function App() {
     [],
   );
 
+  const onCollabRoomSave = useCallback(
+    async (
+      elements: readonly SyncableExcalidrawElement[],
+      appState: AppState,
+    ) => {
+      console.log("collab room save");
+    },
+    [],
+  );
+
   return (
     <StrictMode>
       <ExcalidrawApp
@@ -29,9 +40,10 @@ function App() {
           roomKey: "yx8WgrzkcceYyZFXAo4_9g", // arbitrary constant key
         }}
         username={"Karat Engineer"}
-        token="placeholder"
+        firebaseToken="placeholder"
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
+        onCollabRoomSave={onCollabRoomSave}
       />
     </StrictMode>
   );
