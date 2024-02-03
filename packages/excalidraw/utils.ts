@@ -845,7 +845,7 @@ export const composeEventHandlers = <E>(
 
     if (
       !checkForDefaultPrevented ||
-      !(event as unknown as Event).defaultPrevented
+      !(event as unknown as Event)?.defaultPrevented
     ) {
       return ourEventHandler?.(event);
     }
