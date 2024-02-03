@@ -2,8 +2,9 @@ import React, { forwardRef, useState } from "react";
 import clsx from "clsx";
 
 import "./FilledButton.scss";
-import Spinner from "./Spinner";
 import { AbortError } from "../errors";
+import Spinner from "./Spinner";
+import { isPromiseLike } from "../utils";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
 export type ButtonColor = "primary" | "danger" | "warning" | "muted";
@@ -21,14 +22,14 @@ export type FilledButtonProps = {
   className?: string;
   fullWidth?: boolean;
 
-  startIcon?: React.ReactNode;
+  icon?: React.ReactNode;
 };
 
 export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
   (
     {
       children,
-      startIcon,
+      icon,
       onClick,
       label,
       variant = "filled",
@@ -44,7 +45,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
     const _onClick = async (event: React.MouseEvent) => {
       const ret = onClick?.(event);
 
-      if (ret && "then" in ret) {
+      if (isPromiseLike(ret)) {
         try {
           setIsLoading(true);
           await ret;
@@ -76,13 +77,15 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
         ref={ref}
         disabled={isLoading}
       >
-        {startIcon && (
-          <div className="ExcButton__icon" aria-hidden>
-            {startIcon}
-          </div>
-        )}
-        {variant !== "icon" && (children ?? label)}
-        {isLoading && <Spinner />}
+        <div className="ExcButton__contents">
+          {isLoading && <Spinner />}
+          {icon && (
+            <div className="ExcButton__icon" aria-hidden>
+              {icon}
+            </div>
+          )}
+          {variant !== "icon" && (children ?? label)}
+        </div>
       </button>
     );
   },

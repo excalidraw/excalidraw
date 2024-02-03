@@ -123,7 +123,7 @@ const ActiveRoomDialog = ({
             size="large"
             variant="icon"
             label="Share"
-            startIcon={getShareIcon()}
+            icon={getShareIcon()}
             className="ShareDialog__active__share"
             onClick={shareRoomLink}
           />
@@ -133,7 +133,7 @@ const ActiveRoomDialog = ({
             <FilledButton
               size="large"
               label="Copy link"
-              startIcon={copyIcon}
+              icon={copyIcon}
               onClick={copyRoomLink}
             />
           </Popover.Trigger>
@@ -169,7 +169,7 @@ const ActiveRoomDialog = ({
           variant="outlined"
           color="danger"
           label={t("roomDialog.button_stopSession")}
-          startIcon={playerStopFilledIcon}
+          icon={playerStopFilledIcon}
           onClick={() => {
             trackEvent("share", "room closed");
             collabAPI.stopCollaboration();
@@ -203,7 +203,7 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
         <FilledButton
           size="large"
           label={t("roomDialog.button_startSession")}
-          startIcon={playerPlayIcon}
+          icon={playerPlayIcon}
           onClick={() => {
             trackEvent("share", "room creation", `ui (${getFrame()})`);
             collabAPI.startCollaboration(null);
@@ -236,7 +236,7 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
             <FilledButton
               size="large"
               label={t("exportDialog.link_button")}
-              startIcon={LinkIcon}
+              icon={LinkIcon}
               onClick={async () => {
                 await props.onExportToBackend();
                 props.handleClose();
