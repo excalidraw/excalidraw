@@ -6394,6 +6394,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure: event.pressure === 0.5,
+      enablePressure: this.state.currentItemEnablePressure,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
     });
@@ -7260,7 +7261,10 @@ class App extends React.Component<AppProps, AppState> {
         if (!discardPoint) {
           const pressures = draggingElement.simulatePressure
             ? draggingElement.pressures
-            : [...draggingElement.pressures, event.pressure];
+            : [
+                ...draggingElement.pressures,
+                draggingElement.enablePressure ? event.pressure : 0.5,
+              ];
 
           mutateElement(draggingElement, {
             points: [...points, [dx, dy]],

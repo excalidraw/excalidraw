@@ -35,6 +35,7 @@ type _ExcalidrawElementBase = Readonly<{
   strokeWidth: number;
   strokeStyle: StrokeStyle;
   roundness: null | { type: RoundnessType; value?: number };
+  enablePressure: boolean;
   roughness: number;
   opacity: number;
   width: number;
@@ -248,6 +249,7 @@ export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
     points: readonly Point[];
     pressures: readonly number[];
     simulatePressure: boolean;
+    enablePressure: boolean;
     lastCommittedPoint: Point | null;
   }>;
 

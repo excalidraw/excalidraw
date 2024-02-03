@@ -1,5 +1,8 @@
 {
   "labels": {
+    "enablePressure": "Enable Pressure",
+    "enablePressureTrue": "Enable pressure true",
+    "enablePressureFalse": "Enable pressure false",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
@@ -63,6 +66,7 @@
     "left": "Left",
     "center": "Center",
     "right": "Right",
+    "ultraThin": "Ultra thin",
     "extraBold": "Extra bold",
     "architect": "Architect",
     "artist": "Artist",

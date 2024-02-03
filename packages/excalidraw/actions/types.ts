@@ -60,6 +60,7 @@ export type ActionName =
   | "changeStrokeShape"
   | "changeSloppiness"
   | "changeStrokeStyle"
+  | "changeEnablePressure"
   | "changeArrowhead"
   | "changeOpacity"
   | "changeFontSize"

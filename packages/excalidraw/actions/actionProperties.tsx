@@ -426,6 +426,12 @@ export const actionChangeStrokeWidth = register({
         group="stroke-width"
         options={[
           {
+            value: STROKE_WIDTH.ultraThin,
+            text: t("labels.ultraThin"),
+            icon: StrokeWidthBaseIcon,
+            testId: "strokeWidth-ultraThin",
+          },
+          {
             value: STROKE_WIDTH.thin,
             text: t("labels.thin"),
             icon: StrokeWidthBaseIcon,
@@ -451,6 +457,53 @@ export const actionChangeStrokeWidth = register({
           (element) => element.hasOwnProperty("strokeWidth"),
           (hasSelection) =>
             hasSelection ? null : appState.currentItemStrokeWidth,
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});
+
+export const actionChangeEnablePressure = register({
+  name: "changeEnablePressure",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          enablePressure: value,
+        }),
+      ),
+      appState: { ...appState, currentItemEnablePressure: value },
+      commitToHistory: true,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.enablePressure")}</legend>
+      <ButtonIconSelect
+        group="enablePressure"
+        options={[
+          {
+            value: false,
+            text: t("labels.enablePressureFalse"),
+            icon: StrokeWidthBaseIcon,
+            testId: "enablePressure-true",
+          },
+          {
+            value: true,
+            text: t("labels.enablePressureTrue"),
+            icon: StrokeWidthExtraBoldIcon,
+            testId: "enablePressure-false",
+          },
+        ]}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => element.enablePressure,
+          (element) => element.hasOwnProperty("enablePressure"),
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemEnablePressure,
         )}
         onChange={(value) => updateData(value)}
       />

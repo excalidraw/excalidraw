@@ -163,6 +163,7 @@ export class API {
       | "groupIds"
       | "link"
       | "updated"
+      | "enablePressure"
     > = {
       x,
       y,
@@ -232,6 +233,7 @@ export class API {
         element = newFreeDrawElement({
           type: type as "freedraw",
           simulatePressure: true,
+          enablePressure: true,
           ...base,
         });
         break;
