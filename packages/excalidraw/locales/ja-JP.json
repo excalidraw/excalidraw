@@ -301,9 +301,12 @@
     "openIssueMessage": "エラーに関するシーン情報を含めないように非常に慎重に設定しました。もしあなたのシーンがプライベートでない場合は、私たちのフォローアップを検討してください。 <button>バグ報告</button> GitHub のIssueに以下の情報をコピーして貼り付けてください。",
     "sceneContent": "シーンの内容:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "他の人を編集中のあなたの画面に招待して共同編集することができます。",
-    "desc_privacy": "このセッションはエンドツーエンド暗号化されており、描画内容は保護されています。運営サーバーからも内容は見えません。",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "セッションを開始する",
     "button_stopSession": "セッションを終了する",
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
