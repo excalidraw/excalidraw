@@ -301,9 +301,12 @@
     "openIssueMessage": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille <button>virheenseurantajärjestelmässämme.</button> Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
     "sceneContent": "Piirroksen tiedot:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Voit kutsua ihmisiä piirrokseesi tekemään yhteistyötä kanssasi.",
-    "desc_privacy": "Älä huoli, istunto käyttää päästä-päähän-salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme eivät näe mitä keksit.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Aloita istunto",
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
