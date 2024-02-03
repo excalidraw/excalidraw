@@ -1,7 +1,14 @@
-import React, { forwardRef } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import clsx from "clsx";
 
 import "./FilledButton.scss";
+import { AbortError } from "../errors";
+import Spinner from "./Spinner";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
 export type ButtonColor = "primary" | "danger" | "warning" | "muted";
@@ -11,7 +18,7 @@ export type FilledButtonProps = {
   label: string;
 
   children?: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent) => void;
 
   variant?: ButtonVariant;
   color?: ButtonColor;
@@ -37,6 +44,34 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
     },
     ref,
   ) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const internalRef = useRef<HTMLButtonElement>(null);
+    const widthRef = useRef<number | undefined>(undefined);
+
+    useImperativeHandle(ref, () => internalRef.current!, []);
+
+    const _onClick = async (event: React.MouseEvent) => {
+      const ret = onClick?.(event);
+
+      if (ret && "then" in ret) {
+        try {
+          widthRef.current = internalRef.current?.offsetWidth;
+          setIsLoading(true);
+          await ret;
+        } catch (error: any) {
+          if (!(error instanceof AbortError)) {
+            throw error;
+          } else {
+            console.warn(error);
+          }
+        } finally {
+          widthRef.current = undefined;
+          setIsLoading(false);
+        }
+      }
+    };
+
     return (
       <button
         className={clsx(
@@ -47,17 +82,29 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
           { "ExcButton--fullWidth": fullWidth },
           className,
         )}
-        onClick={onClick}
+        onClick={_onClick}
         type="button"
         aria-label={label}
-        ref={ref}
+        ref={internalRef}
+        disabled={isLoading}
+        style={{
+          // too keep the same width when replacing the button content
+          // with a spinner
+          width: widthRef.current,
+        }}
       >
-        {startIcon && (
-          <div className="ExcButton__icon" aria-hidden>
-            {startIcon}
-          </div>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            {startIcon && (
+              <div className="ExcButton__icon" aria-hidden>
+                {startIcon}
+              </div>
+            )}
+            {variant !== "icon" && (children ?? label)}
+          </>
         )}
-        {variant !== "icon" && (children ?? label)}
       </button>
     );
   },

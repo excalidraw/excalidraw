@@ -10,6 +10,15 @@
     background-color: var(--back-color);
     border-color: var(--border-color);
 
+    .Spinner {
+      --spinner-color: var(--color-surface-lowest);
+    }
+
+    &[disabled] {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
     &--color-primary {
       &.ExcButton--variant-filled {
         --text-color: var(--color-surface-lowest);
