@@ -120,7 +120,7 @@ export const RoomModal = ({
               size="large"
               variant="icon"
               label="Share"
-              startIcon={getShareIcon()}
+              icon={getShareIcon()}
               className="RoomDialog__active__share"
               onClick={shareRoomLink}
             />
@@ -130,7 +130,7 @@ export const RoomModal = ({
               <FilledButton
                 size="large"
                 label="Copy link"
-                startIcon={copyIcon}
+                icon={copyIcon}
                 onClick={copyRoomLink}
               />
             </Popover.Trigger>
@@ -166,7 +166,7 @@ export const RoomModal = ({
             variant="outlined"
             color="danger"
             label={t("roomDialog.button_stopSession")}
-            startIcon={playerStopFilledIcon}
+            icon={playerStopFilledIcon}
             onClick={() => {
               trackEvent("share", "room closed");
               onRoomDestroy();
@@ -195,7 +195,7 @@ export const RoomModal = ({
         <FilledButton
           size="large"
           label={t("roomDialog.button_startSession")}
-          startIcon={playerPlayIcon}
+          icon={playerPlayIcon}
           onClick={() => {
             trackEvent("share", "room creation", `ui (${getFrame()})`);
             onRoomCreate();
