@@ -39,6 +39,10 @@
         --text-color: var(--color-surface-lowest);
         --back-color: var(--color-primary);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-brand-hover);
         }
@@ -51,8 +55,12 @@
       &.ExcButton--variant-outlined,
       &.ExcButton--variant-icon {
         --text-color: var(--color-primary);
-        --border-color: var(--color-border-outline);
+        --border-color: var(--color-primary);
         --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-brand-hover);
@@ -71,6 +79,10 @@
         --text-color: var(--color-danger-text);
         --back-color: var(--color-danger-dark);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-danger-darker);
         }
@@ -85,6 +97,10 @@
         --text-color: var(--color-danger);
         --border-color: var(--color-danger);
         --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-danger-darkest);
@@ -103,6 +119,10 @@
         --text-color: var(--island-bg-color);
         --back-color: var(--color-gray-50);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-gray-60);
         }
@@ -117,6 +137,10 @@
         --text-color: var(--color-muted-background);
         --border-color: var(--color-muted);
         --back-color: var(--island-bg-color);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-muted-background-darker);
@@ -135,6 +159,10 @@
         --text-color: black;
         --back-color: var(--color-warning-dark);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-warning-darker);
         }
@@ -149,6 +177,10 @@
         --text-color: var(--color-warning-dark);
         --border-color: var(--color-warning-dark);
         --back-color: var(--input-bg-color);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-warning-darker);
