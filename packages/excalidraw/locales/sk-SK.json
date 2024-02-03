@@ -301,9 +301,12 @@
     "openIssueMessage": "Boli sme veľmi opatrní, aby informácie vašej scény neboli v chybe zaznamenané. Ak vaša scéna nie je súkromná, prosím zvážte pokračovanie na naše <button>hlásenie chýb.</button> Prosím zahrňte informácie nižšie pomocou kopírovania a prilepenia do GitHub issue.",
     "sceneContent": "Obsah scény:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Pozvite niekoho do svojej aktuálnej scény a pracujte spoločne.",
-    "desc_privacy": "Nemajte obavy, schôdza používa end-to-end šifrovanie, takže všetko čo nakreslíte je súkromné. Dokonca, ani náš server dedokáže prečítať, čo ste vytvorili.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Začať schôdzu",
     "button_stopSession": "Ukončiť schôdzu",
     "desc_inProgressIntro": "Práve prebieha živá schôdza.",
