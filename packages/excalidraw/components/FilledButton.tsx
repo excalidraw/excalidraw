@@ -56,7 +56,13 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
 
       if (ret && "then" in ret) {
         try {
-          widthRef.current = internalRef.current?.offsetWidth;
+          if (internalRef.current) {
+            try {
+              widthRef.current =
+                parseFloat(getComputedStyle(internalRef.current).width) ||
+                undefined;
+            } catch {}
+          }
           setIsLoading(true);
           await ret;
         } catch (error: any) {
