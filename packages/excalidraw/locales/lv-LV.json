@@ -301,9 +301,12 @@
     "openIssueMessage": "Mēs uzmanījāmies, lai neiekļautu jūsu ainas informāciju šajā kļūdā. Ja jūsu aina nav privāta, lūdzu ziņojiet par šo kļūdu mūsu <button>kļūdu uzskaitē.</button> Lūdzu, miniet sekojošo informāciju to kopējot un ielīmējot jūsu ziņojumā platformā GitHub.",
     "sceneContent": "Ainas saturs:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Varat ielūgt cilvēkus pašreizējajā ainā, lai sadarbotos ar tiem.",
-    "desc_privacy": "Neuztraucieties, sesija izmanto šifrēšanu no gala līdz galam, tātad jūsu zīmējums paliks privāts. Pat mūsu serveri nevarēs redzēt, ar ko esat nācis klajā.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Sākt sesiju",
     "button_stopSession": "Beigt sesiju",
     "desc_inProgressIntro": "Notiek tiešsaistes sadarbības sesija.",
