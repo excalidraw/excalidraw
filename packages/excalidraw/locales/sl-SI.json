@@ -301,9 +301,12 @@
     "openIssueMessage": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem <button>sledilniku hroščev.</button> Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
     "sceneContent": "Vsebina scene:"
   },
+  "shareDialog": {
+    "or": "Ali"
+  },
   "roomDialog": {
-    "desc_intro": "Na vašo trenutno sceno lahko povabite osebe, ki bodo sodelovale z vami.",
-    "desc_privacy": "Brez skrbi. Seja uporablja šifriranje od konca do konca, tako da bo vse, kar narišete, ostalo zasebno. Niti naš strežnik ne bo mogel videti, kaj si izmislite.",
+    "desc_intro": "Povabite ljudi k sodelovanju pri vaši risbi.",
+    "desc_privacy": "Ne skrbite, seja je šifrirana od konca do konca in popolnoma zasebna. Niti naš strežnik ne vidi, kaj rišete.",
     "button_startSession": "Začni sejo",
     "button_stopSession": "Ustavi sejo",
     "desc_inProgressIntro": "Seja sodelovanja v živo je v teku.",
