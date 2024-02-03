@@ -301,9 +301,12 @@
     "openIssueMessage": "Vi var mycket försiktiga med att inte inkludera din skissinformation om felet. Om din skiss inte är privat, vänligen överväga att följa upp på vår <button>buggspårare.</button> Vänligen inkludera information nedan genom att kopiera och klistra in i GitHub-problemet.",
     "sceneContent": "Skissinnehåll:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Du kan bjuda in personer till din nuvarande skiss för att samarbeta med dig.",
-    "desc_privacy": "Oroa dig inte, sessionen använder kryptering från ände till ände, så vad du än ritar kommer att förbli privat. Inte ens vår server kommer att kunna se vad du skissar.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Starta sessionen",
     "button_stopSession": "Stoppa session",
     "desc_inProgressIntro": "Nu pågår en live-samarbetssession.",
