@@ -26,14 +26,14 @@ export type FilledButtonProps = {
   className?: string;
   fullWidth?: boolean;
 
-  startIcon?: React.ReactNode;
+  icon?: React.ReactNode;
 };
 
 export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
   (
     {
       children,
-      startIcon,
+      icon,
       onClick,
       label,
       variant = "filled",
@@ -97,9 +97,9 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
           <Spinner />
         ) : (
           <>
-            {startIcon && (
+            {icon && (
               <div className="ExcButton__icon" aria-hidden>
-                {startIcon}
+                {icon}
               </div>
             )}
             {variant !== "icon" && (children ?? label)}
