@@ -301,9 +301,12 @@
     "openIssueMessage": "Vigyáztunk arra, hogy a jelenthez tartozó információ ne jelenjen meg a hibaüzenetben. Ha a jeleneted nem bizalmas, kérjük add hozzá a <button>hibakövető rendszerünkhöz.</button> Kérjük, másolja be az alábbi információkat a GitHub problémába.",
     "sceneContent": "Jelenet tartalma:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Meghívhat embereket a jelenlegi jelenetbe, hogy együttműködjenek önnel.",
-    "desc_privacy": "Ne aggódj, a munkamenet végpontok közötti titkosítást használ, tehát bármit rajzolsz, privát marad. Még a szerverünkről se lehet belenézni.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Munkamenet indítása",
     "button_stopSession": "Munkamenet leállítása",
     "desc_inProgressIntro": "Az élő együttműködési munkamenet folyamatban van.",
