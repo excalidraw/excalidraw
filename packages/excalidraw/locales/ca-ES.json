@@ -301,9 +301,12 @@
     "openIssueMessage": "Anàvem amb molta cura de no incloure la informació de la vostra escena en l'error. Si l'escena no és privada, podeu fer-ne el seguiment al nostre <button>rastrejador d'errors.</button> Incloeu la informació a continuació copiant i enganxant a GitHub Issues.",
     "sceneContent": "Contingut de l'escena:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Podeu convidar persones a la vostra escena actual a col·laborar amb vós.",
-    "desc_privacy": "No us preocupeu, la sessió utilitza el xifratge de punta a punta, de manera que qualsevol cosa que dibuixeu romandrà privada. Ni tan sols el nostre servidor podrà veure què feu.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Inicia la sessió",
     "button_stopSession": "Atura la sessió",
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
