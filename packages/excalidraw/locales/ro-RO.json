@@ -301,9 +301,12 @@
     "openIssueMessage": "Am luat măsuri de precauție pentru a nu include informații despre scenă în eroare. Dacă scena nu este privată, oferă-ne mai multe informații în <button>monitorul nostru pentru erori</button>. Include informațiile de mai jos copiindu-le și lipindu-le în tichetul cu problemă de pe GitHub.",
     "sceneContent": "Conținutul scenei:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Poți invita alte persoane pentru a colabora la scena actuală.",
-    "desc_privacy": "Nu te îngrijora. Sesiunea utilizează criptarea integrală, astfel încât orice desenezi va rămâne privat. Nici măcar serverul nostru nu va putea vedea pe ce ai lucrat.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
