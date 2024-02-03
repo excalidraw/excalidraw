@@ -301,9 +301,12 @@
     "openIssueMessage": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑在我们的 <button>bug 跟踪系统</button>上提供更多信息。请复制粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布内容:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
-    "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "开始会话",
     "button_stopSession": "结束会话",
     "desc_inProgressIntro": "实时协作会话进行中。",
