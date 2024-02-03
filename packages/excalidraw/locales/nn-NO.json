@@ -301,9 +301,12 @@
     "openIssueMessage": "Vi er veldig nøye med å ikkje inkludere scene-opplysingane dine i feilmeldinga. Viss scena di ikkje er privat kan du vurdere å følge opp i <button>feilrapporteringssystemet vårt.</button> Ta med opplysingane nedanfor ved å kopiere og lime inn i GitHub-saka.",
     "sceneContent": "Scene-innhald:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Du kan invitere personar til scena di for å samarbeide med deg.",
-    "desc_privacy": "Ta det med ro; økta brukar ende-til-ende-kryptering, så alt du teiknar held fram med å vere privat. Ikkje ein gong serveren vår kan sjå kva du lagar.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Start økt",
     "button_stopSession": "Stopp økt",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er no i gang.",
