@@ -301,9 +301,12 @@
     "openIssueMessage": "Siamo stati molto cauti nel non includere informazioni della scena nell'errore. Se la tua scena non è privata, ti preghiamo di considerare la sua inclusione nel nostro <button>bug tracker.</button> Per favore includi le informazioni riportate qui sotto copiandole e incollandole nella issue di GitHub.",
     "sceneContent": "Contenuto della scena:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Puoi invitare persone nella tua scena attuale per collaborare con te.",
-    "desc_privacy": "Non preoccuparti, la sessione utilizza la crittografia end-to-end, quindi qualsiasi cosa disegni rimarrà privata. Nemmeno il nostro server sarà in grado di vedere cosa hai creato.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
