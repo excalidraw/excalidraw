@@ -301,9 +301,12 @@
     "openIssueMessage": "<button></button> Kopiere og indsæt venligst oplysningerne nedenfor i et GitHub problem.",
     "sceneContent": "Scene indhold:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Du kan invitere folk til din nuværende scene, så de kan samarbejde med dig.",
-    "desc_privacy": "Bare rolig, sessionen bruger end-to-end kryptering, så uanset hvad du tegner vil det forblive privat. Ikke engang vores server vil kunne se, hvad du kommer op med.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "",
     "button_stopSession": "",
     "desc_inProgressIntro": "Live-samarbejde session er nu begyndt.",
