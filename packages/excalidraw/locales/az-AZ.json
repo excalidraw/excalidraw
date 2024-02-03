@@ -301,6 +301,9 @@
     "openIssueMessage": "",
     "sceneContent": ""
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
