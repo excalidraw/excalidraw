@@ -301,9 +301,12 @@
     "openIssueMessage": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ <button>afecku n weḍfar n yibugen.</button> Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Tzemreḍ ad d-teɛerḍeḍ medden ɣer usayes-inek (m) amiran akken ad ttekkin yid-k.",
-    "desc_privacy": "Ur tqelliq ara, tiɣimit tsseqdac awgelhen ixef s ixef, dɣa ayen ara tsunɣeḍ ad iqqim d amaẓlay. Ula d aqeddac-nneɣ ur yezmir ara ad iwali acu txeddemeḍ.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Bdu tiɣimit",
     "button_stopSession": "Ḥbes tiɣimit",
     "desc_inProgressIntro": "Tiɣimit n umɛawen s srid tetteddu akka tura.",
