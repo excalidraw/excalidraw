@@ -301,9 +301,12 @@
     "openIssueMessage": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre <button>traçadors d’avarias.</button> Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
     "sceneContent": "Contengut de la scèna :"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Podètz convidar lo monde a vòstra scèna actuala per participar amb vos.",
-    "desc_privacy": "Vos en fagatz pas, la session utiliza lo chiframent del cap a la fin, çò que dessenetz demorarà privat. Mai nòstres servidors poiràn pas veire vòstra creacion.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Començar la session",
     "button_stopSession": "Arrestar la session",
     "desc_inProgressIntro": "La session de collaboracion es ara en cors.",
