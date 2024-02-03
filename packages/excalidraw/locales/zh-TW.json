@@ -301,9 +301,12 @@
     "openIssueMessage": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的<button>bug tracker。</button>請將下列資訊複製貼上至 GitHub issue 中。",
     "sceneContent": "作品內容："
   },
+  "shareDialog": {
+    "or": "或"
+  },
   "roomDialog": {
-    "desc_intro": "你可以邀請其他人一起協作目前的作品。",
-    "desc_privacy": "連線使用 end-to-end 加密故無須擔心作品的安全性。即使是我們的伺服器也無法取得其內容。",
+    "desc_intro": "邀請其他人一起協作",
+    "desc_privacy": "不用擔心，此連線為端到端加密且完全私有，即使是我們的伺服器也無法看見您的繪圖。",
     "button_startSession": "開始連線",
     "button_stopSession": "停止連線",
     "desc_inProgressIntro": "即時協作連線正在進行中。",
