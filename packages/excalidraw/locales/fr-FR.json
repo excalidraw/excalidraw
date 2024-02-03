@@ -301,9 +301,12 @@
     "openIssueMessage": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre <button>outil de suivi des bugs.</button> Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Vous pouvez inviter des personnes à collaborer avec vous sur votre scène actuelle.",
-    "desc_privacy": "Pas d'inquiétude, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne pourra voir ce que vous faites.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
