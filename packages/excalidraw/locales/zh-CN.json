@@ -302,11 +302,11 @@
     "sceneContent": "画布内容:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "或"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "邀请他人协作绘图。",
+    "desc_privacy": "别担心，会话是端到端加密、完全私密的。即使是我们的服务器也无法看到您绘制的内容。",
     "button_startSession": "开始会话",
     "button_stopSession": "结束会话",
     "desc_inProgressIntro": "实时协作会话进行中。",
