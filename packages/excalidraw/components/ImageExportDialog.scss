@@ -12,6 +12,8 @@
     flex-direction: row;
     justify-content: space-between;
 
+    user-select: none;
+
     & h3 {
       font-family: "Assistant";
       font-style: normal;

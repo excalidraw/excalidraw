@@ -10,6 +10,7 @@ import {
 import { ExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { trackEvent } from "../analytics";
+import { isPromiseLike } from "../utils";
 
 const trackAction = (
   action: Action,
@@ -55,7 +56,7 @@ export class ActionManager {
     app: AppClassProperties,
   ) {
     this.updater = (actionResult) => {
-      if (actionResult && "then" in actionResult) {
+      if (isPromiseLike(actionResult)) {
         actionResult.then((actionResult) => {
           return updater(actionResult);
         });

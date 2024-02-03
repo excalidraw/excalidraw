@@ -6,6 +6,7 @@ import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
 import Spinner from "./Spinner";
 import { PointerType } from "../element/types";
+import { isPromiseLike } from "../utils";
 
 export type ToolButtonSize = "small" | "medium";
 
@@ -65,7 +66,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   const onClick = async (event: React.MouseEvent) => {
     const ret = "onClick" in props && props.onClick?.(event);
 
-    if (ret && "then" in ret) {
+    if (isPromiseLike(ret)) {
       try {
         setIsLoading(true);
         await ret;
