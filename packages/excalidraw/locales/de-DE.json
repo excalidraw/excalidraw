@@ -302,11 +302,11 @@
     "sceneContent": "Zeichnungsinhalt:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Oder"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Lade Leute ein, an deiner Zeichnung mitzuarbeiten.",
+    "desc_privacy": "Keine Sorge, die Sitzung ist Ende-zu-Ende verschlüsselt und vollständig privat. Nicht einmal unser Server kann sehen, was du zeichnest.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
     "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
