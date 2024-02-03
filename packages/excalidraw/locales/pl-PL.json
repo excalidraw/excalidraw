@@ -301,9 +301,12 @@
     "openIssueMessage": "Szanujemy twoją prywatność i raport nie zawierał żadnych danych dotyczących tego nad czym pracowałeś, natomiast jeżeli jesteś w stanie podzielić się tym nad czym pracowałeś, prosimy o dodatkowy raport poprzez <button>nasze narzędzie do raportowania błędów.</button> Prosimy o dołączenie poniższej informacji poprzez skopiowanie jej i umieszczenie jej w zgłoszeniu na portalu GitHub.",
     "sceneContent": "Zawartość dokumentu:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Będziesz w stanie pracować wraz z osobami które zaprosisz do współpracy.",
-    "desc_privacy": "By zapewnić Ci prywatność, sesja współpracy na żywo jest zabezpieczona szyfrowaniem end-to-end, co oznacza, że poza tobą i osobami z którymi podzielisz się linkiem, nikt nie ma dostępu do tego co będziecie tworzyć.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Rozpocznij sesję",
     "button_stopSession": "Zakończ sesję",
     "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
