@@ -301,9 +301,12 @@
     "openIssueMessage": "저희는 화면 정보를 오류에 포함하지 않도록 매우 주의하고 있습니다. 혹시 화면에 민감한 내용이 없다면 이곳에 업로드를 고려해주세요.<button>버그 트래커</button> 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
     "sceneContent": "화면 내용:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "현재 화면에 공동 작업자를 초대해 협업할 수 있습니다.",
-    "desc_privacy": "안심하세요, 세션은 종단 간 암호화를 사용하므로 당신의 작업은 비공개로 유지되며 서버조차도 작업 내용을 알 수 없습니다.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "세션 시작",
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
