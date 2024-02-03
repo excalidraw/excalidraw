@@ -301,9 +301,12 @@
     "openIssueMessage": "Fomos muito cautelosos para não incluir suas informações de cena no erro. Se sua cena não for privada, por favor, considere seguir nosso <button>rastreador de bugs.</button> Por favor, inclua informações abaixo, copiando e colando para a issue do GitHub.",
     "sceneContent": "Conteúdo da cena:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Você pode convidar pessoas para sua cena atual para colaborar com você.",
-    "desc_privacy": "Não se preocupe, a sessão usa criptografia de ponta a ponta; portanto, o que você desenhar permanecerá privado. Nem mesmo nosso servidor poderá ver o que você cria.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Iniciar sessão",
     "button_stopSession": "Parar sessão",
     "desc_inProgressIntro": "A sessão de colaboração ao vivo está agora em andamento.",
