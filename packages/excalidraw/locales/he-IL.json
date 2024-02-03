@@ -301,9 +301,12 @@
     "openIssueMessage": "",
     "sceneContent": "תוכן הקנבאס:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "אתה יכול להזמין אנשים לקנבאס הנוכחי שלך לעבודה משותפת.",
-    "desc_privacy": "אל דאגה, השיתוף מוצפן מקצה לקצה, כך שכל מה שתצייר ישאר פרטי. אפילו השרתים שלנו לא יוכלו לראות את מה שאתה ממציא.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "התחל שיתוף",
     "button_stopSession": "הפסק שיתוף",
     "desc_inProgressIntro": "שיתוף חי פעיל כרגע.",
