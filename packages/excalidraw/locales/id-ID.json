@@ -301,9 +301,12 @@
     "openIssueMessage": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada <button>pelacak bug.</button> Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
     "sceneContent": "Pemandangan konten:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Anda dapat mengundang orang ke pemandangan Anda saat ini untuk berkolaborasi dengan Anda.",
-    "desc_privacy": "Jangan khawatir, sesi menggunakan enkripsi end-to-end, sehingga apa pun yang Anda gambar akan tetap bersifat pribadi. Bahkan server kami tidak dapat melihat apa yang Anda lakukan.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
