@@ -301,9 +301,12 @@
     "openIssueMessage": "Byli jsme velmi opatrní, abychom neuváděli informace o Vaší scéně. Pokud vaše scéna není soukromá, zvažte prosím sledování na našem <button>bug trackeru</button>. Uveďte prosím níže uvedené informace kopírováním a vložením do problému na GitHubu.",
     "sceneContent": "Obsah scény:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Můžete pozvat lidi na vaši aktuální scénu ke spolupráci s vámi.",
-    "desc_privacy": "Nebojte se, relace používá end-to-end šifrování, takže cokoliv nakreslíte zůstane soukromé. Ani náš server nebude schopen vidět, s čím budete pracovat.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Zahájit relaci",
     "button_stopSession": "Ukončit relaci",
     "desc_inProgressIntro": "Živá spolupráce právě probíhá.",
