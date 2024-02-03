@@ -301,9 +301,12 @@
     "openIssueMessage": "Oso kontuz ibili gara zure eszenaren informazioa errorean ez sartzeko. Zure eszena pribatua ez bada, kontuan hartu gure <button>erroreen jarraipena egitea.</button> Sartu beheko informazioa kopiatu eta itsatsi bidez GitHub issue-n.",
     "sceneContent": "Eszenaren edukia:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Jendea zure uneko eszenara gonbida dezakezu zurekin elkarlanean aritzeko.",
-    "desc_privacy": "Ez kezkatu, saioak muturretik muturrerako enkriptatzea erabiltzen du, beraz, marrazten duzuna pribatua izango da. Gure zerbitzariak ere ezingo du ikusi zer egiten duzun.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Hasi saioa",
     "button_stopSession": "Itxi saioa",
     "desc_inProgressIntro": "Zuzeneko lankidetza saioa abian da.",
