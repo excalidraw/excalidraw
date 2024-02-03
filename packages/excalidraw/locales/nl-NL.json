@@ -301,9 +301,12 @@
     "openIssueMessage": "We waren voorzichtig om je scène-informatie niet in de fout toe te voegen. Als je scène niet privé is, overweeg dan alstublieft het opvolgen op onze <button>bugtracker.</button> Kopieer de informatie hieronder naar de GitHub issue.",
     "sceneContent": "Scène-inhoud:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Je kunt mensen uitnodigen om met je samen te werken.",
-    "desc_privacy": "Geen zorgen, de sessie gebruikt end-to-end encryptie, dus wat je tekent blijft privé. Zelfs onze server zal niet kunnen zien wat je tekent.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Start sessie",
     "button_stopSession": "Stop sessie",
     "desc_inProgressIntro": "De live-samenwerkingssessie is nu gestart.",
