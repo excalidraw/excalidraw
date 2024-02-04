@@ -12,7 +12,7 @@
     "copyAsSvg": "Kopieer naar klembord als SVG",
     "copyText": "Kopieer naar klembord als tekst",
     "copySource": "",
-    "convertToCode": "",
+    "convertToCode": "Zet om naar code",
     "bringForward": "Breng naar voren",
     "sendToBack": "Stuur naar achtergrond",
     "bringToFront": "Breng naar voorgrond",
@@ -38,8 +38,8 @@
     "arrowhead_none": "Geen",
     "arrowhead_arrow": "Pijl",
     "arrowhead_bar": "Balk",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Rond",
+    "arrowhead_circle_outline": "Rond (omtrek)",
     "arrowhead_triangle": "Driehoek",
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
@@ -49,7 +49,7 @@
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
     "handDrawn": "Handgetekend",
     "normal": "Normaal",
-    "code": "",
+    "code": "Code",
     "small": "Klein",
     "medium": "",
     "large": "Groot",
@@ -64,9 +64,9 @@
     "center": "Midden",
     "right": "Rechts",
     "extraBold": "Zwaar",
-    "architect": "",
+    "architect": "Architect",
     "artist": "Artiest",
-    "cartoonist": "",
+    "cartoonist": "Cartoonist",
     "fileTitle": "Bestandsnaam",
     "colorPicker": "Kleurenkiezer",
     "canvasColors": "Gebruikt op canvas",
@@ -118,7 +118,7 @@
       "editEmbed": "Link bewerken & insluiten",
       "create": "Maak link",
       "createEmbed": "Link maken en insluiten",
-      "label": "",
+      "label": "Link",
       "labelEmbed": "Link toevoegen & insluiten",
       "empty": "Er is geen link ingesteld"
     },
@@ -139,7 +139,7 @@
     "eyeDropper": "",
     "textToDiagram": "",
     "prompt": "",
-    "followUs": "",
+    "followUs": "Volg ons",
     "discordChat": ""
   },
   "library": {
@@ -155,7 +155,7 @@
     "copyToClipboard": "Kopieer",
     "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
-    "load": "",
+    "load": "Open",
     "getShareableLink": "Maak een deelbare link",
     "close": "Sluiten",
     "selectLanguage": "Taal selecteren",
@@ -163,7 +163,7 @@
     "zoomIn": "Inzoomen",
     "zoomOut": "Uitzoomen",
     "resetZoom": "Zoom terugzetten",
-    "menu": "",
+    "menu": "Menu",
     "done": "Klaar",
     "edit": "Bewerken",
     "undo": "Ongedaan maken",
@@ -232,8 +232,8 @@
       "image": "Ondersteuning voor het toevoegen van afbeeldingen aan de bibliotheek komt binnenkort!"
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Kon niet plakken.",
+    "copyToSystemClipboardFailed": "Kon niet naar klembord kopiëren."
   },
   "toolBar": {
     "selection": "Selectie",
@@ -250,14 +250,14 @@
     "penMode": "Pen modus - Blokkeer aanraken",
     "link": "Link toevoegen / bijwerken voor een geselecteerde vorm",
     "eraser": "Gum",
-    "frame": "",
+    "frame": "Frame tool",
     "magicframe": "",
     "embeddable": "Web insluiten",
-    "laser": "",
+    "laser": "Laseraanwijzer",
     "hand": "",
-    "extraTools": "",
+    "extraTools": "Meer tools",
     "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "magicSettings": "AI-instellingen"
   },
   "headings": {
     "canvasActions": "Canvasacties",
@@ -399,24 +399,24 @@
   "imageExportDialog": {
     "header": "",
     "label": {
-      "withBackground": "",
+      "withBackground": "Achtergrond",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "Dark mode",
       "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "scale": "Schaal",
+      "padding": "Padding"
     },
     "tooltip": {
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Exporteer naar PNG",
+      "exportToSvg": "Exporteer naar SVG",
+      "copyPngToClipboard": "Kopieer PNG naar klembord"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": ""
     }
   },
@@ -426,10 +426,10 @@
   },
   "stats": {
     "angle": "Hoek",
-    "element": "",
+    "element": "Element",
     "elements": "Elementen",
     "height": "Hoogte",
-    "scene": "",
+    "scene": "Scene",
     "selected": "Geselecteerd",
     "storage": "Opslag",
     "title": "Statistieken voor nerds",
@@ -446,7 +446,7 @@
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
-    "canvas": "",
+    "canvas": "canvas",
     "selection": "selectie",
     "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
     "unableToEmbed": "Het insluiten van deze url is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
@@ -454,10 +454,10 @@
   },
   "colors": {
     "transparent": "Transparant",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
+    "black": "Zwart",
+    "white": "Wit",
+    "red": "Rood",
+    "pink": "Roze",
     "grape": "",
     "violet": "",
     "gray": "",
