@@ -302,11 +302,11 @@
     "sceneContent": "Conținutul scenei:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Sau"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Invită persoane să colaboreze la desenul tău.",
+    "desc_privacy": "Nu-ți face griji, sesiunea este criptată integral și complet privată. Nici măcar serverul nostru nu poate vedea ce desenezi.",
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
