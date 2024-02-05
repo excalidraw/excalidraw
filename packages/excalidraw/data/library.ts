@@ -572,6 +572,9 @@ export const useHandleLibrary = (
         .then((libraryItems) => {
           excalidrawAPI.updateLibrary({
             libraryItems,
+            // merge with current library items because we may have already
+            // populated it (e.g. by installing 3rd party library which can
+            // happen before the DB data is loaded)
             merge: true,
           });
         })
@@ -684,6 +687,9 @@ export const useHandleLibrary = (
       initDataPromise.then(async (data) => {
         excalidrawAPI.updateLibrary({
           libraryItems: data || [],
+          // merge with current library items because we may have already
+          // populated it (e.g. by installing 3rd party library which can
+          // happen before the DB data is loaded)
           merge: true,
         });
       });
