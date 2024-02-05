@@ -306,12 +306,10 @@ describe("restoreAppState", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.activeTool.type = "selection";
     stubImportedAppState.cursorButton = "down";
-    stubImportedAppState.name = "imported app state";
 
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.activeTool.type = "rectangle";
     stubLocalAppState.cursorButton = "up";
-    stubLocalAppState.name = "local app state";
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
@@ -321,7 +319,6 @@ describe("restoreAppState", () => {
       stubImportedAppState.activeTool,
     );
     expect(restoredAppState.cursorButton).toBe("up");
-    expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
   it("should restore with current app state when imported data state is undefined", () => {
@@ -340,30 +337,25 @@ describe("restoreAppState", () => {
       stubLocalAppState,
     );
     expect(restoredAppState.cursorButton).toBe(stubLocalAppState.cursorButton);
-    expect(restoredAppState.name).toBe(stubLocalAppState.name);
   });
 
   it("should return imported data when local app state is null", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
-    stubImportedAppState.name = "imported app state";
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
       null,
     );
     expect(restoredAppState.cursorButton).toBe("up");
-    expect(restoredAppState.name).toBe(stubImportedAppState.name);
   });
 
   it("should return local app state when imported data state is null", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
-    stubLocalAppState.name = "local app state";
 
     const restoredAppState = restore.restoreAppState(null, stubLocalAppState);
     expect(restoredAppState.cursorButton).toBe(stubLocalAppState.cursorButton);
-    expect(restoredAppState.name).toBe(stubLocalAppState.name);
   });
 
   it("should return default app state when imported data state and local app state are undefined", () => {
@@ -492,13 +484,11 @@ describe("restore", () => {
   it("when imported data state is null it should return the local app state property", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
-    stubLocalAppState.name = "local app state";
 
     const restoredData = restore.restore(null, stubLocalAppState, null);
     expect(restoredData.appState.cursorButton).toBe(
       stubLocalAppState.cursorButton,
     );
-    expect(restoredData.appState.name).toBe(stubLocalAppState.name);
   });
 
   it("when imported data state has elements", () => {
@@ -522,14 +512,12 @@ describe("restore", () => {
   it("when local app state is null but imported app state is supplied", () => {
     const stubImportedAppState = getDefaultAppState();
     stubImportedAppState.cursorButton = "down";
-    stubImportedAppState.name = "imported app state";
 
     const importedDataState = {} as ImportedDataState;
     importedDataState.appState = stubImportedAppState;
 
     const restoredData = restore.restore(importedDataState, null, null);
     expect(restoredData.appState.cursorButton).toBe("up");
-    expect(restoredData.appState.name).toBe(stubImportedAppState.name);
   });
 
   it("bump versions of local duplicate elements when supplied", () => {

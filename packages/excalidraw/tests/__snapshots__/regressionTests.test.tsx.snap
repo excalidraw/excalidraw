@@ -55,7 +55,6 @@ exports[`given element A and group of elements B and given both are selected whe
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -119,7 +118,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -130,7 +128,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -173,7 +170,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -245,7 +241,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -346,7 +341,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id2": true,
@@ -513,7 +507,6 @@ exports[`given element A and group of elements B and given both are selected whe
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -579,7 +572,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -590,7 +582,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -633,7 +624,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -705,7 +695,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -806,7 +795,6 @@ exports[`given element A and group of elements B and given both are selected whe
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id2": true,
@@ -973,7 +961,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -1030,7 +1017,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -1041,7 +1027,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -1084,7 +1069,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -1156,7 +1140,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -1235,7 +1218,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": "id4",
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -1311,7 +1293,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id7": true,
         },
@@ -1416,7 +1397,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -1529,7 +1509,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": "id4",
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -1638,7 +1617,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "appState": {
         "editingGroupId": "id10",
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id7": true,
         },
@@ -1806,7 +1784,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -1865,7 +1842,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -1876,7 +1852,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -1919,7 +1894,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -2021,7 +1995,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -2083,7 +2056,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -2094,7 +2066,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -2137,7 +2108,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -2209,7 +2179,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -2310,7 +2279,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id2": true,
@@ -2477,7 +2445,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -2536,7 +2503,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] histo
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -2547,7 +2513,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] histo
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -2590,7 +2555,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] histo
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -2721,7 +2685,6 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -2778,7 +2741,6 @@ exports[`regression tests > arrow keys > [end of test] history 1`] = `
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -2789,7 +2751,6 @@ exports[`regression tests > arrow keys > [end of test] history 1`] = `
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -2891,7 +2852,6 @@ exports[`regression tests > can drag element that covers another element, while 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -2950,7 +2910,6 @@ exports[`regression tests > can drag element that covers another element, while 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -2961,7 +2920,6 @@ exports[`regression tests > can drag element that covers another element, while 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3004,7 +2962,6 @@ exports[`regression tests > can drag element that covers another element, while 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -3076,7 +3033,6 @@ exports[`regression tests > can drag element that covers another element, while 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -3177,7 +3133,6 @@ exports[`regression tests > can drag element that covers another element, while 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -3337,7 +3292,6 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -3394,7 +3348,6 @@ exports[`regression tests > change the properties of a shape > [end of test] his
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -3405,7 +3358,6 @@ exports[`regression tests > change the properties of a shape > [end of test] his
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3448,7 +3400,6 @@ exports[`regression tests > change the properties of a shape > [end of test] his
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3491,7 +3442,6 @@ exports[`regression tests > change the properties of a shape > [end of test] his
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3534,7 +3484,6 @@ exports[`regression tests > change the properties of a shape > [end of test] his
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3636,7 +3585,6 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -3727,7 +3675,6 @@ exports[`regression tests > click on an element and drag it > [dragged] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -3738,7 +3685,6 @@ exports[`regression tests > click on an element and drag it > [dragged] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3781,7 +3727,6 @@ exports[`regression tests > click on an element and drag it > [dragged] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3883,7 +3828,6 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -3942,7 +3886,6 @@ exports[`regression tests > click on an element and drag it > [end of test] hist
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -3953,7 +3896,6 @@ exports[`regression tests > click on an element and drag it > [end of test] hist
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -3996,7 +3938,6 @@ exports[`regression tests > click on an element and drag it > [end of test] hist
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -4039,7 +3980,6 @@ exports[`regression tests > click on an element and drag it > [end of test] hist
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -4141,7 +4081,6 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -4200,7 +4139,6 @@ exports[`regression tests > click to select a shape > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -4211,7 +4149,6 @@ exports[`regression tests > click to select a shape > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -4254,7 +4191,6 @@ exports[`regression tests > click to select a shape > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -4385,7 +4321,6 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -4445,7 +4380,6 @@ exports[`regression tests > click-drag to select a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -4456,7 +4390,6 @@ exports[`regression tests > click-drag to select a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -4499,7 +4432,6 @@ exports[`regression tests > click-drag to select a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -4571,7 +4503,6 @@ exports[`regression tests > click-drag to select a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -4731,7 +4662,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -4790,7 +4720,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -4801,7 +4730,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -4844,7 +4772,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -4916,7 +4843,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -4995,7 +4921,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "appState": {
         "editingGroupId": "id4",
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -5071,7 +4996,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -5236,7 +5160,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -5322,7 +5245,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -5333,7 +5255,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -5376,7 +5297,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -5535,7 +5455,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -5593,7 +5512,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -5604,7 +5522,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -5647,7 +5564,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -5806,7 +5722,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -5891,7 +5806,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -5902,7 +5816,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -6004,7 +5917,6 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -6061,7 +5973,6 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -6072,7 +5983,6 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -6174,7 +6084,6 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -6231,7 +6140,6 @@ exports[`regression tests > double click to edit a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -6242,7 +6150,6 @@ exports[`regression tests > double click to edit a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -6285,7 +6192,6 @@ exports[`regression tests > double click to edit a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -6357,7 +6263,6 @@ exports[`regression tests > double click to edit a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -6458,7 +6363,6 @@ exports[`regression tests > double click to edit a group > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -6628,7 +6532,6 @@ exports[`regression tests > drags selected elements from point inside common bou
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -6689,7 +6592,6 @@ exports[`regression tests > drags selected elements from point inside common bou
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -6700,7 +6602,6 @@ exports[`regression tests > drags selected elements from point inside common bou
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -6743,7 +6644,6 @@ exports[`regression tests > drags selected elements from point inside common bou
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -6815,7 +6715,6 @@ exports[`regression tests > drags selected elements from point inside common bou
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -6947,7 +6846,6 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -7002,7 +6900,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -7013,7 +6910,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -7056,7 +6952,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -7128,7 +7023,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -7229,7 +7123,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id3": true,
         },
@@ -7374,7 +7267,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id4": true,
         },
@@ -7563,7 +7455,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id5": true,
         },
@@ -7799,7 +7690,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id5": true,
         },
@@ -8039,7 +7929,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id6": true,
         },
@@ -8326,7 +8215,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id6": true,
         },
@@ -8617,7 +8505,6 @@ exports[`regression tests > draw every type of shape > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -9016,7 +8903,6 @@ exports[`regression tests > given a group of selected elements with an element t
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -9076,7 +8962,6 @@ exports[`regression tests > given a group of selected elements with an element t
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -9087,7 +8972,6 @@ exports[`regression tests > given a group of selected elements with an element t
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -9130,7 +9014,6 @@ exports[`regression tests > given a group of selected elements with an element t
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -9202,7 +9085,6 @@ exports[`regression tests > given a group of selected elements with an element t
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -9362,7 +9244,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -9422,7 +9303,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -9433,7 +9313,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -9476,7 +9355,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -9607,7 +9485,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -9666,7 +9543,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -9677,7 +9553,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -9808,7 +9683,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -9867,7 +9741,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -9878,7 +9751,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -9950,7 +9822,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -10081,7 +9952,6 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -10138,7 +10008,6 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -10149,7 +10018,6 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -10251,7 +10119,6 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -10308,7 +10175,6 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -10319,7 +10185,6 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -10421,7 +10286,6 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -10478,7 +10342,6 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -10489,7 +10352,6 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -10591,7 +10453,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -10671,7 +10532,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -10682,7 +10542,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -10799,7 +10658,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -10879,7 +10737,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -10890,7 +10747,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -11007,7 +10863,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -11062,7 +10917,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -11073,7 +10927,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -11195,7 +11048,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -11275,7 +11127,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -11286,7 +11137,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] history 1`]
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -11403,7 +11253,6 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -11460,7 +11309,6 @@ exports[`regression tests > key d selects diamond tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -11471,7 +11319,6 @@ exports[`regression tests > key d selects diamond tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -11573,7 +11420,6 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -11653,7 +11499,6 @@ exports[`regression tests > key l selects line tool > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -11664,7 +11509,6 @@ exports[`regression tests > key l selects line tool > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -11781,7 +11625,6 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -11838,7 +11681,6 @@ exports[`regression tests > key o selects ellipse tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -11849,7 +11691,6 @@ exports[`regression tests > key o selects ellipse tool > [end of test] history 1
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -11951,7 +11792,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -12006,7 +11846,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -12017,7 +11856,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] history 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -12139,7 +11977,6 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -12196,7 +12033,6 @@ exports[`regression tests > key r selects rectangle tool > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -12207,7 +12043,6 @@ exports[`regression tests > key r selects rectangle tool > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -12309,7 +12144,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -12374,7 +12208,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -12385,7 +12218,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -12428,7 +12260,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -12500,7 +12331,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -12601,7 +12431,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -12712,7 +12541,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] histor
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -12975,7 +12803,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -13034,7 +12861,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -13045,7 +12871,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -13088,7 +12913,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -13219,7 +13043,6 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "isRotating": false,
   "lastPointerDownWith": "touch",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -13274,7 +13097,6 @@ exports[`regression tests > pinch-to-zoom works > [end of test] history 1`] = `
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -13344,7 +13166,6 @@ exports[`regression tests > shift click on selected element should deselect it o
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -13401,7 +13222,6 @@ exports[`regression tests > shift click on selected element should deselect it o
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -13412,7 +13232,6 @@ exports[`regression tests > shift click on selected element should deselect it o
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -13514,7 +13333,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -13575,7 +13393,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -13586,7 +13403,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -13629,7 +13445,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -13701,7 +13516,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -13833,7 +13647,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -13896,7 +13709,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -13907,7 +13719,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -13950,7 +13761,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -14022,7 +13832,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -14123,7 +13932,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -14234,7 +14042,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -14396,7 +14203,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -14463,7 +14269,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -14474,7 +14279,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -14517,7 +14321,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -14589,7 +14392,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -14668,7 +14470,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id5": true,
         },
@@ -14773,7 +14574,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id6": true,
         },
@@ -14907,7 +14707,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id5": true,
           "id6": true,
@@ -15048,7 +14847,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -15254,7 +15052,6 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -15312,7 +15109,6 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] h
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -15382,7 +15178,6 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -15441,7 +15236,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -15452,7 +15246,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -15495,7 +15288,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -15567,7 +15359,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -15668,7 +15459,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -15779,7 +15569,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": "id3",
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id2": true,
@@ -15887,7 +15676,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": "id3",
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id2": true,
@@ -15999,7 +15787,6 @@ exports[`regression tests > supports nested groups > [end of test] history 1`] =
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
           "id1": true,
@@ -16199,7 +15986,6 @@ exports[`regression tests > switches from group of selected elements to another 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -16287,7 +16073,6 @@ exports[`regression tests > switches from group of selected elements to another 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -16298,7 +16083,6 @@ exports[`regression tests > switches from group of selected elements to another 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -16341,7 +16125,6 @@ exports[`regression tests > switches from group of selected elements to another 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -16413,7 +16196,6 @@ exports[`regression tests > switches from group of selected elements to another 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -16601,7 +16383,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -16688,7 +16469,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -16699,7 +16479,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -16742,7 +16521,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -16873,7 +16651,6 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "isRotating": false,
   "lastPointerDownWith": "touch",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -16928,7 +16705,6 @@ exports[`regression tests > two-finger scroll works > [end of test] history 1`] 
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -16998,7 +16774,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -17054,7 +16829,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -17177,7 +16951,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id2": true,
         },
@@ -17298,7 +17071,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -17309,7 +17081,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id0": true,
         },
@@ -17352,7 +17123,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] history
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {
           "id1": true,
         },
@@ -17483,7 +17253,6 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -17538,7 +17307,6 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
@@ -17608,7 +17376,6 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
-  "name": "Untitled-201933152653",
   "objectsSnapModeEnabled": false,
   "offsetLeft": 0,
   "offsetTop": 0,
@@ -17666,7 +17433,6 @@ exports[`regression tests > zoom hotkeys > [end of test] history 1`] = `
       "appState": {
         "editingGroupId": null,
         "editingLinearElement": null,
-        "name": "Untitled-201933152653",
         "selectedElementIds": {},
         "selectedGroupIds": {},
         "viewBackgroundColor": "#ffffff",
