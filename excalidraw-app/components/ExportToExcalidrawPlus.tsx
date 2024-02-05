@@ -23,13 +23,14 @@ import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getFrame } from "../../packages/excalidraw/utils";
+import { getDateTime, getFrame } from "../../packages/excalidraw/utils";
 import { ExcalidrawLogo } from "../../packages/excalidraw/components/ExcalidrawLogo";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
+  name: string,
 ) => {
   const firebase = await loadFirebaseStorage();
 
@@ -53,7 +54,7 @@ export const exportToExcalidrawPlus = async (
     .ref(`/migrations/scenes/${id}`)
     .put(blob, {
       customMetadata: {
-        data: JSON.stringify({ version: 2, name: appState.name }),
+        data: JSON.stringify({ version: 2, name }),
         created: Date.now().toString(),
       },
     });
@@ -117,7 +118,12 @@ export const ExportToExcalidrawPlus: React.FC<{
         onClick={async () => {
           try {
             trackEvent("export", "eplus", `ui (${getFrame()})`);
-            await exportToExcalidrawPlus(elements, appState, files);
+            await exportToExcalidrawPlus(
+              elements,
+              appState,
+              files,
+              `${t("labels.untitled")}-${getDateTime()}`,
+            );
             onSuccess();
           } catch (error: any) {
             console.error(error);

@@ -247,7 +247,6 @@ export interface AppState {
   scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
-  name: string;
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;

@@ -45,6 +45,7 @@ import {
   ResolvablePromise,
   resolvablePromise,
   isRunningInIframe,
+  getDateTime,
 } from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -775,6 +776,7 @@ const ExcalidrawWrapper = () => {
                   excalidrawAPI.getSceneElements(),
                   excalidrawAPI.getAppState(),
                   excalidrawAPI.getFiles(),
+                  `${t("labels.untitled")}-${getDateTime()}`,
                 );
               }}
             >

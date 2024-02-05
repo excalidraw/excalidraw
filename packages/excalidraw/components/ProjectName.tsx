@@ -1,14 +1,15 @@
 import "./TextInput.scss";
 
 import React, { useState } from "react";
-import { focusNearestParent } from "../utils";
+import { focusNearestParent, getDateTime } from "../utils";
 
 import "./ProjectName.scss";
 import { useExcalidrawContainer } from "./App";
 import { KEYS } from "../keys";
+import { t } from "../i18n";
 
 type Props = {
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   label: string;
   isNameEditable: boolean;
@@ -17,7 +18,9 @@ type Props = {
 
 export const ProjectName = (props: Props) => {
   const { id } = useExcalidrawContainer();
-  const [fileName, setFileName] = useState<string>(props.value);
+  const [fileName, setFileName] = useState<string>(
+    props.value || `${t("labels.untitled")}-${getDateTime()}`,
+  );
 
   const handleBlur = (event: any) => {
     if (!props.ignoreFocus) {

@@ -270,6 +270,7 @@ import {
   updateStable,
   addEventListener,
   normalizeEOL,
+  getDateTime,
 } from "../utils";
 import {
   createSrcDoc,
@@ -619,7 +620,6 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
-      name = defaultAppState.name,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -630,7 +630,6 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
-      name,
       width: window.innerWidth,
       height: window.innerHeight,
     };
@@ -1725,7 +1724,7 @@ class App extends React.Component<AppProps, AppState> {
       this.files,
       {
         exportBackground: this.state.exportBackground,
-        name: this.state.name,
+        name: this.props?.name || `${t("labels.untitled")}-${getDateTime()}`,
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
       },
@@ -2124,7 +2123,7 @@ class App extends React.Component<AppProps, AppState> {
         let gridSize = actionResult?.appState?.gridSize || null;
         const theme =
           actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
-        let name = actionResult?.appState?.name ?? this.state.name;
+
         const errorMessage =
           actionResult?.appState?.errorMessage ?? this.state.errorMessage;
         if (typeof this.props.viewModeEnabled !== "undefined") {
@@ -2137,10 +2136,6 @@ class App extends React.Component<AppProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        if (typeof this.props.name !== "undefined") {
-          name = this.props.name;
         }
 
         editingElement =
@@ -2165,7 +2160,6 @@ class App extends React.Component<AppProps, AppState> {
               zenModeEnabled,
               gridSize,
               theme,
-              name,
               errorMessage,
             });
           },
@@ -2696,12 +2690,6 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
       this.setState({
         gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
-      });
-    }
-
-    if (this.props.name && prevProps.name !== this.props.name) {
-      this.setState({
-        name: this.props.name,
       });
     }
 

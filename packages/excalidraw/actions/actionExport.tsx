@@ -19,6 +19,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
+import { getDateTime } from "../utils";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -29,7 +30,7 @@ export const actionChangeProjectName = register({
   PanelComponent: ({ appState, updateData, appProps, data }) => (
     <ProjectName
       label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
+      value={appProps.name}
       onChange={(name: string) => updateData(name)}
       isNameEditable={
         typeof appProps.name === "undefined" && !appState.viewModeEnabled
@@ -144,8 +145,18 @@ export const actionSaveToActiveFile = register({
 
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(elements, appState, app.files)
-        : await saveAsJSON(elements, appState, app.files);
+        ? await resaveAsImageWithScene(
+            elements,
+            appState,
+            app.files,
+            app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
+          )
+        : await saveAsJSON(
+            elements,
+            appState,
+            app.files,
+            app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
+          );
 
       return {
         commitToHistory: false,
@@ -190,6 +201,7 @@ export const actionSaveFileToDisk = register({
           fileHandle: null,
         },
         app.files,
+        app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
       );
       return {
         commitToHistory: false,

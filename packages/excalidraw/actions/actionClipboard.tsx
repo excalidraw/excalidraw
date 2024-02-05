@@ -13,6 +13,7 @@ import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { isTextElement } from "../element";
 import { t } from "../i18n";
 import { isFirefox } from "../constants";
+import { getDateTime } from "../utils";
 
 export const actionCopy = register({
   name: "copy",
@@ -138,6 +139,7 @@ export const actionCopyAsSvg = register({
         {
           ...appState,
           exportingFrame,
+          name: app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
         },
       );
       return {
@@ -184,6 +186,7 @@ export const actionCopyAsPng = register({
       await exportCanvas("clipboard", exportedElements, appState, app.files, {
         ...appState,
         exportingFrame,
+        name: app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
       });
       return {
         appState: {
