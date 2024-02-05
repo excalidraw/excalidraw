@@ -200,39 +200,48 @@ export class LocalData {
 }
 
 class LibraryIndexedDBAdapter implements LibraryPersistenceAdapter {
-  name: string;
+  name = "excalidraw-library";
   key = "libraryData";
 
-  legacyLSKey = "excalidraw-library";
+  migrationLocalStorageKey?: string;
 
   store: UseStore;
 
-  constructor(name: string, legacyLSKey?: string) {
-    if (legacyLSKey) {
-      this.legacyLSKey = legacyLSKey;
+  migrate: LibraryPersistenceAdapter["migrate"];
+
+  constructor(opts?: {
+    /** IndexedDB databse and store name */
+    name?: string;
+    /** LocalStorage key containing legacy data to be migrated, if applicable */
+    migrationLocalStorageKey?: string;
+  }) {
+    if (opts?.migrationLocalStorageKey) {
+      this.migrationLocalStorageKey = opts.migrationLocalStorageKey;
     }
-    this.name = name;
+    if (opts?.name) {
+      this.name = opts.name;
+    }
     this.store = createStore(`${this.name}-db`, `${this.name}-store`);
-  }
 
-  /** migrates */
-  migrate() {
-    return {
-      load: () => {
-        const LSData = localStorage.getItem(this.legacyLSKey);
-
-        if (LSData != null) {
-          const libraryItems: ImportedDataState["libraryItems"] =
-            JSON.parse(LSData);
-          return libraryItems || [];
-        }
-
-        return null;
-      },
-      delete: () => {
-        localStorage.removeItem(this.legacyLSKey);
-      },
-    };
+    if (this.migrationLocalStorageKey) {
+      let migrationLocalStorageKey = this.migrationLocalStorageKey;
+      this.migrate = () => {
+        return {
+          load: () => {
+            const LSData = localStorage.getItem(migrationLocalStorageKey);
+            if (LSData != null) {
+              const libraryItems: ImportedDataState["libraryItems"] =
+                JSON.parse(LSData);
+              return libraryItems || [];
+            }
+            return null;
+          },
+          delete: () => {
+            localStorage.removeItem(migrationLocalStorageKey);
+          },
+        };
+      };
+    }
   }
 
   async load() {
@@ -246,7 +255,8 @@ class LibraryIndexedDBAdapter implements LibraryPersistenceAdapter {
   }
 }
 
-export const libraryIndexedDBAdapter = new LibraryIndexedDBAdapter(
-  STORAGE_KEYS.IDB_LIBRARY,
-  STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
-);
+export const libraryIndexedDBAdapter = new LibraryIndexedDBAdapter({
+  name: STORAGE_KEYS.IDB_LIBRARY,
+  // TODO maybe remove this in several months (shipped: 24-02-07)
+  migrationLocalStorageKey: STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
+});

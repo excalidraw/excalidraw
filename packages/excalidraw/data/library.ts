@@ -659,6 +659,10 @@ export const useHandleLibrary = (
       const initDataPromise = resolvablePromise<LibraryItems | null>();
 
       // migrate from old data source if needed
+      // (note, if `migrate` function is defined, we always migrate even
+      //  if the data has already been migrated. In that case it'll be a no-op,
+      //  though with several unnecessary steps — we will still load latest
+      //  DB data during the `persistLibraryChange()` step)
       // -----------------------------------------------------------------------
       if (adapter.migrate) {
         const migration = adapter.migrate();
