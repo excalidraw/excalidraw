@@ -270,7 +270,6 @@ import {
   updateStable,
   addEventListener,
   normalizeEOL,
-  getDateTime,
 } from "../utils";
 import {
   createSrcDoc,
@@ -410,6 +409,7 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
+import { getFileName } from "../data/filename";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1724,7 +1724,7 @@ class App extends React.Component<AppProps, AppState> {
       this.files,
       {
         exportBackground: this.state.exportBackground,
-        name: this.props?.name || `${t("labels.untitled")}-${getDateTime()}`,
+        name: this.props?.name || getFileName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
       },

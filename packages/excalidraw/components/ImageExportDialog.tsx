@@ -34,8 +34,9 @@ import { Tooltip } from "./Tooltip";
 import "./ImageExportDialog.scss";
 import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
-import { cloneJSON, getDateTime } from "../utils";
+import { cloneJSON } from "../utils";
 import { prepareElementsForExport } from "../data";
+import { getFileName } from "../data/filename";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -74,7 +75,7 @@ const ImageExportModal = ({
 
   const appProps = useAppProps();
   const [projectName, setProjectName] = useState(
-    appProps.name || `${t("labels.untitled")}-${getDateTime()}`,
+    appProps.name || getFileName(),
   );
   const [exportSelectionOnly, setExportSelectionOnly] = useState(hasSelection);
   const [exportWithBackground, setExportWithBackground] = useState(

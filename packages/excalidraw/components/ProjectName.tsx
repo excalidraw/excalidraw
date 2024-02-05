@@ -1,12 +1,15 @@
 import "./TextInput.scss";
 
 import React, { useState } from "react";
-import { focusNearestParent, getDateTime } from "../utils";
+import { focusNearestParent } from "../utils";
 
 import "./ProjectName.scss";
 import { useExcalidrawContainer } from "./App";
 import { KEYS } from "../keys";
 import { t } from "../i18n";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import { EDITOR_LS_KEYS } from "../constants";
+import { getFileName } from "../data/filename";
 
 type Props = {
   value?: string;
@@ -19,10 +22,12 @@ type Props = {
 export const ProjectName = (props: Props) => {
   const { id } = useExcalidrawContainer();
   const [fileName, setFileName] = useState<string>(
-    props.value || `${t("labels.untitled")}-${getDateTime()}`,
+    props.value || getFileName(),
   );
 
   const handleBlur = (event: any) => {
+    EditorLocalStorage.set(EDITOR_LS_KEYS.EXCALIDRAW_FILE_NAME, fileName);
+
     if (!props.ignoreFocus) {
       focusNearestParent(event.target);
     }

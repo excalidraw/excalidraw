@@ -23,8 +23,9 @@ import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getDateTime, getFrame } from "../../packages/excalidraw/utils";
+import { getFrame } from "../../packages/excalidraw/utils";
 import { ExcalidrawLogo } from "../../packages/excalidraw/components/ExcalidrawLogo";
+import { getFileName } from "../../packages/excalidraw/data/filename";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -122,7 +123,7 @@ export const ExportToExcalidrawPlus: React.FC<{
               elements,
               appState,
               files,
-              `${t("labels.untitled")}-${getDateTime()}`,
+              getFileName(),
             );
             onSuccess();
           } catch (error: any) {

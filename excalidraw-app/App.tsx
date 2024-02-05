@@ -45,7 +45,6 @@ import {
   ResolvablePromise,
   resolvablePromise,
   isRunningInIframe,
-  getDateTime,
 } from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -105,6 +104,7 @@ import { openConfirmModal } from "../packages/excalidraw/components/OverwriteCon
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
+import { getFileName } from "../packages/excalidraw/data/filename";
 
 polyfill();
 
@@ -691,7 +691,6 @@ const ExcalidrawWrapper = () => {
       </div>
     );
   }
-
   return (
     <div
       style={{ height: "100%" }}
@@ -776,7 +775,7 @@ const ExcalidrawWrapper = () => {
                   excalidrawAPI.getSceneElements(),
                   excalidrawAPI.getAppState(),
                   excalidrawAPI.getFiles(),
-                  `${t("labels.untitled")}-${getDateTime()}`,
+                  getFileName(),
                 );
               }}
             >

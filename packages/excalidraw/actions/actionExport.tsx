@@ -17,9 +17,9 @@ import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
+import { getFileName } from "../data/filename";
 
 import "../components/ToolIcon.scss";
-import { getDateTime } from "../utils";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -149,13 +149,13 @@ export const actionSaveToActiveFile = register({
             elements,
             appState,
             app.files,
-            app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
+            app.props.name || getFileName(),
           )
         : await saveAsJSON(
             elements,
             appState,
             app.files,
-            app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
+            app.props.name || getFileName(),
           );
 
       return {
@@ -201,7 +201,7 @@ export const actionSaveFileToDisk = register({
           fileHandle: null,
         },
         app.files,
-        app.props.name || `${t("labels.untitled")}-${getDateTime()}`,
+        app.props.name || getFileName(),
       );
       return {
         commitToHistory: false,
