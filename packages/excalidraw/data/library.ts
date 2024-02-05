@@ -35,7 +35,9 @@ type LibraryUpdate = {
   libraryItems: Map<LibraryItem["id"], LibraryItem>;
 };
 
-export type LibraryPersistedData = LibraryItems;
+// an object so that we can later add more properties to it without breaking,
+// such as schema version
+export type LibraryPersistedData = { libraryItems: LibraryItems };
 
 const onLibraryChangeEmitter = new Emitter<[change: LibraryUpdate]>();
 
@@ -59,7 +61,7 @@ export interface LibraryPersistenceAdapter {
    * `save` method. If you first need to migrate data from elsewhere, use
    * the `migrate` method.
    */
-  load(): MaybePromise<LibraryPersistedData | null>;
+  load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
 }
@@ -589,6 +591,21 @@ export const useHandleLibrary = (
     // --------------------------------------------------------- init load -----
     // -------------------------------------------------------------------------
 
+    const createLibraryData = (
+      libraryItems: LibraryItems,
+    ): LibraryPersistedData => {
+      return { libraryItems };
+    };
+
+    const getLibraryItems = async (adapter: {
+      load: () => MaybePromise<{
+        libraryItems: LibraryItems_anyVersion;
+      } | null>;
+    }): Promise<LibraryItems> => {
+      const data = await adapter.load();
+      return restoreLibraryItems(data?.libraryItems || [], "published");
+    };
+
     // ------ (A) data source adapter ------------------------------------------
     let unsubOnLibraryChange: () => void | undefined;
 
@@ -596,9 +613,7 @@ export const useHandleLibrary = (
       const adapter = optsRef.current.adapter;
 
       const persistLibraryChange = async (change: LibraryUpdate) => {
-        const currentDBData = await adapter.load();
-
-        const nextLibraryItemsMap = arrayToMap(currentDBData || []);
+        const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
 
         for (const [id] of change.deletedItems) {
           nextLibraryItemsMap.delete(id);
@@ -636,51 +651,55 @@ export const useHandleLibrary = (
           Array.from(nextLibraryItemsMap.values()),
         );
 
-        await adapter.save(nextLibraryItems);
+        await adapter.save(createLibraryData(nextLibraryItems));
 
         return nextLibraryItems;
       };
 
-      const initDataPromise = resolvablePromise<LibraryPersistedData | null>();
+      const initDataPromise = resolvablePromise<LibraryItems | null>();
 
       // migrate from old data source if needed
       // -----------------------------------------------------------------------
       if (adapter.migrate) {
         const migration = adapter.migrate();
+
         initDataPromise.resolve(
-          Promise.resolve(migration.load()).then(async (items) => {
-            const data = restoreLibraryItems(items || [], "published");
-            try {
-              // note that we don't attempt to queue the migration operation
-              // so it'd be persisted to the database before any other updates
-              // we may potentially receive from the onLibraryChange listener,
-              // because during init we're unlikely to get updates other than
-              // insert-only operations, which on the library item-level should
-              // be commutative and thus safe to happen in any order (provided
-              // we save using the persistLibraryChange function)
-              const nextData = await persistLibraryChange(
-                createLibraryUpdate([], data),
-              );
+          Promise.resolve(migration.load())
+            .then((libraryItems) =>
+              restoreLibraryItems(libraryItems || [], "published"),
+            )
+            .then(async (libraryItems) => {
               try {
-                await migration.delete();
-              } catch (error: any) {
-                console.warn(
-                  `couldn't delete legacy library data: ${error.message}`,
+                // note that we don't attempt to queue the migration operation
+                // so it'd be persisted to the database before any other updates
+                // we may potentially receive from the onLibraryChange listener,
+                // because during init we're unlikely to get updates other than
+                // insert-only operations, which on the library item-level should
+                // be commutative and thus safe to happen in any order (provided
+                // we save using the persistLibraryChange function)
+                const nextItems = await persistLibraryChange(
+                  createLibraryUpdate([], libraryItems),
                 );
+                try {
+                  await migration.delete();
+                } catch (error: any) {
+                  console.warn(
+                    `couldn't delete legacy library data: ${error.message}`,
+                  );
+                }
+                // migration suceeded, load migrated data
+                return nextItems;
+              } catch (error: any) {
+                console.error(
+                  `couldn't migrate legacy library data: ${error.message}`,
+                );
+                // migration failed, load empty library
+                return [];
               }
-              // migration suceeded, load migrated data
-              return nextData;
-            } catch (error: any) {
-              console.error(
-                `couldn't migrate legacy library data: ${error.message}`,
-              );
-              // migration failed, load empty library
-              return [];
-            }
-          }),
+            }),
         );
       } else {
-        initDataPromise.resolve(adapter.load());
+        initDataPromise.resolve(getLibraryItems(adapter));
       }
 
       // load initial (or migrated) library
