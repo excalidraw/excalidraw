@@ -224,7 +224,7 @@ class LibraryIndexedDBAdapter implements LibraryPersistenceAdapter {
     this.store = createStore(`${this.name}-db`, `${this.name}-store`);
 
     if (this.migrationLocalStorageKey) {
-      let migrationLocalStorageKey = this.migrationLocalStorageKey;
+      const migrationLocalStorageKey = this.migrationLocalStorageKey;
       this.migrate = () => {
         return {
           load: () => {
