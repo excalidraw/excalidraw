@@ -4,6 +4,7 @@ import {
   LibraryItem,
   ExcalidrawImperativeAPI,
   LibraryItemsSource,
+  LibraryItems_anyVersion,
 } from "../types";
 import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
@@ -23,7 +24,40 @@ import {
   LIBRARY_SIDEBAR_TAB,
 } from "../constants";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
-import { cloneJSON } from "../utils";
+import { arrayToMap, cloneJSON, resolvablePromise } from "../utils";
+import { MaybePromise } from "../utility-types";
+
+export type LibraryChange = {
+  deleted: Map<LibraryItem["id"], LibraryItem>;
+  inserted: Map<LibraryItem["id"], LibraryItem>;
+};
+
+export type LibraryPersistedData = LibraryItems;
+
+export interface LibraryPersistenceAdapter {
+  /**
+   * Should load data from legacy data source, which will be deleted after
+   * successful migration. If no migration is needed, this method can be
+   * omitted.
+   */
+  migrate?(): {
+    /**
+     * loads data from legacy data source. Returns `null` if no data is
+     * to be migrated.
+     */
+    load: () => MaybePromise<LibraryItems_anyVersion | null>;
+    /** deletes data from legacy data source after migration is complete */
+    delete: () => MaybePromise<void>;
+  };
+  /**
+   * Should load data that were previously saved into the database using the
+   * `save` method. If you first need to migrate data from elsewhere, use
+   * the `migrate` method.
+   */
+  load(): MaybePromise<LibraryPersistedData | null>;
+  /** Should persist to the database as is (do no change the data structure). */
+  save(libraryData: LibraryPersistedData): MaybePromise<void>;
+}
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
@@ -74,11 +108,42 @@ export const mergeLibraryItems = (
   return [...newItems, ...localItems];
 };
 
+/**
+ * Returns { deleted, inserted } libraryItems maps, where inserted is
+ * all currently available library items and deleted is all library items
+ * that were deleted since last onLibraryChange call.
+ *
+ * Host apps are recommended to merge `inserted` with whatever state they
+ * have, while removing from the resulting state all items from `deleted`.
+ */
+const createLibraryChange = (
+  prevLibraryItems: LibraryItems,
+  nextLibraryItems: LibraryItems,
+): LibraryChange => {
+  const nextItemsMap = arrayToMap(nextLibraryItems);
+
+  const change: LibraryChange = {
+    deleted: new Map<LibraryItem["id"], LibraryItem>(),
+    inserted: arrayToMap(nextLibraryItems),
+  };
+
+  for (const item of prevLibraryItems) {
+    if (!nextItemsMap.has(item.id)) {
+      change.deleted.set(item.id, item);
+    }
+  }
+
+  return change;
+};
+
 class Library {
   /** latest libraryItems */
-  private lastLibraryItems: LibraryItems = [];
+  private currLibraryItems: LibraryItems = [];
+  /** snapshot of library items since last onLibraryChange call */
+  private prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
+
   /** indicates whether library is initialized with library items (has gone
-   * though at least one update) */
+   * through at least one update) */
   private isInitialized = false;
 
   private app: App;
@@ -97,19 +162,28 @@ class Library {
     if (this.updateQueue.length > 0) {
       jotaiStore.set(libraryItemsAtom, {
         status: "loading",
-        libraryItems: this.lastLibraryItems,
+        libraryItems: this.currLibraryItems,
         isInitialized: this.isInitialized,
       });
     } else {
       this.isInitialized = true;
       jotaiStore.set(libraryItemsAtom, {
         status: "loaded",
-        libraryItems: this.lastLibraryItems,
+        libraryItems: this.currLibraryItems,
         isInitialized: this.isInitialized,
       });
       try {
-        this.app.props.onLibraryChange?.(
-          cloneLibraryItems(this.lastLibraryItems),
+        const prevLibraryItems = this.prevLibraryItems;
+        this.prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
+
+        const nextLibraryItems = cloneLibraryItems(this.currLibraryItems);
+
+        const change = createLibraryChange(prevLibraryItems, nextLibraryItems);
+
+        this.app.props.onLibraryChange?.(nextLibraryItems, change);
+        this.app.onLibraryChangeListenersEmitter.trigger(
+          nextLibraryItems,
+          change,
         );
       } catch (error) {
         console.error(error);
@@ -121,7 +195,7 @@ class Library {
   destroy = () => {
     this.isInitialized = false;
     this.updateQueue = [];
-    this.lastLibraryItems = [];
+    this.currLibraryItems = [];
     jotaiStore.set(libraryItemSvgsCache, new Map());
     // TODO uncomment after/if we make jotai store scoped to each excal instance
     // jotaiStore.set(libraryItemsAtom, {
@@ -142,14 +216,14 @@ class Library {
     return new Promise(async (resolve) => {
       try {
         const libraryItems = await (this.getLastUpdateTask() ||
-          this.lastLibraryItems);
+          this.currLibraryItems);
         if (this.updateQueue.length > 0) {
           resolve(this.getLatestLibrary());
         } else {
           resolve(cloneLibraryItems(libraryItems));
         }
       } catch (error) {
-        return resolve(this.lastLibraryItems);
+        return resolve(this.currLibraryItems);
       }
     });
   };
@@ -181,7 +255,7 @@ class Library {
         try {
           const source = await (typeof libraryItems === "function" &&
           !(libraryItems instanceof Blob)
-            ? libraryItems(this.lastLibraryItems)
+            ? libraryItems(this.currLibraryItems)
             : libraryItems);
 
           let nextItems;
@@ -207,7 +281,7 @@ class Library {
             }
 
             if (merge) {
-              resolve(mergeLibraryItems(this.lastLibraryItems, nextItems));
+              resolve(mergeLibraryItems(this.currLibraryItems, nextItems));
             } else {
               resolve(nextItems);
             }
@@ -244,12 +318,12 @@ class Library {
         await this.getLastUpdateTask();
 
         if (typeof libraryItems === "function") {
-          libraryItems = libraryItems(this.lastLibraryItems);
+          libraryItems = libraryItems(this.currLibraryItems);
         }
 
-        this.lastLibraryItems = cloneLibraryItems(await libraryItems);
+        this.currLibraryItems = cloneLibraryItems(await libraryItems);
 
-        resolve(this.lastLibraryItems);
+        resolve(this.currLibraryItems);
       } catch (error: any) {
         reject(error);
       }
@@ -257,7 +331,7 @@ class Library {
       .catch((error) => {
         if (error.name === "AbortError") {
           console.warn("Library update aborted by user");
-          return this.lastLibraryItems;
+          return this.currLibraryItems;
         }
         throw error;
       })
@@ -382,14 +456,23 @@ export const parseLibraryTokensFromUrl = () => {
   return libraryUrl ? { libraryUrl, idToken } : null;
 };
 
-export const useHandleLibrary = ({
-  excalidrawAPI,
-  getInitialLibraryItems,
-}: {
-  excalidrawAPI: ExcalidrawImperativeAPI | null;
-  getInitialLibraryItems?: () => LibraryItemsSource;
-}) => {
-  const getInitialLibraryRef = useRef(getInitialLibraryItems);
+export const useHandleLibrary = (
+  opts: {
+    excalidrawAPI: ExcalidrawImperativeAPI | null;
+  } & (
+    | {
+        /** @deprecated we recommend using `opts.adapter` instead */
+        getInitialLibraryItems?: () => MaybePromise<LibraryItemsSource>;
+      }
+    | {
+        adapter: LibraryPersistenceAdapter;
+      }
+  ),
+) => {
+  const { excalidrawAPI } = opts;
+
+  const optsRef = useRef(opts);
+  optsRef.current = opts;
 
   useEffect(() => {
     if (!excalidrawAPI) {
@@ -463,23 +546,135 @@ export const useHandleLibrary = ({
     };
 
     // -------------------------------------------------------------------------
-    // ------ init load --------------------------------------------------------
-    if (getInitialLibraryRef.current) {
-      excalidrawAPI.updateLibrary({
-        libraryItems: getInitialLibraryRef.current(),
-      });
-    }
+    // ---------------------------------- init ---------------------------------
+    // -------------------------------------------------------------------------
 
     const libraryUrlTokens = parseLibraryTokensFromUrl();
 
     if (libraryUrlTokens) {
       importLibraryFromURL(libraryUrlTokens);
     }
+
+    // ------ (A) init load (legacy) -------------------------------------------
+    if (
+      "getInitialLibraryItems" in optsRef.current &&
+      optsRef.current.getInitialLibraryItems
+    ) {
+      console.warn(
+        "useHandleLibrar `opts.getInitialLibraryItems` is deprecated. Use `opts.adapter` instead.",
+      );
+
+      Promise.resolve(optsRef.current.getInitialLibraryItems())
+        .then((libraryItems) => {
+          excalidrawAPI.updateLibrary({
+            libraryItems,
+            merge: true,
+          });
+        })
+        .catch((error: any) => {
+          console.error(
+            `UseHandeLibrary getInitialLibraryItems failed: ${error?.message}`,
+          );
+        });
+    }
+
+    // -------------------------------------------------------------------------
     // --------------------------------------------------------- init load -----
+    // -------------------------------------------------------------------------
+
+    // ------ (A) data source adapter ------------------------------------------
+    let unsubOnLibraryChange: () => void | undefined;
+
+    if ("adapter" in optsRef.current && optsRef.current.adapter) {
+      const adapter = optsRef.current.adapter;
+
+      const persistLibraryChange = async (change: LibraryChange) => {
+        const IDBData = await adapter.load();
+
+        const nextLibraryItemsMap = arrayToMap(IDBData || []);
+
+        for (const [id] of change.deleted) {
+          nextLibraryItemsMap.delete(id);
+        }
+
+        const addedItems: LibraryItem[] = [];
+
+        for (const [id, item] of change.inserted) {
+          if (nextLibraryItemsMap.has(id)) {
+            // replace item with latest version
+            nextLibraryItemsMap.set(id, item);
+          } else {
+            addedItems.push(item);
+          }
+        }
+
+        const nextLibraryItems = addedItems.concat(
+          Array.from(nextLibraryItemsMap.values()),
+        );
+
+        await adapter.save(nextLibraryItems);
+
+        return nextLibraryItems;
+      };
+
+      const initDataPromise = resolvablePromise<LibraryPersistedData | null>();
+
+      // migrate from old data source if needed
+      // (note that we don't queue this operation as the saves are commutative)
+      // -----------------------------------------------------------------------
+      if (adapter.migrate) {
+        const migration = adapter.migrate();
+        initDataPromise.resolve(
+          Promise.resolve(migration.load()).then(async (items) => {
+            const data = restoreLibraryItems(items || [], "published");
+            try {
+              const nextData = await persistLibraryChange(
+                createLibraryChange([], data),
+              );
+              try {
+                await migration.delete();
+              } catch (error: any) {
+                console.warn(
+                  `couldn't delete legacy library data: ${error.message}`,
+                );
+              }
+              // migration suceeded, load migrated data
+              return nextData;
+            } catch (error: any) {
+              console.error(
+                `couldn't migrate legacy library data: ${error.message}`,
+              );
+              // migration failed, load empty library
+              return [];
+            }
+          }),
+        );
+      } else {
+        initDataPromise.resolve(adapter.load());
+      }
+
+      // load initial (or migrated) library
+      initDataPromise.then(async (data) => {
+        excalidrawAPI.updateLibrary({
+          libraryItems: data || [],
+          merge: true,
+        });
+      });
+
+      // on change, merge with current library items and persist
+      // -----------------------------------------------------------------------
+      unsubOnLibraryChange = excalidrawAPI.onLibraryChange(
+        async (_, change) => {
+          persistLibraryChange(change);
+        },
+      );
+    }
+    // ---------------------------------------------- data source datapter -----
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange);
+      unsubOnLibraryChange?.();
     };
   }, [excalidrawAPI]);
 };

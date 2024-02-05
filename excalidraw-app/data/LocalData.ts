@@ -10,8 +10,22 @@
  *   (localStorage, indexedDB).
  */
 
-import { createStore, entries, del, getMany, set, setMany } from "idb-keyval";
+import {
+  createStore,
+  entries,
+  del,
+  getMany,
+  set,
+  setMany,
+  get,
+  UseStore,
+} from "idb-keyval";
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
+import {
+  LibraryPersistenceAdapter,
+  LibraryPersistedData,
+} from "../../packages/excalidraw/data/library";
+import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
 import {
   ExcalidrawElement,
@@ -22,6 +36,7 @@ import {
   BinaryFileData,
   BinaryFiles,
 } from "../../packages/excalidraw/types";
+import { MaybePromise } from "../../packages/excalidraw/utility-types";
 import { debounce } from "../../packages/excalidraw/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
@@ -183,3 +198,55 @@ export class LocalData {
     },
   });
 }
+
+class LibraryIndexedDBAdapter implements LibraryPersistenceAdapter {
+  name: string;
+  key = "libraryData";
+
+  legacyLSKey = "excalidraw-library";
+
+  store: UseStore;
+
+  constructor(name: string, legacyLSKey?: string) {
+    if (legacyLSKey) {
+      this.legacyLSKey = legacyLSKey;
+    }
+    this.name = name;
+    this.store = createStore(`${this.name}-db`, `${this.name}-store`);
+  }
+
+  /** migrates */
+  migrate() {
+    return {
+      load: () => {
+        const LSData = localStorage.getItem(this.legacyLSKey);
+
+        if (LSData != null) {
+          const libraryItems: ImportedDataState["libraryItems"] =
+            JSON.parse(LSData);
+          return libraryItems || [];
+        }
+
+        return null;
+      },
+      delete: () => {
+        localStorage.removeItem(this.legacyLSKey);
+      },
+    };
+  }
+
+  async load() {
+    const IDBData = await get<LibraryPersistedData>(this.key, this.store);
+
+    return IDBData || null;
+  }
+
+  save(data: LibraryPersistedData): MaybePromise<void> {
+    return set(this.key, data, this.store);
+  }
+}
+
+export const libraryIndexedDBAdapter = new LibraryIndexedDBAdapter(
+  STORAGE_KEYS.IDB_LIBRARY,
+  STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
+);

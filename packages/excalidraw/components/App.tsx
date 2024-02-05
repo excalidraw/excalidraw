@@ -91,7 +91,10 @@ import {
   isIOS,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
-import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import Library, {
+  distributeLibraryItemsOnSquareGrid,
+  LibraryChange,
+} from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
   dragNewElement,
@@ -611,6 +614,9 @@ class App extends React.Component<AppProps, AppState> {
     [event: PointerEvent | null]
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
+  onLibraryChangeListenersEmitter = new Emitter<
+    [libraryItems: LibraryItems, change: LibraryChange]
+  >();
 
   constructor(props: AppProps) {
     super(props);
@@ -682,6 +688,7 @@ class App extends React.Component<AppProps, AppState> {
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
         onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
         onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
+        onLibraryChange: (cb) => this.onLibraryChangeListenersEmitter.on(cb),
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);

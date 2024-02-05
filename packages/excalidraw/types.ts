@@ -33,12 +33,12 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene/scrollbars";
 import { MaybeTransformHandleType } from "./element/transformHandles";
-import Library from "./data/library";
+import Library, { LibraryChange } from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
-import { Merge, ValueOf } from "./utility-types";
+import { Merge, MaybePromise, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -392,9 +392,7 @@ export type LibraryItemsSource =
 export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,
   {
-    libraryItems?:
-      | Required<ImportedDataState>["libraryItems"]
-      | Promise<Required<ImportedDataState>["libraryItems"]>;
+    libraryItems?: MaybePromise<Required<ImportedDataState>["libraryItems"]>;
   }
 >;
 
@@ -409,10 +407,7 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
-  initialData?:
-    | ExcalidrawInitialDataState
-    | null
-    | Promise<ExcalidrawInitialDataState | null>;
+  initialData?: MaybePromise<ExcalidrawInitialDataState | null>;
   excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
@@ -444,7 +439,10 @@ export interface ExcalidrawProps {
   UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
-  onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
+  onLibraryChange?: (
+    libraryItems: LibraryItems,
+    change: LibraryChange,
+  ) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   onLinkOpen?: (
@@ -699,6 +697,9 @@ export type ExcalidrawImperativeAPI = {
   ) => UnsubscribeCallback;
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
+  ) => UnsubscribeCallback;
+  onLibraryChange: (
+    callback: (libraryItems: LibraryItems, change: LibraryChange) => void,
   ) => UnsubscribeCallback;
 };
 
