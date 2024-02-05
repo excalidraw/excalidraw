@@ -28,14 +28,16 @@ import { arrayToMap, cloneJSON, resolvablePromise } from "../utils";
 import { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 
-type LibraryChange = {
-  deleted: Map<LibraryItem["id"], LibraryItem>;
-  inserted: Map<LibraryItem["id"], LibraryItem>;
+type LibraryUpdate = {
+  /** deleted library items since last onLibraryChange event */
+  deletedItems: Map<LibraryItem["id"], LibraryItem>;
+  /** all currently non-deleted items in the library */
+  libraryItems: Map<LibraryItem["id"], LibraryItem>;
 };
 
 export type LibraryPersistedData = LibraryItems;
 
-const onLibraryChangeEmitter = new Emitter<[change: LibraryChange]>();
+const onLibraryChangeEmitter = new Emitter<[change: LibraryUpdate]>();
 
 export interface LibraryPersistenceAdapter {
   /**
@@ -112,31 +114,31 @@ export const mergeLibraryItems = (
 };
 
 /**
- * Returns { deleted, inserted } libraryItems maps, where inserted is
- * all currently available library items and deleted is all library items
- * that were deleted since last onLibraryChange call.
+ * Returns { deletedItems, libraryItems } maps, where `libraryItems` are
+ * all non-deleted items that are currently in the library, and `deletedItems`
+ * are all items there deleted since last onLibraryChange event.
  *
- * Host apps are recommended to merge `inserted` with whatever state they
- * have, while removing from the resulting state all items from `deleted`.
+ * Host apps are recommended to merge `libraryItems` with whatever state they
+ * have, while removing from the resulting state all items from `deletedItems`.
  */
-const createLibraryChange = (
+const createLibraryUpdate = (
   prevLibraryItems: LibraryItems,
   nextLibraryItems: LibraryItems,
-): LibraryChange => {
+): LibraryUpdate => {
   const nextItemsMap = arrayToMap(nextLibraryItems);
 
-  const change: LibraryChange = {
-    deleted: new Map<LibraryItem["id"], LibraryItem>(),
-    inserted: arrayToMap(nextLibraryItems),
+  const update: LibraryUpdate = {
+    deletedItems: new Map<LibraryItem["id"], LibraryItem>(),
+    libraryItems: nextItemsMap,
   };
 
   for (const item of prevLibraryItems) {
     if (!nextItemsMap.has(item.id)) {
-      change.deleted.set(item.id, item);
+      update.deletedItems.set(item.id, item);
     }
   }
 
-  return change;
+  return update;
 };
 
 class Library {
@@ -181,10 +183,12 @@ class Library {
 
         const nextLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
-        const change = createLibraryChange(prevLibraryItems, nextLibraryItems);
-
         this.app.props.onLibraryChange?.(nextLibraryItems);
-        onLibraryChangeEmitter.trigger(change);
+
+        // for internal use in `useHandleLibrary` hook
+        onLibraryChangeEmitter.trigger(
+          createLibraryUpdate(prevLibraryItems, nextLibraryItems),
+        );
       } catch (error) {
         console.error(error);
       }
@@ -588,22 +592,39 @@ export const useHandleLibrary = (
     if ("adapter" in optsRef.current && optsRef.current.adapter) {
       const adapter = optsRef.current.adapter;
 
-      const persistLibraryChange = async (change: LibraryChange) => {
-        const IDBData = await adapter.load();
+      const persistLibraryChange = async (change: LibraryUpdate) => {
+        const currentDBData = await adapter.load();
 
-        const nextLibraryItemsMap = arrayToMap(IDBData || []);
+        const nextLibraryItemsMap = arrayToMap(currentDBData || []);
 
-        for (const [id] of change.deleted) {
+        for (const [id] of change.deletedItems) {
           nextLibraryItemsMap.delete(id);
         }
 
         const addedItems: LibraryItem[] = [];
 
-        for (const [id, item] of change.inserted) {
+        // we want to merge current library items with the ones stored in the
+        // DB so that we don't lose any elements that for some reason aren't
+        // in the current editor library, which could happen when:
+        //
+        // 1. we haven't received an update deleting some elements
+        //    (in which case it's still better to keep them in the DB lest
+        //     it was due to a different reason)
+        // 2. we keep a single DB for all active editors, but the editors'
+        //    libraries aren't synced or there's a race conditions during
+        //    syncing
+        // 3. some other race condition, e.g. during init where emit updates
+        //    for partial updates (e.g. you install a 3rd party library and
+        //    init from DB only after — we emit events for both updates)
+        for (const [id, item] of change.libraryItems) {
           if (nextLibraryItemsMap.has(id)) {
             // replace item with latest version
+            // TODO we could prefer the newer item instead
             nextLibraryItemsMap.set(id, item);
           } else {
+            // we want to prepend the new items with the ones that are already
+            // in DB to preserve the ordering we do in editor (newly added
+            // items are added to the beginning)
             addedItems.push(item);
           }
         }
@@ -635,7 +656,7 @@ export const useHandleLibrary = (
               // be commutative and thus safe to happen in any order (provided
               // we save using the persistLibraryChange function)
               const nextData = await persistLibraryChange(
-                createLibraryChange([], data),
+                createLibraryUpdate([], data),
               );
               try {
                 await migration.delete();
