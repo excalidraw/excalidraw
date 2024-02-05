@@ -184,6 +184,7 @@ import {
   IframeData,
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
+  ExcalidrawRectangleElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -229,6 +230,7 @@ import { RenderInteractiveSceneCallback, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
+  Polygon,
   Shape,
   getClosedCurveShape,
   getCurveShape,
@@ -4482,9 +4484,22 @@ class App extends React.Component<AppProps, AppState> {
           hit = isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
         } else {
           const shape = this.getElementShape(el);
+
           hit = this.shouldTestInside(el)
             ? isPointInShape([x, y], shape)
             : isPointOnShape([x, y], shape, tolerance);
+        }
+
+        if (!hit && isFrameLikeElement(el)) {
+          const nameBounds = this.frameNameBoundsCache.get(el);
+
+          if (nameBounds) {
+            hit = isPointInShape([x, y], {
+              type: "polygon",
+              data: getPolygonShape(nameBounds as ExcalidrawRectangleElement)
+                .data as Polygon,
+            });
+          }
         }
 
         if (hit) {
