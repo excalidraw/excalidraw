@@ -26,13 +26,16 @@ import {
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import { arrayToMap, cloneJSON, resolvablePromise } from "../utils";
 import { MaybePromise } from "../utility-types";
+import { Emitter } from "../emitter";
 
-export type LibraryChange = {
+type LibraryChange = {
   deleted: Map<LibraryItem["id"], LibraryItem>;
   inserted: Map<LibraryItem["id"], LibraryItem>;
 };
 
 export type LibraryPersistedData = LibraryItems;
+
+const onLibraryChangeEmitter = new Emitter<[change: LibraryChange]>();
 
 export interface LibraryPersistenceAdapter {
   /**
@@ -180,11 +183,8 @@ class Library {
 
         const change = createLibraryChange(prevLibraryItems, nextLibraryItems);
 
-        this.app.props.onLibraryChange?.(nextLibraryItems, change);
-        this.app.onLibraryChangeListenersEmitter.trigger(
-          nextLibraryItems,
-          change,
-        );
+        this.app.props.onLibraryChange?.(nextLibraryItems);
+        onLibraryChangeEmitter.trigger(change);
       } catch (error) {
         console.error(error);
       }
@@ -669,11 +669,9 @@ export const useHandleLibrary = (
 
       // on change, merge with current library items and persist
       // -----------------------------------------------------------------------
-      unsubOnLibraryChange = excalidrawAPI.onLibraryChange(
-        async (_, change) => {
-          persistLibraryChange(change);
-        },
-      );
+      unsubOnLibraryChange = onLibraryChangeEmitter.on(async (change) => {
+        persistLibraryChange(change);
+      });
     }
     // ---------------------------------------------- data source datapter -----
 

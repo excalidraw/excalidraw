@@ -33,7 +33,7 @@ import { Language } from "./i18n";
 import { ClipboardData } from "./clipboard";
 import { isOverScrollBars } from "./scene/scrollbars";
 import { MaybeTransformHandleType } from "./element/transformHandles";
-import Library, { LibraryChange } from "./data/library";
+import Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
@@ -439,10 +439,7 @@ export interface ExcalidrawProps {
   UIOptions?: Partial<UIOptions>;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
-  onLibraryChange?: (
-    libraryItems: LibraryItems,
-    change: LibraryChange,
-  ) => void | Promise<any>;
+  onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   onLinkOpen?: (
@@ -641,7 +638,7 @@ export type PointerDownState = Readonly<{
 
 export type UnsubscribeCallback = () => void;
 
-export type ExcalidrawImperativeAPI = {
+export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
@@ -698,10 +695,7 @@ export type ExcalidrawImperativeAPI = {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
-  onLibraryChange: (
-    callback: (libraryItems: LibraryItems, change: LibraryChange) => void,
-  ) => UnsubscribeCallback;
-};
+}
 
 export type Device = Readonly<{
   viewport: {
