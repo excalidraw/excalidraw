@@ -6,7 +6,6 @@ import { focusNearestParent } from "../utils";
 import "./ProjectName.scss";
 import { useExcalidrawContainer } from "./App";
 import { KEYS } from "../keys";
-import { t } from "../i18n";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { EDITOR_LS_KEYS } from "../constants";
 import { getFileName } from "../data/filename";
