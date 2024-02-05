@@ -302,11 +302,11 @@
     "sceneContent": "Contenu de la scène :"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Ou"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Invitez des personnes à collaborer sur votre dessin.",
+    "desc_privacy": "Ne vous inquiétez pas, la session est chiffrée de bout en bout et entièrement privée. Même notre serveur ne peut pas voir ce que vous dessinez.",
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
