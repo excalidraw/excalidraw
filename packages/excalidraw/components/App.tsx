@@ -4292,59 +4292,6 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
-  private getElementAtPosition(
-    x: number,
-    y: number,
-    opts?: {
-      /** if true, returns the first selected element (with highest z-index)
-        of all hit elements */
-      preferSelected?: boolean;
-      includeBoundTextElement?: boolean;
-      includeLockedElements?: boolean;
-    },
-  ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this.getElementsAtPosition(
-      x,
-      y,
-      opts?.includeBoundTextElement,
-      opts?.includeLockedElements,
-    );
-
-    const _allHitElements = this._getElementsAtPosition(
-      x,
-      y,
-      opts?.includeBoundTextElement,
-      opts?.includeLockedElements,
-    );
-
-    if (allHitElements.length > 1) {
-      if (opts?.preferSelected) {
-        for (let index = allHitElements.length - 1; index > -1; index--) {
-          if (this.state.selectedElementIds[allHitElements[index].id]) {
-            return allHitElements[index];
-          }
-        }
-      }
-      const elementWithHighestZIndex =
-        allHitElements[allHitElements.length - 1];
-      // If we're hitting element with highest z-index only on its bounding box
-      // while also hitting other element figure, the latter should be considered.
-      return isHittingElementBoundingBoxWithoutHittingElement(
-        elementWithHighestZIndex,
-        this.state,
-        this.frameNameBoundsCache,
-        x,
-        y,
-      )
-        ? allHitElements[allHitElements.length - 2]
-        : elementWithHighestZIndex;
-    }
-    if (allHitElements.length === 1) {
-      return allHitElements[0];
-    }
-    return null;
-  }
-
   private getElementShape(element: ExcalidrawElement): Shape {
     switch (element.type) {
       case "rectangle":
@@ -4412,7 +4359,7 @@ class App extends React.Component<AppProps, AppState> {
     return isDraggableFromInside || isImageElement(element);
   }
 
-  private _getElementAtPosition(
+  private getElementAtPosition(
     x: number,
     y: number,
     opts?: {
@@ -4421,7 +4368,7 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement> | null {
-    const allHitElements = this._getElementsAtPosition(
+    const allHitElements = this.getElementsAtPosition(
       x,
       y,
       opts?.includeBoundTextElement,
@@ -4454,7 +4401,7 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
-  private _getElementsAtPosition(
+  private getElementsAtPosition(
     x: number,
     y: number,
     includeBoundTextElement: boolean = false,
@@ -4481,10 +4428,9 @@ class App extends React.Component<AppProps, AppState> {
           shouldShowBoundingBox([el], this.state)
         ) {
           const [x1, y1, x2, y2] = getElementBounds(el);
-          hit = isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
+          return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
         } else {
           const shape = this.getElementShape(el);
-
           hit = this.shouldTestInside(el)
             ? isPointInShape([x, y], shape)
             : isPointOnShape([x, y], shape, tolerance);
@@ -4492,7 +4438,6 @@ class App extends React.Component<AppProps, AppState> {
 
         if (!hit && isFrameLikeElement(el)) {
           const nameBounds = this.frameNameBoundsCache.get(el);
-
           if (nameBounds) {
             hit = isPointInShape([x, y], {
               type: "polygon",
@@ -4500,10 +4445,6 @@ class App extends React.Component<AppProps, AppState> {
                 .data as Polygon,
             });
           }
-        }
-
-        if (hit) {
-          console.log(hit, el.type);
         }
 
         return hit;
@@ -4519,37 +4460,6 @@ class App extends React.Component<AppProps, AppState> {
       }) as NonDeleted<ExcalidrawElement>[];
 
     return elements;
-  }
-
-  private getElementsAtPosition(
-    x: number,
-    y: number,
-    includeBoundTextElement: boolean = false,
-    includeLockedElements: boolean = false,
-  ): NonDeleted<ExcalidrawElement>[] {
-    const elements =
-      includeBoundTextElement && includeLockedElements
-        ? this.scene.getNonDeletedElements()
-        : this.scene
-            .getNonDeletedElements()
-            .filter(
-              (element) =>
-                (includeLockedElements || !element.locked) &&
-                (includeBoundTextElement ||
-                  !(isTextElement(element) && element.containerId)),
-            );
-
-    return getElementsAtPosition(elements, (element) =>
-      hitTest(element, this.state, this.frameNameBoundsCache, x, y),
-    ).filter((element) => {
-      // hitting a frame's element from outside the frame is not considered a hit
-      const containingFrame = getContainingFrame(element);
-      return containingFrame &&
-        this.state.frameRendering.enabled &&
-        this.state.frameRendering.clip
-        ? isCursorInFrame({ x, y }, containingFrame)
-        : true;
-    });
   }
 
   private startTextEditing = ({
