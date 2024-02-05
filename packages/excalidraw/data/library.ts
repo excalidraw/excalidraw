@@ -620,7 +620,6 @@ export const useHandleLibrary = (
       const initDataPromise = resolvablePromise<LibraryPersistedData | null>();
 
       // migrate from old data source if needed
-      // (note that we don't queue this operation as the saves are commutative)
       // -----------------------------------------------------------------------
       if (adapter.migrate) {
         const migration = adapter.migrate();
@@ -628,6 +627,13 @@ export const useHandleLibrary = (
           Promise.resolve(migration.load()).then(async (items) => {
             const data = restoreLibraryItems(items || [], "published");
             try {
+              // note that we don't attempt to queue the migration operation
+              // so it'd be persisted to the database before any other updates
+              // we may potentially receive from the onLibraryChange listener,
+              // because during init we're unlikely to get updates other than
+              // insert-only operations, which on the library item-level should
+              // be commutative and thus safe to happen in any order (provided
+              // we save using the persistLibraryChange function)
               const nextData = await persistLibraryChange(
                 createLibraryChange([], data),
               );
