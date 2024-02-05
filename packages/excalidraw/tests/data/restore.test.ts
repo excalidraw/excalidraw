@@ -330,7 +330,6 @@ describe("restoreAppState", () => {
 
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
-    stubLocalAppState.name = "local app state";
 
     const restoredAppState = restore.restoreAppState(
       stubImportedAppState,
