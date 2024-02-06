@@ -207,11 +207,16 @@ const restoreElement = (
           : // no element height likely means programmatic use, so default
             // to a fixed line height
             getDefaultLineHeight(element.fontFamily));
+
       const baseline = measureBaseline(
         element.text,
-        getFontString(element),
-        lineHeight,
+        getFontString({
+          fontSize: element.fontSize,
+          fontFamily: element.fontFamily,
+        }),
+        String(lineHeight),
       );
+
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,

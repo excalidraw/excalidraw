@@ -54,6 +54,8 @@ import {
   getApproxMinLineHeight,
   measureText,
   getBoundTextMaxHeight,
+  measureBaselines,
+  BaselineInput,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -769,6 +771,25 @@ export const resizeMultipleElements = (
     };
   }[] = [];
 
+  const precomputedBaselines = measureBaselines(
+    targetElements.reduce((inputs, { latest: element }) => {
+      if (!isTextElement(element)) {
+        return inputs;
+      }
+
+      inputs.push({
+        id: element.id,
+        text: element.text,
+        font: getFontString({
+          fontSize: element.fontSize,
+          fontFamily: element.fontFamily,
+        }),
+        lineHeight: String(element.lineHeight),
+      });
+      return inputs;
+    }, [] as BaselineInput[]),
+  );
+
   for (const { orig, latest } of targetElements) {
     // bounded text elements are updated along with their container elements
     if (isTextElement(orig) && isBoundToContainer(orig)) {
@@ -838,17 +859,13 @@ export const resizeMultipleElements = (
     }
 
     if (isTextElement(orig)) {
-      const metrics = measureFontSizeFromWidth(
-        orig,
-        elementsMap,
-        width,
-        height,
-      );
-      if (!metrics) {
+      const nextFontSize = orig.fontSize * scale;
+      if (nextFontSize < MIN_FONT_SIZE) {
         return;
       }
-      update.fontSize = metrics.size;
-      update.baseline = metrics.baseline;
+
+      update.fontSize = nextFontSize;
+      update.baseline = precomputedBaselines.get(orig.id);
     }
 
     const boundTextElement = originalElements.get(

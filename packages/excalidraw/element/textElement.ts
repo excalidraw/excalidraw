@@ -294,59 +294,102 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const baseline = measureBaseline(text, font, lineHeight);
+  const baseline = measureBaseline(text, font, String(lineHeight));
   return { width, height, baseline };
+};
+
+export type BaselineInput = {
+  id: string;
+  font: FontString;
+  lineHeight: string;
+  text: string;
+};
+
+/**
+ * Baseline calculation is based on expensive DOM operations, resulting in forced reflow.
+ * Therefore whenever we can, we should always batch the calculation of the baselines upfront for all the elements.
+ */
+export const measureBaselines = (inputs: BaselineInput[]) => {
+  const baselines = new Map<string, number>();
+  const containers = new Map<string, [HTMLDivElement, BaselineInput]>();
+
+  // Batch DOM writes (and reads below) to avoid layout trashing
+  for (const input of inputs) {
+    const container = document.createElement("div");
+    const span = document.createElement("span");
+
+    Object.assign(span.style, {
+      display: "inline-block",
+      // overflow: "hidden",
+    });
+
+    Object.assign(container.style, {
+      font: input.font,
+      lineHeight: input.lineHeight,
+      minHeight: "1em",
+      visibility: "hidden",
+      // whitespace: "pre",
+      // overflow: "hidden",
+      // wordBreak: "break-word",
+      // whiteSpace: "pre-wrap",
+    });
+
+    container.innerText = input.text;
+
+    container.appendChild(span);
+    document.body.appendChild(container);
+
+    containers.set(input.id, [container, input]);
+  }
+
+  for (const [id, [container, input]] of containers.entries()) {
+    const span = container.lastChild as HTMLSpanElement;
+    let baseline =
+      span.getBoundingClientRect().y - container.getBoundingClientRect().y;
+
+    if (isSafari) {
+      const height = container.offsetHeight;
+      const fontSize = parseFloat(input.font);
+      const canvasHeight = getTextHeight(
+        input.text,
+        fontSize,
+        Number(input.lineHeight) as any,
+      );
+      // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
+      // from the actual canvas height
+      const domHeight = getTextHeight(
+        input.text,
+        Math.round(fontSize),
+        Number(input.lineHeight) as any,
+      );
+      if (canvasHeight > height) {
+        baseline += canvasHeight - domHeight;
+      }
+
+      if (height > canvasHeight) {
+        baseline -= domHeight - canvasHeight;
+      }
+    }
+
+    baselines.set(id, baseline);
+  }
+
+  for (const [container] of containers.values()) {
+    document.body.removeChild(container);
+  }
+
+  return baselines;
 };
 
 export const measureBaseline = (
   text: string,
   font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-  wrapInContainer?: boolean,
+  lineHeight: string,
 ) => {
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
-  if (wrapInContainer) {
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.whiteSpace = "pre-wrap";
-  }
-
-  container.style.lineHeight = String(lineHeight);
-
-  container.innerText = text;
-
-  // Baseline is important for positioning text on canvas
-  document.body.appendChild(container);
-
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  let baseline = span.offsetTop + span.offsetHeight;
-  const height = container.offsetHeight;
-
-  if (isSafari) {
-    const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
-    const fontSize = parseFloat(font);
-    // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
-    // from the actual canvas height
-    const domHeight = getTextHeight(text, Math.round(fontSize), lineHeight);
-    if (canvasHeight > height) {
-      baseline += canvasHeight - domHeight;
-    }
-
-    if (height > canvasHeight) {
-      baseline -= domHeight - canvasHeight;
-    }
-  }
-  document.body.removeChild(container);
-  return baseline;
+  // In single measurement the element id is irrelevant
+  const fakeId = "fake-id";
+  const baselines = measureBaselines([{ id: fakeId, text, font, lineHeight }]);
+  return baselines.get(fakeId)!;
 };
 
 /**
