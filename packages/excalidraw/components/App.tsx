@@ -4411,6 +4411,7 @@ class App extends React.Component<AppProps, AppState> {
   ): NonDeleted<ExcalidrawElement>[] {
     const tolerance = 10 / this.state.zoom.value;
 
+    const iframeLikes: ExcalidrawIframeElement[] = [];
     const elements = (
       includeBoundTextElement && includeLockedElements
         ? this.scene.getNonDeletedElements()
@@ -4479,7 +4480,20 @@ class App extends React.Component<AppProps, AppState> {
           this.state.frameRendering.clip
           ? isCursorInFrame({ x, y }, containingFrame)
           : true;
-      }) as NonDeleted<ExcalidrawElement>[];
+      })
+      .filter((el) => {
+        // The parameter elements comes ordered from lower z-index to higher.
+        // We want to preserve that order on the returned array.
+        // Exception being embeddables which should be on top of everything else in
+        // terms of hit testing.
+
+        if (isIframeElement(el)) {
+          iframeLikes.push(el);
+          return false;
+        }
+        return true;
+      })
+      .concat(iframeLikes) as NonDeleted<ExcalidrawElement>[];
 
     return elements;
   }
