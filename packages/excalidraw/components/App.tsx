@@ -208,7 +208,6 @@ import {
 } from "../keys";
 import { isElementInViewport } from "../element/sizeHelpers";
 import {
-  centerPoint,
   distance2d,
   getCornerRadius,
   getGridPoint,
@@ -217,7 +216,6 @@ import {
 } from "../math";
 import {
   calculateScrollCenter,
-  getElementsAtPosition,
   getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
@@ -4292,6 +4290,10 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  /**
+   * get the pure geometric shape of an excalidraw element
+   * which is then used for hit detection
+   */
   private getElementShape(element: ExcalidrawElement): Shape {
     switch (element.type) {
       case "rectangle":
@@ -4422,19 +4424,39 @@ class App extends React.Component<AppProps, AppState> {
             )
     )
       .filter((el) => {
-        let hit = false;
         if (
           this.state.selectedElementIds[el.id] &&
           shouldShowBoundingBox([el], this.state)
         ) {
           const [x1, y1, x2, y2] = getElementBounds(el);
           return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
-        } else {
-          const shape = this.getElementShape(el);
-          hit = this.shouldTestInside(el)
-            ? isPointInShape([x, y], shape)
-            : isPointOnShape([x, y], shape, tolerance);
         }
+
+        const boundTextElement = getBoundTextElement(el);
+        if (boundTextElement) {
+          let textShape = this.getElementShape(boundTextElement);
+          if (el.type === "arrow") {
+            const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+              el,
+              boundTextElement,
+            );
+            textShape = this.getElementShape({
+              ...boundTextElement,
+              x,
+              y,
+            });
+          }
+          const hit = isPointInShape([x, y], textShape);
+          if (hit) {
+            return true;
+          }
+        }
+
+        const shape = this.getElementShape(el);
+
+        let hit = this.shouldTestInside(el)
+          ? isPointInShape([x, y], shape)
+          : isPointOnShape([x, y], shape, tolerance);
 
         if (!hit && isFrameLikeElement(el)) {
           const nameBounds = this.frameNameBoundsCache.get(el);
