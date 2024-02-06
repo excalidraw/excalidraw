@@ -302,11 +302,11 @@
     "sceneContent": "Skissinnehåll:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Eller"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Bjud in personer att samarbeta på din ritning.",
+    "desc_privacy": "Oroa dig inte, sessionen är krypterad och helt privat. Inte ens vår server kan se vad du ritar.",
     "button_startSession": "Starta sessionen",
     "button_stopSession": "Stoppa session",
     "desc_inProgressIntro": "Nu pågår en live-samarbetssession.",
