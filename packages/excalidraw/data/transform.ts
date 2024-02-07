@@ -222,7 +222,7 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container);
+  redrawTextBoundingBox(textElement, container, elementsMap);
   return [container, textElement] as const;
 };
 
@@ -243,6 +243,8 @@ const bindLinearElementToElement = (
     startBinding: linearElement?.startBinding || null,
     endBinding: linearElement.endBinding || null,
   });
+
+  const elementsMap = arrayToMap(elementStore.getElements());
 
   if (start) {
     const width = start?.width ?? DEFAULT_DIMENSION;
@@ -316,6 +318,7 @@ const bindLinearElementToElement = (
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
         "start",
+        elementsMap,
       );
     }
   }
@@ -390,6 +393,7 @@ const bindLinearElementToElement = (
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
         "end",
+        elementsMap,
       );
     }
   }

@@ -2,6 +2,7 @@ import {
   ExcalidrawElement,
   PointerType,
   NonDeletedExcalidrawElement,
+  ElementsMap,
 } from "./types";
 
 import {
@@ -14,6 +15,7 @@ import {
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
 import { Bounds } from "./bounds";
+import { arrayToMap } from "../utils";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -27,6 +29,7 @@ const isInsideTransformHandle = (
 
 export const resizeTest = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   appState: AppState,
   x: number,
   y: number,
@@ -38,7 +41,7 @@ export const resizeTest = (
   }
 
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandles(element, zoom, pointerType);
+    getTransformHandles(element, zoom, elementsMap, pointerType);
 
   if (
     rotationTransformHandle &&
@@ -77,6 +80,7 @@ export const getElementWithTransformHandleType = (
     }
     const transformHandleType = resizeTest(
       element,
+      arrayToMap(elements),
       appState,
       scenePointerX,
       scenePointerY,

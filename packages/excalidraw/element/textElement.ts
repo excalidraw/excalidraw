@@ -53,6 +53,7 @@ const splitIntoLines = (text: string) => {
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
+  elementsMap: ElementsMap,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -110,7 +111,11 @@ export const redrawTextBoundingBox = (
       ...textElement,
       ...boundTextUpdates,
     } as ExcalidrawTextElementWithContainer;
-    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+    const { x, y } = computeBoundTextPosition(
+      container,
+      updatedTextElement,
+      elementsMap,
+    );
     boundTextUpdates.x = x;
     boundTextUpdates.y = y;
   }
@@ -236,7 +241,7 @@ export const handleBindTextResize = (
     if (!isArrowElement(container)) {
       mutateElement(
         textElement,
-        computeBoundTextPosition(container, textElement),
+        computeBoundTextPosition(container, textElement, elementsMap),
       );
     }
   }
@@ -245,11 +250,13 @@ export const handleBindTextResize = (
 export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
+  elementsMap: ElementsMap,
 ) => {
   if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
       container,
       boundTextElement,
+      elementsMap,
     );
   }
   const containerCoords = getContainerCoords(container);
@@ -698,12 +705,16 @@ export const getContainerCenter = (
       y: container.y + container.height / 2,
     };
   }
-  const points = LinearElementEditor.getPointsGlobalCoordinates(container);
+  const points = LinearElementEditor.getPointsGlobalCoordinates(
+    container,
+    elementsMap,
+  );
   if (points.length % 2 === 1) {
     const index = Math.floor(container.points.length / 2);
     const midPoint = LinearElementEditor.getPointGlobalCoordinates(
       container,
       container.points[index],
+      elementsMap,
     );
     return { x: midPoint[0], y: midPoint[1] };
   }
@@ -719,6 +730,7 @@ export const getContainerCenter = (
       points[index],
       points[index + 1],
       index + 1,
+      elementsMap,
     );
   }
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
@@ -757,11 +769,13 @@ export const getTextElementAngle = (
 export const getBoundTextElementPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
+  elementsMap: ElementsMap,
 ) => {
   if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
       container,
       boundTextElement,
+      elementsMap,
     );
   }
 };
@@ -817,7 +831,10 @@ export const getTextBindableContainerAtPosition = (
     if (elements[index].isDeleted) {
       continue;
     }
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+      elements[index],
+      arrayToMap(elements),
+    );
     if (
       isArrowElement(elements[index]) &&
       isHittingElementNotConsideringBoundingBox(
@@ -825,6 +842,7 @@ export const getTextBindableContainerAtPosition = (
         appState,
         null,
         [x, y],
+        arrayToMap(elements),
       )
     ) {
       hitElement = elements[index];

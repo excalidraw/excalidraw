@@ -26,6 +26,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
+import { arrayToMap } from "../utils";
 
 export type RectangleBox = {
   x: number;
@@ -102,8 +103,10 @@ export class ElementBounds {
   ): Bounds {
     let bounds: Bounds;
 
-    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
-
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+      element,
+      elementsMap,
+    );
     if (isFreeDrawElement(element)) {
       const [minX, minY, maxX, maxY] = getBoundsFromPoints(
         element.points.map(([x, y]) =>
@@ -159,10 +162,9 @@ export class ElementBounds {
 // This set of functions retrieves the absolute position of the 4 points.
 export const getElementAbsoluteCoords = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   includeBoundText: boolean = false,
 ): [number, number, number, number, number, number] => {
-  const elementsMap =
-    Scene.getScene(element)?.getElementsMapIncludingDeleted() || new Map();
   if (isFreeDrawElement(element)) {
     return getFreeDrawElementAbsoluteCoords(element);
   } else if (isLinearElement(element)) {
@@ -179,6 +181,7 @@ export const getElementAbsoluteCoords = (
       const coords = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,
+        elementsMap,
       );
       return [
         coords.x,
@@ -207,8 +210,12 @@ export const getElementAbsoluteCoords = (
  */
 export const getElementLineSegments = (
   element: ExcalidrawElement,
+  elements: readonly ExcalidrawElement[],
 ): [Point, Point][] => {
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    arrayToMap(elements),
+  );
 
   const center: Point = [cx, cy];
 
@@ -703,6 +710,7 @@ const getLinearElementRotatedBounds = (
     if (boundTextElement) {
       const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
         element,
+        elementsMap,
         [x, y, x, y],
         boundTextElement,
       );
@@ -727,6 +735,7 @@ const getLinearElementRotatedBounds = (
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
       element,
+      elementsMap,
       coords,
       boundTextElement,
     );

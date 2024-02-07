@@ -121,7 +121,7 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-
+    const elementsMap = app.scene.getElementsMapIncludingDeleted();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
@@ -143,6 +143,7 @@ export const textWysiwyg = ({
             LinearElementEditor.getBoundTextElementPosition(
               container,
               updatedTextElement as ExcalidrawTextElementWithContainer,
+              elementsMap,
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
@@ -200,6 +201,7 @@ export const textWysiwyg = ({
           const { y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
+            elementsMap,
           );
           coordY = y;
         }
@@ -541,7 +543,11 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(updateElement, container);
+      redrawTextBoundingBox(
+        updateElement,
+        container,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
     }
 
     onSubmit({

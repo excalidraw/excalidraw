@@ -185,7 +185,10 @@ export const getElementsCorners = (
   if (elements.length === 1) {
     const element = elements[0];
 
-    let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(element);
+    let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+      element,
+      arrayToMap(elements),
+    );
 
     if (dragOffset) {
       x1 += dragOffset.x;
