@@ -819,6 +819,7 @@ export const getTextBindableContainerAtPosition = (
   x: number,
   y: number,
 ): ExcalidrawTextContainer | null => {
+  const elementsMap = arrayToMap(elements);
   const selectedElements = getSelectedElements(elements, appState);
   if (selectedElements.length === 1) {
     return isTextBindableContainer(selectedElements[0], false)
@@ -833,7 +834,7 @@ export const getTextBindableContainerAtPosition = (
     }
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(
       elements[index],
-      arrayToMap(elements),
+      elementsMap,
     );
     if (
       isArrowElement(elements[index]) &&
@@ -842,7 +843,7 @@ export const getTextBindableContainerAtPosition = (
         appState,
         null,
         [x, y],
-        arrayToMap(elements),
+        elementsMap,
       )
     ) {
       hitElement = elements[index];

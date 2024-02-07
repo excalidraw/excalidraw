@@ -267,9 +267,10 @@ export const isLinearElementSimpleAndAlreadyBound = (
 export const unbindLinearElements = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): void => {
+  const elementsMap = arrayToMap(elements);
   elements.forEach((element) => {
     if (isBindingElement(element)) {
-      bindOrUnbindLinearElement(element, null, null, arrayToMap(elements));
+      bindOrUnbindLinearElement(element, null, null, elementsMap);
     }
   });
 };
@@ -532,12 +533,13 @@ const maybeCalculateNewGapWhenScaling = (
 export const getEligibleElementsForBinding = (
   elements: NonDeleted<ExcalidrawElement>[],
 ): SuggestedBinding[] => {
+  const elementsMap = arrayToMap(elements);
   const includedElementIds = new Set(elements.map(({ id }) => id));
   return elements.flatMap((element) =>
     isBindingElement(element, false)
       ? (getElligibleElementsForBindingElement(
           element as NonDeleted<ExcalidrawLinearElement>,
-          arrayToMap(elements),
+          elementsMap,
         ).filter(
           (element) => !includedElementIds.has(element.id),
         ) as SuggestedBinding[])

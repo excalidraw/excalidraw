@@ -616,6 +616,7 @@ export const convertToExcalidrawElements = (
     }
   }
 
+  const elementsMap = arrayToMap(elementStore.getElements());
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
     const excalidrawElement = elementStore.getElement(id)!;
@@ -629,7 +630,7 @@ export const convertToExcalidrawElements = (
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
-            arrayToMap(elementStore.getElements()),
+            elementsMap,
           );
           elementStore.add(container);
           elementStore.add(text);

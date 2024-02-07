@@ -270,7 +270,6 @@ import {
   updateStable,
   addEventListener,
   normalizeEOL,
-  arrayToMap,
 } from "../utils";
 import {
   createSrcDoc,
@@ -6050,7 +6049,9 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getNonDeletedElements();
+      const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
+
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -6083,7 +6084,7 @@ class App extends React.Component<AppProps, AppState> {
           getResizeOffsetXY(
             pointerDownState.resize.handleType,
             selectedElements,
-            arrayToMap(elements),
+            elementsMap,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),

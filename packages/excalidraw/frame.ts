@@ -190,6 +190,7 @@ export const groupsAreCompletelyOutOfFrame = (
   groupIds: readonly string[],
   frame: ExcalidrawFrameLikeElement,
 ) => {
+  const elementsMap = arrayToMap(elements);
   const elementsInGroup = groupIds.flatMap((groupId) =>
     getElementsInGroup(elements, groupId),
   );
@@ -202,7 +203,7 @@ export const groupsAreCompletelyOutOfFrame = (
     elementsInGroup.find(
       (element) =>
         elementsAreInFrameBounds([element], frame) ||
-        isElementIntersectingFrame(element, frame, arrayToMap(elements)),
+        isElementIntersectingFrame(element, frame, elementsMap),
     ) === undefined
   );
 };
@@ -274,6 +275,7 @@ export const getElementsInResizingFrame = (
   frame: ExcalidrawFrameLikeElement,
   appState: AppState,
 ): ExcalidrawElement[] => {
+  const elementsMap = arrayToMap(allElements);
   const prevElementsInFrame = getFrameChildren(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
@@ -298,7 +300,7 @@ export const getElementsInResizingFrame = (
   );
 
   for (const element of elementsNotCompletelyInFrame) {
-    if (!isElementIntersectingFrame(element, frame, arrayToMap(allElements))) {
+    if (!isElementIntersectingFrame(element, frame, elementsMap)) {
       if (element.groupIds.length === 0) {
         nextElementsInFrame.delete(element);
       }
