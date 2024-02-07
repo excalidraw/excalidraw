@@ -27,6 +27,7 @@ import {
   LiveCollaborationTrigger,
   TTDDialog,
   TTDDialogTrigger,
+  getCommonBounds,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -35,6 +36,7 @@ import {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
+  ScrollConstraints,
 } from "../packages/excalidraw/types";
 import {
   debounce,
@@ -98,14 +100,160 @@ import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
-import { ResolutionType } from "../packages/excalidraw/utility-types";
+import { Merge, ResolutionType } from "../packages/excalidraw/utility-types";
 import { ShareableLinkDialog } from "../packages/excalidraw/components/ShareableLinkDialog";
 import { openConfirmModal } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
+import { getSelectedElements } from "../packages/excalidraw/scene";
 
 polyfill();
+
+type DebugScrollConstraints = Merge<
+  ScrollConstraints,
+  { viewportZoomFactor: number; enabled: boolean }
+>;
+
+const ConstraintsSettings = ({
+  initialConstraints,
+  excalidrawAPI,
+}: {
+  initialConstraints: DebugScrollConstraints;
+  excalidrawAPI: ExcalidrawImperativeAPI;
+}) => {
+  const [constraints, setConstraints] =
+    useState<DebugScrollConstraints>(initialConstraints);
+
+  useEffect(() => {
+    // add JSON-stringified constraints into url hash for easy sharing
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    hash.set(
+      "constraints",
+      encodeURIComponent(
+        window.btoa(JSON.stringify(constraints)).replace(/=+/, ""),
+      ),
+    );
+    window.location.hash = decodeURIComponent(hash.toString());
+  }, [constraints]);
+
+  const [selection, setSelection] = useState<ExcalidrawElement[]>([]);
+  useEffect(() => {
+    return excalidrawAPI.onChange((elements, appState) => {
+      setSelection(getSelectedElements(elements, appState));
+    });
+  }, [excalidrawAPI]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        position: "fixed",
+        bottom: 10,
+        left: "calc(50%)",
+        transform: "translateX(-50%)",
+        gap: "0.6rem",
+        zIndex: 999999,
+      }}
+    >
+      enabled:{" "}
+      <input
+        type="checkbox"
+        defaultChecked={!!constraints.enabled}
+        onChange={(e) =>
+          setConstraints((s) => ({ ...s, enabled: e.target.checked }))
+        }
+      />
+      x:{" "}
+      <input
+        placeholder="x"
+        size={4}
+        value={constraints.x.toString()}
+        onChange={(e) =>
+          setConstraints((s) => ({
+            ...s,
+            x: parseInt(e.target.value) ?? 0,
+          }))
+        }
+      />
+      y:{" "}
+      <input
+        placeholder="y"
+        size={4}
+        value={constraints.y.toString()}
+        onChange={(e) =>
+          setConstraints((s) => ({
+            ...s,
+            y: parseInt(e.target.value) ?? 0,
+          }))
+        }
+      />
+      w:{" "}
+      <input
+        placeholder="width"
+        size={4}
+        value={constraints.width.toString()}
+        onChange={(e) =>
+          setConstraints((s) => ({
+            ...s,
+            x: parseInt(e.target.value) ?? 200,
+          }))
+        }
+      />
+      h:{" "}
+      <input
+        placeholder="height"
+        size={4}
+        value={constraints.height.toString()}
+        onChange={(e) =>
+          setConstraints((s) => ({
+            ...s,
+            x: parseInt(e.target.value) ?? 200,
+          }))
+        }
+      />
+      zoomFactor:
+      <input
+        placeholder="height"
+        type="number"
+        min="0.1"
+        max="1"
+        step="0.1"
+        value={constraints.viewportZoomFactor.toString()}
+        onChange={(e) =>
+          setConstraints((s) => ({
+            ...s,
+            viewportZoomFactor: parseFloat(e.target.value.toString()) ?? 0.7,
+          }))
+        }
+      />
+      lockZoom:{" "}
+      <input
+        type="checkbox"
+        defaultChecked={!!constraints.lockZoom}
+        onChange={(e) =>
+          setConstraints((s) => ({ ...s, lockZoom: e.target.checked }))
+        }
+      />
+      {selection.length > 0 && (
+        <button
+          onClick={() => {
+            const bbox = getCommonBounds(selection);
+            setConstraints((s) => ({
+              ...s,
+              x: Math.round(bbox[0]),
+              y: Math.round(bbox[1]),
+              width: Math.round(bbox[2] - bbox[0]),
+              height: Math.round(bbox[3] - bbox[1]),
+            }));
+          }}
+        >
+          use selection
+        </button>
+      )}
+    </div>
+  );
+};
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 
@@ -151,10 +299,22 @@ const initializeScene = async (opts: {
   )
 > => {
   const searchParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.slice(1));
   const id = searchParams.get("id");
-  const jsonBackendMatch = window.location.hash.match(
-    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
-  );
+  const shareableLink = hashParams.get("json")?.split(",");
+
+  if (shareableLink) {
+    hashParams.delete("json");
+    const hash = `#${decodeURIComponent(hashParams.toString())}`;
+    window.history.replaceState(
+      {},
+      APP_NAME,
+      `${window.location.origin}${hash}`,
+    );
+  }
+
+  console.log({ shareableLink });
+
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
@@ -164,7 +324,7 @@ const initializeScene = async (opts: {
   } = await loadScene(null, null, localDataState);
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+  const isExternalScene = !!(id || shareableLink || roomLinkData);
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -174,16 +334,17 @@ const initializeScene = async (opts: {
       // otherwise, prompt whether user wants to override current scene
       (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
-      if (jsonBackendMatch) {
+      if (shareableLink) {
         scene = await loadScene(
-          jsonBackendMatch[1],
-          jsonBackendMatch[2],
+          shareableLink[0],
+          shareableLink[1],
           localDataState,
         );
+        console.log(">>>>", scene);
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
+        // window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
@@ -200,7 +361,7 @@ const initializeScene = async (opts: {
       }
 
       roomLinkData = null;
-      window.history.replaceState({}, APP_NAME, window.location.origin);
+      // window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   } else if (externalUrlMatch) {
     window.history.replaceState({}, APP_NAME, window.location.origin);
@@ -261,12 +422,12 @@ const initializeScene = async (opts: {
       key: roomLinkData.roomKey,
     };
   } else if (scene) {
-    return isExternalScene && jsonBackendMatch
+    return isExternalScene && shareableLink
       ? {
           scene,
           isExternalScene,
-          id: jsonBackendMatch[1],
-          key: jsonBackendMatch[2],
+          id: shareableLink[0],
+          key: shareableLink[1],
         }
       : { scene, isExternalScene: false };
   }
@@ -672,6 +833,31 @@ const ExcalidrawWrapper = () => {
     [setShareDialogState],
   );
 
+  const [constraints] = useState<DebugScrollConstraints>(() => {
+    const stored = new URLSearchParams(location.hash.slice(1)).get(
+      "constraints",
+    );
+    let storedConstraints = {};
+    if (stored) {
+      try {
+        storedConstraints = JSON.parse(window.atob(stored));
+      } catch {}
+    }
+
+    return {
+      x: 0,
+      y: 0,
+      width: document.body.clientWidth,
+      height: document.body.clientHeight,
+      lockZoom: false,
+      viewportZoomFactor: 0.7,
+      enabled: true,
+      ...storedConstraints,
+    };
+  });
+
+  console.log(constraints);
+
   // browsers generally prevent infinite self-embedding, there are
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
@@ -753,14 +939,14 @@ const ExcalidrawWrapper = () => {
             />
           );
         }}
-        scrollConstraints={{
-          x: 0,
-          y: 0,
-          width: 2560,
-          height: 1300,
-          lockZoom: false,
-        }}
+        scrollConstraints={constraints.enabled ? constraints : undefined}
       >
+        {excalidrawAPI && (
+          <ConstraintsSettings
+            excalidrawAPI={excalidrawAPI}
+            initialConstraints={constraints}
+          />
+        )}
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}

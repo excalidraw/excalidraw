@@ -77,7 +77,7 @@ const calculateZoomLevel = (
   width: AppState["width"],
   height: AppState["height"],
 ) => {
-  const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.7;
+  const DEFAULT_VIEWPORT_ZOOM_FACTOR = 0.2;
 
   const viewportZoomFactor = scrollConstraints.viewportZoomFactor
     ? Math.min(1, Math.max(scrollConstraints.viewportZoomFactor, 0.1))
