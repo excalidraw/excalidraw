@@ -295,9 +295,9 @@ const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
 
       return hitTestFreeDrawElement(
         args.element,
-        args.elementsMap,
         args.point,
         args.threshold,
+        args.elementsMap,
       );
     }
     case "arrow":
@@ -475,9 +475,9 @@ const ellipseParamsForTest = (
 
 const hitTestFreeDrawElement = (
   element: ExcalidrawFreeDrawElement,
-  elementsMap: ElementsMap,
   point: Point,
   threshold: number,
+  elementsMap: ElementsMap,
 ): boolean => {
   // Check point-distance-to-line-segment for every segment in the
   // element's points (its input points, not its outline points).
