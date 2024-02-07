@@ -4,27 +4,18 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import {
-  distance2d,
-  rotatePoint,
-  isPathALoop,
-  isPointInPolygon,
-  rotate,
-} from "../math";
+import { isPointInPolygon } from "../math";
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import {
-  NonDeletedExcalidrawElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
   ExcalidrawDiamondElement,
   ExcalidrawTextElement,
   ExcalidrawEllipseElement,
-  NonDeleted,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
-  ExcalidrawLinearElement,
   StrokeRoundness,
   ExcalidrawFrameLikeElement,
   ExcalidrawIframeLikeElement,
@@ -36,116 +27,9 @@ import {
   getRectangleBoxAbsoluteCoords,
   RectangleBox,
 } from "./bounds";
-import { FrameNameBoundsCache, Point } from "../types";
+import { Point } from "../types";
 import { Drawable } from "roughjs/bin/core";
-import { AppState } from "../types";
-import {
-  hasBoundTextElement,
-  isFrameLikeElement,
-  isIframeLikeElement,
-  isImageElement,
-} from "./typeChecks";
-import { isTextElement } from ".";
-import { isTransparent } from "../utils";
 import { Mutable } from "../utility-types";
-import { ShapeCache } from "../scene/ShapeCache";
-
-const isElementDraggableFromInside = (
-  element: NonDeletedExcalidrawElement,
-): boolean => {
-  if (element.type === "arrow") {
-    return false;
-  }
-
-  if (element.type === "freedraw") {
-    return true;
-  }
-  const isDraggableFromInside =
-    !isTransparent(element.backgroundColor) ||
-    hasBoundTextElement(element) ||
-    isIframeLikeElement(element);
-  if (element.type === "line") {
-    return isDraggableFromInside && isPathALoop(element.points);
-  }
-  return isDraggableFromInside || isImageElement(element);
-};
-
-export const isHittingElementNotConsideringBoundingBox = (
-  element: NonDeletedExcalidrawElement,
-  appState: AppState,
-  frameNameBoundsCache: FrameNameBoundsCache | null,
-  point: Point,
-): boolean => {
-  const threshold = 10 / appState.zoom.value;
-  const check = isTextElement(element)
-    ? isStrictlyInside
-    : isElementDraggableFromInside(element)
-    ? isInsideCheck
-    : isNearCheck;
-  return hitTestPointAgainstElement({
-    element,
-    point,
-    threshold,
-    check,
-    frameNameBoundsCache,
-  });
-};
-
-export const isPointHittingElementBoundingBox = (
-  element: NonDeleted<ExcalidrawElement>,
-  [x, y]: Point,
-  threshold: number,
-  frameNameBoundsCache: FrameNameBoundsCache | null,
-) => {
-  // frames needs be checked differently so as to be able to drag it
-  // by its frame, whether it has been selected or not
-  // this logic here is not ideal
-  // TODO: refactor it later...
-  if (isFrameLikeElement(element)) {
-    return hitTestPointAgainstElement({
-      element,
-      point: [x, y],
-      threshold,
-      check: isInsideCheck,
-      frameNameBoundsCache,
-    });
-  }
-
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-  const elementCenterX = (x1 + x2) / 2;
-  const elementCenterY = (y1 + y2) / 2;
-  // reverse rotate to take element's angle into account.
-  const [rotatedX, rotatedY] = rotate(
-    x,
-    y,
-    elementCenterX,
-    elementCenterY,
-    -element.angle,
-  );
-
-  return (
-    rotatedX > x1 - threshold &&
-    rotatedX < x2 + threshold &&
-    rotatedY > y1 - threshold &&
-    rotatedY < y2 + threshold
-  );
-};
-
-export const bindingBorderTest = (
-  element: NonDeleted<ExcalidrawBindableElement>,
-  { x, y }: { x: number; y: number },
-): boolean => {
-  const threshold = maxBindingGap(element, element.width, element.height);
-  const check = isOutsideCheck;
-  const point: Point = [x, y];
-  return hitTestPointAgainstElement({
-    element,
-    point,
-    threshold,
-    check,
-    frameNameBoundsCache: null,
-  });
-};
 
 export const maxBindingGap = (
   element: ExcalidrawElement,
@@ -157,70 +41,6 @@ export const maxBindingGap = (
   const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
   // We make the bindable boundary bigger for bigger elements
   return Math.max(16, Math.min(0.25 * smallerDimension, 32));
-};
-
-type HitTestArgs = {
-  element: NonDeletedExcalidrawElement;
-  point: Point;
-  threshold: number;
-  check: (distance: number, threshold: number) => boolean;
-  frameNameBoundsCache: FrameNameBoundsCache | null;
-};
-
-const hitTestPointAgainstElement = (args: HitTestArgs): boolean => {
-  switch (args.element.type) {
-    case "rectangle":
-    case "iframe":
-    case "embeddable":
-    case "image":
-    case "text":
-    case "diamond":
-    case "ellipse":
-      const distance = distanceToBindableElement(args.element, args.point);
-      return args.check(distance, args.threshold);
-    case "freedraw": {
-      if (
-        !args.check(
-          distanceToRectangle(args.element, args.point),
-          args.threshold,
-        )
-      ) {
-        return false;
-      }
-
-      return hitTestFreeDrawElement(args.element, args.point, args.threshold);
-    }
-    case "arrow":
-    case "line":
-      return hitTestLinear(args);
-    case "selection":
-      console.warn(
-        "This should not happen, we need to investigate why it does.",
-      );
-      return false;
-    case "frame":
-    case "magicframe": {
-      // check distance to frame element first
-      if (
-        args.check(
-          distanceToBindableElement(args.element, args.point),
-          args.threshold,
-        )
-      ) {
-        return true;
-      }
-
-      const frameNameBounds = args.frameNameBoundsCache?.get(args.element);
-
-      if (frameNameBounds) {
-        return args.check(
-          distanceToRectangleBox(frameNameBounds, args.point),
-          args.threshold,
-        );
-      }
-      return false;
-    }
-  }
 };
 
 export const distanceToBindableElement = (
@@ -241,22 +61,6 @@ export const distanceToBindableElement = (
     case "ellipse":
       return distanceToEllipse(element, point);
   }
-};
-
-const isStrictlyInside = (distance: number, threshold: number): boolean => {
-  return distance < 0;
-};
-
-const isInsideCheck = (distance: number, threshold: number): boolean => {
-  return distance < threshold;
-};
-
-const isNearCheck = (distance: number, threshold: number): boolean => {
-  return Math.abs(distance) < threshold;
-};
-
-const isOutsideCheck = (distance: number, threshold: number): boolean => {
-  return 0 <= distance && distance < threshold;
 };
 
 const distanceToRectangle = (
@@ -344,127 +148,6 @@ const ellipseParamsForTest = (
 
   const tangent = GALine.orthogonalThrough(pointRel, closestPoint);
   return [pointRel, tangent];
-};
-
-const hitTestFreeDrawElement = (
-  element: ExcalidrawFreeDrawElement,
-  point: Point,
-  threshold: number,
-): boolean => {
-  // Check point-distance-to-line-segment for every segment in the
-  // element's points (its input points, not its outline points).
-  // This is... okay? It's plenty fast, but the GA library may
-  // have a faster option.
-
-  let x: number;
-  let y: number;
-
-  if (element.angle === 0) {
-    x = point[0] - element.x;
-    y = point[1] - element.y;
-  } else {
-    // Counter-rotate the point around center before testing
-    const [minX, minY, maxX, maxY] = getElementAbsoluteCoords(element);
-    const rotatedPoint = rotatePoint(
-      point,
-      [minX + (maxX - minX) / 2, minY + (maxY - minY) / 2],
-      -element.angle,
-    );
-    x = rotatedPoint[0] - element.x;
-    y = rotatedPoint[1] - element.y;
-  }
-
-  let [A, B] = element.points;
-  let P: readonly [number, number];
-
-  // For freedraw dots
-  if (
-    distance2d(A[0], A[1], x, y) < threshold ||
-    distance2d(B[0], B[1], x, y) < threshold
-  ) {
-    return true;
-  }
-
-  // For freedraw lines
-  for (let i = 0; i < element.points.length; i++) {
-    const delta = [B[0] - A[0], B[1] - A[1]];
-    const length = Math.hypot(delta[1], delta[0]);
-
-    const U = [delta[0] / length, delta[1] / length];
-    const C = [x - A[0], y - A[1]];
-    const d = (C[0] * U[0] + C[1] * U[1]) / Math.hypot(U[1], U[0]);
-    P = [A[0] + U[0] * d, A[1] + U[1] * d];
-
-    const da = distance2d(P[0], P[1], A[0], A[1]);
-    const db = distance2d(P[0], P[1], B[0], B[1]);
-
-    P = db < da && da > length ? B : da < db && db > length ? A : P;
-
-    if (Math.hypot(y - P[1], x - P[0]) < threshold) {
-      return true;
-    }
-
-    A = B;
-    B = element.points[i + 1];
-  }
-
-  const shape = ShapeCache.get(element);
-
-  // for filled freedraw shapes, support
-  // selecting from inside
-  if (shape && shape.sets.length) {
-    return element.fillStyle === "solid"
-      ? hitTestCurveInside(shape, x, y, "round")
-      : hitTestRoughShape(shape, x, y, threshold);
-  }
-
-  return false;
-};
-
-const hitTestLinear = (args: HitTestArgs): boolean => {
-  const { element, threshold } = args;
-  if (!ShapeCache.get(element)) {
-    return false;
-  }
-
-  const [point, pointAbs, hwidth, hheight] = pointRelativeToElement(
-    args.element,
-    args.point,
-  );
-  const side1 = GALine.equation(0, 1, -hheight);
-  const side2 = GALine.equation(1, 0, -hwidth);
-  if (
-    !isInsideCheck(GAPoint.distanceToLine(pointAbs, side1), threshold) ||
-    !isInsideCheck(GAPoint.distanceToLine(pointAbs, side2), threshold)
-  ) {
-    return false;
-  }
-  const [relX, relY] = GAPoint.toTuple(point);
-
-  const shape = ShapeCache.get(element as ExcalidrawLinearElement);
-
-  if (!shape) {
-    return false;
-  }
-
-  if (args.check === isInsideCheck) {
-    const hit = shape.some((subshape) =>
-      hitTestCurveInside(
-        subshape,
-        relX,
-        relY,
-        element.roundness ? "round" : "sharp",
-      ),
-    );
-    if (hit) {
-      return true;
-    }
-  }
-
-  // hit test all "subshapes" of the linear element
-  return shape.some((subshape) =>
-    hitTestRoughShape(subshape, relX, relY, threshold),
-  );
 };
 
 // Returns:

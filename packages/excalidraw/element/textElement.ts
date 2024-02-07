@@ -2,7 +2,6 @@ import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
 import {
   ExcalidrawElement,
   ExcalidrawElementType,
-  ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   FontFamilyValues,
@@ -27,10 +26,6 @@ import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import { AppState } from "../types";
-import { isTextBindableContainer } from "./typeChecks";
-import { getElementAbsoluteCoords } from ".";
-import { getSelectedElements } from "../scene";
-import { isHittingElementNotConsideringBoundingBox } from "./collision";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
@@ -817,45 +812,6 @@ export const suppportsHorizontalAlign = (
 
     return isTextElement(element);
   });
-};
-
-export const getTextBindableContainerAtPosition = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  x: number,
-  y: number,
-): ExcalidrawTextContainer | null => {
-  const selectedElements = getSelectedElements(elements, appState);
-  if (selectedElements.length === 1) {
-    return isTextBindableContainer(selectedElements[0], false)
-      ? selectedElements[0]
-      : null;
-  }
-  let hitElement = null;
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  for (let index = elements.length - 1; index >= 0; --index) {
-    if (elements[index].isDeleted) {
-      continue;
-    }
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
-    if (
-      isArrowElement(elements[index]) &&
-      isHittingElementNotConsideringBoundingBox(
-        elements[index],
-        appState,
-        null,
-        [x, y],
-      )
-    ) {
-      hitElement = elements[index];
-      break;
-    } else if (x1 < x && x < x2 && y1 < y && y < y2) {
-      hitElement = elements[index];
-      break;
-    }
-  }
-
-  return isTextBindableContainer(hitElement, false) ? hitElement : null;
 };
 
 const VALID_CONTAINER_TYPES = new Set([

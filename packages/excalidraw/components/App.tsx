@@ -162,6 +162,7 @@ import {
   isIframeElement,
   isIframeLikeElement,
   isMagicFrameElement,
+  isTextBindableContainer,
 } from "../element/typeChecks";
 import {
   ExcalidrawBindableElement,
@@ -329,7 +330,6 @@ import {
   getContainerElement,
   getDefaultLineHeight,
   getLineHeightInPx,
-  getTextBindableContainerAtPosition,
   isMeasureTextSupported,
   isValidTextContainer,
 } from "../element/textElement";
@@ -4494,6 +4494,36 @@ class App extends React.Component<AppProps, AppState> {
     return hit;
   }
 
+  private getTextBindableContainerAtPosition(x: number, y: number) {
+    const elements = this.scene.getNonDeletedElements();
+    const selectedElements = this.scene.getSelectedElements(this.state);
+    if (selectedElements.length === 1) {
+      return isTextBindableContainer(selectedElements[0], false)
+        ? selectedElements[0]
+        : null;
+    }
+    let hitElement = null;
+    // We need to to hit testing from front (end of the array) to back (beginning of the array)
+    for (let index = elements.length - 1; index >= 0; --index) {
+      if (elements[index].isDeleted) {
+        continue;
+      }
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
+      if (
+        isArrowElement(elements[index]) &&
+        this.hitElementItselfOnly(x, y, elements[index])
+      ) {
+        hitElement = elements[index];
+        break;
+      } else if (x1 < x && x < x2 && y1 < y && y < y2) {
+        hitElement = elements[index];
+        break;
+      }
+    }
+
+    return isTextBindableContainer(hitElement, false) ? hitElement : null;
+  }
+
   private hitElementBoundingBox(
     x: number,
     y: number,
@@ -4778,12 +4808,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const container = getTextBindableContainerAtPosition(
-        this.scene.getNonDeletedElements(),
-        this.state,
-        sceneX,
-        sceneY,
-      );
+      const container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
       if (container) {
         if (
@@ -6450,12 +6475,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     // FIXME
-    let container = getTextBindableContainerAtPosition(
-      this.scene.getNonDeletedElements(),
-      this.state,
-      sceneX,
-      sceneY,
-    );
+    let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
     if (hasBoundTextElement(element)) {
       container = element as ExcalidrawTextContainer;
