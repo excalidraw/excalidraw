@@ -152,7 +152,7 @@ export const actionBindText = register({
     redrawTextBoundingBox(
       textElement,
       container,
-      app.scene.getElementsMapIncludingDeleted(),
+      app.scene.getNonDeletedElementsMap(),
     );
     // overwritting the cache with original container height so
     // it can be restored when unbind
@@ -297,7 +297,7 @@ export const actionWrapTextInContainer = register({
         redrawTextBoundingBox(
           textElement,
           container,
-          app.scene.getElementsMapIncludingDeleted(),
+          app.scene.getNonDeletedElementsMap(),
         );
 
         updatedElements = pushContainerBelowText(
