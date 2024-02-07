@@ -47,8 +47,6 @@ import {
 } from "./typeChecks";
 import { isTextElement } from ".";
 import { isTransparent } from "../utils";
-import { shouldShowBoundingBox } from "./transformHandles";
-import { getBoundTextElement } from "./textElement";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 
@@ -72,85 +70,6 @@ const isElementDraggableFromInside = (
   return isDraggableFromInside || isImageElement(element);
 };
 
-export const hitTest = (
-  element: NonDeletedExcalidrawElement,
-  appState: AppState,
-  frameNameBoundsCache: FrameNameBoundsCache,
-  x: number,
-  y: number,
-): boolean => {
-  // How many pixels off the shape boundary we still consider a hit
-  const threshold = 10 / appState.zoom.value;
-  const point: Point = [x, y];
-
-  if (
-    isElementSelected(appState, element) &&
-    shouldShowBoundingBox([element], appState)
-  ) {
-    return isPointHittingElementBoundingBox(
-      element,
-      point,
-      threshold,
-      frameNameBoundsCache,
-    );
-  }
-
-  const boundTextElement = getBoundTextElement(element);
-  if (boundTextElement) {
-    const isHittingBoundTextElement = hitTest(
-      boundTextElement,
-      appState,
-      frameNameBoundsCache,
-      x,
-      y,
-    );
-    if (isHittingBoundTextElement) {
-      return true;
-    }
-  }
-  return isHittingElementNotConsideringBoundingBox(
-    element,
-    appState,
-    frameNameBoundsCache,
-    point,
-  );
-};
-
-export const isHittingElementBoundingBoxWithoutHittingElement = (
-  element: NonDeletedExcalidrawElement,
-  appState: AppState,
-  frameNameBoundsCache: FrameNameBoundsCache,
-  x: number,
-  y: number,
-): boolean => {
-  const threshold = 10 / appState.zoom.value;
-
-  // So that bound text element hit is considered within bounding box of container even if its outside actual bounding box of element
-  // eg for linear elements text can be outside the element bounding box
-  const boundTextElement = getBoundTextElement(element);
-  if (
-    boundTextElement &&
-    hitTest(boundTextElement, appState, frameNameBoundsCache, x, y)
-  ) {
-    return false;
-  }
-
-  return (
-    !isHittingElementNotConsideringBoundingBox(
-      element,
-      appState,
-      frameNameBoundsCache,
-      [x, y],
-    ) &&
-    isPointHittingElementBoundingBox(
-      element,
-      [x, y],
-      threshold,
-      frameNameBoundsCache,
-    )
-  );
-};
-
 export const isHittingElementNotConsideringBoundingBox = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
@@ -171,11 +90,6 @@ export const isHittingElementNotConsideringBoundingBox = (
     frameNameBoundsCache,
   });
 };
-
-const isElementSelected = (
-  appState: AppState,
-  element: NonDeleted<ExcalidrawElement>,
-) => appState.selectedElementIds[element.id];
 
 export const isPointHittingElementBoundingBox = (
   element: NonDeleted<ExcalidrawElement>,

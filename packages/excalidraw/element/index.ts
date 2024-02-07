@@ -30,10 +30,6 @@ export {
   getTransformHandles,
 } from "./transformHandles";
 export {
-  hitTest,
-  isHittingElementBoundingBoxWithoutHittingElement,
-} from "./collision";
-export {
   resizeTest,
   getCursorForResizingElement,
   getElementWithTransformHandleType,

@@ -106,8 +106,6 @@ import {
   getResizeOffsetXY,
   getLockedLinearCursorAlignSize,
   getTransformHandleTypeFromCoords,
-  hitTest,
-  isHittingElementBoundingBoxWithoutHittingElement,
   isInvisiblySmallElement,
   isNonDeletedElement,
   isTextElement,
@@ -335,7 +333,6 @@ import {
   isMeasureTextSupported,
   isValidTextContainer,
 } from "../element/textElement";
-import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
@@ -4409,9 +4406,8 @@ class App extends React.Component<AppProps, AppState> {
     includeBoundTextElement: boolean = false,
     includeLockedElements: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
-    const tolerance = 10 / this.state.zoom.value;
-
     const iframeLikes: ExcalidrawIframeElement[] = [];
+
     const elements = (
       includeBoundTextElement && includeLockedElements
         ? this.scene.getNonDeletedElements()
@@ -4424,54 +4420,7 @@ class App extends React.Component<AppProps, AppState> {
                   !(isTextElement(element) && element.containerId)),
             )
     )
-      .filter((el) => {
-        if (
-          this.state.selectedElementIds[el.id] &&
-          shouldShowBoundingBox([el], this.state)
-        ) {
-          const [x1, y1, x2, y2] = getElementBounds(el);
-          return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
-        }
-
-        const boundTextElement = getBoundTextElement(el);
-        if (boundTextElement) {
-          let textShape = this.getElementShape(boundTextElement);
-          if (el.type === "arrow") {
-            const { x, y } = LinearElementEditor.getBoundTextElementPosition(
-              el,
-              boundTextElement,
-            );
-            textShape = this.getElementShape({
-              ...boundTextElement,
-              x,
-              y,
-            });
-          }
-          const hit = isPointInShape([x, y], textShape);
-          if (hit) {
-            return true;
-          }
-        }
-
-        const shape = this.getElementShape(el);
-
-        let hit = this.shouldTestInside(el)
-          ? isPointInShape([x, y], shape)
-          : isPointOnShape([x, y], shape, tolerance);
-
-        if (!hit && isFrameLikeElement(el)) {
-          const nameBounds = this.frameNameBoundsCache.get(el);
-          if (nameBounds) {
-            hit = isPointInShape([x, y], {
-              type: "polygon",
-              data: getPolygonShape(nameBounds as ExcalidrawRectangleElement)
-                .data as Polygon,
-            });
-          }
-        }
-
-        return hit;
-      })
+      .filter((el) => this.hitElement(x, y, el))
       .filter((element) => {
         // hitting a frame's element from outside the frame is not considered a hit
         const containingFrame = getContainingFrame(element);
@@ -4486,7 +4435,6 @@ class App extends React.Component<AppProps, AppState> {
         // We want to preserve that order on the returned array.
         // Exception being embeddables which should be on top of everything else in
         // terms of hit testing.
-
         if (isIframeElement(el)) {
           iframeLikes.push(el);
           return false;
@@ -4496,6 +4444,109 @@ class App extends React.Component<AppProps, AppState> {
       .concat(iframeLikes) as NonDeleted<ExcalidrawElement>[];
 
     return elements;
+  }
+
+  private getHitThreshold() {
+    return 10 / this.state.zoom.value;
+  }
+
+  private hitElement(
+    x: number,
+    y: number,
+    element: ExcalidrawElement,
+    considerBoundingBox = true,
+  ) {
+    const tolerance = 10 / this.state.zoom.value;
+
+    // if the element is selected, then hit test is done against its bounding box
+    if (
+      considerBoundingBox &&
+      this.state.selectedElementIds[element.id] &&
+      shouldShowBoundingBox([element], this.state)
+    ) {
+      return this.hitElementBoundingBox(x, y, element);
+    }
+
+    // take bound text element into consideration for hit collision as well
+    const hitBoundTextOfElement = this.hitElementBoundText(x, y, element);
+    if (hitBoundTextOfElement) {
+      return true;
+    }
+
+    const shape = this.getElementShape(element);
+
+    let hit = this.shouldTestInside(element)
+      ? isPointInShape([x, y], shape)
+      : isPointOnShape([x, y], shape, tolerance);
+
+    // hit test against a frame's name
+    if (!hit && isFrameLikeElement(element)) {
+      const nameBounds = this.frameNameBoundsCache.get(element);
+      if (nameBounds) {
+        hit = isPointInShape([x, y], {
+          type: "polygon",
+          data: getPolygonShape(nameBounds as ExcalidrawRectangleElement)
+            .data as Polygon,
+        });
+      }
+    }
+
+    return hit;
+  }
+
+  private hitElementBoundingBox(
+    x: number,
+    y: number,
+    element: ExcalidrawElement,
+  ) {
+    const [x1, y1, x2, y2] = getElementBounds(element);
+    return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
+  }
+
+  private hitElementBoundText(
+    x: number,
+    y: number,
+    element: ExcalidrawElement,
+  ) {
+    let hit = false;
+    const boundTextElement = getBoundTextElement(element);
+    if (boundTextElement) {
+      let textShape = this.getElementShape(boundTextElement);
+      if (element.type === "arrow") {
+        textShape = this.getElementShape({
+          ...boundTextElement,
+          // arrow's bound text accurate position is not stored in the element's property
+          // but rather calculated and returned from the following static method
+          ...LinearElementEditor.getBoundTextElementPosition(
+            element,
+            boundTextElement,
+          ),
+        });
+      }
+      hit = isPointInShape([x, y], textShape);
+    }
+    return hit;
+  }
+
+  // only hitting bounding box and not the element itself
+  private hitElementBoundingBoxOnly(
+    x: number,
+    y: number,
+    element: ExcalidrawElement,
+  ) {
+    return (
+      !this.hitElement(x, y, element, false) &&
+      this.hitElementBoundingBox(x, y, element)
+    );
+  }
+
+  // hit element not considering its bounding box
+  private hitElementItselfOnly(
+    x: number,
+    y: number,
+    element: ExcalidrawElement,
+  ) {
+    return this.hitElement(x, y, element, false);
   }
 
   private startTextEditing = ({
@@ -4738,12 +4789,7 @@ class App extends React.Component<AppProps, AppState> {
         if (
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
-          isHittingElementNotConsideringBoundingBox(
-            container,
-            this.state,
-            this.frameNameBoundsCache,
-            [sceneX, sceneY],
-          )
+          this.hitElementItselfOnly(sceneX, sceneY, container)
         ) {
           const midPoint = getContainerCenter(container, this.state);
 
@@ -5319,7 +5365,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
-    const threshold = 10 / this.state.zoom.value;
+    const threshold = this.getHitThreshold();
     const point = { ...pointerDownState.lastCoords };
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
@@ -5390,14 +5436,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
-      if (
-        isHittingElementNotConsideringBoundingBox(
-          element,
-          this.state,
-          this.frameNameBoundsCache,
-          [scenePointerX, scenePointerY],
-        )
-      ) {
+      if (this.hitElementItselfOnly(scenePointerX, scenePointerY, element)) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
           element,
           this.state.zoom,
@@ -5416,27 +5455,7 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
-      } else if (
-        shouldShowBoundingBox([element], this.state) &&
-        isHittingElementBoundingBoxWithoutHittingElement(
-          element,
-          this.state,
-          this.frameNameBoundsCache,
-          scenePointerX,
-          scenePointerY,
-        )
-      ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-      } else if (
-        boundTextElement &&
-        hitTest(
-          boundTextElement,
-          this.state,
-          this.frameNameBoundsCache,
-          scenePointerX,
-          scenePointerY,
-        )
-      ) {
+      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
       }
 
@@ -6403,7 +6422,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = 10 / this.state.zoom.value;
+    const threshold = this.getHitThreshold();
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -8210,15 +8229,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // not dragged
         !pointerDownState.drag.hasOccurred &&
+        // not resized
         !this.state.isResizing &&
+        // only hitting the bounding box of the previous hit element
         ((hitElement &&
-          isHittingElementBoundingBoxWithoutHittingElement(
-            hitElement,
-            this.state,
-            this.frameNameBoundsCache,
+          this.hitElementBoundingBoxOnly(
             pointerDownState.origin.x,
             pointerDownState.origin.y,
+            hitElement,
           )) ||
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
@@ -8234,6 +8254,8 @@ class App extends React.Component<AppProps, AppState> {
             activeEmbeddable: null,
           });
         }
+        // reset cursor
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
         return;
       }
 
