@@ -60,10 +60,7 @@ export class Fonts {
         return newElementWith(element, {
           ...refreshTextDimensions(
             element,
-            getContainerElement(
-              element,
-              this.scene.getElementsMapIncludingDeleted(),
-            ),
+            getContainerElement(element, this.scene.getNonDeletedElementsMap()),
             this.scene.getNonDeletedElementsMap(),
           ),
         });

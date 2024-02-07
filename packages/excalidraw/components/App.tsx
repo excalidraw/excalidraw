@@ -4193,6 +4193,7 @@ class App extends React.Component<AppProps, AppState> {
       isDeleted: boolean,
     ) => {
       this.scene.replaceAllElements([
+        // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(
@@ -5114,7 +5115,7 @@ class App extends React.Component<AppProps, AppState> {
       showHyperlinkTooltip(
         this.hitLinkElement,
         this.state,
-        this.scene.getElementsMapIncludingDeleted(),
+        this.scene.getNonDeletedElementsMap(),
       );
     } else {
       hideHyperlinkToolip();
@@ -6996,7 +6997,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             this.state,
             !event[KEYS.CTRL_OR_CMD],
-            this.scene.getElementsMapIncludingDeleted(),
+            this.scene.getNonDeletedElementsMap(),
           );
           if (!ret) {
             return;
