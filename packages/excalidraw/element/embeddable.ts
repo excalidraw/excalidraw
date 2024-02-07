@@ -1,21 +1,15 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
-import { t } from "../i18n";
 import { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { getContainerElement, wrapText } from "./textElement";
-import {
-  isFrameLikeElement,
-  isIframeElement,
-  isIframeLikeElement,
-} from "./typeChecks";
+import { wrapText } from "./textElement";
+import { isIframeElement } from "./typeChecks";
 import {
   ExcalidrawElement,
   ExcalidrawIframeLikeElement,
   IframeData,
-  NonDeletedExcalidrawElement,
 } from "./types";
 
 const embeddedLinkCache = new Map<string, IframeData>();
@@ -112,8 +106,8 @@ export const getEmbedLink = (
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
-    const warning = !/^\d+$/.test(target)
-      ? t("toast.unrecognizedLinkFormat")
+    const error = !/^\d+$/.test(target)
+      ? new URIError("Invalid embed link format")
       : undefined;
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
@@ -125,7 +119,7 @@ export const getEmbedLink = (
       intrinsicSize: aspectRatio,
       type,
     });
-    return { link, intrinsicSize: aspectRatio, type, warning };
+    return { link, intrinsicSize: aspectRatio, type, error };
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -215,21 +209,6 @@ export const getEmbedLink = (
 
   embeddedLinkCache.set(link, { link, intrinsicSize: aspectRatio, type });
   return { link, intrinsicSize: aspectRatio, type };
-};
-
-export const isIframeLikeOrItsLabel = (
-  element: NonDeletedExcalidrawElement,
-): Boolean => {
-  if (isIframeLikeElement(element)) {
-    return true;
-  }
-  if (element.type === "text") {
-    const container = getContainerElement(element);
-    if (container && isFrameLikeElement(container)) {
-      return true;
-    }
-  }
-  return false;
 };
 
 export const createPlaceholderEmbeddableLabel = (

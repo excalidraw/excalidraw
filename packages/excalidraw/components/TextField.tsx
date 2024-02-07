@@ -13,8 +13,6 @@ import { Button } from "./Button";
 import { eyeIcon, eyeClosedIcon } from "./icons";
 
 type TextFieldProps = {
-  value?: string;
-
   onChange?: (value: string) => void;
   onClick?: () => void;
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -26,12 +24,11 @@ type TextFieldProps = {
   label?: string;
   placeholder?: string;
   isRedacted?: boolean;
-};
+} & ({ value: string } | { defaultValue: string });
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   (
     {
-      value,
       onChange,
       label,
       fullWidth,
@@ -40,6 +37,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       selectOnRender,
       onKeyDown,
       isRedacted = false,
+      ...rest
     },
     ref,
   ) => {
@@ -73,10 +71,17 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         >
           <input
             className={clsx({
-              "is-redacted": value && isRedacted && !isTemporarilyUnredacted,
+              "is-redacted":
+                "value" in rest &&
+                rest.value &&
+                isRedacted &&
+                !isTemporarilyUnredacted,
             })}
             readOnly={readonly}
-            value={value}
+            value={"value" in rest ? rest.value : undefined}
+            defaultValue={
+              "defaultValue" in rest ? rest.defaultValue : undefined
+            }
             placeholder={placeholder}
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}

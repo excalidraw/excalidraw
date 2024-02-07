@@ -17,5 +17,5 @@
     "jsx": "react-jsx"
   },
   "include": ["packages", "excalidraw-app"],
-  "exclude": ["packages/excalidraw/types"]
+  "exclude": ["packages/excalidraw/types", "examples"]
 }

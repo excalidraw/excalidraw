@@ -68,6 +68,7 @@
   cursor: pointer;
   background-color: var(--button-bg, var(--island-bg-color));
   color: var(--button-color, var(--color-on-surface));
+  font-family: var(--ui-font);
 
   svg {
     width: var(--button-width, var(--lg-icon-size));

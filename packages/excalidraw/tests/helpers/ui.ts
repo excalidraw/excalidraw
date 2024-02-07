@@ -206,6 +206,8 @@ export class Pointer {
   moveTo(x: number = this.clientX, y: number = this.clientY) {
     this.clientX = x;
     this.clientY = y;
+    // fire "mousemove" to update editor cursor position
+    fireEvent.mouseMove(document, this.getEvent());
     fireEvent.pointerMove(GlobalTestState.interactiveCanvas, this.getEvent());
   }
 

@@ -271,7 +271,7 @@ const ImageExportModal = ({
                 exportingFrame,
               })
             }
-            startIcon={downloadIcon}
+            icon={downloadIcon}
           >
             {t("imageExportDialog.button.exportToPng")}
           </FilledButton>
@@ -283,7 +283,7 @@ const ImageExportModal = ({
                 exportingFrame,
               })
             }
-            startIcon={downloadIcon}
+            icon={downloadIcon}
           >
             {t("imageExportDialog.button.exportToSvg")}
           </FilledButton>
@@ -296,7 +296,7 @@ const ImageExportModal = ({
                   exportingFrame,
                 })
               }
-              startIcon={copyIcon}
+              icon={copyIcon}
             >
               {t("imageExportDialog.button.copyPngToClipboard")}
             </FilledButton>
