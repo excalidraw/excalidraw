@@ -7770,7 +7770,7 @@ class App extends React.Component<AppProps, AppState> {
                   !elementOverlapsWithFrame(
                     linearElement,
                     frame,
-                    this.scene.getElementsIncludingDeleted(),
+                    this.scene.getNonDeletedElementsMap(),
                   )
                 ) {
                   // remove the linear element from all groups

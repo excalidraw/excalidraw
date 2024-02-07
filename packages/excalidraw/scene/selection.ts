@@ -46,8 +46,9 @@ export const getElementsWithinSelection = (
   selection: NonDeletedExcalidrawElement,
   excludeElementsInFrames: boolean = true,
 ) => {
+  const elementsMap = arrayToMap(elements);
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(selection, arrayToMap(elements));
+    getElementAbsoluteCoords(selection, elementsMap);
 
   let elementsInSelection = elements.filter((element) => {
     let [elementX1, elementY1, elementX2, elementY2] =
@@ -82,7 +83,7 @@ export const getElementsWithinSelection = (
     const containingFrame = getContainingFrame(element);
 
     if (containingFrame) {
-      return elementOverlapsWithFrame(element, containingFrame, elements);
+      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
     }
 
     return true;

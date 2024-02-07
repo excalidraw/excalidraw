@@ -210,11 +210,11 @@ export const getElementAbsoluteCoords = (
  */
 export const getElementLineSegments = (
   element: ExcalidrawElement,
-  elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): [Point, Point][] => {
   const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
     element,
-    arrayToMap(elements),
+    elementsMap,
   );
 
   const center: Point = [cx, cy];

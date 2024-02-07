@@ -973,7 +973,7 @@ const _renderStaticScene = ({
       (elementOverlapsWithFrame(
         element,
         appState.frameToHighlight,
-        visibleElements,
+        arrayToMap(visibleElements),
       ) ||
         element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
     ) {
