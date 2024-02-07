@@ -78,7 +78,7 @@ export const saveAsJSON = async (
   });
 
   const fileHandle = await fileSave(blob, {
-    name: appState.name,
+    name: appState.name || "Unnamed",
     extension: "excalidraw",
     description: "Excalidraw file",
     fileHandle: isImageFileHandle(appState.fileHandle)

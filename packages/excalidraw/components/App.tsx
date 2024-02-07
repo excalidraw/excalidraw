@@ -270,6 +270,7 @@ import {
   updateStable,
   addEventListener,
   normalizeEOL,
+  getDateTime,
 } from "../utils";
 import {
   createSrcDoc,
@@ -380,7 +381,7 @@ import {
   ExcalidrawElementSkeleton,
   convertToExcalidrawElements,
 } from "../data/transform";
-import { ValueOf } from "../utility-types";
+import { Merge, ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
@@ -619,7 +620,7 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
-      name = defaultAppState.name,
+      name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
     this.state = {
       ...defaultAppState,

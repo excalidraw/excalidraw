@@ -91,7 +91,7 @@ export const exportCanvas = async (
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    name: string;
+    name: string | null;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },
@@ -121,7 +121,7 @@ export const exportCanvas = async (
         }),
         {
           description: "Export to SVG",
-          name,
+          name: name || "Unnamed",
           extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
           fileHandle,
         },
@@ -157,7 +157,7 @@ export const exportCanvas = async (
 
     return fileSave(blob, {
       description: "Export to PNG",
-      name,
+      name: name || "Unnamed",
       // FIXME reintroduce `excalidraw.png` when most people upgrade away
       // from 111.0.5563.64 (arm64), see #6349
       extension: /* appState.exportEmbedScene ? "excalidraw.png" : */ "png",
