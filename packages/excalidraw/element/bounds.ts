@@ -26,7 +26,6 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
-import { arrayToMap } from "../utils";
 
 export type RectangleBox = {
   x: number;
