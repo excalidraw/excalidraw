@@ -25,7 +25,6 @@ import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
-import { e } from "vitest/dist/reporters-LLiOBu3g";
 
 const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
 const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
