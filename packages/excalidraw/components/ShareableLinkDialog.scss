@@ -22,7 +22,7 @@
     }
 
     &__popover {
-      @keyframes RoomDialog__popover__scaleIn {
+      @keyframes ShareableLinkDialog__popover__scaleIn {
         from {
           opacity: 0;
         }
@@ -61,7 +61,7 @@
       }
 
       transform-origin: var(--radix-popover-content-transform-origin);
-      animation: RoomDialog__popover__scaleIn 150ms ease-out;
+      animation: ShareableLinkDialog__popover__scaleIn 150ms ease-out;
     }
 
     &__linkRow {
