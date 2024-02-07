@@ -219,7 +219,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": [
     {
       "id": "id48",
@@ -263,7 +262,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": [
     {
       "id": "id48",
@@ -365,7 +363,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id48",
   "fillStyle": "solid",
@@ -462,7 +459,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id37",
   "fillStyle": "solid",
@@ -629,7 +625,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id41",
   "fillStyle": "solid",
@@ -668,7 +663,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": [
     {
       "id": "id41",
@@ -712,7 +706,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": [
     {
       "id": "id41",
@@ -1146,7 +1139,6 @@ exports[`Test Transform > should transform text element 1`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": null,
   "fillStyle": "solid",
@@ -1185,7 +1177,6 @@ exports[`Test Transform > should transform text element 2`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": null,
   "fillStyle": "solid",
@@ -1424,7 +1415,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id25",
   "fillStyle": "solid",
@@ -1463,7 +1453,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id26",
   "fillStyle": "solid",
@@ -1502,7 +1491,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id27",
   "fillStyle": "solid",
@@ -1542,7 +1530,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id28",
   "fillStyle": "solid",
@@ -1792,7 +1779,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id13",
   "fillStyle": "solid",
@@ -1831,7 +1817,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id14",
   "fillStyle": "solid",
@@ -1871,7 +1856,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id15",
   "fillStyle": "solid",
@@ -1913,7 +1897,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id16",
   "fillStyle": "solid",
@@ -1953,7 +1936,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id17",
   "fillStyle": "solid",
@@ -1994,7 +1976,6 @@ exports[`Test Transform > should transform to text containers when label provide
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": null,
   "containerId": "id18",
   "fillStyle": "solid",

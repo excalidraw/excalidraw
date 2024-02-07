@@ -289,7 +289,6 @@ exports[`restoreElements > should restore text element correctly passing value f
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": [],
   "containerId": null,
   "fillStyle": "solid",
@@ -330,7 +329,6 @@ exports[`restoreElements > should restore text element correctly with unknown fo
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "baseline": 0,
   "boundElements": [],
   "containerId": null,
   "fillStyle": "solid",

@@ -18,7 +18,6 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
-  isSafari,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -61,7 +60,6 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    baseline: textElement.baseline,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -82,7 +80,6 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
-  boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
     const maxContainerHeight = getBoundTextMaxHeight(
@@ -183,7 +180,6 @@ export const handleBindTextResize = (
     const maxWidth = getBoundTextMaxWidth(container, textElement);
     const maxHeight = getBoundTextMaxHeight(container, textElement);
     let containerHeight = container.height;
-    let nextBaseLine = textElement.baseline;
     if (
       shouldMaintainAspectRatio ||
       (transformHandleType !== "n" && transformHandleType !== "s")
@@ -202,7 +198,6 @@ export const handleBindTextResize = (
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
-      nextBaseLine = metrics.baseline;
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
@@ -230,7 +225,6 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextBaseLine,
     });
 
     if (!isArrowElement(container)) {
@@ -294,59 +288,7 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const baseline = measureBaseline(text, font, lineHeight);
-  return { width, height, baseline };
-};
-
-export const measureBaseline = (
-  text: string,
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-  wrapInContainer?: boolean,
-) => {
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
-  if (wrapInContainer) {
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.whiteSpace = "pre-wrap";
-  }
-
-  container.style.lineHeight = String(lineHeight);
-
-  container.innerText = text;
-
-  // Baseline is important for positioning text on canvas
-  document.body.appendChild(container);
-
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  let baseline = span.offsetTop + span.offsetHeight;
-  const height = container.offsetHeight;
-
-  if (isSafari) {
-    const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
-    const fontSize = parseFloat(font);
-    // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
-    // from the actual canvas height
-    const domHeight = getTextHeight(text, Math.round(fontSize), lineHeight);
-    if (canvasHeight > height) {
-      baseline += canvasHeight - domHeight;
-    }
-
-    if (height > canvasHeight) {
-      baseline -= domHeight - canvasHeight;
-    }
-  }
-  document.body.removeChild(container);
-  return baseline;
+  return { width, height };
 };
 
 /**

@@ -395,7 +395,7 @@ const drawElementOnCanvas = (
           element.fontSize,
           element.lineHeight,
         );
-        const verticalOffset = element.height - element.baseline;
+        const verticalOffset = 0; //TODO_DOMLESS;
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],

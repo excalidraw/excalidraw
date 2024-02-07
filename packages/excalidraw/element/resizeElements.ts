@@ -211,8 +211,7 @@ const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   elementsMap: ElementsMap,
   nextWidth: number,
-  nextHeight: number,
-): { size: number; baseline: number } | null => {
+): { size: number } | null => {
   // We only use width to scale font on resize
   let width = element.width;
 
@@ -227,14 +226,9 @@ const measureFontSizeFromWidth = (
   if (nextFontSize < MIN_FONT_SIZE) {
     return null;
   }
-  const metrics = measureText(
-    element.text,
-    getFontString({ fontSize: nextFontSize, fontFamily: element.fontFamily }),
-    element.lineHeight,
-  );
+
   return {
     size: nextFontSize,
-    baseline: metrics.baseline + (nextHeight - metrics.height),
   };
 };
 
@@ -307,12 +301,7 @@ const resizeSingleTextElement = (
   if (scale > 0) {
     const nextWidth = element.width * scale;
     const nextHeight = element.height * scale;
-    const metrics = measureFontSizeFromWidth(
-      element,
-      elementsMap,
-      nextWidth,
-      nextHeight,
-    );
+    const metrics = measureFontSizeFromWidth(element, elementsMap, nextWidth);
     if (metrics === null) {
       return;
     }
@@ -340,7 +329,6 @@ const resizeSingleTextElement = (
       fontSize: metrics.size,
       width: nextWidth,
       height: nextHeight,
-      baseline: metrics.baseline,
       x: nextElementX,
       y: nextElementY,
     });
@@ -394,7 +382,7 @@ export const resizeSingleElement = (
   let scaleX = atStartBoundsWidth / boundsCurrentWidth;
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
-  let boundTextFont: { fontSize?: number; baseline?: number } = {};
+  let boundTextFont: { fontSize?: number } = {};
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (transformHandleDirection.includes("e")) {
@@ -446,7 +434,6 @@ export const resizeSingleElement = (
     if (stateOfBoundTextElementAtResize) {
       boundTextFont = {
         fontSize: stateOfBoundTextElementAtResize.fontSize,
-        baseline: stateOfBoundTextElementAtResize.baseline,
       };
     }
     if (shouldMaintainAspectRatio) {
@@ -460,14 +447,12 @@ export const resizeSingleElement = (
         boundTextElement,
         elementsMap,
         getBoundTextMaxWidth(updatedElement, boundTextElement),
-        getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
         return;
       }
       boundTextFont = {
         fontSize: nextFont.size,
-        baseline: nextFont.baseline,
       };
     } else {
       const minWidth = getApproxMinLineWidth(
@@ -636,7 +621,6 @@ export const resizeSingleElement = (
     if (boundTextElement && boundTextFont != null) {
       mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
-        baseline: boundTextFont.baseline,
       });
     }
     handleBindTextResize(
@@ -763,7 +747,6 @@ export const resizeMultipleElements = (
     > & {
       points?: ExcalidrawLinearElement["points"];
       fontSize?: ExcalidrawTextElement["fontSize"];
-      baseline?: ExcalidrawTextElement["baseline"];
       scale?: ExcalidrawImageElement["scale"];
       boundTextFontSize?: ExcalidrawTextElement["fontSize"];
     };
@@ -838,17 +821,11 @@ export const resizeMultipleElements = (
     }
 
     if (isTextElement(orig)) {
-      const metrics = measureFontSizeFromWidth(
-        orig,
-        elementsMap,
-        width,
-        height,
-      );
+      const metrics = measureFontSizeFromWidth(orig, elementsMap, width);
       if (!metrics) {
         return;
       }
       update.fontSize = metrics.size;
-      update.baseline = metrics.baseline;
     }
 
     const boundTextElement = originalElements.get(
