@@ -663,6 +663,7 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
+        getAppName: this.getAppName,
         registerAction: (action: Action) => {
           this.actionManager.registerAction(action);
         },

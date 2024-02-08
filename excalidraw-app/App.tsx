@@ -715,6 +715,7 @@ const ExcalidrawWrapper = () => {
                     elements={elements}
                     appState={appState}
                     files={files}
+                    name={excalidrawAPI?.getAppName() || "Unnamed"}
                     onError={(error) => {
                       excalidrawAPI?.updateScene({
                         appState: {
@@ -775,6 +776,7 @@ const ExcalidrawWrapper = () => {
                   excalidrawAPI.getSceneElements(),
                   excalidrawAPI.getAppState(),
                   excalidrawAPI.getFiles(),
+                  excalidrawAPI.getAppName(),
                 );
               }}
             >
