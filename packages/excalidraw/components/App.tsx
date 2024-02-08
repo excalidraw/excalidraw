@@ -1410,6 +1410,13 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private toggleOverscrollBehavior(event: React.PointerEvent) {
+    // when pointer inside editor, disable overscroll behavior to prevent
+    // panning to trigger history back/forward on MacOS Chrome
+    document.documentElement.style.overscrollBehaviorX =
+      event.type === "pointerenter" ? "none" : "auto";
+  }
+
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
@@ -1463,6 +1470,8 @@ class App extends React.Component<AppProps, AppState> {
         onKeyDown={
           this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
         }
+        onPointerEnter={this.toggleOverscrollBehavior}
+        onPointerLeave={this.toggleOverscrollBehavior}
       >
         <AppContext.Provider value={this}>
           <AppPropsContext.Provider value={this.props}>
@@ -2455,6 +2464,7 @@ class App extends React.Component<AppProps, AppState> {
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
+    document.documentElement.style.overscrollBehaviorX = "";
   }
 
   private onResize = withBatchedUpdates(() => {
