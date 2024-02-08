@@ -397,19 +397,16 @@ const drawElementOnCanvas = (
         );
 
         const metrics = context.measureText(element.text);
-        // TODO_DOMLESS: we shouldn't need the harcoded line-heights as now with line gaps we could have any line-height (double-check)
         const lineGap =
-          (lineHeightPx -
-            (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent)) /
-          2;
-
+          lineHeightPx -
+          (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent);
         /**
          * Set a vertical offset to be aligned with <textarea>.
-         * - `fontBoundingBoxAscent` is here the default "gap" for the font with its default line-height used in textareas
-         * - line gap is the padding above and below font bounding box to be consistent regardless of the default font line-height
-         * - for details check https://codesandbox.io/p/devbox/v4nsqz?file=%2Fsrc%2Findex.js%3A1%2C1-166%2C1
+         * - `fontBoundingBoxAscent` is here the font bouding box with its default line-height used in textareas
+         * - half of the line gap is the additional padding above and below the bounding box when line-height isn't equal to the default value
+         * - for details check - https://codesandbox.io/p/devbox/v4nsqz?file=%2Fsrc%2Findex.js%3A1%2C1-166%2C1
          */
-        context.translate(0, metrics.fontBoundingBoxAscent + lineGap);
+        context.translate(0, metrics.fontBoundingBoxAscent + lineGap / 2);
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(

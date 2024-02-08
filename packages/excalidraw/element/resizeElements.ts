@@ -52,8 +52,6 @@ import {
   handleBindTextResize,
   getBoundTextMaxWidth,
   getApproxMinLineHeight,
-  measureText,
-  getBoundTextMaxHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 
