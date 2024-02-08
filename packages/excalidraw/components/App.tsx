@@ -1726,7 +1726,7 @@ class App extends React.Component<AppProps, AppState> {
       this.files,
       {
         exportBackground: this.state.exportBackground,
-        name: this.state.name,
+        name: this.getAppName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
       },
@@ -4111,6 +4111,10 @@ class App extends React.Component<AppProps, AppState> {
     // only work on touch screens, so checking for >= pointers means we're on a
     // touchscreen
     return gesture.pointers.size >= 2;
+  };
+
+  public getAppName = () => {
+    return this.state.name || `${t("labels.untitled")}-${getDateTime()}`;
   };
 
   // fires only on Safari

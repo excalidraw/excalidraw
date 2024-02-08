@@ -144,7 +144,12 @@ export const actionSaveToActiveFile = register({
 
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(elements, appState, app.files)
+        ? await resaveAsImageWithScene(
+            elements,
+            appState,
+            app.files,
+            app.getAppName(),
+          )
         : await saveAsJSON(elements, appState, app.files);
 
       return {

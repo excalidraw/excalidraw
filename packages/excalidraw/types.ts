@@ -577,6 +577,7 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  getAppName: App["getAppName"];
 };
 
 export type PointerDownState = Readonly<{
