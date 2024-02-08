@@ -25,11 +25,18 @@ export const calculateConstrainedScrollCenter = (
   scrollY: AppState["scrollY"];
   zoom: AppState["zoom"];
 } => {
-  const { width, height, zoom, scrollConstraints } = state;
+  const {
+    width,
+    height,
+    zoom,
+    scrollConstraints: inverseScrollConstraints,
+  } = state;
 
-  if (!scrollConstraints) {
+  if (!inverseScrollConstraints) {
     return { scrollX, scrollY, zoom };
   }
+
+  const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 
   const { zoomLevelX, zoomLevelY, initialZoomLevel } = calculateZoomLevel(
     scrollConstraints,
@@ -282,6 +289,23 @@ const constrainScrollValues = ({
 };
 
 /**
+ * Inverts the scroll constraints to align with the state scrollX and scrollY values, which are inverted.
+ * This should be removed once the https://github.com/excalidraw/excalidraw/issues/5965 is resolved.
+ *
+ * @param originalScrollContraints - The scroll constraints with the original coordinates.
+ */
+// BUG: remove this function once the #5965 is resolved
+const alignScrollConstraints = (
+  originalScrollContraints: ScrollConstraints,
+) => {
+  return {
+    ...originalScrollContraints,
+    x: originalScrollContraints.x * -1,
+    y: originalScrollContraints.y * -1,
+  };
+};
+
+/**
  * Determines whether the current viewport is outside the constrained area defined in the AppState.
  *
  * @param state - The application state containing scroll, zoom, and constraint information.
@@ -292,7 +316,16 @@ const isViewportOutsideOfConstrainedArea = (state: AppState) => {
     return false;
   }
 
-  const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;
+  const {
+    scrollX,
+    scrollY,
+    width,
+    height,
+    scrollConstraints: inverseScrollConstraints,
+    zoom,
+  } = state;
+
+  const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 
   // Adjust scroll and dimensions according to the zoom level
   const adjustedScrollX = scrollX * zoom.value;
@@ -332,7 +365,16 @@ export const constrainScrollState = (
   if (!state.scrollConstraints) {
     return state;
   }
-  const { scrollX, scrollY, width, height, scrollConstraints, zoom } = state;
+  const {
+    scrollX,
+    scrollY,
+    width,
+    height,
+    scrollConstraints: inverseScrollConstraints,
+    zoom,
+  } = state;
+
+  const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 
   const canUseMemoizedValues =
     memoizedValues && // there are memoized values
