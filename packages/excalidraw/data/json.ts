@@ -71,6 +71,7 @@ export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
+  name: string,
 ) => {
   const serialized = serializeAsJSON(elements, appState, files, "local");
   const blob = new Blob([serialized], {
@@ -78,7 +79,7 @@ export const saveAsJSON = async (
   });
 
   const fileHandle = await fileSave(blob, {
-    name: appState.name || "Unnamed",
+    name,
     extension: "excalidraw",
     description: "Excalidraw file",
     fileHandle: isImageFileHandle(appState.fileHandle)

@@ -381,7 +381,7 @@ import {
   ExcalidrawElementSkeleton,
   convertToExcalidrawElements,
 } from "../data/transform";
-import { Merge, ValueOf } from "../utility-types";
+import { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
