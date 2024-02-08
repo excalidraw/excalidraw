@@ -822,4 +822,22 @@ describe("Test Transform", () => {
       "Duplicate id found for rect-1",
     );
   });
+
+  it("should contains customData if provided", () => {
+    const rawData = [
+      {
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        customData: { createdBy: "user01" },
+      },
+    ];
+    const convertedElements = convertToExcalidrawElements(
+      rawData as ExcalidrawElementSkeleton[],
+      opts,
+    );
+    expect(convertedElements[0].customData).toStrictEqual({
+      createdBy: "user01",
+    });
+  });
 });
