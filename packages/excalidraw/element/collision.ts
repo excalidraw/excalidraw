@@ -1,4 +1,4 @@
-import { isPointWithinBounds } from "../math";
+import { isPathALoop, isPointWithinBounds } from "../math";
 
 import { ExcalidrawElement, ExcalidrawRectangleElement } from "./types";
 
@@ -10,12 +10,39 @@ import {
   getPolygonShape,
 } from "../../utils/geometry/shape";
 import { isPointInShape, isPointOnShape } from "../../utils/collision";
+import { isTransparent } from "../utils";
+import {
+  hasBoundTextElement,
+  isIframeLikeElement,
+  isImageElement,
+} from "./typeChecks";
 
-export type HitElementArgs = {
+export const shouldTestInside = (element: ExcalidrawElement) => {
+  if (element.type === "arrow") {
+    return false;
+  }
+
+  const isDraggableFromInside =
+    !isTransparent(element.backgroundColor) ||
+    hasBoundTextElement(element) ||
+    isIframeLikeElement(element);
+
+  if (element.type === "line") {
+    return isDraggableFromInside && isPathALoop(element.points);
+  }
+
+  if (element.type === "freedraw") {
+    return isDraggableFromInside && isPathALoop(element.points);
+  }
+
+  return isDraggableFromInside || isImageElement(element);
+};
+
+export type HitTestArgs = {
   x: number;
   y: number;
+  element: ExcalidrawElement;
   shape: GeometricShape;
-  shouldTestInside?: boolean;
   threshold?: number;
   frameNameBound?: FrameNameBounds | null;
 };
@@ -23,12 +50,12 @@ export type HitElementArgs = {
 export const hitElementItselfOnly = ({
   x,
   y,
+  element,
   shape,
-  shouldTestInside = false,
   threshold = 10,
   frameNameBound = null,
-}: HitElementArgs) => {
-  let hit = shouldTestInside
+}: HitTestArgs) => {
+  let hit = shouldTestInside(element)
     ? isPointInShape([x, y], shape)
     : isPointOnShape([x, y], shape, threshold);
 
@@ -53,13 +80,10 @@ export const hitElementBoundingBox = (
   return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
 };
 
-export const hitElementBoundingBoxOnly = (
-  hitArgs: HitElementArgs,
-  element: ExcalidrawElement,
-) => {
+export const hitElementBoundingBoxOnly = (hitArgs: HitTestArgs) => {
   return (
     !hitElementItselfOnly(hitArgs) &&
-    hitElementBoundingBox(hitArgs.x, hitArgs.y, element)
+    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element)
   );
 };
 

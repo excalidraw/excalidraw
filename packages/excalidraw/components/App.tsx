@@ -419,6 +419,7 @@ import {
   hitElementBoundingBox,
   hitElementBoundingBoxOnly,
   hitElementItselfOnly,
+  shouldTestInside,
 } from "../element/collision";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -4314,7 +4315,7 @@ class App extends React.Component<AppProps, AppState> {
           ShapeCache.generateElementShape(element, null)[0];
         const [, , , , cx, cy] = getElementAbsoluteCoords(element);
 
-        return this.shouldTestInside(element)
+        return shouldTestInside(element)
           ? getClosedCurveShape(
               roughShape,
               [element.x, element.y],
@@ -4332,11 +4333,7 @@ class App extends React.Component<AppProps, AppState> {
 
       case "freedraw": {
         const [, , , , cx, cy] = getElementAbsoluteCoords(element);
-        return getFreedrawShape(
-          element,
-          [cx, cy],
-          this.shouldTestInside(element),
-        );
+        return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
       }
     }
   }
@@ -4360,27 +4357,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     return null;
-  }
-
-  private shouldTestInside(element: ExcalidrawElement) {
-    if (element.type === "arrow") {
-      return false;
-    }
-
-    const isDraggableFromInside =
-      !isTransparent(element.backgroundColor) ||
-      hasBoundTextElement(element) ||
-      isIframeLikeElement(element);
-
-    if (element.type === "line") {
-      return isDraggableFromInside && isPathALoop(element.points);
-    }
-
-    if (element.type === "freedraw") {
-      return isDraggableFromInside && isPathALoop(element.points);
-    }
-
-    return isDraggableFromInside || isImageElement(element);
   }
 
   private getElementAtPosition(
@@ -4503,8 +4479,8 @@ class App extends React.Component<AppProps, AppState> {
     return hitElementItselfOnly({
       x,
       y,
+      element,
       shape: this.getElementShape(element),
-      shouldTestInside: this.shouldTestInside(element),
       threshold: this.getHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
@@ -4532,6 +4508,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementItselfOnly({
           x,
           y,
+          element: elements[index],
           shape: this.getElementShape(elements[index]),
           threshold: this.getHitThreshold(),
         })
@@ -4785,6 +4762,7 @@ class App extends React.Component<AppProps, AppState> {
           hitElementItselfOnly({
             x: sceneX,
             y: sceneY,
+            element: container,
             shape: this.getElementShape(container),
             threshold: this.getHitThreshold(),
           })
@@ -5438,6 +5416,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementItselfOnly({
           x: scenePointerX,
           y: scenePointerY,
+          element,
           shape: this.getElementShape(element),
         })
       ) {
@@ -8239,19 +8218,16 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.isResizing &&
         // only hitting the bounding box of the previous hit element
         ((hitElement &&
-          hitElementBoundingBoxOnly(
-            {
-              x: pointerDownState.origin.x,
-              y: pointerDownState.origin.y,
-              shape: this.getElementShape(hitElement),
-              threshold: this.getHitThreshold(),
-              shouldTestInside: this.shouldTestInside(hitElement),
-              frameNameBound: isFrameLikeElement(hitElement)
-                ? this.frameNameBoundsCache.get(hitElement)
-                : null,
-            },
-            hitElement,
-          )) ||
+          hitElementBoundingBoxOnly({
+            x: pointerDownState.origin.x,
+            y: pointerDownState.origin.y,
+            element: hitElement,
+            shape: this.getElementShape(hitElement),
+            threshold: this.getHitThreshold(),
+            frameNameBound: isFrameLikeElement(hitElement)
+              ? this.frameNameBoundsCache.get(hitElement)
+              : null,
+          })) ||
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {

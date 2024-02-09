@@ -16,7 +16,7 @@ import {
 } from "../../excalidraw/element/types";
 import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
 import { pointsOnBezierCurves } from "points-on-curve";
-import { Drawable, Op } from "roughjs/bin/core";
+import type { Drawable, Op } from "roughjs/bin/core";
 
 export type Point = [number, number];
 export type Vector = Point;
