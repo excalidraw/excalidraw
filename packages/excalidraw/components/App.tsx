@@ -2486,7 +2486,11 @@ class App extends React.Component<AppProps, AppState> {
     if (!supportsResizeObserver) {
       this.refreshEditorBreakpoints();
     }
-    this.setState({});
+    if (this.state.scrollConstraints) {
+      this.setState((state) => constrainScrollState(state));
+    } else {
+      this.setState({});
+    }
   });
 
   /** generally invoked only if fullscreen was invoked programmatically */
