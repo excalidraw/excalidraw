@@ -22,6 +22,7 @@ import {
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
+import { constrainScrollState } from "../scene/scrollConstraints";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -137,7 +138,7 @@ export const actionZoomOut = register({
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
-      appState: {
+      appState: constrainScrollState({
         ...appState,
         ...getStateForZoom(
           {
@@ -148,7 +149,7 @@ export const actionZoomOut = register({
           appState,
         ),
         userToFollow: null,
-      },
+      }),
       commitToHistory: false,
     };
   },
