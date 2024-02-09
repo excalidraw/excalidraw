@@ -3,7 +3,7 @@
 .excalidraw {
   .collab-button {
     --button-bg: var(--color-primary);
-    --button-color: white;
+    --button-color: var(--color-surface-lowest);
     --button-border: var(--color-primary);
 
     --button-width: var(--lg-button-size);
@@ -32,12 +32,6 @@
         background-color: #0fb884;
         border-color: #0fb884;
       }
-    }
-  }
-
-  &.theme--dark {
-    .collab-button {
-      color: var(--color-gray-90);
     }
   }
 

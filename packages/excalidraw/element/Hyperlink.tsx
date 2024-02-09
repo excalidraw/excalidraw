@@ -120,8 +120,11 @@ export const Hyperlink = ({
       } else {
         const { width, height } = element;
         const embedLink = getEmbedLink(link);
-        if (embedLink?.warning) {
-          setToast({ message: embedLink.warning, closable: true });
+        if (embedLink?.error instanceof URIError) {
+          setToast({
+            message: t("toast.unrecognizedLinkFormat"),
+            closable: true,
+          });
         }
         const ar = embedLink
           ? embedLink.intrinsicSize.w / embedLink.intrinsicSize.h

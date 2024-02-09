@@ -17,7 +17,7 @@ import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "../element/textWysiwyg";
+} from "../element/containerCache";
 import {
   hasBoundTextElement,
   isTextBindableContainer,
@@ -45,8 +45,9 @@ export const actionUnbindText = register({
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     selectedElements.forEach((element) => {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
         const { width, height, baseline } = measureText(
           boundTextElement.originalText,
@@ -106,7 +107,10 @@ export const actionBindText = register({
       if (
         textElement &&
         bindingContainer &&
-        getBoundTextElement(bindingContainer) === null
+        getBoundTextElement(
+          bindingContainer,
+          app.scene.getNonDeletedElementsMap(),
+        ) === null
       ) {
         return true;
       }

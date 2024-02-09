@@ -2,7 +2,6 @@ import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
-
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
@@ -143,6 +142,7 @@ export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
+export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 

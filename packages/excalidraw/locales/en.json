@@ -301,9 +301,12 @@
     "openIssueMessage": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our <button>bug tracker</button>. Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
+  "shareDialog": {
+    "or": "Or"
+  },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
+    "desc_intro": "Invite people to collaborate on your drawing.",
+    "desc_privacy": "Don't worry, the session is end-to-end encrypted, and fully private. Not even our server can see what you draw.",
     "button_startSession": "Start session",
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",

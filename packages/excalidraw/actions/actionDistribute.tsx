@@ -32,7 +32,11 @@ const distributeSelectedElements = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
-  const updatedElements = distributeElements(selectedElements, distribution);
+  const updatedElements = distributeElements(
+    selectedElements,
+    app.scene.getNonDeletedElementsMap(),
+    distribution,
+  );
 
   const updatedElementsMap = arrayToMap(updatedElements);
 

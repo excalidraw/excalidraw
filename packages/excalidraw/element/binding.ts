@@ -345,9 +345,9 @@ export const updateBoundElements = (
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
-
+  const scene = Scene.getScene(changedElement)!;
   getNonDeletedElements(
-    Scene.getScene(changedElement)!,
+    scene,
     boundLinearElements.map((el) => el.id),
   ).forEach((element) => {
     if (!isLinearElement(element)) {
@@ -386,9 +386,12 @@ export const updateBoundElements = (
       endBinding,
       changedElement as ExcalidrawBindableElement,
     );
-    const boundText = getBoundTextElement(element);
+    const boundText = getBoundTextElement(
+      element,
+      scene.getNonDeletedElementsMap(),
+    );
     if (boundText) {
-      handleBindTextResize(element, false);
+      handleBindTextResize(element, scene.getNonDeletedElementsMap(), false);
     }
   });
 };

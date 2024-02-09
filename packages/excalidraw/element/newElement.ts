@@ -31,7 +31,6 @@ import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
-  getContainerElement,
   measureText,
   normalizeText,
   wrapText,
@@ -69,6 +68,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "roundness"
   | "locked"
   | "opacity"
+  | "customData"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -122,6 +122,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     updated: getUpdatedTimestamp(),
     link,
     locked,
+    customData: rest.customData,
   };
   return element;
 };
@@ -333,17 +334,17 @@ const getAdjustedDimensions = (
 
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
+  container: ExcalidrawTextContainer | null,
   text = textElement.text,
 ) => {
   if (textElement.isDeleted) {
     return;
   }
-  const container = getContainerElement(textElement);
   if (container) {
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container),
+      getBoundTextMaxWidth(container, textElement),
     );
   }
   const dimensions = getAdjustedDimensions(textElement, text);
@@ -352,6 +353,7 @@ export const refreshTextDimensions = (
 
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
+  container: ExcalidrawTextContainer | null,
   {
     text,
     isDeleted,
@@ -365,7 +367,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, originalText),
+    ...refreshTextDimensions(textElement, container, originalText),
   });
 };
 

@@ -20,17 +20,6 @@ Object.defineProperty(window, "crypto", {
   },
 });
 
-vi.mock("../../excalidraw-app/data/index.ts", async (importActual) => {
-  const module = (await importActual()) as any;
-  return {
-    __esmodule: true,
-    ...module,
-    getCollabServer: vi.fn(() => ({
-      url: /* doesn't really matter */ "http://localhost:3002",
-    })),
-  };
-});
-
 vi.mock("../../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
