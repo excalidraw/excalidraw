@@ -12,6 +12,7 @@ import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+import { arrayToMap } from "../utils";
 
 const { h } = window;
 
@@ -138,6 +139,8 @@ describe("paste text as single lines", () => {
   });
 
   it("should space items correctly", async () => {
+    const elementsMap = arrayToMap(h.elements);
+
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
     const lineHeightPx =
       getLineHeightInPx(
@@ -149,16 +152,17 @@ describe("paste text as single lines", () => {
     pasteWithCtrlCmdV(text);
     await waitFor(async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0]);
+      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
       for (let i = 1; i < h.elements.length; i++) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [fx, elY] = getElementBounds(h.elements[i]);
+        const [fx, elY] = getElementBounds(h.elements[i], elementsMap);
         expect(elY).toEqual(firstElY + lineHeightPx * i);
       }
     });
   });
 
   it("should leave a space for blank new lines", async () => {
+    const elementsMap = arrayToMap(h.elements);
     const text = "hkhkjhki\n\njgkjhffjh";
     const lineHeightPx =
       getLineHeightInPx(
@@ -168,11 +172,12 @@ describe("paste text as single lines", () => {
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     pasteWithCtrlCmdV(text);
+
     await waitFor(async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0]);
+      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [lx, lastElY] = getElementBounds(h.elements[1]);
+      const [lx, lastElY] = getElementBounds(h.elements[1], elementsMap);
       expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
     });
   });
