@@ -75,6 +75,10 @@ define: {
 }
 ```
 
+- Disable caching bounds for arrow labels [#7343](https://github.com/excalidraw/excalidraw/pull/7343)
+
+- Bounds cached prematurely resulting in incorrectly rendered labels [#7339](https://github.com/excalidraw/excalidraw/pull/7339)
+
 ## Excalidraw Library
 
 ### Fixes
