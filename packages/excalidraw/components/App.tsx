@@ -4270,17 +4270,20 @@ class App extends React.Component<AppProps, AppState> {
     const initialScale = gesture.initialScale;
     if (initialScale) {
       this.setState((state) =>
-        constrainScrollState({
-          ...state,
-          ...getStateForZoom(
-            {
-              viewportX: this.lastViewportPosition.x,
-              viewportY: this.lastViewportPosition.y,
-              nextZoom: getNormalizedZoom(initialScale * event.scale),
-            },
-            state,
-          ),
-        }),
+        constrainScrollState(
+          {
+            ...state,
+            ...getStateForZoom(
+              {
+                viewportX: this.lastViewportPosition.x,
+                viewportY: this.lastViewportPosition.y,
+                nextZoom: getNormalizedZoom(initialScale * event.scale),
+              },
+              state,
+            ),
+          },
+          false,
+        ),
       );
     }
   });
