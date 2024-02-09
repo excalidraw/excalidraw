@@ -3,7 +3,7 @@ import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { resizeMultipleElements } from "../element/resizeElements";
-import { AppState, PointerDownState } from "../types";
+import { AppClassProperties, AppState, PointerDownState } from "../types";
 import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
@@ -20,7 +20,7 @@ export const actionFlipHorizontal = register({
   perform: (elements, appState, _, app) => {
     return {
       elements: updateFrameMembershipOfSelectedElements(
-        flipSelectedElements(elements, appState, "horizontal"),
+        flipSelectedElements(elements, appState, "horizontal", app),
         appState,
         app,
       ),
@@ -38,7 +38,7 @@ export const actionFlipVertical = register({
   perform: (elements, appState, _, app) => {
     return {
       elements: updateFrameMembershipOfSelectedElements(
-        flipSelectedElements(elements, appState, "vertical"),
+        flipSelectedElements(elements, appState, "vertical", app),
         appState,
         app,
       ),
@@ -55,6 +55,7 @@ const flipSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   flipDirection: "horizontal" | "vertical",
+  app: AppClassProperties,
 ) => {
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
@@ -69,6 +70,7 @@ const flipSelectedElements = (
     selectedElements,
     appState,
     flipDirection,
+    app,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);
@@ -82,6 +84,7 @@ const flipElements = (
   elements: NonDeleted<ExcalidrawElement>[],
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
+  app: AppClassProperties,
 ): ExcalidrawElement[] => {
   const { minX, minY, maxX, maxY } = getCommonBoundingBox(elements);
 
@@ -96,7 +99,7 @@ const flipElements = (
 
   (isBindingEnabled(appState)
     ? bindOrUnbindSelectedElements
-    : unbindLinearElements)(elements);
+    : unbindLinearElements)(elements, app);
 
   return elements;
 };

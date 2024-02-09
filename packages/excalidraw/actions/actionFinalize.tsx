@@ -20,12 +20,8 @@ import { resetCursor } from "../cursor";
 export const actionFinalize = register({
   name: "finalize",
   trackEvent: false,
-  perform: (
-    elements,
-    appState,
-    _,
-    { interactiveCanvas, focusContainer, scene },
-  ) => {
+  perform: (elements, appState, _, app) => {
+    const { interactiveCanvas, focusContainer, scene } = app;
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
@@ -131,6 +127,7 @@ export const actionFinalize = register({
           appState,
           Scene.getScene(multiPointElement)!,
           { x, y },
+          app,
         );
       }
     }

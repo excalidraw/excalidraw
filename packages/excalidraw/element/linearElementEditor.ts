@@ -31,6 +31,7 @@ import {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
+  AppClassProperties,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
@@ -321,6 +322,7 @@ export class LinearElementEditor {
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
     appState: AppState,
+    app: AppClassProperties,
   ): LinearElementEditor {
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -365,6 +367,7 @@ export class LinearElementEditor {
                   ),
                 ),
                 Scene.getScene(element)!,
+                app,
               )
             : null;
 
@@ -605,6 +608,7 @@ export class LinearElementEditor {
     history: History,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
+    app: AppClassProperties,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
@@ -672,6 +676,7 @@ export class LinearElementEditor {
         endBindingElement: getHoveredElementForBinding(
           scenePointer,
           Scene.getScene(element)!,
+          app,
         ),
       };
 

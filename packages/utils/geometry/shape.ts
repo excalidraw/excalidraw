@@ -32,7 +32,7 @@ export type Ellipse = {
   halfWidth: number;
   halfHeight: number;
 };
-export type Shape =
+export type GeometricShape =
   | {
       type: "line";
       data: Line;
@@ -69,7 +69,9 @@ type RectangularElement =
   | ExcalidrawSelectionElement;
 
 // polygon
-export const getPolygonShape = (element: RectangularElement): Shape => {
+export const getPolygonShape = (
+  element: RectangularElement,
+): GeometricShape => {
   const { angle, width, height, x, y } = element;
   const angleInDegrees = angleToDegrees(angle);
   const cx = x + width / 2;
@@ -102,7 +104,9 @@ export const getPolygonShape = (element: RectangularElement): Shape => {
 };
 
 // ellipse
-export const getEllipseShape = (element: ExcalidrawEllipseElement): Shape => {
+export const getEllipseShape = (
+  element: ExcalidrawEllipseElement,
+): GeometricShape => {
   const { width, height, angle, x, y } = element;
 
   return {
@@ -131,7 +135,7 @@ export const getCurveShape = (
   startingPoint: Point = [0, 0],
   angleInRadian: number,
   center: Point,
-): Shape => {
+): GeometricShape => {
   const transform = (p: Point) =>
     pointRotate(
       [p[0] + startingPoint[0], p[1] + startingPoint[1]],
@@ -179,7 +183,7 @@ export const getFreedrawShape = (
   element: ExcalidrawFreeDrawElement,
   center: Point,
   isClosed: boolean = false,
-): Shape => {
+): GeometricShape => {
   const angle = angleToDegrees(element.angle);
   const transform = (p: Point) =>
     pointRotate(pointAdd(p, [element.x, element.y] as Point), angle, center);
@@ -204,7 +208,7 @@ export const getClosedCurveShape = (
   startingPoint: Point = [0, 0],
   angleInRadian: number,
   center: Point,
-): Shape => {
+): GeometricShape => {
   const ops = getCurvePathOps(roughShape);
   const transform = (p: Point) =>
     pointRotate(

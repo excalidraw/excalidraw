@@ -53,8 +53,11 @@ import {
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "../groups";
-import { maxBindingGap } from "../element/collision";
-import { SuggestedBinding, SuggestedPointBinding } from "../element/binding";
+import {
+  maxBindingGap,
+  SuggestedBinding,
+  SuggestedPointBinding,
+} from "../element/binding";
 import {
   OMIT_SIDES_FOR_FRAME,
   shouldShowBoundingBox,

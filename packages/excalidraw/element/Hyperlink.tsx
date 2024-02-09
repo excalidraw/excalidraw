@@ -31,7 +31,7 @@ import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
 import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
-import { isPointHittingElementBoundingBox } from "./collision";
+import { hitElementBoundingBox } from "./collision";
 import { getElementAbsoluteCoords } from ".";
 import { isLocalLink, normalizeLink } from "../data/url";
 
@@ -458,7 +458,7 @@ export const isPointHittingLink = (
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    isPointHittingElementBoundingBox(element, [x, y], threshold, null)
+    hitElementBoundingBox(x, y, element)
   ) {
     return true;
   }
@@ -542,9 +542,7 @@ export const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (
-    isPointHittingElementBoundingBox(element, [sceneX, sceneY], threshold, null)
-  ) {
+  if (hitElementBoundingBox(sceneX, sceneY, element)) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element);

@@ -183,7 +183,6 @@ import {
   IframeData,
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
-  ExcalidrawRectangleElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -211,7 +210,6 @@ import {
   getCornerRadius,
   getGridPoint,
   isPathALoop,
-  isPointWithinBounds,
 } from "../math";
 import {
   calculateScrollCenter,
@@ -227,8 +225,7 @@ import { RenderInteractiveSceneCallback, ScrollBars } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
 import {
-  Polygon,
-  Shape,
+  GeometricShape,
   getClosedCurveShape,
   getCurveShape,
   getEllipseShape,
@@ -417,6 +414,12 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
+import {
+  hitElementBoundText,
+  hitElementBoundingBox,
+  hitElementBoundingBoxOnly,
+  hitElementItselfOnly,
+} from "../element/collision";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2764,6 +2767,7 @@ class App extends React.Component<AppProps, AppState> {
             -1,
           ),
         ),
+        this,
       );
     }
     this.history.record(this.state, this.scene.getElementsIncludingDeleted());
@@ -4000,7 +4004,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isArrowKey(event.key)) {
       const selectedElements = this.scene.getSelectedElements(this.state);
       isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements)
+        ? bindOrUnbindSelectedElements(selectedElements, this)
         : unbindLinearElements(selectedElements);
       this.setState({ suggestedBindings: [] });
     }
@@ -4291,7 +4295,7 @@ class App extends React.Component<AppProps, AppState> {
    * get the pure geometric shape of an excalidraw element
    * which is then used for hit detection
    */
-  private getElementShape(element: ExcalidrawElement): Shape {
+  public getElementShape(element: ExcalidrawElement): GeometricShape {
     switch (element.type) {
       case "rectangle":
       case "diamond":
@@ -4335,6 +4339,27 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     }
+  }
+
+  private getBoundTextShape(element: ExcalidrawElement): GeometricShape | null {
+    const boundTextElement = getBoundTextElement(element);
+
+    if (boundTextElement) {
+      if (element.type === "arrow") {
+        return this.getElementShape({
+          ...boundTextElement,
+          // arrow's bound text accurate position is not stored in the element's property
+          // but rather calculated and returned from the following static method
+          ...LinearElementEditor.getBoundTextElementPosition(
+            element,
+            boundTextElement,
+          ),
+        });
+      }
+      return this.getElementShape(boundTextElement);
+    }
+
+    return null;
   }
 
   private shouldTestInside(element: ExcalidrawElement) {
@@ -4456,42 +4481,35 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawElement,
     considerBoundingBox = true,
   ) {
-    const tolerance = 10 / this.state.zoom.value;
-
     // if the element is selected, then hit test is done against its bounding box
     if (
       considerBoundingBox &&
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      return this.hitElementBoundingBox(x, y, element);
+      return hitElementBoundingBox(x, y, element);
     }
 
     // take bound text element into consideration for hit collision as well
-    const hitBoundTextOfElement = this.hitElementBoundText(x, y, element);
+    const hitBoundTextOfElement = hitElementBoundText(
+      x,
+      y,
+      this.getBoundTextShape(element),
+    );
     if (hitBoundTextOfElement) {
       return true;
     }
 
-    const shape = this.getElementShape(element);
-
-    let hit = this.shouldTestInside(element)
-      ? isPointInShape([x, y], shape)
-      : isPointOnShape([x, y], shape, tolerance);
-
-    // hit test against a frame's name
-    if (!hit && isFrameLikeElement(element)) {
-      const nameBounds = this.frameNameBoundsCache.get(element);
-      if (nameBounds) {
-        hit = isPointInShape([x, y], {
-          type: "polygon",
-          data: getPolygonShape(nameBounds as ExcalidrawRectangleElement)
-            .data as Polygon,
-        });
-      }
-    }
-
-    return hit;
+    return hitElementItselfOnly({
+      x,
+      y,
+      shape: this.getElementShape(element),
+      shouldTestInside: this.shouldTestInside(element),
+      threshold: this.getHitThreshold(),
+      frameNameBound: isFrameLikeElement(element)
+        ? this.frameNameBoundsCache.get(element)
+        : null,
+    });
   }
 
   private getTextBindableContainerAtPosition(x: number, y: number) {
@@ -4503,7 +4521,7 @@ class App extends React.Component<AppProps, AppState> {
         : null;
     }
     let hitElement = null;
-    // We need to to hit testing from front (end of the array) to back (beginning of the array)
+    // We need to do hit testing from front (end of the array) to back (beginning of the array)
     for (let index = elements.length - 1; index >= 0; --index) {
       if (elements[index].isDeleted) {
         continue;
@@ -4511,7 +4529,12 @@ class App extends React.Component<AppProps, AppState> {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
       if (
         isArrowElement(elements[index]) &&
-        this.hitElementItselfOnly(x, y, elements[index])
+        hitElementItselfOnly({
+          x,
+          y,
+          shape: this.getElementShape(elements[index]),
+          threshold: this.getHitThreshold(),
+        })
       ) {
         hitElement = elements[index];
         break;
@@ -4522,61 +4545,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
-  }
-
-  private hitElementBoundingBox(
-    x: number,
-    y: number,
-    element: ExcalidrawElement,
-  ) {
-    const [x1, y1, x2, y2] = getElementBounds(element);
-    return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
-  }
-
-  private hitElementBoundText(
-    x: number,
-    y: number,
-    element: ExcalidrawElement,
-  ) {
-    let hit = false;
-    const boundTextElement = getBoundTextElement(element);
-    if (boundTextElement) {
-      let textShape = this.getElementShape(boundTextElement);
-      if (element.type === "arrow") {
-        textShape = this.getElementShape({
-          ...boundTextElement,
-          // arrow's bound text accurate position is not stored in the element's property
-          // but rather calculated and returned from the following static method
-          ...LinearElementEditor.getBoundTextElementPosition(
-            element,
-            boundTextElement,
-          ),
-        });
-      }
-      hit = isPointInShape([x, y], textShape);
-    }
-    return hit;
-  }
-
-  // only hitting bounding box and not the element itself
-  private hitElementBoundingBoxOnly(
-    x: number,
-    y: number,
-    element: ExcalidrawElement,
-  ) {
-    return (
-      !this.hitElement(x, y, element, false) &&
-      this.hitElementBoundingBox(x, y, element)
-    );
-  }
-
-  // hit element not considering its bounding box
-  private hitElementItselfOnly(
-    x: number,
-    y: number,
-    element: ExcalidrawElement,
-  ) {
-    return this.hitElement(x, y, element, false);
   }
 
   private startTextEditing = ({
@@ -4814,7 +4782,12 @@ class App extends React.Component<AppProps, AppState> {
         if (
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
-          this.hitElementItselfOnly(sceneX, sceneY, container)
+          hitElementItselfOnly({
+            x: sceneX,
+            y: sceneY,
+            shape: this.getElementShape(container),
+            threshold: this.getHitThreshold(),
+          })
         ) {
           const midPoint = getContainerCenter(container, this.state);
 
@@ -5461,7 +5434,13 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
-      if (this.hitElementItselfOnly(scenePointerX, scenePointerY, element)) {
+      if (
+        hitElementItselfOnly({
+          x: scenePointerX,
+          y: scenePointerY,
+          shape: this.getElementShape(element),
+        })
+      ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
           element,
           this.state.zoom,
@@ -6225,6 +6204,7 @@ class App extends React.Component<AppProps, AppState> {
             this.history,
             pointerDownState.origin,
             linearElementEditor,
+            this,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -6556,6 +6536,7 @@ class App extends React.Component<AppProps, AppState> {
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
       this.scene,
+      this,
     );
     this.scene.addNewElement(element);
     this.setState({
@@ -6821,6 +6802,7 @@ class App extends React.Component<AppProps, AppState> {
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
         this.scene,
+        this,
       );
 
       this.scene.addNewElement(element);
@@ -7598,7 +7580,6 @@ class App extends React.Component<AppProps, AppState> {
             ? this.state.editingElement
             : null,
         snapLines: updateStable(prevState.snapLines, []),
-
         originSnapOffset: null,
       }));
 
@@ -7625,6 +7606,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.editingLinearElement,
             this.state,
+            this,
           );
           if (editingLinearElement !== this.state.editingLinearElement) {
             this.setState({
@@ -7648,6 +7630,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.selectedLinearElement,
             this.state,
+            this,
           );
 
           const { startBindingElement, endBindingElement } =
@@ -7796,6 +7779,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               this.scene,
               pointerCoords,
+              this,
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -8255,9 +8239,17 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.isResizing &&
         // only hitting the bounding box of the previous hit element
         ((hitElement &&
-          this.hitElementBoundingBoxOnly(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+          hitElementBoundingBoxOnly(
+            {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+              shape: this.getElementShape(hitElement),
+              threshold: this.getHitThreshold(),
+              shouldTestInside: this.shouldTestInside(hitElement),
+              frameNameBound: isFrameLikeElement(hitElement)
+                ? this.frameNameBoundsCache.get(hitElement)
+                : null,
+            },
             hitElement,
           )) ||
           (!hitElement &&
@@ -8310,7 +8302,10 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(this.scene.getSelectedElements(this.state));
+          : unbindLinearElements)(
+          this.scene.getSelectedElements(this.state),
+          this,
+        );
       }
 
       if (activeTool.type === "laser") {
@@ -8788,6 +8783,7 @@ class App extends React.Component<AppProps, AppState> {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
       this.scene,
+      this,
     );
     this.setState({
       suggestedBindings:
@@ -8815,6 +8811,7 @@ class App extends React.Component<AppProps, AppState> {
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
           this.scene,
+          this,
         );
         if (
           hoveredBindableElement != null &&
@@ -8840,7 +8837,10 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length > 50) {
       return;
     }
-    const suggestedBindings = getEligibleElementsForBinding(selectedElements);
+    const suggestedBindings = getEligibleElementsForBinding(
+      selectedElements,
+      this,
+    );
     this.setState({ suggestedBindings });
   }
 
