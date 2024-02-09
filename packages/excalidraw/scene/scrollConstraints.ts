@@ -401,11 +401,17 @@ export const constrainScrollState = (
         allowOverscroll,
       });
 
-  const constrainedValues = constrainScrollValues({
-    ...constraints,
-    scrollX,
-    scrollY,
-  });
+  const constrainedValues =
+    zoom.value >= constraints.constrainedZoom.value // when trying to zoom out of the constrained area we want to keep the viewport centered and prevent jumping caused by change of scrollX and scrollY values when zooming
+      ? constrainScrollValues({
+          ...constraints,
+          scrollX,
+          scrollY,
+        })
+      : calculateConstrainedScrollCenter(state, {
+          scrollX,
+          scrollY,
+        });
 
   if (!canUseMemoizedValues) {
     memoizedValues = {
