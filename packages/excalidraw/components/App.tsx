@@ -2797,7 +2797,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.scrollConstraints?.animateOnNextUpdate) {
-      const newState = constrainScrollState(this.state, false);
+      const newState = constrainScrollState(this.state, {
+        allowOverscroll: false,
+      });
 
       scrollConstraintsAnimationTimeout = setTimeout(() => {
         this.cancelInProgressAnimation?.();
@@ -4282,7 +4284,7 @@ class App extends React.Component<AppProps, AppState> {
               state,
             ),
           },
-          false,
+          { disableAnimation: true },
         ),
       );
     }
@@ -9646,7 +9648,7 @@ class App extends React.Component<AppProps, AppState> {
               ...this.state,
               scrollConstraints,
             },
-            false,
+            { allowOverscroll: false },
           );
 
           this.animateToConstrainedArea(

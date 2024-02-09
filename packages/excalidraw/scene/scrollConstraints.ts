@@ -348,15 +348,17 @@ let memoizedValues: {
   allowOverscroll: boolean;
 } | null = null;
 
+type Options = { allowOverscroll?: boolean; disableAnimation?: boolean };
 /**
  * Constrains the AppState scroll values within the defined scroll constraints.
  *
  * @param state - The original AppState with the current scroll position, dimensions, and constraints.
+ * @param options - An object containing options for the method: allowOverscroll and disableAnimation.
  * @returns A new AppState object with scroll values constrained as per the defined constraints.
  */
 export const constrainScrollState = (
   state: AppState,
-  allowOverscroll = true,
+  options?: Options,
 ): AppState => {
   if (!state.scrollConstraints) {
     return state;
@@ -369,6 +371,8 @@ export const constrainScrollState = (
     scrollConstraints: inverseScrollConstraints,
     zoom,
   } = state;
+
+  const { allowOverscroll = true, disableAnimation = false } = options || {};
 
   const scrollConstraints = alignScrollConstraints(inverseScrollConstraints);
 
@@ -430,7 +434,9 @@ export const constrainScrollState = (
     ...state,
     scrollConstraints: {
       ...state.scrollConstraints,
-      animateOnNextUpdate: isViewportOutsideOfConstrainedArea(state),
+      animateOnNextUpdate: disableAnimation
+        ? false
+        : isViewportOutsideOfConstrainedArea(state),
     },
     ...constrainedValues,
   };

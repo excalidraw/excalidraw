@@ -100,18 +100,21 @@ export const actionZoomIn = register({
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
-      appState: {
-        ...appState,
-        ...getStateForZoom(
-          {
-            viewportX: appState.width / 2 + appState.offsetLeft,
-            viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
-          },
-          appState,
-        ),
-        userToFollow: null,
-      },
+      appState: constrainScrollState(
+        {
+          ...appState,
+          ...getStateForZoom(
+            {
+              viewportX: appState.width / 2 + appState.offsetLeft,
+              viewportY: appState.height / 2 + appState.offsetTop,
+              nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
+            },
+            appState,
+          ),
+          userToFollow: null,
+        },
+        { disableAnimation: true },
+      ),
       commitToHistory: false,
     };
   },
@@ -138,18 +141,21 @@ export const actionZoomOut = register({
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
-      appState: constrainScrollState({
-        ...appState,
-        ...getStateForZoom(
-          {
-            viewportX: appState.width / 2 + appState.offsetLeft,
-            viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
-          },
-          appState,
-        ),
-        userToFollow: null,
-      }),
+      appState: constrainScrollState(
+        {
+          ...appState,
+          ...getStateForZoom(
+            {
+              viewportX: appState.width / 2 + appState.offsetLeft,
+              viewportY: appState.height / 2 + appState.offsetTop,
+              nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
+            },
+            appState,
+          ),
+          userToFollow: null,
+        },
+        { disableAnimation: true },
+      ),
       commitToHistory: false,
     };
   },
