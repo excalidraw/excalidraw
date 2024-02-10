@@ -302,11 +302,11 @@
     "sceneContent": "シーンの内容:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "または"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "図面にコラボレーションするよう人々を招待します。",
+    "desc_privacy": "心配しないでください、セッションはエンドツーエンドで暗号化されており、完全にプライベートです。私たちのサーバーでさえも、あなたが描いたものを見ることができません。",
     "button_startSession": "セッションを開始する",
     "button_stopSession": "セッションを終了する",
     "desc_inProgressIntro": "共同編集セッションが有効になっています。",
