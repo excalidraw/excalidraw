@@ -80,7 +80,11 @@ import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../packages/excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "../packages/excalidraw/element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import { libraryIndexedDBAdapter, LocalData } from "./data/LocalData";
+import {
+  LibraryIndexedDBAdapter,
+  LibraryLocalStorageMigrationAdapter,
+  LocalData,
+} from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { reconcileElements } from "./collab/reconciliation";
@@ -313,7 +317,9 @@ const ExcalidrawWrapper = () => {
 
   useHandleLibrary({
     excalidrawAPI,
-    adapter: libraryIndexedDBAdapter,
+    adapter: LibraryIndexedDBAdapter,
+    // TODO maybe remove this in several months (shipped: 24-02-07)
+    migrateFrom: LibraryLocalStorageMigrationAdapter,
   });
 
   useEffect(() => {
@@ -443,7 +449,7 @@ const ExcalidrawWrapper = () => {
           excalidrawAPI.updateScene({
             ...localDataState,
           });
-          libraryIndexedDBAdapter.load().then((data) => {
+          LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
               excalidrawAPI.updateLibrary({
                 libraryItems: data.libraryItems,

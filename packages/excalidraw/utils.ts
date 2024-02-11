@@ -1092,3 +1092,13 @@ export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
 };
 
 // -----------------------------------------------------------------------------
+
+// Promise.try, adapted from https://github.com/sindresorhus/p-try
+export const promiseTry = async <TValue, TArgs extends unknown[]>(
+  fn: (...args: TArgs) => PromiseLike<TValue> | TValue,
+  ...args: TArgs
+): Promise<TValue> => {
+  return new Promise((resolve) => {
+    resolve(fn(...args));
+  });
+};

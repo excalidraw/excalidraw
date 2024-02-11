@@ -380,13 +380,8 @@ export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
 export type LibraryItemsSource =
   | ((
       currentLibraryItems: LibraryItems,
-    ) =>
-      | Blob
-      | LibraryItems_anyVersion
-      | Promise<LibraryItems_anyVersion | Blob>)
-  | Blob
-  | LibraryItems_anyVersion
-  | Promise<LibraryItems_anyVersion | Blob>;
+    ) => MaybePromise<LibraryItems_anyVersion | Blob>)
+  | MaybePromise<LibraryItems_anyVersion | Blob>;
 // -----------------------------------------------------------------------------
 
 export type ExcalidrawInitialDataState = Merge<

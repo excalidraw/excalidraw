@@ -18,13 +18,9 @@ import {
   set,
   setMany,
   get,
-  UseStore,
 } from "idb-keyval";
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
-import {
-  LibraryPersistenceAdapter,
-  LibraryPersistedData,
-} from "../../packages/excalidraw/data/library";
+import { LibraryPersistedData } from "../../packages/excalidraw/data/library";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
 import {
@@ -198,65 +194,52 @@ export class LocalData {
     },
   });
 }
+export class LibraryIndexedDBAdapter {
+  /** IndexedDB database and store name */
+  private static idb_name = STORAGE_KEYS.IDB_LIBRARY;
+  /** library data store key */
+  private static key = "libraryData";
 
-class LibraryIndexedDBAdapter implements LibraryPersistenceAdapter {
-  name = "excalidraw-library";
-  key = "libraryData";
+  private static store = createStore(
+    `${LibraryIndexedDBAdapter.idb_name}-db`,
+    `${LibraryIndexedDBAdapter.idb_name}-store`,
+  );
 
-  migrationLocalStorageKey?: string;
-
-  store: UseStore;
-
-  migrate: LibraryPersistenceAdapter["migrate"];
-
-  constructor(opts?: {
-    /** IndexedDB databse and store name */
-    name?: string;
-    /** LocalStorage key containing legacy data to be migrated, if applicable */
-    migrationLocalStorageKey?: string;
-  }) {
-    if (opts?.migrationLocalStorageKey) {
-      this.migrationLocalStorageKey = opts.migrationLocalStorageKey;
-    }
-    if (opts?.name) {
-      this.name = opts.name;
-    }
-    this.store = createStore(`${this.name}-db`, `${this.name}-store`);
-
-    if (this.migrationLocalStorageKey) {
-      const migrationLocalStorageKey = this.migrationLocalStorageKey;
-      this.migrate = () => {
-        return {
-          load: () => {
-            const LSData = localStorage.getItem(migrationLocalStorageKey);
-            if (LSData != null) {
-              const libraryItems: ImportedDataState["libraryItems"] =
-                JSON.parse(LSData);
-              return libraryItems || [];
-            }
-            return null;
-          },
-          delete: () => {
-            localStorage.removeItem(migrationLocalStorageKey);
-          },
-        };
-      };
-    }
-  }
-
-  async load() {
-    const IDBData = await get<LibraryPersistedData>(this.key, this.store);
+  static async load() {
+    const IDBData = await get<LibraryPersistedData>(
+      LibraryIndexedDBAdapter.key,
+      LibraryIndexedDBAdapter.store,
+    );
 
     return IDBData || null;
   }
 
-  save(data: LibraryPersistedData): MaybePromise<void> {
-    return set(this.key, data, this.store);
+  static save(data: LibraryPersistedData): MaybePromise<void> {
+    return set(
+      LibraryIndexedDBAdapter.key,
+      data,
+      LibraryIndexedDBAdapter.store,
+    );
   }
 }
 
-export const libraryIndexedDBAdapter = new LibraryIndexedDBAdapter({
-  name: STORAGE_KEYS.IDB_LIBRARY,
-  // TODO maybe remove this in several months (shipped: 24-02-07)
-  migrationLocalStorageKey: STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
-});
+/** LS Adapter used only for migrating LS library data
+ * to indexedDB */
+export class LibraryLocalStorageMigrationAdapter {
+  static load() {
+    const LSData = localStorage.getItem(
+      STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
+    );
+    if (LSData != null) {
+      const libraryItems: ImportedDataState["libraryItems"] =
+        JSON.parse(LSData);
+      if (libraryItems) {
+        return { libraryItems: libraryItems };
+      }
+    }
+    return null;
+  }
+  static clear() {
+    localStorage.removeItem(STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY);
+  }
+}

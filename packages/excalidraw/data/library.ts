@@ -24,7 +24,7 @@ import {
   LIBRARY_SIDEBAR_TAB,
 } from "../constants";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
-import { arrayToMap, cloneJSON, resolvablePromise } from "../utils";
+import { arrayToMap, cloneJSON, promiseTry, resolvablePromise } from "../utils";
 import { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 
@@ -43,20 +43,6 @@ const onLibraryChangeEmitter = new Emitter<[change: LibraryUpdate]>();
 
 export interface LibraryPersistenceAdapter {
   /**
-   * Should load data from legacy data source, which will be deleted after
-   * successful migration. If no migration is needed, this method can be
-   * omitted.
-   */
-  migrate?(): {
-    /**
-     * loads data from legacy data source. Returns `null` if no data is
-     * to be migrated.
-     */
-    load: () => MaybePromise<LibraryItems_anyVersion | null>;
-    /** deletes data from legacy data source after migration is complete */
-    delete: () => MaybePromise<void>;
-  };
-  /**
    * Should load data that were previously saved into the database using the
    * `save` method. If you first need to migrate data from elsewhere, use
    * the `migrate` method.
@@ -64,6 +50,18 @@ export interface LibraryPersistenceAdapter {
   load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
+  /** clears entire storage */
+  clear?(): MaybePromise<void>;
+}
+
+export interface LibraryMigrationAdapter {
+  /**
+   * loads data from legacy data source. Returns `null` if no data is
+   * to be migrated.
+   */
+  load: LibraryPersistenceAdapter["load"];
+  /** clears entire storage afterwards */
+  clear: Required<LibraryPersistenceAdapter>["clear"];
 }
 
 export const libraryItemsAtom = atom<{
@@ -468,6 +466,14 @@ export const useHandleLibrary = (
       }
     | {
         adapter: LibraryPersistenceAdapter;
+        /**
+         * Adapter that takes care of loading data from legacy data store.
+         * Supply this if you want to migrate data on initial load from legacy
+         * data store.
+         *
+         * Can be a different LibraryPersistenceAdapter.
+         */
+        migrateFrom?: LibraryMigrationAdapter;
       }
   ),
 ) => {
@@ -475,6 +481,8 @@ export const useHandleLibrary = (
 
   const optsRef = useRef(opts);
   optsRef.current = opts;
+
+  const isLibraryLoadedRef = useRef(false);
 
   useEffect(() => {
     if (!excalidrawAPI) {
@@ -587,12 +595,6 @@ export const useHandleLibrary = (
     // --------------------------------------------------------- init load -----
     // -------------------------------------------------------------------------
 
-    const createLibraryData = (
-      libraryItems: LibraryItems,
-    ): LibraryPersistedData => {
-      return { libraryItems };
-    };
-
     const getLibraryItems = async (adapter: {
       load: () => MaybePromise<{
         libraryItems: LibraryItems_anyVersion;
@@ -607,6 +609,7 @@ export const useHandleLibrary = (
 
     if ("adapter" in optsRef.current && optsRef.current.adapter) {
       const adapter = optsRef.current.adapter;
+      const migrationAdapter = optsRef.current.migrateFrom;
 
       const persistLibraryChange = async (change: LibraryUpdate) => {
         const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
@@ -647,7 +650,7 @@ export const useHandleLibrary = (
           Array.from(nextLibraryItemsMap.values()),
         );
 
-        await adapter.save(createLibraryData(nextLibraryItems));
+        await adapter.save({ libraryItems: nextLibraryItems });
 
         return nextLibraryItems;
       };
@@ -660,13 +663,11 @@ export const useHandleLibrary = (
       //  though with several unnecessary steps — we will still load latest
       //  DB data during the `persistLibraryChange()` step)
       // -----------------------------------------------------------------------
-      if (adapter.migrate) {
-        const migration = adapter.migrate();
-
+      if (migrationAdapter) {
         initDataPromise.resolve(
-          Promise.resolve(migration.load())
-            .then((libraryItems) =>
-              restoreLibraryItems(libraryItems || [], "published"),
+          promiseTry(migrationAdapter.load)
+            .then((data) =>
+              restoreLibraryItems(data?.libraryItems || [], "published"),
             )
             .then(async (libraryItems) => {
               try {
@@ -681,9 +682,9 @@ export const useHandleLibrary = (
                   createLibraryUpdate([], libraryItems),
                 );
                 try {
-                  await migration.delete();
+                  await migrationAdapter.clear();
                 } catch (error: any) {
-                  console.warn(
+                  console.error(
                     `couldn't delete legacy library data: ${error.message}`,
                   );
                 }
@@ -696,27 +697,52 @@ export const useHandleLibrary = (
                 // migration failed, load empty library
                 return [];
               }
+            })
+            // errors caught during `migrationAdapter.load()`
+            .catch((error: any) => {
+              console.error(`error during library migration: ${error.message}`);
+              // as a default, load latest library from current data source
+              return getLibraryItems(adapter);
             }),
         );
       } else {
-        initDataPromise.resolve(getLibraryItems(adapter));
+        initDataPromise.resolve(promiseTry(getLibraryItems, adapter));
       }
 
       // load initial (or migrated) library
-      initDataPromise.then(async (data) => {
-        excalidrawAPI.updateLibrary({
-          libraryItems: data || [],
+      excalidrawAPI
+        .updateLibrary({
+          libraryItems: initDataPromise.then(
+            (libraryItems) => libraryItems || [],
+          ),
           // merge with current library items because we may have already
           // populated it (e.g. by installing 3rd party library which can
           // happen before the DB data is loaded)
           merge: true,
+        })
+        .finally(() => {
+          isLibraryLoadedRef.current = true;
         });
-      });
 
       // on change, merge with current library items and persist
       // -----------------------------------------------------------------------
       unsubOnLibraryChange = onLibraryChangeEmitter.on(async (change) => {
-        persistLibraryChange(change);
+        const isLoaded = isLibraryLoadedRef.current;
+        try {
+          await persistLibraryChange(change);
+        } catch (error: any) {
+          console.error(
+            `couldn't persist library change: ${error.message}`,
+            change,
+          );
+          if (isLoaded) {
+            excalidrawAPI.updateScene({
+              appState: {
+                errorMessage: t("errors.saveLibraryError"),
+              },
+            });
+          }
+        }
       });
     }
     // ---------------------------------------------- data source datapter -----
