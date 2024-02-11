@@ -44,8 +44,10 @@ const onLibraryChangeEmitter = new Emitter<[change: LibraryUpdate]>();
 export interface LibraryPersistenceAdapter {
   /**
    * Should load data that were previously saved into the database using the
-   * `save` method. If you first need to migrate data from elsewhere, use
-   * the `migrate` method.
+   * `save` method. Should throw if saving fails.
+   *
+   * Will be used internally in multiple places, such as during save to
+   * in order to reconcile changes with latest store data.
    */
   load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
   /** Should persist to the database as is (do no change the data structure). */
@@ -456,6 +458,60 @@ export const parseLibraryTokensFromUrl = () => {
   return libraryUrl ? { libraryUrl, idToken } : null;
 };
 
+const getLibraryItems = async (
+  adapter: LibraryPersistenceAdapter,
+): Promise<LibraryItems> => {
+  const data = await adapter.load();
+  return restoreLibraryItems(data?.libraryItems || [], "published");
+};
+
+const persistLibraryChange = async (
+  adapter: LibraryPersistenceAdapter,
+  change: LibraryUpdate,
+) => {
+  const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
+
+  for (const [id] of change.deletedItems) {
+    nextLibraryItemsMap.delete(id);
+  }
+
+  const addedItems: LibraryItem[] = [];
+
+  // we want to merge current library items with the ones stored in the
+  // DB so that we don't lose any elements that for some reason aren't
+  // in the current editor library, which could happen when:
+  //
+  // 1. we haven't received an update deleting some elements
+  //    (in which case it's still better to keep them in the DB lest
+  //     it was due to a different reason)
+  // 2. we keep a single DB for all active editors, but the editors'
+  //    libraries aren't synced or there's a race conditions during
+  //    syncing
+  // 3. some other race condition, e.g. during init where emit updates
+  //    for partial updates (e.g. you install a 3rd party library and
+  //    init from DB only after — we emit events for both updates)
+  for (const [id, item] of change.libraryItems) {
+    if (nextLibraryItemsMap.has(id)) {
+      // replace item with latest version
+      // TODO we could prefer the newer item instead
+      nextLibraryItemsMap.set(id, item);
+    } else {
+      // we want to prepend the new items with the ones that are already
+      // in DB to preserve the ordering we do in editor (newly added
+      // items are added to the beginning)
+      addedItems.push(item);
+    }
+  }
+
+  const nextLibraryItems = addedItems.concat(
+    Array.from(nextLibraryItemsMap.values()),
+  );
+
+  await adapter.save({ libraryItems: nextLibraryItems });
+
+  return nextLibraryItems;
+};
+
 export const useHandleLibrary = (
   opts: {
     excalidrawAPI: ExcalidrawImperativeAPI | null;
@@ -488,6 +544,9 @@ export const useHandleLibrary = (
     if (!excalidrawAPI) {
       return;
     }
+
+    // reset on editor remount (excalidrawAPI changed)
+    isLibraryLoadedRef.current = false;
 
     const importLibraryFromURL = async ({
       libraryUrl,
@@ -595,65 +654,11 @@ export const useHandleLibrary = (
     // --------------------------------------------------------- init load -----
     // -------------------------------------------------------------------------
 
-    const getLibraryItems = async (adapter: {
-      load: () => MaybePromise<{
-        libraryItems: LibraryItems_anyVersion;
-      } | null>;
-    }): Promise<LibraryItems> => {
-      const data = await adapter.load();
-      return restoreLibraryItems(data?.libraryItems || [], "published");
-    };
-
     // ------ (B) data source adapter ------------------------------------------
-    let unsubOnLibraryChange: () => void | undefined;
 
     if ("adapter" in optsRef.current && optsRef.current.adapter) {
       const adapter = optsRef.current.adapter;
       const migrationAdapter = optsRef.current.migrationAdapter;
-
-      const persistLibraryChange = async (change: LibraryUpdate) => {
-        const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
-
-        for (const [id] of change.deletedItems) {
-          nextLibraryItemsMap.delete(id);
-        }
-
-        const addedItems: LibraryItem[] = [];
-
-        // we want to merge current library items with the ones stored in the
-        // DB so that we don't lose any elements that for some reason aren't
-        // in the current editor library, which could happen when:
-        //
-        // 1. we haven't received an update deleting some elements
-        //    (in which case it's still better to keep them in the DB lest
-        //     it was due to a different reason)
-        // 2. we keep a single DB for all active editors, but the editors'
-        //    libraries aren't synced or there's a race conditions during
-        //    syncing
-        // 3. some other race condition, e.g. during init where emit updates
-        //    for partial updates (e.g. you install a 3rd party library and
-        //    init from DB only after — we emit events for both updates)
-        for (const [id, item] of change.libraryItems) {
-          if (nextLibraryItemsMap.has(id)) {
-            // replace item with latest version
-            // TODO we could prefer the newer item instead
-            nextLibraryItemsMap.set(id, item);
-          } else {
-            // we want to prepend the new items with the ones that are already
-            // in DB to preserve the ordering we do in editor (newly added
-            // items are added to the beginning)
-            addedItems.push(item);
-          }
-        }
-
-        const nextLibraryItems = addedItems.concat(
-          Array.from(nextLibraryItemsMap.values()),
-        );
-
-        await adapter.save({ libraryItems: nextLibraryItems });
-
-        return nextLibraryItems;
-      };
 
       const initDataPromise = resolvablePromise<LibraryItems | null>();
 
@@ -675,14 +680,10 @@ export const useHandleLibrary = (
                   return getLibraryItems(adapter);
                 }
 
-                // note that we don't attempt to queue the migration operation
-                // so it'd be persisted to the database before any other updates
-                // we may potentially receive from the onLibraryChange listener,
-                // because during init we're unlikely to get updates other than
-                // insert-only operations, which on the library item-level should
-                // be commutative and thus safe to happen in any order (provided
-                // we save using the persistLibraryChange function)
+                // we don't queue this operation because it's running inside
+                // a promise that's running inside Library update queue itself
                 const nextItems = await persistLibraryChange(
+                  adapter,
                   createLibraryUpdate(
                     [],
                     restoreLibraryItems(
@@ -733,20 +734,50 @@ export const useHandleLibrary = (
         .finally(() => {
           isLibraryLoadedRef.current = true;
         });
+    }
+    // ---------------------------------------------- data source datapter -----
 
+    window.addEventListener(EVENT.HASHCHANGE, onHashChange);
+    return () => {
+      window.removeEventListener(EVENT.HASHCHANGE, onHashChange);
+    };
+  }, [
+    // important this useEffect only depends on excalidrawAPI so it only reruns
+    // on editor remounts (the excalidrawAPI changes)
+    excalidrawAPI,
+  ]);
+
+  // This effect is run without excalidrawAPI dependency so that host apps
+  // can run this hook outside of an active editor instance and the library
+  // update queue/loop survives editor remounts
+  //
+  // This effect is still only meant to be run if host apps supply an persitence
+  // adapter. If we don't have access to it, it the update listener doesn't
+  // do anything.
+  useEffect(
+    () => {
       // on change, merge with current library items and persist
       // -----------------------------------------------------------------------
-      unsubOnLibraryChange = onLibraryChangeEmitter.on(async (change) => {
+      const unsubOnLibraryChange = onLibraryChangeEmitter.on(async (change) => {
         const isLoaded = isLibraryLoadedRef.current;
+        // we want to operate with the latest adapter, but we don't want this
+        // effect to rerun on every adapter change in case host apps' adapter
+        // isn't stable
+        const adapter =
+          ("adapter" in optsRef.current && optsRef.current.adapter) || null;
         try {
-          await persistLibraryChange(change);
+          if (adapter) {
+            await persistLibraryChange(adapter, change);
+          }
         } catch (error: any) {
           console.error(
             `couldn't persist library change: ${error.message}`,
             change,
           );
-          if (isLoaded) {
-            excalidrawAPI.updateScene({
+
+          // currently we only show error if an editor is loaded
+          if (isLoaded && optsRef.current.excalidrawAPI) {
+            optsRef.current.excalidrawAPI.updateScene({
               appState: {
                 errorMessage: t("errors.saveLibraryError"),
               },
@@ -754,13 +785,13 @@ export const useHandleLibrary = (
           }
         }
       });
-    }
-    // ---------------------------------------------- data source datapter -----
 
-    window.addEventListener(EVENT.HASHCHANGE, onHashChange);
-    return () => {
-      window.removeEventListener(EVENT.HASHCHANGE, onHashChange);
-      unsubOnLibraryChange?.();
-    };
-  }, [excalidrawAPI]);
+      return () => {
+        unsubOnLibraryChange();
+      };
+    },
+    [
+      // this effect must not have any deps so it doesn't rerun
+    ],
+  );
 };
