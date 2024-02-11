@@ -68,9 +68,11 @@ export interface LibraryPersistenceAdapter {
 
 export const libraryItemsAtom = atom<{
   status: "loading" | "loaded";
+  /** indicates whether library is initialized with library items (has gone
+   * through at least one update). Used in UI. Specific to this atom only. */
   isInitialized: boolean;
   libraryItems: LibraryItems;
-}>({ status: "loaded", isInitialized: true, libraryItems: [] });
+}>({ status: "loaded", isInitialized: false, libraryItems: [] });
 
 const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
   cloneJSON(libraryItems);
@@ -149,10 +151,6 @@ class Library {
   /** snapshot of library items since last onLibraryChange call */
   private prevLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
-  /** indicates whether library is initialized with library items (has gone
-   * through at least one update) */
-  private isInitialized = false;
-
   private app: App;
 
   constructor(app: App) {
@@ -167,17 +165,16 @@ class Library {
 
   private notifyListeners = () => {
     if (this.updateQueue.length > 0) {
-      jotaiStore.set(libraryItemsAtom, {
+      jotaiStore.set(libraryItemsAtom, (s) => ({
         status: "loading",
         libraryItems: this.currLibraryItems,
-        isInitialized: this.isInitialized,
-      });
+        isInitialized: s.isInitialized,
+      }));
     } else {
-      this.isInitialized = true;
       jotaiStore.set(libraryItemsAtom, {
         status: "loaded",
         libraryItems: this.currLibraryItems,
-        isInitialized: this.isInitialized,
+        isInitialized: true,
       });
       try {
         const prevLibraryItems = this.prevLibraryItems;
@@ -199,7 +196,6 @@ class Library {
 
   /** call on excalidraw instance unmount */
   destroy = () => {
-    this.isInitialized = false;
     this.updateQueue = [];
     this.currLibraryItems = [];
     jotaiStore.set(libraryItemSvgsCache, new Map());
