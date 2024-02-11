@@ -666,11 +666,15 @@ export const useHandleLibrary = (
       if (migrationAdapter) {
         initDataPromise.resolve(
           promiseTry(migrationAdapter.load)
-            .then((data) =>
-              restoreLibraryItems(data?.libraryItems || [], "published"),
-            )
-            .then(async (libraryItems) => {
+            .then(async (libraryData) => {
               try {
+                // if no library data to migrate, assume no migration needed
+                // and skip persisting to new data store, as well as well
+                // clearing the old store via `migrationAdapter.clear()`
+                if (!libraryData) {
+                  return getLibraryItems(adapter);
+                }
+
                 // note that we don't attempt to queue the migration operation
                 // so it'd be persisted to the database before any other updates
                 // we may potentially receive from the onLibraryChange listener,
@@ -679,7 +683,13 @@ export const useHandleLibrary = (
                 // be commutative and thus safe to happen in any order (provided
                 // we save using the persistLibraryChange function)
                 const nextItems = await persistLibraryChange(
-                  createLibraryUpdate([], libraryItems),
+                  createLibraryUpdate(
+                    [],
+                    restoreLibraryItems(
+                      libraryData.libraryItems || [],
+                      "published",
+                    ),
+                  ),
                 );
                 try {
                   await migrationAdapter.clear();
