@@ -319,7 +319,7 @@ const ExcalidrawWrapper = () => {
     excalidrawAPI,
     adapter: LibraryIndexedDBAdapter,
     // TODO maybe remove this in several months (shipped: 24-02-07)
-    migrateFrom: LibraryLocalStorageMigrationAdapter,
+    migrationAdapter: LibraryLocalStorageMigrationAdapter,
   });
 
   useEffect(() => {

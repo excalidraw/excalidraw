@@ -473,7 +473,7 @@ export const useHandleLibrary = (
          *
          * Can be a different LibraryPersistenceAdapter.
          */
-        migrateFrom?: LibraryMigrationAdapter;
+        migrationAdapter?: LibraryMigrationAdapter;
       }
   ),
 ) => {
@@ -609,7 +609,7 @@ export const useHandleLibrary = (
 
     if ("adapter" in optsRef.current && optsRef.current.adapter) {
       const adapter = optsRef.current.adapter;
-      const migrationAdapter = optsRef.current.migrateFrom;
+      const migrationAdapter = optsRef.current.migrationAdapter;
 
       const persistLibraryChange = async (change: LibraryUpdate) => {
         const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
