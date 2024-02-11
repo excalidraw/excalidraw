@@ -234,7 +234,7 @@ export class LibraryLocalStorageMigrationAdapter {
       const libraryItems: ImportedDataState["libraryItems"] =
         JSON.parse(LSData);
       if (libraryItems) {
-        return { libraryItems: libraryItems };
+        return { libraryItems };
       }
     }
     return null;

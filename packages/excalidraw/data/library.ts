@@ -50,7 +50,7 @@ export interface LibraryPersistenceAdapter {
   load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
-  /** clears entire storage */
+  /** clears entire storage. Currently unused. */
   clear?(): MaybePromise<void>;
 }
 
@@ -604,7 +604,7 @@ export const useHandleLibrary = (
       return restoreLibraryItems(data?.libraryItems || [], "published");
     };
 
-    // ------ (A) data source adapter ------------------------------------------
+    // ------ (B) data source adapter ------------------------------------------
     let unsubOnLibraryChange: () => void | undefined;
 
     if ("adapter" in optsRef.current && optsRef.current.adapter) {
