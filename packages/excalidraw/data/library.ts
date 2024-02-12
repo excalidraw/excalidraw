@@ -27,6 +27,7 @@ import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import { arrayToMap, cloneJSON, promiseTry, resolvablePromise } from "../utils";
 import { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
+import { Queue } from "../queue";
 
 type LibraryUpdate = {
   /** deleted library items since last onLibraryChange event */
@@ -456,58 +457,98 @@ export const parseLibraryTokensFromUrl = () => {
   return libraryUrl ? { libraryUrl, idToken } : null;
 };
 
-const getLibraryItems = async (
-  adapter: LibraryPersistenceAdapter,
-): Promise<LibraryItems> => {
-  const data = await adapter.load();
-  return restoreLibraryItems(data?.libraryItems || [], "published");
-};
+class AdapterTransaction {
+  static queue = new Queue();
+
+  static async getLibraryItems(
+    adapter: LibraryPersistenceAdapter,
+    _queue = true,
+  ): Promise<LibraryItems> {
+    const task = () =>
+      new Promise<LibraryItems>(async (resolve, reject) => {
+        try {
+          const data = await adapter.load();
+          resolve(restoreLibraryItems(data?.libraryItems || [], "published"));
+        } catch (error: any) {
+          reject(error);
+        }
+      });
+
+    if (_queue) {
+      return AdapterTransaction.queue.push(task);
+    }
+
+    return task();
+  }
+
+  static run = async <T>(
+    adapter: LibraryPersistenceAdapter,
+    fn: (transaction: AdapterTransaction) => Promise<T>,
+  ) => {
+    const transaction = new AdapterTransaction(adapter);
+    return AdapterTransaction.queue.push(() => fn(transaction));
+  };
+
+  // ------------------
+
+  private adapter: LibraryPersistenceAdapter;
+
+  constructor(adapter: LibraryPersistenceAdapter) {
+    this.adapter = adapter;
+  }
+
+  getLibraryItems() {
+    return AdapterTransaction.getLibraryItems(this.adapter, false);
+  }
+}
 
 const persistLibraryUpdate = async (
   adapter: LibraryPersistenceAdapter,
   update: LibraryUpdate,
-) => {
-  const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
+): Promise<LibraryItems> => {
+  return AdapterTransaction.run(adapter, async (transaction) => {
+    const nextLibraryItemsMap = arrayToMap(await transaction.getLibraryItems());
 
-  for (const [id] of update.deletedItems) {
-    nextLibraryItemsMap.delete(id);
-  }
-
-  const addedItems: LibraryItem[] = [];
-
-  // we want to merge current library items with the ones stored in the
-  // DB so that we don't lose any elements that for some reason aren't
-  // in the current editor library, which could happen when:
-  //
-  // 1. we haven't received an update deleting some elements
-  //    (in which case it's still better to keep them in the DB lest
-  //     it was due to a different reason)
-  // 2. we keep a single DB for all active editors, but the editors'
-  //    libraries aren't synced or there's a race conditions during
-  //    syncing
-  // 3. some other race condition, e.g. during init where emit updates
-  //    for partial updates (e.g. you install a 3rd party library and
-  //    init from DB only after — we emit events for both updates)
-  for (const [id, item] of update.libraryItems) {
-    if (nextLibraryItemsMap.has(id)) {
-      // replace item with latest version
-      // TODO we could prefer the newer item instead
-      nextLibraryItemsMap.set(id, item);
-    } else {
-      // we want to prepend the new items with the ones that are already
-      // in DB to preserve the ordering we do in editor (newly added
-      // items are added to the beginning)
-      addedItems.push(item);
+    for (const [id] of update.deletedItems) {
+      nextLibraryItemsMap.delete(id);
     }
-  }
 
-  const nextLibraryItems = addedItems.concat(
-    Array.from(nextLibraryItemsMap.values()),
-  );
+    const addedItems: LibraryItem[] = [];
 
-  await adapter.save({ libraryItems: nextLibraryItems });
+    // we want to merge current library items with the ones stored in the
+    // DB so that we don't lose any elements that for some reason aren't
+    // in the current editor library, which could happen when:
+    //
+    // 1. we haven't received an update deleting some elements
+    //    (in which case it's still better to keep them in the DB lest
+    //     it was due to a different reason)
+    // 2. we keep a single DB for all active editors, but the editors'
+    //    libraries aren't synced or there's a race conditions during
+    //    syncing
+    // 3. some other race condition, e.g. during init where emit updates
+    //    for partial updates (e.g. you install a 3rd party library and
+    //    init from DB only after — we emit events for both updates)
+    for (const [id, item] of update.libraryItems) {
+      if (nextLibraryItemsMap.has(id)) {
+        // replace item with latest version
+        // TODO we could prefer the newer item instead
+        nextLibraryItemsMap.set(id, item);
+      } else {
+        // we want to prepend the new items with the ones that are already
+        // in DB to preserve the ordering we do in editor (newly added
+        // items are added to the beginning)
+        addedItems.push(item);
+      }
+    }
 
-  return nextLibraryItems;
+    const nextLibraryItems = addedItems.concat(
+      Array.from(nextLibraryItemsMap.values()),
+    );
+
+    await adapter.save({ libraryItems: nextLibraryItems });
+
+    return nextLibraryItems;
+  });
 };
 
 export const useHandleLibrary = (
@@ -675,7 +716,7 @@ export const useHandleLibrary = (
                 // and skip persisting to new data store, as well as well
                 // clearing the old store via `migrationAdapter.clear()`
                 if (!libraryData) {
-                  return getLibraryItems(adapter);
+                  return AdapterTransaction.getLibraryItems(adapter);
                 }
 
                 // we don't queue this operation because it's running inside
@@ -711,11 +752,13 @@ export const useHandleLibrary = (
             .catch((error: any) => {
               console.error(`error during library migration: ${error.message}`);
               // as a default, load latest library from current data source
-              return getLibraryItems(adapter);
+              return AdapterTransaction.getLibraryItems(adapter);
             }),
         );
       } else {
-        initDataPromise.resolve(promiseTry(getLibraryItems, adapter));
+        initDataPromise.resolve(
+          promiseTry(AdapterTransaction.getLibraryItems, adapter),
+        );
       }
 
       // load initial (or migrated) library
