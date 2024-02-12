@@ -39,7 +39,7 @@ type LibraryUpdate = {
 // such as schema version
 export type LibraryPersistedData = { libraryItems: LibraryItems };
 
-const onLibraryChangeEmitter = new Emitter<[change: LibraryUpdate]>();
+const onLibraryUpdateEmitter = new Emitter<[update: LibraryUpdate]>();
 
 export interface LibraryPersistenceAdapter {
   /**
@@ -183,7 +183,7 @@ class Library {
         this.app.props.onLibraryChange?.(nextLibraryItems);
 
         // for internal use in `useHandleLibrary` hook
-        onLibraryChangeEmitter.trigger(
+        onLibraryUpdateEmitter.trigger(
           createLibraryUpdate(prevLibraryItems, nextLibraryItems),
         );
       } catch (error) {
@@ -463,13 +463,13 @@ const getLibraryItems = async (
   return restoreLibraryItems(data?.libraryItems || [], "published");
 };
 
-const persistLibraryChange = async (
+const persistLibraryUpdate = async (
   adapter: LibraryPersistenceAdapter,
-  change: LibraryUpdate,
+  update: LibraryUpdate,
 ) => {
   const nextLibraryItemsMap = arrayToMap(await getLibraryItems(adapter));
 
-  for (const [id] of change.deletedItems) {
+  for (const [id] of update.deletedItems) {
     nextLibraryItemsMap.delete(id);
   }
 
@@ -488,7 +488,7 @@ const persistLibraryChange = async (
   // 3. some other race condition, e.g. during init where emit updates
   //    for partial updates (e.g. you install a 3rd party library and
   //    init from DB only after — we emit events for both updates)
-  for (const [id, item] of change.libraryItems) {
+  for (const [id, item] of update.libraryItems) {
     if (nextLibraryItemsMap.has(id)) {
       // replace item with latest version
       // TODO we could prefer the newer item instead
@@ -680,7 +680,7 @@ export const useHandleLibrary = (
 
                 // we don't queue this operation because it's running inside
                 // a promise that's running inside Library update queue itself
-                const nextItems = await persistLibraryChange(
+                const nextItems = await persistLibraryUpdate(
                   adapter,
                   createLibraryUpdate(
                     [],
@@ -754,9 +754,9 @@ export const useHandleLibrary = (
   // do anything.
   useEffect(
     () => {
-      // on change, merge with current library items and persist
+      // on update, merge with current library items and persist
       // -----------------------------------------------------------------------
-      const unsubOnLibraryChange = onLibraryChangeEmitter.on(async (change) => {
+      const unsubOnLibraryUpdate = onLibraryUpdateEmitter.on(async (update) => {
         const isLoaded = isLibraryLoadedRef.current;
         // we want to operate with the latest adapter, but we don't want this
         // effect to rerun on every adapter change in case host apps' adapter
@@ -765,12 +765,12 @@ export const useHandleLibrary = (
           ("adapter" in optsRef.current && optsRef.current.adapter) || null;
         try {
           if (adapter) {
-            await persistLibraryChange(adapter, change);
+            await persistLibraryUpdate(adapter, update);
           }
         } catch (error: any) {
           console.error(
-            `couldn't persist library change: ${error.message}`,
-            change,
+            `couldn't persist library update: ${error.message}`,
+            update,
           );
 
           // currently we only show error if an editor is loaded
@@ -785,7 +785,7 @@ export const useHandleLibrary = (
       });
 
       return () => {
-        unsubOnLibraryChange();
+        unsubOnLibraryUpdate();
       };
     },
     [
