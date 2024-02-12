@@ -15,6 +15,7 @@ import {
   hasBoundTextElement,
   isIframeLikeElement,
   isImageElement,
+  isTextElement,
 } from "./typeChecks";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -25,7 +26,8 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   const isDraggableFromInside =
     !isTransparent(element.backgroundColor) ||
     hasBoundTextElement(element) ||
-    isIframeLikeElement(element);
+    isIframeLikeElement(element) ||
+    isTextElement(element);
 
   if (element.type === "line") {
     return isDraggableFromInside && isPathALoop(element.points);
