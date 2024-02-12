@@ -52,8 +52,6 @@ export interface LibraryPersistenceAdapter {
   load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
-  /** clears entire storage. Currently unused. */
-  clear?(): MaybePromise<void>;
 }
 
 export interface LibraryMigrationAdapter {
@@ -63,7 +61,7 @@ export interface LibraryMigrationAdapter {
    */
   load: LibraryPersistenceAdapter["load"];
   /** clears entire storage afterwards */
-  clear: Required<LibraryPersistenceAdapter>["clear"];
+  clear(): MaybePromise<void>;
 }
 
 export const libraryItemsAtom = atom<{
