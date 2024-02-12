@@ -144,7 +144,7 @@ export const lineInterpolate = (line: Line, clamp = false) => {
   const [[x1, y1], [x2, y2]] = line;
   return (t: number) => {
     const t0 = clamp ? (t < 0 ? 0 : t > 1 ? 1 : t) : t;
-    return [(x2 - x1) * t0 + x1, (y2 - y1) * t0 + y1];
+    return [(x2 - x1) * t0 + x1, (y2 - y1) * t0 + y1] as Point;
   };
 };
 
@@ -225,7 +225,7 @@ export const cubicBezierPoint = (t: number, controlPoints: Curve): Point => {
 
 const solveCubicEquation = (a: number, b: number, c: number, d: number) => {
   // This function solves the cubic equation ax^3 + bx^2 + cx + d = 0
-  const roots = [];
+  const roots: number[] = [];
 
   const discriminant =
     18 * a * b * c * d -
@@ -458,7 +458,7 @@ export const polygonScaleY = (
 
 export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
   const [[min, _], [max, __]] = polygonBounds(polygon);
-  const p = [];
+  const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
     const [x, y] = polygon[i];
@@ -479,7 +479,7 @@ export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
 
 export const polygonReflectY = (polygon: Polygon, reflectFactor = 1) => {
   const [[_, min], [__, max]] = polygonBounds(polygon);
-  const p = [];
+  const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
     const [x, y] = polygon[i];
