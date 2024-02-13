@@ -11,8 +11,8 @@
     "copyAsPng": "Copiar no portapapeis como PNG",
     "copyAsSvg": "Copiar no portapapeis como SVG",
     "copyText": "Copia no portapapeis como texto",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiar fonte ao portapapeis",
+    "convertToCode": "Converter a código",
     "bringForward": "Traer cara adiante",
     "sendToBack": "Enviar cara atrás",
     "bringToFront": "Traer á fronte",
@@ -38,17 +38,17 @@
     "arrowhead_none": "Ningunha",
     "arrowhead_arrow": "Frecha",
     "arrowhead_bar": "Barra",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Círculo",
+    "arrowhead_circle_outline": "Círculo (contorno)",
     "arrowhead_triangle": "Triángulo",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triángulo (contorno)",
+    "arrowhead_diamond": "Diamante",
+    "arrowhead_diamond_outline": "Diamante (contorno)",
     "fontSize": "Tamaño da fonte",
     "fontFamily": "Tipo de fonte",
     "addWatermark": "Engadir \"Feito con Excalidraw\"",
     "handDrawn": "Debuxado a man",
-    "normal": "",
+    "normal": "Normal",
     "code": "Código",
     "small": "Pequeno",
     "medium": "Mediano",
@@ -56,7 +56,7 @@
     "veryLarge": "Moi grande",
     "solid": "Sólido",
     "hachure": "Folleto",
-    "zigzag": "",
+    "zigzag": "Zigzag",
     "crossHatch": "Raiado transversal",
     "thin": "Estreito",
     "bold": "Groso",
@@ -120,7 +120,7 @@
       "createEmbed": "",
       "label": "Ligazón",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "Non se estableceu un enlace"
     },
     "lineEditor": {
       "edit": "Editar liña",
@@ -137,10 +137,10 @@
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
-    "textToDiagram": "",
+    "textToDiagram": "Texto a diagrama",
     "prompt": "",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Síguenos",
+    "discordChat": "Chat de Discord"
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
@@ -213,13 +213,13 @@
     "imageInsertError": "Non se puido inserir a imaxe. Probe de novo máis tarde...",
     "fileTooBig": "O ficheiro é demasiado grande. O tamaño máximo permitido é {{maxSize}}.",
     "svgImageInsertError": "Non se puido inserir como imaxe SVG. O marcado SVG semella inválido.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Non se puido obter a imaxe.",
     "invalidSVGString": "SVG inválido.",
     "cannotResolveCollabServer": "Non se puido conectar ao servidor de colaboración. Por favor recargue a páxina e probe de novo.",
     "importLibraryError": "Non se puido cargar a biblioteca",
     "collabSaveFailed": "Non se puido gardar na base de datos. Se o problema persiste, deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
     "collabSaveFailed_sizeExceeded": "Non se puido gardar na base de datos, o lenzo semella demasiado grande. Deberías gardar o teu arquivo de maneira local para asegurarte de non perdelo teu traballo.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "As imaxes están desactivadas.",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -232,8 +232,8 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Non se puido copiar.",
+    "copyToSystemClipboardFailed": "Non se puido copiar ao portapapeis."
   },
   "toolBar": {
     "selection": "Selección",
@@ -302,10 +302,10 @@
     "sceneContent": "Contido da escena:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Ou"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Invita xente a colaborar no teu diagrama.",
     "desc_privacy": "",
     "button_startSession": "Comezar sesión",
     "button_stopSession": "Rematar sesión",
@@ -338,7 +338,7 @@
     "documentation": "Documentación",
     "doubleClick": "dobre-clic",
     "drag": "arrastrar",
-    "editor": "",
+    "editor": "Editor",
     "editLineArrowPoints": "",
     "editText": "",
     "github": "Encontrou un problema? Envíeo",
@@ -400,14 +400,14 @@
     "header": "Exportar imaxe",
     "label": {
       "withBackground": "Fondo",
-      "onlySelected": "",
+      "onlySelected": "Só seleccionados",
       "darkMode": "Modo escuro",
       "embedScene": "",
       "scale": "",
       "padding": ""
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Os datos da escena serán gardados no ficheiro PNG/SVG exportado polo que a escena poderá ser restaurada dende el. Isto aumentará o tamaño do ficheiro exportado."
     },
     "title": {
       "exportToPng": "Exportar a PNG",
@@ -530,11 +530,11 @@
   "userList": {
     "search": {
       "placeholder": "Busca rápida",
-      "empty": ""
+      "empty": "Non se atoparon usuarios"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Fai clic no usuario para seguilo",
+      "followStatus": "Xa estás a seguir a este usuario"
     }
   }
 }
