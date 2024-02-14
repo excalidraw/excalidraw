@@ -77,15 +77,25 @@ export const hitElementBoundingBox = (
   x: number,
   y: number,
   element: ExcalidrawElement,
+  tolerance = 0,
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element);
+  let [x1, y1, x2, y2] = getElementBounds(element);
+  x1 -= tolerance;
+  y1 -= tolerance;
+  x2 += tolerance;
+  y2 += tolerance;
   return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
 };
 
 export const hitElementBoundingBoxOnly = (hitArgs: HitTestArgs) => {
   return (
     !hitElementItselfOnly(hitArgs) &&
-    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element)
+    hitElementBoundingBox(
+      hitArgs.x,
+      hitArgs.y,
+      hitArgs.element,
+      hitArgs.threshold,
+    )
   );
 };
 

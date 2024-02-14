@@ -116,7 +116,6 @@ import {
   transformElements,
   updateTextElement,
   redrawTextBoundingBox,
-  getElementBounds,
   getElementAbsoluteCoords,
 } from "../element";
 import {
@@ -230,7 +229,7 @@ import {
   getFreedrawShape,
   getPolygonShape,
 } from "../../utils/geometry/shape";
-import { isPointOnShape, isPointInShape } from "../../utils/collision";
+import { isPointInShape } from "../../utils/collision";
 import {
   AppClassProperties,
   AppProps,
@@ -4426,12 +4425,15 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements[allHitElements.length - 1];
       // If we're hitting element with highest z-index only on its bounding box
       // while also hitting other element figure, the latter should be considered.
-      return isPointInShape(
-        [x, y],
-        this.getElementShape(elementWithHighestZIndex),
-      )
-        ? elementWithHighestZIndex
-        : allHitElements[allHitElements.length - 2];
+      return hitElementBoundingBoxOnly({
+        x,
+        y,
+        threshold: this.getHitThreshold(),
+        element: elementWithHighestZIndex,
+        shape: this.getElementShape(elementWithHighestZIndex),
+      })
+        ? allHitElements[allHitElements.length - 2]
+        : elementWithHighestZIndex;
     }
     if (allHitElements.length === 1) {
       return allHitElements[0];
@@ -4502,7 +4504,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      return hitElementBoundingBox(x, y, element);
+      return hitElementBoundingBox(x, y, element, this.getHitThreshold());
     }
 
     // take bound text element into consideration for hit collision as well
