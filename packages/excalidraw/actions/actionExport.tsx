@@ -29,7 +29,7 @@ export const actionChangeProjectName = register({
   PanelComponent: ({ appState, updateData, appProps, data, app }) => (
     <ProjectName
       label={t("labels.fileTitle")}
-      value={app.getAppName()}
+      value={app.getName()}
       onChange={(name: string) => updateData(name)}
       isNameEditable={
         typeof appProps.name === "undefined" && !appState.viewModeEnabled
@@ -148,9 +148,9 @@ export const actionSaveToActiveFile = register({
             elements,
             appState,
             app.files,
-            app.getAppName(),
+            app.getName(),
           )
-        : await saveAsJSON(elements, appState, app.files, app.getAppName());
+        : await saveAsJSON(elements, appState, app.files, app.getName());
 
       return {
         commitToHistory: false,
@@ -195,7 +195,7 @@ export const actionSaveFileToDisk = register({
           fileHandle: null,
         },
         app.files,
-        app.getAppName(),
+        app.getName(),
       );
       return {
         commitToHistory: false,
