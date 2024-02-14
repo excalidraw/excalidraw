@@ -2077,14 +2077,14 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id1": true,
+    "id0": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": {
-    "id1": true,
+    "id0": true,
     "id2": true,
   },
   "selectedElementsAreBeingDragged": false,
@@ -2357,7 +2357,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
         "editingLinearElement": null,
         "name": "Untitled-201933152653",
         "selectedElementIds": {
-          "id1": true,
+          "id0": true,
           "id2": true,
         },
         "selectedGroupIds": {
@@ -2375,38 +2375,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
           "frameId": null,
           "groupIds": [],
           "height": 10,
-          "id": "id0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "roundness": {
-            "type": 3,
-          },
-          "seed": 1278240551,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 2,
-          "versionNonce": 453191,
-          "width": 10,
-          "x": 10,
-          "y": 10,
-        },
-        {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "customData": undefined,
-          "fillStyle": "solid",
-          "frameId": null,
-          "groupIds": [
-            "id5",
-          ],
-          "height": 10,
           "id": "id1",
           "isDeleted": false,
           "link": null,
@@ -2422,10 +2390,42 @@ exports[`regression tests > adjusts z order when grouping > [end of test] histor
           "strokeWidth": 2,
           "type": "rectangle",
           "updated": 1,
+          "version": 2,
+          "versionNonce": 1116226695,
+          "width": 10,
+          "x": 30,
+          "y": 10,
+        },
+        {
+          "angle": 0,
+          "backgroundColor": "transparent",
+          "boundElements": null,
+          "customData": undefined,
+          "fillStyle": "solid",
+          "frameId": null,
+          "groupIds": [
+            "id5",
+          ],
+          "height": 10,
+          "id": "id0",
+          "isDeleted": false,
+          "link": null,
+          "locked": false,
+          "opacity": 100,
+          "roughness": 1,
+          "roundness": {
+            "type": 3,
+          },
+          "seed": 1278240551,
+          "strokeColor": "#1e1e1e",
+          "strokeStyle": "solid",
+          "strokeWidth": 2,
+          "type": "rectangle",
+          "updated": 1,
           "version": 3,
           "versionNonce": 915032327,
           "width": 10,
-          "x": 30,
+          "x": 10,
           "y": 10,
         },
         {
@@ -4236,7 +4236,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "scrollY": 0,
   "scrolledOutside": false,
   "selectedElementIds": {
-    "id1": true,
+    "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4402,7 +4402,7 @@ exports[`regression tests > click to select a shape > [end of test] history 1`] 
 
 exports[`regression tests > click to select a shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click to select a shape > [end of test] number of renders 1`] = `11`;
+exports[`regression tests > click to select a shape > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > click-drag to select a group > [end of test] appState 1`] = `
 {
@@ -13199,7 +13199,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id1": true,
+    "id0": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -13372,7 +13372,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
 
 exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of renders 1`] = `15`;
+exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
 {

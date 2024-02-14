@@ -90,12 +90,7 @@ export const hitElementBoundingBox = (
 export const hitElementBoundingBoxOnly = (hitArgs: HitTestArgs) => {
   return (
     !hitElementItselfOnly(hitArgs) &&
-    hitElementBoundingBox(
-      hitArgs.x,
-      hitArgs.y,
-      hitArgs.element,
-      hitArgs.threshold,
-    )
+    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element)
   );
 };
 

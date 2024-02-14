@@ -4423,17 +4423,15 @@ class App extends React.Component<AppProps, AppState> {
       }
       const elementWithHighestZIndex =
         allHitElements[allHitElements.length - 1];
+
       // If we're hitting element with highest z-index only on its bounding box
       // while also hitting other element figure, the latter should be considered.
-      return hitElementBoundingBoxOnly({
-        x,
-        y,
-        threshold: this.getHitThreshold(),
-        element: elementWithHighestZIndex,
-        shape: this.getElementShape(elementWithHighestZIndex),
-      })
-        ? allHitElements[allHitElements.length - 2]
-        : elementWithHighestZIndex;
+      return isPointInShape(
+        [x, y],
+        this.getElementShape(elementWithHighestZIndex),
+      )
+        ? elementWithHighestZIndex
+        : allHitElements[allHitElements.length - 2];
     }
     if (allHitElements.length === 1) {
       return allHitElements[0];
