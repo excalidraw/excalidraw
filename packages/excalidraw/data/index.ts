@@ -2,7 +2,12 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FILENAME,
+  isFirefox,
+  MIME_TYPES,
+} from "../constants";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import {
@@ -84,14 +89,15 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
-    name,
+    name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    name: string;
+    /** filename, if applicable */
+    name?: string;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },

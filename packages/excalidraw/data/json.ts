@@ -1,6 +1,7 @@
 import { fileOpen, fileSave } from "./filesystem";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import {
+  DEFAULT_FILENAME,
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
   MIME_TYPES,
@@ -71,7 +72,8 @@ export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
-  name: string,
+  /** filename */
+  name: string = appState.name || DEFAULT_FILENAME,
 ) => {
   const serialized = serializeAsJSON(elements, appState, files, "local");
   const blob = new Blob([serialized], {
