@@ -160,10 +160,6 @@ const ImageExportModal = ({
               className="TextInput"
               value={projectName}
               style={{ width: "30ch" }}
-              disabled={
-                typeof appProps.name !== "undefined" ||
-                appStateSnapshot.viewModeEnabled
-              }
               onChange={(event) => {
                 setProjectName(event.target.value);
                 actionManager.executeAction(

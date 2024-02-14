@@ -31,9 +31,6 @@ export const actionChangeProjectName = register({
       label={t("labels.fileTitle")}
       value={app.getName()}
       onChange={(name: string) => updateData(name)}
-      isNameEditable={
-        typeof appProps.name === "undefined" && !appState.viewModeEnabled
-      }
       ignoreFocus={data?.ignoreFocus ?? false}
     />
   ),
