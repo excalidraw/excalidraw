@@ -2141,10 +2141,6 @@ class App extends React.Component<AppProps, AppState> {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
         }
 
-        if (typeof this.props.name !== "undefined") {
-          name = this.props.name;
-        }
-
         editingElement =
           editingElement || actionResult.appState?.editingElement || null;
 
@@ -2698,12 +2694,6 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
       this.setState({
         gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
-      });
-    }
-
-    if (this.props.name && prevProps.name !== this.props.name) {
-      this.setState({
-        name: this.props.name,
       });
     }
 
@@ -4115,7 +4105,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public getName = () => {
-    return this.state.name || `${t("labels.untitled")}-${getDateTime()}`;
+    return (
+      this.state.name ||
+      this.props.name ||
+      `${t("labels.untitled")}-${getDateTime()}`
+    );
   };
 
   // fires only on Safari
