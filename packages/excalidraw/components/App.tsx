@@ -2126,7 +2126,7 @@ class App extends React.Component<AppProps, AppState> {
         let gridSize = actionResult?.appState?.gridSize || null;
         const theme =
           actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
-        let name = actionResult?.appState?.name ?? this.state.name;
+        const name = actionResult?.appState?.name ?? this.state.name;
         const errorMessage =
           actionResult?.appState?.errorMessage ?? this.state.errorMessage;
         if (typeof this.props.viewModeEnabled !== "undefined") {

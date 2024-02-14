@@ -74,7 +74,6 @@ const ImageExportModal = ({
     appStateSnapshot,
   );
 
-  const appProps = useAppProps();
   const [projectName, setProjectName] = useState(name);
   const [exportSelectionOnly, setExportSelectionOnly] = useState(hasSelection);
   const [exportWithBackground, setExportWithBackground] = useState(
