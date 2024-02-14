@@ -28,6 +28,7 @@ import { arrayToMap, cloneJSON, promiseTry, resolvablePromise } from "../utils";
 import { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 import { Queue } from "../queue";
+import { hashElementsVersion, hashString } from "../element";
 
 type LibraryUpdate = {
   /** deleted library items since last onLibraryChange event */
@@ -502,6 +503,19 @@ class AdapterTransaction {
   }
 }
 
+let lastSavedLibraryItemsHash = 0;
+
+const getLibraryItemsHash = (items: LibraryItems) => {
+  return hashString(
+    items
+      .map((item) => {
+        return `${item.id}:${hashElementsVersion(item.elements)}`;
+      })
+      .sort()
+      .join(),
+  );
+};
+
 const persistLibraryUpdate = async (
   adapter: LibraryPersistenceAdapter,
   update: LibraryUpdate,
@@ -545,7 +559,13 @@ const persistLibraryUpdate = async (
       Array.from(nextLibraryItemsMap.values()),
     );
 
-    await adapter.save({ libraryItems: nextLibraryItems });
+    const version = getLibraryItemsHash(nextLibraryItems);
+
+    if (version !== lastSavedLibraryItemsHash) {
+      await adapter.save({ libraryItems: nextLibraryItems });
+    }
+
+    lastSavedLibraryItemsHash = version;
 
     return nextLibraryItems;
   });
@@ -764,9 +784,11 @@ export const useHandleLibrary = (
       // load initial (or migrated) library
       excalidrawAPI
         .updateLibrary({
-          libraryItems: initDataPromise.then(
-            (libraryItems) => libraryItems || [],
-          ),
+          libraryItems: initDataPromise.then((libraryItems) => {
+            const _libraryItems = libraryItems || [];
+            lastSavedLibraryItemsHash = getLibraryItemsHash(_libraryItems);
+            return _libraryItems;
+          }),
           // merge with current library items because we may have already
           // populated it (e.g. by installing 3rd party library which can
           // happen before the DB data is loaded)
@@ -829,6 +851,7 @@ export const useHandleLibrary = (
 
       return () => {
         unsubOnLibraryUpdate();
+        lastSavedLibraryItemsHash = 0;
       };
     },
     [
