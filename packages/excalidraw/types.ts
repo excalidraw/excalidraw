@@ -435,6 +435,7 @@ export interface ExcalidrawProps {
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
+  // @TODO come with better API before v0.18.0
   name?: string;
   renderCustomStats?: (
     elements: readonly NonDeletedExcalidrawElement[],
