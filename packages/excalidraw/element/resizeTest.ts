@@ -73,6 +73,7 @@ export const getElementWithTransformHandleType = (
   scenePointerY: number,
   zoom: Zoom,
   pointerType: PointerType,
+  elementsMap: ElementsMap,
 ) => {
   return elements.reduce((result, element) => {
     if (result) {
@@ -80,7 +81,7 @@ export const getElementWithTransformHandleType = (
     }
     const transformHandleType = resizeTest(
       element,
-      arrayToMap(elements),
+      elementsMap,
       appState,
       scenePointerX,
       scenePointerY,

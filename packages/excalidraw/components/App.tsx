@@ -5063,6 +5063,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
+        this.scene.getNonDeletedElementsMap(),
       );
       if (
         elementWithTransformHandleType &&
@@ -6060,6 +6061,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
             this.state.zoom,
             event.pointerType,
+            this.scene.getNonDeletedElementsMap(),
           );
         if (elementWithTransformHandleType != null) {
           this.setState({
