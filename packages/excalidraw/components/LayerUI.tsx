@@ -195,6 +195,7 @@ const LayerUI = ({
         actionManager={actionManager}
         onExportImage={onExportImage}
         onCloseRequest={() => setAppState({ openDialog: null })}
+        name={app.getName()}
       />
     );
   };

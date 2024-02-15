@@ -7,8 +7,9 @@ export const resaveAsImageWithScene = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
+  name: string,
 ) => {
-  const { exportBackground, viewBackgroundColor, name, fileHandle } = appState;
+  const { exportBackground, viewBackgroundColor, fileHandle } = appState;
 
   const fileHandleType = getFileHandleType(fileHandle);
 

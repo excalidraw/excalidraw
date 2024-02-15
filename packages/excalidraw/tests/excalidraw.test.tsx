@@ -303,7 +303,7 @@ describe("<Excalidraw/>", () => {
   });
 
   describe("Test name prop", () => {
-    it('should allow editing name when the name prop is "undefined"', async () => {
+    it("should allow editing name", async () => {
       const { container } = await render(<Excalidraw />);
       //open menu
       toggleMenu(container);
@@ -315,7 +315,7 @@ describe("<Excalidraw/>", () => {
       expect(textInput?.nodeName).toBe("INPUT");
     });
 
-    it('should set the name and not allow editing when the name prop is present"', async () => {
+    it('should set the name when the name prop is present"', async () => {
       const name = "test";
       const { container } = await render(<Excalidraw name={name} />);
       //open menu
@@ -326,7 +326,6 @@ describe("<Excalidraw/>", () => {
       ) as HTMLInputElement;
       expect(textInput?.value).toEqual(name);
       expect(textInput?.nodeName).toBe("INPUT");
-      expect(textInput?.disabled).toBe(true);
     });
   });
 
