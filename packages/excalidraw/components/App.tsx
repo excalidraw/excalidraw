@@ -7157,7 +7157,7 @@ class App extends React.Component<AppProps, AppState> {
           this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
           const { snapOffset, snapLines } = snapDraggedElements(
-            getSelectedElements(originalElements, this.state),
+            originalElements,
             dragOffset,
             this.state,
             event,
@@ -9083,6 +9083,7 @@ class App extends React.Component<AppProps, AppState> {
           x: gridX - pointerDownState.originInGrid.x,
           y: gridY - pointerDownState.originInGrid.y,
         },
+        this.scene.getNonDeletedElementsMap(),
       );
 
       gridX += snapOffset.x;

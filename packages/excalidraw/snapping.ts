@@ -8,13 +8,17 @@ import {
 import { MaybeTransformHandleType } from "./element/transformHandles";
 import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
 import {
+  ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
 import { rangeIntersection, rangesOverlap, rotatePoint } from "./math";
-import { getVisibleAndNonSelectedElements } from "./scene/selection";
+import {
+  getSelectedElements,
+  getVisibleAndNonSelectedElements,
+} from "./scene/selection";
 import { AppState, KeyboardModifiersObject, Point } from "./types";
 import { arrayToMap } from "./utils";
 
@@ -167,6 +171,7 @@ export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
 
 export const getElementsCorners = (
   elements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
   {
     omitCenter,
     boundingBoxCorners,
@@ -187,7 +192,7 @@ export const getElementsCorners = (
 
     let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
       element,
-      arrayToMap(elements),
+      elementsMap,
     );
 
     if (dragOffset) {
@@ -578,13 +583,13 @@ export const getReferenceSnapPoints = (
     selectedElements,
     appState,
   );
-
+  const elementsMap = arrayToMap(elements);
   return getMaximumGroups(referenceElements, arrayToMap(elements))
     .filter(
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
     )
-    .flatMap((elementGroup) => getElementsCorners(elementGroup));
+    .flatMap((elementGroup) => getElementsCorners(elementGroup, elementsMap));
 };
 
 const getPointSnaps = (
@@ -644,11 +649,12 @@ const getPointSnaps = (
 };
 
 export const snapDraggedElements = (
-  selectedElements: ExcalidrawElement[],
+  elements: ExcalidrawElement[],
   dragOffset: Vector2D,
   appState: AppState,
   event: KeyboardModifiersObject,
 ) => {
+  const selectedElements = getSelectedElements(elements, appState);
   if (
     !isSnappingEnabled({ appState, event, selectedElements }) ||
     selectedElements.length === 0
@@ -661,7 +667,7 @@ export const snapDraggedElements = (
       snapLines: [],
     };
   }
-
+  const elementsMap = arrayToMap(elements);
   dragOffset.x = round(dragOffset.x);
   dragOffset.y = round(dragOffset.y);
   const nearestSnapsX: Snaps = [];
@@ -672,7 +678,7 @@ export const snapDraggedElements = (
     y: snapDistance,
   };
 
-  const selectionPoints = getElementsCorners(selectedElements, {
+  const selectionPoints = getElementsCorners(selectedElements, elementsMap, {
     dragOffset,
   });
 
@@ -722,7 +728,7 @@ export const snapDraggedElements = (
 
   getPointSnaps(
     selectedElements,
-    getElementsCorners(selectedElements, {
+    getElementsCorners(selectedElements, elementsMap, {
       dragOffset: newDragOffset,
     }),
     appState,
@@ -1207,6 +1213,7 @@ export const snapNewElement = (
   event: KeyboardModifiersObject,
   origin: Vector2D,
   dragOffset: Vector2D,
+  elementsMap: ElementsMap,
 ) => {
   if (
     !isSnappingEnabled({ event, selectedElements: [draggingElement], appState })
@@ -1251,7 +1258,7 @@ export const snapNewElement = (
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
 
-  const corners = getElementsCorners([draggingElement], {
+  const corners = getElementsCorners([draggingElement], elementsMap, {
     boundingBoxCorners: true,
     omitCenter: true,
   });
@@ -1302,9 +1309,10 @@ export const getSnapLinesAtPointer = (
 
   const horizontalSnapLines: PointerSnapLine[] = [];
   const verticalSnapLines: PointerSnapLine[] = [];
+  const elementsMap = arrayToMap(elements);
 
   for (const referenceElement of referenceElements) {
-    const corners = getElementsCorners([referenceElement]);
+    const corners = getElementsCorners([referenceElement], elementsMap);
 
     for (const corner of corners) {
       const offsetX = corner[0] - pointer.x;
