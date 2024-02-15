@@ -288,6 +288,7 @@ export const getVisibleGaps = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   const referenceElements: ExcalidrawElement[] = getReferenceElements(
     elements,
@@ -295,10 +296,7 @@ export const getVisibleGaps = (
     appState,
   );
 
-  const referenceBounds = getMaximumGroups(
-    referenceElements,
-    arrayToMap(elements),
-  )
+  const referenceBounds = getMaximumGroups(referenceElements, elementsMap)
     .filter(
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
@@ -577,14 +575,14 @@ export const getReferenceSnapPoints = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: ExcalidrawElement[],
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   const referenceElements = getReferenceElements(
     elements,
     selectedElements,
     appState,
   );
-  const elementsMap = arrayToMap(elements);
-  return getMaximumGroups(referenceElements, arrayToMap(elements))
+  return getMaximumGroups(referenceElements, elementsMap)
     .filter(
       (elementsGroup) =>
         !(elementsGroup.length === 1 && isBoundToContainer(elementsGroup[0])),
@@ -653,6 +651,7 @@ export const snapDraggedElements = (
   dragOffset: Vector2D,
   appState: AppState,
   event: KeyboardModifiersObject,
+  elementsMap: ElementsMap,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   if (
@@ -667,7 +666,6 @@ export const snapDraggedElements = (
       snapLines: [],
     };
   }
-  const elementsMap = arrayToMap(elements);
   dragOffset.x = round(dragOffset.x);
   dragOffset.y = round(dragOffset.y);
   const nearestSnapsX: Snaps = [];
@@ -1286,6 +1284,7 @@ export const getSnapLinesAtPointer = (
   appState: AppState,
   pointer: Vector2D,
   event: KeyboardModifiersObject,
+  elementsMap: ElementsMap,
 ) => {
   if (!isSnappingEnabled({ event, selectedElements: [], appState })) {
     return {
@@ -1309,7 +1308,6 @@ export const getSnapLinesAtPointer = (
 
   const horizontalSnapLines: PointerSnapLine[] = [];
   const verticalSnapLines: PointerSnapLine[] = [];
-  const elementsMap = arrayToMap(elements);
 
   for (const referenceElement of referenceElements) {
     const corners = getElementsCorners([referenceElement], elementsMap);

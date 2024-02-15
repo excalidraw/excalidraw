@@ -4873,6 +4873,7 @@ class App extends React.Component<AppProps, AppState> {
           y: scenePointerY,
         },
         event,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       this.setState((prevState) => {
@@ -6860,6 +6861,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           selectedElements,
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         ),
       );
     }
@@ -6883,6 +6885,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           selectedElements,
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         ),
       );
     }
@@ -7162,6 +7165,7 @@ class App extends React.Component<AppProps, AppState> {
             dragOffset,
             this.state,
             event,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           this.setState({ snapLines });

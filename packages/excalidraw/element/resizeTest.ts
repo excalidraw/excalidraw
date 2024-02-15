@@ -15,7 +15,6 @@ import {
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
 import { Bounds } from "./bounds";
-import { arrayToMap } from "../utils";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
