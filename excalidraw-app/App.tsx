@@ -709,9 +709,8 @@ const ExcalidrawWrapper = () => {
             toggleTheme: true,
             export: {
               onExportToBackend,
-              renderCustomUI: !excalidrawAPI
-                ? undefined
-                : (elements, appState, files) => {
+              renderCustomUI: excalidrawAPI
+                ? (elements, appState, files) => {
                     return (
                       <ExportToExcalidrawPlus
                         elements={elements}
@@ -732,7 +731,8 @@ const ExcalidrawWrapper = () => {
                         }}
                       />
                     );
-                  },
+                  }
+                : undefined,
             },
           },
         }}
