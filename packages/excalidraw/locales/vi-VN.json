@@ -302,13 +302,13 @@
     "sceneContent": ""
   },
   "shareDialog": {
-    "or": ""
+    "or": "Hoặc"
   },
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
+    "button_startSession": "Bắt đầu phiên",
+    "button_stopSession": "Kết thúc phiên",
     "desc_inProgressIntro": "",
     "desc_shareLink": "",
     "desc_exitSession": "",
