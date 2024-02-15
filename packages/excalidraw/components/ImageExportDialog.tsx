@@ -32,7 +32,6 @@ import { Switch } from "./Switch";
 import { Tooltip } from "./Tooltip";
 
 import "./ImageExportDialog.scss";
-import { useAppProps } from "./App";
 import { FilledButton } from "./FilledButton";
 import { cloneJSON } from "../utils";
 import { prepareElementsForExport } from "../data";
@@ -58,6 +57,7 @@ type ImageExportModalProps = {
   files: BinaryFiles;
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
+  name: string;
 };
 
 const ImageExportModal = ({
@@ -66,14 +66,14 @@ const ImageExportModal = ({
   files,
   actionManager,
   onExportImage,
+  name,
 }: ImageExportModalProps) => {
   const hasSelection = isSomeElementSelected(
     elementsSnapshot,
     appStateSnapshot,
   );
 
-  const appProps = useAppProps();
-  const [projectName, setProjectName] = useState(appStateSnapshot.name);
+  const [projectName, setProjectName] = useState(name);
   const [exportSelectionOnly, setExportSelectionOnly] = useState(hasSelection);
   const [exportWithBackground, setExportWithBackground] = useState(
     appStateSnapshot.exportBackground,
@@ -158,10 +158,6 @@ const ImageExportModal = ({
               className="TextInput"
               value={projectName}
               style={{ width: "30ch" }}
-              disabled={
-                typeof appProps.name !== "undefined" ||
-                appStateSnapshot.viewModeEnabled
-              }
               onChange={(event) => {
                 setProjectName(event.target.value);
                 actionManager.executeAction(
@@ -347,6 +343,7 @@ export const ImageExportDialog = ({
   actionManager,
   onExportImage,
   onCloseRequest,
+  name,
 }: {
   appState: UIAppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -354,6 +351,7 @@ export const ImageExportDialog = ({
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
   onCloseRequest: () => void;
+  name: string;
 }) => {
   // we need to take a snapshot so that the exported state can't be modified
   // while the dialog is open
@@ -372,6 +370,7 @@ export const ImageExportDialog = ({
         files={files}
         actionManager={actionManager}
         onExportImage={onExportImage}
+        name={name}
       />
     </Dialog>
   );
