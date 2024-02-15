@@ -61,6 +61,7 @@ import {
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
+  FONT_METRICS,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -391,22 +392,22 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
+
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
         );
 
-        const metrics = context.measureText(element.text);
+        const { unitsPerEm, ascender, descender } =
+          FONT_METRICS[element.fontFamily];
+
+        const fontSizeEm = element.fontSize / unitsPerEm;
         const lineGap =
-          lineHeightPx -
-          (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent);
-        /**
-         * Set a vertical offset to be aligned with <textarea>.
-         * - `fontBoundingBoxAscent` is here the font bouding box with its default line-height used in textareas
-         * - half of the line gap is the additional padding above and below the bounding box when line-height isn't equal to the default value
-         * - for details check - https://codesandbox.io/p/devbox/v4nsqz?file=%2Fsrc%2Findex.js%3A1%2C1-166%2C1
-         */
-        context.translate(0, metrics.fontBoundingBoxAscent + lineGap / 2);
+          lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender;
+
+        const verticalOffset = fontSizeEm * ascender + lineGap;
+
+        context.translate(0, verticalOffset);
 
         for (let index = 0; index < lines.length; index++) {
           context.fillText(

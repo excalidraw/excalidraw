@@ -272,8 +272,6 @@ export const computeBoundTextPosition = (
   return { x, y };
 };
 
-// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-
 export const measureText = (
   text: string,
   font: FontString,
@@ -887,12 +885,39 @@ const DEFAULT_LINE_HEIGHT = {
   // ~1.25 is the average for Virgil in WebKit and Blink.
   // Gecko (FF) uses ~1.28.
   [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
-  // ~1.15 is the average for Virgil in WebKit and Blink.
-  // Gecko if all over the place.
+  // ~1.15 is the average for Helvetica in WebKit and Blink.
   [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
-  // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
+  // ~1.2 is the average for Cascadia in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
+
+type FontMetrics = {
+  unitsPerEm: number; // head.unitsPerEm
+  ascender: number; // sTypoAscender
+  descender: number; // sTypoDescender
+};
+
+/**
+ * Hardcoded metrics for default fonts, read by https://opentype.js.org/font-inspector.html.
+ * For custom fonts, read these metrics on load and extend this object.
+ */
+export const FONT_METRICS = {
+  [FONT_FAMILY.Virgil]: {
+    unitsPerEm: 1000,
+    ascender: 886,
+    descender: -374,
+  },
+  [FONT_FAMILY.Helvetica]: {
+    unitsPerEm: 2048,
+    ascender: 1577,
+    descender: -471,
+  },
+  [FONT_FAMILY.Cascadia]: {
+    unitsPerEm: 2048,
+    ascender: 1977,
+    descender: -480,
+  },
+} as Record<number, FontMetrics>;
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
   if (fontFamily in DEFAULT_LINE_HEIGHT) {
