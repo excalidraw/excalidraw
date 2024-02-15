@@ -1,4 +1,5 @@
 import {
+  ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -11,7 +12,7 @@ import {
   getContainingFrame,
   getFrameChildren,
 } from "../frame";
-import { arrayToMap, isShallowEqual } from "../utils";
+import { isShallowEqual } from "../utils";
 import { isElementInViewport } from "../element/sizeHelpers";
 
 /**
@@ -44,9 +45,9 @@ export const excludeElementsInFramesFromSelection = <
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   excludeElementsInFrames: boolean = true,
 ) => {
-  const elementsMap = arrayToMap(elements);
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
     getElementAbsoluteCoords(selection, elementsMap);
 

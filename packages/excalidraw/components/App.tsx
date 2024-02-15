@@ -7374,6 +7374,7 @@ class App extends React.Component<AppProps, AppState> {
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           this.setState((prevState) => {
@@ -7883,6 +7884,7 @@ class App extends React.Component<AppProps, AppState> {
           const elementsInsideFrame = getElementsInNewFrame(
             this.scene.getElementsIncludingDeleted(),
             draggingElement,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           this.scene.replaceAllElements(

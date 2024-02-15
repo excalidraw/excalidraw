@@ -83,9 +83,10 @@ export function isElementIntersectingFrame(
 export const getElementsCompletelyInFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) =>
   omitGroupsContainingFrameLikes(
-    getElementsWithinSelection(elements, frame, false),
+    getElementsWithinSelection(elements, frame, elementsMap, false),
   ).filter(
     (element) =>
       (!isFrameLikeElement(element) && !element.frameId) ||
@@ -96,8 +97,9 @@ export const isElementContainingFrame = (
   elements: readonly ExcalidrawElement[],
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
-  return getElementsWithinSelection(elements, element).some(
+  return getElementsWithinSelection(elements, element, elementsMap).some(
     (e) => e.id === frame.id,
   );
 };
@@ -141,7 +143,7 @@ export const elementOverlapsWithFrame = (
   return (
     elementsAreInFrameBounds([element], frame, elementsMap) ||
     isElementIntersectingFrame(element, frame, elementsMap) ||
-    isElementContainingFrame([frame], element, frame)
+    isElementContainingFrame([frame], element, frame, elementsMap)
   );
 };
 
@@ -278,9 +280,9 @@ export const getElementsInResizingFrame = (
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
   const elementsCompletelyInFrame = new Set([
-    ...getElementsCompletelyInFrame(allElements, frame),
+    ...getElementsCompletelyInFrame(allElements, frame, elementsMap),
     ...prevElementsInFrame.filter((element) =>
-      isElementContainingFrame(allElements, element, frame),
+      isElementContainingFrame(allElements, element, frame, elementsMap),
     ),
   ]);
 
@@ -363,12 +365,13 @@ export const getElementsInResizingFrame = (
 };
 
 export const getElementsInNewFrame = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+  elements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
   return omitGroupsContainingFrameLikes(
-    allElements,
-    getElementsCompletelyInFrame(allElements, frame),
+    elements,
+    getElementsCompletelyInFrame(elements, frame, elementsMap),
   );
 };
 
