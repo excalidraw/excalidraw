@@ -239,9 +239,9 @@ const duplicateElements = (
   // ---------------------------------------------------------------------------
 
   bindTextToShapeAfterDuplication(
+    elementsWithClones,
     oldElements,
     oldIdToDuplicatedId,
-    arrayToMap(elementsWithClones),
   );
   fixBindingsAfterDuplication(
     elementsWithClones,

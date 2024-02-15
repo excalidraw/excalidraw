@@ -1,4 +1,4 @@
-import { getFontString, isTestEnv, normalizeEOL } from "../utils";
+import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
 import {
   ElementsMap,
   ExcalidrawElement,
@@ -124,10 +124,14 @@ export const redrawTextBoundingBox = (
 };
 
 export const bindTextToShapeAfterDuplication = (
+  newElements: ExcalidrawElement[],
   oldElements: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-  elementsMap: ElementsMap,
 ): void => {
+  const newElementsMap = arrayToMap(newElements) as Map<
+    ExcalidrawElement["id"],
+    ExcalidrawElement
+  >;
   oldElements.forEach((element) => {
     const newElementId = oldIdToDuplicatedId.get(element.id) as string;
     const boundTextElementId = getBoundTextElementId(element);
@@ -135,7 +139,7 @@ export const bindTextToShapeAfterDuplication = (
     if (boundTextElementId) {
       const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId);
       if (newTextElementId) {
-        const newContainer = elementsMap.get(newElementId);
+        const newContainer = newElementsMap.get(newElementId);
         if (newContainer) {
           mutateElement(newContainer, {
             boundElements: (element.boundElements || [])
@@ -150,7 +154,7 @@ export const bindTextToShapeAfterDuplication = (
               }),
           });
         }
-        const newTextElement = elementsMap.get(newTextElementId);
+        const newTextElement = newElementsMap.get(newTextElementId);
         if (newTextElement && isTextElement(newTextElement)) {
           mutateElement(newTextElement, {
             containerId: newContainer ? newElementId : null,

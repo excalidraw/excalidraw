@@ -7249,9 +7249,9 @@ class App extends React.Component<AppProps, AppState> {
             }
             const nextSceneElements = [...nextElements, ...elementsToAppend];
             bindTextToShapeAfterDuplication(
+              nextElements,
               elementsToAppend,
               oldIdToDuplicatedId,
-              this.scene.getNonDeletedElementsMap(),
             );
             fixBindingsAfterDuplication(
               nextSceneElements,
