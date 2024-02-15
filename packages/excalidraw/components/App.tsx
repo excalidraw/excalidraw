@@ -4631,6 +4631,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
         sceneX,
         sceneY,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       if (container) {
@@ -6367,6 +6368,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
       sceneX,
       sceneY,
+      this.scene.getNonDeletedElementsMap(),
     );
 
     if (hasBoundTextElement(element)) {
@@ -7247,9 +7249,9 @@ class App extends React.Component<AppProps, AppState> {
             }
             const nextSceneElements = [...nextElements, ...elementsToAppend];
             bindTextToShapeAfterDuplication(
-              nextElements,
               elementsToAppend,
               oldIdToDuplicatedId,
+              this.scene.getNonDeletedElementsMap(),
             );
             fixBindingsAfterDuplication(
               nextSceneElements,

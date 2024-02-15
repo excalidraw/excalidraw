@@ -231,6 +231,7 @@ const bindLinearElementToElement = (
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
+  elementsMap: ElementsMap,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -243,8 +244,6 @@ const bindLinearElementToElement = (
     startBinding: linearElement?.startBinding || null,
     endBinding: linearElement.endBinding || null,
   });
-
-  const elementsMap = arrayToMap(elementStore.getElements());
 
   if (start) {
     const width = start?.width ?? DEFAULT_DIMENSION;
@@ -658,6 +657,7 @@ export const convertToExcalidrawElements = (
                 originalStart,
                 originalEnd,
                 elementStore,
+                elementsMap,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -682,6 +682,7 @@ export const convertToExcalidrawElements = (
                   start,
                   end,
                   elementStore,
+                  elementsMap,
                 );
 
               elementStore.add(linearElement);

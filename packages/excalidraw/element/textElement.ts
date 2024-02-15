@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
+import { getFontString, isTestEnv, normalizeEOL } from "../utils";
 import {
   ElementsMap,
   ExcalidrawElement,
@@ -124,14 +124,10 @@ export const redrawTextBoundingBox = (
 };
 
 export const bindTextToShapeAfterDuplication = (
-  sceneElements: ExcalidrawElement[],
   oldElements: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+  elementsMap: ElementsMap,
 ): void => {
-  const sceneElementMap = arrayToMap(sceneElements) as Map<
-    ExcalidrawElement["id"],
-    ExcalidrawElement
-  >;
   oldElements.forEach((element) => {
     const newElementId = oldIdToDuplicatedId.get(element.id) as string;
     const boundTextElementId = getBoundTextElementId(element);
@@ -139,7 +135,7 @@ export const bindTextToShapeAfterDuplication = (
     if (boundTextElementId) {
       const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId);
       if (newTextElementId) {
-        const newContainer = sceneElementMap.get(newElementId);
+        const newContainer = elementsMap.get(newElementId);
         if (newContainer) {
           mutateElement(newContainer, {
             boundElements: (element.boundElements || [])
@@ -154,7 +150,7 @@ export const bindTextToShapeAfterDuplication = (
               }),
           });
         }
-        const newTextElement = sceneElementMap.get(newTextElementId);
+        const newTextElement = elementsMap.get(newTextElementId);
         if (newTextElement && isTextElement(newTextElement)) {
           mutateElement(newTextElement, {
             containerId: newContainer ? newElementId : null,
@@ -818,8 +814,8 @@ export const getTextBindableContainerAtPosition = (
   appState: AppState,
   x: number,
   y: number,
+  elementsMap: ElementsMap,
 ): ExcalidrawTextContainer | null => {
-  const elementsMap = arrayToMap(elements);
   const selectedElements = getSelectedElements(elements, appState);
   if (selectedElements.length === 1) {
     return isTextBindableContainer(selectedElements[0], false)
