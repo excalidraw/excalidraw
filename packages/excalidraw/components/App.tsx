@@ -8744,7 +8744,7 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length > 50) {
       return;
     }
-    const suggestedBindings = getEligibleElementsForBinding(selectedElements);
+    const suggestedBindings = getEligibleElementsForBinding(selectedElements, this.scene.getNonDeletedElementsMap());
     this.setState({ suggestedBindings });
   }
 
