@@ -4009,9 +4009,10 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (isArrowKey(event.key)) {
       const selectedElements = this.scene.getSelectedElements(this.state);
+      const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements)
-        : unbindLinearElements(selectedElements);
+        ? bindOrUnbindSelectedElements(selectedElements, elementsMap)
+        : unbindLinearElements(selectedElements, elementsMap);
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -8214,7 +8215,10 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         (isBindingEnabled(this.state)
           ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(this.scene.getSelectedElements(this.state));
+          : unbindLinearElements)(
+          this.scene.getSelectedElements(this.state),
+          elementsMap,
+        );
       }
 
       if (activeTool.type === "laser") {
@@ -8744,7 +8748,10 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length > 50) {
       return;
     }
-    const suggestedBindings = getEligibleElementsForBinding(selectedElements, this.scene.getNonDeletedElementsMap());
+    const suggestedBindings = getEligibleElementsForBinding(
+      selectedElements,
+      this.scene.getNonDeletedElementsMap(),
+    );
     this.setState({ suggestedBindings });
   }
 

@@ -150,19 +150,27 @@ const bindOrUnbindLinearElementEdge = (
 };
 
 export const bindOrUnbindSelectedElements = (
-  elements: NonDeleted<ExcalidrawElement>[],
+  selectedElements: NonDeleted<ExcalidrawElement>[],
+  elementsMap: ElementsMap,
 ): void => {
-  const elementsMap = arrayToMap(elements);
-  elements.forEach((element) => {
-    if (isBindingElement(element)) {
+  selectedElements.forEach((selectedElement) => {
+    if (isBindingElement(selectedElement)) {
       bindOrUnbindLinearElement(
-        element,
-        getElligibleElementForBindingElement(element, "start", elementsMap),
-        getElligibleElementForBindingElement(element, "end", elementsMap),
+        selectedElement,
+        getElligibleElementForBindingElement(
+          selectedElement,
+          "start",
+          elementsMap,
+        ),
+        getElligibleElementForBindingElement(
+          selectedElement,
+          "end",
+          elementsMap,
+        ),
         elementsMap,
       );
-    } else if (isBindableElement(element)) {
-      maybeBindBindableElement(element, elementsMap);
+    } else if (isBindableElement(selectedElement)) {
+      maybeBindBindableElement(selectedElement, elementsMap);
     }
   });
 };
@@ -266,8 +274,8 @@ export const isLinearElementSimpleAndAlreadyBound = (
 
 export const unbindLinearElements = (
   elements: NonDeleted<ExcalidrawElement>[],
+  elementsMap: ElementsMap,
 ): void => {
-  const elementsMap = arrayToMap(elements);
   elements.forEach((element) => {
     if (isBindingElement(element)) {
       bindOrUnbindLinearElement(element, null, null, elementsMap);
