@@ -20,7 +20,6 @@ import {
   getVisibleAndNonSelectedElements,
 } from "./scene/selection";
 import { AppState, KeyboardModifiersObject, Point } from "./types";
-import { arrayToMap } from "./utils";
 
 const SNAP_DISTANCE = 8;
 
