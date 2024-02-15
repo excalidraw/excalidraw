@@ -4370,6 +4370,7 @@ class App extends React.Component<AppProps, AppState> {
                   !(isTextElement(element) && element.containerId)),
             );
 
+    const elementsMap = this.scene.getNonDeletedElementsMap();
     return getElementsAtPosition(elements, (element) =>
       hitTest(
         element,
@@ -4377,7 +4378,7 @@ class App extends React.Component<AppProps, AppState> {
         this.frameNameBoundsCache,
         x,
         y,
-        this.scene.getNonDeletedElementsMap(),
+        elementsMap,
       ),
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
@@ -4385,11 +4386,7 @@ class App extends React.Component<AppProps, AppState> {
       return containingFrame &&
         this.state.frameRendering.enabled &&
         this.state.frameRendering.clip
-        ? isCursorInFrame(
-            { x, y },
-            containingFrame,
-            this.scene.getNonDeletedElements(),
-          )
+        ? isCursorInFrame({ x, y }, containingFrame, elementsMap)
         : true;
     });
   }
@@ -4768,10 +4765,11 @@ class App extends React.Component<AppProps, AppState> {
     x: number;
     y: number;
   }) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
     const frames = this.scene
       .getNonDeletedFramesLikes()
       .filter((frame): frame is ExcalidrawFrameLikeElement =>
-        isCursorInFrame(sceneCoords, frame, this.scene.getNonDeletedElements()),
+        isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
@@ -7935,6 +7933,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getElementsIncludingDeleted(),
               frame,
               this.state,
+              elementsMap,
             ),
             frame,
             this,
@@ -9129,6 +9128,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElements(),
             draggingElement as ExcalidrawFrameLikeElement,
             this.state,
+            this.scene.getNonDeletedElementsMap(),
           ),
         });
       }
@@ -9248,6 +9248,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           frame,
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         ).forEach((element) => elementsToHighlight.add(element));
       });
 

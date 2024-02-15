@@ -115,10 +115,11 @@ export const getElementsIntersectingFrame = (
 export const elementsAreInFrameBounds = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
   const [frameX1, frameY1, frameX2, frameY2] = getElementAbsoluteCoords(
     frame,
-    arrayToMap(elements),
+    elementsMap,
   );
 
   const [elementX1, elementY1, elementX2, elementY2] =
@@ -138,7 +139,7 @@ export const elementOverlapsWithFrame = (
   elementsMap: ElementsMap,
 ) => {
   return (
-    elementsAreInFrameBounds([element], frame) ||
+    elementsAreInFrameBounds([element], frame, elementsMap) ||
     isElementIntersectingFrame(element, frame, elementsMap) ||
     isElementContainingFrame([frame], element, frame)
   );
@@ -150,12 +151,9 @@ export const isCursorInFrame = (
     y: number;
   },
   frame: NonDeleted<ExcalidrawFrameLikeElement>,
-  elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ) => {
-  const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(
-    frame,
-    arrayToMap(elements),
-  );
+  const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
 
   return isPointWithinBounds(
     [fx1, fy1],
@@ -180,7 +178,7 @@ export const groupsAreAtLeastIntersectingTheFrame = (
 
   return !!elementsInGroup.find(
     (element) =>
-      elementsAreInFrameBounds([element], frame) ||
+      elementsAreInFrameBounds([element], frame, elementsMap) ||
       isElementIntersectingFrame(element, frame, elementsMap),
   );
 };
@@ -202,7 +200,7 @@ export const groupsAreCompletelyOutOfFrame = (
   return (
     elementsInGroup.find(
       (element) =>
-        elementsAreInFrameBounds([element], frame) ||
+        elementsAreInFrameBounds([element], frame, elementsMap) ||
         isElementIntersectingFrame(element, frame, elementsMap),
     ) === undefined
   );
@@ -274,8 +272,8 @@ export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
   appState: AppState,
+  elementsMap: ElementsMap,
 ): ExcalidrawElement[] => {
-  const elementsMap = arrayToMap(allElements);
   const prevElementsInFrame = getFrameChildren(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
@@ -351,7 +349,7 @@ export const getElementsInResizingFrame = (
     if (isSelected) {
       const elementsInGroup = getElementsInGroup(allElements, id);
 
-      if (elementsAreInFrameBounds(elementsInGroup, frame)) {
+      if (elementsAreInFrameBounds(elementsInGroup, frame, elementsMap)) {
         for (const element of elementsInGroup) {
           nextElementsInFrame.add(element);
         }
