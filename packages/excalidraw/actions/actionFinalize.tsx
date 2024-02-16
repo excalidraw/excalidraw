@@ -26,7 +26,7 @@ export const actionFinalize = register({
     _,
     { interactiveCanvas, focusContainer, scene },
   ) => {
-    const elementsMap = arrayToMap(elements);
+    const elementsMap = scene.getNonDeletedElementsMap();
 
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =

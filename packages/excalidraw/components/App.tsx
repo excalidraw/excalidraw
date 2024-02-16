@@ -2603,7 +2603,7 @@ class App extends React.Component<AppProps, AppState> {
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
-    const elementsMap = this.scene.getElementsMapIncludingDeleted();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });

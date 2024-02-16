@@ -76,7 +76,7 @@ describe("move element", () => {
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
     const line = UI.createElement("line", { x: 110, y: 50, size: 80 });
-    const elementsMap = arrayToMap(h.elements);
+    const elementsMap = h.app.scene.getNonDeletedElementsMap();
     // bind line to two rectangles
     bindOrUnbindLinearElement(
       line.get() as NonDeleted<ExcalidrawLinearElement>,

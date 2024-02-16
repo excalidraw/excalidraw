@@ -4,7 +4,6 @@ import { getNonDeletedElements } from "../element";
 import {
   ExcalidrawElement,
   NonDeleted,
-  NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
 } from "../element/types";
 import { resizeMultipleElements } from "../element/resizeElements";
@@ -68,7 +67,7 @@ export const actionFlipVertical = register({
 
 const flipSelectedElements = (
   elements: readonly ExcalidrawElement[],
-  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   appState: Readonly<AppState>,
   flipDirection: "horizontal" | "vertical",
 ) => {
@@ -99,7 +98,7 @@ const flipSelectedElements = (
 const flipElements = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
   elements: readonly ExcalidrawElement[],
-  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
 ): ExcalidrawElement[] => {

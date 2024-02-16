@@ -7,6 +7,7 @@ import {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "./types";
 import {
   distance2d,
@@ -137,7 +138,7 @@ export class LinearElementEditor {
     event: PointerEvent,
     appState: AppState,
     setState: React.Component<any, AppState>["setState"],
-    elementsMap: ElementsMap,
+    elementsMap: NonDeletedSceneElementsMap,
   ) {
     if (
       !appState.editingLinearElement ||
@@ -199,7 +200,7 @@ export class LinearElementEditor {
       pointSceneCoords: { x: number; y: number }[],
     ) => void,
     linearElementEditor: LinearElementEditor,
-    elementsMap: ElementsMap,
+    elementsMap: NonDeletedSceneElementsMap,
   ): boolean {
     if (!linearElementEditor) {
       return false;
@@ -334,7 +335,7 @@ export class LinearElementEditor {
     editingLinearElement: LinearElementEditor,
     appState: AppState,
     elements: readonly NonDeletedExcalidrawElement[],
-    elementsMap: ElementsMap,
+    elementsMap: NonDeletedSceneElementsMap,
   ): LinearElementEditor {
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -645,7 +646,7 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
     elements: readonly NonDeletedExcalidrawElement[],
-    elementsMap: ElementsMap,
+    elementsMap: NonDeletedSceneElementsMap,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
