@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
 import { Excalidraw } from "../index";
@@ -13,7 +12,6 @@ import {
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
-import { arrayToMap } from "../utils";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
