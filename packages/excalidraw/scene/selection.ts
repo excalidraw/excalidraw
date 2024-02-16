@@ -1,4 +1,5 @@
 import {
+  ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -44,10 +45,11 @@ export const excludeElementsInFramesFromSelection = <
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   excludeElementsInFrames: boolean = true,
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(selection);
+    getElementAbsoluteCoords(selection, elementsMap);
 
   let elementsInSelection = elements.filter((element) => {
     let [elementX1, elementY1, elementX2, elementY2] =
@@ -82,7 +84,7 @@ export const getElementsWithinSelection = (
     const containingFrame = getContainingFrame(element);
 
     if (containingFrame) {
-      return elementOverlapsWithFrame(element, containingFrame);
+      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
     }
 
     return true;
