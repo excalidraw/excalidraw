@@ -1,4 +1,5 @@
 import {
+  ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   PointerType,
@@ -230,6 +231,8 @@ export const getTransformHandlesFromCoords = (
 export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
+  elementsMap: ElementsMap,
+
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
@@ -267,7 +270,7 @@ export const getTransformHandles = (
     ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8
     : DEFAULT_TRANSFORM_HANDLE_SPACING;
   return getTransformHandlesFromCoords(
-    getElementAbsoluteCoords(element, true),
+    getElementAbsoluteCoords(element, elementsMap, true),
     element.angle,
     zoom,
     pointerType,

@@ -7,6 +7,7 @@ import {
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
+  ElementsMap,
 } from "../element/types";
 import {
   isTextElement,
@@ -137,6 +138,7 @@ export interface ExcalidrawElementWithCanvas {
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   zoom: Zoom,
 ): {
   width: number;
@@ -155,7 +157,7 @@ const cappedElementCanvasSize = (
 
   const padding = getCanvasPadding(element);
 
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const elementWidth =
     isLinearElement(element) || isFreeDrawElement(element)
       ? distance(x1, x2)
@@ -200,7 +202,11 @@ const generateElementCanvas = (
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
-  const { width, height, scale } = cappedElementCanvasSize(element, zoom);
+  const { width, height, scale } = cappedElementCanvasSize(
+    element,
+    elementsMap,
+    zoom,
+  );
 
   canvas.width = width;
   canvas.height = height;
@@ -209,7 +215,7 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const [x1, y1] = getElementAbsoluteCoords(element);
+    const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
 
     canvasOffsetX =
       element.x > x1
@@ -468,7 +474,7 @@ const drawElementFromCanvas = (
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
   const zoom = elementWithCanvas.scale;
-  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
 
   // Free draw elements will otherwise "shuffle" as the min x and y change
   if (isFreeDrawElement(element)) {
@@ -513,8 +519,10 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas.height,
     );
 
-    const [, , , , boundTextCx, boundTextCy] =
-      getElementAbsoluteCoords(boundTextElement);
+    const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
+      boundTextElement,
+      allElementsMap,
+    );
 
     tempCanvasContext.rotate(-element.angle);
 
@@ -694,7 +702,7 @@ export const renderElement = (
       ShapeCache.generateElementShape(element, null);
 
       if (renderConfig.isExporting) {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
         const cy = (y1 + y2) / 2 + appState.scrollY;
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
@@ -737,7 +745,7 @@ export const renderElement = (
       // rely on existing shapes
       ShapeCache.generateElementShape(element, renderConfig);
       if (renderConfig.isExporting) {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
         const cy = (y1 + y2) / 2 + appState.scrollY;
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
@@ -749,6 +757,7 @@ export const renderElement = (
               LinearElementEditor.getBoundTextElementPosition(
                 container,
                 element as ExcalidrawTextElementWithContainer,
+                elementsMap,
               );
             shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
             shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
@@ -804,8 +813,10 @@ export const renderElement = (
           tempCanvasContext.rotate(-element.angle);
 
           // Shift the canvas to center of bound text
-          const [, , , , boundTextCx, boundTextCy] =
-            getElementAbsoluteCoords(boundTextElement);
+          const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
+            boundTextElement,
+            elementsMap,
+          );
           const boundTextShiftX = (x1 + x2) / 2 - boundTextCx;
           const boundTextShiftY = (y1 + y2) / 2 - boundTextCy;
           tempCanvasContext.translate(-boundTextShiftX, -boundTextShiftY);
@@ -939,17 +950,18 @@ export const renderElementToSvg = (
   renderConfig: SVGRenderConfig,
 ) => {
   const offset = { x: offsetX, y: offsetY };
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
   if (isTextElement(element)) {
     const container = getContainerElement(element, elementsMap);
     if (isArrowElement(container)) {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(container);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(container, elementsMap);
 
       const boundTextCoords = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,
+        elementsMap,
       );
       cx = (x2 - x1) / 2 - (boundTextCoords.x - x1);
       cy = (y2 - y1) / 2 - (boundTextCoords.y - y1);
@@ -1151,6 +1163,7 @@ export const renderElementToSvg = (
         const boundTextCoords = LinearElementEditor.getBoundTextElementPosition(
           element,
           boundText,
+          elementsMap,
         );
 
         const maskX = offsetX + boundTextCoords.x - element.x;

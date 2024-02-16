@@ -1,4 +1,5 @@
 import { ROUNDNESS } from "../constants";
+import { arrayToMap } from "../utils";
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 
@@ -35,26 +36,26 @@ const _ce = ({
 
 describe("getElementAbsoluteCoords", () => {
   it("test x1 coordinate", () => {
-    const [x1] = getElementAbsoluteCoords(_ce({ x: 10, y: 0, w: 10, h: 0 }));
+    const element = _ce({ x: 10, y: 20, w: 10, h: 0 });
+    const [x1] = getElementAbsoluteCoords(element, arrayToMap([element]));
     expect(x1).toEqual(10);
   });
 
   it("test x2 coordinate", () => {
-    const [, , x2] = getElementAbsoluteCoords(
-      _ce({ x: 10, y: 0, w: 10, h: 0 }),
-    );
+    const element = _ce({ x: 10, y: 20, w: 10, h: 0 });
+    const [, , x2] = getElementAbsoluteCoords(element, arrayToMap([element]));
     expect(x2).toEqual(20);
   });
 
   it("test y1 coordinate", () => {
-    const [, y1] = getElementAbsoluteCoords(_ce({ x: 0, y: 10, w: 0, h: 10 }));
+    const element = _ce({ x: 0, y: 10, w: 0, h: 10 });
+    const [, y1] = getElementAbsoluteCoords(element, arrayToMap([element]));
     expect(y1).toEqual(10);
   });
 
   it("test y2 coordinate", () => {
-    const [, , , y2] = getElementAbsoluteCoords(
-      _ce({ x: 0, y: 10, w: 0, h: 10 }),
-    );
+    const element = _ce({ x: 0, y: 10, w: 0, h: 10 });
+    const [, , , y2] = getElementAbsoluteCoords(element, arrayToMap([element]));
     expect(y2).toEqual(20);
   });
 });

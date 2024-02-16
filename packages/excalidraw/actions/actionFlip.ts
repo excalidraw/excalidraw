@@ -115,7 +115,7 @@ const flipElements = (
 
   (isBindingEnabled(appState)
     ? bindOrUnbindSelectedElements
-    : unbindLinearElements)(selectedElements);
+    : unbindLinearElements)(selectedElements, elementsMap);
 
   return selectedElements;
 };

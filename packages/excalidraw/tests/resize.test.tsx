@@ -13,6 +13,7 @@ import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { arrayToMap } from "../utils";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -301,10 +302,12 @@ describe("arrow element", () => {
       ],
     });
     const label = await UI.editText(arrow, "Hello");
+    const elementsMap = arrayToMap(h.elements);
     UI.resize(arrow, "se", [50, 30]);
     let labelPos = LinearElementEditor.getBoundTextElementPosition(
       arrow,
       label,
+      elementsMap,
     );
 
     expect(labelPos.x + label.width / 2).toBeCloseTo(
@@ -317,7 +320,11 @@ describe("arrow element", () => {
     expect(label.fontSize).toEqual(20);
 
     UI.resize(arrow, "w", [20, 0]);
-    labelPos = LinearElementEditor.getBoundTextElementPosition(arrow, label);
+    labelPos = LinearElementEditor.getBoundTextElementPosition(
+      arrow,
+      label,
+      elementsMap,
+    );
 
     expect(labelPos.x + label.width / 2).toBeCloseTo(
       arrow.x + arrow.points[2][0],
@@ -743,15 +750,17 @@ describe("multiple selection", () => {
     const selectionTop = 20 - topArrowLabel.height / 2;
     const move = [80, 0] as [number, number];
     const scale = move[0] / selectionWidth + 1;
-
+    const elementsMap = arrayToMap(h.elements);
     UI.resize([topArrow.get(), bottomArrow.get()], "se", move);
     const topArrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
       topArrow,
       topArrowLabel,
+      elementsMap,
     );
     const bottomArrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
       bottomArrow,
       bottomArrowLabel,
+      elementsMap,
     );
 
     expect(topArrow.x).toBeCloseTo(0);
@@ -944,12 +953,13 @@ describe("multiple selection", () => {
     const scaleX = move[0] / selectionWidth + 1;
     const scaleY = -scaleX;
     const lineOrigBounds = getBoundsFromPoints(line);
-
+    const elementsMap = arrayToMap(h.elements);
     UI.resize([line, image, rectangle, boundArrow], "se", move);
     const lineNewBounds = getBoundsFromPoints(line);
     const arrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
       boundArrow,
       arrowLabel,
+      elementsMap,
     );
 
     expect(line.x).toBeCloseTo(60 * scaleX);

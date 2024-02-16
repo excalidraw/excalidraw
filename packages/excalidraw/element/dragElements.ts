@@ -65,7 +65,7 @@ export const dragSelectedElements = (
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
-    updateBoundElements(element, {
+    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
       simultaneouslyUpdated: Array.from(elementsToUpdate),
     });
   });
