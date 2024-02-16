@@ -786,10 +786,10 @@ const newBoundElementsAfterDeletion = (
 export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
-  appInstance: AppClassProperties,
+  app: AppClassProperties,
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height);
-  const shape = appInstance.getElementShape(element);
+  const shape = app.getElementShape(element);
   return isPointOnShape([x, y], shape, threshold);
 };
 
