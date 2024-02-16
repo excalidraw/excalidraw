@@ -49,7 +49,7 @@ export type HitTestArgs = {
   frameNameBound?: FrameNameBounds | null;
 };
 
-export const hitElementItselfOnly = ({
+export const hitElementItself = ({
   x,
   y,
   element,
@@ -89,7 +89,7 @@ export const hitElementBoundingBox = (
 
 export const hitElementBoundingBoxOnly = (hitArgs: HitTestArgs) => {
   return (
-    !hitElementItselfOnly(hitArgs) &&
+    !hitElementItself(hitArgs) &&
     hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element)
   );
 };

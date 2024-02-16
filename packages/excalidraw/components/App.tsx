@@ -417,7 +417,7 @@ import {
   hitElementBoundText,
   hitElementBoundingBox,
   hitElementBoundingBoxOnly,
-  hitElementItselfOnly,
+  hitElementItself,
   shouldTestInside,
 } from "../element/collision";
 import { textWysiwyg } from "../element/textWysiwyg";
@@ -4515,7 +4515,7 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
 
-    return hitElementItselfOnly({
+    return hitElementItself({
       x,
       y,
       element,
@@ -4544,7 +4544,7 @@ class App extends React.Component<AppProps, AppState> {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
       if (
         isArrowElement(elements[index]) &&
-        hitElementItselfOnly({
+        hitElementItself({
           x,
           y,
           element: elements[index],
@@ -4804,7 +4804,7 @@ class App extends React.Component<AppProps, AppState> {
         if (
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
-          hitElementItselfOnly({
+          hitElementItself({
             x: sceneX,
             y: sceneY,
             element: container,
@@ -5462,7 +5462,7 @@ class App extends React.Component<AppProps, AppState> {
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
       if (
-        hitElementItselfOnly({
+        hitElementItself({
           x: scenePointerX,
           y: scenePointerY,
           element,

@@ -140,7 +140,7 @@ describe("element binding", () => {
 
   it("should bind/unbind arrow when moving it with keyboard", () => {
     const rectangle = UI.createElement("rectangle", {
-      x: 76,
+      x: 75,
       y: 0,
       size: 100,
     });

@@ -624,18 +624,18 @@ export const distanceToSegment = (point: Point, line: Line) => {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-export const pointOnLine = (point: Point, line: Line, tolerance = 0) => {
+export const pointOnLine = (point: Point, line: Line, threshold = 0) => {
   const distance = distanceToSegment(point, line);
 
-  return distance <= tolerance;
+  return distance < threshold;
 };
 
 export const pointOnPolylines = (
   point: Point,
   polyline: Polyline,
-  tolerance = 0,
+  threshold = 0,
 ) => {
-  return polyline.some((line) => pointOnLine(point, line, tolerance));
+  return polyline.some((line) => pointOnLine(point, line, threshold));
 };
 
 export const lineIntersectsLine = (lineA: Line, lineB: Line) => {
@@ -750,16 +750,16 @@ export const polyLineFromCurve = (curve: Curve, segments = 10): Polyline => {
   return lineSegments;
 };
 
-export const pointOnCurve = (point: Point, curve: Curve, tolerance = 0) => {
-  return pointOnPolylines(point, polyLineFromCurve(curve), tolerance);
+export const pointOnCurve = (point: Point, curve: Curve, threshold = 0) => {
+  return pointOnPolylines(point, polyLineFromCurve(curve), threshold);
 };
 
 export const pointOnPolycurve = (
   point: Point,
   polycurve: Polycurve,
-  tolerance = 0,
+  threshold = 0,
 ) => {
-  return polycurve.some((curve) => pointOnCurve(point, curve, tolerance));
+  return polycurve.some((curve) => pointOnCurve(point, curve, threshold));
 };
 
 export const pointInPolygon = (point: Point, polygon: Polygon) => {
@@ -784,13 +784,13 @@ export const pointInPolygon = (point: Point, polygon: Polygon) => {
 export const pointOnPolygon = (
   point: Point,
   polygon: Polygon,
-  tolerance = 0,
+  threshold = 0,
 ) => {
   let on = false;
   const closed = close(polygon);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
-    if (pointOnLine(point, [closed[i], closed[i + 1]], tolerance)) {
+    if (pointOnLine(point, [closed[i], closed[i + 1]], threshold)) {
       on = true;
       break;
     }
@@ -902,9 +902,9 @@ const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
 export const pointOnEllipse = (
   point: Point,
   ellipse: Ellipse,
-  tolerance = 0,
+  threshold = 0,
 ) => {
-  return distanceToEllipse(point, ellipse) <= tolerance;
+  return distanceToEllipse(point, ellipse) <= threshold;
 };
 
 export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
