@@ -78,7 +78,7 @@ const JSONExportModal = ({
               onClick={async () => {
                 try {
                   trackEvent("export", "link", `ui (${getFrame()})`);
-                  await onExportToBackend(elements, appState, files, canvas);
+                  await onExportToBackend(elements, appState, files);
                   onCloseRequest();
                 } catch (error: any) {
                   setAppState({ errorMessage: error.message });

@@ -86,11 +86,12 @@ export const transformElements = (
     if (transformHandleType === "rotation") {
       rotateSingleElement(
         element,
+        elementsMap,
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
       );
-      updateBoundElements(element);
+      updateBoundElements(element, elementsMap);
     } else if (
       isTextElement(element) &&
       (transformHandleType === "nw" ||
@@ -106,7 +107,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      updateBoundElements(element);
+      updateBoundElements(element, elementsMap);
     } else if (transformHandleType) {
       resizeSingleElement(
         originalElements,
@@ -126,6 +127,7 @@ export const transformElements = (
       rotateMultipleElements(
         originalElements,
         selectedElements,
+        elementsMap,
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
@@ -156,11 +158,12 @@ export const transformElements = (
 
 const rotateSingleElement = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   let angle: number;
@@ -219,7 +222,7 @@ const measureFontSizeFromWidth = (
   if (hasContainer) {
     const container = getContainerElement(element, elementsMap);
     if (container) {
-      width = getBoundTextMaxWidth(container);
+      width = getBoundTextMaxWidth(container, element);
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
@@ -265,7 +268,7 @@ const resizeSingleTextElement = (
   pointerX: number,
   pointerY: number,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // rotation pointer with reverse angle
@@ -394,7 +397,7 @@ export const resizeSingleElement = (
   let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
   let boundTextFont: { fontSize?: number; baseline?: number } = {};
-  const boundTextElement = getBoundTextElement(element);
+  const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (transformHandleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
@@ -458,7 +461,7 @@ export const resizeSingleElement = (
       const nextFont = measureFontSizeFromWidth(
         boundTextElement,
         elementsMap,
-        getBoundTextMaxWidth(updatedElement),
+        getBoundTextMaxWidth(updatedElement, boundTextElement),
         getBoundTextMaxHeight(updatedElement, boundTextElement),
       );
       if (nextFont === null) {
@@ -628,7 +631,7 @@ export const resizeSingleElement = (
   ) {
     mutateElement(element, resizedElement);
 
-    updateBoundElements(element, {
+    updateBoundElements(element, elementsMap, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
 
@@ -640,6 +643,7 @@ export const resizeSingleElement = (
     }
     handleBindTextResize(
       element,
+      elementsMap,
       transformHandleDirection,
       shouldMaintainAspectRatio,
     );
@@ -694,7 +698,11 @@ export const resizeMultipleElements = (
     if (!isBoundToContainer(text)) {
       return acc;
     }
-    const xy = LinearElementEditor.getBoundTextElementPosition(orig, text);
+    const xy = LinearElementEditor.getBoundTextElementPosition(
+      orig,
+      text,
+      elementsMap,
+    );
     return [...acc, { ...text, ...xy }];
   }, [] as ExcalidrawTextElementWithContainer[]);
 
@@ -877,12 +885,12 @@ export const resizeMultipleElements = (
 
     mutateElement(element, update, false);
 
-    updateBoundElements(element, {
+    updateBoundElements(element, elementsMap, {
       simultaneouslyUpdated: elementsToUpdate,
       newSize: { width, height },
     });
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement && boundTextFontSize) {
       mutateElement(
         boundTextElement,
@@ -892,7 +900,7 @@ export const resizeMultipleElements = (
         },
         false,
       );
-      handleBindTextResize(element, transformHandleType, true);
+      handleBindTextResize(element, elementsMap, transformHandleType, true);
     }
   }
 
@@ -902,6 +910,7 @@ export const resizeMultipleElements = (
 const rotateMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -918,7 +927,7 @@ const rotateMultipleElements = (
   elements
     .filter((element) => !isFrameLikeElement(element))
     .forEach((element) => {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
       const cx = (x1 + x2) / 2;
       const cy = (y1 + y2) / 2;
       const origAngle =
@@ -939,9 +948,11 @@ const rotateMultipleElements = (
         },
         false,
       );
-      updateBoundElements(element, { simultaneouslyUpdated: elements });
+      updateBoundElements(element, elementsMap, {
+        simultaneouslyUpdated: elements,
+      });
 
-      const boundText = getBoundTextElement(element);
+      const boundText = getBoundTextElement(element, elementsMap);
       if (boundText && !isArrowElement(element)) {
         mutateElement(
           boundText,
@@ -961,12 +972,13 @@ const rotateMultipleElements = (
 export const getResizeOffsetXY = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
   x: number,
   y: number,
 ): [number, number] => {
   const [x1, y1, x2, y2] =
     selectedElements.length === 1
-      ? getElementAbsoluteCoords(selectedElements[0])
+      ? getElementAbsoluteCoords(selectedElements[0], elementsMap)
       : getCommonBounds(selectedElements);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;

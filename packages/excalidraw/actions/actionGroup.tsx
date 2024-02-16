@@ -106,7 +106,10 @@ export const actionGroup = register({
       const frameElementsMap = groupByFrameLikes(selectedElements);
 
       frameElementsMap.forEach((elementsInFrame, frameId) => {
-        removeElementsFromFrame(elementsInFrame);
+        removeElementsFromFrame(
+          elementsInFrame,
+          app.scene.getNonDeletedElementsMap(),
+        );
       });
     }
 
@@ -178,6 +181,8 @@ export const actionUngroup = register({
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
+    const elementsMap = arrayToMap(elements);
+
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
@@ -224,8 +229,14 @@ export const actionUngroup = register({
       if (frame) {
         nextElements = replaceAllElementsInFrame(
           nextElements,
-          getElementsInResizingFrame(nextElements, frame, appState),
+          getElementsInResizingFrame(
+            nextElements,
+            frame,
+            appState,
+            elementsMap,
+          ),
           frame,
+          app,
         );
       }
     });

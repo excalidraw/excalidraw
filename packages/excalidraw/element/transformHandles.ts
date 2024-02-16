@@ -1,4 +1,5 @@
 import {
+  ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   PointerType,
@@ -9,7 +10,7 @@ import { rotate } from "../math";
 import { InteractiveCanvasAppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
-import { DEFAULT_SPACING } from "../renderer/renderScene";
+import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../constants";
 
 export type TransformHandleDirection =
   | "n"
@@ -106,7 +107,8 @@ export const getTransformHandlesFromCoords = (
   const width = x2 - x1;
   const height = y2 - y1;
   const dashedLineMargin = margin / zoom.value;
-  const centeringOffset = (size - DEFAULT_SPACING * 2) / (2 * zoom.value);
+  const centeringOffset =
+    (size - DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
@@ -229,6 +231,8 @@ export const getTransformHandlesFromCoords = (
 export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
+  elementsMap: ElementsMap,
+
   pointerType: PointerType = "mouse",
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
@@ -263,10 +267,10 @@ export const getTransformHandles = (
     };
   }
   const dashedLineMargin = isLinearElement(element)
-    ? DEFAULT_SPACING + 8
-    : DEFAULT_SPACING;
+    ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8
+    : DEFAULT_TRANSFORM_HANDLE_SPACING;
   return getTransformHandlesFromCoords(
-    getElementAbsoluteCoords(element, true),
+    getElementAbsoluteCoords(element, elementsMap, true),
     element.angle,
     zoom,
     pointerType,

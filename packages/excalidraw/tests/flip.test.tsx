@@ -27,7 +27,7 @@ import * as blob from "../data/blob";
 import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
-import { cloneJSON } from "../utils";
+import { arrayToMap, cloneJSON } from "../utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -194,9 +194,10 @@ const checkElementsBoundingBox = async (
   element2: ExcalidrawElement,
   toleranceInPx: number = 0,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1);
+  const elementsMap = arrayToMap([element1, element2]);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1, elementsMap);
 
-  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2);
+  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2, elementsMap);
 
   await waitFor(() => {
     // Check if width and height did not change
@@ -853,7 +854,11 @@ describe("mutliple elements", () => {
     h.app.actionManager.executeAction(actionFlipVertical);
 
     const arrowText = h.elements[1] as ExcalidrawTextElementWithContainer;
-    const arrowTextPos = getBoundTextElementPosition(arrow.get(), arrowText)!;
+    const arrowTextPos = getBoundTextElementPosition(
+      arrow.get(),
+      arrowText,
+      arrayToMap(h.elements),
+    )!;
     const rectText = h.elements[3] as ExcalidrawTextElementWithContainer;
 
     expect(arrow.x).toBeCloseTo(180);

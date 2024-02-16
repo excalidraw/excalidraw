@@ -23,7 +23,6 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import { MaybeTransformHandleType } from "./transformHandles";
-import Scene from "../scene/Scene";
 import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -32,11 +31,12 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from ".";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
+
+import { ExtractSetType } from "../utility-types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "./textWysiwyg";
-import { ExtractSetType } from "../utility-types";
+} from "./containerCache";
 
 export const normalizeText = (text: string) => {
   return (
@@ -53,6 +53,7 @@ const splitIntoLines = (text: string) => {
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
+  elementsMap: ElementsMap,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -89,7 +90,7 @@ export const redrawTextBoundingBox = (
       container,
       textElement as ExcalidrawTextElementWithContainer,
     );
-    const maxContainerWidth = getBoundTextMaxWidth(container);
+    const maxContainerWidth = getBoundTextMaxWidth(container, textElement);
 
     if (!isArrowElement(container) && metrics.height > maxContainerHeight) {
       const nextHeight = computeContainerDimensionForBoundText(
@@ -110,7 +111,11 @@ export const redrawTextBoundingBox = (
       ...textElement,
       ...boundTextUpdates,
     } as ExcalidrawTextElementWithContainer;
-    const { x, y } = computeBoundTextPosition(container, updatedTextElement);
+    const { x, y } = computeBoundTextPosition(
+      container,
+      updatedTextElement,
+      elementsMap,
+    );
     boundTextUpdates.x = x;
     boundTextUpdates.y = y;
   }
@@ -119,11 +124,11 @@ export const redrawTextBoundingBox = (
 };
 
 export const bindTextToShapeAfterDuplication = (
-  sceneElements: ExcalidrawElement[],
+  newElements: ExcalidrawElement[],
   oldElements: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ): void => {
-  const sceneElementMap = arrayToMap(sceneElements) as Map<
+  const newElementsMap = arrayToMap(newElements) as Map<
     ExcalidrawElement["id"],
     ExcalidrawElement
   >;
@@ -134,7 +139,7 @@ export const bindTextToShapeAfterDuplication = (
     if (boundTextElementId) {
       const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId);
       if (newTextElementId) {
-        const newContainer = sceneElementMap.get(newElementId);
+        const newContainer = newElementsMap.get(newElementId);
         if (newContainer) {
           mutateElement(newContainer, {
             boundElements: (element.boundElements || [])
@@ -149,7 +154,7 @@ export const bindTextToShapeAfterDuplication = (
               }),
           });
         }
-        const newTextElement = sceneElementMap.get(newTextElementId);
+        const newTextElement = newElementsMap.get(newTextElementId);
         if (newTextElement && isTextElement(newTextElement)) {
           mutateElement(newTextElement, {
             containerId: newContainer ? newElementId : null,
@@ -162,6 +167,7 @@ export const bindTextToShapeAfterDuplication = (
 
 export const handleBindTextResize = (
   container: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
 ) => {
@@ -170,25 +176,17 @@ export const handleBindTextResize = (
     return;
   }
   resetOriginalContainerCache(container.id);
-  let textElement = Scene.getScene(container)!.getElement(
-    boundTextElementId,
-  ) as ExcalidrawTextElement;
+  const textElement = getBoundTextElement(container, elementsMap);
   if (textElement && textElement.text) {
     if (!container) {
       return;
     }
 
-    textElement = Scene.getScene(container)!.getElement(
-      boundTextElementId,
-    ) as ExcalidrawTextElement;
     let text = textElement.text;
     let nextHeight = textElement.height;
     let nextWidth = textElement.width;
-    const maxWidth = getBoundTextMaxWidth(container);
-    const maxHeight = getBoundTextMaxHeight(
-      container,
-      textElement as ExcalidrawTextElementWithContainer,
-    );
+    const maxWidth = getBoundTextMaxWidth(container, textElement);
+    const maxHeight = getBoundTextMaxHeight(container, textElement);
     let containerHeight = container.height;
     let nextBaseLine = textElement.baseline;
     if (
@@ -243,10 +241,7 @@ export const handleBindTextResize = (
     if (!isArrowElement(container)) {
       mutateElement(
         textElement,
-        computeBoundTextPosition(
-          container,
-          textElement as ExcalidrawTextElementWithContainer,
-        ),
+        computeBoundTextPosition(container, textElement, elementsMap),
       );
     }
   }
@@ -255,16 +250,18 @@ export const handleBindTextResize = (
 export const computeBoundTextPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
+  elementsMap: ElementsMap,
 ) => {
   if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
       container,
       boundTextElement,
+      elementsMap,
     );
   }
   const containerCoords = getContainerCoords(container);
   const maxContainerHeight = getBoundTextMaxHeight(container, boundTextElement);
-  const maxContainerWidth = getBoundTextMaxWidth(container);
+  const maxContainerWidth = getBoundTextMaxWidth(container, boundTextElement);
 
   let x;
   let y;
@@ -667,17 +664,18 @@ export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
     : null;
 };
 
-export const getBoundTextElement = (element: ExcalidrawElement | null) => {
+export const getBoundTextElement = (
+  element: ExcalidrawElement | null,
+  elementsMap: ElementsMap,
+) => {
   if (!element) {
     return null;
   }
   const boundTextElementId = getBoundTextElementId(element);
+
   if (boundTextElementId) {
-    return (
-      (Scene.getScene(element)?.getElement(
-        boundTextElementId,
-      ) as ExcalidrawTextElementWithContainer) || null
-    );
+    return (elementsMap.get(boundTextElementId) ||
+      null) as ExcalidrawTextElementWithContainer | null;
   }
   return null;
 };
@@ -699,6 +697,7 @@ export const getContainerElement = (
 export const getContainerCenter = (
   container: ExcalidrawElement,
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   if (!isArrowElement(container)) {
     return {
@@ -706,18 +705,23 @@ export const getContainerCenter = (
       y: container.y + container.height / 2,
     };
   }
-  const points = LinearElementEditor.getPointsGlobalCoordinates(container);
+  const points = LinearElementEditor.getPointsGlobalCoordinates(
+    container,
+    elementsMap,
+  );
   if (points.length % 2 === 1) {
     const index = Math.floor(container.points.length / 2);
     const midPoint = LinearElementEditor.getPointGlobalCoordinates(
       container,
       container.points[index],
+      elementsMap,
     );
     return { x: midPoint[0], y: midPoint[1] };
   }
   const index = container.points.length / 2 - 1;
   let midSegmentMidpoint = LinearElementEditor.getEditorMidPoints(
     container,
+    elementsMap,
     appState,
   )[index];
   if (!midSegmentMidpoint) {
@@ -726,6 +730,7 @@ export const getContainerCenter = (
       points[index],
       points[index + 1],
       index + 1,
+      elementsMap,
     );
   }
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
@@ -764,11 +769,13 @@ export const getTextElementAngle = (
 export const getBoundTextElementPosition = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
+  elementsMap: ElementsMap,
 ) => {
   if (isArrowElement(container)) {
     return LinearElementEditor.getBoundTextElementPosition(
       container,
       boundTextElement,
+      elementsMap,
     );
   }
 };
@@ -811,6 +818,7 @@ export const getTextBindableContainerAtPosition = (
   appState: AppState,
   x: number,
   y: number,
+  elementsMap: ElementsMap,
 ): ExcalidrawTextContainer | null => {
   const selectedElements = getSelectedElements(elements, appState);
   if (selectedElements.length === 1) {
@@ -824,7 +832,10 @@ export const getTextBindableContainerAtPosition = (
     if (elements[index].isDeleted) {
       continue;
     }
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+      elements[index],
+      elementsMap,
+    );
     if (
       isArrowElement(elements[index]) &&
       isHittingElementNotConsideringBoundingBox(
@@ -832,6 +843,7 @@ export const getTextBindableContainerAtPosition = (
         appState,
         null,
         [x, y],
+        elementsMap,
       )
     ) {
       hitElement = elements[index];
@@ -877,9 +889,7 @@ export const computeContainerDimensionForBoundText = (
 
 export const getBoundTextMaxWidth = (
   container: ExcalidrawElement,
-  boundTextElement: ExcalidrawTextElement | null = getBoundTextElement(
-    container,
-  ),
+  boundTextElement: ExcalidrawTextElement | null,
 ) => {
   const { width } = container;
   if (isArrowElement(container)) {

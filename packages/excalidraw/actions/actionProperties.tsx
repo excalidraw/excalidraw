@@ -209,6 +209,7 @@ const changeFontSize = (
           redrawTextBoundingBox(
             newElement,
             app.scene.getContainerElement(oldElement),
+            app.scene.getNonDeletedElementsMap(),
           );
 
           newElement = offsetElementAfterFontResize(oldElement, newElement);
@@ -606,7 +607,7 @@ export const actionChangeFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
       <ButtonIconSelect
@@ -644,14 +645,21 @@ export const actionChangeFontSize = register({
             if (isTextElement(element)) {
               return element.fontSize;
             }
-            const boundTextElement = getBoundTextElement(element);
+            const boundTextElement = getBoundTextElement(
+              element,
+              app.scene.getNonDeletedElementsMap(),
+            );
             if (boundTextElement) {
               return boundTextElement.fontSize;
             }
             return null;
           },
           (element) =>
-            isTextElement(element) || getBoundTextElement(element) !== null,
+            isTextElement(element) ||
+            getBoundTextElement(
+              element,
+              app.scene.getNonDeletedElementsMap(),
+            ) !== null,
           (hasSelection) =>
             hasSelection
               ? null
@@ -723,6 +731,7 @@ export const actionChangeFontFamily = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
             );
             return newElement;
           }
@@ -738,7 +747,7 @@ export const actionChangeFontFamily = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const options: {
       value: FontFamilyValues;
       text: string;
@@ -778,14 +787,21 @@ export const actionChangeFontFamily = register({
               if (isTextElement(element)) {
                 return element.fontFamily;
               }
-              const boundTextElement = getBoundTextElement(element);
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
               if (boundTextElement) {
                 return boundTextElement.fontFamily;
               }
               return null;
             },
             (element) =>
-              isTextElement(element) || getBoundTextElement(element) !== null,
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
             (hasSelection) =>
               hasSelection
                 ? null
@@ -815,6 +831,7 @@ export const actionChangeTextAlign = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
             );
             return newElement;
           }
@@ -830,7 +847,8 @@ export const actionChangeTextAlign = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     return (
       <fieldset>
         <legend>{t("labels.textAlign")}</legend>
@@ -863,14 +881,18 @@ export const actionChangeTextAlign = register({
               if (isTextElement(element)) {
                 return element.textAlign;
               }
-              const boundTextElement = getBoundTextElement(element);
+              const boundTextElement = getBoundTextElement(
+                element,
+                elementsMap,
+              );
               if (boundTextElement) {
                 return boundTextElement.textAlign;
               }
               return null;
             },
             (element) =>
-              isTextElement(element) || getBoundTextElement(element) !== null,
+              isTextElement(element) ||
+              getBoundTextElement(element, elementsMap) !== null,
             (hasSelection) =>
               hasSelection ? null : appState.currentItemTextAlign,
           )}
@@ -899,6 +921,7 @@ export const actionChangeVerticalAlign = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
             );
             return newElement;
           }
@@ -913,7 +936,7 @@ export const actionChangeVerticalAlign = register({
       commitToHistory: true,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     return (
       <fieldset>
         <ButtonIconSelect<VerticalAlign | false>
@@ -945,14 +968,21 @@ export const actionChangeVerticalAlign = register({
               if (isTextElement(element) && element.containerId) {
                 return element.verticalAlign;
               }
-              const boundTextElement = getBoundTextElement(element);
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
               if (boundTextElement) {
                 return boundTextElement.verticalAlign;
               }
               return null;
             },
             (element) =>
-              isTextElement(element) || getBoundTextElement(element) !== null,
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
             (hasSelection) => (hasSelection ? null : VERTICAL_ALIGN.MIDDLE),
           )}
           onChange={(value) => updateData(value)}

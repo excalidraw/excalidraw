@@ -7,9 +7,7 @@ import {
   EXPORT_SCALES,
   THEME,
 } from "./constants";
-import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
@@ -65,7 +63,7 @@ export const getDefaultAppState = (): Omit<
     isRotating: false,
     lastPointerDownWith: "mouse",
     multiElement: null,
-    name: `${t("labels.untitled")}-${getDateTime()}`,
+    name: null,
     contextMenu: null,
     openMenu: null,
     openPopup: null,

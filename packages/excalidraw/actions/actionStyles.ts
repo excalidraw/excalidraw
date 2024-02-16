@@ -32,12 +32,15 @@ export let copiedStyles: string = "{}";
 export const actionCopyStyles = register({
   name: "copyStyles",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     const elementsCopied = [];
     const element = elements.find((el) => appState.selectedElementIds[el.id]);
     elementsCopied.push(element);
     if (element && hasBoundTextElement(element)) {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      );
       elementsCopied.push(boundTextElement);
     }
     if (element) {
@@ -59,7 +62,7 @@ export const actionCopyStyles = register({
 export const actionPasteStyles = register({
   name: "pasteStyles",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     const elementsCopied = JSON.parse(copiedStyles);
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];
@@ -125,7 +128,11 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
-            redrawTextBoundingBox(newElement, container);
+            redrawTextBoundingBox(
+              newElement,
+              container,
+              app.scene.getNonDeletedElementsMap(),
+            );
           }
 
           if (

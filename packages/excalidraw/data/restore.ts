@@ -458,6 +458,7 @@ export const restoreElements = (
         refreshTextDimensions(
           element,
           getContainerElement(element, restoredElementsMap),
+          restoredElementsMap,
         ),
       );
     }

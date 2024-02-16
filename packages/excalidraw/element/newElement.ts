@@ -16,6 +16,7 @@ import {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
+  ElementsMap,
 } from "./types";
 import {
   arrayToMap,
@@ -69,6 +70,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "roundness"
   | "locked"
   | "opacity"
+  | "customData"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -124,6 +126,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     updated: getUpdatedTimestamp(),
     link,
     locked,
+    customData: rest.customData,
   };
   return element;
 };
@@ -261,6 +264,7 @@ export const newTextElement = (
 
 const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
+  elementsMap: ElementsMap,
   nextText: string,
 ): {
   x: number;
@@ -295,7 +299,7 @@ const getAdjustedDimensions = (
     x = element.x - offsets.x;
     y = element.y - offsets.y;
   } else {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
 
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
       element,
@@ -336,6 +340,7 @@ const getAdjustedDimensions = (
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
+  elementsMap: ElementsMap,
   text = textElement.text,
 ) => {
   if (textElement.isDeleted) {
@@ -345,16 +350,17 @@ export const refreshTextDimensions = (
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container),
+      getBoundTextMaxWidth(container, textElement),
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, text);
+  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
 };
 
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
+  elementsMap: ElementsMap,
   {
     text,
     isDeleted,
@@ -368,7 +374,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, originalText),
+    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
   });
 };
 

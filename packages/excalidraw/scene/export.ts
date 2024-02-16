@@ -4,6 +4,7 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   Bounds,
@@ -248,14 +249,15 @@ export const exportToCanvas = async (
     files,
   });
 
-  const elementsMap = toBrandedType<RenderableElementsMap>(
-    arrayToMap(elementsForRender),
-  );
-
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
-    elementsMap,
+    elementsMap: toBrandedType<RenderableElementsMap>(
+      arrayToMap(elementsForRender),
+    ),
+    allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
+      arrayToMap(elements),
+    ),
     visibleElements: elementsForRender,
     scale,
     appState: {
@@ -390,8 +392,9 @@ export const exportToSvg = async (
   const frameElements = getFrameLikeElements(elements);
 
   let exportingFrameClipPath = "";
+  const elementsMap = arrayToMap(elements);
   for (const frame of frameElements) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame, elementsMap);
     const cx = (x2 - x1) / 2 - (frame.x - x1);
     const cy = (y2 - y1) / 2 - (frame.y - y1);
 

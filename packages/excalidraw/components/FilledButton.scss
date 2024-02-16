@@ -10,10 +10,39 @@
     background-color: var(--back-color);
     border-color: var(--border-color);
 
+    .Spinner {
+      --spinner-color: var(--color-surface-lowest);
+      position: absolute;
+      visibility: visible;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+
+      .ExcButton__contents {
+        visibility: hidden;
+      }
+    }
+
+    &,
+    &__contents {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      flex-wrap: nowrap;
+      // needed because of .Spinner
+      position: relative;
+    }
+
     &--color-primary {
       &.ExcButton--variant-filled {
         --text-color: var(--color-surface-lowest);
         --back-color: var(--color-primary);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --back-color: var(--color-brand-hover);
@@ -27,8 +56,12 @@
       &.ExcButton--variant-outlined,
       &.ExcButton--variant-icon {
         --text-color: var(--color-primary);
-        --border-color: var(--color-border-outline);
+        --border-color: var(--color-primary);
         --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-brand-hover);
@@ -47,6 +80,10 @@
         --text-color: var(--color-danger-text);
         --back-color: var(--color-danger-dark);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-danger-darker);
         }
@@ -61,6 +98,10 @@
         --text-color: var(--color-danger);
         --border-color: var(--color-danger);
         --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-danger-darkest);
@@ -79,6 +120,10 @@
         --text-color: var(--island-bg-color);
         --back-color: var(--color-gray-50);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-gray-60);
         }
@@ -93,6 +138,10 @@
         --text-color: var(--color-muted-background);
         --border-color: var(--color-muted);
         --back-color: var(--island-bg-color);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
 
         &:hover {
           --text-color: var(--color-muted-background-darker);
@@ -111,6 +160,10 @@
         --text-color: black;
         --back-color: var(--color-warning-dark);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --back-color: var(--color-warning-darker);
         }
@@ -126,6 +179,10 @@
         --border-color: var(--color-warning-dark);
         --back-color: var(--input-bg-color);
 
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
         &:hover {
           --text-color: var(--color-warning-darker);
           --border-color: var(--color-warning-darker);
@@ -138,17 +195,11 @@
       }
     }
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    flex-wrap: nowrap;
-
     border-radius: 0.5rem;
     border-width: 1px;
     border-style: solid;
 
-    font-family: "Assistant";
+    font-family: var(--font-family);
 
     user-select: none;
 
@@ -159,9 +210,12 @@
       font-size: 0.875rem;
       min-height: 3rem;
       padding: 0.5rem 1.5rem;
-      gap: 0.75rem;
 
       letter-spacing: 0.4px;
+
+      .ExcButton__contents {
+        gap: 0.75rem;
+      }
     }
 
     &--size-medium {
@@ -169,9 +223,12 @@
       font-size: 0.75rem;
       min-height: 2.5rem;
       padding: 0.5rem 1rem;
-      gap: 0.5rem;
 
       letter-spacing: normal;
+
+      .ExcButton__contents {
+        gap: 0.5rem;
+      }
     }
 
     &--variant-icon {

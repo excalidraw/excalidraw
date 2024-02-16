@@ -4,6 +4,7 @@ import {
   ExcalidrawTextElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import {
   AppClassProperties,
@@ -66,6 +67,7 @@ export type StaticSceneRenderConfig = {
   canvas: HTMLCanvasElement;
   rc: RoughCanvas;
   elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   scale: number;
   appState: StaticCanvasAppState;

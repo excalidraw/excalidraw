@@ -17,7 +17,6 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
-  ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
@@ -34,6 +33,7 @@ import {
   computeContainerDimensionForBoundText,
   detectLineHeight,
   computeBoundTextPosition,
+  getBoundTextElement,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -43,6 +43,10 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import {
+  originalContainerCache,
+  updateOriginalContainerCache,
+} from "./containerCache";
 
 const getTransform = (
   width: number,
@@ -63,38 +67,6 @@ const getTransform = (
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
-};
-
-const originalContainerCache: {
-  [id: ExcalidrawTextContainer["id"]]:
-    | {
-        height: ExcalidrawTextContainer["height"];
-      }
-    | undefined;
-} = {};
-
-export const updateOriginalContainerCache = (
-  id: ExcalidrawTextContainer["id"],
-  height: ExcalidrawTextContainer["height"],
-) => {
-  const data =
-    originalContainerCache[id] || (originalContainerCache[id] = { height });
-  data.height = height;
-  return data;
-};
-
-export const resetOriginalContainerCache = (
-  id: ExcalidrawTextContainer["id"],
-) => {
-  if (originalContainerCache[id]) {
-    delete originalContainerCache[id];
-  }
-};
-
-export const getOriginalContainerHeightFromCache = (
-  id: ExcalidrawTextContainer["id"],
-) => {
-  return originalContainerCache[id]?.height ?? null;
 };
 
 export const textWysiwyg = ({
@@ -149,13 +121,13 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
       const container = getContainerElement(
         updatedTextElement,
-        app.scene.getElementsMapIncludingDeleted(),
+        app.scene.getNonDeletedElementsMap(),
       );
       let maxWidth = updatedTextElement.width;
 
@@ -171,6 +143,7 @@ export const textWysiwyg = ({
             LinearElementEditor.getBoundTextElementPosition(
               container,
               updatedTextElement as ExcalidrawTextElementWithContainer,
+              elementsMap,
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
@@ -196,7 +169,8 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getBoundTextMaxWidth(container);
+        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -227,6 +201,7 @@ export const textWysiwyg = ({
           const { y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
+            elementsMap,
           );
           coordY = y;
         }
@@ -353,7 +328,7 @@ export const textWysiwyg = ({
       }
       const container = getContainerElement(
         element,
-        app.scene.getElementsMapIncludingDeleted(),
+        app.scene.getNonDeletedElementsMap(),
       );
 
       const font = getFontString({
@@ -361,10 +336,14 @@ export const textWysiwyg = ({
         fontFamily: app.state.currentItemFontFamily,
       });
       if (container) {
+        const boundTextElement = getBoundTextElement(
+          container,
+          app.scene.getNonDeletedElementsMap(),
+        );
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getBoundTextMaxWidth(container),
+          getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -536,7 +515,7 @@ export const textWysiwyg = ({
     let text = editable.value;
     const container = getContainerElement(
       updateElement,
-      app.scene.getElementsMapIncludingDeleted(),
+      app.scene.getNonDeletedElementsMap(),
     );
 
     if (container) {
@@ -564,7 +543,11 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(updateElement, container);
+      redrawTextBoundingBox(
+        updateElement,
+        container,
+        app.scene.getNonDeletedElementsMap(),
+      );
     }
 
     onSubmit({
