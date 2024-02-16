@@ -42,7 +42,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { arrayToMap, tupleToCoors } from "../utils";
+import { tupleToCoors } from "../utils";
 import { isBindingElement } from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
@@ -334,8 +334,8 @@ export class LinearElementEditor {
     editingLinearElement: LinearElementEditor,
     appState: AppState,
     elements: readonly NonDeletedExcalidrawElement[],
+    elementsMap: ElementsMap,
   ): LinearElementEditor {
-    const elementsMap = arrayToMap(elements);
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -644,12 +644,12 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
     elements: readonly NonDeletedExcalidrawElement[],
+    elementsMap: ElementsMap,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
-    const elementsMap = arrayToMap(elements);
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,

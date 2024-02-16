@@ -151,6 +151,7 @@ const bindOrUnbindLinearElementEdge = (
 
 export const bindOrUnbindSelectedElements = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
+  elements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
 ): void => {
   selectedElements.forEach((selectedElement) => {
@@ -160,11 +161,13 @@ export const bindOrUnbindSelectedElements = (
         getElligibleElementForBindingElement(
           selectedElement,
           "start",
+          elements,
           elementsMap,
         ),
         getElligibleElementForBindingElement(
           selectedElement,
           "end",
+          elements,
           elementsMap,
         ),
         elementsMap,
@@ -538,20 +541,22 @@ const maybeCalculateNewGapWhenScaling = (
 
 // TODO: this is a bottleneck, optimise
 export const getEligibleElementsForBinding = (
-  elements: NonDeleted<ExcalidrawElement>[],
+  selectedElements: NonDeleted<ExcalidrawElement>[],
+  elements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
 ): SuggestedBinding[] => {
-  const includedElementIds = new Set(elements.map(({ id }) => id));
-  return elements.flatMap((element) =>
-    isBindingElement(element, false)
+  const includedElementIds = new Set(selectedElements.map(({ id }) => id));
+  return selectedElements.flatMap((selectedElement) =>
+    isBindingElement(selectedElement, false)
       ? (getElligibleElementsForBindingElement(
-          element as NonDeleted<ExcalidrawLinearElement>,
+          selectedElement as NonDeleted<ExcalidrawLinearElement>,
+          elements,
           elementsMap,
         ).filter(
           (element) => !includedElementIds.has(element.id),
         ) as SuggestedBinding[])
-      : isBindableElement(element, false)
-      ? getElligibleElementsForBindableElementAndWhere(element).filter(
+      : isBindableElement(selectedElement, false)
+      ? getElligibleElementsForBindableElementAndWhere(selectedElement).filter(
           (binding) => !includedElementIds.has(binding[0].id),
         )
       : [],
@@ -560,11 +565,23 @@ export const getEligibleElementsForBinding = (
 
 const getElligibleElementsForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
+  elements: readonly ExcalidrawElement[],
+
   elementsMap: ElementsMap,
 ): NonDeleted<ExcalidrawBindableElement>[] => {
   return [
-    getElligibleElementForBindingElement(linearElement, "start", elementsMap),
-    getElligibleElementForBindingElement(linearElement, "end", elementsMap),
+    getElligibleElementForBindingElement(
+      linearElement,
+      "start",
+      elements,
+      elementsMap,
+    ),
+    getElligibleElementForBindingElement(
+      linearElement,
+      "end",
+      elements,
+      elementsMap,
+    ),
   ].filter(
     (element): element is NonDeleted<ExcalidrawBindableElement> =>
       element != null,
@@ -574,11 +591,12 @@ const getElligibleElementsForBindingElement = (
 const getElligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
+  elements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   return getHoveredElementForBinding(
     getLinearElementEdgeCoors(linearElement, startOrEnd, elementsMap),
-    Array.from(elementsMap.values()),
+    elements,
   );
 };
 

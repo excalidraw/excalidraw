@@ -4012,7 +4012,11 @@ class App extends React.Component<AppProps, AppState> {
       const selectedElements = this.scene.getSelectedElements(this.state);
       const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements, elementsMap)
+        ? bindOrUnbindSelectedElements(
+            selectedElements,
+            this.scene.getNonDeletedElements(),
+            elementsMap,
+          )
         : unbindLinearElements(selectedElements, elementsMap);
       this.setState({ suggestedBindings: [] });
     }
@@ -6121,6 +6125,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin,
             linearElementEditor,
             this.scene.getNonDeletedElements(),
+            elementsMap,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -7537,6 +7542,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.editingLinearElement,
             this.state,
             this.scene.getNonDeletedElements(),
+            elementsMap,
           );
           if (editingLinearElement !== this.state.editingLinearElement) {
             this.setState({
@@ -7561,6 +7567,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement,
             this.state,
             this.scene.getNonDeletedElements(),
+            elementsMap,
           );
 
           const { startBindingElement, endBindingElement } =
@@ -8220,12 +8227,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        (isBindingEnabled(this.state)
-          ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(
-          this.scene.getSelectedElements(this.state),
-          elementsMap,
-        );
+        isBindingEnabled(this.state)
+          ? bindOrUnbindSelectedElements(
+              this.scene.getSelectedElements(this.state),
+              this.scene.getNonDeletedElements(),
+              elementsMap,
+            )
+          : unbindLinearElements(
+              this.scene.getSelectedElements(this.state),
+              elementsMap,
+            );
       }
 
       if (activeTool.type === "laser") {
@@ -8757,6 +8768,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const suggestedBindings = getEligibleElementsForBinding(
       selectedElements,
+      this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
     );
     this.setState({ suggestedBindings });

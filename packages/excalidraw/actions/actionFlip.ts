@@ -83,6 +83,7 @@ const flipSelectedElements = (
 
   const updatedElements = flipElements(
     selectedElements,
+    elements,
     elementsMap,
     appState,
     flipDirection,
@@ -97,6 +98,7 @@ const flipSelectedElements = (
 
 const flipElements = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
+  elements: readonly ExcalidrawElement[],
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap,
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
@@ -113,9 +115,9 @@ const flipElements = (
     flipDirection === "horizontal" ? minY : maxY,
   );
 
-  (isBindingEnabled(appState)
-    ? bindOrUnbindSelectedElements
-    : unbindLinearElements)(selectedElements, elementsMap);
+  isBindingEnabled(appState)
+    ? bindOrUnbindSelectedElements(selectedElements, elements, elementsMap)
+    : unbindLinearElements(selectedElements, elementsMap);
 
   return selectedElements;
 };
