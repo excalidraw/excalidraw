@@ -6463,6 +6463,7 @@ class App extends React.Component<AppProps, AppState> {
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
       this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
     );
     this.scene.addNewElement(element);
     this.setState({
@@ -6731,6 +6732,7 @@ class App extends React.Component<AppProps, AppState> {
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
+        this.scene.getNonDeletedElementsMap(),
       );
 
       this.scene.addNewElement(element);
@@ -8714,6 +8716,7 @@ class App extends React.Component<AppProps, AppState> {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
       this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
     );
     this.setState({
       suggestedBindings:
@@ -8741,6 +8744,7 @@ class App extends React.Component<AppProps, AppState> {
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
           this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
         );
         if (
           hoveredBindableElement != null &&

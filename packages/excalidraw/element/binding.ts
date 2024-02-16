@@ -173,23 +173,27 @@ export const bindOrUnbindSelectedElements = (
         elementsMap,
       );
     } else if (isBindableElement(selectedElement)) {
-      maybeBindBindableElement(selectedElement, elementsMap);
+      maybeBindBindableElement(selectedElement, elements, elementsMap);
     }
   });
 };
 
 const maybeBindBindableElement = (
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  elements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
 ): void => {
-  getElligibleElementsForBindableElementAndWhere(bindableElement).forEach(
-    ([linearElement, where]) =>
-      bindOrUnbindLinearElement(
-        linearElement,
-        where === "end" ? "keep" : bindableElement,
-        where === "start" ? "keep" : bindableElement,
-        elementsMap,
-      ),
+  getElligibleElementsForBindableElementAndWhere(
+    bindableElement,
+    elements,
+    elementsMap,
+  ).forEach(([linearElement, where]) =>
+    bindOrUnbindLinearElement(
+      linearElement,
+      where === "end" ? "keep" : bindableElement,
+      where === "start" ? "keep" : bindableElement,
+      elementsMap,
+    ),
   );
 };
 
@@ -211,6 +215,7 @@ export const maybeBindLinearElement = (
   const hoveredElement = getHoveredElementForBinding(
     pointerCoords,
     scene.getNonDeletedElements(),
+    elementsMap,
   );
   if (
     hoveredElement != null &&
@@ -308,12 +313,13 @@ export const getHoveredElementForBinding = (
     y: number;
   },
   elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const hoveredElement = getElementAtPosition(
     elements,
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(element, pointerCoords, arrayToMap(elements)),
+      bindingBorderTest(element, pointerCoords, elementsMap),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
@@ -556,9 +562,11 @@ export const getEligibleElementsForBinding = (
           (element) => !includedElementIds.has(element.id),
         ) as SuggestedBinding[])
       : isBindableElement(selectedElement, false)
-      ? getElligibleElementsForBindableElementAndWhere(selectedElement).filter(
-          (binding) => !includedElementIds.has(binding[0].id),
-        )
+      ? getElligibleElementsForBindableElementAndWhere(
+          selectedElement,
+          elements,
+          elementsMap,
+        ).filter((binding) => !includedElementIds.has(binding[0].id))
       : [],
   );
 };
@@ -597,6 +605,7 @@ const getElligibleElementForBindingElement = (
   return getHoveredElementForBinding(
     getLinearElementEdgeCoors(linearElement, startOrEnd, elementsMap),
     elements,
+    elementsMap,
   );
 };
 
@@ -617,9 +626,10 @@ const getLinearElementEdgeCoors = (
 
 const getElligibleElementsForBindableElementAndWhere = (
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): SuggestedPointBinding[] => {
   const scene = Scene.getScene(bindableElement)!;
-  const elements = scene.getNonDeletedElements();
   return scene
     .getNonDeletedElements()
     .map((element) => {
@@ -631,12 +641,14 @@ const getElligibleElementsForBindableElementAndWhere = (
         "start",
         bindableElement,
         elements,
+        elementsMap,
       );
       const canBindEnd = isLinearElementEligibleForNewBindingByBindable(
         element,
         "end",
         bindableElement,
         elements,
+        elementsMap,
       );
       if (!canBindStart && !canBindEnd) {
         return null;
@@ -655,6 +667,7 @@ const isLinearElementEligibleForNewBindingByBindable = (
   startOrEnd: "start" | "end",
   bindableElement: NonDeleted<ExcalidrawBindableElement>,
   elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): boolean => {
   const existingBinding =
     linearElement[startOrEnd === "start" ? "startBinding" : "endBinding"];
@@ -667,12 +680,8 @@ const isLinearElementEligibleForNewBindingByBindable = (
     ) &&
     bindingBorderTest(
       bindableElement,
-      getLinearElementEdgeCoors(
-        linearElement,
-        startOrEnd,
-        arrayToMap(elements),
-      ),
-      arrayToMap(elements),
+      getLinearElementEdgeCoors(linearElement, startOrEnd, elementsMap),
+      elementsMap,
     )
   );
 };
