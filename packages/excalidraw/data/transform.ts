@@ -222,7 +222,7 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container);
+  redrawTextBoundingBox(textElement, container, elementsMap);
   return [container, textElement] as const;
 };
 
@@ -231,6 +231,7 @@ const bindLinearElementToElement = (
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
+  elementsMap: ElementsMap,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -316,6 +317,7 @@ const bindLinearElementToElement = (
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
         "start",
+        elementsMap,
       );
     }
   }
@@ -390,6 +392,7 @@ const bindLinearElementToElement = (
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
         "end",
+        elementsMap,
       );
     }
   }
@@ -612,6 +615,7 @@ export const convertToExcalidrawElements = (
     }
   }
 
+  const elementsMap = arrayToMap(elementStore.getElements());
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
     const excalidrawElement = elementStore.getElement(id)!;
@@ -625,7 +629,7 @@ export const convertToExcalidrawElements = (
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
-            arrayToMap(elementStore.getElements()),
+            elementsMap,
           );
           elementStore.add(container);
           elementStore.add(text);
@@ -653,6 +657,7 @@ export const convertToExcalidrawElements = (
                 originalStart,
                 originalEnd,
                 elementStore,
+                elementsMap,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -677,6 +682,7 @@ export const convertToExcalidrawElements = (
                   start,
                   end,
                   elementStore,
+                  elementsMap,
                 );
 
               elementStore.add(linearElement);
