@@ -86,11 +86,12 @@ export const transformElements = (
     if (transformHandleType === "rotation") {
       rotateSingleElement(
         element,
+        elementsMap,
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
       );
-      updateBoundElements(element);
+      updateBoundElements(element, elementsMap);
     } else if (
       isTextElement(element) &&
       (transformHandleType === "nw" ||
@@ -106,7 +107,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      updateBoundElements(element);
+      updateBoundElements(element, elementsMap);
     } else if (transformHandleType) {
       resizeSingleElement(
         originalElements,
@@ -157,11 +158,12 @@ export const transformElements = (
 
 const rotateSingleElement = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   let angle: number;
@@ -266,7 +268,7 @@ const resizeSingleTextElement = (
   pointerX: number,
   pointerY: number,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
   // rotation pointer with reverse angle
@@ -629,7 +631,7 @@ export const resizeSingleElement = (
   ) {
     mutateElement(element, resizedElement);
 
-    updateBoundElements(element, {
+    updateBoundElements(element, elementsMap, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
 
@@ -696,7 +698,11 @@ export const resizeMultipleElements = (
     if (!isBoundToContainer(text)) {
       return acc;
     }
-    const xy = LinearElementEditor.getBoundTextElementPosition(orig, text);
+    const xy = LinearElementEditor.getBoundTextElementPosition(
+      orig,
+      text,
+      elementsMap,
+    );
     return [...acc, { ...text, ...xy }];
   }, [] as ExcalidrawTextElementWithContainer[]);
 
@@ -879,7 +885,7 @@ export const resizeMultipleElements = (
 
     mutateElement(element, update, false);
 
-    updateBoundElements(element, {
+    updateBoundElements(element, elementsMap, {
       simultaneouslyUpdated: elementsToUpdate,
       newSize: { width, height },
     });
@@ -921,7 +927,7 @@ const rotateMultipleElements = (
   elements
     .filter((element) => !isFrameLikeElement(element))
     .forEach((element) => {
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
       const cx = (x1 + x2) / 2;
       const cy = (y1 + y2) / 2;
       const origAngle =
@@ -942,7 +948,9 @@ const rotateMultipleElements = (
         },
         false,
       );
-      updateBoundElements(element, { simultaneouslyUpdated: elements });
+      updateBoundElements(element, elementsMap, {
+        simultaneouslyUpdated: elements,
+      });
 
       const boundText = getBoundTextElement(element, elementsMap);
       if (boundText && !isArrowElement(element)) {
@@ -964,12 +972,13 @@ const rotateMultipleElements = (
 export const getResizeOffsetXY = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
   x: number,
   y: number,
 ): [number, number] => {
   const [x1, y1, x2, y2] =
     selectedElements.length === 1
-      ? getElementAbsoluteCoords(selectedElements[0])
+      ? getElementAbsoluteCoords(selectedElements[0], elementsMap)
       : getCommonBounds(selectedElements);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
