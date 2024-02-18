@@ -4840,6 +4840,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     //zsviczian
+    /*
     if (this.state.viewModeEnabled && !isExcaliBrainView()) {
       if (this.state.activeTool.type === "laser") {
         this.setActiveTool({ type: "selection" });
@@ -4849,7 +4850,7 @@ class App extends React.Component<AppProps, AppState> {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
       }
       return;
-    }
+    }*/
 
     // we should only be able to double click when mode is selection
     if (this.state.activeTool.type !== "selection") {
@@ -5773,15 +5774,19 @@ class App extends React.Component<AppProps, AppState> {
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
     // panning
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+    /*if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
-    }
+    }*/ //zsviczian this broke on pointer down in onPointerUpdate
 
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
+
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    } //zsviczian moved it here, because else pointer down in onPointerUpdate did not work
 
     if (
       event.button === POINTER_BUTTON.ERASER &&
