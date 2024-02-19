@@ -11,7 +11,7 @@ import { moveAllLeft, moveOneLeft, moveOneRight } from "../zindex";
 import { AppState } from "../types";
 import { InvalidFractionalIndexError } from "../errors";
 
-const createElementWithIndex = (
+const createElement = (
   fractionalIndex: string | null = null,
 ): ExcalidrawElement => {
   return API.createElement({
@@ -40,7 +40,7 @@ const generateElementsAtLength = (length: number) => {
   const elements: ExcalidrawElement[] = [];
 
   for (let i = 0; i < length; i++) {
-    elements.push(createElementWithIndex());
+    elements.push(createElement());
   }
 
   return elements;
@@ -48,10 +48,7 @@ const generateElementsAtLength = (length: number) => {
 
 describe("validating fractional indices", () => {
   it("should not pass validity check when elements are not in order", () => {
-    const elements = [
-      createElementWithIndex("A1"),
-      createElementWithIndex("A0"),
-    ];
+    const elements = [createElement("A1"), createElement("A0")];
 
     expect(() => validateFractionalIndices(elements)).toThrowError(
       InvalidFractionalIndexError,
@@ -59,10 +56,7 @@ describe("validating fractional indices", () => {
   });
 
   it("should not pass validity check when elements have equal indices", () => {
-    const elements = [
-      createElementWithIndex("A0"),
-      createElementWithIndex("A0"),
-    ];
+    const elements = [createElement("A0"), createElement("A0")];
 
     expect(() => validateFractionalIndices(elements)).toThrowError(
       InvalidFractionalIndexError,
@@ -71,7 +65,7 @@ describe("validating fractional indices", () => {
 });
 
 describe("restoring fractional indices", () => {
-  it("restore all null fractional indices", () => {
+  it("should restore all null fractional indices", () => {
     const randomNumOfElements = Math.floor(Math.random() * 100);
 
     const elements: ExcalidrawElement[] = [];
@@ -79,7 +73,7 @@ describe("restoring fractional indices", () => {
     let i = 0;
 
     while (i < randomNumOfElements) {
-      elements.push(createElementWithIndex());
+      elements.push(createElement());
       i++;
     }
 
@@ -89,12 +83,12 @@ describe("restoring fractional indices", () => {
     testValidity(restoredElements);
   });
 
-  it("restore out of order fractional indices", () => {
+  it("should restore out of order fractional indices", () => {
     const elements = [
-      createElementWithIndex("A0"),
-      createElementWithIndex("C0"),
-      createElementWithIndex("B0"),
-      createElementWithIndex("D0"),
+      createElement("A0"),
+      createElement("C0"),
+      createElement("B0"),
+      createElement("D0"),
     ];
 
     const restoredElements = restoreFractionalIndices([...elements]);
@@ -108,7 +102,7 @@ describe("restoring fractional indices", () => {
     );
   });
 
-  it("restore same fractional indices", () => {
+  it("should restore same fractional indices", () => {
     const randomNumOfElements = Math.floor(Math.random() * 100);
 
     const elements: ExcalidrawElement[] = [];
@@ -116,7 +110,7 @@ describe("restoring fractional indices", () => {
     let i = 0;
 
     while (i < randomNumOfElements) {
-      elements.push(createElementWithIndex(generateKeyBetween(null, null)));
+      elements.push(createElement(generateKeyBetween(null, null)));
       i++;
     }
 
@@ -129,16 +123,16 @@ describe("restoring fractional indices", () => {
     );
   });
 
-  it("restore a mix of bad fractional indices", () => {
+  it("should restore a mix of bad fractional indices", () => {
     const elements = [
-      createElementWithIndex("A0"),
-      createElementWithIndex("A0"),
-      createElementWithIndex("A1"),
-      createElementWithIndex(),
-      createElementWithIndex("A3"),
-      createElementWithIndex("A2"),
-      createElementWithIndex(),
-      createElementWithIndex(),
+      createElement("A0"),
+      createElement("A0"),
+      createElement("A1"),
+      createElement(),
+      createElement("A3"),
+      createElement("A2"),
+      createElement(),
+      createElement(),
     ];
 
     const restoredElements = restoreFractionalIndices([...elements]);
@@ -152,36 +146,37 @@ describe("restoring fractional indices", () => {
 });
 
 describe("update fractional indices", () => {
-  it("add each new element properly", () => {
+  it("should add index on few newly created elements", () => {
     const elements = [
-      createElementWithIndex(),
-      createElementWithIndex(),
-      createElementWithIndex(),
-      createElementWithIndex(),
+      createElement(),
+      createElement(),
+      createElement(),
+      createElement(),
     ];
 
     const fixedElements = elements.reduce((acc, el) => {
-      return updateFractionalIndices([...acc, el], arrayToMap([el]));
+      return updateFractionalIndices([], [...acc, el], arrayToMap([el]));
     }, [] as ExcalidrawElement[]);
 
     testLengthAndOrder(elements, fixedElements);
     testValidity(fixedElements);
   });
 
-  it("add each new element properly - long", () => {
+  it("should add index on a ton of newly created elements", () => {
     const elements = generateElementsAtLength(20000);
 
     const fixedElements = elements.reduce((acc, el) => {
-      return updateFractionalIndices([...acc, el], arrayToMap([el]));
+      return updateFractionalIndices([], [...acc, el], arrayToMap([el]));
     }, [] as ExcalidrawElement[]);
 
     testLengthAndOrder(elements, fixedElements);
     testValidity(fixedElements);
   });
 
-  it("add multiple new elements properly", () => {
+  it("should add index only on newly created elements", () => {
     const elements = generateElementsAtLength(Math.floor(Math.random() * 100));
     const fixedElements = updateFractionalIndices(
+      [],
       [...elements],
       arrayToMap(elements),
     );
@@ -192,6 +187,7 @@ describe("update fractional indices", () => {
     const elements2 = generateElementsAtLength(Math.floor(Math.random() * 100));
     const allElements2 = [...elements, ...elements2];
     const fixedElements2 = updateFractionalIndices(
+      [...elements],
       [...allElements2],
       arrayToMap(elements2),
     );
@@ -200,9 +196,10 @@ describe("update fractional indices", () => {
     testValidity(fixedElements2);
   });
 
-  it("fix properly after z-index changes", () => {
+  it("should update index after z-index changes", () => {
     const elements = generateElementsAtLength(Math.random() * 100);
     const fixedElements = updateFractionalIndices(
+      [],
       [...elements],
       arrayToMap(elements),
     );
@@ -364,5 +361,35 @@ describe("update fractional indices", () => {
     ) as ExcalidrawElement[];
 
     testValidity(movedAllRightFixedElements);
+  });
+
+  /**
+   * One of the cases is that often the first element could be brought further up by the user, even though it's already on top (and vice versa the last one).
+   * In those cases we don't want to regenerate the index, as the action does not result in a visible change.
+   */
+  it("should not update already valid index", () => {
+    const elements = [
+      createElement("A0a"),
+      createElement("A0b"),
+      createElement("A0c"),
+      createElement("A0d"),
+    ];
+
+    const firstElement = elements[0];
+    const lastElement = elements.at(-1)!;
+    const firstElementIndex = firstElement.index;
+    const lastElementIndex = lastElement.index;
+
+    const fixedElements = updateFractionalIndices(
+      elements,
+      elements,
+      arrayToMap([firstElement, lastElement]),
+    );
+
+    testLengthAndOrder(elements, fixedElements);
+    testValidity(fixedElements);
+
+    expect(firstElementIndex).toBe(firstElement.index);
+    expect(lastElementIndex).toBe(lastElement.index);
   });
 });

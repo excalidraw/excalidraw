@@ -127,18 +127,25 @@ export const validateFractionalIndices = (
  * As opposed to `restoreFractionalIndices`, this one does not alter neighboring indices.
  */
 export const updateFractionalIndices = (
-  elements: readonly ExcalidrawElement[],
-  reorderedElements: Map<string, ExcalidrawElement>,
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+  maybeReorderedElements: Map<string, ExcalidrawElement>,
 ) => {
+  const reorderedElements = getActuallyReorderedElements(
+    prevElements,
+    nextElements,
+    maybeReorderedElements,
+  );
+
   const contiguousMovedIndices = getContiguousMovedIndices(
-    elements,
+    nextElements,
     reorderedElements,
   );
 
   for (const indices of contiguousMovedIndices) {
-    const lowerBoundIndex = elements[indices[0] - 1]?.index || null;
+    const lowerBoundIndex = nextElements[indices[0] - 1]?.index || null;
     const upperBoundIndex =
-      elements[indices[indices.length - 1] + 1]?.index || null;
+      nextElements[indices[indices.length - 1] + 1]?.index || null;
 
     const fractionalIndices = generateNKeysBetween(
       lowerBoundIndex,
@@ -147,7 +154,7 @@ export const updateFractionalIndices = (
     );
 
     for (let i = 0; i < indices.length; i++) {
-      const element = elements[indices[i]];
+      const element = nextElements[indices[i]];
 
       mutateElement(
         element,
@@ -159,7 +166,39 @@ export const updateFractionalIndices = (
     }
   }
 
-  return elements as ExcalidrawElement[];
+  return nextElements as ExcalidrawElement[];
+};
+
+/**
+ * Returns elements for which the position within the elements array actually changed.
+ *
+ * Since @param maybeReorderedElements could contain also elements, for which the order within the elements arary didn't really change,
+ * it doesn't make sense regenerating the fractional index again for them. Therefore we are additionally checking against the previous
+ * elements, to find the ones that were actually reordered.
+ *
+ * WARN: the actually reordered elements do not have to result in a visible change.
+ */
+const getActuallyReorderedElements = (
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+  maybeReorderedElements: Map<string, ExcalidrawElement>,
+) => {
+  const reorderedElements = new Map<string, ExcalidrawElement>();
+
+  for (const [id, element] of maybeReorderedElements) {
+    const prevElementIndex = prevElements.findIndex((x) => x.id === id);
+    const nextElementIndex = nextElements.findIndex((x) => x.id === id);
+
+    // The order has changed in case we cannot find the element in prevElements (it's a new one),
+    // or we find it, but the index compared to prevElements does not match (order has changed)
+    if (prevElementIndex === -1) {
+      reorderedElements.set(id, element);
+    } else if (prevElementIndex !== nextElementIndex) {
+      reorderedElements.set(id, element);
+    }
+  }
+
+  return reorderedElements;
 };
 
 const getContiguousMovedIndices = (

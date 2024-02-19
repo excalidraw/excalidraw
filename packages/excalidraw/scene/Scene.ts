@@ -273,7 +273,7 @@ class Scene {
         : Array.from(nextElements.values());
 
     if (reorderedElements) {
-      updateFractionalIndices(_nextElements, reorderedElements);
+      updateFractionalIndices(this.elements, _nextElements, reorderedElements);
     }
 
     validateFractionalIndices(_nextElements);

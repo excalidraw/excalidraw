@@ -81,6 +81,7 @@ const duplicateElements = (
 
   // step (1)
 
+  const prevElements = [...elements];
   const sortedElements = normalizeElementOrder(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
@@ -239,6 +240,7 @@ const duplicateElements = (
   const finalElements = finalElementsReversed.reverse();
 
   updateFractionalIndices(
+    prevElements,
     finalElements,
     arrayToMap([...oldElements, ...newElements]),
   );

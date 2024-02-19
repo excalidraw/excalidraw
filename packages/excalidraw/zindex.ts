@@ -244,8 +244,10 @@ const shiftElementsByOne = (
   appState: AppState,
   direction: "left" | "right",
 ) => {
+  const prevElements = [...elements];
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
+
   let groupedIndices = toContiguousGroups(indicesToMove);
 
   if (direction === "right") {
@@ -312,7 +314,7 @@ const shiftElementsByOne = (
           ];
   });
 
-  return updateFractionalIndices(elements, targetElementsMap);
+  return updateFractionalIndices(prevElements, elements, targetElementsMap);
 };
 
 const shiftElementsToEnd = (
@@ -322,6 +324,7 @@ const shiftElementsToEnd = (
   containingFrame: ExcalidrawFrameLikeElement["id"] | null,
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
+  const prevElements = [...elements];
   const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   const displacedElements: ExcalidrawElement[] = [];
@@ -384,6 +387,7 @@ const shiftElementsToEnd = (
   const trailingElements = elements.slice(trailingIndex + 1);
 
   return updateFractionalIndices(
+    prevElements,
     direction === "left"
       ? [
           ...leadingElements,

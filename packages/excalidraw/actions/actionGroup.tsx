@@ -94,6 +94,7 @@ export const actionGroup = register({
       }
     }
 
+    const prevElements = [...elements];
     let nextElements = [...elements];
 
     // this includes the case where we are grouping elements inside a frame
@@ -141,6 +142,7 @@ export const actionGroup = register({
       );
 
     nextElements = updateFractionalIndices(
+      prevElements,
       [...elementsBeforeGroup, ...elementsInGroup, ...elementsAfterGroup],
       arrayToMap(elementsInGroup),
     );
