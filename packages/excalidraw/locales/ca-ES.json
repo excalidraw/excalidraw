@@ -134,8 +134,8 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Manté la barra lateral oberta",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Selecciona tots els elements del marc",
+    "removeAllElementsFromFrame": "Elimina tots els elements del marc",
     "eyeDropper": "",
     "textToDiagram": "",
     "prompt": "",
@@ -250,7 +250,7 @@
     "penMode": "Mode de llapis - evita tocar",
     "link": "Afegeix / actualitza l'enllaç per a la forma seleccionada",
     "eraser": "Esborrador",
-    "frame": "",
+    "frame": "Eina de marc",
     "magicframe": "",
     "embeddable": "",
     "laser": "Punter làser",
@@ -306,7 +306,7 @@
   },
   "roomDialog": {
     "desc_intro": "",
-    "desc_privacy": "",
+    "desc_privacy": "No us amoïneu, la sessió està encriptada d'extrem a extrem i és totalment privada. Ni tan sols el nostre servidor pot veure què dibuixeu.",
     "button_startSession": "Inicia la sessió",
     "button_stopSession": "Atura la sessió",
     "desc_inProgressIntro": "La sessió de col·laboració en directe està en marxa.",
@@ -514,7 +514,7 @@
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "Carrega des d'un enllaç",
         "button": "",
         "description": ""
       }
@@ -533,7 +533,7 @@
       "empty": "No s'han trobat usuaris"
     },
     "hint": {
-      "text": "",
+      "text": "Feu clic sobre un usuari per seguir-lo",
       "followStatus": ""
     }
   }
