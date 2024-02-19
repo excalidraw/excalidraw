@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "./types";
+import { ElementsMap, ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
@@ -26,8 +26,9 @@ export const isElementInViewport = (
     scrollX: number;
     scrollY: number;
   },
+  elementsMap: ElementsMap,
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
     {
       clientX: viewTransformations.offsetLeft,
