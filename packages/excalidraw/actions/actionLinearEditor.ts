@@ -24,7 +24,7 @@ export const actionToggleLinearEditor = register({
     const editingLinearElement =
       appState.editingLinearElement?.elementId === selectedElement.id
         ? null
-        : new LinearElementEditor(selectedElement, app.scene);
+        : new LinearElementEditor(selectedElement);
     return {
       appState: {
         ...appState,

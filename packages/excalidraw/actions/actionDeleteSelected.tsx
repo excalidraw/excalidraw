@@ -73,7 +73,7 @@ const handleGroupEditingState = (
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
   trackEvent: { category: "element", action: "delete" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     if (appState.editingLinearElement) {
       const {
         elementId,
@@ -81,7 +81,8 @@ export const actionDeleteSelected = register({
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
-      const element = LinearElementEditor.getElement(elementId);
+      const elementsMap = app.scene.getNonDeletedElementsMap();
+      const element = LinearElementEditor.getElement(elementId, elementsMap);
       if (!element) {
         return false;
       }

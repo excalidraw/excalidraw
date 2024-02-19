@@ -43,7 +43,7 @@ export const actionSelectAll = register({
           // single linear element selected
           Object.keys(selectedElementIds).length === 1 &&
           isLinearElement(elements[0])
-            ? new LinearElementEditor(elements[0], app.scene)
+            ? new LinearElementEditor(elements[0])
             : null,
       },
       commitToHistory: true,

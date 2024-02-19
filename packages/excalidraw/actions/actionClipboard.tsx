@@ -107,7 +107,7 @@ export const actionCut = register({
   trackEvent: { category: "element" },
   perform: (elements, appState, event: ClipboardEvent | null, app) => {
     actionCopy.perform(elements, appState, event, app);
-    return actionDeleteSelected.perform(elements, appState);
+    return actionDeleteSelected.perform(elements, appState, null, app);
   },
   contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
