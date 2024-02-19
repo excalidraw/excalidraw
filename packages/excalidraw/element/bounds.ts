@@ -5,7 +5,6 @@ import {
   ExcalidrawFreeDrawElement,
   NonDeleted,
   ExcalidrawTextElementWithContainer,
-  ElementsMapOrArray,
   ElementsMap,
 } from "./types";
 import { distance2d, rotate, rotatePoint } from "../math";
