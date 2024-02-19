@@ -12,7 +12,7 @@ import {
   getContainingFrame,
   getFrameChildren,
 } from "../frame";
-import { arrayToMap, isShallowEqual } from "../utils";
+import { isShallowEqual } from "../utils";
 import { isElementInViewport } from "../element/sizeHelpers";
 
 /**
@@ -102,6 +102,7 @@ export const getVisibleAndNonSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   const selectedElementsSet = new Set(
     selectedElements.map((element) => element.id),
@@ -112,7 +113,7 @@ export const getVisibleAndNonSelectedElements = (
       appState.width,
       appState.height,
       appState,
-      arrayToMap(elements),
+      elementsMap,
     );
 
     return !selectedElementsSet.has(element.id) && isVisible;
