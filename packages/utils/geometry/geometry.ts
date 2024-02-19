@@ -789,7 +789,10 @@ export const pointInPolygon = (point: Point, polygon: Polygon) => {
     const xj = polygon[j][0];
     const yj = polygon[j][1];
 
-    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+    if (
+      ((yi > y && yj <= y) || (yi <= y && yj > y)) &&
+      x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+    ) {
       inside = !inside;
     }
   }

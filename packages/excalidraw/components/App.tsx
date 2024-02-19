@@ -4555,7 +4555,10 @@ class App extends React.Component<AppProps, AppState> {
       if (elements[index].isDeleted) {
         continue;
       }
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(elements[index]);
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+        elements[index],
+        this.scene.getNonDeletedElementsMap(),
+      );
       if (
         isArrowElement(elements[index]) &&
         hitElementItself({
