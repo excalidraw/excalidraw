@@ -1,14 +1,14 @@
 import { expect } from "chai";
-import { PRECEDING_ELEMENT_KEY } from "../../src/constants";
-import { ExcalidrawElement } from "../../src/element/types";
+import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   BroadcastedExcalidrawElement,
   ReconciledElements,
   reconcileElements,
 } from "../../excalidraw-app/collab/reconciliation";
-import { randomInteger } from "../../src/random";
-import { AppState } from "../../src/types";
-import { cloneJSON } from "../../src/utils";
+import { randomInteger } from "../../packages/excalidraw/random";
+import { AppState } from "../../packages/excalidraw/types";
+import { cloneJSON } from "../../packages/excalidraw/utils";
 
 type Id = string;
 type ElementLike = {

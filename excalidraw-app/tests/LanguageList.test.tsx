@@ -1,8 +1,13 @@
-import { defaultLang } from "../../src/i18n";
-import { UI } from "../../src/tests/helpers/ui";
-import { screen, fireEvent, waitFor, render } from "../../src/tests/test-utils";
+import { defaultLang } from "../../packages/excalidraw/i18n";
+import { UI } from "../../packages/excalidraw/tests/helpers/ui";
+import {
+  screen,
+  fireEvent,
+  waitFor,
+  render,
+} from "../../packages/excalidraw/tests/test-utils";
 
-import ExcalidrawApp from "../../excalidraw-app";
+import ExcalidrawApp from "../App";
 
 describe("Test LanguageList", () => {
   it("rerenders UI on language change", async () => {

@@ -1,0 +1,91 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  --RadioGroup-background: var(--island-bg-color);
+  --RadioGroup-border: var(--color-surface-high);
+
+  --RadioGroup-choice-color-off: var(--color-primary);
+  --RadioGroup-choice-color-off-hover: var(--color-brand-hover);
+  --RadioGroup-choice-background-off: var(--island-bg-color);
+  --RadioGroup-choice-background-off-active: var(--color-surface-high);
+
+  --RadioGroup-choice-color-on: var(--color-surface-lowest);
+  --RadioGroup-choice-background-on: var(--color-primary);
+  --RadioGroup-choice-background-on-hover: var(--color-brand-hover);
+  --RadioGroup-choice-background-on-active: var(--color-brand-active);
+
+  .RadioGroup {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    padding: 3px;
+    border-radius: 10px;
+
+    background: var(--RadioGroup-background);
+    border: 1px solid var(--RadioGroup-border);
+
+    &__choice {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 24px;
+
+      color: var(--RadioGroup-choice-color-off);
+      background: var(--RadioGroup-choice-background-off);
+
+      border-radius: 8px;
+
+      font-family: "Assistant";
+      font-style: normal;
+      font-weight: 600;
+      font-size: 0.75rem;
+      line-height: 100%;
+      user-select: none;
+      letter-spacing: 0.4px;
+
+      transition: all 75ms ease-out;
+
+      &:hover {
+        color: var(--RadioGroup-choice-color-off-hover);
+      }
+
+      &:active {
+        background: var(--RadioGroup-choice-background-off-active);
+      }
+
+      &.active {
+        color: var(--RadioGroup-choice-color-on);
+        background: var(--RadioGroup-choice-background-on);
+
+        &:hover {
+          background: var(--RadioGroup-choice-background-on-hover);
+        }
+
+        &:active {
+          background: var(--RadioGroup-choice-background-on-active);
+        }
+      }
+
+      & input {
+        z-index: 1;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+        border-radius: 8px;
+
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+
+        cursor: pointer;
+      }
+    }
+  }
+}

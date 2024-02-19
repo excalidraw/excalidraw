@@ -13,5 +13,5 @@ jobs:
           node-version: 18.x
       - name: Install and test
         run: |
-          yarn --frozen-lockfile
+          yarn install
           yarn test:app

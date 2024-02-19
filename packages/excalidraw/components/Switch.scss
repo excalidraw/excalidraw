@@ -1,0 +1,118 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  --Switch-disabled-color: var(--color-border-outline);
+  --Switch-disabled-toggled-background: var(--color-border-outline-variant);
+  --Switch-disabled-border: var(--color-border-outline-variant);
+  --Switch-track-background: var(--island-bg-color);
+  --Switch-thumb-background: var(--color-on-surface);
+  --Switch-hover-background: var(--color-brand-hover);
+  --Switch-active-background: var(--color-brand-active);
+
+  .Switch {
+    position: relative;
+    box-sizing: border-box;
+
+    width: 40px;
+    height: 20px;
+    border-radius: 12px;
+
+    transition-property: background, border;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+
+    background: var(--Switch-track-background);
+    border: 1px solid var(--Switch-disabled-color);
+
+    &:hover {
+      background: var(--Switch-track-background);
+      border: 1px solid var(--Switch-hover-background);
+    }
+
+    &:active {
+      border: 1px solid var(--Switch-active-background);
+    }
+
+    &.toggled {
+      background: var(--color-primary);
+      border: 1px solid var(--color-primary);
+
+      &:hover {
+        background: var(--color-primary-darker);
+        border: 1px solid var(--color-primary-darker);
+      }
+    }
+
+    &.disabled {
+      background: var(--Switch-track-background);
+      border: 1px solid var(--Switch-disabled-border);
+
+      &.toggled {
+        background: var(--Switch-disabled-toggled-background);
+        border: 1px solid var(--Switch-disabled-toggled-background);
+      }
+    }
+
+    &:before {
+      content: "";
+      box-sizing: border-box;
+      display: block;
+      pointer-events: none;
+      position: absolute;
+
+      border-radius: 100%;
+      transition: all 150ms ease-out;
+
+      width: 10px;
+      height: 10px;
+      top: 4px;
+      left: 4px;
+
+      background: var(--Switch-thumb-background);
+    }
+
+    &:active:before {
+      width: 12px;
+    }
+
+    &.toggled:before {
+      width: 14px;
+      height: 14px;
+      left: 22px;
+      top: 2px;
+
+      background: var(--Switch-track-background);
+    }
+
+    &.toggled:active:before {
+      width: 16px;
+      left: 20px;
+    }
+
+    &.disabled:before {
+      background: var(--Switch-disabled-color);
+    }
+
+    &.disabled.toggled:before {
+      background: var(--Switch-disabled-color);
+    }
+
+    & input {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+
+      border-radius: 12px;
+
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      cursor: pointer;
+
+      &:disabled {
+        cursor: unset;
+      }
+    }
+  }
+}

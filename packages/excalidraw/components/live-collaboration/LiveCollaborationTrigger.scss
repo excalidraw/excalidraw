@@ -1,0 +1,66 @@
+@import "../../css/variables.module.scss";
+
+.excalidraw {
+  .collab-button {
+    --button-bg: var(--color-primary);
+    --button-color: var(--color-surface-lowest);
+    --button-border: var(--color-primary);
+
+    --button-width: var(--lg-button-size);
+    --button-height: var(--lg-button-size);
+
+    --button-hover-bg: var(--color-primary-darker);
+    --button-hover-border: var(--color-primary-darker);
+
+    --button-active-bg: var(--color-primary-darker);
+
+    box-shadow: 0 0 0 1px var(--color-surface-lowest);
+
+    flex-shrink: 0;
+
+    // double .active to force specificity
+    &.active.active {
+      background-color: #0fb884;
+      border-color: #0fb884;
+
+      svg {
+        color: #fff;
+      }
+
+      &:hover,
+      &:active {
+        background-color: #0fb884;
+        border-color: #0fb884;
+      }
+    }
+  }
+
+  .CollabButton.is-collaborating {
+    background-color: var(--button-special-active-bg-color);
+
+    .ToolIcon__icon svg,
+    .ToolIcon__label {
+      color: var(--icon-green-fill-color);
+    }
+  }
+
+  .CollabButton-collaborators {
+    :root[dir="ltr"] & {
+      right: -5px;
+    }
+    :root[dir="rtl"] & {
+      left: -5px;
+    }
+    min-width: 1em;
+    min-height: 1em;
+    line-height: 1;
+    position: absolute;
+    bottom: -5px;
+    padding: 3px;
+    border-radius: 50%;
+    background-color: $oc-green-2;
+    color: $oc-green-9;
+    font-size: 0.6rem;
+    font-family: "Cascadia";
+  }
+}

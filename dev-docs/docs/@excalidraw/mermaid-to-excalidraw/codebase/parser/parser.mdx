@@ -55,11 +55,11 @@ If you want to understand how flowchart parser works, you can navigate to [Flowc
 
 ## Converting to ExcalidrawElementSkeleton
 
-Now we have all the data, we just need to transform it to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133C13-L133C38) API so it can be rendered in Excalidraw.
+Now we have all the data, we just need to transform it to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133C13-L133C38) API so it can be rendered in Excalidraw.
 
 For this we have `converters` which takes the parsed mermaid data and gives back the Excalidraw Skeleton.
 For Unsupported types, we have already mentioned above that we convert it to `dataURL` and return the ExcalidrawImageSkeleton.
 
-For supported types, currently only flowchart, we have [flowchartConverter](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24) which parses the data and converts to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/src/data/transform.ts#L133C13-L133C38).
+For supported types, currently only flowchart, we have [flowchartConverter](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24) which parses the data and converts to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133C13-L133C38).
 
 ![image](https://github.com/excalidraw/excalidraw/assets/11256141/00226e9d-043d-4a08-989a-3ad9d2a574f1)

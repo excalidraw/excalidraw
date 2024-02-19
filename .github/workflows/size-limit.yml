@@ -15,16 +15,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-      - name: Install
-        run: yarn --frozen-lockfile
-      - name: Install in src/packages/excalidraw
-        run: yarn --frozen-lockfile
-        working-directory: src/packages/excalidraw
+      - name: Install in packages/excalidraw
+        run: yarn
+        working-directory: packages/excalidraw
         env:
           CI: true
       - uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script: build:umd
+          build_script: build:esm
           skip_step: install
-          directory: src/packages/excalidraw
+          directory: packages/excalidraw

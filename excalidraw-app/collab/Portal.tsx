@@ -6,23 +6,24 @@ import {
 
 import { TCollabClass } from "./Collab";
 
-import { ExcalidrawElement } from "../../src/element/types";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
 import {
-  WS_EVENTS,
-  FILE_UPLOAD_TIMEOUT,
-  WS_SCENE_EVENT_TYPES,
-} from "../app_constants";
-import { UserIdleState } from "../../src/types";
-import { trackEvent } from "../../src/analytics";
+  OnUserFollowedPayload,
+  SocketId,
+  UserIdleState,
+} from "../../packages/excalidraw/types";
+import { trackEvent } from "../../packages/excalidraw/analytics";
 import throttle from "lodash.throttle";
-import { newElementWith } from "../../src/element/mutateElement";
+import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import { BroadcastedExcalidrawElement } from "./reconciliation";
-import { encryptData } from "../../src/data/encryption";
-import { PRECEDING_ELEMENT_KEY } from "../../src/constants";
+import { encryptData } from "../../packages/excalidraw/data/encryption";
+import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
+import type { Socket } from "socket.io-client";
 
 class Portal {
   collab: TCollabClass;
-  socket: SocketIOClient.Socket | null = null;
+  socket: Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
@@ -32,7 +33,7 @@ class Portal {
     this.collab = collab;
   }
 
-  open(socket: SocketIOClient.Socket, id: string, key: string) {
+  open(socket: Socket, id: string, key: string) {
     this.socket = socket;
     this.roomId = id;
     this.roomKey = key;
@@ -46,12 +47,12 @@ class Portal {
     });
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
-        WS_SCENE_EVENT_TYPES.INIT,
+        WS_SUBTYPES.INIT,
         this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
     });
-    this.socket.on("room-user-change", (clients: string[]) => {
+    this.socket.on("room-user-change", (clients: SocketId[]) => {
       this.collab.setCollaborators(clients);
     });
 
@@ -83,6 +84,7 @@ class Portal {
   async _broadcastSocketData(
     data: SocketUpdateData,
     volatile: boolean = false,
+    roomId?: string,
   ) {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
@@ -91,7 +93,7 @@ class Portal {
 
       this.socket?.emit(
         volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
-        this.roomId,
+        roomId ?? this.roomId,
         encryptedBuffer,
         iv,
       );
@@ -130,11 +132,11 @@ class Portal {
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (
-    updateType: WS_SCENE_EVENT_TYPES.INIT | WS_SCENE_EVENT_TYPES.UPDATE,
+    updateType: WS_SUBTYPES.INIT | WS_SUBTYPES.UPDATE,
     allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
-    if (updateType === WS_SCENE_EVENT_TYPES.INIT && !syncAll) {
+    if (updateType === WS_SUBTYPES.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
@@ -183,9 +185,9 @@ class Portal {
   broadcastIdleChange = (userState: UserIdleState) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
-        type: "IDLE_STATUS",
+        type: WS_SUBTYPES.IDLE_STATUS,
         payload: {
-          socketId: this.socket.id,
+          socketId: this.socket.id as SocketId,
           userState,
           username: this.collab.state.username,
         },
@@ -203,9 +205,9 @@ class Portal {
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
-        type: "MOUSE_LOCATION",
+        type: WS_SUBTYPES.MOUSE_LOCATION,
         payload: {
-          socketId: this.socket.id,
+          socketId: this.socket.id as SocketId,
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
@@ -213,10 +215,41 @@ class Portal {
           username: this.collab.state.username,
         },
       };
+
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile
       );
+    }
+  };
+
+  broadcastVisibleSceneBounds = (
+    payload: {
+      sceneBounds: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"]["payload"]["sceneBounds"];
+    },
+    roomId: string,
+  ) => {
+    if (this.socket?.id) {
+      const data: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"] = {
+        type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS,
+        payload: {
+          socketId: this.socket.id as SocketId,
+          username: this.collab.state.username,
+          sceneBounds: payload.sceneBounds,
+        },
+      };
+
+      return this._broadcastSocketData(
+        data as SocketUpdateData,
+        true, // volatile
+        roomId,
+      );
+    }
+  };
+
+  broadcastUserFollowed = (payload: OnUserFollowedPayload) => {
+    if (this.socket?.id) {
+      this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
   };
 }

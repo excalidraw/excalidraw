@@ -8,7 +8,7 @@ id: "restore"
 **_Signature_**
 
 <pre>
-restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L34">ImportedDataState["appState"]</a>,<br/>&nbsp; localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>
+restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L34">ImportedDataState["appState"]</a>,<br/>&nbsp; localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>
 </pre>
 
 **_How to use_**
@@ -17,7 +17,7 @@ restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob
 import { restoreAppState } from "@excalidraw/excalidraw";
 ```
 
-This function will make sure all the `keys` have appropriate `values` in [appState](https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95) and if any key is missing, it will be set to its `default` value.
+This function will make sure all the `keys` have appropriate `values` in [appState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) and if any key is missing, it will be set to its `default` value.
 
 When `localAppState` is supplied, it's used in place of values that are missing (`undefined`) in `appState` instead of the defaults.  
 Use this as a way to not override user's defaults if you persist them.
@@ -29,16 +29,16 @@ You can pass `null` / `undefined` if not applicable.
 
 <pre>
 restoreElements(
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ImportedDataState["elements"]</a>,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ImportedDataState["elements"]</a>,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
   opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }<br/>
 )
 </pre>
 
 | Prop | Type | Description |
 | ---- | ---- | ---- |
-| `elements` | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ImportedDataState["elements"]</a> | The `elements` to be restored |
-| [`localElements`](#localelements) | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> &#124; null &#124; undefined |  When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. |
+| `elements` | <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ImportedDataState["elements"]</a> | The `elements` to be restored |
+| [`localElements`](#localelements) | <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> &#124; null &#124; undefined |  When `localElements` are supplied, they are used to ensure that existing restored elements reuse `version` (and increment it), and regenerate `versionNonce`. |
 | [`opts`](#opts) | `Object` | The extra optional parameter to configure restored elements
 
 #### localElements
@@ -70,15 +70,15 @@ Parameter `refreshDimensions` indicates whether we should also `recalculate` tex
 
 <pre>
 restore(
-  data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L34">ImportedDataState</a>,<br/>&nbsp;
-  localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>> | null | undefined,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined<br/>): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L4">DataState</a><br/>
+  data: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L34">ImportedDataState</a>,<br/>&nbsp;
+  localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>> | null | undefined,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null | undefined<br/>): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L4">DataState</a><br/>
   opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }<br/>
 
 )
 </pre>
 
-See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreAppState) about `localAppState`, and [`restoreElements()`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#restoreElements) about `localElements`.
+See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/excalidraw/README.md#restoreAppState) about `localAppState`, and [`restoreElements()`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/excalidraw/README.md#restoreElements) about `localElements`.
 
 **_How to use_**
 
@@ -93,7 +93,7 @@ This function makes sure elements and state is set to appropriate values and set
 **_Signature_**
 
 <pre>
-restoreLibraryItems(libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L34">ImportedDataState["libraryItems"]</a>,<br/>&nbsp;
+restoreLibraryItems(libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L34">ImportedDataState["libraryItems"]</a>,<br/>&nbsp;
 defaultStatus: "published" | "unpublished")
 </pre>
 

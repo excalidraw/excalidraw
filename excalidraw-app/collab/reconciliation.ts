@@ -1,7 +1,7 @@
-import { PRECEDING_ELEMENT_KEY } from "../../src/constants";
-import { ExcalidrawElement } from "../../src/element/types";
-import { AppState } from "../../src/types";
-import { arrayToMapWithIndex } from "../../src/utils";
+import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import { AppState } from "../../packages/excalidraw/types";
+import { arrayToMapWithIndex } from "../../packages/excalidraw/utils";
 
 export type ReconciledElements = readonly ExcalidrawElement[] & {
   _brand: "reconciledElements";

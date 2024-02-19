@@ -1,0 +1,142 @@
+@import "../css/variables.module";
+
+.excalidraw {
+  .UserList {
+    pointer-events: none;
+    /*github corner*/
+    padding: var(--space-factor) var(--space-factor) var(--space-factor)
+      var(--space-factor);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.625rem;
+
+    &:empty {
+      display: none;
+    }
+
+    box-sizing: border-box;
+
+    // can fit max 4 avatars (3 avatars + show more) in a column
+    max-height: 120px;
+
+    // can fit max 4 avatars (3 avatars + show more) when there's enough space
+    max-width: 120px;
+
+    // Tweak in 30px increments to fit more/fewer avatars in a row/column ^^
+
+    overflow: hidden;
+  }
+
+  .UserList > * {
+    pointer-events: var(--ui-pointerEvents);
+  }
+
+  .UserList_mobile {
+    padding: 0;
+    justify-content: normal;
+    margin: 0.5rem 0;
+    max-width: none;
+    max-height: none;
+  }
+
+  .UserList__more {
+    @include avatarStyles;
+    background-color: var(--color-gray-20);
+    border: 0 !important;
+    font-size: 0.5rem;
+    font-weight: 400;
+    flex-shrink: 0;
+    color: var(--color-gray-100);
+  }
+
+  .UserList__collaborator-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .UserList__collaborator-follow-status-icon {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 1rem;
+    display: flex;
+  }
+
+  --userlist-hint-bg-color: var(--color-gray-10);
+  --userlist-hint-heading-color: var(--color-gray-80);
+  --userlist-hint-text-color: var(--color-gray-60);
+  --userlist-collaborators-border-color: var(--color-gray-20);
+
+  &.theme--dark {
+    --userlist-hint-bg-color: var(--color-gray-90);
+    --userlist-hint-heading-color: var(--color-gray-30);
+    --userlist-hint-text-color: var(--color-gray-40);
+    --userlist-collaborators-border-color: var(--color-gray-80);
+  }
+
+  .UserList__collaborators {
+    position: static;
+    top: auto;
+    margin-top: 0;
+    max-height: 12rem;
+    overflow-y: auto;
+    padding: 0.25rem 0.5rem;
+    border-top: 1px solid var(--userlist-collaborators-border-color);
+    border-bottom: 1px solid var(--userlist-collaborators-border-color);
+
+    &__empty {
+      color: var(--color-gray-60);
+      font-size: 0.75rem;
+      line-height: 150%;
+      padding: 0.5rem 0;
+    }
+  }
+
+  .UserList__hint {
+    padding: 0.5rem 0.75rem;
+    overflow: hidden;
+    text-align: center;
+    color: var(--userlist-hint-text-color);
+    font-size: 0.75rem;
+    line-height: 150%;
+  }
+
+  .UserList__search-wrapper {
+    position: relative;
+    height: 2.5rem;
+
+    svg {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0.75rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--color-gray-40);
+      z-index: 1;
+    }
+  }
+
+  .UserList__search {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border: 0 !important;
+    border-radius: 0 !important;
+    font-size: 0.875rem;
+    padding-left: 2.5rem !important;
+    padding-right: 0.75rem !important;
+
+    &::placeholder {
+      color: var(--color-gray-40);
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+}

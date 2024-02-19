@@ -1,12 +1,12 @@
 import React from "react";
-import { PlusPromoIcon } from "../../src/components/icons";
-import { useI18n } from "../../src/i18n";
-import { WelcomeScreen } from "../../src/packages/excalidraw/index";
+import { PlusPromoIcon } from "../../packages/excalidraw/components/icons";
+import { useI18n } from "../../packages/excalidraw/i18n";
+import { WelcomeScreen } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
-import { POINTER_EVENTS } from "../../src/constants";
+import { POINTER_EVENTS } from "../../packages/excalidraw/constants";
 
 export const AppWelcomeScreen: React.FC<{
-  setCollabDialogShown: (toggle: boolean) => any;
+  onCollabDialogOpen: () => any;
   isCollabEnabled: boolean;
 }> = React.memo((props) => {
   const { t } = useI18n();
@@ -52,7 +52,7 @@ export const AppWelcomeScreen: React.FC<{
           <WelcomeScreen.Center.MenuItemHelp />
           {props.isCollabEnabled && (
             <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
-              onSelect={() => props.setCollabDialogShown(true)}
+              onSelect={() => props.onCollabDialogOpen()}
             />
           )}
           {!isExcalidrawPlusSignedUser && (

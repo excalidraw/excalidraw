@@ -1,0 +1,98 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .context-menu {
+    position: relative;
+    border-radius: 4px;
+    box-shadow: 0 3px 10px transparentize($oc-black, 0.8);
+    padding: 0;
+    list-style: none;
+    user-select: none;
+    margin: -0.25rem 0 0 0.125rem;
+    padding: 0.5rem 0;
+    background-color: var(--popup-secondary-bg-color);
+    border: 1px solid var(--button-gray-3);
+    cursor: default;
+  }
+
+  .context-menu button {
+    color: var(--popup-text-color);
+  }
+
+  .context-menu-item {
+    position: relative;
+    width: 100%;
+    min-width: 9.5rem;
+    margin: 0;
+    padding: 0.25rem 1rem 0.25rem 1.25rem;
+    text-align: start;
+    border-radius: 0;
+    background-color: transparent;
+    border: none;
+    white-space: nowrap;
+    font-family: inherit;
+
+    display: grid;
+    grid-template-columns: 1fr 0.2fr;
+    align-items: center;
+
+    &.checkmark::before {
+      position: absolute;
+      left: 6px;
+      margin-bottom: 1px;
+      content: "\2713";
+    }
+
+    &.dangerous {
+      .context-menu-item__label {
+        color: $oc-red-7;
+      }
+    }
+
+    .context-menu-item__label {
+      justify-self: start;
+      margin-inline-end: 20px;
+    }
+    .context-menu-item__shortcut {
+      justify-self: end;
+      opacity: 0.6;
+      font-family: inherit;
+      font-size: 0.7rem;
+    }
+  }
+
+  .context-menu-item:hover {
+    color: var(--popup-bg-color);
+    background-color: var(--select-highlight-color);
+
+    &.dangerous {
+      .context-menu-item__label {
+        color: var(--popup-bg-color);
+      }
+      background-color: $oc-red-6;
+    }
+  }
+
+  .context-menu-item:focus {
+    z-index: 1;
+  }
+
+  @include isMobile {
+    .context-menu-item {
+      display: block;
+
+      .context-menu-item__label {
+        margin-inline-end: 0;
+      }
+
+      .context-menu-item__shortcut {
+        display: none;
+      }
+    }
+  }
+
+  .context-menu-item-separator {
+    border: none;
+    border-top: 1px solid $oc-gray-5;
+  }
+}

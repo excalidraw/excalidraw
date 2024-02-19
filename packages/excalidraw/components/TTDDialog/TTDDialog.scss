@@ -1,0 +1,315 @@
+@import "../../css/variables.module.scss";
+
+$verticalBreakpoint: 861px;
+
+.excalidraw {
+  .Modal.Dialog.ttd-dialog {
+    padding: 1.25rem;
+
+    &.Dialog--fullscreen {
+      margin-top: 0;
+    }
+
+    .Island {
+      padding-inline: 0 !important;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      box-shadow: none;
+    }
+
+    .Modal__content {
+      height: auto;
+      max-height: 100%;
+
+      @media screen and (min-width: $verticalBreakpoint) {
+        max-height: 750px;
+        height: 100%;
+      }
+    }
+
+    .Dialog__content {
+      flex: 1 1 auto;
+    }
+  }
+
+  .ttd-dialog-desc {
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+
+  .ttd-dialog-tabs-root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ttd-dialog-tab-trigger {
+    color: var(--color-on-surface);
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 0 1rem;
+    background-color: transparent;
+    border: 0;
+    height: 2.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    letter-spacing: 0.4px;
+
+    &[data-state="active"] {
+      border-bottom: 2px solid var(--color-primary);
+    }
+  }
+
+  .ttd-dialog-triggers {
+    border-bottom: 1px solid var(--color-surface-high);
+    margin-bottom: 1.5rem;
+    padding-inline: 2.5rem;
+  }
+
+  .ttd-dialog-content {
+    padding-inline: 2.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .ttd-dialog-input {
+    width: auto;
+    height: 10rem;
+    resize: none;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--dialog-border-color);
+    white-space: pre-wrap;
+    padding: 0.85rem;
+    box-sizing: border-box;
+    font-family: monospace;
+
+    @media screen and (min-width: $verticalBreakpoint) {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .ttd-dialog-output-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem;
+    box-sizing: border-box;
+    flex-grow: 1;
+    position: relative;
+
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
+      left center;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--dialog-border-color);
+
+    height: 400px;
+    width: auto;
+
+    @media screen and (min-width: $verticalBreakpoint) {
+      width: 100%;
+      // acts as min-height
+      height: 200px;
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+
+  .ttd-dialog-output-canvas-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+  }
+
+  .ttd-dialog-output-error {
+    color: red;
+    font-weight: 800;
+    font-size: 30px;
+    word-break: break-word;
+    overflow: auto;
+    max-height: 100%;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    z-index: 10;
+
+    p {
+      font-weight: 500;
+      font-family: Cascadia;
+      text-align: left;
+      white-space: pre-wrap;
+      font-size: 0.875rem;
+      padding: 0 10px;
+    }
+  }
+
+  .ttd-dialog-panels {
+    height: 100%;
+
+    @media screen and (min-width: $verticalBreakpoint) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .ttd-dialog-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &__header {
+      display: flex;
+      margin: 0px 4px 4px 4px;
+      align-items: center;
+      gap: 1rem;
+
+      label {
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+      }
+    }
+
+    &:first-child {
+      .ttd-dialog-panel-button-container:not(.invisible) {
+        margin-bottom: 4rem;
+      }
+    }
+
+    @media screen and (min-width: $verticalBreakpoint) {
+      .ttd-dialog-panel-button-container:not(.invisible) {
+        margin-bottom: 0.5rem !important;
+      }
+    }
+
+    textarea {
+      height: 100%;
+      resize: none;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--dialog-border-color);
+      white-space: pre-wrap;
+      padding: 0.85rem;
+      box-sizing: border-box;
+      width: 100%;
+      font-family: monospace;
+
+      @media screen and (max-width: $verticalBreakpoint) {
+        width: auto;
+        height: 10rem;
+      }
+    }
+  }
+
+  .ttd-dialog-panel-button-container {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+
+    &.invisible {
+      .ttd-dialog-panel-button {
+        display: none;
+
+        @media screen and (min-width: $verticalBreakpoint) {
+          display: block;
+          visibility: hidden;
+        }
+      }
+    }
+  }
+
+  .ttd-dialog-panel-button {
+    &.excalidraw-button {
+      font-family: inherit;
+      font-weight: 600;
+      height: 2.5rem;
+
+      font-size: 12px;
+      color: $oc-white;
+      background-color: var(--color-primary);
+      width: 100%;
+
+      &:hover {
+        background-color: var(--color-primary-darker);
+      }
+      &:active {
+        background-color: var(--color-primary-darkest);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        &:hover {
+          background-color: var(--color-primary);
+        }
+      }
+
+      @media screen and (min-width: $verticalBreakpoint) {
+        width: auto;
+        min-width: 7.5rem;
+      }
+
+      @at-root .excalidraw.theme--dark#{&} {
+        color: var(--color-gray-100);
+      }
+    }
+
+    position: relative;
+
+    div {
+      display: contents;
+
+      &.invisible {
+        visibility: hidden;
+      }
+
+      &.Spinner {
+        display: flex !important;
+        position: absolute;
+        inset: 0;
+
+        --spinner-color: white;
+
+        @at-root .excalidraw.theme--dark#{&} {
+          --spinner-color: var(--color-gray-100);
+        }
+      }
+
+      span {
+        padding-left: 0.5rem;
+        display: flex;
+      }
+    }
+  }
+
+  .ttd-dialog-submit-shortcut {
+    margin-inline-start: 0.5rem;
+    font-size: 0.625rem;
+    opacity: 0.6;
+    display: flex;
+    gap: 0.125rem;
+
+    &__key {
+      border: 1px solid gray;
+      padding: 2px 3px;
+      border-radius: 4px;
+    }
+  }
+}

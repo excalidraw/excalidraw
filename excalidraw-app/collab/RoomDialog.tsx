@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
-import { copyTextToSystemClipboard } from "../../src/clipboard";
-import { trackEvent } from "../../src/analytics";
-import { getFrame } from "../../src/utils";
-import { useI18n } from "../../src/i18n";
-import { KEYS } from "../../src/keys";
+import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
+import { trackEvent } from "../../packages/excalidraw/analytics";
+import { getFrame } from "../../packages/excalidraw/utils";
+import { useI18n } from "../../packages/excalidraw/i18n";
+import { KEYS } from "../../packages/excalidraw/keys";
 
-import { Dialog } from "../../src/components/Dialog";
+import { Dialog } from "../../packages/excalidraw/components/Dialog";
 import {
   copyIcon,
   playerPlayIcon,
@@ -16,11 +16,11 @@ import {
   shareIOS,
   shareWindows,
   tablerCheckIcon,
-} from "../../src/components/icons";
-import { TextField } from "../../src/components/TextField";
-import { FilledButton } from "../../src/components/FilledButton";
+} from "../../packages/excalidraw/components/icons";
+import { TextField } from "../../packages/excalidraw/components/TextField";
+import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
 
-import { ReactComponent as CollabImage } from "../../src/assets/lock.svg";
+import { ReactComponent as CollabImage } from "../../packages/excalidraw/assets/lock.svg";
 import "./RoomDialog.scss";
 
 const getShareIcon = () => {
@@ -120,7 +120,7 @@ export const RoomModal = ({
               size="large"
               variant="icon"
               label="Share"
-              startIcon={getShareIcon()}
+              icon={getShareIcon()}
               className="RoomDialog__active__share"
               onClick={shareRoomLink}
             />
@@ -130,7 +130,7 @@ export const RoomModal = ({
               <FilledButton
                 size="large"
                 label="Copy link"
-                startIcon={copyIcon}
+                icon={copyIcon}
                 onClick={copyRoomLink}
               />
             </Popover.Trigger>
@@ -166,7 +166,7 @@ export const RoomModal = ({
             variant="outlined"
             color="danger"
             label={t("roomDialog.button_stopSession")}
-            startIcon={playerStopFilledIcon}
+            icon={playerStopFilledIcon}
             onClick={() => {
               trackEvent("share", "room closed");
               onRoomDestroy();
@@ -195,7 +195,7 @@ export const RoomModal = ({
         <FilledButton
           size="large"
           label={t("roomDialog.button_startSession")}
-          startIcon={playerPlayIcon}
+          icon={playerPlayIcon}
           onClick={() => {
             trackEvent("share", "room creation", `ui (${getFrame()})`);
             onRoomCreate();

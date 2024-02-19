@@ -44,7 +44,7 @@ jobs:
       - name: Auto release preview
         id: "autorelease"
         run: |
-          yarn add @actions/core
+          yarn add @actions/core -W
           yarn autorelease preview ${{ github.event.issue.number }}
       - name: Post comment post release
         if: always()

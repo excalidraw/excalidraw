@@ -1,0 +1,38 @@
+@import "../../css/variables.module.scss";
+
+.excalidraw {
+  .sidebar-trigger {
+    @include outlineButtonStyles;
+    @include filledButtonOnCanvas;
+
+    width: auto;
+    height: var(--lg-button-size);
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    line-height: 0;
+
+    font-size: 0.75rem;
+    letter-spacing: 0.4px;
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+
+    &__label-element {
+      align-self: flex-start;
+    }
+  }
+
+  .default-sidebar-trigger .sidebar-trigger__label {
+    display: block;
+    white-space: nowrap;
+  }
+
+  &.excalidraw--mobile .default-sidebar-trigger .sidebar-trigger__label {
+    display: none;
+  }
+}

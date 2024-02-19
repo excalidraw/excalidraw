@@ -2,7 +2,7 @@ const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
-const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
+const excalidrawDir = `${__dirname}/../packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
 const pkg = require(excalidrawPackage);
 const lastVersion = pkg.version;

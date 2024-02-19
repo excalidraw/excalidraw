@@ -1,0 +1,130 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .HelpDialog {
+    .Modal__content {
+      max-width: 960px;
+    }
+
+    h3 {
+      margin: 1.5rem 0;
+      font-weight: bold;
+      font-size: 1.125rem;
+    }
+
+    &__header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    &__btn {
+      --background: var(--color-surface-mid);
+
+      display: flex;
+      column-gap: 0.5rem;
+      align-items: center;
+      background-color: var(--background);
+      padding: 0.625rem 1rem;
+      border: 1px solid var(--background);
+      border-radius: var(--border-radius-lg);
+      color: var(--text-primary-color);
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.4px;
+
+      @at-root .excalidraw.theme--dark#{&} {
+        --background: var(--color-surface-high);
+        &:hover {
+          --background: #363541;
+        }
+      }
+
+      &:hover {
+        --background: var(--color-surface-high);
+        text-decoration: none;
+      }
+
+      &:active {
+        border-color: var(--color-primary);
+      }
+    }
+
+    &__link-icon {
+      line-height: 0;
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &__islands-container {
+      display: grid;
+      @media screen and (min-width: 1024px) {
+        grid-template-columns: 1fr 1fr;
+      }
+      grid-column-gap: 1.5rem;
+      grid-row-gap: 2rem;
+    }
+
+    @media screen and (min-width: 1024px) {
+      &__island--tools {
+        grid-area: 1 / 1 / 2 / 2;
+      }
+      &__island--view {
+        grid-area: 2 / 1 / 3 / 2;
+      }
+      &__island--editor {
+        grid-area: 1 / 2 / 3 / 3;
+      }
+    }
+
+    &__island {
+      h4 {
+        font-size: 1rem;
+        font-weight: bold;
+        margin: 0;
+        margin-bottom: 0.625rem;
+      }
+
+      &-content {
+        border: 1px solid var(--dialog-border-color);
+        border-radius: var(--border-radius-lg);
+      }
+    }
+
+    &__shortcut {
+      border-bottom: 1px solid var(--dialog-border-color);
+      padding: 0.375rem 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+      column-gap: 0.5rem;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    &__key-container {
+      display: flex;
+      align-items: center;
+      column-gap: 0.25rem;
+      flex-shrink: 0;
+    }
+
+    &__key {
+      display: flex;
+      box-sizing: border-box;
+      font-size: 0.625rem;
+      background-color: var(--color-primary-light);
+      border-radius: var(--border-radius-md);
+      padding: 0.5rem;
+      word-break: keep-all;
+      align-items: center;
+      font-family: inherit;
+      line-height: 1;
+    }
+  }
+}

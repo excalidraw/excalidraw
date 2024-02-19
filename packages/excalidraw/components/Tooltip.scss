@@ -1,0 +1,47 @@
+@import "../css/variables.module.scss";
+
+// container in body where the actual tooltip is appended to
+.excalidraw-tooltip {
+  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font);
+  position: fixed;
+  z-index: var(--zIndex-popup);
+
+  padding: 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  pointer-events: none;
+  word-wrap: break-word;
+
+  background: $oc-black;
+
+  line-height: 1.5;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: $oc-white;
+
+  display: none;
+
+  &.excalidraw-tooltip--visible {
+    display: block;
+  }
+}
+
+// wraps the element we want to apply the tooltip to
+.excalidraw-tooltip-wrapper {
+  display: flex;
+}
+
+.excalidraw-tooltip-icon {
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 5px;
+  margin-top: 1px;
+  display: flex;
+
+  @include isMobile {
+    display: none;
+  }
+}
