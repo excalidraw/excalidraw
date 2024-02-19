@@ -278,6 +278,7 @@ import {
   updateStable,
   addEventListener,
   normalizeEOL,
+  getDateTime,
 } from "../utils";
 import {
   createSrcDoc,
@@ -632,7 +633,7 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
-      name = defaultAppState.name,
+      name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
     this.state = {
       ...defaultAppState,
@@ -675,6 +676,7 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
+        getName: this.getName,
         registerAction: (action: Action) => {
           this.actionManager.registerAction(action);
         },
@@ -1547,6 +1549,7 @@ class App extends React.Component<AppProps, AppState> {
                             <Hyperlink
                               key={firstSelectedElement.id}
                               element={firstSelectedElement}
+                              elementsMap={allElementsMap}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
                               setToast={this.setToast}
@@ -1560,6 +1563,7 @@ class App extends React.Component<AppProps, AppState> {
                           isMagicFrameElement(firstSelectedElement) && (
                             <ElementCanvasButtons
                               element={firstSelectedElement}
+                              elementsMap={elementsMap}
                             >
                               <ElementCanvasButton
                                 title={t("labels.convertToCode")}
@@ -1580,6 +1584,7 @@ class App extends React.Component<AppProps, AppState> {
                             ?.status === "done" && (
                             <ElementCanvasButtons
                               element={firstSelectedElement}
+                              elementsMap={elementsMap}
                             >
                               <ElementCanvasButton
                                 title={t("labels.copySource")}
@@ -1747,7 +1752,7 @@ class App extends React.Component<AppProps, AppState> {
       this.files,
       {
         exportBackground: this.state.exportBackground,
-        name: this.state.name,
+        name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
       },
@@ -2146,7 +2151,7 @@ class App extends React.Component<AppProps, AppState> {
         let gridSize = actionResult?.appState?.gridSize || null;
         const theme =
           actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
-        let name = actionResult?.appState?.name ?? this.state.name;
+        const name = actionResult?.appState?.name ?? this.state.name;
         const errorMessage =
           actionResult?.appState?.errorMessage ?? this.state.errorMessage;
         if (typeof this.props.viewModeEnabled !== "undefined") {
@@ -2159,10 +2164,6 @@ class App extends React.Component<AppProps, AppState> {
 
         if (typeof this.props.gridModeEnabled !== "undefined") {
           gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        if (typeof this.props.name !== "undefined") {
-          name = this.props.name;
         }
 
         editingElement =
@@ -2614,10 +2615,10 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     this.updateEmbeddables();
-    if (
-      !this.state.showWelcomeScreen &&
-      !this.scene.getElementsIncludingDeleted().length
-    ) {
+    const elements = this.scene.getElementsIncludingDeleted();
+    const elementsMap = this.scene.getElementsMapIncludingDeleted();
+
+    if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
     }
 
@@ -2722,12 +2723,6 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (this.props.name && prevProps.name !== this.props.name) {
-      this.setState({
-        name: this.props.name,
-      });
-    }
-
     this.excalidrawContainerRef.current?.classList.toggle(
       "theme--dark",
       this.state.theme === "dark",
@@ -2777,28 +2772,22 @@ class App extends React.Component<AppProps, AppState> {
           LinearElementEditor.getPointAtIndexGlobalCoordinates(
             multiElement,
             -1,
+            elementsMap,
           ),
         ),
+        elementsMap,
         this,
       );
     }
-    this.history.record(this.state, this.scene.getElementsIncludingDeleted());
+    this.history.record(this.state, elements);
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
     // init, which would trigger onChange with empty elements, which would then
     // override whatever is in localStorage currently.
     if (!this.state.isLoading) {
-      this.props.onChange?.(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-        this.files,
-      );
-      this.onChangeEmitter.trigger(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-        this.files,
-      );
+      this.props.onChange?.(elements, this.state, this.files);
+      this.onChangeEmitter.trigger(elements, this.state, this.files);
     }
   }
 
@@ -3148,7 +3137,11 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(newElement, container);
+        redrawTextBoundingBox(
+          newElement,
+          container,
+          this.scene.getElementsMapIncludingDeleted(),
+        );
       }
     });
 
@@ -3858,7 +3851,7 @@ class App extends React.Component<AppProps, AppState> {
             y: element.y + offsetY,
           });
 
-          updateBoundElements(element, {
+          updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
             simultaneouslyUpdated: selectedElements,
           });
         });
@@ -4032,9 +4025,10 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (isArrowKey(event.key)) {
       const selectedElements = this.scene.getSelectedElements(this.state);
+      const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements, this)
-        : unbindLinearElements(selectedElements);
+        ? bindOrUnbindSelectedElements(selectedElements, elementsMap, this)
+        : unbindLinearElements(selectedElements, elementsMap);
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -4136,6 +4130,14 @@ class App extends React.Component<AppProps, AppState> {
     return gesture.pointers.size >= 2;
   };
 
+  public getName = () => {
+    return (
+      this.state.name ||
+      this.props.name ||
+      `${t("labels.untitled")}-${getDateTime()}`
+    );
+  };
+
   // fires only on Safari
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
     event.preventDefault();
@@ -4207,20 +4209,21 @@ class App extends React.Component<AppProps, AppState> {
       isExistingElement?: boolean;
     },
   ) {
+    const elementsMap = this.scene.getElementsMapIncludingDeleted();
+
     const updateElement = (
       text: string,
       originalText: string,
       isDeleted: boolean,
     ) => {
       this.scene.replaceAllElements([
+        // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return updateTextElement(
               _element,
-              getContainerElement(
-                _element,
-                this.scene.getElementsMapIncludingDeleted(),
-              ),
+              getContainerElement(_element, elementsMap),
+              elementsMap,
               {
                 text,
                 isDeleted,
@@ -4252,7 +4255,7 @@ class App extends React.Component<AppProps, AppState> {
       onChange: withBatchedUpdates((text) => {
         updateElement(text, text, false);
         if (isNonDeletedElement(element)) {
-          updateBoundElements(element);
+          updateBoundElements(element, elementsMap);
         }
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
@@ -4348,7 +4351,10 @@ class App extends React.Component<AppProps, AppState> {
         const roughShape =
           ShapeCache.get(element)?.[0] ??
           ShapeCache.generateElementShape(element, null)[0];
-        const [, , , , cx, cy] = getElementAbsoluteCoords(element);
+        const [, , , , cx, cy] = getElementAbsoluteCoords(
+          element,
+          this.scene.getNonDeletedElementsMap(),
+        );
 
         return shouldTestInside(element)
           ? getClosedCurveShape(
@@ -4367,7 +4373,10 @@ class App extends React.Component<AppProps, AppState> {
         return getEllipseShape(element);
 
       case "freedraw": {
-        const [, , , , cx, cy] = getElementAbsoluteCoords(element);
+        const [, , , , cx, cy] = getElementAbsoluteCoords(
+          element,
+          this.scene.getNonDeletedElementsMap(),
+        );
         return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
       }
     }
@@ -4388,6 +4397,7 @@ class App extends React.Component<AppProps, AppState> {
           ...LinearElementEditor.getBoundTextElementPosition(
             element,
             boundTextElement,
+            this.scene.getNonDeletedElementsMap(),
           ),
         });
       }
@@ -4467,7 +4477,11 @@ class App extends React.Component<AppProps, AppState> {
         return containingFrame &&
           this.state.frameRendering.enabled &&
           this.state.frameRendering.clip
-          ? isCursorInFrame({ x, y }, containingFrame)
+          ? isCursorInFrame(
+              { x, y },
+              containingFrame,
+              this.scene.getNonDeletedElementsMap(),
+            )
           : true;
       })
       .filter((el) => {
@@ -4850,6 +4864,7 @@ class App extends React.Component<AppProps, AppState> {
         index <= hitElementIndex &&
         isPointHittingLink(
           element,
+          this.scene.getNonDeletedElementsMap(),
           this.state,
           [scenePointer.x, scenePointer.y],
           this.device.editor.isMobile,
@@ -4880,8 +4895,10 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerDownEvent!,
       this.state,
     );
+    const elementsMap = this.scene.getNonDeletedElementsMap();
     const lastPointerDownHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
+      elementsMap,
       this.state,
       [lastPointerDownCoords.x, lastPointerDownCoords.y],
       this.device.editor.isMobile,
@@ -4892,6 +4909,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     const lastPointerUpHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
+      elementsMap,
       this.state,
       [lastPointerUpCoords.x, lastPointerUpCoords.y],
       this.device.editor.isMobile,
@@ -4928,10 +4946,11 @@ class App extends React.Component<AppProps, AppState> {
     x: number;
     y: number;
   }) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
     const frames = this.scene
       .getNonDeletedFramesLikes()
       .filter((frame): frame is ExcalidrawFrameLikeElement =>
-        isCursorInFrame(sceneCoords, frame),
+        isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
     return frames.length ? frames[frames.length - 1] : null;
@@ -5035,6 +5054,7 @@ class App extends React.Component<AppProps, AppState> {
           y: scenePointerY,
         },
         event,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       this.setState((prevState) => {
@@ -5074,6 +5094,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerX,
         scenePointerY,
         this.state,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       if (
@@ -5224,6 +5245,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
+        this.scene.getNonDeletedElementsMap(),
       );
       if (
         elementWithTransformHandleType &&
@@ -5271,7 +5293,11 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.selectedElementIds[this.hitLinkElement.id]
     ) {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-      showHyperlinkTooltip(this.hitLinkElement, this.state);
+      showHyperlinkTooltip(
+        this.hitLinkElement,
+        this.state,
+        this.scene.getNonDeletedElementsMap(),
+      );
     } else {
       hideHyperlinkToolip();
       if (
@@ -5471,6 +5497,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
           element,
+          elementsMap,
           this.state.zoom,
           scenePointerX,
           scenePointerY,
@@ -5878,10 +5905,12 @@ class App extends React.Component<AppProps, AppState> {
       if (
         clicklength < 300 &&
         isIframeLikeElement(this.hitLinkElement) &&
-        !isPointHittingLinkIcon(this.hitLinkElement, this.state, [
-          scenePointer.x,
-          scenePointer.y,
-        ])
+        !isPointHittingLinkIcon(
+          this.hitLinkElement,
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+          [scenePointer.x, scenePointer.y],
+        )
       ) {
         this.handleEmbeddableCenterClick(this.hitLinkElement);
       } else {
@@ -6179,7 +6208,9 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean => {
     if (this.state.activeTool.type === "selection") {
       const elements = this.scene.getNonDeletedElements();
+      const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
+
       if (selectedElements.length === 1 && !this.state.editingLinearElement) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -6189,6 +6220,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y,
             this.state.zoom,
             event.pointerType,
+            this.scene.getNonDeletedElementsMap(),
           );
         if (elementWithTransformHandleType != null) {
           this.setState({
@@ -6212,6 +6244,7 @@ class App extends React.Component<AppProps, AppState> {
           getResizeOffsetXY(
             pointerDownState.resize.handleType,
             selectedElements,
+            elementsMap,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           ),
@@ -6984,6 +7017,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           selectedElements,
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         ),
       );
     }
@@ -7007,6 +7041,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           selectedElements,
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         ),
       );
     }
@@ -7123,6 +7158,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             this.state,
             !event[KEYS.CTRL_OR_CMD],
+            this.scene.getNonDeletedElementsMap(),
           );
           if (!ret) {
             return;
@@ -7281,10 +7317,11 @@ class App extends React.Component<AppProps, AppState> {
           this.maybeCacheReferenceSnapPoints(event, selectedElements);
 
           const { snapOffset, snapLines } = snapDraggedElements(
-            getSelectedElements(originalElements, this.state),
+            originalElements,
             dragOffset,
             this.state,
             event,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           this.setState({ snapLines });
@@ -7468,6 +7505,7 @@ class App extends React.Component<AppProps, AppState> {
             event,
             this.state,
             this.setState.bind(this),
+            this.scene.getNonDeletedElementsMap(),
           );
           // regular box-select
         } else {
@@ -7498,6 +7536,7 @@ class App extends React.Component<AppProps, AppState> {
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
             draggingElement,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           this.setState((prevState) => {
@@ -7628,7 +7667,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         selectedElementsAreBeingDragged: false,
       });
-
+      const elementsMap = this.scene.getNonDeletedElementsMap();
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
@@ -7643,6 +7682,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.editingLinearElement,
             this.state,
+            elementsMap,
             this,
           );
           if (editingLinearElement !== this.state.editingLinearElement) {
@@ -7667,6 +7707,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.selectedLinearElement,
             this.state,
+            elementsMap,
             this,
           );
 
@@ -7678,6 +7719,7 @@ class App extends React.Component<AppProps, AppState> {
               element,
               startBindingElement,
               endBindingElement,
+              elementsMap,
             );
           }
 
@@ -7817,6 +7859,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               this.scene,
               pointerCoords,
+              elementsMap,
               this,
             );
           }
@@ -7888,7 +7931,13 @@ class App extends React.Component<AppProps, AppState> {
               const frame = getContainingFrame(linearElement);
 
               if (frame && linearElement) {
-                if (!elementOverlapsWithFrame(linearElement, frame)) {
+                if (
+                  !elementOverlapsWithFrame(
+                    linearElement,
+                    frame,
+                    this.scene.getNonDeletedElementsMap(),
+                  )
+                ) {
                   // remove the linear element from all groups
                   // before removing it from the frame as well
                   mutateElement(linearElement, {
@@ -7999,6 +8048,7 @@ class App extends React.Component<AppProps, AppState> {
           const elementsInsideFrame = getElementsInNewFrame(
             this.scene.getElementsIncludingDeleted(),
             draggingElement,
+            this.scene.getNonDeletedElementsMap(),
           );
 
           this.scene.replaceAllElements(
@@ -8049,6 +8099,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getElementsIncludingDeleted(),
               frame,
               this.state,
+              elementsMap,
             ),
             frame,
             this,
@@ -8338,6 +8389,7 @@ class App extends React.Component<AppProps, AppState> {
           ? bindOrUnbindSelectedElements
           : unbindLinearElements)(
           this.scene.getSelectedElements(this.state),
+          elementsMap,
           this,
         );
       }
@@ -8873,6 +8925,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const suggestedBindings = getEligibleElementsForBinding(
       selectedElements,
+      this.scene.getNonDeletedElementsMap(),
       this,
     );
     this.setState({ suggestedBindings });
@@ -9213,6 +9266,7 @@ class App extends React.Component<AppProps, AppState> {
           x: gridX - pointerDownState.originInGrid.x,
           y: gridY - pointerDownState.originInGrid.y,
         },
+        this.scene.getNonDeletedElementsMap(),
       );
 
       gridX += snapOffset.x;
@@ -9251,6 +9305,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElements(),
             draggingElement as ExcalidrawFrameLikeElement,
             this.state,
+            this.scene.getNonDeletedElementsMap(),
           ),
         });
       }
@@ -9370,6 +9425,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           frame,
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         ).forEach((element) => elementsToHighlight.add(element));
       });
 
