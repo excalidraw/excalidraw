@@ -908,108 +908,108 @@ describe("multiple selection", () => {
 
   // FIXME: works perfectly fine in the editor but test fails
   //        commenting this out for now
-  // it("flips while resizing", async () => {
-  //   const image = API.createElement({
-  //     type: "image",
-  //     x: 60,
-  //     y: 100,
-  //     width: 100,
-  //     height: 100,
-  //     angle: (Math.PI * 7) / 6,
-  //   });
-  //   h.elements = [image];
+  test.skip("flips while resizing", async () => {
+    const image = API.createElement({
+      type: "image",
+      x: 60,
+      y: 100,
+      width: 100,
+      height: 100,
+      angle: (Math.PI * 7) / 6,
+    });
+    h.elements = [image];
 
-  //   const line = UI.createElement("line", {
-  //     x: 60,
-  //     y: 0,
-  //     points: [
-  //       [0, 0],
-  //       [-40, 40],
-  //       [-20, 60],
-  //       [20, 20],
-  //       [40, 40],
-  //       [-20, 100],
-  //       [-60, 60],
-  //     ],
-  //   });
+    const line = UI.createElement("line", {
+      x: 60,
+      y: 0,
+      points: [
+        [0, 0],
+        [-40, 40],
+        [-20, 60],
+        [20, 20],
+        [40, 40],
+        [-20, 100],
+        [-60, 60],
+      ],
+    });
 
-  //   const rectangle = UI.createElement("rectangle", {
-  //     x: 180,
-  //     y: 60,
-  //     width: 160,
-  //     height: 80,
-  //     angle: Math.PI / 6,
-  //   });
-  //   const rectLabel = await UI.editText(rectangle, "hello\nworld");
+    const rectangle = UI.createElement("rectangle", {
+      x: 180,
+      y: 60,
+      width: 160,
+      height: 80,
+      angle: Math.PI / 6,
+    });
+    const rectLabel = await UI.editText(rectangle, "hello\nworld");
 
-  //   const boundArrow = UI.createElement("arrow", {
-  //     x: 380,
-  //     y: 240,
-  //     width: -60,
-  //     height: -80,
-  //   });
-  //   const arrowLabel = await UI.editText(boundArrow, "test");
+    const boundArrow = UI.createElement("arrow", {
+      x: 380,
+      y: 240,
+      width: -60,
+      height: -80,
+    });
+    const arrowLabel = await UI.editText(boundArrow, "test");
 
-  //   const selectionWidth = 380;
-  //   const move = [-800, 0] as [number, number];
-  //   const scaleX = move[0] / selectionWidth + 1;
-  //   const scaleY = -scaleX;
-  //   const lineOrigBounds = getBoundsFromPoints(line);
-  //   const elementsMap = arrayToMap(h.elements);
-  //   UI.resize([line, image, rectangle, boundArrow], "se", move);
-  //   const lineNewBounds = getBoundsFromPoints(line);
-  //   const arrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
-  //     boundArrow,
-  //     arrowLabel,
-  //     elementsMap,
-  //   );
+    const selectionWidth = 380;
+    const move = [-800, 0] as [number, number];
+    const scaleX = move[0] / selectionWidth + 1;
+    const scaleY = -scaleX;
+    const lineOrigBounds = getBoundsFromPoints(line);
+    const elementsMap = arrayToMap(h.elements);
+    UI.resize([line, image, rectangle, boundArrow], "se", move);
+    const lineNewBounds = getBoundsFromPoints(line);
+    const arrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
+      boundArrow,
+      arrowLabel,
+      elementsMap,
+    );
 
-  //   expect(line.x).toBeCloseTo(60 * scaleX);
-  //   expect(line.y).toBeCloseTo(0);
-  //   expect(lineNewBounds[0]).toBeCloseTo(
-  //     (lineOrigBounds[2] - lineOrigBounds[0]) * scaleX,
-  //   );
-  //   expect(lineNewBounds[1]).toBeCloseTo(0);
-  //   expect(lineNewBounds[3]).toBeCloseTo(
-  //     (lineOrigBounds[3] - lineOrigBounds[1]) * scaleY,
-  //   );
-  //   expect(lineNewBounds[2]).toBeCloseTo(0);
-  //   expect(line.angle).toEqual(0);
+    expect(line.x).toBeCloseTo(60 * scaleX);
+    expect(line.y).toBeCloseTo(0);
+    expect(lineNewBounds[0]).toBeCloseTo(
+      (lineOrigBounds[2] - lineOrigBounds[0]) * scaleX,
+    );
+    expect(lineNewBounds[1]).toBeCloseTo(0);
+    expect(lineNewBounds[3]).toBeCloseTo(
+      (lineOrigBounds[3] - lineOrigBounds[1]) * scaleY,
+    );
+    expect(lineNewBounds[2]).toBeCloseTo(0);
+    expect(line.angle).toEqual(0);
 
-  //   expect(image.x).toBeCloseTo((60 + 100) * scaleX);
-  //   expect(image.y).toBeCloseTo(100 * scaleY);
-  //   expect(image.width).toBeCloseTo(100 * -scaleX);
-  //   expect(image.height).toBeCloseTo(100 * scaleY);
-  //   expect(image.angle).toBeCloseTo((Math.PI * 5) / 6);
-  //   expect(image.scale).toEqual([1, 1]);
+    expect(image.x).toBeCloseTo((60 + 100) * scaleX);
+    expect(image.y).toBeCloseTo(100 * scaleY);
+    expect(image.width).toBeCloseTo(100 * -scaleX);
+    expect(image.height).toBeCloseTo(100 * scaleY);
+    expect(image.angle).toBeCloseTo((Math.PI * 5) / 6);
+    expect(image.scale).toEqual([1, 1]);
 
-  //   expect(rectangle.x).toBeCloseTo((180 + 160) * scaleX);
-  //   expect(rectangle.y).toBeCloseTo(60 * scaleY);
-  //   expect(rectangle.width).toBeCloseTo(160 * -scaleX);
-  //   expect(rectangle.height).toBeCloseTo(80 * scaleY);
-  //   expect(rectangle.angle).toEqual((Math.PI * 11) / 6);
+    expect(rectangle.x).toBeCloseTo((180 + 160) * scaleX);
+    expect(rectangle.y).toBeCloseTo(60 * scaleY);
+    expect(rectangle.width).toBeCloseTo(160 * -scaleX);
+    expect(rectangle.height).toBeCloseTo(80 * scaleY);
+    expect(rectangle.angle).toEqual((Math.PI * 11) / 6);
 
-  //   expect(rectLabel.x + rectLabel.width / 2).toBeCloseTo(
-  //     rectangle.x + rectangle.width / 2,
-  //   );
-  //   expect(rectLabel.y + rectLabel.height / 2).toBeCloseTo(
-  //     rectangle.y + rectangle.height / 2,
-  //   );
-  //   expect(rectLabel.angle).toBeCloseTo(rectangle.angle);
-  //   expect(rectLabel.fontSize).toBeCloseTo(20 * scaleY);
+    expect(rectLabel.x + rectLabel.width / 2).toBeCloseTo(
+      rectangle.x + rectangle.width / 2,
+    );
+    expect(rectLabel.y + rectLabel.height / 2).toBeCloseTo(
+      rectangle.y + rectangle.height / 2,
+    );
+    expect(rectLabel.angle).toBeCloseTo(rectangle.angle);
+    expect(rectLabel.fontSize).toBeCloseTo(20 * scaleY);
 
-  //   expect(boundArrow.x).toBeCloseTo(380 * scaleX);
-  //   expect(boundArrow.y).toBeCloseTo(240 * scaleY);
-  //   expect(boundArrow.points[1][0]).toBeCloseTo(-60 * scaleX);
-  //   expect(boundArrow.points[1][1]).toBeCloseTo(-80 * scaleY);
+    expect(boundArrow.x).toBeCloseTo(380 * scaleX);
+    expect(boundArrow.y).toBeCloseTo(240 * scaleY);
+    expect(boundArrow.points[1][0]).toBeCloseTo(-60 * scaleX);
+    expect(boundArrow.points[1][1]).toBeCloseTo(-80 * scaleY);
 
-  //   expect(arrowLabelPos.x + arrowLabel.width / 2).toBeCloseTo(
-  //     boundArrow.x + boundArrow.points[1][0] / 2,
-  //   );
-  //   expect(arrowLabelPos.y + arrowLabel.height / 2).toBeCloseTo(
-  //     boundArrow.y + boundArrow.points[1][1] / 2,
-  //   );
-  //   expect(arrowLabel.angle).toEqual(0);
-  //   expect(arrowLabel.fontSize).toBeCloseTo(20 * scaleY);
-  // });
+    expect(arrowLabelPos.x + arrowLabel.width / 2).toBeCloseTo(
+      boundArrow.x + boundArrow.points[1][0] / 2,
+    );
+    expect(arrowLabelPos.y + arrowLabel.height / 2).toBeCloseTo(
+      boundArrow.y + boundArrow.points[1][1] / 2,
+    );
+    expect(arrowLabel.angle).toEqual(0);
+    expect(arrowLabel.fontSize).toBeCloseTo(20 * scaleY);
+  });
 });
