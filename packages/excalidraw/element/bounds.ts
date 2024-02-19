@@ -743,8 +743,11 @@ export const getElementBounds = (
 ): Bounds => {
   return ElementBounds.getBounds(element, elementsMap);
 };
-export const getCommonBounds = (elements: ElementsMapOrArray): Bounds => {
-  if ("size" in elements ? !elements.size : !elements.length) {
+
+export const getCommonBounds = (
+  elements: readonly ExcalidrawElement[],
+): Bounds => {
+  if (!elements.length) {
     return [0, 0, 0, 0];
   }
 
