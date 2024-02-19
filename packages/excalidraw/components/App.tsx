@@ -9598,4 +9598,13 @@ if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
   });
 }
 
+export { App };
+// Remove the unused function 'getElementAbsoluteCoords'
+// function getElementAbsoluteCoords(elementsMap: ElementsMap, elementId: string) {
+//   // Remove the unused variable assignment
+//   // const element = elementsMap[elementId]; // Keep this line if you need to use 'element' elsewhere in the code
+//   // Use 'elementsMap[elementId]' directly
+//   // ... rest of the code
+// }
+
 export default App;
