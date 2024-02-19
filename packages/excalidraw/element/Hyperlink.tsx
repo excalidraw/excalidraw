@@ -463,7 +463,6 @@ export const isPointHittingLink = (
   if (!element.link || appState.selectedElementIds[element.id]) {
     return false;
   }
-  const threshold = 4 / appState.zoom.value;
   if (
     !isMobile &&
     appState.viewModeEnabled &&

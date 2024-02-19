@@ -5479,7 +5479,6 @@ class App extends React.Component<AppProps, AppState> {
       linearElementEditor.elementId,
     );
     const elementsMap = this.scene.getNonDeletedElementsMap();
-    const boundTextElement = getBoundTextElement(element, elementsMap);
 
     if (!element) {
       return;

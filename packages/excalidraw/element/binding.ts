@@ -4,9 +4,6 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import { isPointInPolygon } from "../math";
-import { pointsOnBezierCurves } from "points-on-curve";
-
 import {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -16,7 +13,6 @@ import {
   ExcalidrawEllipseElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
-  StrokeRoundness,
   ExcalidrawFrameLikeElement,
   ExcalidrawIframeLikeElement,
   NonDeleted,
@@ -26,15 +22,8 @@ import {
   ElementsMap,
 } from "./types";
 
-import {
-  getElementAbsoluteCoords,
-  getCurvePathOps,
-  getRectangleBoxAbsoluteCoords,
-  RectangleBox,
-} from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { AppClassProperties, AppState, Point } from "../types";
-import { Drawable } from "roughjs/bin/core";
-import { Mutable } from "../utility-types";
 import { isPointOnShape } from "../../utils/collision";
 import { getElementAtPosition } from "../scene";
 import {
@@ -1034,24 +1023,6 @@ const pointRelativeToElement = (
   return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
 };
 
-const pointRelativeToDivElement = (
-  pointTuple: Point,
-  rectangle: RectangleBox,
-): [GA.Point, GA.Point, number, number] => {
-  const point = GAPoint.from(pointTuple);
-  const [x1, y1, x2, y2] = getRectangleBoxAbsoluteCoords(rectangle);
-  const center = coordsCenter(x1, y1, x2, y2);
-  const rotate = GATransform.rotation(center, rectangle.angle);
-  const pointRotated = GATransform.apply(rotate, point);
-  const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));
-  const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);
-  const elementPos = GA.offset(rectangle.x, rectangle.y);
-  const pointRelToPos = GA.sub(pointRotated, elementPos);
-  const halfWidth = (x2 - x1) / 2;
-  const halfHeight = (y2 - y1) / 2;
-  return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
-};
-
 const relativizationToElementCenter = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
@@ -1424,133 +1395,4 @@ export const findFocusPointForRectangulars = (
     }
   });
   return tangentPoint!;
-};
-
-const pointInBezierEquation = (
-  p0: Point,
-  p1: Point,
-  p2: Point,
-  p3: Point,
-  [mx, my]: Point,
-  lineThreshold: number,
-) => {
-  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-  const equation = (t: number, idx: number) =>
-    Math.pow(1 - t, 3) * p3[idx] +
-    3 * t * Math.pow(1 - t, 2) * p2[idx] +
-    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-    p0[idx] * Math.pow(t, 3);
-
-  // go through t in increments of 0.01
-  let t = 0;
-  while (t <= 1.0) {
-    const tx = equation(t, 0);
-    const ty = equation(t, 1);
-
-    const diff = Math.sqrt(Math.pow(tx - mx, 2) + Math.pow(ty - my, 2));
-
-    if (diff < lineThreshold) {
-      return true;
-    }
-
-    t += 0.01;
-  }
-
-  return false;
-};
-
-const hitTestCurveInside = (
-  drawable: Drawable,
-  x: number,
-  y: number,
-  roundness: StrokeRoundness,
-) => {
-  const ops = getCurvePathOps(drawable);
-  const points: Mutable<Point>[] = [];
-  let odd = false; // select one line out of double lines
-  for (const operation of ops) {
-    if (operation.op === "move") {
-      odd = !odd;
-      if (odd) {
-        points.push([operation.data[0], operation.data[1]]);
-      }
-    } else if (operation.op === "bcurveTo") {
-      if (odd) {
-        points.push([operation.data[0], operation.data[1]]);
-        points.push([operation.data[2], operation.data[3]]);
-        points.push([operation.data[4], operation.data[5]]);
-      }
-    } else if (operation.op === "lineTo") {
-      if (odd) {
-        points.push([operation.data[0], operation.data[1]]);
-      }
-    }
-  }
-  if (points.length >= 4) {
-    if (roundness === "sharp") {
-      return isPointInPolygon(points, x, y);
-    }
-    const polygonPoints = pointsOnBezierCurves(points, 10, 5);
-    return isPointInPolygon(polygonPoints, x, y);
-  }
-  return false;
-};
-
-const hitTestRoughShape = (
-  drawable: Drawable,
-  x: number,
-  y: number,
-  lineThreshold: number,
-) => {
-  // read operations from first opSet
-  const ops = getCurvePathOps(drawable);
-
-  // set start position as (0,0) just in case
-  // move operation does not exist (unlikely but it is worth safekeeping it)
-  let currentP: Point = [0, 0];
-
-  return ops.some(({ op, data }, idx) => {
-    // There are only four operation types:
-    // move, bcurveTo, lineTo, and curveTo
-    if (op === "move") {
-      // change starting point
-      currentP = data as unknown as Point;
-      // move operation does not draw anything; so, it always
-      // returns false
-    } else if (op === "bcurveTo") {
-      // create points from bezier curve
-      // bezier curve stores data as a flattened array of three positions
-      // [x1, y1, x2, y2, x3, y3]
-      const p1 = [data[0], data[1]] as Point;
-      const p2 = [data[2], data[3]] as Point;
-      const p3 = [data[4], data[5]] as Point;
-
-      const p0 = currentP;
-      currentP = p3;
-
-      // check if points are on the curve
-      // cubic bezier curves require four parameters
-      // the first parameter is the last stored position (p0)
-      const retVal = pointInBezierEquation(
-        p0,
-        p1,
-        p2,
-        p3,
-        [x, y],
-        lineThreshold,
-      );
-
-      // set end point of bezier curve as the new starting point for
-      // upcoming operations as each operation is based on the last drawn
-      // position of the previous operation
-      return retVal;
-    } else if (op === "lineTo") {
-      return hitTestCurveInside(drawable, x, y, "sharp");
-    } else if (op === "qcurveTo") {
-      // TODO: Implement this
-      console.warn("qcurveTo is not implemented yet");
-    }
-
-    return false;
-  });
 };

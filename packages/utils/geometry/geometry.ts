@@ -19,8 +19,8 @@ export const cross = (a: Point, b: Point, o: Point) => {
 };
 
 export const isClosed = (polygon: Polygon) => {
-  const first = polygon[0],
-    last = polygon[polygon.length - 1];
+  const first = polygon[0];
+  const last = polygon[polygon.length - 1];
   return first[0] === last[0] && first[1] === last[1];
 };
 
@@ -73,11 +73,10 @@ export const pointRotate = (
 
   if (!origin || isOrigin(origin)) {
     return rotate(point, r);
-  } else {
-    return rotate(point.map((c, i) => c - origin[i]) as Point, r).map(
-      (c, i) => c + origin[i],
-    ) as Point;
   }
+  return rotate(point.map((c, i) => c - origin[i]) as Point, r).map(
+    (c, i) => c + origin[i],
+  ) as Point;
 };
 
 // translate a point by an angle (in degrees) and distance
@@ -245,7 +244,6 @@ const solveCubicEquation = (a: number, b: number, c: number, d: number) => {
     roots.push(root1, root2, root3);
   } else {
     const realPart = -b / (3 * a);
-    const imaginaryPart = Math.sqrt(-discriminant) / (3 * a);
 
     const root1 =
       2 * Math.sqrt(-b / (3 * a)) * Math.cos(Math.acos(realPart) / 3);
@@ -348,15 +346,23 @@ export const polygonBounds = (polygon: Polygon) => {
   let yMax = -Infinity;
 
   for (let i = 0, l = polygon.length; i < l; i++) {
-    const p = polygon[i],
-      x = p[0],
-      y = p[1];
+    const p = polygon[i];
+    const x = p[0];
+    const y = p[1];
 
     if (x != null && isFinite(x) && y != null && isFinite(y)) {
-      if (x < xMin) xMin = x;
-      if (x > xMax) xMax = x;
-      if (y < yMin) yMin = y;
-      if (y > yMax) yMax = y;
+      if (x < xMin) {
+        xMin = x;
+      }
+      if (x > xMax) {
+        xMax = x;
+      }
+      if (y < yMin) {
+        yMin = y;
+      }
+      if (y > yMax) {
+        yMax = y;
+      }
     }
   }
 
@@ -367,16 +373,16 @@ export const polygonBounds = (polygon: Polygon) => {
 };
 
 export const polygonCentroid = (vertices: Point[]) => {
-  let a = 0,
-    x = 0,
-    y = 0,
-    l = vertices.length;
+  let a = 0;
+  let x = 0;
+  let y = 0;
+  const l = vertices.length;
 
   for (let i = 0; i < l; i++) {
-    const s = i === l - 1 ? 0 : i + 1,
-      v0 = vertices[i],
-      v1 = vertices[s],
-      f = v0[0] * v1[1] - v1[0] * v0[1];
+    const s = i === l - 1 ? 0 : i + 1;
+    const v0 = vertices[i];
+    const v1 = vertices[s];
+    const f = v0[0] * v1[1] - v1[0] * v0[1];
 
     a += f;
     x += (v0[0] + v1[0]) * f;
@@ -397,12 +403,12 @@ export const polygonScale = (
     origin = polygonCentroid(polygon);
   }
 
-  let p: Polygon = [];
+  const p: Polygon = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
-    const v = polygon[i],
-      d = lineLength([origin, v]),
-      a = lineAngle([origin, v]);
+    const v = polygon[i];
+    const d = lineLength([origin, v]);
+    const a = lineAngle([origin, v]);
 
     p[i] = pointTranslate(origin, a, d * scale);
   }
@@ -419,13 +425,13 @@ export const polygonScaleX = (
     origin = polygonCentroid(polygon);
   }
 
-  let p: Polygon = [];
+  const p: Polygon = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
-    const v = polygon[i],
-      d = lineLength([origin, v]),
-      a = lineAngle([origin, v]),
-      t = pointTranslate(origin, a, d * scale);
+    const v = polygon[i];
+    const d = lineLength([origin, v]);
+    const a = lineAngle([origin, v]);
+    const t = pointTranslate(origin, a, d * scale);
 
     p[i] = [t[0], v[1]];
   }
@@ -442,13 +448,13 @@ export const polygonScaleY = (
     origin = polygonCentroid(polygon);
   }
 
-  let p: Polygon = [];
+  const p: Polygon = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
-    const v = polygon[i],
-      d = lineLength([origin, v]),
-      a = lineAngle([origin, v]),
-      t = pointTranslate(origin, a, d * scale);
+    const v = polygon[i];
+    const d = lineLength([origin, v]);
+    const a = lineAngle([origin, v]);
+    const t = pointTranslate(origin, a, d * scale);
 
     p[i] = [v[0], t[1]];
   }
@@ -457,7 +463,7 @@ export const polygonScaleY = (
 };
 
 export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
-  const [[min, _], [max, __]] = polygonBounds(polygon);
+  const [[min], [max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
@@ -478,7 +484,7 @@ export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
 };
 
 export const polygonReflectY = (polygon: Polygon, reflectFactor = 1) => {
-  const [[_, min], [__, max]] = polygonBounds(polygon);
+  const [[, min], [, max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
@@ -619,8 +625,8 @@ export const distanceToSegment = (point: Point, line: Line) => {
     yy = y1 + param * D;
   }
 
-  var dx = x - xx;
-  var dy = y - yy;
+  const dx = x - xx;
+  const dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
@@ -643,16 +649,26 @@ export const lineIntersectsLine = (lineA: Line, lineB: Line) => {
   const [[b0x, b0y], [b1x, b1y]] = lineB;
 
   // shared points
-  if (a0x === b0x && a0y === b0y) return true;
-  if (a1x === b1x && a1y === b1y) return true;
+  if (a0x === b0x && a0y === b0y) {
+    return true;
+  }
+  if (a1x === b1x && a1y === b1y) {
+    return true;
+  }
 
   // point on line
-  if (pointOnLine(lineA[0], lineB) || pointOnLine(lineA[1], lineB)) return true;
-  if (pointOnLine(lineB[0], lineA) || pointOnLine(lineB[1], lineA)) return true;
+  if (pointOnLine(lineA[0], lineB) || pointOnLine(lineA[1], lineB)) {
+    return true;
+  }
+  if (pointOnLine(lineB[0], lineA) || pointOnLine(lineB[1], lineA)) {
+    return true;
+  }
 
   const denom = (b1y - b0y) * (a1x - a0x) - (b1x - b0x) * (a1y - a0y);
 
-  if (denom === 0) return false;
+  if (denom === 0) {
+    return false;
+  }
 
   const deltaY = a0y - b0y;
   const deltaX = a0x - b0x;
@@ -669,8 +685,8 @@ export const lineIntersectsPolygon = (line: Line, polygon: Polygon) => {
   const closed = close(polygon);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
-    const v0 = closed[i],
-      v1 = closed[i + 1];
+    const v0 = closed[i];
+    const v1 = closed[i + 1];
 
     if (
       lineIntersectsLine(line, [v0, v1]) ||
@@ -763,8 +779,8 @@ export const pointOnPolycurve = (
 };
 
 export const pointInPolygon = (point: Point, polygon: Polygon) => {
-  let x = point[0];
-  let y = point[1];
+  const x = point[0];
+  const y = point[1];
   let inside = false;
 
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -773,7 +789,7 @@ export const pointInPolygon = (point: Point, polygon: Polygon) => {
     const xj = polygon[j][0];
     const yj = polygon[j][1];
 
-    if (yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
       inside = !inside;
     }
   }
