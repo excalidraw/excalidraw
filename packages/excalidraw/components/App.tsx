@@ -402,7 +402,10 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { restoreFractionalIndices } from "../fractionalIndex";
+import {
+  restoreFractionalIndices,
+  updateFractionalIndices,
+} from "../fractionalIndex";
 import FollowMode from "./FollowMode/FollowMode";
 
 import { AnimationFrameHandler } from "../animation-frame-handler";
@@ -2042,7 +2045,7 @@ class App extends React.Component<AppProps, AppState> {
           locked: false,
         });
 
-        this.scene.addNewElement(frame);
+        this.scene.insertElement(frame);
 
         for (const child of selectedElements) {
           mutateElement(child, { frameId: frame.id });
@@ -3102,10 +3105,12 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
 
-    const allElements = [
-      ...this.scene.getElementsIncludingDeleted(),
-      ...newElements,
-    ];
+    const prevElements = this.scene.getElementsIncludingDeleted();
+    const nextElements = updateFractionalIndices(
+      prevElements,
+      [...prevElements, ...newElements],
+      arrayToMap(newElements),
+    );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
@@ -3114,10 +3119,10 @@ class App extends React.Component<AppProps, AppState> {
         newElements,
         topLayerFrame,
       );
-      addElementsToFrame(allElements, eligibleElements, topLayerFrame);
+      addElementsToFrame(nextElements, eligibleElements, topLayerFrame);
     }
 
-    this.scene.replaceAllElements(allElements, arrayToMap(newElements));
+    this.scene.replaceAllElements(nextElements);
 
     newElements.forEach((newElement) => {
       if (isTextElement(newElement) && isBoundToContainer(newElement)) {
@@ -3342,19 +3347,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const frameId = textElements[0].frameId;
-
-    if (frameId) {
-      this.scene.insertElementsAtIndex(
-        textElements,
-        this.scene.getElementIndex(frameId),
-      );
-    } else {
-      this.scene.replaceAllElements(
-        [...this.scene.getElementsIncludingDeleted(), ...textElements],
-        arrayToMap(textElements),
-      );
-    }
+    this.scene.insertElements(textElements);
 
     this.setState({
       selectedElementIds: makeNextSelectedElementIds(
@@ -3658,7 +3651,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(
-          restoreFractionalIndices(sceneData.elements),
+          restoreFractionalIndices(sceneData.elements), // https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
         );
       }
 
@@ -4546,7 +4539,7 @@ class App extends React.Component<AppProps, AppState> {
         const containerIndex = this.scene.getElementIndex(container.id);
         this.scene.insertElementAtIndex(element, containerIndex + 1);
       } else {
-        this.scene.addNewElement(element);
+        this.scene.insertElement(element);
       }
     }
 
@@ -6465,7 +6458,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene,
     );
-    this.scene.addNewElement(element);
+    this.scene.insertElement(element);
     this.setState({
       draggingElement: element,
       editingElement: element,
@@ -6510,10 +6503,7 @@ class App extends React.Component<AppProps, AppState> {
       height,
     });
 
-    this.scene.replaceAllElements(
-      [...this.scene.getElementsIncludingDeleted(), element],
-      arrayToMap([element]),
-    );
+    this.scene.insertElement(element);
 
     return element;
   };
@@ -6567,10 +6557,7 @@ class App extends React.Component<AppProps, AppState> {
       link,
     });
 
-    this.scene.replaceAllElements(
-      [...this.scene.getElementsIncludingDeleted(), element],
-      arrayToMap([element]),
-    );
+    this.scene.insertElement(element);
 
     return element;
   };
@@ -6734,7 +6721,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene,
       );
 
-      this.scene.addNewElement(element);
+      this.scene.insertElement(element);
       this.setState({
         draggingElement: element,
         editingElement: element,
@@ -6813,7 +6800,7 @@ class App extends React.Component<AppProps, AppState> {
         draggingElement: element,
       });
     } else {
-      this.scene.addNewElement(element);
+      this.scene.insertElement(element);
       this.setState({
         multiElement: null,
         draggingElement: element,
@@ -6847,10 +6834,7 @@ class App extends React.Component<AppProps, AppState> {
         ? newMagicFrameElement(constructorOpts)
         : newFrameElement(constructorOpts);
 
-    this.scene.replaceAllElements(
-      [...this.scene.getElementsIncludingDeleted(), frame],
-      arrayToMap([frame]),
-    );
+    this.scene.insertElement(frame);
 
     this.setState({
       multiElement: null,
@@ -7263,7 +7247,12 @@ class App extends React.Component<AppProps, AppState> {
                 nextElements.push(element);
               }
             }
-            const nextSceneElements = [...nextElements, ...elementsToAppend];
+            const nextSceneElements = updateFractionalIndices(
+              elements,
+              [...nextElements, ...elementsToAppend],
+              arrayToMap(elementsToAppend), // TODO_FI: double-check
+            );
+
             bindTextToShapeAfterDuplication(
               nextElements,
               elementsToAppend,
@@ -7280,10 +7269,8 @@ class App extends React.Component<AppProps, AppState> {
               elementsToAppend,
               oldIdToDuplicatedId,
             );
-            this.scene.replaceAllElements(
-              nextSceneElements,
-              duplicatedElementsMap,
-            );
+
+            this.scene.replaceAllElements(nextSceneElements);
             this.maybeCacheVisibleGaps(event, selectedElements, true);
             this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
@@ -8458,7 +8445,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.addNewElement(imageElement);
+    this.scene.insertElement(imageElement);
 
     try {
       return await this.initializeImage({

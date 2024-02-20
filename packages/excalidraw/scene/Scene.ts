@@ -263,7 +263,6 @@ class Scene {
 
   replaceAllElements(
     nextElements: ElementsMapOrArray,
-    reorderedElements?: Map<string, ExcalidrawElement>,
     mapElementIds: boolean = true,
   ) {
     // ts doesn't like `Array.isArray` of `instanceof Map`
@@ -271,10 +270,6 @@ class Scene {
       nextElements instanceof Array
         ? nextElements
         : Array.from(nextElements.values());
-
-    if (reorderedElements) {
-      updateFractionalIndices(this.elements, _nextElements, reorderedElements);
-    }
 
     validateFractionalIndices(_nextElements);
 
@@ -348,12 +343,17 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
-    const nextElements = [
-      ...this.elements.slice(0, index),
-      element,
-      ...this.elements.slice(index),
-    ];
-    this.replaceAllElements(nextElements, arrayToMap([element]));
+    const nextElements = updateFractionalIndices(
+      this.elements,
+      [
+        ...this.elements.slice(0, index),
+        element,
+        ...this.elements.slice(index),
+      ],
+      arrayToMap([element]),
+    );
+
+    this.replaceAllElements(nextElements);
   }
 
   insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
@@ -362,24 +362,34 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
-    const nextElements = [
-      ...this.elements.slice(0, index),
-      ...elements,
-      ...this.elements.slice(index),
-    ];
 
-    this.replaceAllElements(nextElements, arrayToMap(elements));
+    const nextElements = updateFractionalIndices(
+      this.elements,
+      [
+        ...this.elements.slice(0, index),
+        ...elements,
+        ...this.elements.slice(index),
+      ],
+      arrayToMap(elements),
+    );
+
+    this.replaceAllElements(nextElements);
   }
 
-  addNewElement = (element: ExcalidrawElement) => {
-    if (element.frameId) {
-      this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
-    } else {
-      this.replaceAllElements(
-        [...this.elements, element],
-        arrayToMap([element]),
-      );
-    }
+  insertElement = (element: ExcalidrawElement) => {
+    const index = element.frameId
+      ? this.getElementIndex(element.frameId)
+      : this.elements.length;
+
+    this.insertElementAtIndex(element, index);
+  };
+
+  insertElements = (elements: ExcalidrawElement[]) => {
+    const index = elements[0].frameId
+      ? this.getElementIndex(elements[0].frameId)
+      : this.elements.length;
+
+    this.insertElementsAtIndex(elements, index);
   };
 
   getElementIndex(elementId: string) {
