@@ -19,7 +19,7 @@ serializeAsJSON({
   elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,
   appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>,
   files: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L97">BinaryFiles</a>,
-  type: "local" | "database"
+  type: &quot;local&quot; | &quot;database&quot;
 }): string
 </pre>
 
