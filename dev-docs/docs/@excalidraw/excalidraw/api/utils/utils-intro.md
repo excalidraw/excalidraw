@@ -15,11 +15,11 @@ If you want to overwrite the `source` field in the `JSON` string, you can set `w
 **_Signature_**
 
 <pre>
-serializeAsJSON(
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>,
-  files: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L97">BinaryFiles</a>,
-  type: "local" | "database"
+serializeAsJSON(<br/>&nbsp;
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>,<br/>&nbsp;
+  files: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L97">BinaryFiles</a>,<br/>&nbsp;
+  type: "local" | "database"<br/>&nbsp;
 ): string
 </pre>
 
