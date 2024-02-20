@@ -31,8 +31,11 @@ import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import { Mutable } from "../../utility-types";
 import { assertNever } from "../../utils";
+import { createTestHook } from "../../components/App";
 
 const readFile = util.promisify(fs.readFile);
+// so that window.h is available when App.tsx is not imported as well.
+createTestHook();
 
 const { h } = window;
 

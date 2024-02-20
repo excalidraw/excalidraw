@@ -33,6 +33,10 @@ import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { rotatePoint } from "../../math";
 import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
+import { createTestHook } from "../../components/App";
+
+// so that window.h is available when App.tsx is not imported as well.
+createTestHook();
 
 const { h } = window;
 
@@ -460,7 +464,6 @@ export class UI {
       mouse.reset();
       mouse.up(x + width, y + height);
     }
-
     const origElement = h.elements[h.elements.length - 1] as any;
 
     if (angle !== 0) {

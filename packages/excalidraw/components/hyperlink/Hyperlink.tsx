@@ -1,22 +1,20 @@
-import { AppState, ExcalidrawProps, Point, UIAppState } from "../types";
+import { AppState, ExcalidrawProps, Point } from "../../types";
 import {
-  getShortcutKey,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   wrapEvent,
-} from "../utils";
-import { getEmbedLink, embeddableURLValidator } from "./embeddable";
-import { mutateElement } from "./mutateElement";
+} from "../../utils";
+import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
+import { mutateElement } from "../../element/mutateElement";
 import {
   ElementsMap,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
-} from "./types";
+} from "../../element/types";
 
-import { register } from "../actions/register";
-import { ToolButton } from "../components/ToolButton";
-import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
-import { t } from "../i18n";
+import { ToolButton } from "../ToolButton";
+import { FreedrawIcon, TrashIcon } from "../icons";
+import { t } from "../../i18n";
 import {
   useCallback,
   useEffect,
@@ -25,32 +23,25 @@ import {
   useState,
 } from "react";
 import clsx from "clsx";
-import { KEYS } from "../keys";
-import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
-import { rotate } from "../math";
-import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
-import { Bounds } from "./bounds";
-import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
-import { getSelectedElements } from "../scene";
-import { isPointHittingElementBoundingBox } from "./collision";
-import { getElementAbsoluteCoords } from ".";
-import { isLocalLink, normalizeLink } from "../data/url";
+import { KEYS } from "../../keys";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
+import { getElementAbsoluteCoords } from "../../element/bounds";
+import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
+import { getSelectedElements } from "../../scene";
+import { isPointHittingElementBoundingBox } from "../../element/collision";
+import { isLocalLink, normalizeLink } from "../../data/url";
 
 import "./Hyperlink.scss";
-import { trackEvent } from "../analytics";
-import { useAppProps, useExcalidrawAppState } from "../components/App";
-import { isEmbeddableElement } from "./typeChecks";
+import { trackEvent } from "../../analytics";
+import { useAppProps, useExcalidrawAppState } from "../App";
+import { isEmbeddableElement } from "../../element/typeChecks";
+import { getLinkHandleFromCoords } from "./helpers";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
 const CONTAINER_PADDING = 5;
 const CONTAINER_HEIGHT = 42;
 const AUTO_HIDE_TIMEOUT = 500;
-
-export const EXTERNAL_LINK_IMG = document.createElement("img");
-EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
-)}`;
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
 
@@ -339,51 +330,6 @@ const getCoordsForPopover = (
   return { x, y };
 };
 
-export const actionLink = register({
-  name: "hyperlink",
-  perform: (elements, appState) => {
-    if (appState.showHyperlinkPopup === "editor") {
-      return false;
-    }
-
-    return {
-      elements,
-      appState: {
-        ...appState,
-        showHyperlinkPopup: "editor",
-        openMenu: null,
-      },
-      commitToHistory: true,
-    };
-  },
-  trackEvent: { category: "hyperlink", action: "click" },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
-  contextItemLabel: (elements, appState) =>
-    getContextMenuLabel(elements, appState),
-  predicate: (elements, appState) => {
-    const selectedElements = getSelectedElements(elements, appState);
-    return selectedElements.length === 1;
-  },
-  PanelComponent: ({ elements, appState, updateData }) => {
-    const selectedElements = getSelectedElements(elements, appState);
-
-    return (
-      <ToolButton
-        type="button"
-        icon={LinkIcon}
-        aria-label={t(getContextMenuLabel(elements, appState))}
-        title={`${
-          isEmbeddableElement(elements[0])
-            ? t("labels.link.labelEmbed")
-            : t("labels.link.label")
-        } - ${getShortcutKey("CtrlOrCmd+K")}`}
-        onClick={() => updateData(null)}
-        selected={selectedElements.length === 1 && !!selectedElements[0].link}
-      />
-    );
-  },
-});
-
 export const getContextMenuLabel = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -397,87 +343,6 @@ export const getContextMenuLabel = (
     ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;
-};
-
-export const getLinkHandleFromCoords = (
-  [x1, y1, x2, y2]: Bounds,
-  angle: number,
-  appState: Pick<UIAppState, "zoom">,
-): Bounds => {
-  const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
-  const linkMarginY = size / appState.zoom.value;
-  const centerX = (x1 + x2) / 2;
-  const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
-  const dashedLineMargin = 4 / appState.zoom.value;
-
-  // Same as `ne` resize handle
-  const x = x2 + dashedLineMargin - centeringOffset;
-  const y = y1 - dashedLineMargin - linkMarginY + centeringOffset;
-
-  const [rotatedX, rotatedY] = rotate(
-    x + linkWidth / 2,
-    y + linkHeight / 2,
-    centerX,
-    centerY,
-    angle,
-  );
-  return [
-    rotatedX - linkWidth / 2,
-    rotatedY - linkHeight / 2,
-    linkWidth,
-    linkHeight,
-  ];
-};
-
-export const isPointHittingLinkIcon = (
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-  appState: AppState,
-  [x, y]: Point,
-) => {
-  const threshold = 4 / appState.zoom.value;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
-    [x1, y1, x2, y2],
-    element.angle,
-    appState,
-  );
-  const hitLink =
-    x > linkX - threshold &&
-    x < linkX + threshold + linkWidth &&
-    y > linkY - threshold &&
-    y < linkY + linkHeight + threshold;
-  return hitLink;
-};
-
-export const isPointHittingLink = (
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-  appState: AppState,
-  [x, y]: Point,
-  isMobile: boolean,
-) => {
-  if (!element.link || appState.selectedElementIds[element.id]) {
-    return false;
-  }
-  const threshold = 4 / appState.zoom.value;
-  if (
-    !isMobile &&
-    appState.viewModeEnabled &&
-    isPointHittingElementBoundingBox(
-      element,
-      elementsMap,
-      [x, y],
-      threshold,
-      null,
-    )
-  ) {
-    return true;
-  }
-  return isPointHittingLinkIcon(element, elementsMap, appState, [x, y]);
 };
 
 let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;
@@ -547,7 +412,7 @@ export const hideHyperlinkToolip = () => {
   }
 };
 
-export const shouldHideLinkPopup = (
+const shouldHideLinkPopup = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
