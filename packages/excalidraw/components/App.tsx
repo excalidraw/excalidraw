@@ -328,7 +328,7 @@ import {
   Hyperlink,
   isPointHittingLink,
   isPointHittingLinkIcon,
-} from "../element/Hyperlink";
+} from "../components/hyperlink/Hyperlink";
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";

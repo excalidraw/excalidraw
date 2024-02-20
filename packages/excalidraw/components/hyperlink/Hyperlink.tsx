@@ -1,22 +1,22 @@
-import { AppState, ExcalidrawProps, Point, UIAppState } from "../types";
+import { AppState, ExcalidrawProps, Point, UIAppState } from "../../types";
 import {
   getShortcutKey,
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   wrapEvent,
-} from "../utils";
-import { getEmbedLink, embeddableURLValidator } from "./embeddable";
-import { mutateElement } from "./mutateElement";
+} from "../../utils";
+import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
+import { mutateElement } from "../../element/mutateElement";
 import {
   ElementsMap,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
-} from "./types";
+} from "../../element/types";
 
-import { register } from "../actions/register";
-import { ToolButton } from "../components/ToolButton";
-import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
-import { t } from "../i18n";
+import { register } from "../../actions/register";
+import { ToolButton } from "../ToolButton";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../icons";
+import { t } from "../../i18n";
 import {
   useCallback,
   useEffect,
@@ -25,21 +25,20 @@ import {
   useState,
 } from "react";
 import clsx from "clsx";
-import { KEYS } from "../keys";
-import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
-import { rotate } from "../math";
-import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
-import { Bounds } from "./bounds";
-import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
-import { getSelectedElements } from "../scene";
-import { isPointHittingElementBoundingBox } from "./collision";
-import { getElementAbsoluteCoords } from ".";
-import { isLocalLink, normalizeLink } from "../data/url";
+import { KEYS } from "../../keys";
+import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
+import { rotate } from "../../math";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../../constants";
+import { Bounds, getElementAbsoluteCoords } from "../../element/bounds";
+import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
+import { getSelectedElements } from "../../scene";
+import { isPointHittingElementBoundingBox } from "../../element/collision";
+import { isLocalLink, normalizeLink } from "../../data/url";
 
 import "./Hyperlink.scss";
-import { trackEvent } from "../analytics";
-import { useAppProps, useExcalidrawAppState } from "../components/App";
-import { isEmbeddableElement } from "./typeChecks";
+import { trackEvent } from "../../analytics";
+import { useAppProps, useExcalidrawAppState } from "../App";
+import { isEmbeddableElement } from "../../element/typeChecks";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
