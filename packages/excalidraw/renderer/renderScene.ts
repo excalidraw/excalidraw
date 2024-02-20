@@ -73,7 +73,7 @@ import {
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
-} from "../components/hyperlink/Hyperlink";
+} from "../components/hyperlink/helpers";
 import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
