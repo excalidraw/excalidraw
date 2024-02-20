@@ -80,6 +80,7 @@ const getReconciledAndExpectedElements = (
   return [reconciledEls, expectedEls];
 };
 
+// TODO_FI: these tests are not really readable
 describe("reconcile without fractional indices", () => {
   it("take higher version - remote", () => {
     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(

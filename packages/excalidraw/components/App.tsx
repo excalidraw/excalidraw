@@ -3651,7 +3651,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(
-          restoreFractionalIndices(sceneData.elements), // https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
+          restoreFractionalIndices(sceneData.elements), // TODO_FI: https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
         );
       }
 
@@ -7250,7 +7250,7 @@ class App extends React.Component<AppProps, AppState> {
             const nextSceneElements = updateFractionalIndices(
               elements,
               [...nextElements, ...elementsToAppend],
-              arrayToMap(elementsToAppend), // TODO_FI: double-check
+              arrayToMap(elementsToAppend),
             );
 
             bindTextToShapeAfterDuplication(

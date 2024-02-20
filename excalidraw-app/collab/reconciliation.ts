@@ -70,6 +70,7 @@ export const reconcileElements = (
     }
   }
 
+  // TODO_FI: should we do it now? could we log out differences between actual old and new order?
   return orderByFractionalIndex(
     reconciledElements,
   ) as readonly ExcalidrawElement[] as ReconciledElements;

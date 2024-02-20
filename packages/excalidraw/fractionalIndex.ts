@@ -22,7 +22,7 @@ export const generateKeyBetween = (
   lower: string | null,
   upper: string | null,
 ) =>
-  import.meta.env.DEV || import.meta.env.MODE === ENV.TEST
+  import.meta.env.DEV || import.meta.env.MODE === ENV.TEST //TODO_FI: double-check if it actually makes sense, as it might hide potential prod issues
     ? _generateKeyBetween(lower, upper, base36CharSet)
     : generateJitteredKeyBetween(lower, upper);
 
@@ -77,6 +77,7 @@ export const restoreFractionalIndices = (
     if (
       !isValidFractionalIndex(element.index, predecessorIndex, successorIndex)
     ) {
+      // TODO_FI: we might be incorrectly overriding valid indices here
       const fractionalIndex = restoreFractionalIndex(
         predecessorIndex,
         successorIndex,
@@ -110,6 +111,7 @@ export const validateFractionalIndices = (
       !isValidFractionalIndex(element.index, predecessorIndex, successorIndex)
     ) {
       if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+        // TODO_FI: could we somehow explicitly log in prod?
         console.error(
           `Fractional index of element, predecessor and successor respectively: "${element.index}", "${predecessorIndex}", "${successorIndex}"`,
         );

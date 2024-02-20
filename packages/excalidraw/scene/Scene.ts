@@ -152,6 +152,7 @@ class Scene {
     return this.nonDeletedElementsMap;
   }
 
+  // TODO_FI: should be branded as ordered
   getElementsIncludingDeleted() {
     return this.elements;
   }

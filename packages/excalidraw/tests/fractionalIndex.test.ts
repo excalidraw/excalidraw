@@ -46,6 +46,8 @@ const generateElementsAtLength = (length: number) => {
   return elements;
 };
 
+// TODO_FI: rewrite these tests for future stability & to cover more cases
+
 describe("validating fractional indices", () => {
   it("should not pass validity check when elements are not in order", () => {
     const elements = [createElement("A1"), createElement("A0")];
