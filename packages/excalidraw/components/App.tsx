@@ -9573,19 +9573,19 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 // TEST HOOKS
 // -----------------------------------------------------------------------------
-export const createTestHook = () => {
-  declare global {
-    interface Window {
-      h: {
-        elements: readonly ExcalidrawElement[];
-        state: AppState;
-        setState: React.Component<any, AppState>["setState"];
-        app: InstanceType<typeof App>;
-        history: History;
-      };
-    }
+declare global {
+  interface Window {
+    h: {
+      elements: readonly ExcalidrawElement[];
+      state: AppState;
+      setState: React.Component<any, AppState>["setState"];
+      app: InstanceType<typeof App>;
+      history: History;
+    };
   }
+}
 
+export const createTestHook = () => {
   if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
     window.h = window.h || ({} as Window["h"]);
 
