@@ -9573,33 +9573,35 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 // TEST HOOKS
 // -----------------------------------------------------------------------------
-
-declare global {
-  interface Window {
-    h: {
-      elements: readonly ExcalidrawElement[];
-      state: AppState;
-      setState: React.Component<any, AppState>["setState"];
-      app: InstanceType<typeof App>;
-      history: History;
-    };
+export const createTestHook = () => {
+  declare global {
+    interface Window {
+      h: {
+        elements: readonly ExcalidrawElement[];
+        state: AppState;
+        setState: React.Component<any, AppState>["setState"];
+        app: InstanceType<typeof App>;
+        history: History;
+      };
+    }
   }
-}
 
-if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
-  window.h = window.h || ({} as Window["h"]);
+  if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    window.h = window.h || ({} as Window["h"]);
 
-  Object.defineProperties(window.h, {
-    elements: {
-      configurable: true,
-      get() {
-        return this.app?.scene.getElementsIncludingDeleted();
+    Object.defineProperties(window.h, {
+      elements: {
+        configurable: true,
+        get() {
+          return this.app?.scene.getElementsIncludingDeleted();
+        },
+        set(elements: ExcalidrawElement[]) {
+          return this.app?.scene.replaceAllElements(elements);
+        },
       },
-      set(elements: ExcalidrawElement[]) {
-        return this.app?.scene.replaceAllElements(elements);
-      },
-    },
-  });
-}
+    });
+  }
+};
 
+createTestHook();
 export default App;
