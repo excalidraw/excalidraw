@@ -25,7 +25,7 @@ export const isExcaliBrainView = () => {
   if(!OBSIDIAN_PLUGIN) {
     setObsidianPlugin();
   }
-  const excalidrawView = OBSIDIAN_PLUGIN.activeExcalidrawView;
+  const excalidrawView = OBSIDIAN_PLUGIN?.activeExcalidrawView;
   if(!excalidrawView) return false;
   return excalidrawView.linksAlwaysOpenInANewPane && excalidrawView.allowFrameButtonsInViewMode;
 }
