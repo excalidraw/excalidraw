@@ -39,7 +39,7 @@ import {
   getFrameLikeTitle,
   getRootElements,
 } from "../frame";
-import { newTextElement } from "../element";
+import { newTextElement } from "../element/newElement";
 import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import Scene from "./Scene";
