@@ -68,11 +68,11 @@ const ActiveRoomDialog = ({
 
   const copyRoomLink = async () => {
     try {
-      await copyTextToSystemClipboard(
-        activeRoomLink,
-        null,
-        t("errors.copyToSystemClipboardFailed"),
-      );
+      try {
+        await copyTextToSystemClipboard(activeRoomLink);
+      } catch (e) {
+        throw new Error(t("errors.copyToSystemClipboardFailed"));
+      }
 
       setJustCopied(true);
 

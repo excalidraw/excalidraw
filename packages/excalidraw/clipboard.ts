@@ -406,7 +406,6 @@ export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
 export const copyTextToSystemClipboard = async (
   text: string | null,
   clipboardEvent?: ClipboardEvent | null,
-  errorMessage?: string,
 ) => {
   // (1) first try using Async Clipboard API
   if (probablySupportsClipboardWriteText) {
@@ -435,7 +434,7 @@ export const copyTextToSystemClipboard = async (
 
   // (3) if that fails, use document.execCommand
   if (!copyTextViaExecCommand(text)) {
-    throw new Error(errorMessage || "Error copying to clipboard.");
+    throw new Error();
   }
 };
 

@@ -133,11 +133,12 @@ export const exportCanvas = async (
         },
       );
     } else if (type === "clipboard-svg") {
-      await copyTextToSystemClipboard(
-        await svgPromise.then((svg) => svg.outerHTML),
-        null,
-        t("errors.copyToSystemClipboardFailed"),
-      );
+      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      try {
+        await copyTextToSystemClipboard(svg);
+      } catch (e) {
+        throw new Error(t("errors.copyToSystemClipboardFailed"));
+      }
       return;
     }
   }

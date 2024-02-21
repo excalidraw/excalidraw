@@ -238,11 +238,11 @@ export const copyText = register({
         return acc;
       }, [])
       .join("\n\n");
-    copyTextToSystemClipboard(
-      text,
-      null,
-      t("errors.copyToSystemClipboardFailed"),
-    );
+    try {
+      copyTextToSystemClipboard(text);
+    } catch (e) {
+      throw new Error(t("errors.copyToSystemClipboardFailed"));
+    }
     return {
       commitToHistory: false,
     };
