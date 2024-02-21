@@ -57,7 +57,7 @@ export const getElementsWithinSelection = (
       elementsMap,
     );
 
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
     if (containingFrame) {
       const [fx1, fy1, fx2, fy2] = getElementBounds(
         containingFrame,
@@ -86,7 +86,7 @@ export const getElementsWithinSelection = (
     : elementsInSelection;
 
   elementsInSelection = elementsInSelection.filter((element) => {
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
 
     if (containingFrame) {
       return elementOverlapsWithFrame(element, containingFrame, elementsMap);

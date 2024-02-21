@@ -1131,7 +1131,7 @@ class App extends React.Component<AppProps, AppState> {
                 display: isVisible ? "block" : "none",
                 opacity: getRenderOpacity(
                   el,
-                  getContainingFrame(el),
+                  getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                 ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
@@ -4399,7 +4399,7 @@ class App extends React.Component<AppProps, AppState> {
       ),
     ).filter((element) => {
       // hitting a frame's element from outside the frame is not considered a hit
-      const containingFrame = getContainingFrame(element);
+      const containingFrame = getContainingFrame(element, elementsMap);
       return containingFrame &&
         this.state.frameRendering.enabled &&
         this.state.frameRendering.clip
@@ -7789,7 +7789,7 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             if (linearElement?.frameId) {
-              const frame = getContainingFrame(linearElement);
+              const frame = getContainingFrame(linearElement, elementsMap);
 
               if (frame && linearElement) {
                 if (

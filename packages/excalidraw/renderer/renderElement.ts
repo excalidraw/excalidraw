@@ -257,7 +257,8 @@ const generateElementCanvas = (
     canvasOffsetY,
     boundTextElementVersion:
       getBoundTextElement(element, elementsMap)?.version || null,
-    containingFrameOpacity: getContainingFrame(element)?.opacity || 100,
+    containingFrameOpacity:
+      getContainingFrame(element, elementsMap)?.opacity || 100,
   };
 };
 
@@ -440,7 +441,8 @@ const generateElementWithCanvas = (
   const boundTextElementVersion =
     getBoundTextElement(element, elementsMap)?.version || null;
 
-  const containingFrameOpacity = getContainingFrame(element)?.opacity || 100;
+  const containingFrameOpacity =
+    getContainingFrame(element, elementsMap)?.opacity || 100;
 
   if (
     !prevElementWithCanvas ||
@@ -652,7 +654,7 @@ export const renderElement = (
 ) => {
   context.globalAlpha = getRenderOpacity(
     element,
-    getContainingFrame(element),
+    getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
   );
 
@@ -924,11 +926,12 @@ const maybeWrapNodesInFrameClipPath = (
   root: SVGElement,
   nodes: SVGElement[],
   frameRendering: AppState["frameRendering"],
+  elementsMap: RenderableElementsMap,
 ) => {
   if (!frameRendering.enabled || !frameRendering.clip) {
     return null;
   }
-  const frame = getContainingFrame(element);
+  const frame = getContainingFrame(element, elementsMap);
   if (frame) {
     const g = root.ownerDocument!.createElementNS(SVG_NS, "g");
     g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
@@ -990,7 +993,9 @@ export const renderElementToSvg = (
   };
 
   const opacity =
-    ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
+    ((getContainingFrame(element, elementsMap)?.opacity ?? 100) *
+      element.opacity) /
+    10000;
 
   switch (element.type) {
     case "selection": {
@@ -1024,6 +1029,7 @@ export const renderElementToSvg = (
         root,
         [node],
         renderConfig.frameRendering,
+        elementsMap,
       );
 
       addToRoot(g || node, element);
@@ -1215,6 +1221,7 @@ export const renderElementToSvg = (
         root,
         [group, maskPath],
         renderConfig.frameRendering,
+        elementsMap,
       );
       if (g) {
         addToRoot(g, element);
@@ -1258,6 +1265,7 @@ export const renderElementToSvg = (
         root,
         [node],
         renderConfig.frameRendering,
+        elementsMap,
       );
 
       addToRoot(g || node, element);
@@ -1355,6 +1363,7 @@ export const renderElementToSvg = (
           root,
           [g],
           renderConfig.frameRendering,
+          elementsMap,
         );
         addToRoot(clipG || g, element);
       }
@@ -1442,6 +1451,7 @@ export const renderElementToSvg = (
           root,
           [node],
           renderConfig.frameRendering,
+          elementsMap,
         );
 
         addToRoot(g || node, element);

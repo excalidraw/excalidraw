@@ -80,29 +80,16 @@ class Scene {
   private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapById = new Map<string, Scene>();
 
-  static mapElementToScene(
-    elementKey: ElementKey,
-    scene: Scene,
-    /**
-     * needed because of frame exporting hack.
-     * elementId:Scene mapping will be removed completely, soon.
-     */
-    mapElementIds = true,
-  ) {
+  static mapElementToScene(elementKey: ElementKey, scene: Scene) {
     if (isIdKey(elementKey)) {
-      if (!mapElementIds) {
-        return;
-      }
       // for cases where we don't have access to the element object
       // (e.g. restore serialized appState with id references)
       this.sceneMapById.set(elementKey, scene);
     } else {
       this.sceneMapByElement.set(elementKey, scene);
-      if (!mapElementIds) {
-        // if mapping element objects, also cache the id string when later
-        // looking up by id alone
-        this.sceneMapById.set(elementKey.id, scene);
-      }
+      // if mapping element objects, also cache the id string when later
+      // looking up by id alone
+      this.sceneMapById.set(elementKey.id, scene);
     }
   }
 
@@ -256,7 +243,7 @@ class Scene {
     return didChange;
   }
 
-  replaceAllElements(nextElements: ElementsMapOrArray, mapElementIds = true) {
+  replaceAllElements(nextElements: ElementsMapOrArray) {
     this.elements =
       // ts doesn't like `Array.isArray` of `instanceof Map`
       nextElements instanceof Array
@@ -269,7 +256,7 @@ class Scene {
         nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
-      Scene.mapElementToScene(element, this, mapElementIds);
+      Scene.mapElementToScene(element, this);
     });
     const nonDeletedElements = getNonDeletedElements(this.elements);
     this.nonDeletedElements = nonDeletedElements.elements;
