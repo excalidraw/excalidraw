@@ -76,7 +76,7 @@ import {
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
-} from "../element/Hyperlink";
+} from "../components/hyperlink/helpers";
 import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
@@ -889,7 +889,7 @@ const _renderInteractiveScene = ({
   let scrollBars;
   if (renderConfig.renderScrollbars) {
     scrollBars = getScrollBars(
-      elementsMap,
+      visibleElements,
       normalizedWidth,
       normalizedHeight,
       appState,
