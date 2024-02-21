@@ -248,8 +248,6 @@ export const exportToCanvas = async (
     },
   });
 
-  //tempScene.destroy();
-
   return canvas;
 };
 
