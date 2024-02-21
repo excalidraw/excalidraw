@@ -906,9 +906,7 @@ describe("multiple selection", () => {
     expect(ellipse.angle).toEqual(0);
   });
 
-  // FIXME: works perfectly fine in the editor but test fails
-  //        commenting this out for now
-  test.skip("flips while resizing", async () => {
+  it("flips while resizing", async () => {
     const image = API.createElement({
       type: "image",
       x: 60,
