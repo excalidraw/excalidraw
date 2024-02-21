@@ -68,24 +68,20 @@ const ActiveRoomDialog = ({
 
   const copyRoomLink = async () => {
     try {
-      try {
-        await copyTextToSystemClipboard(activeRoomLink);
-      } catch (e) {
-        throw new Error(t("errors.copyToSystemClipboardFailed"));
-      }
-
-      setJustCopied(true);
-
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-      }
-
-      timerRef.current = window.setTimeout(() => {
-        setJustCopied(false);
-      }, 3000);
-    } catch (error: any) {
-      collabAPI.setErrorMessage(error.message);
+      await copyTextToSystemClipboard(activeRoomLink);
+    } catch (e) {
+      collabAPI.setErrorMessage(t("errors.copyToSystemClipboardFailed"));
     }
+
+    setJustCopied(true);
+
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = window.setTimeout(() => {
+      setJustCopied(false);
+    }, 3000);
 
     ref.current?.select();
   };

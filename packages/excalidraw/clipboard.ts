@@ -434,7 +434,7 @@ export const copyTextToSystemClipboard = async (
 
   // (3) if that fails, use document.execCommand
   if (!copyTextViaExecCommand(text)) {
-    throw new Error();
+    throw new Error("Error copying to clipboard.");
   }
 };
 
