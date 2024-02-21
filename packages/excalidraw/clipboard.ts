@@ -16,7 +16,7 @@ import {
 import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
-import { isMemberOf, isPromiseLike } from "./utils";
+import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
 import { t } from "./i18n";
 
 type ElementsClipboard = {
@@ -126,6 +126,7 @@ export const serializeAsClipboardJSON = ({
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | null;
 }) => {
+  const elementsMap = arrayToMap(elements);
   const framesToCopy = new Set(
     elements.filter((element) => isFrameLikeElement(element)),
   );
@@ -152,8 +153,8 @@ export const serializeAsClipboardJSON = ({
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: elements.map((element) => {
       if (
-        getContainingFrame(element) &&
-        !framesToCopy.has(getContainingFrame(element)!)
+        getContainingFrame(element, elementsMap) &&
+        !framesToCopy.has(getContainingFrame(element, elementsMap)!)
       ) {
         const copiedElement = deepCopyElement(element);
         mutateElement(copiedElement, {
