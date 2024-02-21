@@ -17,7 +17,6 @@ import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
 import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
-import { t } from "./i18n";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
@@ -435,7 +434,7 @@ export const copyTextToSystemClipboard = async (
 
   // (3) if that fails, use document.execCommand
   if (!copyTextViaExecCommand(text)) {
-    throw new Error(t("errors.copyToSystemClipboardFailed"));
+    throw new Error("Error copying to clipboard.");
   }
 };
 
