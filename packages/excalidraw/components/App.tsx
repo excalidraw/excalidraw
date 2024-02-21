@@ -2616,7 +2616,7 @@ class App extends React.Component<AppProps, AppState> {
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
-    const elementsMap = this.scene.getElementsMapIncludingDeleted();
+    const elementsMap = this.scene.getNonDeletedElementsMap();
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
@@ -2767,7 +2767,6 @@ class App extends React.Component<AppProps, AppState> {
       maybeBindLinearElement(
         multiElement,
         this.state,
-        this.scene,
         tupleToCoors(
           LinearElementEditor.getPointAtIndexGlobalCoordinates(
             multiElement,
@@ -2775,7 +2774,6 @@ class App extends React.Component<AppProps, AppState> {
             elementsMap,
           ),
         ),
-        elementsMap,
         this,
       );
     }
@@ -3874,7 +3872,6 @@ class App extends React.Component<AppProps, AppState> {
                 this.setState({
                   editingLinearElement: new LinearElementEditor(
                     selectedElement,
-                    this.scene,
                   ),
                 });
               }
@@ -4027,7 +4024,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectedElements = this.scene.getSelectedElements(this.state);
       const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements, elementsMap, this)
+        ? bindOrUnbindSelectedElements(selectedElements, this)
         : unbindLinearElements(selectedElements, elementsMap);
       this.setState({ suggestedBindings: [] });
     }
@@ -4757,10 +4754,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.history.resumeRecording();
         this.setState({
-          editingLinearElement: new LinearElementEditor(
-            selectedElements[0],
-            this.scene,
-          ),
+          editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
       } else if (
@@ -5478,10 +5472,12 @@ class App extends React.Component<AppProps, AppState> {
     scenePointerX: number,
     scenePointerY: number,
   ) {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
+      elementsMap,
     );
-    const elementsMap = this.scene.getNonDeletedElementsMap();
 
     if (!element) {
       return;
@@ -6271,7 +6267,6 @@ class App extends React.Component<AppProps, AppState> {
             this.history,
             pointerDownState.origin,
             linearElementEditor,
-            this.scene.getNonDeletedElementsMap(),
             this,
           );
           if (ret.hitElement) {
@@ -6603,7 +6598,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
-      this.scene,
       this,
     );
     this.scene.addNewElement(element);
@@ -6872,7 +6866,6 @@ class App extends React.Component<AppProps, AppState> {
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
-        this.scene,
         this,
       );
 
@@ -7143,6 +7136,7 @@ class App extends React.Component<AppProps, AppState> {
           return true;
         }
       }
+      const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
@@ -7153,6 +7147,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement,
             pointerCoords,
             this.state,
+            elementsMap,
           )
         ) {
           const ret = LinearElementEditor.addMidpoint(
@@ -7160,7 +7155,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             this.state,
             !event[KEYS.CTRL_OR_CMD],
-            this.scene.getNonDeletedElementsMap(),
+            elementsMap,
           );
           if (!ret) {
             return;
@@ -7581,10 +7576,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedLinearElement:
                 elementsWithinSelection.length === 1 &&
                 isLinearElement(elementsWithinSelection[0])
-                  ? new LinearElementEditor(
-                      elementsWithinSelection[0],
-                      this.scene,
-                    )
+                  ? new LinearElementEditor(elementsWithinSelection[0])
                   : null,
               showHyperlinkPopup:
                 elementsWithinSelection.length === 1 &&
@@ -7684,7 +7676,6 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.editingLinearElement,
             this.state,
-            elementsMap,
             this,
           );
           if (editingLinearElement !== this.state.editingLinearElement) {
@@ -7709,7 +7700,6 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.selectedLinearElement,
             this.state,
-            elementsMap,
             this,
           );
 
@@ -7859,9 +7849,7 @@ class App extends React.Component<AppProps, AppState> {
             maybeBindLinearElement(
               draggingElement,
               this.state,
-              this.scene,
               pointerCoords,
-              elementsMap,
               this,
             );
           }
@@ -7880,10 +7868,7 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 prevState,
               ),
-              selectedLinearElement: new LinearElementEditor(
-                draggingElement,
-                this.scene,
-              ),
+              selectedLinearElement: new LinearElementEditor(draggingElement),
             }));
           } else {
             this.setState((prevState) => ({
@@ -8123,10 +8108,7 @@ class App extends React.Component<AppProps, AppState> {
         // the one we've hit
         if (selectedELements.length === 1) {
           this.setState({
-            selectedLinearElement: new LinearElementEditor(
-              hitElement,
-              this.scene,
-            ),
+            selectedLinearElement: new LinearElementEditor(hitElement),
           });
         }
       }
@@ -8239,10 +8221,7 @@ class App extends React.Component<AppProps, AppState> {
                   selectedLinearElement:
                     newSelectedElements.length === 1 &&
                     isLinearElement(newSelectedElements[0])
-                      ? new LinearElementEditor(
-                          newSelectedElements[0],
-                          this.scene,
-                        )
+                      ? new LinearElementEditor(newSelectedElements[0])
                       : prevState.selectedLinearElement,
                 };
               });
@@ -8316,7 +8295,7 @@ class App extends React.Component<AppProps, AppState> {
               // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
               // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
               prevState.selectedLinearElement?.elementId !== hitElement.id
-                ? new LinearElementEditor(hitElement, this.scene)
+                ? new LinearElementEditor(hitElement)
                 : prevState.selectedLinearElement,
           }));
         }
@@ -8387,13 +8366,15 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        (isBindingEnabled(this.state)
-          ? bindOrUnbindSelectedElements
-          : unbindLinearElements)(
-          this.scene.getSelectedElements(this.state),
-          elementsMap,
-          this,
-        );
+        isBindingEnabled(this.state)
+          ? bindOrUnbindSelectedElements(
+              this.scene.getSelectedElements(this.state),
+              this,
+            )
+          : unbindLinearElements(
+              this.scene.getNonDeletedElements(),
+              elementsMap,
+            );
       }
 
       if (activeTool.type === "laser") {
@@ -8870,7 +8851,6 @@ class App extends React.Component<AppProps, AppState> {
   }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
-      this.scene,
       this,
     );
     this.setState({
@@ -8898,7 +8878,6 @@ class App extends React.Component<AppProps, AppState> {
       (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
-          this.scene,
           this,
         );
         if (
@@ -8927,7 +8906,6 @@ class App extends React.Component<AppProps, AppState> {
     }
     const suggestedBindings = getEligibleElementsForBinding(
       selectedElements,
-      this.scene.getNonDeletedElementsMap(),
       this,
     );
     this.setState({ suggestedBindings });
@@ -9196,7 +9174,7 @@ class App extends React.Component<AppProps, AppState> {
                 this,
               ),
               selectedLinearElement: isLinearElement(element)
-                ? new LinearElementEditor(element, this.scene)
+                ? new LinearElementEditor(element)
                 : null,
             }
           : this.state),

@@ -4,7 +4,6 @@ import { getNonDeletedElements } from "../element";
 import {
   ExcalidrawElement,
   NonDeleted,
-  NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
 } from "../element/types";
 import { resizeMultipleElements } from "../element/resizeElements";
@@ -70,7 +69,7 @@ export const actionFlipVertical = register({
 
 const flipSelectedElements = (
   elements: readonly ExcalidrawElement[],
-  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   appState: Readonly<AppState>,
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
@@ -86,6 +85,7 @@ const flipSelectedElements = (
 
   const updatedElements = flipElements(
     selectedElements,
+    elements,
     elementsMap,
     appState,
     flipDirection,
@@ -101,7 +101,8 @@ const flipSelectedElements = (
 
 const flipElements = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
-  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap,
+  elements: readonly ExcalidrawElement[],
+  elementsMap: NonDeletedSceneElementsMap,
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
@@ -118,9 +119,9 @@ const flipElements = (
     flipDirection === "horizontal" ? minY : maxY,
   );
 
-  (isBindingEnabled(appState)
-    ? bindOrUnbindSelectedElements
-    : unbindLinearElements)(selectedElements, elementsMap, app);
+  isBindingEnabled(appState)
+    ? bindOrUnbindSelectedElements(selectedElements, app)
+    : unbindLinearElements(selectedElements, elementsMap);
 
   return selectedElements;
 };

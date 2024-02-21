@@ -357,7 +357,8 @@ const renderLinearElementPointHighlight = (
   ) {
     return;
   }
-  const element = LinearElementEditor.getElement(elementId);
+  const element = LinearElementEditor.getElement(elementId, elementsMap);
+
   if (!element) {
     return;
   }

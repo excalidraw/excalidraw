@@ -6,6 +6,8 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "./types";
 import {
   distance2d,
@@ -37,7 +39,6 @@ import {
 import { mutateElement } from "./mutateElement";
 import History from "../history";
 
-import Scene from "../scene/Scene";
 import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
@@ -87,11 +88,10 @@ export class LinearElementEditor {
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: Point | null;
 
-  constructor(element: NonDeleted<ExcalidrawLinearElement>, scene: Scene) {
+  constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
-    Scene.mapElementToScene(this.elementId, scene);
     LinearElementEditor.normalizePoints(element);
 
     this.selectedPointsIndices = null;
@@ -124,8 +124,11 @@ export class LinearElementEditor {
    * @param id the `elementId` from the instance of this class (so that we can
    *  statically guarantee this method returns an ExcalidrawLinearElement)
    */
-  static getElement(id: InstanceType<typeof LinearElementEditor>["elementId"]) {
-    const element = Scene.getScene(id)?.getNonDeletedElement(id);
+  static getElement(
+    id: InstanceType<typeof LinearElementEditor>["elementId"],
+    elementsMap: ElementsMap,
+  ) {
+    const element = elementsMap.get(id);
     if (element) {
       return element as NonDeleted<ExcalidrawLinearElement>;
     }
@@ -136,7 +139,7 @@ export class LinearElementEditor {
     event: PointerEvent,
     appState: AppState,
     setState: React.Component<any, AppState>["setState"],
-    elementsMap: ElementsMap,
+    elementsMap: NonDeletedSceneElementsMap,
   ) {
     if (
       !appState.editingLinearElement ||
@@ -147,7 +150,7 @@ export class LinearElementEditor {
     const { editingLinearElement } = appState;
     const { selectedPointsIndices, elementId } = editingLinearElement;
 
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return false;
     }
@@ -198,13 +201,13 @@ export class LinearElementEditor {
       pointSceneCoords: { x: number; y: number }[],
     ) => void,
     linearElementEditor: LinearElementEditor,
-    elementsMap: ElementsMap,
+    elementsMap: NonDeletedSceneElementsMap,
   ): boolean {
     if (!linearElementEditor) {
       return false;
     }
     const { selectedPointsIndices, elementId } = linearElementEditor;
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return false;
     }
@@ -332,12 +335,13 @@ export class LinearElementEditor {
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
     appState: AppState,
-    elementsMap: ElementsMap,
     app: AppClassProperties,
   ): LinearElementEditor {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return editingLinearElement;
     }
@@ -378,7 +382,6 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                Scene.getScene(element)!,
                 app,
               )
             : null;
@@ -493,7 +496,7 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
   ) => {
     const { elementId } = linearElementEditor;
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return null;
     }
@@ -617,6 +620,7 @@ export class LinearElementEditor {
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
+      elementsMap,
     );
     if (!element) {
       return -1;
@@ -642,13 +646,15 @@ export class LinearElementEditor {
     history: History,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
-    elementsMap: ElementsMap,
     app: AppClassProperties,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const elements = app.scene.getNonDeletedElements();
+
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
@@ -660,7 +666,7 @@ export class LinearElementEditor {
     }
 
     const { elementId } = linearElementEditor;
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
 
     if (!element) {
       return ret;
@@ -711,11 +717,7 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(
-          scenePointer,
-          Scene.getScene(element)!,
-          app,
-        ),
+        endBindingElement: getHoveredElementForBinding(scenePointer, app),
       };
 
       ret.didAddPoint = true;
@@ -818,7 +820,7 @@ export class LinearElementEditor {
       return null;
     }
     const { elementId, lastUncommittedPoint } = appState.editingLinearElement;
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return appState.editingLinearElement;
     }
@@ -1025,14 +1027,14 @@ export class LinearElementEditor {
     mutateElement(element, LinearElementEditor.getNormalizedPoints(element));
   }
 
-  static duplicateSelectedPoints(appState: AppState) {
+  static duplicateSelectedPoints(appState: AppState, elementsMap: ElementsMap) {
     if (!appState.editingLinearElement) {
       return false;
     }
 
     const { selectedPointsIndices, elementId } = appState.editingLinearElement;
 
-    const element = LinearElementEditor.getElement(elementId);
+    const element = LinearElementEditor.getElement(elementId, elementsMap);
 
     if (!element || selectedPointsIndices === null) {
       return false;
@@ -1194,9 +1196,11 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
     appState: AppState,
+    elementsMap: ElementsMap,
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
+      elementsMap,
     );
 
     if (!element) {
@@ -1239,6 +1243,7 @@ export class LinearElementEditor {
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
+      elementsMap,
     );
     if (!element) {
       return;
