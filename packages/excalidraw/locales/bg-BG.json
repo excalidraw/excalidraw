@@ -214,7 +214,6 @@
     "fileTooBig": "Файлът е твърде голям. Максималния допустим размер е {{maxSize}}.",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "Невалиден SVG.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "Не можем да заредим библиотеката",
     "collabSaveFailed": "",
