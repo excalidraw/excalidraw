@@ -29,21 +29,20 @@ export const ShareableLinkDialog = ({
   const ref = useRef<HTMLInputElement>(null);
 
   const copyRoomLink = async () => {
-      try {
-        await copyTextToSystemClipboard(link);
-      } catch (e) {
-        setErrorMessage(t("errors.copyToSystemClipboardFailed"));
-      }
-      setJustCopied(true);
+    try {
+      await copyTextToSystemClipboard(link);
+    } catch (e) {
+      setErrorMessage(t("errors.copyToSystemClipboardFailed"));
+    }
+    setJustCopied(true);
 
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-      }
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+    }
 
-      timerRef.current = window.setTimeout(() => {
-        setJustCopied(false);
-      }, 3000);
-    } 
+    timerRef.current = window.setTimeout(() => {
+      setJustCopied(false);
+    }, 3000);
 
     ref.current?.select();
   };
