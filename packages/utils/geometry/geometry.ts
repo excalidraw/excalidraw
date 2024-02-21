@@ -9,6 +9,8 @@ import {
   Polyline,
 } from "./shape";
 
+const DEFAULT_THRESHOLD = 10e-5;
+
 /**
  * utils
  */
@@ -128,10 +130,10 @@ export const lineMidpoint = (line: Line) => {
 
 // return the coordinates resulting from rotating the given line about an origin by an angle in degrees
 // note that when the origin is not given, the midpoint of the given line is used as the origin
-export const lineRotate = (line: Line, angle: number, origin?: Point) => {
+export const lineRotate = (line: Line, angle: number, origin?: Point): Line => {
   return line.map((point) =>
     pointRotate(point, angle, origin || lineMidpoint(line)),
-  );
+  ) as Line;
 };
 
 // returns the coordinates resulting from translating a line by an angle in degrees and a distance.
@@ -630,16 +632,24 @@ export const distanceToSegment = (point: Point, line: Line) => {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-export const pointOnLine = (point: Point, line: Line, threshold = 0) => {
+export const pointOnLine = (
+  point: Point,
+  line: Line,
+  threshold = DEFAULT_THRESHOLD,
+) => {
   const distance = distanceToSegment(point, line);
+
+  if (distance === 0) {
+    return true;
+  }
 
   return distance < threshold;
 };
 
-export const pointOnPolylines = (
+export const pointOnPolyline = (
   point: Point,
   polyline: Polyline,
-  threshold = 0,
+  threshold = DEFAULT_THRESHOLD,
 ) => {
   return polyline.some((line) => pointOnLine(point, line, threshold));
 };
@@ -766,14 +776,18 @@ export const polyLineFromCurve = (curve: Curve, segments = 10): Polyline => {
   return lineSegments;
 };
 
-export const pointOnCurve = (point: Point, curve: Curve, threshold = 0) => {
-  return pointOnPolylines(point, polyLineFromCurve(curve), threshold);
+export const pointOnCurve = (
+  point: Point,
+  curve: Curve,
+  threshold = DEFAULT_THRESHOLD,
+) => {
+  return pointOnPolyline(point, polyLineFromCurve(curve), threshold);
 };
 
 export const pointOnPolycurve = (
   point: Point,
   polycurve: Polycurve,
-  threshold = 0,
+  threshold = DEFAULT_THRESHOLD,
 ) => {
   return polycurve.some((curve) => pointOnCurve(point, curve, threshold));
 };
@@ -803,7 +817,7 @@ export const pointInPolygon = (point: Point, polygon: Polygon) => {
 export const pointOnPolygon = (
   point: Point,
   polygon: Polygon,
-  threshold = 0,
+  threshold = DEFAULT_THRESHOLD,
 ) => {
   let on = false;
   const closed = close(polygon);
@@ -921,7 +935,7 @@ const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
 export const pointOnEllipse = (
   point: Point,
   ellipse: Ellipse,
-  threshold = 0,
+  threshold = DEFAULT_THRESHOLD,
 ) => {
   return distanceToEllipse(point, ellipse) <= threshold;
 };

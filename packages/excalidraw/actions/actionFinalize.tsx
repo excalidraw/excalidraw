@@ -8,7 +8,6 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import Scene from "../scene/Scene";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,

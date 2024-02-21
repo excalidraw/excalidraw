@@ -6,7 +6,6 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
-  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
 import {
@@ -653,7 +652,6 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor | null;
   } {
     const elementsMap = app.scene.getNonDeletedElementsMap();
-    const elements = app.scene.getNonDeletedElements();
 
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,

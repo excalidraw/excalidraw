@@ -7,7 +7,7 @@ import {
   pointOnLine,
   pointOnPolycurve,
   pointOnPolygon,
-  pointOnPolylines,
+  pointOnPolyline,
   close,
 } from "./geometry/geometry";
 
@@ -27,7 +27,7 @@ export const isPointOnShape = (
     case "line":
       return pointOnLine(point, shape.data, tolerance);
     case "polyline":
-      return pointOnPolylines(point, shape.data, tolerance);
+      return pointOnPolyline(point, shape.data, tolerance);
     case "curve":
       return pointOnCurve(point, shape.data, tolerance);
     case "polycurve":
