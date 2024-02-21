@@ -253,7 +253,7 @@ export interface AppState {
   scrollY: number;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
-  name: string;
+  name: string | null;
   isResizing: boolean;
   isRotating: boolean;
   zoom: Zoom;
@@ -468,6 +468,7 @@ export interface ExcalidrawProps {
   libraryReturnUrl?: string;
   initState?: AppState; //zsviczian
   theme?: Theme;
+  // @TODO come with better API before v0.18.0
   name?: string;
   renderCustomStats?: (
     elements: readonly NonDeletedExcalidrawElement[],
@@ -554,7 +555,6 @@ export type ExportOpts = {
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
@@ -638,6 +638,7 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  getName: App["getName"];
 };
 
 export type PointerDownState = Readonly<{
@@ -712,12 +713,13 @@ export type ExcalidrawImperativeAPI = {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
-  startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
+  startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian  
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
+  getName: InstanceType<typeof App>["getName"];
+  scrollToContent: InstanceType<typeof App>["scrollToContent"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

@@ -7,9 +7,7 @@ import {
   //EXPORT_SCALES,
   THEME,
 } from "./constants";
-import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
-import { getDateTime } from "./utils";
 
 const defaultExportScale = 1; //zsviczian - iPad scaling issue on export
 /*EXPORT_SCALES.includes(devicePixelRatio)
@@ -67,7 +65,7 @@ export const getDefaultAppState = (): Omit<
     isRotating: false,
     lastPointerDownWith: "mouse",
     multiElement: null,
-    name: `${t("labels.untitled")}-${getDateTime()}`,
+    name: null,
     contextMenu: null,
     openMenu: null,
     openPopup: null,

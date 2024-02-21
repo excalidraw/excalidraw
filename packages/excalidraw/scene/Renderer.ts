@@ -40,13 +40,19 @@ export class Renderer {
       const visibleElements: NonDeletedExcalidrawElement[] = [];
       for (const element of elementsMap.values()) {
         if (
-          isElementInViewport(element, width, height, {
-            zoom,
-            offsetLeft,
-            offsetTop,
-            scrollX,
-            scrollY,
-          })
+          isElementInViewport(
+            element,
+            width,
+            height,
+            {
+              zoom,
+              offsetLeft,
+              offsetTop,
+              scrollX,
+              scrollY,
+            },
+            elementsMap,
+          )
         ) {
           visibleElements.push(element);
         }

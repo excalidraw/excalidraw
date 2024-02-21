@@ -212,6 +212,7 @@ const changeFontSize = (
           redrawTextBoundingBox(
             newElement,
             app.scene.getContainerElement(oldElement),
+            app.scene.getNonDeletedElementsMap(),
           );
 
           newElement = offsetElementAfterFontResize(oldElement, newElement);
@@ -915,6 +916,7 @@ export const actionChangeFontFamily = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
             );
             return newElement;
           }
@@ -1024,6 +1026,7 @@ export const actionChangeTextAlign = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
             );
             return newElement;
           }
@@ -1113,6 +1116,7 @@ export const actionChangeVerticalAlign = register({
             redrawTextBoundingBox(
               newElement,
               app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
             );
             return newElement;
           }

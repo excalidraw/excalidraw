@@ -76,7 +76,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
 };
 
 export const fileSave = (
-  blob: Blob,
+  blob: Blob | Promise<Blob>,
   opts: {
     /** supply without the extension */
     name: string;
