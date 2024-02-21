@@ -1,6 +1,10 @@
 import { isPathALoop, isPointWithinBounds } from "../math";
 
-import { ExcalidrawElement, ExcalidrawRectangleElement } from "./types";
+import {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawRectangleElement,
+} from "./types";
 
 import { getElementBounds } from "./bounds";
 import { FrameNameBounds } from "../types";
@@ -77,9 +81,10 @@ export const hitElementBoundingBox = (
   x: number,
   y: number,
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   tolerance = 0,
 ) => {
-  let [x1, y1, x2, y2] = getElementBounds(element);
+  let [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
   x1 -= tolerance;
   y1 -= tolerance;
   x2 += tolerance;
@@ -87,10 +92,13 @@ export const hitElementBoundingBox = (
   return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
 };
 
-export const hitElementBoundingBoxOnly = (hitArgs: HitTestArgs) => {
+export const hitElementBoundingBoxOnly = (
+  hitArgs: HitTestArgs,
+  elementsMap: ElementsMap,
+) => {
   return (
     !hitElementItself(hitArgs) &&
-    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element)
+    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element, elementsMap)
   );
 };
 

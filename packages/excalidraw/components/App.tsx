@@ -4517,7 +4517,13 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      return hitElementBoundingBox(x, y, element, this.getHitThreshold());
+      return hitElementBoundingBox(
+        x,
+        y,
+        element,
+        this.scene.getNonDeletedElementsMap(),
+        this.getHitThreshold(),
+      );
     }
 
     // take bound text element into consideration for hit collision as well
@@ -8312,16 +8318,19 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.isResizing &&
         // only hitting the bounding box of the previous hit element
         ((hitElement &&
-          hitElementBoundingBoxOnly({
-            x: pointerDownState.origin.x,
-            y: pointerDownState.origin.y,
-            element: hitElement,
-            shape: this.getElementShape(hitElement),
-            threshold: this.getHitThreshold(),
-            frameNameBound: isFrameLikeElement(hitElement)
-              ? this.frameNameBoundsCache.get(hitElement)
-              : null,
-          })) ||
+          hitElementBoundingBoxOnly(
+            {
+              x: pointerDownState.origin.x,
+              y: pointerDownState.origin.y,
+              element: hitElement,
+              shape: this.getElementShape(hitElement),
+              threshold: this.getHitThreshold(),
+              frameNameBound: isFrameLikeElement(hitElement)
+                ? this.frameNameBoundsCache.get(hitElement)
+                : null,
+            },
+            elementsMap,
+          )) ||
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {

@@ -1,4 +1,4 @@
-import { AppState, ExcalidrawProps, Point, UIAppState } from "../../types";
+import { AppState, ExcalidrawProps, Point } from "../../types";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -24,10 +24,8 @@ import {
 } from "react";
 import clsx from "clsx";
 import { KEYS } from "../../keys";
-import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
-import { rotate } from "../../math";
-import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../../constants";
-import { Bounds, getElementAbsoluteCoords } from "../../element/bounds";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
+import { getElementAbsoluteCoords } from "../../element/bounds";
 import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 import { getSelectedElements } from "../../scene";
 import { hitElementBoundingBox } from "../../element/collision";
@@ -37,6 +35,7 @@ import "./Hyperlink.scss";
 import { trackEvent } from "../../analytics";
 import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
+import { getLinkHandleFromCoords } from "./helpers";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -346,80 +345,6 @@ export const getContextMenuLabel = (
   return label;
 };
 
-export const getLinkHandleFromCoords = (
-  [x1, y1, x2, y2]: Bounds,
-  angle: number,
-  appState: Pick<UIAppState, "zoom">,
-): Bounds => {
-  const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
-  const linkMarginY = size / appState.zoom.value;
-  const centerX = (x1 + x2) / 2;
-  const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
-  const dashedLineMargin = 4 / appState.zoom.value;
-
-  // Same as `ne` resize handle
-  const x = x2 + dashedLineMargin - centeringOffset;
-  const y = y1 - dashedLineMargin - linkMarginY + centeringOffset;
-
-  const [rotatedX, rotatedY] = rotate(
-    x + linkWidth / 2,
-    y + linkHeight / 2,
-    centerX,
-    centerY,
-    angle,
-  );
-  return [
-    rotatedX - linkWidth / 2,
-    rotatedY - linkHeight / 2,
-    linkWidth,
-    linkHeight,
-  ];
-};
-
-export const isPointHittingLinkIcon = (
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-  appState: AppState,
-  [x, y]: Point,
-) => {
-  const threshold = 4 / appState.zoom.value;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
-    [x1, y1, x2, y2],
-    element.angle,
-    appState,
-  );
-  const hitLink =
-    x > linkX - threshold &&
-    x < linkX + threshold + linkWidth &&
-    y > linkY - threshold &&
-    y < linkY + linkHeight + threshold;
-  return hitLink;
-};
-
-export const isPointHittingLink = (
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-  appState: AppState,
-  [x, y]: Point,
-  isMobile: boolean,
-) => {
-  if (!element.link || appState.selectedElementIds[element.id]) {
-    return false;
-  }
-  if (
-    !isMobile &&
-    appState.viewModeEnabled &&
-    hitElementBoundingBox(x, y, element)
-  ) {
-    return true;
-  }
-  return isPointHittingLinkIcon(element, elementsMap, appState, [x, y]);
-};
-
 let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;
 export const showHyperlinkTooltip = (
   element: NonDeletedExcalidrawElement,
@@ -500,7 +425,7 @@ const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (hitElementBoundingBox(sceneX, sceneY, element)) {
+  if (hitElementBoundingBox(sceneX, sceneY, element, elementsMap)) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element, elementsMap);
