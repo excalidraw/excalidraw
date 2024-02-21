@@ -30,7 +30,11 @@ export const ShareableLinkDialog = ({
 
   const copyRoomLink = async () => {
     try {
-      await copyTextToSystemClipboard(link);
+      await copyTextToSystemClipboard(
+        link,
+        null,
+        t("errors.copyToSystemClipboardFailed"),
+      );
 
       setJustCopied(true);
 

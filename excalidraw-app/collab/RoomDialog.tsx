@@ -64,7 +64,11 @@ export const RoomModal = ({
 
   const copyRoomLink = async () => {
     try {
-      await copyTextToSystemClipboard(activeRoomLink);
+      await copyTextToSystemClipboard(
+        activeRoomLink,
+        null,
+        t("errors.copyToSystemClipboardFailed"),
+      );
 
       setJustCopied(true);
 
