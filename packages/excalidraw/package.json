@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.17.1-obsidian-14",
+  "version": "0.17.1-obsidian-15",
   "main": "main.js",
   "types": "types/excalidraw/index.d.ts",
   "files": [
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
-    "@excalidraw/laser-pointer": "1.3.1",
+    "@zsviczian/laser-pointer": "1.3.1",
     "@zsviczian/mermaid-to-excalidraw": "0.2.0-obsidian-2",
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",

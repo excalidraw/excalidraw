@@ -1,4 +1,4 @@
-import { LaserPointerOptions } from "@excalidraw/laser-pointer";
+import { LaserPointerOptions } from "@zsviczian/laser-pointer";
 import { AnimatedTrail, Trail } from "./animated-trail";
 import { AnimationFrameHandler } from "./animation-frame-handler";
 import type App from "./components/App";

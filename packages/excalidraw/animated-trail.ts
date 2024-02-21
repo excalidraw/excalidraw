@@ -1,4 +1,4 @@
-import { LaserPointer, LaserPointerOptions } from "@excalidraw/laser-pointer";
+import { LaserPointer, LaserPointerOptions } from "@zsviczian/laser-pointer";
 import { AnimationFrameHandler } from "./animation-frame-handler";
 import { AppState } from "./types";
 import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
