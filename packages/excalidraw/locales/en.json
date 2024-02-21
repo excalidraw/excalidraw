@@ -217,7 +217,6 @@
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "failedToFetchImage": "Failed to fetch image.",
-    "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
@@ -251,7 +250,7 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Pen mode - prevent touch",
-    "link": "Add/ Update link for a selected shape",
+    "link": "Add / Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
@@ -304,9 +303,12 @@
     "openIssueMessage": "We were very cautious not to include your scene information on the error. If your scene is not private, please consider following up on our <button>bug tracker</button>. Please include information below by copying and pasting into the GitHub issue.",
     "sceneContent": "Scene content:"
   },
+  "shareDialog": {
+    "or": "Or"
+  },
   "roomDialog": {
-    "desc_intro": "You can invite people to your current scene to collaborate with you.",
-    "desc_privacy": "Don't worry, the session uses end-to-end encryption, so whatever you draw will stay private. Not even our server will be able to see what you come up with.",
+    "desc_intro": "Invite people to collaborate on your drawing.",
+    "desc_privacy": "Don't worry, the session is end-to-end encrypted, and fully private. Not even our server can see what you draw.",
     "button_startSession": "Start session",
     "button_stopSession": "Stop session",
     "desc_inProgressIntro": "Live-collaboration session is now in progress.",

@@ -1,4 +1,5 @@
 import {
+  ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -44,18 +45,24 @@ export const excludeElementsInFramesFromSelection = <
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   excludeElementsInFrames: boolean = true,
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(selection);
+    getElementAbsoluteCoords(selection, elementsMap);
 
   let elementsInSelection = elements.filter((element) => {
-    let [elementX1, elementY1, elementX2, elementY2] =
-      getElementBounds(element);
+    let [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
+      element,
+      elementsMap,
+    );
 
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
     if (containingFrame) {
-      const [fx1, fy1, fx2, fy2] = getElementBounds(containingFrame);
+      const [fx1, fy1, fx2, fy2] = getElementBounds(
+        containingFrame,
+        elementsMap,
+      );
 
       elementX1 = Math.max(fx1, elementX1);
       elementY1 = Math.max(fy1, elementY1);
@@ -79,10 +86,10 @@ export const getElementsWithinSelection = (
     : elementsInSelection;
 
   elementsInSelection = elementsInSelection.filter((element) => {
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
 
     if (containingFrame) {
-      return elementOverlapsWithFrame(element, containingFrame);
+      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
     }
 
     return true;
@@ -95,6 +102,7 @@ export const getVisibleAndNonSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   const selectedElementsSet = new Set(
     selectedElements.map((element) => element.id),
@@ -105,6 +113,7 @@ export const getVisibleAndNonSelectedElements = (
       appState.width,
       appState.height,
       appState,
+      elementsMap,
     );
 
     return !selectedElementsSet.has(element.id) && isVisible;

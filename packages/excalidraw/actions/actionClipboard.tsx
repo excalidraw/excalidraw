@@ -107,7 +107,7 @@ export const actionCut = register({
   trackEvent: { category: "element" },
   perform: (elements, appState, event: ClipboardEvent | null, app) => {
     actionCopy.perform(elements, appState, event, app);
-    return actionDeleteSelected.perform(elements, appState);
+    return actionDeleteSelected.perform(elements, appState, null, app);
   },
   contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
@@ -138,6 +138,7 @@ export const actionCopyAsSvg = register({
         {
           ...appState,
           exportingFrame,
+          name: app.getName(),
         },
       );
       return {
@@ -184,6 +185,7 @@ export const actionCopyAsPng = register({
       await exportCanvas("clipboard", exportedElements, appState, app.files, {
         ...appState,
         exportingFrame,
+        name: app.getName(),
       });
       return {
         appState: {
@@ -236,7 +238,11 @@ export const copyText = register({
         return acc;
       }, [])
       .join("\n\n");
-    copyTextToSystemClipboard(text);
+    try {
+      copyTextToSystemClipboard(text);
+    } catch (e) {
+      throw new Error(t("errors.copyToSystemClipboardFailed"));
+    }
     return {
       commitToHistory: false,
     };

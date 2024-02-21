@@ -84,6 +84,6 @@ export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 
 export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
-export { actionLink } from "../element/Hyperlink";
+export { actionLink } from "./actionLink";
 export { actionToggleElementLock } from "./actionElementLock";
 export { actionToggleLinearEditor } from "./actionLinearEditor";
