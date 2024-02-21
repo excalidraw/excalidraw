@@ -214,7 +214,6 @@
     "fileTooBig": "ਫਾਈਲ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡੀ ਹੈ। ਵੱਧ-ਤੋਂ-ਵੱਧ ਪ੍ਰਵਾਨਤ ਅਕਾਰ {{maxSize}} ਹੈ।",
     "svgImageInsertError": "SVG ਤਸਵੀਰ ਸ਼ਾਮਲ ਨਹੀਂ ਕਰ ਸਕੇ। SVG ਮਾਰਕ-ਅੱਪ ਨਜਾਇਜ਼ ਲੱਗ ਰਿਹਾ ਹੈ।",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
     "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
     "collabSaveFailed": "",
