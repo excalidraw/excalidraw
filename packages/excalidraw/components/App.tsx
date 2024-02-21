@@ -4490,6 +4490,7 @@ class App extends React.Component<AppProps, AppState> {
                   _element,
                   this.scene.getElementsMapIncludingDeleted(),
                 ),
+                this.scene.getElementsMapIncludingDeleted(),
                 {
                 text,
                 isDeleted: false,
