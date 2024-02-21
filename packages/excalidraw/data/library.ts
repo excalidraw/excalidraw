@@ -24,7 +24,13 @@ import {
   LIBRARY_SIDEBAR_TAB,
 } from "../constants";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
-import { arrayToMap, cloneJSON, promiseTry, resolvablePromise } from "../utils";
+import {
+  arrayToMap,
+  cloneJSON,
+  preventUnload,
+  promiseTry,
+  resolvablePromise,
+} from "../utils";
 import { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 import { Queue } from "../queue";
@@ -504,6 +510,7 @@ class AdapterTransaction {
 }
 
 let lastSavedLibraryItemsHash = 0;
+let librarySaveCounter = 0;
 
 const getLibraryItemsHash = (items: LibraryItems) => {
   return hashString(
@@ -520,55 +527,63 @@ const persistLibraryUpdate = async (
   adapter: LibraryPersistenceAdapter,
   update: LibraryUpdate,
 ): Promise<LibraryItems> => {
-  return AdapterTransaction.run(adapter, async (transaction) => {
-    const nextLibraryItemsMap = arrayToMap(await transaction.getLibraryItems());
+  try {
+    librarySaveCounter++;
 
-    for (const [id] of update.deletedItems) {
-      nextLibraryItemsMap.delete(id);
-    }
+    return await AdapterTransaction.run(adapter, async (transaction) => {
+      const nextLibraryItemsMap = arrayToMap(
+        await transaction.getLibraryItems(),
+      );
 
-    const addedItems: LibraryItem[] = [];
-
-    // we want to merge current library items with the ones stored in the
-    // DB so that we don't lose any elements that for some reason aren't
-    // in the current editor library, which could happen when:
-    //
-    // 1. we haven't received an update deleting some elements
-    //    (in which case it's still better to keep them in the DB lest
-    //     it was due to a different reason)
-    // 2. we keep a single DB for all active editors, but the editors'
-    //    libraries aren't synced or there's a race conditions during
-    //    syncing
-    // 3. some other race condition, e.g. during init where emit updates
-    //    for partial updates (e.g. you install a 3rd party library and
-    //    init from DB only after — we emit events for both updates)
-    for (const [id, item] of update.libraryItems) {
-      if (nextLibraryItemsMap.has(id)) {
-        // replace item with latest version
-        // TODO we could prefer the newer item instead
-        nextLibraryItemsMap.set(id, item);
-      } else {
-        // we want to prepend the new items with the ones that are already
-        // in DB to preserve the ordering we do in editor (newly added
-        // items are added to the beginning)
-        addedItems.push(item);
+      for (const [id] of update.deletedItems) {
+        nextLibraryItemsMap.delete(id);
       }
-    }
 
-    const nextLibraryItems = addedItems.concat(
-      Array.from(nextLibraryItemsMap.values()),
-    );
+      const addedItems: LibraryItem[] = [];
 
-    const version = getLibraryItemsHash(nextLibraryItems);
+      // we want to merge current library items with the ones stored in the
+      // DB so that we don't lose any elements that for some reason aren't
+      // in the current editor library, which could happen when:
+      //
+      // 1. we haven't received an update deleting some elements
+      //    (in which case it's still better to keep them in the DB lest
+      //     it was due to a different reason)
+      // 2. we keep a single DB for all active editors, but the editors'
+      //    libraries aren't synced or there's a race conditions during
+      //    syncing
+      // 3. some other race condition, e.g. during init where emit updates
+      //    for partial updates (e.g. you install a 3rd party library and
+      //    init from DB only after — we emit events for both updates)
+      for (const [id, item] of update.libraryItems) {
+        if (nextLibraryItemsMap.has(id)) {
+          // replace item with latest version
+          // TODO we could prefer the newer item instead
+          nextLibraryItemsMap.set(id, item);
+        } else {
+          // we want to prepend the new items with the ones that are already
+          // in DB to preserve the ordering we do in editor (newly added
+          // items are added to the beginning)
+          addedItems.push(item);
+        }
+      }
 
-    if (version !== lastSavedLibraryItemsHash) {
-      await adapter.save({ libraryItems: nextLibraryItems });
-    }
+      const nextLibraryItems = addedItems.concat(
+        Array.from(nextLibraryItemsMap.values()),
+      );
 
-    lastSavedLibraryItemsHash = version;
+      const version = getLibraryItemsHash(nextLibraryItems);
 
-    return nextLibraryItems;
-  });
+      if (version !== lastSavedLibraryItemsHash) {
+        await adapter.save({ libraryItems: nextLibraryItems });
+      }
+
+      lastSavedLibraryItemsHash = version;
+
+      return nextLibraryItems;
+    });
+  } finally {
+    librarySaveCounter--;
+  }
 };
 
 export const useHandleLibrary = (
@@ -849,9 +864,19 @@ export const useHandleLibrary = (
         }
       });
 
+      const onUnload = (event: Event) => {
+        if (librarySaveCounter) {
+          preventUnload(event);
+        }
+      };
+
+      window.addEventListener(EVENT.BEFORE_UNLOAD, onUnload);
+
       return () => {
+        window.removeEventListener(EVENT.BEFORE_UNLOAD, onUnload);
         unsubOnLibraryUpdate();
         lastSavedLibraryItemsHash = 0;
+        librarySaveCounter = 0;
       };
     },
     [
