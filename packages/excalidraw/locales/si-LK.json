@@ -214,7 +214,6 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
     "collabSaveFailed": "",
