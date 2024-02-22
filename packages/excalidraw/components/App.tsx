@@ -8884,6 +8884,7 @@ class App extends React.Component<AppProps, AppState> {
             });
             return;
           } catch (error: any) {
+            // Don't throw for image scene daa
             if (error.name !== "EncodingError") {
               throw new Error(t("alerts.couldNotLoadInvalidFile"));
             }
@@ -8968,8 +8969,9 @@ class App extends React.Component<AppProps, AppState> {
           fileHandle,
         );
       } catch (error: any) {
+        const imageSceneDataError = error instanceof ImageSceneDataError;
         if (
-          error instanceof ImageSceneDataError &&
+          imageSceneDataError &&
           error.code === "IMAGE_NOT_CONTAINS_SCENE_DATA" &&
           !this.isToolSupported("image")
         ) {
@@ -8979,9 +8981,12 @@ class App extends React.Component<AppProps, AppState> {
           });
           return;
         }
+        const errorMessage = imageSceneDataError
+          ? t("alerts.cannotRestoreFromImage")
+          : t("alerts.couldNotLoadInvalidFile");
         this.setState({
           isLoading: false,
-          errorMessage: t("alerts.couldNotLoadInvalidFile"),
+          errorMessage,
         });
       }
       if (!ret) {
