@@ -6,8 +6,8 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
 import { Excalidraw } from "../index";
-import * as Renderer from "../renderer/renderScene";
-import { KEYS } from "../keys";
+import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../renderer/interactiveScene";import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 import { vi } from "vitest";
@@ -15,8 +15,11 @@ import { vi } from "vitest";
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(
+  InteractiveCanvas,
+  "renderInteractiveScene",
+);
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 beforeEach(() => {
   localStorage.clear();
