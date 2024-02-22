@@ -26,7 +26,6 @@ import {
 import {
   CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
-  FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
   LOAD_IMAGES_TIMEOUT,
   WS_SUBTYPES,
@@ -41,12 +40,12 @@ import {
   SyncableExcalidrawElement,
 } from "../data";
 import {
-  isSavedToFirebase,
-  loadFilesFromFirebase,
-  loadFromFirebase,
-  saveFilesToFirebase,
-  saveToFirebase,
-} from "../data/firebase";
+  isSavedToHttpStorage,
+  saveToHttpStorage,
+  loadFromHttpStorage,
+  saveFilesToHttpStorage,
+  loadFilesFromHttpStorage,
+} from "../data/httpStorage";
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
@@ -140,7 +139,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           throw new AbortError();
         }
 
-        return loadFilesFromFirebase(`files/rooms/${roomId}`, roomKey, fileIds);
+        return loadFilesFromHttpStorage(fileIds, roomId, roomKey);
       },
       saveFiles: async ({ addedFiles }) => {
         const { roomId, roomKey } = this.portal;
@@ -148,13 +147,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           throw new AbortError();
         }
 
-        return saveFilesToFirebase({
-          prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
+        // TODO (Jess): Reconsider encoding files for upload
+        return saveFilesToHttpStorage({
           files: await encodeFilesForUpload({
             files: addedFiles,
             encryptionKey: roomKey,
             maxBytes: FILE_UPLOAD_MAX_BYTES,
           }),
+          roomId,
+          roomKey,
         });
       },
     });
@@ -256,7 +257,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     if (
       this.isCollaborating() &&
       (this.fileManager.shouldPreventUnload(syncableElements) ||
-        !isSavedToFirebase(this.portal, syncableElements))
+        !isSavedToHttpStorage(this.portal, syncableElements))
     ) {
       // this won't run in time if user decides to leave the site, but
       //  the purpose is to run in immediately after user decides to stay
@@ -266,21 +267,24 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   });
 
+  // TODO (Jess): consider renaming to "saveCollabRoomToHttpStorage"
   saveCollabRoomToFirebase = async (
     syncableElements: readonly SyncableExcalidrawElement[],
   ) => {
     try {
-      const savedData = await saveToFirebase(
+      // TODO (Jess): Firebase uses app state when saving, consider if we should use this too
+      const savedData = await saveToHttpStorage(
         this.portal,
         syncableElements,
-        this.excalidrawAPI.getAppState(),
+        // this.excalidrawAPI.getAppState(),
       );
 
-      if (this.isCollaborating() && savedData && savedData.reconciledElements) {
-        this.handleRemoteSceneUpdate(
-          this.reconcileElements(savedData.reconciledElements),
-        );
-      }
+      // TODO (Jess): current httpStorage does not use reconciliation, but consider if this should be included
+      // if (this.isCollaborating() && savedData && savedData.reconciledElements) {
+      //   this.handleRemoteSceneUpdate(
+      //     this.reconcileElements(savedData.reconciledElements),
+      //   );
+      // }
     } catch (error: any) {
       this.setState({
         // firestore doesn't return a specific error code when size exceeded
@@ -651,7 +655,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
-        const elements = await loadFromFirebase(
+        const elements = await loadFromHttpStorage(
           roomLinkData.roomId,
           roomLinkData.roomKey,
           this.portal.socket,
