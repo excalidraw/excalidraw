@@ -1,5 +1,5 @@
 import { RoughSVG } from "roughjs/bin/svg";
-import { isFrameLikeElement, isIframeLikeElement } from "../element/typeChecks";
+import { isIframeLikeElement } from "../element/typeChecks";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import { BinaryFiles } from "../types";
@@ -19,7 +19,7 @@ export const renderSceneToSvg = (
 
   // render elements
   elements
-    .filter((el) => !isFrameLikeElement(el))
+    .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
