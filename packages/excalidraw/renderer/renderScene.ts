@@ -1,19 +1,8 @@
-import { RoughSVG } from "roughjs/bin/svg";
+import { StaticCanvasAppState, AppState } from "../types";
 
-import { StaticCanvasAppState, BinaryFiles, AppState } from "../types";
-import { NonDeletedExcalidrawElement } from "../element/types";
-
-import {
-  SVGRenderConfig,
-  StaticCanvasRenderConfig,
-  RenderableElementsMap,
-} from "../scene/types";
-
-import { renderElementToSvg } from "./renderElement";
+import { StaticCanvasRenderConfig } from "../scene/types";
 
 import { THEME_FILTER } from "../constants";
-
-import { isIframeLikeElement } from "../element/typeChecks";
 
 export const fillCircle = (
   context: CanvasRenderingContext2D,
@@ -83,62 +72,4 @@ export const bootstrapCanvas = ({
   }
 
   return context;
-};
-
-// This should be only called for exporting purposes
-export const renderSceneToSvg = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: RenderableElementsMap,
-  rsvg: RoughSVG,
-  svgRoot: SVGElement,
-  files: BinaryFiles,
-  renderConfig: SVGRenderConfig,
-) => {
-  if (!svgRoot) {
-    return;
-  }
-
-  // render elements
-  elements
-    .filter((el) => !isIframeLikeElement(el))
-    .forEach((element) => {
-      if (!element.isDeleted) {
-        try {
-          renderElementToSvg(
-            element,
-            elementsMap,
-            rsvg,
-            svgRoot,
-            files,
-            element.x + renderConfig.offsetX,
-            element.y + renderConfig.offsetY,
-            renderConfig,
-          );
-        } catch (error: any) {
-          console.error(error);
-        }
-      }
-    });
-
-  // render embeddables on top
-  elements
-    .filter((el) => isIframeLikeElement(el))
-    .forEach((element) => {
-      if (!element.isDeleted) {
-        try {
-          renderElementToSvg(
-            element,
-            elementsMap,
-            rsvg,
-            svgRoot,
-            files,
-            element.x + renderConfig.offsetX,
-            element.y + renderConfig.offsetY,
-            renderConfig,
-          );
-        } catch (error: any) {
-          console.error(error);
-        }
-      }
-    });
 };
