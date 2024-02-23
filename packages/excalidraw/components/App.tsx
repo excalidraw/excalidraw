@@ -3214,7 +3214,13 @@ class App extends React.Component<AppProps, AppState> {
           try {
             return { file: await ImageURLToFile(url) };
           } catch (error: any) {
-            return { errorMessage: error.message as string };
+            let errorMessage = error.message;
+            if (error.cause === "FETCH_ERROR") {
+              errorMessage = t("errors.failedToFetchImage");
+            } else if (error.cause === "UNSUPPORTED") {
+              errorMessage = t("errors.unsupportedFileType");
+            }
+            return { errorMessage };
           }
         }),
       );
@@ -8478,10 +8484,18 @@ class App extends React.Component<AppProps, AppState> {
     // mustn't be larger than 128 px
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
     const cursorImageSizePx = 96;
+    let imagePreview;
 
-    const imagePreview = await resizeImageFile(imageFile, {
-      maxWidthOrHeight: cursorImageSizePx,
-    });
+    try {
+      imagePreview = await resizeImageFile(imageFile, {
+        maxWidthOrHeight: cursorImageSizePx,
+      });
+    } catch (e: any) {
+      if (e.cause === "UNSUPPORTED") {
+        throw new Error(t("errors.unsupportedFileType"));
+      }
+      throw e;
+    }
 
     let previewDataURL = await getDataURL(imagePreview);
 
@@ -8870,8 +8884,9 @@ class App extends React.Component<AppProps, AppState> {
             });
             return;
           } catch (error: any) {
+            // Don't throw for image scene daa
             if (error.name !== "EncodingError") {
-              throw error;
+              throw new Error(t("alerts.couldNotLoadInvalidFile"));
             }
           }
         }
@@ -8945,12 +8960,39 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     file = await normalizeFile(file);
     try {
-      const ret = await loadSceneOrLibraryFromBlob(
-        file,
-        this.state,
-        this.scene.getElementsIncludingDeleted(),
-        fileHandle,
-      );
+      let ret;
+      try {
+        ret = await loadSceneOrLibraryFromBlob(
+          file,
+          this.state,
+          this.scene.getElementsIncludingDeleted(),
+          fileHandle,
+        );
+      } catch (error: any) {
+        const imageSceneDataError = error instanceof ImageSceneDataError;
+        if (
+          imageSceneDataError &&
+          error.code === "IMAGE_NOT_CONTAINS_SCENE_DATA" &&
+          !this.isToolSupported("image")
+        ) {
+          this.setState({
+            isLoading: false,
+            errorMessage: t("errors.imageToolNotSupported"),
+          });
+          return;
+        }
+        const errorMessage = imageSceneDataError
+          ? t("alerts.cannotRestoreFromImage")
+          : t("alerts.couldNotLoadInvalidFile");
+        this.setState({
+          isLoading: false,
+          errorMessage,
+        });
+      }
+      if (!ret) {
+        return;
+      }
+
       if (ret.type === MIME_TYPES.excalidraw) {
         this.setState({ isLoading: true });
         this.syncActionResult({
@@ -8975,17 +9017,6 @@ class App extends React.Component<AppProps, AppState> {
           });
       }
     } catch (error: any) {
-      if (
-        error instanceof ImageSceneDataError &&
-        error.code === "IMAGE_NOT_CONTAINS_SCENE_DATA" &&
-        !this.isToolSupported("image")
-      ) {
-        this.setState({
-          isLoading: false,
-          errorMessage: t("errors.imageToolNotSupported"),
-        });
-        return;
-      }
       this.setState({ isLoading: false, errorMessage: error.message });
     }
   };

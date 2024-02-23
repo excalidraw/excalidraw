@@ -179,7 +179,7 @@ export const exportCanvas = async (
     } catch (error: any) {
       console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
-        throw error;
+        throw new Error(t("canvasError.canvasTooBig"));
       }
       // TypeError *probably* suggests ClipboardItem not defined, which
       // people on Firefox can enable through a flag, so let's tell them.
