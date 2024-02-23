@@ -41,7 +41,7 @@ import {
   bootstrapCanvas,
   fillCircle,
   getNormalizedCanvasDimensions,
-} from "../renderer/renderScene";
+} from "./helpers";
 import oc from "open-color";
 import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
 import {

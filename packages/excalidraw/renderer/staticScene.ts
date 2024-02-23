@@ -27,7 +27,7 @@ import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./renderScene";
+import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { throttleRAF } from "../utils";
 
 const strokeGrid = (
