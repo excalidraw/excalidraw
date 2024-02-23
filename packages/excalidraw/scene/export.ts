@@ -11,7 +11,7 @@ import {
   getCommonBounds,
   getElementAbsoluteCoords,
 } from "../element/bounds";
-import { renderSceneToSvg } from "../renderer/export";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
 import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
