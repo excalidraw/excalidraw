@@ -562,6 +562,9 @@ const ExcalidrawWrapper = () => {
     files: BinaryFiles,
   ) => {
     if (collabAPI?.isCollaborating()) {
+      // this call consists of two throttled methods to broadcast and save elements
+      // so, if an error persists in either one of them, error message will be
+      // set and displayed repeatedly, therefore interrupting the user workflow
       collabAPI.syncElements(elements);
     }
 
