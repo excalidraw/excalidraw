@@ -20,15 +20,13 @@ import {
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-import type { Drawable } from "roughjs/bin/core";
-import type { RoughSVG } from "roughjs/bin/svg";
 
 import {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
-import { getCornerRadius, isPathALoop, isRightAngle } from "../math";
+import { getCornerRadius, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import {
   AppState,
