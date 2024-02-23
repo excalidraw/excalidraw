@@ -1040,6 +1040,10 @@ export const renderInteractiveSceneThrottled = throttleRAF(
   { trailing: true },
 );
 
+/**
+ * Interactive scene is the ui-canvas where we render bounding boxes, selections
+ * and other ui stuff.
+ */
 export const renderInteractiveScene = <
   U extends typeof _renderInteractiveScene,
   T extends boolean = false,

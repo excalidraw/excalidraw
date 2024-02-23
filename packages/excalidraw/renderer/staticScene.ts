@@ -8,7 +8,6 @@ import {
 } from "../frame";
 import {
   isEmbeddableElement,
-  isFrameLikeElement,
   isIframeLikeElement,
 } from "../element/typeChecks";
 import { renderElement } from "../renderer/renderElement";
@@ -107,6 +106,7 @@ const frameClip = (
     -(frame.y + appState.scrollY),
   );
 };
+
 let linkCanvasCache: any;
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -231,7 +231,7 @@ const _renderStaticScene = ({
 
   // Paint visible elements
   visibleElements
-    .filter((el) => !isFrameLikeElement(el))
+    .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
         const frameId = element.frameId || appState.frameToHighlight?.id;
