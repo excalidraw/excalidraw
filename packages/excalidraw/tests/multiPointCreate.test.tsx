@@ -7,7 +7,8 @@ import {
 } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
-import * as InteractiveCanvas from "../renderer/interactiveScene";import { KEYS } from "../keys";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import { KEYS } from "../keys";
 import { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 import { vi } from "vitest";
