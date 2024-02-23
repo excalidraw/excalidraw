@@ -1,5 +1,15 @@
 /**
- * convert excalidraw elements into geometric shapes
+ * this file defines pure geometric shapes
+ *
+ * for instance, a cubic bezier curve is specified by its four control points and
+ * an ellipse is defined by its center, angle, semi major axis and semi minor axis
+ * (but in semi-width and semi-height so it's more relevant to Excalidraw)
+ *
+ * the idea with pure shapes is so that we can provide collision and other geoemtric methods not depending on
+ * the specifics of roughjs or elements in Excalidraw; instead, we can focus on the pure shapes themselves
+ *
+ * also included in this file are methods for converting an Excalidraw element or a Drawable from roughjs
+ * to pure shapes
  */
 
 import {
@@ -18,20 +28,39 @@ import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";
 
+// a point is specified by its coordinate (x, y)
 export type Point = [number, number];
 export type Vector = Point;
+
+// a line (segment) is defined by two endpoints
 export type Line = [Point, Point];
+
+// a polyline (made up term here) is a line consisting of other line segments
+// this corresponds to a straight line element in the editor but it could also
+// be used to model other elements
 export type Polyline = Line[];
+
 // cubic bezier curve with four control points
 export type Curve = [Point, Point, Point, Point];
+
+// a polycurve is a curve consisting of ther curves, this corresponds to a complex
+// curve on the canvas
 export type Polycurve = Curve[];
+
+// a polygon is a closed shape by connecting the given points
+// rectangles and diamonds are modelled by polygons
 export type Polygon = Point[];
+
+// an ellipse is specified by its center, angle, and its major and minor axes
+// but for the sake of simplicity, we've used halfWidth and halfHeight instead
+// in replace of semi major and semi minor axes
 export type Ellipse = {
   center: Point;
   angle: number;
   halfWidth: number;
   halfHeight: number;
 };
+
 export type GeometricShape =
   | {
       type: "line";
