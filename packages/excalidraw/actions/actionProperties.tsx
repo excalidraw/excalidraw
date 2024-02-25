@@ -1276,51 +1276,51 @@ const getArrowheadOptions = (flip: boolean) => {
     },
     {
       value: "dot",
-      text: t("labels.arrowhead_circle"),
-      keyBinding: null,
+      text: t("labels.arrowhead_dot"),
+      keyBinding: "a", //zsviczian was null
       icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: false,
+      showInPicker: true, //zsviczian
     },
     {
       value: "circle",
       text: t("labels.arrowhead_circle"),
-      keyBinding: "r",
+      keyBinding: "s", //zsivczian was "r"
       icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: false,
+      showInPicker: true, //zsviczian
     },
     {
       value: "circle_outline",
       text: t("labels.arrowhead_circle_outline"),
-      keyBinding: null,
+      keyBinding: "d", //zsviczian was null
       icon: <ArrowheadCircleOutlineIcon flip={flip} />,
-      showInPicker: false,
+      showInPicker: true, //zsviczian
     },
     {
       value: "triangle",
       text: t("labels.arrowhead_triangle"),
       icon: <ArrowheadTriangleIcon flip={flip} />,
-      keyBinding: "t",
+      keyBinding: "z", //zsviczian was t
     },
     {
       value: "triangle_outline",
       text: t("labels.arrowhead_triangle_outline"),
       icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
-      keyBinding: null,
-      showInPicker: false,
+      keyBinding: "x", //zsviczian was null
+      showInPicker: true, //zsviczian
     },
     {
       value: "diamond",
       text: t("labels.arrowhead_diamond"),
       icon: <ArrowheadDiamondIcon flip={flip} />,
-      keyBinding: null,
-      showInPicker: false,
+      keyBinding: "c", //zsviczian was null
+      showInPicker: true, //zsviczian
     },
     {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
-      keyBinding: null,
-      showInPicker: false,
+      keyBinding: "v",//zsviczian was null
+      showInPicker: true, //zsviczian
     },
   ] as const;
 };
