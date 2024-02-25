@@ -1,6 +1,6 @@
 {
   "labels": {
-    "paste": "चिपकायें",
+    "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
     "selectAll": "सभी का चयन करें",
@@ -301,7 +301,7 @@
     "sceneContent": "दृश्य सामग्री:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "या"
   },
   "roomDialog": {
     "desc_intro": "",
