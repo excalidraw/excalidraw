@@ -247,7 +247,7 @@
     "library": "Libreria",
     "lock": "Mantieni lo strumento selezionato attivo dopo aver disegnato",
     "penMode": "Modalità penna - previene il tocco",
-    "link": "",
+    "link": "Aggiungi / aggiorna collegamento per una forma selezionata",
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
     "magicframe": "Dal wireframe al codice",
@@ -305,7 +305,7 @@
   },
   "roomDialog": {
     "desc_intro": "Invita altri a collaborare al tuo disegno.",
-    "desc_privacy": "Non ti preoccupare, la sessione è crittografata e completamente privata. Nemmeno il nostro server può vedere ciò che disegni.",
+    "desc_privacy": "Non preoccuparti, la sessione utilizza la crittografia end-to-end ed è completamente privata. Nemmeno il nostro server è in grado di vedere ciò che disegni.",
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
