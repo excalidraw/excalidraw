@@ -81,6 +81,8 @@ import { appJotaiStore } from "../app-jotai";
 import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
+import { Toast } from "../../packages/excalidraw/components/Toast";
+import { DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE } from "../../packages/excalidraw/colors";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
@@ -88,6 +90,8 @@ export const isOfflineAtom = atom(false);
 
 interface CollabState {
   errorMessage: string | null;
+  dialogNotifiedErrors: Record<string, boolean>;
+  errorDisplayMethod: "dialog" | "toast";
   username: string;
   activeRoomLink: string | null;
 }
@@ -129,6 +133,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     super(props);
     this.state = {
       errorMessage: null,
+      dialogNotifiedErrors: {},
+      errorDisplayMethod: "dialog",
       username: importUsernameFromLocalStorage() || "",
       activeRoomLink: null,
     };
@@ -282,12 +288,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         );
       }
     } catch (error: any) {
-      this.setState({
-        // firestore doesn't return a specific error code when size exceeded
-        errorMessage: /is longer than.*?bytes/.test(error.message)
+      this.setErrorMessage(
+        /is longer than.*?bytes/.test(error.message)
           ? t("errors.collabSaveFailed_sizeExceeded")
           : t("errors.collabSaveFailed"),
-      });
+      );
+
       console.error(error);
     }
   };
@@ -464,7 +470,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.portal.socket.once("connect_error", fallbackInitializationHandler);
     } catch (error: any) {
       console.error(error);
-      this.setState({ errorMessage: error.message });
+      this.setErrorMessage(error.message);
       return null;
     }
 
@@ -924,7 +930,25 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   getActiveRoomLink = () => this.state.activeRoomLink;
 
   setErrorMessage = (errorMessage: string | null) => {
-    this.setState({ errorMessage });
+    if (errorMessage) {
+      if (this.state.dialogNotifiedErrors[errorMessage]) {
+        this.setState({
+          errorMessage,
+          errorDisplayMethod: "toast",
+        });
+      } else {
+        this.setState({
+          dialogNotifiedErrors: {
+            ...this.state.dialogNotifiedErrors,
+            [errorMessage]: true,
+          },
+          errorDisplayMethod: "dialog",
+          errorMessage,
+        });
+      }
+    } else {
+      this.setState({ errorMessage });
+    }
   };
 
   render() {
@@ -932,11 +956,22 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     return (
       <>
-        {errorMessage != null && (
-          <ErrorDialog onClose={() => this.setState({ errorMessage: null })}>
-            {errorMessage}
-          </ErrorDialog>
-        )}
+        {errorMessage != null &&
+          (this.state.errorDisplayMethod === "dialog" ? (
+            <ErrorDialog onClose={() => this.setErrorMessage(null)}>
+              {errorMessage}
+            </ErrorDialog>
+          ) : (
+            <Toast
+              message={errorMessage}
+              onClose={() => this.setErrorMessage(null)}
+              closable={true}
+              style={{
+                backgroundColor:
+                  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE.red[1],
+              }}
+            />
+          ))}
       </>
     );
   }
