@@ -250,12 +250,12 @@
     "link": "",
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
-    "magicframe": "",
+    "magicframe": "Dal wireframe al codice",
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti",
-    "mermaidToExcalidraw": "",
+    "mermaidToExcalidraw": "Da Mermaid a Excalidraw",
     "magicSettings": "Impostazioni di IA"
   },
   "headings": {
@@ -301,11 +301,11 @@
     "sceneContent": "Contenuto della scena:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "O"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Invita altri a collaborare al tuo disegno.",
+    "desc_privacy": "Non ti preoccupare, la sessione è crittografata e completamente privata. Nemmeno il nostro server può vedere ciò che disegni.",
     "button_startSession": "Avvia sessione",
     "button_stopSession": "Termina sessione",
     "desc_inProgressIntro": "La sessione di collaborazione è attualmente in corso.",
@@ -520,10 +520,10 @@
     }
   },
   "mermaid": {
-    "title": "",
+    "title": "Da Mermaid a Excalidraw",
     "button": "Inserisci",
-    "description": "",
-    "syntax": "",
+    "description": "Attualmente sono supportati solo diagrammi di <flowchartLink>flusso</flowchartLink>,<sequenceLink> sequenza, </sequenceLink> e <classLink>classe </classLink>. Gli altri tipi saranno rappresentati come immagini in Excalidraw.",
+    "syntax": "Sintassi Mermaid",
     "preview": "Anteprima"
   },
   "userList": {
