@@ -39,11 +39,12 @@ import {
   ExcalidrawTextElement,
   FileId,
   FontFamilyValues,
+  NonDeletedSceneElementsMap,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { arrayToMap, assertNever, cloneJSON, getFontString } from "../utils";
+import { assertNever, cloneJSON, getFontString, toBrandedType } from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 
@@ -231,7 +232,7 @@ const bindLinearElementToElement = (
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -460,6 +461,10 @@ class ElementStore {
     return Array.from(this.excalidrawElements.values());
   };
 
+  getElementsMap = () => {
+    return toBrandedType<NonDeletedSceneElementsMap>(this.excalidrawElements);
+  };
+
   getElement = (id: string) => {
     return this.excalidrawElements.get(id);
   };
@@ -615,7 +620,7 @@ export const convertToExcalidrawElements = (
     }
   }
 
-  const elementsMap = arrayToMap(elementStore.getElements());
+  const elementsMap = elementStore.getElementsMap();
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
     const excalidrawElement = elementStore.getElement(id)!;

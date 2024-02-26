@@ -5,7 +5,6 @@ import {
   ExcalidrawFreeDrawElement,
   NonDeleted,
   ExcalidrawTextElementWithContainer,
-  ElementsMapOrArray,
   ElementsMap,
 } from "./types";
 import { distance2d, rotate, rotatePoint } from "../math";
@@ -25,7 +24,7 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
-import Scene from "../scene/Scene";
+import { arrayToMap } from "../utils";
 
 export type RectangleBox = {
   x: number;
@@ -63,7 +62,7 @@ export class ElementBounds {
     }
   >();
 
-  static getBounds(element: ExcalidrawElement) {
+  static getBounds(element: ExcalidrawElement, elementsMap: ElementsMap) {
     const cachedBounds = ElementBounds.boundsCache.get(element);
 
     if (
@@ -75,23 +74,12 @@ export class ElementBounds {
     ) {
       return cachedBounds.bounds;
     }
-    const scene = Scene.getScene(element);
-    const bounds = ElementBounds.calculateBounds(
-      element,
-      scene?.getNonDeletedElementsMap() || new Map(),
-    );
+    const bounds = ElementBounds.calculateBounds(element, elementsMap);
 
-    // hack to ensure that downstream checks could retrieve element Scene
-    // so as to have correctly calculated bounds
-    // FIXME remove when we get rid of all the id:Scene / element:Scene mapping
-    const shouldCache = !!scene;
-
-    if (shouldCache) {
-      ElementBounds.boundsCache.set(element, {
-        version: element.version,
-        bounds,
-      });
-    }
+    ElementBounds.boundsCache.set(element, {
+      version: element.version,
+      bounds,
+    });
 
     return bounds;
   }
@@ -748,11 +736,17 @@ const getLinearElementRotatedBounds = (
   return coords;
 };
 
-export const getElementBounds = (element: ExcalidrawElement): Bounds => {
-  return ElementBounds.getBounds(element);
+export const getElementBounds = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): Bounds => {
+  return ElementBounds.getBounds(element, elementsMap);
 };
-export const getCommonBounds = (elements: ElementsMapOrArray): Bounds => {
-  if ("size" in elements ? !elements.size : !elements.length) {
+
+export const getCommonBounds = (
+  elements: readonly ExcalidrawElement[],
+): Bounds => {
+  if (!elements.length) {
     return [0, 0, 0, 0];
   }
 
@@ -761,8 +755,10 @@ export const getCommonBounds = (elements: ElementsMapOrArray): Bounds => {
   let minY = Infinity;
   let maxY = -Infinity;
 
+  const elementsMap = arrayToMap(elements);
+
   elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element);
+    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
     minX = Math.min(minX, x1);
     minY = Math.min(minY, y1);
     maxX = Math.max(maxX, x2);
@@ -868,9 +864,9 @@ export const getClosestElementBounds = (
 
   let minDistance = Infinity;
   let closestElement = elements[0];
-
+  const elementsMap = arrayToMap(elements);
   elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element);
+    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
     const distance = distance2d((x1 + x2) / 2, (y1 + y2) / 2, from.x, from.y);
 
     if (distance < minDistance) {
@@ -879,7 +875,7 @@ export const getClosestElementBounds = (
     }
   });
 
-  return getElementBounds(closestElement);
+  return getElementBounds(closestElement, elementsMap);
 };
 
 export interface BoundingBox {

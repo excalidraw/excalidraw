@@ -4,7 +4,6 @@ import { IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
 import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError, ImageSceneDataError } from "../errors";
-import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { AppState, DataURL, LibraryItem } from "../types";
 import { ValueOf } from "../utility-types";
@@ -23,11 +22,11 @@ const parseFileContents = async (blob: Blob | File) => {
     } catch (error: any) {
       if (error.message === "INVALID") {
         throw new ImageSceneDataError(
-          t("alerts.imageDoesNotContainScene"),
+          "Image doesn't contain scene",
           "IMAGE_NOT_CONTAINS_SCENE_DATA",
         );
       } else {
-        throw new ImageSceneDataError(t("alerts.cannotRestoreFromImage"));
+        throw new ImageSceneDataError("Error: cannot restore image");
       }
     }
   } else {
@@ -54,11 +53,11 @@ const parseFileContents = async (blob: Blob | File) => {
       } catch (error: any) {
         if (error.message === "INVALID") {
           throw new ImageSceneDataError(
-            t("alerts.imageDoesNotContainScene"),
+            "Image doesn't contain scene",
             "IMAGE_NOT_CONTAINS_SCENE_DATA",
           );
         } else {
-          throw new ImageSceneDataError(t("alerts.cannotRestoreFromImage"));
+          throw new ImageSceneDataError("Error: cannot restore image");
         }
       }
     }
@@ -130,7 +129,7 @@ export const loadSceneOrLibraryFromBlob = async (
     } catch (error: any) {
       if (isSupportedImageFile(blob)) {
         throw new ImageSceneDataError(
-          t("alerts.imageDoesNotContainScene"),
+          "Image doesn't contain scene",
           "IMAGE_NOT_CONTAINS_SCENE_DATA",
         );
       }
@@ -163,12 +162,12 @@ export const loadSceneOrLibraryFromBlob = async (
         data,
       };
     }
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    throw new Error("Error: invalid file");
   } catch (error: any) {
     if (error instanceof ImageSceneDataError) {
       throw error;
     }
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    throw new Error("Error: invalid file");
   }
 };
 
@@ -187,7 +186,7 @@ export const loadFromBlob = async (
     fileHandle,
   );
   if (ret.type !== MIME_TYPES.excalidraw) {
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    throw new Error("Error: invalid file");
   }
   return ret.data;
 };
@@ -222,10 +221,7 @@ export const canvasToBlob = async (
       canvas.toBlob((blob) => {
         if (!blob) {
           return reject(
-            new CanvasError(
-              t("canvasError.canvasTooBig"),
-              "CANVAS_POSSIBLY_TOO_BIG",
-            ),
+            new CanvasError("Error: Canvas too big", "CANVAS_POSSIBLY_TOO_BIG"),
           );
         }
         resolve(blob);
@@ -314,7 +310,7 @@ export const resizeImageFile = async (
   }
 
   if (!isSupportedImageFile(file)) {
-    throw new Error(t("errors.unsupportedFileType"));
+    throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
   }
 
   return new File(
@@ -340,11 +336,11 @@ export const ImageURLToFile = async (
   try {
     response = await fetch(imageUrl);
   } catch (error: any) {
-    throw new Error(t("errors.failedToFetchImage"));
+    throw new Error("Error: failed to fetch image", { cause: "FETCH_ERROR" });
   }
 
   if (!response.ok) {
-    throw new Error(t("errors.failedToFetchImage"));
+    throw new Error("Error: failed to fetch image", { cause: "FETCH_ERROR" });
   }
 
   const blob = await response.blob();
@@ -354,7 +350,7 @@ export const ImageURLToFile = async (
     return new File([blob], name, { type: blob.type });
   }
 
-  throw new Error(t("errors.unsupportedFileType"));
+  throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
 };
 
 export const getFileFromEvent = async (

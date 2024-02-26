@@ -133,9 +133,12 @@ export const exportCanvas = async (
         },
       );
     } else if (type === "clipboard-svg") {
-      await copyTextToSystemClipboard(
-        await svgPromise.then((svg) => svg.outerHTML),
-      );
+      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      try {
+        await copyTextToSystemClipboard(svg);
+      } catch (e) {
+        throw new Error(t("errors.copyToSystemClipboardFailed"));
+      }
       return;
     }
   }
@@ -176,7 +179,7 @@ export const exportCanvas = async (
     } catch (error: any) {
       console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
-        throw error;
+        throw new Error(t("canvasError.canvasTooBig"));
       }
       // TypeError *probably* suggests ClipboardItem not defined, which
       // people on Firefox can enable through a flag, so let's tell them.

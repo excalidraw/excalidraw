@@ -124,9 +124,16 @@ const ImageExportModal = ({
         setRenderError(null);
         // if converting to blob fails, there's some problem that will
         // likely prevent preview and export (e.g. canvas too big)
-        return canvasToBlob(canvas).then(() => {
-          previewNode.replaceChildren(canvas);
-        });
+        return canvasToBlob(canvas)
+          .then(() => {
+            previewNode.replaceChildren(canvas);
+          })
+          .catch((e) => {
+            if (e.name === "CANVAS_POSSIBLY_TOO_BIG") {
+              throw new Error(t("canvasError.canvasTooBig"));
+            }
+            throw e;
+          });
       })
       .catch((error) => {
         console.error(error);

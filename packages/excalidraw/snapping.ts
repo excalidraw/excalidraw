@@ -269,6 +269,7 @@ const getReferenceElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: NonDeletedExcalidrawElement[],
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   const selectedFrames = selectedElements
     .filter((element) => isFrameLikeElement(element))
@@ -278,6 +279,7 @@ const getReferenceElements = (
     elements,
     selectedElements,
     appState,
+    elementsMap,
   ).filter(
     (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
   );
@@ -293,6 +295,7 @@ export const getVisibleGaps = (
     elements,
     selectedElements,
     appState,
+    elementsMap,
   );
 
   const referenceBounds = getMaximumGroups(referenceElements, elementsMap)
@@ -580,6 +583,7 @@ export const getReferenceSnapPoints = (
     elements,
     selectedElements,
     appState,
+    elementsMap,
   );
   return getMaximumGroups(referenceElements, elementsMap)
     .filter(
@@ -1296,6 +1300,7 @@ export const getSnapLinesAtPointer = (
     elements,
     [],
     appState,
+    elementsMap,
   );
 
   const snapDistance = getSnapDistance(appState.zoom.value);

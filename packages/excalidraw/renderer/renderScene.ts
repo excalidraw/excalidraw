@@ -73,7 +73,7 @@ import {
 import {
   EXTERNAL_LINK_IMG,
   getLinkHandleFromCoords,
-} from "../element/Hyperlink";
+} from "../components/hyperlink/helpers";
 import { renderSnaps } from "./renderSnaps";
 import {
   isEmbeddableElement,
@@ -354,7 +354,8 @@ const renderLinearElementPointHighlight = (
   ) {
     return;
   }
-  const element = LinearElementEditor.getElement(elementId);
+  const element = LinearElementEditor.getElement(elementId, elementsMap);
+
   if (!element) {
     return;
   }
@@ -885,7 +886,7 @@ const _renderInteractiveScene = ({
   let scrollBars;
   if (renderConfig.renderScrollbars) {
     scrollBars = getScrollBars(
-      elementsMap,
+      visibleElements,
       normalizedWidth,
       normalizedHeight,
       appState,
