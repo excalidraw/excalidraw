@@ -1,7 +1,5 @@
 import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
-  base36CharSet,
-  generateKeyBetween,
   orderByFractionalIndex,
   validateFractionalIndices,
 } from "../../packages/excalidraw/fractionalIndex";
@@ -9,7 +7,7 @@ import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
 import { reconcileElements } from "../collab/reconciliation";
 import { InvalidFractionalIndexError } from "../../packages/excalidraw/errors";
-import { generateJitteredKeyBetween } from "fractional-indexing-jittered";
+// import { generateJitteredKeyBetween } from "fractional-indexing";
 
 const SEPARATOR = ":";
 const NULL_PLACEHOLDER = "x";

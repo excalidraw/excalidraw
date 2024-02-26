@@ -678,14 +678,18 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     return null;
   };
 
+  // TODO_FI: elements which do not have to have zIndex (even if they did, we might want to recreate it again - likely all do not have it?)
   private reconcileElements = (
     remoteElements: readonly ExcalidrawElement[],
   ): ReconciledElements => {
+    // TODO_FI: should return ordered elements
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
 
+    // TODO_FI: should return elements which are maybe ordered by z-index or the order is defined by array
     remoteElements = restoreElements(remoteElements, null);
 
+    // TODO_FI: should return ordered elements
     const reconciledElements = _reconcileElements(
       localElements,
       remoteElements,

@@ -6376,10 +6376,11 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.3.7.tgz#06ca0085157e42fda7f9e726e79fefc4068840f7"
   integrity sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==
 
-fractional-indexing-jittered@0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/fractional-indexing-jittered/-/fractional-indexing-jittered-0.9.0.tgz#53a5f05acc4a8f8ceb5cb5a326122deb2cf8105c"
-  integrity sha512-3XIGQbmuEIg1j/qdHLDVyCH1vNMUyeBhM+5d6Su03fTiHzmQLE5nOqvDXLDgg240lLBIsLyJa3xZIUqO57yrAQ==
+
+fractional-indexing@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fractional-indexing/-/fractional-indexing-3.2.0.tgz#1193e63d54ff4e0cbe0c79a9ed6cfbab25d91628"
+  integrity sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==
 
 fs-constants@^1.0.0:
   version "1.0.0"

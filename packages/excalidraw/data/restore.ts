@@ -44,7 +44,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
-import { restoreFractionalIndices } from "../fractionalIndex";
+import { syncFractionalIndices } from "../fractionalIndex";
 
 type RestoredAppState = Omit<
   AppState,
@@ -432,8 +432,8 @@ export const restoreElements = (
     return elements;
   }, [] as ExcalidrawElement[]);
 
-  // mutate to restore fractional indices
-  restoreFractionalIndices(restoredElements);
+  // mutate elements to sync fractional indices with the array order
+  syncFractionalIndices(restoredElements);
 
   if (!opts?.repairBindings) {
     return restoredElements;

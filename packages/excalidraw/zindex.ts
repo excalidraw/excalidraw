@@ -1,6 +1,6 @@
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
-import { updateFractionalIndices } from "./fractionalIndex";
+import { syncFractionalIndices } from "./fractionalIndex";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
@@ -244,7 +244,6 @@ const shiftElementsByOne = (
   appState: AppState,
   direction: "left" | "right",
 ) => {
-  const prevElements = [...elements];
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
 
@@ -314,7 +313,8 @@ const shiftElementsByOne = (
           ];
   });
 
-  return updateFractionalIndices(prevElements, elements, targetElementsMap);
+  // TODO_FI: filter out first and last elements
+  return syncFractionalIndices(elements, targetElementsMap);
 };
 
 const shiftElementsToEnd = (
@@ -324,7 +324,6 @@ const shiftElementsToEnd = (
   containingFrame: ExcalidrawFrameLikeElement["id"] | null,
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
-  const prevElements = [...elements];
   const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   const displacedElements: ExcalidrawElement[] = [];
@@ -382,12 +381,10 @@ const shiftElementsToEnd = (
   }
 
   const targetElements = Array.from(targetElementsMap.values());
-
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
 
-  return updateFractionalIndices(
-    prevElements,
+  return syncFractionalIndices(
     direction === "left"
       ? [
           ...leadingElements,
