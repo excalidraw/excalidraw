@@ -217,7 +217,6 @@ export {
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";
-export { exportToCanvas, exportToBlob, exportToSvg } from "../utils/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
