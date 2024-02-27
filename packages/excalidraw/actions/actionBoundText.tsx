@@ -29,7 +29,7 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { updateFractionalIndices } from "../fractionalIndex";
+import { syncFractionalIndices } from "../fractionalIndex";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
@@ -183,13 +183,10 @@ const pushTextAboveContainer = (
   );
   updatedElements.splice(containerIndex + 1, 0, textElement);
 
-  updateFractionalIndices(
-    elements,
+  return syncFractionalIndices(
     updatedElements,
     arrayToMap([container, textElement]),
   );
-
-  return updatedElements;
 };
 
 const pushContainerBelowText = (
@@ -208,13 +205,10 @@ const pushContainerBelowText = (
   );
   updatedElements.splice(textElementIndex, 0, container);
 
-  updateFractionalIndices(
-    elements,
+  return syncFractionalIndices(
     updatedElements,
     arrayToMap([container, textElement]),
   );
-
-  return updatedElements;
 };
 
 export const actionWrapTextInContainer = register({

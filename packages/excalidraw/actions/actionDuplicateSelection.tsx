@@ -31,7 +31,7 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
-import { updateFractionalIndices } from "../fractionalIndex";
+import { syncFractionalIndices } from "../fractionalIndex";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -81,7 +81,6 @@ const duplicateElements = (
 
   // step (1)
 
-  const prevElements = [...elements];
   const sortedElements = normalizeElementOrder(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
@@ -239,8 +238,7 @@ const duplicateElements = (
   // step (3)
   const finalElements = finalElementsReversed.reverse();
 
-  updateFractionalIndices(
-    prevElements,
+  syncFractionalIndices(
     finalElements,
     arrayToMap([...oldElements, ...newElements]),
   );

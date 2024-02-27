@@ -313,7 +313,7 @@ const shiftElementsByOne = (
           ];
   });
 
-  // TODO_FI: filter out first and last elements
+  // TODO_FI: filter out first and last elements (deleted elements could complicate this)
   return syncFractionalIndices(elements, targetElementsMap);
 };
 
@@ -384,6 +384,7 @@ const shiftElementsToEnd = (
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
 
+  // TODO_FI: filter out first and last elements (deleted elements could complicate this)
   return syncFractionalIndices(
     direction === "left"
       ? [
