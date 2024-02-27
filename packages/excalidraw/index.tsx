@@ -217,19 +217,16 @@ export {
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";
+export { exportToCanvas, exportToBlob, exportToSvg } from "../utils/export";
+
+export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
-  exportToCanvas,
-  exportToBlob,
-  exportToSvg,
-  serializeAsJSON,
-  serializeLibraryAsJSON,
-  loadLibraryFromBlob,
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
-  getFreeDrawSvgPath,
-  exportToClipboard,
-  mergeLibraryItems,
-} from "../utils/export";
+  loadLibraryFromBlob,
+} from "../excalidraw/data/blob";
+export { getFreeDrawSvgPath } from "../excalidraw/renderer/renderElement";
+export { mergeLibraryItems } from "../excalidraw/data/library";
 export { isLinearElement } from "./element/typeChecks";
 
 export { FONT_FAMILY, THEME, MIME_TYPES, ROUNDNESS } from "./constants";
@@ -263,9 +260,3 @@ export { normalizeLink } from "./data/url";
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";
 export { getCommonBounds, getVisibleSceneBounds } from "./element/bounds";
-
-export {
-  elementsOverlappingBBox,
-  isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
-} from "../utils/export";
