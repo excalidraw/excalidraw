@@ -5,12 +5,13 @@ import {
   DEFAULT_FONT_SIZE,
   EDITOR_LS_KEYS,
 } from "../../constants";
-import { convertToExcalidrawElements, exportToCanvas } from "../../index";
+import { convertToExcalidrawElements } from "../../index";
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppClassProperties, BinaryFiles } from "../../types";
 import { canvasToBlob } from "../../data/blob";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
+import { exportToCanvas } from "../../../utils";
 
 const resetPreview = ({
   canvasRef,
