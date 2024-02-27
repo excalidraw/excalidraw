@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { renderInteractiveScene } from "../../renderer/renderScene";
 import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
@@ -12,6 +11,7 @@ import type {
 } from "../../scene/types";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
+import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 type InteractiveCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement>;

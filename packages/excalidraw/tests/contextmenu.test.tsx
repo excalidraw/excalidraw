@@ -12,7 +12,7 @@ import {
   togglePopover,
 } from "./test-utils";
 import { Excalidraw } from "../index";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
@@ -39,7 +39,7 @@ const mouse = new Pointer("mouse");
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 beforeEach(() => {
   localStorage.clear();
   renderStaticScene.mockClear();
