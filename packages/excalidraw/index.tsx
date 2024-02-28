@@ -266,3 +266,9 @@ export { normalizeLink } from "./data/url";
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";
 export { getCommonBounds, getVisibleSceneBounds } from "./element/bounds";
+
+export {
+  elementsOverlappingBBox,
+  isElementInsideBBox,
+  elementPartiallyOverlapsWithOrContainsBBox,
+} from "../utils/withinBounds";
