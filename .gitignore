@@ -26,3 +26,4 @@ coverage
 dev-dist
 html
 examples/**/bundle.*
+meta*.json
