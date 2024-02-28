@@ -205,21 +205,3 @@ export const exportToClipboard = async (
     throw new Error("Invalid export type");
   }
 };
-
-export * from "./bbox";
-export {
-  elementsOverlappingBBox,
-  isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
-} from "./withinBounds";
-export {
-  serializeAsJSON,
-  serializeLibraryAsJSON,
-} from "../excalidraw/data/json";
-export {
-  loadFromBlob,
-  loadSceneOrLibraryFromBlob,
-  loadLibraryFromBlob,
-} from "../excalidraw/data/blob";
-export { getFreeDrawSvgPath } from "../excalidraw/renderer/renderElement";
-export { mergeLibraryItems } from "../excalidraw/data/library";
