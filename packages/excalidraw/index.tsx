@@ -230,9 +230,9 @@ export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
-} from "../excalidraw/data/blob";
-export { getFreeDrawSvgPath } from "../excalidraw/renderer/renderElement";
-export { mergeLibraryItems } from "../excalidraw/data/library";
+} from "./data/blob";
+export { getFreeDrawSvgPath } from "./renderer/renderElement";
+export { mergeLibraryItems } from "./data/library";
 export { isLinearElement } from "./element/typeChecks";
 
 export { FONT_FAMILY, THEME, MIME_TYPES, ROUNDNESS } from "./constants";
