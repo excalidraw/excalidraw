@@ -23,10 +23,7 @@ import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
-import {
-  doLineSegmentsIntersect,
-  elementsOverlappingBBox,
-} from "../utils/export";
+import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import { ReadonlySetLike } from "./utility-types";
 
