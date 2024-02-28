@@ -49,6 +49,9 @@ const createESMBrowserBuild = async () => {
     outdir: "dist/browser/dev",
     sourcemap: true,
     metafile: true,
+    define: {
+      "import.meta.env": JSON.stringify({ DEV: true }),
+    },
   });
   fs.writeFileSync(
     "meta-browser-dev.json",
@@ -61,6 +64,9 @@ const createESMBrowserBuild = async () => {
     outdir: "dist/browser/prod",
     minify: true,
     metafile: true,
+    define: {
+      "import.meta.env": JSON.stringify({ PROD: true }),
+    },
   });
   fs.writeFileSync(
     "meta-browser-prod.json",
@@ -91,18 +97,24 @@ const createESMRawBuild = async () => {
   // Development unminified build with source maps
   const rawDev = await build({
     ...rawConfig,
-    outdir: "dist",
+    outdir: "dist/dev",
     sourcemap: true,
     metafile: true,
+    define: {
+      "import.meta.env": JSON.stringify({ DEV: true }),
+    },
   });
   fs.writeFileSync("meta-raw-dev.json", JSON.stringify(rawDev.metafile));
 
   // production minified build without sourcemaps
   const rawProd = await build({
     ...rawConfig,
-    outdir: "dist",
+    outdir: "dist/prod",
     minify: true,
     metafile: true,
+    define: {
+      "import.meta.env": JSON.stringify({ PROD: true }),
+    },
   });
   fs.writeFileSync("meta-raw-prod.json", JSON.stringify(rawProd.metafile));
 };
