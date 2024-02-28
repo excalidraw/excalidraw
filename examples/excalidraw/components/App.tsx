@@ -24,12 +24,7 @@ import {
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
 import initialData from "../initialData";
-import {
-  exportToCanvas,
-  exportToSvg,
-  exportToBlob,
-  exportToClipboard,
-} from "../../../packages/utils/export";
+
 import type {
   AppState,
   BinaryFileData,
@@ -86,6 +81,10 @@ export default function App({
   excalidrawLib,
 }: AppProps) {
   const {
+    exportToCanvas,
+    exportToSvg,
+    exportToBlob,
+    exportToClipboard,
     useHandleLibrary,
     MIME_TYPES,
     sceneCoordsToViewportCoords,
