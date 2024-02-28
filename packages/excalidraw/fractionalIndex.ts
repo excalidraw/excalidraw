@@ -110,6 +110,8 @@ export const syncFractionalIndices = (
   } catch (e) {
     // ensure to not cycle here & let it re-throw on the second try
     if (movedElements) {
+      // TODO_FI: do we have a possibility logging this into our telemetry?
+      // TODO_FI: do I need the fallback if I am doing it either way in replaceAllElements? likely yes so it's more resilient and less error prone to passed ("moved elements")
       // fallback to default sync
       syncFractionalIndices(elements, undefined);
     } else {

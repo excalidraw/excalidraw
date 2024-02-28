@@ -678,7 +678,25 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     return null;
   };
 
-  // TODO_FI: elements which do not have to have zIndex (even if they did, we might want to recreate it again - likely all do not have it?)
+  /**
+   * Happy concurrent collab flow (//TODO_FI: add similar test cases):
+   *
+   * concurrent changes for clients 1) and 2):
+   * 1) A, B, (C - a3) ("sync" performed by client 1, with / without moved elements)
+   * 2) A, B, (D)      ("sync" not performed on client 2 - backwards comp. - worst case)
+   *
+   * restore ("sync" fixing just D in client 2): (here it could be just "restore of indices")
+   * 1) A, B, (C - a3)
+   * 2) A, B, (D - a3)
+   *
+   * reconciliation (reconcile -> order by index, id):
+   * 1) A, B, D (a3), C (a3) -> A, B, C (a3), D (a3)
+   * 2) A, B, C (a3), D (a3) -> A, B, C (a3), D (a3)
+   *
+   * updateScene -> replaceAllElements ("sync" fixing D in both client 1 & 2): (here I need consistent restore + fix of all invalid indices - for reliabilityr reasons same as during "restore")
+   * 1) A, B, C (a3), D (a4)
+   * 2) A, B, C (a3), D (a4)
+   */
   private reconcileElements = (
     remoteElements: readonly ExcalidrawElement[],
   ): ReconciledElements => {
@@ -686,7 +704,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
 
-    // TODO_FI: should return elements which are maybe ordered by z-index or the order is defined by array
     remoteElements = restoreElements(remoteElements, null);
 
     // TODO_FI: should return ordered elements

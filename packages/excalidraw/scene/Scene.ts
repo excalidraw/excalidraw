@@ -14,10 +14,7 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
-import {
-  updateFractionalIndices,
-  validateFractionalIndices,
-} from "../fractionalIndex";
+import { syncFractionalIndices } from "../fractionalIndex";
 import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
 
@@ -266,15 +263,12 @@ class Scene {
     nextElements: ElementsMapOrArray,
     mapElementIds: boolean = true,
   ) {
-    // ts doesn't like `Array.isArray` of `instanceof Map`
-    const _nextElements =
+    this.elements = syncFractionalIndices(
+      // ts doesn't like `Array.isArray` of `instanceof Map`
       nextElements instanceof Array
         ? nextElements
-        : Array.from(nextElements.values());
-
-    validateFractionalIndices(_nextElements);
-
-    this.elements = _nextElements;
+        : Array.from(nextElements.values()),
+    );
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
     this.elementsMap.clear();
     this.elements.forEach((element) => {
@@ -344,8 +338,8 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
-    const nextElements = updateFractionalIndices(
-      this.elements,
+
+    const nextElements = syncFractionalIndices(
       [
         ...this.elements.slice(0, index),
         element,
@@ -364,8 +358,7 @@ class Scene {
       );
     }
 
-    const nextElements = updateFractionalIndices(
-      this.elements,
+    const nextElements = syncFractionalIndices(
       [
         ...this.elements.slice(0, index),
         ...elements,

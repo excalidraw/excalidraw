@@ -13,7 +13,7 @@ exports[`multi point mode in linear elements > arrow 3`] = `
   "groupIds": [],
   "height": 110,
   "id": "id0",
-  "index": "A0",
+  "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
     70,
@@ -69,7 +69,7 @@ exports[`multi point mode in linear elements > line 3`] = `
   "groupIds": [],
   "height": 110,
   "id": "id0",
-  "index": "A0",
+  "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
     70,

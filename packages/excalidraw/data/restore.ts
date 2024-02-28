@@ -432,7 +432,7 @@ export const restoreElements = (
     return elements;
   }, [] as ExcalidrawElement[]);
 
-  // mutate elements to sync fractional indices with the array order
+  // sync fractional indices with the array order
   syncFractionalIndices(restoredElements);
 
   if (!opts?.repairBindings) {

@@ -402,10 +402,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import {
-  restoreFractionalIndices,
-  updateFractionalIndices,
-} from "../fractionalIndex";
+import { syncFractionalIndices } from "../fractionalIndex";
 import FollowMode from "./FollowMode/FollowMode";
 
 import { AnimationFrameHandler } from "../animation-frame-handler";
@@ -3106,8 +3103,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    const nextElements = updateFractionalIndices(
-      prevElements,
+    const nextElements = syncFractionalIndices(
       [...prevElements, ...newElements],
       arrayToMap(newElements),
     );
@@ -3650,9 +3646,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        this.scene.replaceAllElements(
-          restoreFractionalIndices(sceneData.elements), // TODO_FI: https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
-        );
+        this.scene.replaceAllElements(sceneData.elements);
       }
 
       if (sceneData.collaborators) {
@@ -7247,8 +7241,7 @@ class App extends React.Component<AppProps, AppState> {
                 nextElements.push(element);
               }
             }
-            const nextSceneElements = updateFractionalIndices(
-              elements,
+            const nextSceneElements = syncFractionalIndices(
               [...nextElements, ...elementsToAppend],
               arrayToMap(elementsToAppend),
             );
@@ -9585,7 +9578,7 @@ if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       },
       set(elements: ExcalidrawElement[]) {
         return this.app?.scene.replaceAllElements(
-          restoreFractionalIndices(elements),
+          syncFractionalIndices(elements),
         );
       },
     },

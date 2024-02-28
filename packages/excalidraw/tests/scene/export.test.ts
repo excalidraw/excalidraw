@@ -9,7 +9,6 @@ import { API } from "../helpers/api";
 import { exportToCanvas, exportToSvg } from "../../../utils";
 import { FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
-import { restoreFractionalIndices } from "../../fractionalIndex";
 
 describe("exportToSvg", () => {
   window.EXCALIDRAW_ASSET_PATH = "/";
@@ -134,8 +133,9 @@ describe("exportToSvg", () => {
   });
 
   it("with elements that have a link", async () => {
+    // TODO_FI: does not seem to be needed, though it seems to expect scene elemnents
     const svgElement = await exportUtils.exportToSvg(
-      restoreFractionalIndices([rectangleWithLinkFixture]),
+      [rectangleWithLinkFixture],
       DEFAULT_OPTIONS,
       null,
     );

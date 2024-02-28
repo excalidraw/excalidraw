@@ -11,7 +11,6 @@ import { exportToSvg } from "../scene/export";
 import { FileId } from "../element/types";
 import { getDataURL } from "../data/blob";
 import { getDefaultAppState } from "../appState";
-import { restoreFractionalIndices } from "../fractionalIndex";
 
 const { h } = window;
 
@@ -110,7 +109,8 @@ describe("export", () => {
   it("exporting svg containing transformed images", async () => {
     const normalizeAngle = (angle: number) => (angle / 180) * Math.PI;
 
-    const elements = restoreFractionalIndices([
+    // TODO_FI: revisit, seems not needed though
+    const elements = [
       API.createElement({
         type: "image",
         fileId: "file_A",
@@ -151,7 +151,7 @@ describe("export", () => {
         height: 50,
         angle: normalizeAngle(315),
       }),
-    ]);
+    ];
     const appState = { ...getDefaultAppState(), exportBackground: false };
     const files = {
       file_A: {

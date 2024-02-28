@@ -12,6 +12,7 @@ import { generateKeyBetween } from "fractional-indexing";
 
 // TODO_FI:
 // test reconcillitation (first restore creates indices)
+// - ensure to stay consistent regardless of given elements
 // - if the elements are same, the indices will be the same (all good)
 // - for completely different arrays of elements, the indices will again be the same and order wil "merge" them together (not ideal) - but will this happen anyway?
 // - I have to make se all clients end up with same order regardless the items!
@@ -79,6 +80,32 @@ describe("sync invalid indices with array order", () => {
       expect: {
         unchangedElements: ["A", "B", "C"],
         validInput: true,
+      },
+    });
+  });
+
+  describe("should sync index even if it is valid", () => {
+    testFractionalIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a4" },
+      ],
+      movedElements: ["A"],
+      expect: {
+        validInput: true,
+        unchangedElements: ["B"],
+      },
+    });
+
+    testFractionalIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a4" },
+      ],
+      movedElements: ["B"],
+      expect: {
+        validInput: true,
+        unchangedElements: ["A"],
       },
     });
   });
@@ -169,6 +196,17 @@ describe("sync invalid indices with array order", () => {
       movedElements: ["B"],
       expect: {
         unchangedElements: ["A"],
+      },
+    });
+
+    testFractionalIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a1" },
+      ],
+      movedElements: ["A"],
+      expect: {
+        unchangedElements: ["B"],
       },
     });
 
@@ -658,7 +696,7 @@ function testFractionalIndicesSync(args: {
   );
 
   const name = movedElements
-    ? "should sync invalid indices of moved elements or fallback to fixing invalid indices of all elements"
+    ? "should sync invalid indices of moved elements or fallback to fixing all invalid indices"
     : "should sync invalid indices of all elements";
 
   test(

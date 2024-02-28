@@ -50,7 +50,8 @@ type _ExcalidrawElementBase = Readonly<{
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */
   versionNonce: number;
-  index: string | null; // TODO_FI: https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1431205318
+   // TODO_FI: would deserve some kind of brand
+  index: string | undefined; // TODO_FI: https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1431205318
   isDeleted: boolean;
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
@@ -165,16 +166,16 @@ export type ExcalidrawElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
-export type OrderedExcalidrawElement<TElement extends ExcalidrawElement> =
-  TElement & {
-    index: string;
-  };
-
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
+
+// TODO_FI: make it happen
+export type OrderedExcalidrawElement = ExcalidrawElement & {
+  index: string;
+};
 
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
