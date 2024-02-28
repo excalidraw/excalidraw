@@ -1,7 +1,6 @@
 import { generateNKeysBetween } from "fractional-indexing";
 import { mutateElement } from "./element/mutateElement";
 import { ExcalidrawElement } from "./element/types";
-import { ENV } from "./constants";
 import { InvalidFractionalIndexError } from "./errors";
 
 /**
@@ -74,8 +73,11 @@ export const syncFractionalIndices = (
   movedElements?: Map<string, ExcalidrawElement>,
 ) => {
   try {
-    // detect moved indices
-    const indicesGroups = getMovedIndicesGroups(elements, movedElements);
+    // detect moved / invalid indices
+    const indicesGroups = movedElements
+      ? getMovedIndicesGroups(elements, movedElements)
+      : getInvalidIndicesGroups(elements);
+
     const elementsUpdates = new Map<ExcalidrawElement, { index: string }>();
 
     // generate new indices
@@ -108,8 +110,6 @@ export const syncFractionalIndices = (
   } catch (e) {
     // ensure to not cycle here & let it re-throw on the second try
     if (movedElements) {
-      // TODO_FI: double-check the test-cases going through here
-      // console.log(e);
       // fallback to default sync
       syncFractionalIndices(elements, undefined);
     } else {
@@ -120,57 +120,6 @@ export const syncFractionalIndices = (
   return elements;
 };
 
-// WARN: expects that we are going left to right right, so it looks only one item left
-const getLowerBound = (
-  elements: readonly ExcalidrawElement[],
-  lowerBoundIndex: number,
-  index: number,
-): [string | undefined, number] => {
-  const lowerBound = elements[lowerBoundIndex]?.index;
-
-  // we are already iterating left to right, therefore tger is no need for additional looping
-  const candidate = elements[index - 1]?.index;
-
-  if (
-    (!lowerBound && candidate) ||
-    (lowerBound && candidate && candidate > lowerBound)
-  ) {
-    return [candidate, index - 1];
-  }
-
-  // cache! take the latest lower bound
-  return [lowerBound, lowerBoundIndex];
-};
-
-const getUpperBound = (
-  elements: readonly ExcalidrawElement[],
-  upperBoundIndex: number,
-  index: number,
-): [string | undefined, number] => {
-  const upperBound = elements[upperBoundIndex]?.index;
-  // cache! don't let it find the upper bound again
-  if (index < upperBoundIndex) {
-    return [upperBound, upperBoundIndex];
-  }
-
-  // set upperBoundIndex as the starting point
-  let i = upperBoundIndex;
-  while (++i < elements.length) {
-    const candidate = elements[i]?.index;
-
-    if (
-      (!upperBound && candidate) ||
-      (upperBound && candidate && candidate > upperBound)
-    ) {
-      return [candidate, i];
-    }
-  }
-
-  // we reached the end, sky is the limit
-  return [undefined, i];
-};
-
-// TODO_FI: movedElement expects restored & ordered elements (valid indices, ordered, no duplicates), without it expects anything
 /**
  * Get contigous indices of moved elements, but only those which are invalid,
  * so that we do not regenerate already valid indices.
@@ -182,68 +131,130 @@ const getUpperBound = (
  * When @param movedElements is passed, only gets contiguous indices of the moved elements.
  * Without @param movedElements, use when you don't know exactly which elements have moved or as a fallback to fix invalid indices.
  */
+// purposefully going from left as:
+// - the biggest likelihood to have the same index on multiple clients is on the first element, as we are inserting new elements at the right side
+// - in other words, if we would go from the right, two clients could often end up with different indices on the same, unchanged elements (i.e. client A inserts one element, but in the meantime client 2 inserts two)
+// - we could still end up in this situation, but only in case one client changes the first element in the array, which does not happen that often
+// - if it does happen, the indices will shift and this client will win (on most elements) in reconcilitation due to the mutation (version increase)
+// - in both ways, we might end up with duplicates which will need to be deduplicated during reconciliation
+
 const getMovedIndicesGroups = (
   elements: readonly ExcalidrawElement[],
-  movedElements?: Map<string, ExcalidrawElement>,
+  movedElements: Map<string, ExcalidrawElement>,
 ) => {
   const indicesGroups: number[][] = [];
 
-  const hasElementMoved = (element: ExcalidrawElement) =>
-    movedElements ? movedElements.has(element.id) : true;
-
-  // purposefully going from left as:
-  // - the biggest likelihood to have the same index on multiple clients is on the first element, as we are inserting new elements at the right side
-  // - in other words, if we would go from the right, two clients could often end up with different indices on the same, unchanged elements (i.e. client A inserts one element, but in the meantime client 2 inserts two)
-  // - we could still end up in this situation, but only in case one client changes the first element in the array, which does not happen that often
-  // - if it does happen, the indices will shift and this client will win (on most elements) in reconcilitation due to the mutation (version increase)
-  // - in both ways, we might end up with duplicates which will need to be deduplicated during reconciliation
   let i = 0;
 
-  // once we find lowerBound / upperBound, it cannot be lower than that, so we cache it for better perf.
-  let lowerBound: string | undefined = undefined;
-  let upperBound: string | undefined = undefined;
-  let lbi: number = -1; // lower bound index
-  let ubi: number = 0; // upper bound index
-
   while (i < elements.length) {
-    const element = elements[i];
-    [lowerBound, lbi] = getLowerBound(elements, lbi, i);
-    [upperBound, ubi] = getUpperBound(elements, ubi, i);
-
-    if (
-      hasElementMoved(element) &&
-      !isValidFractionalIndex(element.index, lowerBound, upperBound)
-    ) {
-      const indicesGroup = [lbi, i]; // push the lower bound index as the first item
+    if (movedElements.has(elements[i].id)) {
+      const indicesGroup = [i - 1, i]; // push the lower bound index as the first item
 
       while (++i < elements.length) {
-        const element = elements[i];
-        const [_lowerBound, _lbi] = getLowerBound(elements, lbi, i);
-        const [_upperBound, _ubi] = getUpperBound(elements, ubi, i);
-
-        if (
-          !(
-            hasElementMoved(element) &&
-            !isValidFractionalIndex(element.index, _lowerBound, _upperBound)
-          )
-        ) {
+        if (!movedElements.has(elements[i].id)) {
           break;
         }
-
-        // assign bounds only for the moved elements, not the valid ones
-        lowerBound = _lowerBound;
-        upperBound = _upperBound;
-        lbi = _lbi;
-        ubi = _ubi;
 
         indicesGroup.push(i);
       }
 
-      indicesGroup.push(ubi); // push the upper bound index as the last item
+      indicesGroup.push(i); // push the upper bound index as the last item
       indicesGroups.push(indicesGroup);
+    } else {
+      i++;
+    }
+  }
+
+  return indicesGroups;
+};
+
+const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
+  const indicesGroups: number[][] = [];
+
+  // once we find lowerBound / upperBound, it cannot be lower than that, so we cache it for better perf.
+  let lowerBound: FractionalIndex = undefined;
+  let upperBound: FractionalIndex = undefined;
+  let lowerBoundIndex: number = -1;
+  let upperBoundIndex: number = 0;
+
+  /** @returns maybe valid lowerBound */
+  const getLowerBound = (index: number): [string | undefined, number] => {
+    const lowerBound = elements[lowerBoundIndex]?.index;
+
+    // we are already iterating left to right, therefore there is no need for additional looping
+    const candidate = elements[index - 1]?.index;
+
+    if (
+      (!lowerBound && candidate) || // first lowerBound
+      (lowerBound && candidate && candidate > lowerBound) // next lowerBound
+    ) {
+      // WARN: candidate's index could be higher or same as the current element's index
+      return [candidate, index - 1];
     }
 
-    i++;
+    // cache hit! take the last lower bound
+    return [lowerBound, lowerBoundIndex];
+  };
+
+  /** @returns always valid upperBound */
+  const getUpperBound = (index: number): [string | undefined, number] => {
+    const upperBound = elements[upperBoundIndex]?.index;
+
+    // cache hit! don't let it find the upper bound again
+    if (index < upperBoundIndex) {
+      return [upperBound, upperBoundIndex];
+    }
+
+    // set the current upperBoundIndex as the starting point
+    let i = upperBoundIndex;
+    while (++i < elements.length) {
+      const candidate = elements[i]?.index;
+
+      if (
+        (!upperBound && candidate) || // first upperBound
+        (upperBound && candidate && candidate > upperBound) // next upperBound
+      ) {
+        return [candidate, i];
+      }
+    }
+
+    // we reached the end, sky is the limit
+    return [undefined, i];
+  };
+
+  let i = 0;
+
+  while (i < elements.length) {
+    const current = elements[i].index;
+    [lowerBound, lowerBoundIndex] = getLowerBound(i);
+    [upperBound, upperBoundIndex] = getUpperBound(i);
+
+    if (!isValidFractionalIndex(current, lowerBound, upperBound)) {
+      // push the lower bound index as the first item
+      const indicesGroup = [lowerBoundIndex, i];
+
+      while (++i < elements.length) {
+        const current = elements[i].index;
+        const [nextLowerBound, nextLowerBoundIndex] = getLowerBound(i);
+        const [nextUpperBound, nextUpperBoundIndex] = getUpperBound(i);
+
+        if (isValidFractionalIndex(current, nextLowerBound, nextUpperBound)) {
+          break;
+        }
+
+        // assign bounds only for the moved elements
+        [lowerBound, lowerBoundIndex] = [nextLowerBound, nextLowerBoundIndex];
+        [upperBound, upperBoundIndex] = [nextUpperBound, nextUpperBoundIndex];
+
+        indicesGroup.push(i);
+      }
+
+      // push the upper bound index as the last item
+      indicesGroup.push(upperBoundIndex);
+      indicesGroups.push(indicesGroup);
+    } else {
+      i++;
+    }
   }
 
   return indicesGroups;
@@ -252,7 +263,7 @@ const getMovedIndicesGroups = (
 const isValidFractionalIndex = (
   index: FractionalIndex,
   predecessor: FractionalIndex,
-  successor: FractionalIndex | undefined = undefined, // TODO_FI: revisit
+  successor: FractionalIndex,
 ) => {
   if (!index) {
     return false;
