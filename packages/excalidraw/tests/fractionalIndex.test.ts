@@ -10,14 +10,7 @@ import { ExcalidrawElement } from "../element/types";
 import { deepCopyElement } from "../element/newElement";
 import { generateKeyBetween } from "fractional-indexing";
 
-// TODO_FI:
-// test reconcillitation (first restore creates indices)
-// - ensure to stay consistent regardless of given elements
-// - if the elements are same, the indices will be the same (all good)
-// - for completely different arrays of elements, the indices will again be the same and order wil "merge" them together (not ideal) - but will this happen anyway?
-// - I have to make se all clients end up with same order regardless the items!
-// consider adding benchmark for sync for 1k, 5k & 20k elements (worst & best cases)
-
+// TOFO_FI: consider adding benchmark for sync for 1k, 5k & 20k elements (worst & best cases)
 describe("sync invalid indices with array order", () => {
   describe("should not sync empty array", () => {
     testFractionalIndicesSync({
@@ -680,7 +673,7 @@ describe("sync invalid indices with array order", () => {
 });
 
 function testFractionalIndicesSync(args: {
-  elements: { id: string; index?: string }[]; // TODO_FI: the index should be either undefined (boundaries) or well defined
+  elements: { id: string; index?: string }[]; // TODO_FI_3: the index should be either undefined (boundaries) or well defined
   movedElements?: string[];
   expect: {
     unchangedElements: string[];

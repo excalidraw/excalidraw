@@ -168,7 +168,7 @@ export class API {
       x,
       y,
       frameId: rest.frameId ?? null,
-      index: rest.index || undefined, // TODO_FI: could be problematic with mutating to undefined (likely will never happen, but double-check)
+      index: rest.index || undefined, // TODO_FI_3: could be problematic with mutating to undefined (likely will never happen, but double-check)
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:

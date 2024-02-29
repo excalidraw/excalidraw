@@ -313,7 +313,7 @@ const shiftElementsByOne = (
           ];
   });
 
-  // TODO_FI: filter out first and last elements (deleted elements could complicate the "visible change"); also on other z-index actions
+  // TODO_FI_2: filter out first and last elements (deleted elements could complicate the "visible change"); also on other z-index actions
   return syncFractionalIndices(elements, targetElementsMap);
 };
 
