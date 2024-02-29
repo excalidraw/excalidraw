@@ -12,6 +12,5 @@
     "resolveJsonModule": true,
     "jsx": "react-jsx"
   },
-  //"include": ["../excalidraw/**/*"],
   "exclude": ["**/*.test.*", "**/tests/*", "types", "dist"]
 }
