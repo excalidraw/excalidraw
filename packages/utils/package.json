@@ -10,6 +10,7 @@
       "default": "./dist/prod/index.js"
     }
   },
+  "types": "./dist/utils/index.d.ts",
   "files": [
     "dist/*"
   ],
