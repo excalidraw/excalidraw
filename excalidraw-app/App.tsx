@@ -56,6 +56,7 @@ import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
   isOfflineAtom,
+  maxSizeExceededAtom,
 } from "./collab/Collab";
 import {
   exportToBackend,
@@ -310,6 +311,7 @@ const ExcalidrawWrapper = () => {
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
+  const [maxSizeExceeded] = useAtom(maxSizeExceededAtom);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -568,7 +570,7 @@ const ExcalidrawWrapper = () => {
     setTheme(appState.theme);
 
     // this check is redundant, but since this is a hot path, it's best
-    // not to evaludate the nested expression every time
+    // not to evaluate the nested expression every time
     if (!LocalData.isSavePaused()) {
       LocalData.save(elements, appState, files, () => {
         if (excalidrawAPI) {
@@ -786,7 +788,7 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter />
+        <AppFooter maxSizeExceeded={maxSizeExceeded} />
         <TTDDialog
           onTextSubmit={async (input) => {
             try {

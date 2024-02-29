@@ -11,6 +11,7 @@
     margin-inline-start: auto;
   }
 
+  .max-size-exceeded-icon,
   .encrypted-icon {
     border-radius: var(--space-factor);
     color: var(--color-primary);
@@ -23,6 +24,14 @@
       width: 1.2rem;
       height: 1.2rem;
     }
+  }
+
+  .max-size-exceeded-icon {
+    color: var(--color-promo);
+  }
+
+  .encrypted-icon {
+    color: var(--color-primary);
   }
 
   .dropdown-menu-container {

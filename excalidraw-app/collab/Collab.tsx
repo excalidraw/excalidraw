@@ -85,6 +85,7 @@ import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
+export const maxSizeExceededAtom = atom(false);
 
 interface CollabState {
   errorMessage: string | null;
@@ -266,29 +267,40 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   });
 
+  maxSizeExceeded = () => appJotaiStore.get(maxSizeExceededAtom);
   saveCollabRoomToFirebase = async (
     syncableElements: readonly SyncableExcalidrawElement[],
   ) => {
-    try {
-      const savedData = await saveToFirebase(
-        this.portal,
-        syncableElements,
-        this.excalidrawAPI.getAppState(),
-      );
-
-      if (this.isCollaborating() && savedData && savedData.reconciledElements) {
-        this.handleRemoteSceneUpdate(
-          this.reconcileElements(savedData.reconciledElements),
+    if (!this.maxSizeExceeded()) {
+      try {
+        const savedData = await saveToFirebase(
+          this.portal,
+          syncableElements,
+          this.excalidrawAPI.getAppState(),
         );
-      }
-    } catch (error: any) {
-      this.setState({
+
+        if (
+          this.isCollaborating() &&
+          savedData &&
+          savedData.reconciledElements
+        ) {
+          this.handleRemoteSceneUpdate(
+            this.reconcileElements(savedData.reconciledElements),
+          );
+        }
+      } catch (error: any) {
         // firestore doesn't return a specific error code when size exceeded
-        errorMessage: /is longer than.*?bytes/.test(error.message)
-          ? t("errors.collabSaveFailed_sizeExceeded")
-          : t("errors.collabSaveFailed"),
-      });
-      console.error(error);
+        const maxSizeExceeded = /is longer than.*?bytes/.test(error.message);
+        this.setState({
+          errorMessage: maxSizeExceeded
+            ? t("errors.collabSaveFailed_sizeExceeded")
+            : t("errors.collabSaveFailed"),
+        });
+        if (maxSizeExceeded) {
+          appJotaiStore.set(maxSizeExceededAtom, true);
+        }
+        console.error(error);
+      }
     }
   };
 
