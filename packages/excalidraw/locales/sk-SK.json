@@ -247,7 +247,7 @@
     "library": "Knižnica",
     "lock": "Nechať zvolený nástroj aktívny po skončení kreslenia",
     "penMode": "Režim pera – zabrániť dotyku",
-    "link": "",
+    "link": "Pridať / Upraviť odkaz pre vybraný tvar",
     "eraser": "Guma",
     "frame": "Nástroj rám",
     "magicframe": "Drôtený model na kód",
@@ -301,11 +301,11 @@
     "sceneContent": "Obsah scény:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Alebo"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Pozvite ľudí a spolupracujte s nimi na vašich kresbách.",
+    "desc_privacy": "Nemajte obavy, relácia je end-to-end šifrovaná a úplne privátna. Ani náš server nedokáže vidieť čo kreslíte.",
     "button_startSession": "Začať schôdzu",
     "button_stopSession": "Ukončiť schôdzu",
     "desc_inProgressIntro": "Práve prebieha živá schôdza.",
