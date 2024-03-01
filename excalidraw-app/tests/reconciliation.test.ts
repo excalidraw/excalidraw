@@ -3,10 +3,7 @@ import {
   ExcalidrawElement,
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
-import {
-  ReconciledElements,
-  reconcileElements,
-} from "../../excalidraw-app/collab/reconciliation";
+import { reconcileElements } from "../../excalidraw-app/collab/reconciliation";
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
 import { cloneJSON } from "../../packages/excalidraw/utils";
@@ -28,7 +25,7 @@ const createElement = (opts: { uid: string } | ElementLike) => {
   let version: number | null;
   let versionNonce: number | null = null;
   if ("uid" in opts) {
-    const match = opts.uid.match(/^(\w+)(?::(\d+))?(?:\((\w+)\))?$/)!;
+    const match = opts.uid.match(/^(\w+)(?::(\d+))?$/)!;
     id = match[1];
     version = match[2] ? parseInt(match[2]) : null;
     uid = version ? `${id}:${version}` : id;
@@ -72,49 +69,51 @@ const test = <U extends `${string}:${"L" | "R"}`>(
   local: (Id | ElementLike)[],
   remote: (Id | ElementLike)[],
   target: U[],
-  bidirectional = true,
 ) => {
   const cache: Cache = {};
   const _local = idsToElements(local, cache);
   const _remote = idsToElements(remote, cache);
-  // console.log(
-  //   _local.map((x) => `${x.id}, ${x.index}`),
-  //   _remote.map((x) => `${x.id}, ${x.index}`),
-  // );
-
-  const _target = target.map((uid) => {
-    const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
-    return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
-  }) as any as ReconciledElements;
   const remoteReconciled = reconcileElements(_local, _remote, {} as AppState);
-  // console.log(remoteReconciled.map((x) => `${x.id}, ${x.index}`));
 
   expect(target.length).equal(remoteReconciled.length);
-  expect(remoteReconciled).deep.equal(_target, "remote reconciliation");
+  expect(remoteReconciled).deep.equal(
+    target.map((uid) => {
+      const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
+      return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
+    }),
+    "remote reconciliation",
+  );
 
-  const __local = cloneJSON(_remote);
-  const __remote = cloneJSON(remoteReconciled);
-  if (bidirectional) {
-    try {
-      expect(
-        reconcileElements(
-          cloneJSON(__local),
-          cloneJSON(__remote as unknown as OrderedExcalidrawElement[]),
-          {} as AppState,
-        ),
-      ).deep.equal(remoteReconciled, "local re-reconciliation");
-    } catch (error: any) {
-      console.error("local original", __local);
-      console.error("remote reconciled", __remote);
-      throw error;
-    }
+  // convergent reconciliation on the remote client
+  try {
+    expect(
+      reconcileElements(cloneJSON(_remote), cloneJSON(_local), {} as AppState),
+    ).deep.equal(remoteReconciled, "convergent reconciliation");
+  } catch (error: any) {
+    console.error("local original", _remote);
+    console.error("remote original", _local);
+    throw error;
+  }
+
+  // bidirectional re-reconciliation on remote client
+  try {
+    expect(
+      reconcileElements(
+        cloneJSON(_remote),
+        cloneJSON(remoteReconciled as unknown as OrderedExcalidrawElement[]),
+        {} as AppState,
+      ),
+    ).deep.equal(remoteReconciled, "local re-reconciliation");
+  } catch (error: any) {
+    console.error("local original", _remote);
+    console.error("remote reconciled", remoteReconciled);
+    throw error;
   }
 };
 
 // -----------------------------------------------------------------------------
 
-// TODO_FI: test the potential concurrency issues (always converging to the same result - though it should already be tested?)
-// TODO_FI: think about extending the test cases to cover fractional indices issues (also compared to previous intentions)
+// TODO_FI_1: think about extending the test cases to cover fractional indices issues (also compared to previous intentions)
 describe("elements reconciliation", () => {
   it("reconcileElements()", () => {
     // -------------------------------------------------------------------------
@@ -127,10 +126,6 @@ describe("elements reconciliation", () => {
     // in the reconciled array:
     //  :L means local element was resolved
     //  :R means remote element was resolved
-    //
-    // if a remote element is prefixed with parentheses, the enclosed string:
-    //  (^) means the element is the first element in the array
-    //  (<id>) means the element is preceded by <id> element
     //
     // if versions are missing, it defaults to version 0
     // -------------------------------------------------------------------------
@@ -154,7 +149,6 @@ describe("elements reconciliation", () => {
     test(["A:2", "B:2"], ["B:1", "A:1"], ["A:L", "B:L"]);
     test(["A", "B", "C"], ["A", "B:2", "G", "C"], ["A:L", "B:R", "G:R", "C:L"]);
     test(["A", "B", "C"], ["A", "B:2", "G"], ["A:R", "B:R", "C:L", "G:R"]);
-
     test(
       ["A:2", "B:2", "C"],
       ["D", "B:1", "A:3"],
@@ -171,10 +165,12 @@ describe("elements reconciliation", () => {
       ["A:L", "B:R", "X:R", "C:L", "E:R", "D:L", "F:L", "Y:R"],
     );
 
+    // fractional elements (previously annotated)
+    // -------------------------------------------------------------------------
     test(
       ["A", "B", "C"],
-      ["X", "Y", "Z"],
-      ["A:L", "X:R", "B:L", "Y:R", "C:L", "Z:R"],
+      ["A", "B", "X", "Y", "Z"],
+      ["A:R", "B:R", "C:L", "X:R", "Y:R", "Z:R"],
     );
 
     test(["A"], ["X", "Y"], ["A:L", "X:R", "Y:R"]);
@@ -187,24 +183,30 @@ describe("elements reconciliation", () => {
       ["A:L", "C:R", "B:L", "D:R"],
     );
     test(
+      ["A", "B", "C"],
+      ["X", "A", "Y", "B", "Z"],
+      ["X:R", "A:R", "Y:R", "B:L", "C:L", "Z:R"],
+    );
+    test(
       ["B", "A", "C"],
-      ["X", "Y", "Z"],
-      ["B:L", "X:R", "A:L", "Y:R", "C:L", "Z:R"],
+      ["X", "A", "Y", "B", "Z"],
+      ["X:R", "A:R", "C:L", "Y:R", "B:R", "Z:R"],
     );
+    test(["A", "B"], ["A", "X", "Y"], ["A:R", "B:L", "X:R", "Y:R"]);
     test(
       ["A", "B", "C", "D", "E"],
-      ["X", "Y", "Z"],
-      ["A:L", "X:R", "B:L", "Y:R", "C:L", "Z:R", "D:L", "E:L"],
+      ["A", "X", "C", "Y", "D", "Z"],
+      ["A:R", "B:L", "X:R", "C:R", "Y:R", "D:R", "E:L", "Z:R"],
     );
     test(
+      ["X", "Y", "Z"],
       ["A", "B", "C", "X", "D", "Y", "Z"],
-      ["A", "X", "Y", "Z"],
-      ["A:R", "B:L", "C:L", "X:R", "D:L", "Y:R", "Z:R"],
+      ["A:R", "B:R", "C:R", "X:L", "D:R", "Y:L", "Z:L"],
     );
     test(
       ["A", "B", "C", "D", "E"],
-      ["C", "X", "A", "Y", "E:1"],
-      ["B:L", "C:L", "D:L", "X:R", "A:R", "Y:R", "E:R"],
+      ["C", "X", "A", "Y", "D", "E:1"],
+      ["B:L", "C:L", "X:R", "A:R", "Y:R", "D:R", "E:R"],
     );
     test(
       ["C:1", "B", "D:1"],
@@ -213,15 +215,15 @@ describe("elements reconciliation", () => {
     );
 
     test(
-      ["A", "B", "C", "D"],
-      ["A", "C:1", "B", "D:1"],
-      ["A:L", "C:R", "B:L", "D:R"],
-    );
-
-    test(
       ["C:1", "B", "D:1"],
       ["A", "B", "C:2", "D:1"],
       ["A:R", "B:L", "C:R", "D:L"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "C:1", "B", "D:1"],
+      ["A:L", "C:R", "B:L", "D:R"],
     );
 
     test(
@@ -250,13 +252,30 @@ describe("elements reconciliation", () => {
 
     test(["A:1", "B:1", "C"], ["B:2"], ["A:L", "B:R", "C:L"]);
     test(["A:1", "B:1", "C"], ["B:2", "C:2"], ["A:L", "B:R", "C:R"]);
-    test(["A", "B"], ["A", "C", "D"], ["A:R", "B:L", "C:R", "D:R"]);
-    test(["A", "B"], ["B", "C", "D"], ["A:L", "B:L", "C:R", "D:R"]);
-    test(["A", "B"], ["B:1"], ["A:L", "B:R"]);
-    test(["A:2", "B"], ["B:1"], ["A:L", "B:R"]);
+    test(["A", "B"], ["A", "C", "B", "D"], ["A:R", "C:R", "B:R", "D:R"]);
+    test(["A", "B"], ["B", "C", "D"], ["A:L", "B:R", "C:R", "D:R"]);
+    test(["A", "B"], ["C", "D"], ["A:L", "C:R", "B:L", "D:R"]);
+    test(["A", "B"], ["A", "B:1"], ["A:L", "B:R"]);
+    test(["A:2", "B"], ["A", "B:1"], ["A:L", "B:R"]);
     test(["A:2", "B:2"], ["B:1"], ["A:L", "B:L"]);
     test(["A:2", "B:2"], ["B:1", "C"], ["A:L", "B:L", "C:R"]);
     test(["A:2", "B:2"], ["A", "C", "B:1"], ["A:L", "B:L", "C:R"]);
+
+    // concurrent convergency
+    test(["A", "B", "C"], ["A", "B", "D"], ["A:R", "B:R", "C:L", "D:R"]);
+    test(["A", "B", "E"], ["A", "B", "D"], ["A:R", "B:R", "D:R", "E:L"]);
+    test(
+      ["A", "B", "C"],
+      ["A", "B", "D", "E"],
+      ["A:R", "B:R", "C:L", "D:R", "E:R"],
+    );
+    test(
+      ["A", "B", "E"],
+      ["A", "B", "D", "C"],
+      ["A:R", "B:R", "D:R", "E:L", "C:R"],
+    );
+    test(["A", "B"], ["B", "D"], ["A:L", "B:R", "D:R"]);
+    test(["C", "A", "B"], ["C", "B", "D"], ["C:R", "A:L", "B:R", "D:R"]);
   });
 
   it("test identical elements reconciliation", () => {
