@@ -46,34 +46,36 @@ export const getCryptoKey = (key: string, usage: KeyUsage) =>
     [usage],
   );
 
+// TODO (Jess): Reconsider if we want to use this
 export const encryptData = async (
   key: string | CryptoKey,
   data: Uint8Array | ArrayBuffer | Blob | File | string,
 ): Promise<{ encryptedBuffer: ArrayBuffer; iv: Uint8Array }> => {
-  const importedKey =
-    typeof key === "string" ? await getCryptoKey(key, "encrypt") : key;
-  const iv = createIV();
-  const buffer: ArrayBuffer | Uint8Array =
-    typeof data === "string"
-      ? new TextEncoder().encode(data)
-      : data instanceof Uint8Array
-      ? data
-      : data instanceof Blob
-      ? await blobToArrayBuffer(data)
-      : data;
+  // const importedKey =
+  //   typeof key === "string" ? await getCryptoKey(key, "encrypt") : key;
+  // const iv = createIV();
+  // const buffer: ArrayBuffer | Uint8Array =
+  //   typeof data === "string"
+  //     ? new TextEncoder().encode(data)
+  //     : data instanceof Uint8Array
+  //     ? data
+  //     : data instanceof Blob
+  //     ? await blobToArrayBuffer(data)
+  //     : data;
 
-  // We use symmetric encryption. AES-GCM is the recommended algorithm and
-  // includes checks that the ciphertext has not been modified by an attacker.
-  const encryptedBuffer = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    importedKey,
-    buffer as ArrayBuffer | Uint8Array,
-  );
+  // // We use symmetric encryption. AES-GCM is the recommended algorithm and
+  // // includes checks that the ciphertext has not been modified by an attacker.
+  // const encryptedBuffer = await window.crypto.subtle.encrypt(
+  //   {
+  //     name: "AES-GCM",
+  //     iv,
+  //   },
+  //   importedKey,
+  //   buffer as ArrayBuffer | Uint8Array,
+  // );
 
-  return { encryptedBuffer, iv };
+  // return { encryptedBuffer, iv };
+  return { encryptedBuffer: data as ArrayBuffer, iv: createIV() };
 };
 
 export const decryptData = async (
@@ -81,13 +83,14 @@ export const decryptData = async (
   encrypted: Uint8Array | ArrayBuffer,
   privateKey: string,
 ): Promise<ArrayBuffer> => {
-  const key = await getCryptoKey(privateKey, "decrypt");
-  return window.crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    encrypted,
-  );
+  // const key = await getCryptoKey(privateKey, "decrypt");
+  // return window.crypto.subtle.decrypt(
+  //   {
+  //     name: "AES-GCM",
+  //     iv,
+  //   },
+  //   key,
+  //   encrypted,
+  // );
+  return encrypted as ArrayBuffer;
 };

@@ -51,10 +51,11 @@ export const isSyncableElement = (
   return !isInvisiblySmallElement(element);
 };
 
-export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
-  elements.filter((element) =>
+export const getSyncableElements = (elements: readonly ExcalidrawElement[]) => {
+  return elements.filter((element) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
+};
 
 const BACKEND_V2_GET = import.meta.env.VITE_APP_BACKEND_V2_GET_URL;
 const BACKEND_V2_POST = import.meta.env.VITE_APP_BACKEND_V2_POST_URL;
@@ -132,10 +133,11 @@ export const isCollaborationLink = (link: string) => {
 export const getCollaborationLinkData = (link: string) => {
   const hash = new URL(link).hash;
   const match = hash.match(RE_COLLAB_LINK);
-  if (match && match[2].length !== 22) {
-    window.alert(t("alerts.invalidEncryptionKey"));
-    return null;
-  }
+  // TODO (Jess): Add this back in if we are using encrypted room keys
+  // if (match && match[2].length !== 22) {
+  //   window.alert(t("alerts.invalidEncryptionKey"));
+  //   return null;
+  // }
   return match ? { roomId: match[1], roomKey: match[2] } : null;
 };
 
