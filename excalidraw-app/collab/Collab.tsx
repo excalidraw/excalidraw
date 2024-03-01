@@ -81,17 +81,17 @@ import { appJotaiStore } from "../app-jotai";
 import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
-import { Toast } from "../../packages/excalidraw/components/Toast";
-import { DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE } from "../../packages/excalidraw/colors";
+import { CollabErrorType, DEFAULT_COLLAB_ERROR } from "./CollabError";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
+export const collabErrorAtom = atom<CollabErrorType>(DEFAULT_COLLAB_ERROR);
 export const isOfflineAtom = atom(false);
 
 interface CollabState {
   errorMessage: string | null;
   dialogNotifiedErrors: Record<string, boolean>;
-  errorDisplayMethod: "dialog" | "toast";
+  shouldShouldDialog: boolean;
   username: string;
   activeRoomLink: string | null;
 }
@@ -134,7 +134,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.state = {
       errorMessage: null,
       dialogNotifiedErrors: {},
-      errorDisplayMethod: "dialog",
+      shouldShouldDialog: false,
       username: importUsernameFromLocalStorage() || "",
       activeRoomLink: null,
     };
@@ -934,7 +934,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       if (this.state.dialogNotifiedErrors[errorMessage]) {
         this.setState({
           errorMessage,
-          errorDisplayMethod: "toast",
+          shouldShouldDialog: false,
         });
       } else {
         this.setState({
@@ -942,36 +942,39 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             ...this.state.dialogNotifiedErrors,
             [errorMessage]: true,
           },
-          errorDisplayMethod: "dialog",
           errorMessage,
+          shouldShouldDialog: true,
         });
       }
+      appJotaiStore.set(collabErrorAtom, {
+        message: errorMessage,
+        timestamp: Date.now(),
+      });
     } else {
-      this.setState({ errorMessage });
+      this.setState({
+        errorMessage: null,
+        shouldShouldDialog: false,
+      });
     }
   };
 
+  clearErrorMessage = () => {
+    this.setState({
+      errorMessage: null,
+    });
+    appJotaiStore.set(collabErrorAtom, DEFAULT_COLLAB_ERROR);
+  };
+
   render() {
-    const { errorMessage } = this.state;
+    const { errorMessage, shouldShouldDialog } = this.state;
 
     return (
       <>
-        {errorMessage != null &&
-          (this.state.errorDisplayMethod === "dialog" ? (
-            <ErrorDialog onClose={() => this.setErrorMessage(null)}>
-              {errorMessage}
-            </ErrorDialog>
-          ) : (
-            <Toast
-              message={errorMessage}
-              onClose={() => this.setErrorMessage(null)}
-              closable={true}
-              style={{
-                backgroundColor:
-                  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE.red[1],
-              }}
-            />
-          ))}
+        {shouldShouldDialog && errorMessage != null && (
+          <ErrorDialog onClose={() => this.setErrorMessage(null)}>
+            {errorMessage}
+          </ErrorDialog>
+        )}
       </>
     );
   }
