@@ -57,7 +57,9 @@ export const actionGoToCollaborator = register({
           isBeingFollowed={isBeingFollowed}
           isCurrentUser={collaborator.isCurrentUser === true}
         />
-        {collaborator.username}
+        <div className="UserList__collaborator-name">
+          {collaborator.username}
+        </div>
         <div
           className="UserList__collaborator-follow-status-icon"
           style={{ visibility: isBeingFollowed ? "visible" : "hidden" }}

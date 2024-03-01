@@ -17,7 +17,6 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
-  ExcalidrawTextContainer,
 } from "./types";
 import { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
@@ -34,6 +33,7 @@ import {
   computeContainerDimensionForBoundText,
   detectLineHeight,
   computeBoundTextPosition,
+  getBoundTextElement,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -43,6 +43,10 @@ import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
 import App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
+import {
+  originalContainerCache,
+  updateOriginalContainerCache,
+} from "./containerCache";
 
 const getTransform = (
   width: number,
@@ -63,38 +67,6 @@ const getTransform = (
     translateY = (maxHeight * (zoom.value - 1)) / 2;
   }
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
-};
-
-const originalContainerCache: {
-  [id: ExcalidrawTextContainer["id"]]:
-    | {
-        height: ExcalidrawTextContainer["height"];
-      }
-    | undefined;
-} = {};
-
-export const updateOriginalContainerCache = (
-  id: ExcalidrawTextContainer["id"],
-  height: ExcalidrawTextContainer["height"],
-) => {
-  const data =
-    originalContainerCache[id] || (originalContainerCache[id] = { height });
-  data.height = height;
-  return data;
-};
-
-export const resetOriginalContainerCache = (
-  id: ExcalidrawTextContainer["id"],
-) => {
-  if (originalContainerCache[id]) {
-    delete originalContainerCache[id];
-  }
-};
-
-export const getOriginalContainerHeightFromCache = (
-  id: ExcalidrawTextContainer["id"],
-) => {
-  return originalContainerCache[id]?.height ?? null;
 };
 
 export const textWysiwyg = ({
@@ -153,7 +125,10 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      const container = getContainerElement(updatedTextElement);
+      const container = getContainerElement(
+        updatedTextElement,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
       let maxWidth = updatedTextElement.width;
 
       let maxHeight = updatedTextElement.height;
@@ -193,7 +168,8 @@ export const textWysiwyg = ({
           }
         }
 
-        maxWidth = getBoundTextMaxWidth(container);
+        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -277,7 +253,7 @@ export const textWysiwyg = ({
         transform: getTransform(
           textElementWidth,
           textElementHeight,
-          getTextElementAngle(updatedTextElement),
+          getTextElementAngle(updatedTextElement, container),
           appState,
           maxWidth,
           editorMaxHeight,
@@ -348,17 +324,24 @@ export const textWysiwyg = ({
       if (!data) {
         return;
       }
-      const container = getContainerElement(element);
+      const container = getContainerElement(
+        element,
+        app.scene.getElementsMapIncludingDeleted(),
+      );
 
       const font = getFontString({
         fontSize: app.state.currentItemFontSize,
         fontFamily: app.state.currentItemFontFamily,
       });
       if (container) {
+        const boundTextElement = getBoundTextElement(
+          container,
+          app.scene.getNonDeletedElementsMap(),
+        );
         const wrappedText = wrapText(
           `${editable.value}${data}`,
           font,
-          getBoundTextMaxWidth(container),
+          getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font);
         editable.style.width = `${width}px`;
@@ -528,7 +511,10 @@ export const textWysiwyg = ({
       return;
     }
     let text = editable.value;
-    const container = getContainerElement(updateElement);
+    const container = getContainerElement(
+      updateElement,
+      app.scene.getElementsMapIncludingDeleted(),
+    );
 
     if (container) {
       text = updateElement.text;
