@@ -111,7 +111,7 @@ export interface CollabAPI {
   setUsername: CollabInstance["setUsername"];
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
-  setErrorMessage: CollabInstance["setErrorMessage"];
+  setCollabError: CollabInstance["setCollabError"];
 }
 
 interface CollabProps {
@@ -203,7 +203,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       setUsername: this.setUsername,
       getUsername: this.getUsername,
       getActiveRoomLink: this.getActiveRoomLink,
-      setErrorMessage: this.setErrorMessage,
+      setCollabError: this.setCollabError,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -282,16 +282,19 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         this.excalidrawAPI.getAppState(),
       );
 
+      this.clearCollabError();
+
       if (this.isCollaborating() && savedData && savedData.reconciledElements) {
         this.handleRemoteSceneUpdate(
           this.reconcileElements(savedData.reconciledElements),
         );
       }
     } catch (error: any) {
-      this.setErrorMessage(
+      this.setCollabError(
         /is longer than.*?bytes/.test(error.message)
           ? t("errors.collabSaveFailed_sizeExceeded")
           : t("errors.collabSaveFailed"),
+        true,
       );
 
       console.error(error);
@@ -302,6 +305,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.queueBroadcastAllElements.cancel();
     this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
+    this.clearCollabError();
 
     this.saveCollabRoomToFirebase(
       getSyncableElements(
@@ -470,7 +474,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.portal.socket.once("connect_error", fallbackInitializationHandler);
     } catch (error: any) {
       console.error(error);
-      this.setErrorMessage(error.message);
+      this.setCollabError(error.message);
       return null;
     }
 
@@ -929,8 +933,13 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   getActiveRoomLink = () => this.state.activeRoomLink;
 
-  setErrorMessage = (errorMessage: string | null) => {
-    if (errorMessage) {
+  setCollabError = (errorMessage: string | null, tooltip = false) => {
+    if (!tooltip) {
+      this.setState({
+        errorMessage,
+        shouldShouldDialog: true,
+      });
+    } else if (errorMessage) {
       if (this.state.dialogNotifiedErrors[errorMessage]) {
         this.setState({
           errorMessage,
@@ -958,7 +967,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   };
 
-  clearErrorMessage = () => {
+  clearCollabError = () => {
     this.setState({
       errorMessage: null,
     });
@@ -971,7 +980,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     return (
       <>
         {shouldShouldDialog && errorMessage != null && (
-          <ErrorDialog onClose={() => this.setErrorMessage(null)}>
+          <ErrorDialog onClose={() => this.setCollabError(null, true)}>
             {errorMessage}
           </ErrorDialog>
         )}
