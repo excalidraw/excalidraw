@@ -1,6 +1,6 @@
 import { generateNKeysBetween } from "fractional-indexing";
 import { mutateElement } from "./element/mutateElement";
-import { ExcalidrawElement } from "./element/types";
+import { ExcalidrawElement, OrderedExcalidrawElement } from "./element/types";
 import { InvalidFractionalIndexError } from "./errors";
 
 /**
@@ -28,13 +28,14 @@ import { InvalidFractionalIndexError } from "./errors";
  *
  * a) replace array with another ordered structure (i.e. ordered map, ordered tree, etc.)
  *    - we already have out of the box support for automatically syncing the indices with given ordered structure, by converting the structure to array and let it perform a sync
- * b) treat fractional indices as SSOT instead of relying on array-order: // TODO_FI_0: I might not need movedElements
- *    - always order based on fractional indices to the ordered structure
- *    - never fix incorrect indices, unless it's for backwards compatibility (restore) or unless merging two "scenes" together (collab, drop scene, lib import, etc.)
- *      - instead of sync on element/s insertion, get the fractional indices boundaries and insert the element/s within these boundaries
- *      - instead of sync on internal z-index-like actions, get the fractional indices indices boundaries and insert the element/s within these boundaries
- *      - instead of sync on restore, assume the elements are ordered already
- *    - offer alternative (i.e. incremental) APIs for hiding the fractional indexing implementation details for the host-apps
+ * b) treat fractional indices as SSOT instead of relying on array-order:
+ *    - always order based on fractional indices (as few times as possible) & ensure ordered type-safety
+ *    - only sync indices on boundaries when moved elements are unknown / expected incorrect (collab, host apps, reconciliation, etc.) or for backwards compatibility (restore)
+ *    - instead of performing sync on following actions, get the boundaries of moved elements first, generate the fractional indices in situ and re-order based on them afterwards
+ *      - new element/s insertion
+ *      - z-index-like actions (including grouping, duplicating, bounding text, etc.)
+ *      - drop scene, lib import, paste element/s, etc.
+ *    - offer alternative (i.e. incremental) APIs for hiding the fractional indexing implementation details
  *      - check related https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
  */
 type FractionalIndex = ExcalidrawElement["index"];
@@ -86,12 +87,12 @@ export const orderByFractionalIndex = (elements: ExcalidrawElement[]) => {
  * If the synchronization of @param movedElements fails or the result is not valid, it fallbacks to synchronizing all the invalid indices with the array order.
  * If @param movedElements are not passed, it synchronizes all the invalid indices with the array order.
  *
- * Can handle both undefined/null indices (restore, element/s insertions) and unordered indices (as a result of z-index actions, reconcilliation, updateScene, etc.).
+ * Can handle both undefined indices (restore, old scene/lib/element) and unordered indices (as a result of z-index actions, reconcilliation, updateScene, etc.).
  */
 export const syncFractionalIndices = (
   elements: readonly ExcalidrawElement[],
   movedElements?: Map<string, ExcalidrawElement>,
-) => {
+): OrderedExcalidrawElement[] => {
   try {
     // detect moved / invalid indices
     const indicesGroups = movedElements
@@ -235,12 +236,6 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
     return [undefined, i];
   };
 
-  // purposefully going from left as:
-  // - the biggest likelihood to have the same index on multiple clients is on the first element, as we are inserting new elements at the right side
-  // - in other words, if we would go from the right, two clients could often end up with different indices on the same, unchanged elements (i.e. client A inserts one element, but in the meantime client 2 inserts two)
-  // - we could still end up in this situation, but only in case one client changes the first element in the array, which does not happen that often (// TODO_FI_1: add tests)
-  // - if it does happen, the indices will shift and this client will win (on most elements) in reconcilitation due to the mutation (version increase)
-  // - in both ways, we might end up with duplicates which will need to be deduplicated during reconciliation
   let i = 0;
 
   while (i < elements.length) {

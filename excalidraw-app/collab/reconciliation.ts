@@ -1,13 +1,13 @@
-import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import { ExcalidrawElement, OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
 import { orderByFractionalIndex } from "../../packages/excalidraw/fractionalIndex";
 import { AppState } from "../../packages/excalidraw/types";
 import { arrayToMap } from "../../packages/excalidraw/utils";
 
-export type ReconciledElements = readonly ExcalidrawElement[] & {
+export type ReconciledElements = readonly OrderedExcalidrawElement[] & {
   _brand: "reconciledElements";
 };
 
-export type BroadcastedExcalidrawElement = ExcalidrawElement;
+export type BroadcastedExcalidrawElement = OrderedExcalidrawElement;
 
 const shouldDiscardRemoteElement = (
   localAppState: AppState,
@@ -33,13 +33,12 @@ const shouldDiscardRemoteElement = (
 };
 
 export const reconcileElements = (
-  localElements: readonly ExcalidrawElement[],
-  remoteElements: readonly BroadcastedExcalidrawElement[],
+  localElements: OrderedExcalidrawElement[],
+  remoteElements: OrderedExcalidrawElement[], // TODO_FI_3: maybe ordered
   localAppState: AppState,
 ): ReconciledElements => {
   const localElementsData = arrayToMap(localElements);
-
-  const reconciledElements: ExcalidrawElement[] = [];
+  const reconciledElements: OrderedExcalidrawElement[] = [];
   const added = new Set<string>();
 
   // process remote elements
@@ -69,8 +68,8 @@ export const reconcileElements = (
       added.add(localElement.id);
     }
   }
-
+  // TODO_FI: ordered & reconciled
   return orderByFractionalIndex(
     reconciledElements,
-  ) as readonly ExcalidrawElement[] as ReconciledElements;
+  ) as readonly OrderedExcalidrawElement[] as ReconciledElements;
 };

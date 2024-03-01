@@ -1,262 +1,338 @@
-import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import { expect } from "chai";
 import {
-  orderByFractionalIndex,
-  validateFractionalIndices,
-} from "../../packages/excalidraw/fractionalIndex";
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../../packages/excalidraw/element/types";
+import {
+  ReconciledElements,
+  reconcileElements,
+} from "../../excalidraw-app/collab/reconciliation";
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
-import { reconcileElements } from "../collab/reconciliation";
-import { InvalidFractionalIndexError } from "../../packages/excalidraw/errors";
+import { cloneJSON } from "../../packages/excalidraw/utils";
+import { syncFractionalIndices } from "../../packages/excalidraw/fractionalIndex";
 
-const SEPARATOR = ":";
-const NULL_PLACEHOLDER = "x";
-
-type Source = "L" | "R";
-
+type Id = string;
 type ElementLike = {
   id: string;
   version: number;
   versionNonce: number;
-  source: Source;
-  index: string | null;
+  index: string;
 };
 
-const createElementFromString = (stringEl: string): ElementLike => {
-  const [_source, id, _version, _versionNonce, _index] =
-    stringEl.split(SEPARATOR);
+type Cache = Record<string, ExcalidrawElement | undefined>;
 
-  const source = _source as Source;
-  const version =
-    _version === NULL_PLACEHOLDER ? randomInteger() : parseInt(_version);
-  const versionNonce =
-    _versionNonce === NULL_PLACEHOLDER
-      ? randomInteger()
-      : parseInt(_versionNonce);
-  const index = _index === NULL_PLACEHOLDER ? null : _index;
-
+const createElement = (opts: { uid: string } | ElementLike) => {
+  let uid: string;
+  let id: string;
+  let version: number | null;
+  let versionNonce: number | null = null;
+  if ("uid" in opts) {
+    const match = opts.uid.match(/^(\w+)(?::(\d+))?(?:\((\w+)\))?$/)!;
+    id = match[1];
+    version = match[2] ? parseInt(match[2]) : null;
+    uid = version ? `${id}:${version}` : id;
+  } else {
+    ({ id, version, versionNonce } = opts);
+    uid = id;
+  }
   return {
+    uid,
     id,
     version,
-    versionNonce,
-    source,
-    index,
+    versionNonce: versionNonce || randomInteger(),
   };
 };
 
-const testReconciled = (reconciled: ElementLike[], expected: ElementLike[]) => {
-  expect(reconciled.length).toBe(expected.length);
+const idsToElements = (
+  ids: (Id | ElementLike)[],
+  cache: Cache = {},
+): OrderedExcalidrawElement[] => {
+  return syncFractionalIndices(
+    ids.reduce((acc, _uid) => {
+      const { uid, id, version, versionNonce } = createElement(
+        typeof _uid === "string" ? { uid: _uid } : _uid,
+      );
+      const cached = cache[uid];
+      const elem = {
+        id,
+        version: version ?? 0,
+        versionNonce,
+        ...cached,
+      } as OrderedExcalidrawElement;
+      // @ts-ignore
+      cache[uid] = elem;
+      acc.push(elem);
+      return acc;
+    }, [] as OrderedExcalidrawElement[]),
+  );
+};
 
-  for (let i = 0; i < expected.length; i++) {
-    expect(reconciled[i].id).toBe(expected[i].id);
-    expect(reconciled[i].source).toBe(expected[i].source);
-    expect(reconciled[i].version).toBe(expected[i].version);
+const test = <U extends `${string}:${"L" | "R"}`>(
+  local: (Id | ElementLike)[],
+  remote: (Id | ElementLike)[],
+  target: U[],
+  bidirectional = true,
+) => {
+  const cache: Cache = {};
+  const _local = idsToElements(local, cache);
+  const _remote = idsToElements(remote, cache);
+  // console.log(
+  //   _local.map((x) => `${x.id}, ${x.index}`),
+  //   _remote.map((x) => `${x.id}, ${x.index}`),
+  // );
+
+  const _target = target.map((uid) => {
+    const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
+    return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
+  }) as any as ReconciledElements;
+  const remoteReconciled = reconcileElements(_local, _remote, {} as AppState);
+  // console.log(remoteReconciled.map((x) => `${x.id}, ${x.index}`));
+
+  expect(target.length).equal(remoteReconciled.length);
+  expect(remoteReconciled).deep.equal(_target, "remote reconciliation");
+
+  const __local = cloneJSON(_remote);
+  const __remote = cloneJSON(remoteReconciled);
+  if (bidirectional) {
+    try {
+      expect(
+        reconcileElements(
+          cloneJSON(__local),
+          cloneJSON(__remote as unknown as OrderedExcalidrawElement[]),
+          {} as AppState,
+        ),
+      ).deep.equal(remoteReconciled, "local re-reconciliation");
+    } catch (error: any) {
+      console.error("local original", __local);
+      console.error("remote reconciled", __remote);
+      throw error;
+    }
   }
 };
 
-const getReconciledAndExpectedElements = (
-  local: string[],
-  remote: string[],
-  expected: string[],
-  appState?: AppState,
-) => {
-  const localEls = local.map((ls) =>
-    createElementFromString(ls),
-  ) as any as ExcalidrawElement[];
-  const remoteEls = remote.map((rs) =>
-    createElementFromString(rs),
-  ) as any as ExcalidrawElement[];
+// -----------------------------------------------------------------------------
 
-  const expectedEls = expected.map((es) => createElementFromString(es));
+// TODO_FI: test the potential concurrency issues (always converging to the same result - though it should already be tested?)
+// TODO_FI: think about extending the test cases to cover fractional indices issues (also compared to previous intentions)
+describe("elements reconciliation", () => {
+  it("reconcileElements()", () => {
+    // -------------------------------------------------------------------------
+    //
+    // in following tests, we pass:
+    //  (1) an array of local elements and their version (:1, :2...)
+    //  (2) an array of remote elements and their version (:1, :2...)
+    //  (3) expected reconciled elements
+    //
+    // in the reconciled array:
+    //  :L means local element was resolved
+    //  :R means remote element was resolved
+    //
+    // if a remote element is prefixed with parentheses, the enclosed string:
+    //  (^) means the element is the first element in the array
+    //  (<id>) means the element is preceded by <id> element
+    //
+    // if versions are missing, it defaults to version 0
+    // -------------------------------------------------------------------------
 
-  const reconciledEls = reconcileElements(
-    localEls,
-    remoteEls,
-    appState ?? ({} as AppState),
-  ) as any as ElementLike[];
+    test(["A:1", "B:1", "C:1"], ["B:2"], ["A:L", "B:R", "C:L"]);
+    test(["A:1", "B:1", "C"], ["B:2", "A:2"], ["B:R", "A:R", "C:L"]);
+    test(["A:2", "B:1", "C"], ["B:2", "A:1"], ["A:L", "B:R", "C:L"]);
+    test(["A:1", "C:1"], ["B:1"], ["A:L", "B:R", "C:L"]);
+    test(["A", "B"], ["A:1"], ["A:R", "B:L"]);
+    test(["A"], ["A", "B"], ["A:L", "B:R"]);
+    test(["A"], ["A:1", "B"], ["A:R", "B:R"]);
+    test(["A:2"], ["A:1", "B"], ["A:L", "B:R"]);
+    test(["A:2"], ["B", "A:1"], ["A:L", "B:R"]);
+    test(["A:1"], ["B", "A:2"], ["B:R", "A:R"]);
+    test(["A"], ["A:1"], ["A:R"]);
+    test(["A", "B:1", "D"], ["B", "C:2", "A"], ["C:R", "A:R", "B:L", "D:L"]);
 
-  return [reconciledEls, expectedEls];
-};
+    // some of the following tests are kinda arbitrary and they're less
+    // likely to happen in real-world cases
+    test(["A", "B"], ["B:1", "A:1"], ["B:R", "A:R"]);
+    test(["A:2", "B:2"], ["B:1", "A:1"], ["A:L", "B:L"]);
+    test(["A", "B", "C"], ["A", "B:2", "G", "C"], ["A:L", "B:R", "G:R", "C:L"]);
+    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:R", "B:R", "C:L", "G:R"]);
 
-// TODO_FI_1: these tests are not really readable
-describe("reconcile without fractional indices", () => {
-  it("take higher version - remote", () => {
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      ["L:1:2:x:x", "L:2:1:x:x"],
-      ["R:1:3:x:x"],
-      ["R:1:3:x:x", "L:2:1:x:x"],
+    test(
+      ["A:2", "B:2", "C"],
+      ["D", "B:1", "A:3"],
+      ["D:R", "B:L", "A:R", "C:L"],
     );
-    testReconciled(reconciledEls, expectedEls);
-  });
-  it("take higher version - local", () => {
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      ["L:1:2:x:x", "L:2:2:x:x"],
-      ["R:1:3:x:x"],
-      ["R:1:3:x:x", "L:2:2:x:x"],
+    test(
+      ["A:2", "B:2", "C"],
+      ["D", "B:2", "A:3", "C"],
+      ["D:R", "B:L", "A:R", "C:L"],
     );
-    testReconciled(reconciledEls, expectedEls);
-  });
-  it("take higher version - mix few", () => {
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      ["L:1:2:x:x", "L:2:3:x:x"],
-      ["R:1:3:x:x", "R:2:2:x:x"],
-      ["R:1:3:x:x", "L:2:3:x:x"],
+    test(
+      ["A", "B", "C", "D", "E", "F"],
+      ["A", "B:2", "X", "E:2", "F", "Y"],
+      ["A:L", "B:R", "X:R", "C:L", "E:R", "D:L", "F:L", "Y:R"],
     );
-    testReconciled(reconciledEls, expectedEls);
-  });
-  it("take higher version - mix more", () => {
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      ["L:1:2:x:x", "L:2:3:x:x", "L:3:10:x:x"],
-      ["R:1:3:x:x", "R:2:2:x:x"],
-      ["R:1:3:x:x", "L:2:3:x:x", "L:3:10:x:x"],
+
+    test(
+      ["A", "B", "C"],
+      ["X", "Y", "Z"],
+      ["A:L", "X:R", "B:L", "Y:R", "C:L", "Z:R"],
     );
-    testReconciled(reconciledEls, expectedEls);
+
+    test(["A"], ["X", "Y"], ["A:L", "X:R", "Y:R"]);
+    test(["A"], ["X", "Y", "Z"], ["A:L", "X:R", "Y:R", "Z:R"]);
+    test(["A", "B"], ["C", "D", "F"], ["A:L", "C:R", "B:L", "D:R", "F:R"]);
+
+    test(
+      ["A", "B", "C", "D"],
+      ["C:1", "B", "D:1"],
+      ["A:L", "C:R", "B:L", "D:R"],
+    );
+    test(
+      ["B", "A", "C"],
+      ["X", "Y", "Z"],
+      ["B:L", "X:R", "A:L", "Y:R", "C:L", "Z:R"],
+    );
+    test(
+      ["A", "B", "C", "D", "E"],
+      ["X", "Y", "Z"],
+      ["A:L", "X:R", "B:L", "Y:R", "C:L", "Z:R", "D:L", "E:L"],
+    );
+    test(
+      ["A", "B", "C", "X", "D", "Y", "Z"],
+      ["A", "X", "Y", "Z"],
+      ["A:R", "B:L", "C:L", "X:R", "D:L", "Y:R", "Z:R"],
+    );
+    test(
+      ["A", "B", "C", "D", "E"],
+      ["C", "X", "A", "Y", "E:1"],
+      ["B:L", "C:L", "D:L", "X:R", "A:R", "Y:R", "E:R"],
+    );
+    test(
+      ["C:1", "B", "D:1"],
+      ["A", "B", "C:1", "D:1"],
+      ["A:R", "B:R", "C:R", "D:R"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "C:1", "B", "D:1"],
+      ["A:L", "C:R", "B:L", "D:R"],
+    );
+
+    test(
+      ["C:1", "B", "D:1"],
+      ["A", "B", "C:2", "D:1"],
+      ["A:R", "B:L", "C:R", "D:L"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["C", "X", "B", "Y", "A", "Z"],
+      ["C:R", "D:L", "X:R", "B:R", "Y:R", "A:R", "Z:R"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "B:1", "C:1"],
+      ["A:R", "B:R", "C:R", "D:L"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "C:1", "B:1"],
+      ["A:R", "C:R", "B:R", "D:L"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "C:1", "B", "D:1"],
+      ["A:R", "C:R", "B:R", "D:R"],
+    );
+
+    test(["A:1", "B:1", "C"], ["B:2"], ["A:L", "B:R", "C:L"]);
+    test(["A:1", "B:1", "C"], ["B:2", "C:2"], ["A:L", "B:R", "C:R"]);
+    test(["A", "B"], ["A", "C", "D"], ["A:R", "B:L", "C:R", "D:R"]);
+    test(["A", "B"], ["B", "C", "D"], ["A:L", "B:L", "C:R", "D:R"]);
+    test(["A", "B"], ["B:1"], ["A:L", "B:R"]);
+    test(["A:2", "B"], ["B:1"], ["A:L", "B:R"]);
+    test(["A:2", "B:2"], ["B:1"], ["A:L", "B:L"]);
+    test(["A:2", "B:2"], ["B:1", "C"], ["A:L", "B:L", "C:R"]);
+    test(["A:2", "B:2"], ["A", "C", "B:1"], ["A:L", "B:L", "C:R"]);
   });
-  it("take lower versionNonce", () => {
-    const length = Math.floor(Math.random() * 100);
-    const randomLocalVersionNonce: number[] = [];
-    const randomRemoteVersionNonce: number[] = [];
-    for (let i = 0; i < length; i++) {
-      randomLocalVersionNonce.push(randomInteger());
-      randomRemoteVersionNonce.push(randomInteger());
-    }
-    const local_input: string[] = [];
-    const remote_input: string[] = [];
-    const expected_input: string[] = [];
-    for (let i = 0; i < length; i++) {
-      local_input.push(`L:${i}:1:${randomLocalVersionNonce[i]}:x`);
-      remote_input.push(`R:${i}:1:${randomRemoteVersionNonce[i]}:x`);
-      const localOrRemote =
-        randomLocalVersionNonce[i] < randomRemoteVersionNonce[i];
-      expected_input.push(
-        `${localOrRemote ? "L" : "R"}:${i}:1:${
-          localOrRemote
-            ? randomLocalVersionNonce[i]
-            : randomRemoteVersionNonce[i]
-        }:x`,
+
+  it("test identical elements reconciliation", () => {
+    const testIdentical = (
+      local: ElementLike[],
+      remote: ElementLike[],
+      expected: Id[],
+    ) => {
+      const ret = reconcileElements(
+        local as any as OrderedExcalidrawElement[],
+        remote as any as OrderedExcalidrawElement[],
+        {} as AppState,
       );
-    }
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      local_input,
-      remote_input,
-      expected_input,
+
+      if (new Set(ret.map((x) => x.id)).size !== ret.length) {
+        throw new Error("reconcileElements: duplicate elements found");
+      }
+
+      expect(ret.map((x) => x.id)).to.deep.equal(expected);
+    };
+
+    // identical id/version/versionNonce/index
+    // -------------------------------------------------------------------------
+
+    testIdentical(
+      [{ id: "A", version: 1, versionNonce: 1, index: "a0" }],
+      [{ id: "A", version: 1, versionNonce: 1, index: "a0" }],
+      ["A"],
     );
-    testReconciled(reconciledEls, expectedEls);
-  });
-  it("identical elements", () => {
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      ["L:1:1:1:x", "L:2:2:2:x"],
-      ["R:1:1:1:x", "R:2:2:2:x"],
-      ["R:1:1:1:x", "R:2:2:2:x"],
+    testIdentical(
+      [
+        { id: "A", version: 1, versionNonce: 1, index: "a0" },
+        { id: "B", version: 1, versionNonce: 1, index: "a0" },
+      ],
+      [
+        { id: "B", version: 1, versionNonce: 1, index: "a0" },
+        { id: "A", version: 1, versionNonce: 1, index: "a0" },
+      ],
+      ["A", "B"],
     );
-    testReconciled(reconciledEls, expectedEls);
-  });
-  it("identical elements, different order", () => {
-    const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-      ["L:1:1:1:x", "L:2:2:2:x"],
-      ["R:2:2:2:x", "R:1:1:1:x"],
-      ["R:2:2:2:x", "R:1:1:1:x"],
-    );
-    testReconciled(reconciledEls, expectedEls);
+
+    // actually identical (arrays and element objects)
+    // -------------------------------------------------------------------------
+
+    const elements1 = [
+      {
+        id: "A",
+        version: 1,
+        versionNonce: 1,
+        index: "a0",
+      },
+      {
+        id: "B",
+        version: 1,
+        versionNonce: 1,
+        index: "a0",
+      },
+    ];
+
+    testIdentical(elements1, elements1, ["A", "B"]);
+    testIdentical(elements1, elements1.slice(), ["A", "B"]);
+    testIdentical(elements1.slice(), elements1, ["A", "B"]);
+    testIdentical(elements1.slice(), elements1.slice(), ["A", "B"]);
+
+    const el1 = {
+      id: "A",
+      version: 1,
+      versionNonce: 1,
+      index: "a0",
+    };
+    const el2 = {
+      id: "B",
+      version: 1,
+      versionNonce: 1,
+      index: "a0",
+    };
+    testIdentical([el1, el2], [el2, el1], ["A", "B"]);
   });
 });
-
-// TODO_FI_1: revisit
-// describe("reconcile with fractional indices", () => {
-//   it("order by fractional indices", () => {
-//     const first = generateKeyBetween(null, null);
-//     const second = generateKeyBetween(first, null);
-//     const third = generateKeyBetween(second, null);
-
-//     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-//       [`L:1:1:1:${first}`, `L:2:1:1:${second}`],
-//       // simulates a z-index change for (el.id = 1)
-//       [`R:1:2:x:${third}`],
-//       [`L:2:1:1${second}`, `R:1:2:x:${third}`],
-//     );
-
-//     testReconciled(reconciledEls, expectedEls);
-//   });
-
-//   it("order by fractional indices - longer", () => {
-//     const totalCount = Math.floor(Math.random() * 100 + 10);
-//     let nextKey = generateKeyBetween(null, null);
-
-//     const local_input: string[] = [];
-//     const remote_input: string[] = [];
-//     const expected_input: string[] = [];
-
-//     for (let i = 0; i < totalCount; i++) {
-//       nextKey = generateKeyBetween(nextKey, null);
-//       const localStr = `L:${i}:1:x:${nextKey}`;
-//       local_input.push(localStr);
-//       if (Math.random() > 0.5) {
-//         const remoteStr = `R:${i}:2:x:${generateJitteredKeyBetween(
-//           nextKey,
-//           null,
-//           base36CharSet,
-//         )}`;
-//         remote_input.push(remoteStr);
-//         expected_input.push(remoteStr);
-//       } else {
-//         expected_input.push(localStr);
-//       }
-//     }
-
-//     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-//       local_input,
-//       remote_input,
-//       expected_input,
-//     );
-
-//     testReconciled(
-//       reconciledEls,
-//       orderByFractionalIndex(
-//         expectedEls as any as ExcalidrawElement[],
-//       ) as any as ElementLike[],
-//     );
-//     expect(() =>
-//       validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
-//     ).not.toThrowError(InvalidFractionalIndexError);
-
-//     const localEls = local_input.map((ls) =>
-//       createElementFromString(ls),
-//     ) as any as ExcalidrawElement[];
-
-//     const localFractionalIndices = new Set(localEls.map((e) => e.index));
-//     const reconciledFractionalIndices = new Set(
-//       reconciledEls.map((e) => e.index),
-//     );
-
-//     let actualDiffCount = 0;
-//     for (const fi of localFractionalIndices) {
-//       if (!reconciledFractionalIndices.has(fi)) {
-//         actualDiffCount += 1;
-//       }
-//     }
-
-//     expect(actualDiffCount).toBe(remote_input.length);
-//   });
-
-//   it("should throw on duplicate indices as we don't update indices in reconciliation", () => {
-//     const first = generateKeyBetween(null, null);
-//     const second = generateKeyBetween(first, null);
-//     const third = generateKeyBetween(second, null);
-
-//     const [reconciledEls, expectedEls] = getReconciledAndExpectedElements(
-//       [`L:1:1:1:${first}`, `L:2:1:1:${second}`, `L:3:1:1:${third}`],
-//       // simulates a z-index change for (el.id = 1)
-//       [`R:1:2:x:${third}`],
-//       // order by id since R:1 and L:3 have the same fractional index and
-//       // id 1 comes before id 3
-//       [`L:2:1:1${second}`, `R:1:2:x:x`, `L:3:1:1:x`],
-//     );
-
-//     testReconciled(reconciledEls, expectedEls);
-
-//     // // we do not restore in reconciliation
-//     // // elements are instead restored in updateScene
-//     expect(() =>
-//       validateFractionalIndices(reconciledEls as any as ExcalidrawElement[]),
-//     ).toThrowError(InvalidFractionalIndexError);
-  // });
-// });
