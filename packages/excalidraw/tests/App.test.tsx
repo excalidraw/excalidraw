@@ -1,12 +1,12 @@
 import ReactDOM from "react-dom";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
 import { reseed } from "../random";
 import { render, queryByTestId } from "../tests/test-utils";
 
 import { Excalidraw } from "../index";
 import { vi } from "vitest";
 
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 describe("Test <App/>", () => {
   beforeEach(async () => {

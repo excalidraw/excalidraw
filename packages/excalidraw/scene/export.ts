@@ -11,14 +11,8 @@ import {
   getCommonBounds,
   getElementAbsoluteCoords,
 } from "../element/bounds";
-import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import {
-  arrayToMap,
-  cloneJSON,
-  distance,
-  getFontString,
-  toBrandedType,
-} from "../utils";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -42,35 +36,12 @@ import {
 import { newTextElement } from "../element";
 import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import Scene from "./Scene";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
 import { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
+import { renderStaticScene } from "../renderer/staticScene";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
-
-// getContainerElement and getBoundTextElement and potentially other helpers
-// depend on `Scene` which will not be available when these pure utils are
-// called outside initialized Excalidraw editor instance or even if called
-// from inside Excalidraw if the elements were never cached by Scene (e.g.
-// for library elements).
-//
-// As such, before passing the elements down, we need to initialize a custom
-// Scene instance and assign them to it.
-//
-// FIXME This is a super hacky workaround and we'll need to rewrite this soon.
-const __createSceneForElementsHack__ = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  const scene = new Scene();
-  // we can't duplicate elements to regenerate ids because we need the
-  // orig ids when embedding. So we do another hack of not mapping element
-  // ids to Scene instances so that we don't override the editor elements
-  // mapping.
-  // We still need to clone the objects themselves to regen references.
-  scene.replaceAllElements(cloneJSON(elements), false);
-  return scene;
-};
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   if (element.width <= maxWidth) {
@@ -214,9 +185,6 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
 ) => {
-  const tempScene = __createSceneForElementsHack__(elements);
-  elements = tempScene.getNonDeletedElements();
-
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
     appState.frameRendering ?? null,
@@ -282,8 +250,6 @@ export const exportToCanvas = async (
     },
   });
 
-  tempScene.destroy();
-
   return canvas;
 };
 
@@ -307,11 +273,6 @@ export const exportToSvg = async (
     exportingFrame?: ExcalidrawFrameLikeElement | null;
   },
 ): Promise<SVGSVGElement> => {
-  const tempScene = __createSceneForElementsHack__(
-    syncInvalidIndices(elements),
-  );
-  elements = tempScene.getNonDeletedElements();
-
   const frameRendering = getFrameRenderingConfig(
     opts?.exportingFrame ?? null,
     appState.frameRendering ?? null,
@@ -472,8 +433,6 @@ export const exportToSvg = async (
         : new Map(),
     },
   );
-
-  tempScene.destroy();
 
   return svgRoot;
 };

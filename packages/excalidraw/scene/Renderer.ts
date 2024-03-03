@@ -4,7 +4,9 @@ import {
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { cancelRender } from "../renderer/renderScene";
+import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
+import { renderStaticSceneThrottled } from "../renderer/staticScene";
+
 import { AppState } from "../types";
 import { memoize, toBrandedType } from "../utils";
 import Scene from "./Scene";
@@ -40,13 +42,19 @@ export class Renderer {
       const visibleElements: NonDeletedExcalidrawElement[] = [];
       for (const element of elementsMap.values()) {
         if (
-          isElementInViewport(element, width, height, {
-            zoom,
-            offsetLeft,
-            offsetTop,
-            scrollX,
-            scrollY,
-          })
+          isElementInViewport(
+            element,
+            width,
+            height,
+            {
+              zoom,
+              offsetLeft,
+              offsetTop,
+              scrollX,
+              scrollY,
+            },
+            elementsMap,
+          )
         ) {
           visibleElements.push(element);
         }
@@ -141,7 +149,8 @@ export class Renderer {
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)
   public destroy() {
-    cancelRender();
+    renderInteractiveSceneThrottled.cancel();
+    renderStaticSceneThrottled.cancel();
     this.getRenderableElements.clear();
   }
 }

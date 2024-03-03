@@ -36,10 +36,14 @@ import { syncMovedIndices } from "../fractionalIndex";
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
-      const ret = LinearElementEditor.duplicateSelectedPoints(appState);
+      const ret = LinearElementEditor.duplicateSelectedPoints(
+        appState,
+        elementsMap,
+      );
 
       if (!ret) {
         return false;

@@ -1,8 +1,8 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent } from "./test-utils";
 import { Excalidraw } from "../index";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";
 import {
@@ -13,13 +13,15 @@ import {
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
-import { arrayToMap } from "../utils";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(
+  InteractiveCanvas,
+  "renderInteractiveScene",
+);
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 beforeEach(() => {
   localStorage.clear();
@@ -76,7 +78,7 @@ describe("move element", () => {
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
     const line = UI.createElement("line", { x: 110, y: 50, size: 80 });
-    const elementsMap = arrayToMap(h.elements);
+    const elementsMap = h.app.scene.getNonDeletedElementsMap();
     // bind line to two rectangles
     bindOrUnbindLinearElement(
       line.get() as NonDeleted<ExcalidrawLinearElement>,
