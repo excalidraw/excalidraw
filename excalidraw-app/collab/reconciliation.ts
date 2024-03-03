@@ -1,7 +1,7 @@
 import { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
 import {
   orderByFractionalIndex,
-  syncFractionalIndices,
+  syncInvalidIndices,
 } from "../../packages/excalidraw/fractionalIndex";
 import { AppState } from "../../packages/excalidraw/types";
 import { MakeBrand } from "../../packages/excalidraw/utility-types";
@@ -79,7 +79,7 @@ export const reconcileElements = (
   const orderedElements = orderByFractionalIndex(reconciledElements);
 
   // de-duplicate indices
-  syncFractionalIndices(orderedElements);
+  syncInvalidIndices(orderedElements);
 
   return orderedElements as ReconciledExcalidrawElement[];
 };

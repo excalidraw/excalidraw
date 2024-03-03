@@ -17,7 +17,8 @@ import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
 import {
-  syncFractionalIndices,
+  syncInvalidIndices,
+  syncMovedIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
 import { arrayToMap } from "../utils";
@@ -39,7 +40,10 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   for (const element of allElements) {
     if (!element.isDeleted) {
       elements.push(element as NonDeleted<T>);
-      elementsMap.set(element.id, element as NonDeletedExcalidrawElement);
+      elementsMap.set(
+        element.id,
+        element as Ordered<NonDeletedExcalidrawElement>,
+      );
     }
   }
   return { elementsMap, elements };
@@ -281,7 +285,7 @@ class Scene {
       validateFractionalIndices(_nextElements.map((x) => x.index));
     }
 
-    this.elements = syncFractionalIndices(_nextElements);
+    this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
@@ -357,7 +361,7 @@ class Scene {
       ...this.elements.slice(index),
     ];
 
-    syncFractionalIndices(nextElements, arrayToMap([element]));
+    syncMovedIndices(nextElements, arrayToMap([element]));
 
     this.replaceAllElements(nextElements);
   }
@@ -375,7 +379,7 @@ class Scene {
       ...this.elements.slice(index),
     ];
 
-    syncFractionalIndices(nextElements, arrayToMap(elements));
+    syncMovedIndices(nextElements, arrayToMap(elements));
 
     this.replaceAllElements(nextElements);
   }

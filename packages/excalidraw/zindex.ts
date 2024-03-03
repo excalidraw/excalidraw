@@ -1,6 +1,6 @@
 import { isFrameLikeElement } from "./element/typeChecks";
 import { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./element/types";
-import { syncFractionalIndices } from "./fractionalIndex";
+import { syncMovedIndices } from "./fractionalIndex";
 import { getElementsInGroup } from "./groups";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
@@ -313,9 +313,8 @@ const shiftElementsByOne = (
           ];
   });
 
-  syncFractionalIndices(elements, targetElementsMap);
+  syncMovedIndices(elements, targetElementsMap);
 
-  // TODO_FI_2: filter out first and last elements (deleted elements could complicate the "visible change"); also on other z-index actions
   return elements;
 };
 
@@ -400,7 +399,7 @@ const shiftElementsToEnd = (
           ...trailingElements,
         ];
 
-  syncFractionalIndices(nextElements, targetElementsMap);
+  syncMovedIndices(nextElements, targetElementsMap);
 
   return nextElements;
 };

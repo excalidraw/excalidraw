@@ -10,7 +10,7 @@ import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
-import { syncFractionalIndices } from "../fractionalIndex";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -50,7 +50,7 @@ const writeData = (
       );
     fixBindingsAfterDeletion(elements, deletedElements);
     // TODO: will be replaced in #7348
-    syncFractionalIndices(elements);
+    syncInvalidIndices(elements);
 
     return {
       elements,

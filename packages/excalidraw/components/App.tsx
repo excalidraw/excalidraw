@@ -403,9 +403,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { syncFractionalIndices } from "../fractionalIndex";
 import FollowMode from "./FollowMode/FollowMode";
-
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -413,6 +411,7 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
+import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3106,7 +3105,7 @@ class App extends React.Component<AppProps, AppState> {
     const prevElements = this.scene.getElementsIncludingDeleted();
     const nextElements = [...prevElements, ...newElements];
 
-    syncFractionalIndices(nextElements, arrayToMap(newElements));
+    syncMovedIndices(nextElements, arrayToMap(newElements));
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
@@ -7244,10 +7243,7 @@ class App extends React.Component<AppProps, AppState> {
 
             const nextSceneElements = [...nextElements, ...elementsToAppend];
 
-            syncFractionalIndices(
-              nextSceneElements,
-              arrayToMap(elementsToAppend),
-            );
+            syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
 
             bindTextToShapeAfterDuplication(
               nextElements,
@@ -9580,9 +9576,7 @@ if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
         return this.app?.scene.getElementsIncludingDeleted();
       },
       set(elements: ExcalidrawElement[]) {
-        return this.app?.scene.replaceAllElements(
-          syncFractionalIndices(elements),
-        );
+        return this.app?.scene.replaceAllElements(syncInvalidIndices(elements));
       },
     },
   });

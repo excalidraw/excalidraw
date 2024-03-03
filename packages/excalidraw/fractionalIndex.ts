@@ -111,38 +111,16 @@ export const orderByFractionalIndex = (
 };
 
 /**
- * Synchronizes fractional indices of @param movedElements with the array order by mutating passed @param elements.
- * If the synchronization of @param movedElements fails or the result is not valid, it fallbacks to synchronizing all the invalid indices with the array order.
- * If @param movedElements are not passed, it synchronizes all the invalid indices with the array order.
- *
- * WARN: invalid indices sync (without @param movedElements) could modify elements which were not moved, therefore it is preferred always to pass @param movedElements explicitly.
+ * Synchronizes invalid fractional indices of moved elements with the array order by mutating passed elements.
+ * If the synchronization fails or the result is invalid, it fallbacks to `syncInvalidIndices`.
  */
-export const syncFractionalIndices = (
-  elements: readonly ExcalidrawElement[],
-  movedElements?: Map<string, ExcalidrawElement>,
-): OrderedExcalidrawElement[] => {
-  return movedElements
-    ? syncMovedIndices(elements, movedElements)
-    : syncInvalidIndices(elements);
-};
-
-const syncInvalidIndices = (elements: readonly ExcalidrawElement[]) => {
-  const indicesGroups = getInvalidIndicesGroups(elements);
-  const elementsUpdates = generateIndices(elements, indicesGroups);
-
-  for (const [element, update] of elementsUpdates) {
-    mutateElement(element, update, false);
-  }
-
-  return elements as OrderedExcalidrawElement[];
-};
-
-const syncMovedIndices = (
+export const syncMovedIndices = (
   elements: readonly ExcalidrawElement[],
   movedElements: Map<string, ExcalidrawElement>,
-) => {
+): OrderedExcalidrawElement[] => {
   try {
     const indicesGroups = getMovedIndicesGroups(elements, movedElements);
+
     // try generatating indices, throws on invalid movedElements
     const elementsUpdates = generateIndices(elements, indicesGroups);
 
@@ -164,7 +142,25 @@ const syncMovedIndices = (
 };
 
 /**
- * Get contiguous groups of indices of passed @param movedElements.
+ * Synchronizes all invalid fractional indices with the array order by mutating passed elements.
+ *
+ * WARN: could modify elements which were not moved, therefore it is preferred to use `syncMovedIndices` instead.
+ */
+export const syncInvalidIndices = (
+  elements: readonly ExcalidrawElement[],
+): OrderedExcalidrawElement[] => {
+  const indicesGroups = getInvalidIndicesGroups(elements);
+  const elementsUpdates = generateIndices(elements, indicesGroups);
+
+  for (const [element, update] of elementsUpdates) {
+    mutateElement(element, update, false);
+  }
+
+  return elements as OrderedExcalidrawElement[];
+};
+
+/**
+ * Get contiguous groups of indices of passed moved elements.
  *
  * NOTE: First and last elements within the groups are indices of lower and upper bounds.
  */
@@ -177,11 +173,27 @@ const getMovedIndicesGroups = (
   let i = 0;
 
   while (i < elements.length) {
-    if (movedElements.has(elements[i].id)) {
+    if (
+      movedElements.has(elements[i].id) &&
+      !isValidFractionalIndex(
+        elements[i]?.index,
+        elements[i - 1]?.index,
+        elements[i + 1]?.index,
+      )
+    ) {
       const indicesGroup = [i - 1, i]; // push the lower bound index as the first item
 
       while (++i < elements.length) {
-        if (!movedElements.has(elements[i].id)) {
+        if (
+          !(
+            movedElements.has(elements[i].id) &&
+            !isValidFractionalIndex(
+              elements[i]?.index,
+              elements[i - 1]?.index,
+              elements[i + 1]?.index,
+            )
+          )
+        ) {
           break;
         }
 

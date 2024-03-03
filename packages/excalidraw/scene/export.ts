@@ -45,7 +45,7 @@ import { newElementWith } from "../element/mutateElement";
 import Scene from "./Scene";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
 import { RenderableElementsMap } from "./types";
-import { syncFractionalIndices } from "../fractionalIndex";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -257,7 +257,7 @@ export const exportToCanvas = async (
       arrayToMap(elementsForRender),
     ),
     allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(elements),
+      arrayToMap(syncInvalidIndices(elements)),
     ),
     visibleElements: elementsForRender,
     scale,
@@ -308,7 +308,7 @@ export const exportToSvg = async (
   },
 ): Promise<SVGSVGElement> => {
   const tempScene = __createSceneForElementsHack__(
-    syncFractionalIndices(elements),
+    syncInvalidIndices(elements),
   );
   elements = tempScene.getNonDeletedElements();
 

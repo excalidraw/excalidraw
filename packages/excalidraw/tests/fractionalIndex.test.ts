@@ -1,6 +1,7 @@
 /* eslint-disable no-lone-blocks */
 import {
-  syncFractionalIndices,
+  syncInvalidIndices,
+  syncMovedIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
 import { API } from "./helpers/api";
@@ -10,10 +11,9 @@ import { ExcalidrawElement, FractionalIndex } from "../element/types";
 import { deepCopyElement } from "../element/newElement";
 import { generateKeyBetween } from "fractional-indexing";
 
-// TOFO_FI_4: consider adding benchmark for sync for 1k, 5k & 20k elements (worst & best cases)
 describe("sync invalid indices with array order", () => {
-  describe("should not sync empty array", () => {
-    testFractionalIndicesSync({
+  describe("should NOT sync empty array", () => {
+    testMovedIndicesSync({
       elements: [],
       movedElements: [],
       expect: {
@@ -22,7 +22,7 @@ describe("sync invalid indices with array order", () => {
       },
     });
 
-    testFractionalIndicesSync({
+    testInvalidIndicesSync({
       elements: [],
       expect: {
         unchangedElements: [],
@@ -31,8 +31,8 @@ describe("sync invalid indices with array order", () => {
     });
   });
 
-  describe("should not sync when index is well defined", () => {
-    testFractionalIndicesSync({
+  describe("should NOT sync when index is well defined", () => {
+    testMovedIndicesSync({
       elements: [{ id: "A", index: "a1" }],
       movedElements: [],
       expect: {
@@ -41,7 +41,7 @@ describe("sync invalid indices with array order", () => {
       },
     });
 
-    testFractionalIndicesSync({
+    testInvalidIndicesSync({
       elements: [{ id: "A", index: "a1" }],
       expect: {
         unchangedElements: ["A"],
@@ -50,8 +50,8 @@ describe("sync invalid indices with array order", () => {
     });
   });
 
-  describe("should not sync when indices are well defined", () => {
-    testFractionalIndicesSync({
+  describe("should NOT sync when indices are well defined", () => {
+    testMovedIndicesSync({
       elements: [
         { id: "A", index: "a1" },
         { id: "B", index: "a2" },
@@ -64,7 +64,7 @@ describe("sync invalid indices with array order", () => {
       },
     });
 
-    testFractionalIndicesSync({
+    testInvalidIndicesSync({
       elements: [
         { id: "A", index: "a1" },
         { id: "B", index: "a2" },
@@ -77,8 +77,8 @@ describe("sync invalid indices with array order", () => {
     });
   });
 
-  describe("should sync index even if it is valid", () => {
-    testFractionalIndicesSync({
+  describe("should NOT sync index when it is already valid", () => {
+    testMovedIndicesSync({
       elements: [
         { id: "A", index: "a2" },
         { id: "B", index: "a4" },
@@ -86,11 +86,11 @@ describe("sync invalid indices with array order", () => {
       movedElements: ["A"],
       expect: {
         validInput: true,
-        unchangedElements: ["B"],
+        unchangedElements: ["A", "B"],
       },
     });
 
-    testFractionalIndicesSync({
+    testMovedIndicesSync({
       elements: [
         { id: "A", index: "a2" },
         { id: "B", index: "a4" },
@@ -98,198 +98,41 @@ describe("sync invalid indices with array order", () => {
       movedElements: ["B"],
       expect: {
         validInput: true,
-        unchangedElements: ["A"],
-      },
-    });
-  });
-
-  // TODO_FI_2: likely it's not the fractional indices responsibility, double-check how to fix this
-  describe("should sync indices even if they are already valid", () => {
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a0" },
-        { id: "C", index: "a2" },
-      ],
-      movedElements: ["B", "C"],
-      expect: {
-        // should sync 'C' even though it's already on the top
-        unchangedElements: ["A"],
-      },
-    });
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a0" },
-        { id: "C", index: "a2" },
-      ],
-      movedElements: ["A", "B"],
-      expect: {
-        // should sync 'A', even though it's already on the bottom
-        unchangedElements: ["C"],
-      },
-    });
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a0" },
-        { id: "C", index: "a2" },
-      ],
-      expect: {
-        unchangedElements: ["A", "C"],
-      },
-    });
-  });
-
-  describe("should sync when fractional index is not defined", () => {
-    testFractionalIndicesSync({
-      elements: [{ id: "A" }],
-      movedElements: ["A"],
-      expect: {
-        unchangedElements: [],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [{ id: "A" }],
-      expect: {
-        unchangedElements: [],
-      },
-    });
-  });
-
-  describe("should sync when fractional indices are duplicated", () => {
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a1" },
-      ],
-      expect: {
-        unchangedElements: ["A"],
-      },
-    });
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a1" },
-      ],
-      expect: {
-        unchangedElements: ["A"],
-      },
-    });
-  });
-
-  describe("should sync when a fractional index is out of order", () => {
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a2" },
-        { id: "B", index: "a1" },
-      ],
-      movedElements: ["B"],
-      expect: {
-        unchangedElements: ["A"],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a2" },
-        { id: "B", index: "a1" },
-      ],
-      movedElements: ["A"],
-      expect: {
-        unchangedElements: ["B"],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a2" },
-        { id: "B", index: "a1" },
-      ],
-      expect: {
-        unchangedElements: ["A"],
-      },
-    });
-  });
-
-  describe("should sync when fractional indices are out of order", () => {
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a3" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-      ],
-      movedElements: ["B", "C"],
-      expect: {
-        unchangedElements: ["A"],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a3" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-      ],
-      expect: {
-        unchangedElements: ["A"],
-      },
-    });
-  });
-
-  describe("should sync when incorrect fractional index is in between correct ones ", () => {
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a0" },
-        { id: "C", index: "a2" },
-      ],
-      movedElements: ["B"],
-      expect: {
-        unchangedElements: ["A", "C"],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a0" },
-        { id: "C", index: "a2" },
-      ],
-      expect: {
-        unchangedElements: ["A", "C"],
-      },
-    });
-  });
-
-  describe("should sync when incorrect fractional index is on top and duplicated below", () => {
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-      ],
-      movedElements: ["C"],
-      expect: {
-        unchangedElements: ["A", "B"],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a1" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-      ],
-      expect: {
         unchangedElements: ["A", "B"],
       },
     });
   });
 
-  describe("should sync when given a mix of duplicate / invalid indices", () => {
-    testFractionalIndicesSync({
+  describe("should NOT sync indices when they are already valid", () => {
+    {
+      testMovedIndicesSync({
+        elements: [
+          { id: "A", index: "a1" },
+          { id: "B", index: "a0" },
+          { id: "C", index: "a2" },
+        ],
+        movedElements: ["B", "C"],
+        expect: {
+          // this should not sync 'C'
+          unchangedElements: ["A", "C"],
+        },
+      });
+
+      testMovedIndicesSync({
+        elements: [
+          { id: "A", index: "a1" },
+          { id: "B", index: "a0" },
+          { id: "C", index: "a2" },
+        ],
+        movedElements: ["A", "B"],
+        expect: {
+          // but this should sync 'A' as it's invalid!
+          unchangedElements: ["C"],
+        },
+      });
+    }
+
+    testMovedIndicesSync({
       elements: [
         { id: "A", index: "a0" },
         { id: "B", index: "a2" },
@@ -299,40 +142,12 @@ describe("sync invalid indices with array order", () => {
       ],
       movedElements: ["B", "D", "E"],
       expect: {
-        unchangedElements: ["A", "C"],
+        // should not sync 'E'
+        unchangedElements: ["A", "C", "E"],
       },
     });
 
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a0" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-        { id: "D", index: "a1" },
-        { id: "E", index: "a2" },
-      ],
-      movedElements: ["C", "D", "E"],
-      expect: {
-        unchangedElements: ["A", "B"],
-      },
-    });
-
-    testFractionalIndicesSync({
-      elements: [
-        { id: "A", index: "a0" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-        { id: "D", index: "a1" },
-        { id: "E", index: "a2" },
-      ],
-      expect: {
-        unchangedElements: ["A", "B"],
-      },
-    });
-  });
-
-  describe("should sync when given a mix of undefined / invalid indices", () => {
-    testFractionalIndicesSync({
+    testMovedIndicesSync({
       elements: [
         { id: "A" },
         { id: "B" },
@@ -347,11 +162,191 @@ describe("sync invalid indices with array order", () => {
       ],
       movedElements: ["A", "B", "D", "E", "F", "G", "J"],
       expect: {
-        unchangedElements: ["C", "H", "I"],
+        // should not sync 'D' and 'F'
+        unchangedElements: ["C", "D", "F"],
+      },
+    });
+  });
+
+  describe("should sync when fractional index is not defined", () => {
+    testMovedIndicesSync({
+      elements: [{ id: "A" }],
+      movedElements: ["A"],
+      expect: {
+        unchangedElements: [],
       },
     });
 
-    testFractionalIndicesSync({
+    testInvalidIndicesSync({
+      elements: [{ id: "A" }],
+      expect: {
+        unchangedElements: [],
+      },
+    });
+  });
+
+  describe("should sync when fractional indices are duplicated", () => {
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a1" },
+      ],
+      expect: {
+        unchangedElements: ["A"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a1" },
+      ],
+      expect: {
+        unchangedElements: ["A"],
+      },
+    });
+  });
+
+  describe("should sync when a fractional index is out of order", () => {
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a1" },
+      ],
+      movedElements: ["B"],
+      expect: {
+        unchangedElements: ["A"],
+      },
+    });
+
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a1" },
+      ],
+      movedElements: ["A"],
+      expect: {
+        unchangedElements: ["B"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a1" },
+      ],
+      expect: {
+        unchangedElements: ["A"],
+      },
+    });
+  });
+
+  describe("should sync when fractional indices are out of order", () => {
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a3" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+      ],
+      movedElements: ["B", "C"],
+      expect: {
+        unchangedElements: ["A"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a3" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+      ],
+      expect: {
+        unchangedElements: ["A"],
+      },
+    });
+  });
+
+  describe("should sync when incorrect fractional index is in between correct ones ", () => {
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a0" },
+        { id: "C", index: "a2" },
+      ],
+      movedElements: ["B"],
+      expect: {
+        unchangedElements: ["A", "C"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a0" },
+        { id: "C", index: "a2" },
+      ],
+      expect: {
+        unchangedElements: ["A", "C"],
+      },
+    });
+  });
+
+  describe("should sync when incorrect fractional index is on top and duplicated below", () => {
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+      ],
+      movedElements: ["C"],
+      expect: {
+        unchangedElements: ["A", "B"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+      ],
+      expect: {
+        unchangedElements: ["A", "B"],
+      },
+    });
+  });
+
+  describe("should sync when given a mix of duplicate / invalid indices", () => {
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a0" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+        { id: "D", index: "a1" },
+        { id: "E", index: "a2" },
+      ],
+      movedElements: ["C", "D", "E"],
+      expect: {
+        unchangedElements: ["A", "B"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a0" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+        { id: "D", index: "a1" },
+        { id: "E", index: "a2" },
+      ],
+      expect: {
+        unchangedElements: ["A", "B"],
+      },
+    });
+  });
+
+  describe("should sync when given a mix of undefined / invalid indices", () => {
+    testMovedIndicesSync({
       elements: [
         { id: "A" },
         { id: "B" },
@@ -370,7 +365,7 @@ describe("sync invalid indices with array order", () => {
       },
     });
 
-    testFractionalIndicesSync({
+    testInvalidIndicesSync({
       elements: [
         { id: "A" },
         { id: "B" },
@@ -391,7 +386,7 @@ describe("sync invalid indices with array order", () => {
 
   describe("should generate fractions for explicitly moved elements", () => {
     describe("should generate a fraction between 'A' and 'C'", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a1" },
           // doing actual fractions, without jitter 'a1' becomes 'a1V'
@@ -405,7 +400,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testInvalidIndicesSync({
         elements: [
           { id: "A", index: "a1" },
           { id: "B", index: "a1" },
@@ -419,7 +414,7 @@ describe("sync invalid indices with array order", () => {
     });
 
     describe("should generate fractions given duplicated indices", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a01" },
           { id: "B", index: "a01" },
@@ -435,7 +430,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a01" },
           { id: "B", index: "a01" },
@@ -451,7 +446,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a01" },
           { id: "B", index: "a01" },
@@ -467,7 +462,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testInvalidIndicesSync({
         elements: [
           { id: "A", index: "a01" },
           { id: "B", index: "a01" },
@@ -493,7 +488,7 @@ describe("sync invalid indices with array order", () => {
         id: `A_${index}`,
       }));
 
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         // elements without fractional index
         elements,
         movedElements: Array.from({ length }).map((_, index) => `A_${index}`),
@@ -502,7 +497,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testInvalidIndicesSync({
         // elements without fractional index
         elements,
         expect: {
@@ -520,7 +515,7 @@ describe("sync invalid indices with array order", () => {
 
         return {
           id: `A_${index}`,
-          // assigning only the last generated index, so sync can go down from there
+          // assigning the last generated index, so sync can go down from there
           // without jitter lastIndex is 'c4BZ' for 20000th element
           index: index === length - 1 ? lastIndex : undefined,
         };
@@ -531,7 +526,7 @@ describe("sync invalid indices with array order", () => {
       // remove last element
       movedElements.pop();
 
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements,
         movedElements,
         expect: {
@@ -539,7 +534,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testInvalidIndicesSync({
         elements,
         expect: {
           unchangedElements: [`A_${length - 1}`],
@@ -566,7 +561,7 @@ describe("sync invalid indices with array order", () => {
       // remove first element
       movedElements.shift();
 
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements,
         movedElements,
         expect: {
@@ -574,7 +569,7 @@ describe("sync invalid indices with array order", () => {
         },
       });
 
-      testFractionalIndicesSync({
+      testInvalidIndicesSync({
         elements,
         expect: {
           unchangedElements: [`A_0`],
@@ -585,7 +580,7 @@ describe("sync invalid indices with array order", () => {
 
   describe("should automatically fallback to fixing all invalid indices", () => {
     describe("should fallback to syncing duplicated indices when moved elements are empty", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a1" },
           { id: "B", index: "a1" },
@@ -601,7 +596,7 @@ describe("sync invalid indices with array order", () => {
     });
 
     describe("should fallback to syncing undefined / invalid indices when moved elements are empty", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a1" },
           { id: "B" },
@@ -617,7 +612,7 @@ describe("sync invalid indices with array order", () => {
     });
 
     describe("should fallback to syncing unordered indices when moved element is invalid", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a1" },
           { id: "B", index: "a2" },
@@ -631,7 +626,7 @@ describe("sync invalid indices with array order", () => {
     });
 
     describe("should fallback when trying to generate an index in between unordered elements", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a2" },
           { id: "B" },
@@ -648,7 +643,7 @@ describe("sync invalid indices with array order", () => {
     });
 
     describe("should fallback when trying to generate an index in between duplicate indices", () => {
-      testFractionalIndicesSync({
+      testMovedIndicesSync({
         elements: [
           { id: "A", index: "a01" },
           { id: "B" },
@@ -671,9 +666,9 @@ describe("sync invalid indices with array order", () => {
   });
 });
 
-function testFractionalIndicesSync(args: {
+function testMovedIndicesSync(args: {
   elements: { id: string; index?: string }[];
-  movedElements?: string[];
+  movedElements: string[];
   expect: {
     unchangedElements: string[];
     validInput?: true;
@@ -687,14 +682,31 @@ function testFractionalIndicesSync(args: {
     args.expect.unchangedElements.map((x) => ({ id: x })),
   );
 
-  const name = movedElements
-    ? "should sync invalid indices of moved elements or fallback"
-    : "should sync invalid indices of all elements";
-
   test(
-    name,
+    "should sync invalid indices of moved elements or fallback",
     elements,
     movedElements,
+    expectUnchangedElements,
+    args.expect.validInput,
+  );
+}
+
+function testInvalidIndicesSync(args: {
+  elements: { id: string; index?: string }[];
+  expect: {
+    unchangedElements: string[];
+    validInput?: true;
+  };
+}) {
+  const [elements] = prepareArguments(args.elements);
+  const expectUnchangedElements = arrayToMap(
+    args.expect.unchangedElements.map((x) => ({ id: x })),
+  );
+
+  test(
+    "should sync invalid indices of all elements",
+    elements,
+    undefined,
     expectUnchangedElements,
     args.expect.validInput,
   );
@@ -734,7 +746,9 @@ function test(
     const clonedElements = elements.map((x) => deepCopyElement(x));
 
     // Act
-    const syncedElements = syncFractionalIndices(clonedElements, movedElements);
+    const syncedElements = movedElements
+      ? syncMovedIndices(clonedElements, movedElements)
+      : syncInvalidIndices(clonedElements);
 
     expect(syncedElements.length).toBe(elements.length);
     expect(() =>

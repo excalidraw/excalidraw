@@ -10,7 +10,7 @@ import {
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
 import { cloneJSON } from "../../packages/excalidraw/utils";
-import { syncFractionalIndices } from "../../packages/excalidraw/fractionalIndex";
+import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
 
 type Id = string;
 type ElementLike = {
@@ -45,7 +45,7 @@ const createElement = (opts: { uid: string } | ElementLike) => {
 };
 
 const idsToElements = (ids: (Id | ElementLike)[], cache: Cache = {}) => {
-  return syncFractionalIndices(
+  return syncInvalidIndices(
     ids.reduce((acc, _uid) => {
       const { uid, id, version, versionNonce } = createElement(
         typeof _uid === "string" ? { uid: _uid } : _uid,

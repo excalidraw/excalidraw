@@ -29,11 +29,11 @@ import {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { syncFractionalIndices } from "../fractionalIndex";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
+import { syncMovedIndices } from "../fractionalIndex";
 
 export const actionUnbindText = register({
   name: "unbindText",
@@ -182,7 +182,7 @@ const pushTextAboveContainer = (
     (ele) => ele.id === container.id,
   );
   updatedElements.splice(containerIndex + 1, 0, textElement);
-  syncFractionalIndices(updatedElements, arrayToMap([container, textElement]));
+  syncMovedIndices(updatedElements, arrayToMap([container, textElement]));
 
   return updatedElements;
 };
@@ -202,7 +202,7 @@ const pushContainerBelowText = (
     (ele) => ele.id === textElement.id,
   );
   updatedElements.splice(textElementIndex, 0, container);
-  syncFractionalIndices(updatedElements, arrayToMap([container, textElement]));
+  syncMovedIndices(updatedElements, arrayToMap([container, textElement]));
 
   return updatedElements;
 };

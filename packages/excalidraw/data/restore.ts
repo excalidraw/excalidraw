@@ -45,7 +45,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
-import { syncFractionalIndices } from "../fractionalIndex";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 type RestoredAppState = Omit<
   AppState,
@@ -412,7 +412,7 @@ export const restoreElements = (
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  const restoredElements = syncFractionalIndices(
+  const restoredElements = syncInvalidIndices(
     (elements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained

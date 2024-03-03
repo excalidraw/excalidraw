@@ -7,7 +7,7 @@ import {
 import ExcalidrawApp from "../App";
 import { API } from "../../packages/excalidraw/tests/helpers/api";
 import { createUndoAction } from "../../packages/excalidraw/actions/actionHistory";
-import { syncFractionalIndices } from "../../packages/excalidraw/fractionalIndex";
+import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
 
 const { h } = window;
 
@@ -63,7 +63,7 @@ describe("collaboration", () => {
     await render(<ExcalidrawApp />);
     // To update the scene with deleted elements before starting collab
     updateSceneData({
-      elements: syncFractionalIndices([
+      elements: syncInvalidIndices([
         API.createElement({ type: "rectangle", id: "A" }),
         API.createElement({
           type: "rectangle",

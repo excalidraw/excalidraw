@@ -53,7 +53,7 @@ type _ExcalidrawElementBase = Readonly<{
   versionNonce: number;
   /** String in a fractional form defined by https://github.com/rocicorp/fractional-indexing.
       Used for ordering in multiplayer scenarios, such as during reconciliation or undo / redo.
-      Always kept in sync with the array order by `syncFractionalIndices`.
+      Always kept in sync with the array order by `syncMovedIndices` and `syncInvalidIndices`.
       Could be null, i.e. for new elements which were not yet assigned to the scene. */
   index: FractionalIndex | null;
   isDeleted: boolean;
@@ -288,7 +288,10 @@ export type NonDeletedElementsMap = Map<
  * Map of all excalidraw Scene elements, including deleted.
  * Not a subset. Use this type when you need access to current Scene elements.
  */
-export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
+export type SceneElementsMap = Map<
+  ExcalidrawElement["id"],
+  Ordered<ExcalidrawElement>
+> &
   MakeBrand<"SceneElementsMap">;
 
 /**
@@ -297,7 +300,7 @@ export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
  */
 export type NonDeletedSceneElementsMap = Map<
   ExcalidrawElement["id"],
-  NonDeletedExcalidrawElement
+  Ordered<NonDeletedExcalidrawElement>
 > &
   MakeBrand<"NonDeletedSceneElementsMap">;
 
