@@ -8,64 +8,24 @@ import {
 import { InvalidFractionalIndexError } from "./errors";
 
 /**
- * Happy concurrent collab flow without jitter:
- *
- * concurrent changes for clients 1) and 2):
- * 1) A, B, (C - a3) ("sync" performed by client 1, with / without moved elements)
- * 2) A, B, (D)      ("sync" not performed on client 2 - backwards comp. - worst case)
- *
- * restore ("sync" fixing just D in client 2): (here it could be just "restore of indices")
- * 1) A, B, (C - a3)
- * 2) A, B, (D - a3)
- *
- * reconciliation (reconcile -> order by index, id):
- * 1) A, B, D (a3), C (a3) -> A, B, C (a3), D (a3)
- * 2) A, B, C (a3), D (a3) -> A, B, C (a3), D (a3)
- *
- * updateScene -> replaceAllElements ("sync" fixing D in both client 1 & 2): (here I need consistent restore + fix of all invalid indices - for reliabilityr reasons same as during "restore")
- * 1) A, B, C (a3), D (a4)
- * 2) A, B, C (a3), D (a4)
- */
-
-// TODO_FI_3: it's already SSOT, array is just a "helper" for caching order (otherwise one would have to reorder each time) & backwards compatibility & abstracting away internal indices (i.e. automatically fallback).
-
-/**
  * Envisioned relation between array order and fractional indices:
  *
- * 1) array and its order should be still prefered in most situations, mostly from the outside (boundaries) as fractional indices are internal behaviour:
- * - it's easy enough to define the order of all element from the outside, without worrying about the underlying structure of fractional indices (i.e. host apps)
- * - we need to always keep the array support for backwards compatibility (restore) - old scenes, old libraries, supporting multiple excalidraw versions etc.
- * - it's impossible to guess the actually moved elements out from the next elements alone - we might end up modfiying the elements which didn't move,
- *   therefore for more granular control over z-index from the outside, we could additionally allow passing the actually moved elements (as we do internally)
+ * 1) Array (or array-like ordered data structure) should be used as a cache of elements order, hiding the internal fractional indices implementation.
+ * - it's undesirable to to perform reorder for each related operation, thefeore it's necessary to cache the order defined by fractional indices into an ordered data structure
+ * - it's easy enough to define the order of the elements from the outside (boundaries), without worrying about the underlying structure of fractional indices (especially for the host apps)
+ * - it's necessary to always keep the array support for backwards compatibility (restore) - old scenes, old libraries, supporting multiple excalidraw versions etc.
+ * - it's necessary to always keep the fractional indices in sync with the array order
+ * - elements with invalid indices should be detected and synced, without altering the already valid indices
  *
- * 2) fractional indices should be prefered internally over the array-order:
- * - whenever we have fractional indices present and expect the change in order, we order the elements by fractional indices (reconcillitation, undo / redo .etc)
- * - as the indices are encoded as part of the element, it opens up possibilties for incremental-like APIs
- *
- * In both cases we should make sure that our fractional indices are always synced with the array order. Elements with invalid indices should be detected and fixed,
- * without altering the already valid indices.
- *
- * Additionally, we should not get too coupled internally to fractional indices, as the actual underlying implementation might change in the future
- * (i.e. incorporating jitter, different charset, custom index structure etc.) or we might choose a different / additional structure (i.e. double linked list).
- * Also, in most cases it's more straighforward and less error prone to perform a simple internal array operation on top of all elements and
- * let the indices automatically sync with array order later, rather than having to deal with fractional indices.
- *
- * At some point it might be beneficial to deprecate the array and choose a different data structure (in each case we will need to keep the array sync for backwards compatibility) or treat indices as SSOT, few options:
- *
- * a) replace array with another ordered structure (i.e. ordered map, ordered tree, etc.)
- *    - we already have out of the box support for automatically syncing the indices with given ordered structure, by converting the structure to array and let it perform a sync
- * b) treat fractional indices as SSOT instead of relying on array-order:
- *    - always order based on fractional indices (as few times as possible) & ensure ordered type-safety
- *    - only sync indices on boundaries when moved elements are unknown / expected incorrect (collab, host apps, reconciliation, etc.) or for backwards compatibility (restore)
- *    - instead of performing sync on following actions, get the boundaries of moved elements first, generate the fractional indices in situ and re-order based on them afterwards
- *      - new element/s insertion
- *      - z-index-like actions (including grouping, duplicating, bounding text, etc.)
- *      - drop scene, lib import, paste element/s, etc.
- *    - offer alternative (i.e. incremental) APIs for hiding the fractional indexing implementation details
- *      - check related https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
+ * 2) Fractional indices should be used to reorder the elements, whenever the cached order is expected to be invalidated.
+ * - as the fractional indices are encoded as part of the elements, it opens up possibilties for incremental-like APIs
+ * - re-order based on fractional indices should be part of (multiplayer) operations such as reconcillitation & undo/redo
+ * - technically all the z-index actions could perform also re-order based on fractional indices,but in current state it would not bring much benefits,
+ *   as it's faster & more efficient to perform re-order based on array manipulation and later synchronisation of moved indices with the array order
  */
+
 /**
- * Ensure that @param elements have valid fractional indices.
+ * Ensure that all elements have valid fractional indices.
  *
  * @throws `InvalidFractionalIndexError` if invalid index is detected.
  */
@@ -86,13 +46,14 @@ export const validateFractionalIndices = (
 
 /**
  * Order the elements based on the fractional indices.
- * - when fractional indices are identical, break the tie based on the element.id
+ * - when fractional indices are identical, break the tie based on the element id
  * - when there is no fractional index in one of the elements, respect the order of the array
  */
 export const orderByFractionalIndex = (
   elements: OrderedExcalidrawElement[],
 ) => {
   return elements.sort((a, b) => {
+    // in case the indices are not the defined at runtime
     if (isOrderedElement(a) && isOrderedElement(b)) {
       if (a.index < b.index) {
         return -1;
@@ -105,7 +66,6 @@ export const orderByFractionalIndex = (
     }
 
     // defensively keep the array order
-    // in case the indices are not the defined at runtime
     return 1;
   });
 };
@@ -144,7 +104,7 @@ export const syncMovedIndices = (
 /**
  * Synchronizes all invalid fractional indices with the array order by mutating passed elements.
  *
- * WARN: could modify elements which were not moved, therefore it is preferred to use `syncMovedIndices` instead.
+ * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
 export const syncInvalidIndices = (
   elements: readonly ExcalidrawElement[],
@@ -377,8 +337,8 @@ const isOrderedElement = (
   element: ExcalidrawElement,
 ): element is OrderedExcalidrawElement => {
   // for now it's sufficient whether the index is there
-  // meaning the element was already ordered in the past
-  // meaning it is not a newly inserted element, not an unrestored element, etc.
+  // meaning, the element was already ordered in the past
+  // meaning, it is not a newly inserted element, not an unrestored element, etc.
   // it does not have to mean that the index itself is valid
   if (element.index) {
     return true;

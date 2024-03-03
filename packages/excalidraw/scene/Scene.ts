@@ -23,6 +23,7 @@ import {
 } from "../fractionalIndex";
 import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
+import { ENV } from "../constants";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
