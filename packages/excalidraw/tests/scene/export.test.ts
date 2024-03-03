@@ -133,7 +133,6 @@ describe("exportToSvg", () => {
   });
 
   it("with elements that have a link", async () => {
-    // TODO_FI: does not seem to be needed, though it seems to expect scene elemnents
     const svgElement = await exportUtils.exportToSvg(
       [rectangleWithLinkFixture],
       DEFAULT_OPTIONS,

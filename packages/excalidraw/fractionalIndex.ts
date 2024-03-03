@@ -1,7 +1,33 @@
 import { generateNKeysBetween } from "fractional-indexing";
 import { mutateElement } from "./element/mutateElement";
-import { ExcalidrawElement, OrderedExcalidrawElement } from "./element/types";
+import {
+  ExcalidrawElement,
+  FractionalIndex,
+  OrderedExcalidrawElement,
+} from "./element/types";
 import { InvalidFractionalIndexError } from "./errors";
+
+/**
+ * Happy concurrent collab flow without jitter:
+ *
+ * concurrent changes for clients 1) and 2):
+ * 1) A, B, (C - a3) ("sync" performed by client 1, with / without moved elements)
+ * 2) A, B, (D)      ("sync" not performed on client 2 - backwards comp. - worst case)
+ *
+ * restore ("sync" fixing just D in client 2): (here it could be just "restore of indices")
+ * 1) A, B, (C - a3)
+ * 2) A, B, (D - a3)
+ *
+ * reconciliation (reconcile -> order by index, id):
+ * 1) A, B, D (a3), C (a3) -> A, B, C (a3), D (a3)
+ * 2) A, B, C (a3), D (a3) -> A, B, C (a3), D (a3)
+ *
+ * updateScene -> replaceAllElements ("sync" fixing D in both client 1 & 2): (here I need consistent restore + fix of all invalid indices - for reliabilityr reasons same as during "restore")
+ * 1) A, B, C (a3), D (a4)
+ * 2) A, B, C (a3), D (a4)
+ */
+
+// TODO_FI_3: it's already SSOT, array is just a "helper" for caching order (otherwise one would have to reorder each time) & backwards compatibility & abstracting away internal indices (i.e. automatically fallback).
 
 /**
  * Envisioned relation between array order and fractional indices:
@@ -38,21 +64,21 @@ import { InvalidFractionalIndexError } from "./errors";
  *    - offer alternative (i.e. incremental) APIs for hiding the fractional indexing implementation details
  *      - check related https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1435020844
  */
-type FractionalIndex = ExcalidrawElement["index"];
-
 /**
  * Ensure that @param elements have valid fractional indices.
  *
  * @throws `InvalidFractionalIndexError` if invalid index is detected.
  */
-export const validateFractionalIndices = (indices: (string | undefined)[]) => {
+export const validateFractionalIndices = (
+  indices: (ExcalidrawElement["index"] | undefined)[],
+) => {
   for (const [i, index] of indices.entries()) {
     const predecessorIndex = indices[i - 1];
     const successorIndex = indices[i + 1];
 
     if (!isValidFractionalIndex(index, predecessorIndex, successorIndex)) {
       throw new InvalidFractionalIndexError(
-        `Fractional indices invariant for element has been compromised - ["${predecessorIndex}", "${index}", "${successorIndex}"] (predecessor, current, successor)`,
+        `Fractional indices invariant for element has been compromised - ["${predecessorIndex}", "${index}", "${successorIndex}"] [predecessor, current, successor]`,
       );
     }
   }
@@ -63,9 +89,11 @@ export const validateFractionalIndices = (indices: (string | undefined)[]) => {
  * - when fractional indices are identical, break the tie based on the element.id
  * - when there is no fractional index in one of the elements, respect the order of the array
  */
-export const orderByFractionalIndex = (elements: ExcalidrawElement[]) => {
+export const orderByFractionalIndex = (
+  elements: OrderedExcalidrawElement[],
+) => {
   return elements.sort((a, b) => {
-    if (a.index && b.index) {
+    if (isOrderedElement(a) && isOrderedElement(b)) {
       if (a.index < b.index) {
         return -1;
       } else if (a.index > b.index) {
@@ -76,70 +104,63 @@ export const orderByFractionalIndex = (elements: ExcalidrawElement[]) => {
       return a.id < b.id ? -1 : 1;
     }
 
-    // respect the order of the array
+    // defensively keep the array order
+    // in case the indices are not the defined at runtime
     return 1;
   });
 };
 
-// TODO_FI_3: should return ordered elements
 /**
  * Synchronizes fractional indices of @param movedElements with the array order by mutating passed @param elements.
  * If the synchronization of @param movedElements fails or the result is not valid, it fallbacks to synchronizing all the invalid indices with the array order.
  * If @param movedElements are not passed, it synchronizes all the invalid indices with the array order.
  *
- * Can handle both undefined indices (restore, old scene/lib/element) and unordered indices (as a result of z-index actions, reconcilliation, updateScene, etc.).
+ * WARN: invalid indices sync (without @param movedElements) could modify elements which were not moved, therefore it is preferred always to pass @param movedElements explicitly.
  */
 export const syncFractionalIndices = (
   elements: readonly ExcalidrawElement[],
   movedElements?: Map<string, ExcalidrawElement>,
 ): OrderedExcalidrawElement[] => {
+  return movedElements
+    ? syncMovedIndices(elements, movedElements)
+    : syncInvalidIndices(elements);
+};
+
+const syncInvalidIndices = (elements: readonly ExcalidrawElement[]) => {
+  const indicesGroups = getInvalidIndicesGroups(elements);
+  const elementsUpdates = generateIndices(elements, indicesGroups);
+
+  for (const [element, update] of elementsUpdates) {
+    mutateElement(element, update, false);
+  }
+
+  return elements as OrderedExcalidrawElement[];
+};
+
+const syncMovedIndices = (
+  elements: readonly ExcalidrawElement[],
+  movedElements: Map<string, ExcalidrawElement>,
+) => {
   try {
-    // detect moved / invalid indices
-    const indicesGroups = movedElements
-      ? getMovedIndicesGroups(elements, movedElements)
-      : getInvalidIndicesGroups(elements);
+    const indicesGroups = getMovedIndicesGroups(elements, movedElements);
+    // try generatating indices, throws on invalid movedElements
+    const elementsUpdates = generateIndices(elements, indicesGroups);
 
-    const elementsUpdates = new Map<ExcalidrawElement, { index: string }>();
-
-    // generate new indices
-    for (const indices of indicesGroups) {
-      const lowerBoundIndex = indices.shift()!;
-      const upperBoundIndex = indices.pop()!;
-
-      const nextIndices = generateNKeysBetween(
-        elements[lowerBoundIndex]?.index,
-        elements[upperBoundIndex]?.index,
-        indices.length,
-      );
-
-      for (let i = 0; i < indices.length; i++) {
-        const element = elements[indices[i]];
-
-        elementsUpdates.set(element, { index: nextIndices[i] });
-      }
-    }
-
-    // validate new indices before assigning
+    // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
       elements.map((x) => elementsUpdates.get(x)?.index || x.index),
     );
 
-    // split mutation so we don't end up in an incosistent state if one generation fails
+    // split mutation so we don't end up in an incosistent state
     for (const [element, update] of elementsUpdates) {
       mutateElement(element, update, false);
     }
   } catch (e) {
-    // ensure to not cycle here & let it re-throw on the second try
-    if (movedElements) {
-      // TODO_FI_2: do we have a possibility logging this into our telemetry?
-      // prefer to fallback to default sync over failing completely
-      syncFractionalIndices(elements, undefined);
-    } else {
-      throw e;
-    }
+    // fallback to default sync
+    syncInvalidIndices(elements);
   }
 
-  return elements;
+  return elements as OrderedExcalidrawElement[];
 };
 
 /**
@@ -186,14 +207,18 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
   const indicesGroups: number[][] = [];
 
   // once we find lowerBound / upperBound, it cannot be lower than that, so we cache it for better perf.
-  let lowerBound: FractionalIndex = undefined;
-  let upperBound: FractionalIndex = undefined;
+  let lowerBound: ExcalidrawElement["index"] | undefined = undefined;
+  let upperBound: ExcalidrawElement["index"] | undefined = undefined;
   let lowerBoundIndex: number = -1;
   let upperBoundIndex: number = 0;
 
   /** @returns maybe valid lowerBound */
-  const getLowerBound = (index: number): [string | undefined, number] => {
-    const lowerBound = elements[lowerBoundIndex]?.index;
+  const getLowerBound = (
+    index: number,
+  ): [ExcalidrawElement["index"] | undefined, number] => {
+    const lowerBound = elements[lowerBoundIndex]
+      ? elements[lowerBoundIndex].index
+      : undefined;
 
     // we are already iterating left to right, therefore there is no need for additional looping
     const candidate = elements[index - 1]?.index;
@@ -211,11 +236,15 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
   };
 
   /** @returns always valid upperBound */
-  const getUpperBound = (index: number): [string | undefined, number] => {
-    const upperBound = elements[upperBoundIndex]?.index;
+  const getUpperBound = (
+    index: number,
+  ): [ExcalidrawElement["index"] | undefined, number] => {
+    const upperBound = elements[upperBoundIndex]
+      ? elements[upperBoundIndex].index
+      : undefined;
 
     // cache hit! don't let it find the upper bound again
-    if (index < upperBoundIndex) {
+    if (upperBound && index < upperBoundIndex) {
       return [upperBound, upperBoundIndex];
     }
 
@@ -275,9 +304,9 @@ const getInvalidIndicesGroups = (elements: readonly ExcalidrawElement[]) => {
 };
 
 const isValidFractionalIndex = (
-  index: FractionalIndex,
-  predecessor: FractionalIndex,
-  successor: FractionalIndex,
+  index: ExcalidrawElement["index"] | undefined,
+  predecessor: ExcalidrawElement["index"] | undefined,
+  successor: ExcalidrawElement["index"] | undefined,
 ) => {
   if (!index) {
     return false;
@@ -299,4 +328,49 @@ const isValidFractionalIndex = (
 
   // only element in the array
   return !!index;
+};
+
+const generateIndices = (
+  elements: readonly ExcalidrawElement[],
+  indicesGroups: number[][],
+) => {
+  const elementsUpdates = new Map<
+    ExcalidrawElement,
+    { index: FractionalIndex }
+  >();
+
+  for (const indices of indicesGroups) {
+    const lowerBoundIndex = indices.shift()!;
+    const upperBoundIndex = indices.pop()!;
+
+    const fractionalIndices = generateNKeysBetween(
+      elements[lowerBoundIndex]?.index,
+      elements[upperBoundIndex]?.index,
+      indices.length,
+    ) as FractionalIndex[];
+
+    for (let i = 0; i < indices.length; i++) {
+      const element = elements[indices[i]];
+
+      elementsUpdates.set(element, {
+        index: fractionalIndices[i],
+      });
+    }
+  }
+
+  return elementsUpdates;
+};
+
+const isOrderedElement = (
+  element: ExcalidrawElement,
+): element is OrderedExcalidrawElement => {
+  // for now it's sufficient whether the index is there
+  // meaning the element was already ordered in the past
+  // meaning it is not a newly inserted element, not an unrestored element, etc.
+  // it does not have to mean that the index itself is valid
+  if (element.index) {
+    return true;
+  }
+
+  return false;
 };

@@ -1,18 +1,23 @@
-import { ExcalidrawElement, OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
-import { orderByFractionalIndex } from "../../packages/excalidraw/fractionalIndex";
+import { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
+import {
+  orderByFractionalIndex,
+  syncFractionalIndices,
+} from "../../packages/excalidraw/fractionalIndex";
 import { AppState } from "../../packages/excalidraw/types";
+import { MakeBrand } from "../../packages/excalidraw/utility-types";
 import { arrayToMap } from "../../packages/excalidraw/utils";
+import { SyncableExcalidrawElement } from "../data";
 
-export type ReconciledElements = readonly OrderedExcalidrawElement[] & {
-  _brand: "reconciledElements";
-};
+export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
+  MakeBrand<"ReconciledElement">;
 
-export type BroadcastedExcalidrawElement = OrderedExcalidrawElement;
+export type BroadcastedExcalidrawElement = OrderedExcalidrawElement &
+  MakeBrand<"BroadcastedElement">;
 
 const shouldDiscardRemoteElement = (
   localAppState: AppState,
-  local: ExcalidrawElement | undefined,
-  remote: BroadcastedExcalidrawElement,
+  local: OrderedExcalidrawElement | undefined,
+  remote: BroadcastedExcalidrawElement | SyncableExcalidrawElement,
 ): boolean => {
   if (
     local &&
@@ -33,10 +38,12 @@ const shouldDiscardRemoteElement = (
 };
 
 export const reconcileElements = (
-  localElements: OrderedExcalidrawElement[],
-  remoteElements: OrderedExcalidrawElement[], // TODO_FI_3: maybe ordered
+  localElements: readonly OrderedExcalidrawElement[],
+  remoteElements:
+    | readonly BroadcastedExcalidrawElement[]
+    | readonly SyncableExcalidrawElement[],
   localAppState: AppState,
-): ReconciledElements => {
+): ReconciledExcalidrawElement[] => {
   const localElementsData = arrayToMap(localElements);
   const reconciledElements: OrderedExcalidrawElement[] = [];
   const added = new Set<string>();
@@ -68,8 +75,11 @@ export const reconcileElements = (
       added.add(localElement.id);
     }
   }
-  // TODO_FI: ordered & reconciled
-  return orderByFractionalIndex(
-    reconciledElements,
-  ) as readonly OrderedExcalidrawElement[] as ReconciledElements;
+
+  const orderedElements = orderByFractionalIndex(reconciledElements);
+
+  // de-duplicate indices
+  syncFractionalIndices(orderedElements);
+
+  return orderedElements as ReconciledExcalidrawElement[];
 };

@@ -3,7 +3,10 @@ import {
   ExcalidrawElement,
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
-import { reconcileElements } from "../../excalidraw-app/collab/reconciliation";
+import {
+  BroadcastedExcalidrawElement,
+  reconcileElements,
+} from "../../excalidraw-app/collab/reconciliation";
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
 import { cloneJSON } from "../../packages/excalidraw/utils";
@@ -41,10 +44,7 @@ const createElement = (opts: { uid: string } | ElementLike) => {
   };
 };
 
-const idsToElements = (
-  ids: (Id | ElementLike)[],
-  cache: Cache = {},
-): OrderedExcalidrawElement[] => {
+const idsToElements = (ids: (Id | ElementLike)[], cache: Cache = {}) => {
   return syncFractionalIndices(
     ids.reduce((acc, _uid) => {
       const { uid, id, version, versionNonce } = createElement(
@@ -56,12 +56,12 @@ const idsToElements = (
         version: version ?? 0,
         versionNonce,
         ...cached,
-      } as OrderedExcalidrawElement;
+      } as ExcalidrawElement;
       // @ts-ignore
       cache[uid] = elem;
       acc.push(elem);
       return acc;
-    }, [] as OrderedExcalidrawElement[]),
+    }, [] as ExcalidrawElement[]),
   );
 };
 
@@ -73,13 +73,26 @@ const test = <U extends `${string}:${"L" | "R"}`>(
   const cache: Cache = {};
   const _local = idsToElements(local, cache);
   const _remote = idsToElements(remote, cache);
-  const remoteReconciled = reconcileElements(_local, _remote, {} as AppState);
 
-  expect(target.length).equal(remoteReconciled.length);
-  expect(remoteReconciled).deep.equal(
+  const reconciled = reconcileElements(
+    cloneJSON(_local),
+    cloneJSON(_remote) as BroadcastedExcalidrawElement[],
+    {} as AppState,
+  );
+
+  const reconciledIds = reconciled.map((x) => x.id);
+  const reconciledIndices = reconciled.map((x) => x.index);
+
+  expect(target.length).equal(reconciled.length);
+  expect(reconciledIndices.length).equal(new Set([...reconciledIndices]).size); // expect no duplicated indices
+  expect(reconciledIds).deep.equal(
     target.map((uid) => {
       const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
-      return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
+      const element = (source === "L" ? _local : _remote).find(
+        (e) => e.id === id,
+      )!;
+
+      return element.id;
     }),
     "remote reconciliation",
   );
@@ -87,8 +100,12 @@ const test = <U extends `${string}:${"L" | "R"}`>(
   // convergent reconciliation on the remote client
   try {
     expect(
-      reconcileElements(cloneJSON(_remote), cloneJSON(_local), {} as AppState),
-    ).deep.equal(remoteReconciled, "convergent reconciliation");
+      reconcileElements(
+        cloneJSON(_remote),
+        cloneJSON(_local as BroadcastedExcalidrawElement[]),
+        {} as AppState,
+      ).map((x) => x.id),
+    ).deep.equal(reconciledIds, "convergent reconciliation");
   } catch (error: any) {
     console.error("local original", _remote);
     console.error("remote original", _local);
@@ -100,20 +117,17 @@ const test = <U extends `${string}:${"L" | "R"}`>(
     expect(
       reconcileElements(
         cloneJSON(_remote),
-        cloneJSON(remoteReconciled as unknown as OrderedExcalidrawElement[]),
+        cloneJSON(reconciled as unknown as BroadcastedExcalidrawElement[]),
         {} as AppState,
-      ),
-    ).deep.equal(remoteReconciled, "local re-reconciliation");
+      ).map((x) => x.id),
+    ).deep.equal(reconciledIds, "local re-reconciliation");
   } catch (error: any) {
     console.error("local original", _remote);
-    console.error("remote reconciled", remoteReconciled);
+    console.error("remote reconciled", reconciled);
     throw error;
   }
 };
 
-// -----------------------------------------------------------------------------
-
-// TODO_FI_1: think about extending the test cases to cover fractional indices issues (also compared to previous intentions)
 describe("elements reconciliation", () => {
   it("reconcileElements()", () => {
     // -------------------------------------------------------------------------
@@ -166,7 +180,6 @@ describe("elements reconciliation", () => {
     );
 
     // fractional elements (previously annotated)
-    // -------------------------------------------------------------------------
     test(
       ["A", "B", "C"],
       ["A", "B", "X", "Y", "Z"],
@@ -197,6 +210,11 @@ describe("elements reconciliation", () => {
       ["A", "B", "C", "D", "E"],
       ["A", "X", "C", "Y", "D", "Z"],
       ["A:R", "B:L", "X:R", "C:R", "Y:R", "D:R", "E:L", "Z:R"],
+    );
+    test(
+      ["X", "Y", "Z"],
+      ["A", "B", "C"],
+      ["A:R", "X:L", "B:R", "Y:L", "C:R", "Z:L"],
     );
     test(
       ["X", "Y", "Z"],
@@ -285,8 +303,8 @@ describe("elements reconciliation", () => {
       expected: Id[],
     ) => {
       const ret = reconcileElements(
-        local as any as OrderedExcalidrawElement[],
-        remote as any as OrderedExcalidrawElement[],
+        local as unknown as OrderedExcalidrawElement[],
+        remote as unknown as BroadcastedExcalidrawElement[],
         {} as AppState,
       );
 

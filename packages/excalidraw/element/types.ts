@@ -24,6 +24,7 @@ export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
+export type FractionalIndex = string & { _brand: "franctionalIndex" };
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -50,8 +51,11 @@ type _ExcalidrawElementBase = Readonly<{
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */
   versionNonce: number;
-   // TODO_FI_3: would deserve some kind of brand
-  index: string | undefined; // TODO_FI: https://github.com/excalidraw/excalidraw/pull/7359#discussion_r1431205318
+  /** String in a fractional form defined by https://github.com/rocicorp/fractional-indexing.
+      Used for ordering in multiplayer scenarios, such as during reconciliation or undo / redo.
+      Always kept in sync with the array order by `syncFractionalIndices`.
+      Could be null, i.e. for new elements which were not yet assigned to the scene. */
+  index: FractionalIndex | null;
   isDeleted: boolean;
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
@@ -166,16 +170,17 @@ export type ExcalidrawElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
+export type Ordered<TElement extends ExcalidrawElement> = TElement & {
+  index: FractionalIndex;
+};
+
+export type OrderedExcalidrawElement = Ordered<ExcalidrawElement>;
+
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
-
-// TODO_FI_3: make it happen
-export type OrderedExcalidrawElement = ExcalidrawElement & {
-  index: string;
-};
 
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{

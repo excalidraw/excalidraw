@@ -6,6 +6,8 @@ import {
   ElementsMapOrArray,
   SceneElementsMap,
   NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
+  Ordered,
 } from "../element/types";
 import { isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -14,7 +16,10 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
-import { syncFractionalIndices } from "../fractionalIndex";
+import {
+  syncFractionalIndices,
+  validateFractionalIndices,
+} from "../fractionalIndex";
 import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
 
@@ -121,11 +126,13 @@ class Scene {
 
   private callbacks: Set<SceneStateCallback> = new Set();
 
-  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
+  private nonDeletedElements: readonly Ordered<NonDeletedExcalidrawElement>[] =
+    [];
   private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
     new Map(),
   );
-  private elements: readonly ExcalidrawElement[] = [];
+  // ideally all elements within the scene should be wrapped around with `Ordered` type, but right now there is no real benefit doing so
+  private elements: readonly OrderedExcalidrawElement[] = [];
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
@@ -149,12 +156,11 @@ class Scene {
     return this.nonDeletedElementsMap;
   }
 
-  // TODO_FI_3: should be branded as ordered
   getElementsIncludingDeleted() {
     return this.elements;
   }
 
-  getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
+  getNonDeletedElements() {
     return this.nonDeletedElements;
   }
 
@@ -263,13 +269,19 @@ class Scene {
     nextElements: ElementsMapOrArray,
     mapElementIds: boolean = true,
   ) {
-    this.elements = syncFractionalIndices(
-      // ts doesn't like `Array.isArray` of `instanceof Map`
+    // ts doesn't like `Array.isArray` of `instanceof Map`
+    const _nextElements =
       nextElements instanceof Array
         ? nextElements
-        : Array.from(nextElements.values()),
-    );
+        : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
+
+    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      // throw on invalid indices in test / dev to potentially detect cases were we forgot to sync moved elements
+      validateFractionalIndices(_nextElements.map((x) => x.index));
+    }
+
+    this.elements = syncFractionalIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
@@ -312,8 +324,8 @@ class Scene {
   }
 
   destroy() {
-    this.nonDeletedElements = [];
     this.elements = [];
+    this.nonDeletedElements = [];
     this.nonDeletedFramesLikes = [];
     this.frames = [];
     this.elementsMap.clear();
@@ -339,14 +351,13 @@ class Scene {
       );
     }
 
-    const nextElements = syncFractionalIndices(
-      [
-        ...this.elements.slice(0, index),
-        element,
-        ...this.elements.slice(index),
-      ],
-      arrayToMap([element]),
-    );
+    const nextElements = [
+      ...this.elements.slice(0, index),
+      element,
+      ...this.elements.slice(index),
+    ];
+
+    syncFractionalIndices(nextElements, arrayToMap([element]));
 
     this.replaceAllElements(nextElements);
   }
@@ -358,14 +369,13 @@ class Scene {
       );
     }
 
-    const nextElements = syncFractionalIndices(
-      [
-        ...this.elements.slice(0, index),
-        ...elements,
-        ...this.elements.slice(index),
-      ],
-      arrayToMap(elements),
-    );
+    const nextElements = [
+      ...this.elements.slice(0, index),
+      ...elements,
+      ...this.elements.slice(index),
+    ];
+
+    syncFractionalIndices(nextElements, arrayToMap(elements));
 
     this.replaceAllElements(nextElements);
   }

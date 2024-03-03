@@ -109,7 +109,6 @@ describe("export", () => {
   it("exporting svg containing transformed images", async () => {
     const normalizeAngle = (angle: number) => (angle / 180) * Math.PI;
 
-    // TODO_FI: revisit, seems not needed though
     const elements = [
       API.createElement({
         type: "image",

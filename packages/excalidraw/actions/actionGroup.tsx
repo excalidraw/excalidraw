@@ -94,7 +94,6 @@ export const actionGroup = register({
       }
     }
 
-    const prevElements = [...elements];
     let nextElements = [...elements];
 
     // this includes the case where we are grouping elements inside a frame
@@ -140,6 +139,12 @@ export const actionGroup = register({
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
+    const reorderedElements = [
+      ...elementsBeforeGroup,
+      ...elementsInGroup,
+      ...elementsAfterGroup,
+    ];
+    syncFractionalIndices(reorderedElements, arrayToMap(elementsInGroup));
 
     return {
       appState: {
@@ -150,10 +155,7 @@ export const actionGroup = register({
           getNonDeletedElements(nextElements),
         ),
       },
-      elements: syncFractionalIndices(
-        [...elementsBeforeGroup, ...elementsInGroup, ...elementsAfterGroup],
-        arrayToMap(elementsInGroup),
-      ),
+      elements: reorderedElements,
       commitToHistory: true,
     };
   },

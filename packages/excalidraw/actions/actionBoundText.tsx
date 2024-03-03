@@ -182,11 +182,9 @@ const pushTextAboveContainer = (
     (ele) => ele.id === container.id,
   );
   updatedElements.splice(containerIndex + 1, 0, textElement);
+  syncFractionalIndices(updatedElements, arrayToMap([container, textElement]));
 
-  return syncFractionalIndices(
-    updatedElements,
-    arrayToMap([container, textElement]),
-  );
+  return updatedElements;
 };
 
 const pushContainerBelowText = (
@@ -204,11 +202,9 @@ const pushContainerBelowText = (
     (ele) => ele.id === textElement.id,
   );
   updatedElements.splice(textElementIndex, 0, container);
+  syncFractionalIndices(updatedElements, arrayToMap([container, textElement]));
 
-  return syncFractionalIndices(
-    updatedElements,
-    arrayToMap([container, textElement]),
-  );
+  return updatedElements;
 };
 
 export const actionWrapTextInContainer = register({

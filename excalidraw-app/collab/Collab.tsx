@@ -10,6 +10,7 @@ import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
+  OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import {
   getSceneVersion,
@@ -70,7 +71,8 @@ import {
 } from "../../packages/excalidraw/element/typeChecks";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import {
-  ReconciledElements,
+  BroadcastedExcalidrawElement,
+  ReconciledExcalidrawElement,
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
 import { decryptData } from "../../packages/excalidraw/data/encryption";
@@ -407,7 +409,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
-  ): Promise<ImportedDataState | null> => {
+  ) => {
     if (!this.state.username) {
       import("@excalidraw/random-username").then(({ getRandomUsername }) => {
         const username = getRandomUsername();
@@ -433,7 +435,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
     }
 
-    const scenePromise = resolvablePromise<ImportedDataState | null>();
+    // TODO: `ImportedDataState` type here seems abused
+    const scenePromise = resolvablePromise<
+      | (ImportedDataState & { elements: readonly OrderedExcalidrawElement[] })
+      | null
+    >();
 
     this.setIsCollaborating(true);
     LocalData.pauseSave("collaboration");
@@ -680,17 +686,17 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private reconcileElements = (
     remoteElements: readonly ExcalidrawElement[],
-  ): ReconciledElements => {
-    // TODO_FI_3: should return ordered elements
+  ): ReconciledExcalidrawElement[] => {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
+    const restoredRemoteElements = restoreElements(
+      remoteElements,
+      null,
+    ) as BroadcastedExcalidrawElement[];
 
-    remoteElements = restoreElements(remoteElements, null);
-
-    // TODO_FI_3: should return ordered elements
     const reconciledElements = _reconcileElements(
       localElements,
-      remoteElements,
+      restoredRemoteElements,
       appState,
     );
 
@@ -721,7 +727,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   }, LOAD_IMAGES_TIMEOUT);
 
   private handleRemoteSceneUpdate = (
-    elements: ReconciledElements,
+    elements: ReconciledExcalidrawElement[],
     { init = false }: { init?: boolean } = {},
   ) => {
     this.excalidrawAPI.updateScene({
@@ -867,7 +873,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.portal.broadcastIdleChange(userState);
   };
 
-  broadcastElements = (elements: readonly ExcalidrawElement[]) => {
+  broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
@@ -878,7 +884,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   };
 
-  syncElements = (elements: readonly ExcalidrawElement[]) => {
+  syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
     this.broadcastElements(elements);
     this.queueSaveToFirebase();
   };

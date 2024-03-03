@@ -6,11 +6,11 @@ import {
 import { API } from "./helpers/api";
 import { arrayToMap } from "../utils";
 import { InvalidFractionalIndexError } from "../errors";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, FractionalIndex } from "../element/types";
 import { deepCopyElement } from "../element/newElement";
 import { generateKeyBetween } from "fractional-indexing";
 
-// TOFO_FI: consider adding benchmark for sync for 1k, 5k & 20k elements (worst & best cases)
+// TOFO_FI_4: consider adding benchmark for sync for 1k, 5k & 20k elements (worst & best cases)
 describe("sync invalid indices with array order", () => {
   describe("should not sync empty array", () => {
     testFractionalIndicesSync({
@@ -103,6 +103,7 @@ describe("sync invalid indices with array order", () => {
     });
   });
 
+  // TODO_FI_2: likely it's not the fractional indices responsibility, double-check how to fix this
   describe("should sync indices even if they are already valid", () => {
     testFractionalIndicesSync({
       elements: [
@@ -112,11 +113,10 @@ describe("sync invalid indices with array order", () => {
       ],
       movedElements: ["B", "C"],
       expect: {
-        // should sync "C" even though it's already on the top
+        // should sync 'C' even though it's already on the top
         unchangedElements: ["A"],
       },
     });
-
     testFractionalIndicesSync({
       elements: [
         { id: "A", index: "a1" },
@@ -125,11 +125,10 @@ describe("sync invalid indices with array order", () => {
       ],
       movedElements: ["A", "B"],
       expect: {
-        // should sync "A", even though it's already on the bottom
+        // should sync 'A', even though it's already on the bottom
         unchangedElements: ["C"],
       },
     });
-
     testFractionalIndicesSync({
       elements: [
         { id: "A", index: "a1" },
@@ -396,7 +395,7 @@ describe("sync invalid indices with array order", () => {
         elements: [
           { id: "A", index: "a1" },
           // doing actual fractions, without jitter 'a1' becomes 'a1V'
-          // as V is taken as the middle-right value
+          // as V is taken as the charset's middle-right value
           { id: "B", index: "a1" },
           { id: "C", index: "a2" },
         ],
@@ -584,7 +583,7 @@ describe("sync invalid indices with array order", () => {
     });
   });
 
-  describe("should automatically fallback to fixing all invalid indices given an invalid input", () => {
+  describe("should automatically fallback to fixing all invalid indices", () => {
     describe("should fallback to syncing duplicated indices when moved elements are empty", () => {
       testFractionalIndicesSync({
         elements: [
@@ -673,7 +672,7 @@ describe("sync invalid indices with array order", () => {
 });
 
 function testFractionalIndicesSync(args: {
-  elements: { id: string; index?: string }[]; // TODO_FI_3: the index should be either undefined (boundaries) or well defined
+  elements: { id: string; index?: string }[];
   movedElements?: string[];
   expect: {
     unchangedElements: string[];
@@ -689,7 +688,7 @@ function testFractionalIndicesSync(args: {
   );
 
   const name = movedElements
-    ? "should sync invalid indices of moved elements or fallback to fixing all invalid indices"
+    ? "should sync invalid indices of moved elements or fallback"
     : "should sync invalid indices of all elements";
 
   test(
@@ -705,7 +704,9 @@ function prepareArguments(
   elementsLike: { id: string; index?: string }[],
   movedElementsIds?: string[],
 ): [ExcalidrawElement[], Map<string, ExcalidrawElement> | undefined] {
-  const elements = elementsLike.map((x) => API.createElement(x));
+  const elements = elementsLike.map((x) =>
+    API.createElement({ id: x.id, index: x.index as FractionalIndex }),
+  );
   const movedMap = arrayToMap(movedElementsIds || []);
   const movedElements = movedElementsIds
     ? arrayToMap(elements.filter((x) => movedMap.has(x.id)))

@@ -181,6 +181,7 @@ import {
   IframeData,
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
+  Ordered,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -936,7 +937,7 @@ class App extends React.Component<AppProps, AppState> {
     const embeddableElements = this.scene
       .getNonDeletedElements()
       .filter(
-        (el): el is NonDeleted<ExcalidrawIframeLikeElement> =>
+        (el): el is Ordered<NonDeleted<ExcalidrawIframeLikeElement>> =>
           (isEmbeddableElement(el) &&
             this.embedsValidationStatus.get(el.id) === true) ||
           isIframeElement(el),
@@ -3103,10 +3104,9 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    const nextElements = syncFractionalIndices(
-      [...prevElements, ...newElements],
-      arrayToMap(newElements),
-    );
+    const nextElements = [...prevElements, ...newElements];
+
+    syncFractionalIndices(nextElements, arrayToMap(newElements));
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
@@ -7241,8 +7241,11 @@ class App extends React.Component<AppProps, AppState> {
                 nextElements.push(element);
               }
             }
-            const nextSceneElements = syncFractionalIndices(
-              [...nextElements, ...elementsToAppend],
+
+            const nextSceneElements = [...nextElements, ...elementsToAppend];
+
+            syncFractionalIndices(
+              nextSceneElements,
               arrayToMap(elementsToAppend),
             );
 

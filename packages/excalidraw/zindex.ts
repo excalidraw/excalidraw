@@ -313,8 +313,10 @@ const shiftElementsByOne = (
           ];
   });
 
+  syncFractionalIndices(elements, targetElementsMap);
+
   // TODO_FI_2: filter out first and last elements (deleted elements could complicate the "visible change"); also on other z-index actions
-  return syncFractionalIndices(elements, targetElementsMap);
+  return elements;
 };
 
 const shiftElementsToEnd = (
@@ -383,8 +385,7 @@ const shiftElementsToEnd = (
   const targetElements = Array.from(targetElementsMap.values());
   const leadingElements = elements.slice(0, leadingIndex);
   const trailingElements = elements.slice(trailingIndex + 1);
-
-  return syncFractionalIndices(
+  const nextElements =
     direction === "left"
       ? [
           ...leadingElements,
@@ -397,9 +398,11 @@ const shiftElementsToEnd = (
           ...displacedElements,
           ...targetElements,
           ...trailingElements,
-        ],
-    targetElementsMap,
-  );
+        ];
+
+  syncFractionalIndices(nextElements, targetElementsMap);
+
+  return nextElements;
 };
 
 function shiftElementsAccountingForFrames(
