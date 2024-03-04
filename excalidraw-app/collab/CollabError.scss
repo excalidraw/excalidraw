@@ -2,39 +2,13 @@
 
 .excalidraw {
   .collab-errors-button {
-    --button-bg: var(--color-danger);
-    --button-color: var(--color-surface-lowest);
-    --button-border: var(--color-danger);
+    width: 26px;
+    height: 26px;
+    margin-inline-end: 1rem;
 
-    --button-width: var(--lg-button-size);
-    --button-height: var(--lg-button-size);
-
-    --button-hover-bg: var(--color-danger-darker);
-    --button-hover-border: var(--color-danger-darker);
-
-    --button-active-bg: var(--color-danger-darker);
-
-    box-shadow: 0 0 0 1px var(--color-surface-lowest);
+    color: var(--color-danger);
 
     flex-shrink: 0;
-
-    margin-right: 6px;
-
-    // double .active to force specificity
-    &.active.active {
-      background-color: #0fb884;
-      border-color: #0fb884;
-
-      svg {
-        color: #fff;
-      }
-
-      &:hover,
-      &:active {
-        background-color: #0fb884;
-        border-color: #0fb884;
-      }
-    }
   }
 
   .collab-errors-button-shake {

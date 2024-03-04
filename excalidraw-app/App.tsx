@@ -54,7 +54,6 @@ import {
 import Collab, {
   CollabAPI,
   collabAPIAtom,
-  collabErrorAtom,
   isCollaboratingAtom,
   isOfflineAtom,
 } from "./collab/Collab";
@@ -105,7 +104,7 @@ import { openConfirmModal } from "../packages/excalidraw/components/OverwriteCon
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import CollabError, { DEFAULT_COLLAB_ERROR } from "./collab/CollabError";
+import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 
 polyfill();
 
@@ -312,10 +311,7 @@ const ExcalidrawWrapper = () => {
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
-  const [collabError] = useAtomWithInitialValue(
-    collabErrorAtom,
-    () => DEFAULT_COLLAB_ERROR,
-  );
+  const collabError = useAtomValue(collabErrorIndicatorAtom);
 
   useHandleLibrary({
     excalidrawAPI,
