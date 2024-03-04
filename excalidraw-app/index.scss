@@ -4,6 +4,13 @@
   &.theme--dark {
     --color-primary-contrast-offset: #726dff; // to offset Chubb illusion
   }
+
+  .top-right-ui {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .footer-center {
     justify-content: flex-end;
     margin-top: auto;
