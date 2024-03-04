@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
+import { CLASSES } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -31,7 +31,6 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
-  detectLineHeight,
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
