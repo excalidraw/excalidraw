@@ -44,6 +44,7 @@ import {
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
+import { THEME } from "../constants";
 
 export const SelectedShapeActions = ({
   appState,
@@ -306,6 +307,24 @@ export const ShapesSwitcher = ({
           title={t("toolBar.extraTools")}
         >
           {extraToolsIcon}
+          {app.props.aiEnabled !== false && (
+            <div
+              style={{
+                display: "inline-flex",
+                marginLeft: "auto",
+                padding: "2px 4px",
+                color: appState.theme === THEME.DARK ? "pink" : "#e93c5b",
+                borderRadius: 6,
+                fontSize: 8,
+                fontFamily: "Cascadia, monospace",
+                position: "absolute",
+                bottom: 7,
+                right: 2,
+              }}
+            >
+              AI
+            </div>
+          )}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}
