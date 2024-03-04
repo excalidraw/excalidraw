@@ -311,6 +311,23 @@ export const getLineHeightInPx = (
   return fontSize * lineHeight;
 };
 
+/**
+ * Calculates vertical offset for a text with alphabetic baseline.
+ */
+export const getVerticalOffset = (
+  fontFamily: ExcalidrawTextElement["fontFamily"],
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeightPx: number,
+) => {
+  const { unitsPerEm, ascender, descender } = FONT_METRICS[fontFamily];
+
+  const fontSizeEm = fontSize / unitsPerEm;
+  const lineGap = lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender;
+
+  const verticalOffset = fontSizeEm * ascender + lineGap;
+  return verticalOffset;
+};
+
 // FIXME rename to getApproxMinContainerHeight
 export const getApproxMinLineHeight = (
   fontSize: ExcalidrawTextElement["fontSize"],
@@ -901,7 +918,7 @@ type FontMetrics = {
  * Hardcoded metrics for default fonts, read by https://opentype.js.org/font-inspector.html.
  * For custom fonts, read these metrics on load and extend this object.
  */
-export const FONT_METRICS = {
+const FONT_METRICS = {
   [FONT_FAMILY.Virgil]: {
     unitsPerEm: 1000,
     ascender: 886,
