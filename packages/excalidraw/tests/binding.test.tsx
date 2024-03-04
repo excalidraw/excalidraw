@@ -5,6 +5,7 @@ import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import { arrayToMap } from "../utils";
 
 const { h } = window;
 
@@ -91,8 +92,12 @@ describe("element binding", () => {
     expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
     expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
-    const rotation = getTransformHandles(arrow, h.state.zoom, "mouse")
-      .rotation!;
+    const rotation = getTransformHandles(
+      arrow,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+    ).rotation!;
     const rotationHandleX = rotation[0] + rotation[2] / 2;
     const rotationHandleY = rotation[1] + rotation[3] / 2;
     mouse.down(rotationHandleX, rotationHandleY);

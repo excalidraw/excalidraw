@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
-import { updateActiveTool } from "../utils";
+import { arrayToMap, updateActiveTool } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
@@ -26,10 +26,12 @@ export const actionFinalize = register({
     _,
     { interactiveCanvas, focusContainer, scene },
   ) => {
+    const elementsMap = scene.getNonDeletedElementsMap();
+
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
-      const element = LinearElementEditor.getElement(elementId);
+      const element = LinearElementEditor.getElement(elementId, elementsMap);
 
       if (element) {
         if (isBindingElement(element)) {
@@ -37,6 +39,7 @@ export const actionFinalize = register({
             element,
             startBindingElement,
             endBindingElement,
+            elementsMap,
           );
         }
         return {
@@ -125,12 +128,14 @@ export const actionFinalize = register({
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           multiPointElement,
           -1,
+          arrayToMap(elements),
         );
         maybeBindLinearElement(
           multiPointElement,
           appState,
           Scene.getScene(multiPointElement)!,
           { x, y },
+          elementsMap,
         );
       }
     }
@@ -186,7 +191,7 @@ export const actionFinalize = register({
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
           multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(multiPointElement, scene)
+            ? new LinearElementEditor(multiPointElement)
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
