@@ -44,7 +44,6 @@ import {
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
-import { THEME } from "../constants";
 
 export const SelectedShapeActions = ({
   appState,
