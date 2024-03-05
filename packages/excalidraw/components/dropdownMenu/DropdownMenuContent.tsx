@@ -2,9 +2,12 @@ import { Island } from "../Island";
 import { useDevice } from "../App";
 import clsx from "clsx";
 import Stack from "../Stack";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { DropdownMenuContentPropsContext } from "./common";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
+import { KEYS } from "../../keys";
+import { EVENT } from "../../constants";
+import { useStable } from "../../hooks/useStable";
 
 const MenuContent = ({
   children,
@@ -25,9 +28,29 @@ const MenuContent = ({
   const device = useDevice();
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const callbacksRef = useStable({ onClickOutside });
+
   useOutsideClick(menuRef, () => {
-    onClickOutside?.();
+    callbacksRef.onClickOutside?.();
   });
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === KEYS.ESCAPE) {
+        event.stopImmediatePropagation();
+        callbacksRef.onClickOutside?.();
+      }
+    };
+
+    document.addEventListener(EVENT.KEYDOWN, onKeyDown, {
+      // so that we can stop propagation of the event before it reaches
+      // event handlers that were bound before this one
+      capture: true,
+    });
+    return () => {
+      document.removeEventListener(EVENT.KEYDOWN, onKeyDown);
+    };
+  }, [callbacksRef]);
 
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": device.editor.isMobile,
