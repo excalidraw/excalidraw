@@ -313,13 +313,14 @@ export const ShapesSwitcher = ({
                 display: "inline-flex",
                 marginLeft: "auto",
                 padding: "2px 4px",
-                color: appState.theme === THEME.DARK ? "pink" : "#e93c5b",
                 borderRadius: 6,
                 fontSize: 8,
                 fontFamily: "Cascadia, monospace",
                 position: "absolute",
-                bottom: 7,
-                right: 2,
+                background: "pink",
+                color: "black",
+                bottom: 3,
+                right: 4,
               }}
             >
               AI
