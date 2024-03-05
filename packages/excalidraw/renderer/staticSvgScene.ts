@@ -17,6 +17,7 @@ import {
   getBoundTextElement,
   getContainerElement,
   getLineHeightInPx,
+  getVerticalOffset,
 } from "../element/textElement";
 import {
   isArrowElement,
@@ -556,6 +557,11 @@ const renderElementToSvg = (
             : element.textAlign === "right"
             ? element.width
             : 0;
+        const verticalOffset = getVerticalOffset(
+          element.fontFamily,
+          element.fontSize,
+          lineHeightPx,
+        );
         const direction = isRTL(element.text) ? "rtl" : "ltr";
         const textAnchor =
           element.textAlign === "center"
@@ -567,14 +573,14 @@ const renderElementToSvg = (
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx}`);
+          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
-          text.setAttribute("dominant-baseline", "text-before-edge");
+          text.setAttribute("dominant-baseline", "alphabetic");
           node.appendChild(text);
         }
 
