@@ -50,6 +50,7 @@ import {
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
+  getVerticalOffset,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -383,16 +384,23 @@ const drawElementOnCanvas = (
             : element.textAlign === "right"
             ? element.width
             : 0;
+
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
         );
-        const verticalOffset = element.height - element.baseline;
+
+        const verticalOffset = getVerticalOffset(
+          element.fontFamily,
+          element.fontSize,
+          lineHeightPx,
+        );
+
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
             horizontalOffset,
-            (index + 1) * lineHeightPx - verticalOffset,
+            index * lineHeightPx + verticalOffset,
           );
         }
         context.restore();
