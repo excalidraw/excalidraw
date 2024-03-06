@@ -326,7 +326,8 @@ export const getVerticalOffset = (
   fontSize: ExcalidrawTextElement["fontSize"],
   lineHeightPx: number,
 ) => {
-  const { unitsPerEm, ascender, descender } = FONT_METRICS[fontFamily];
+  const { unitsPerEm, ascender, descender } =
+    FONT_METRICS[fontFamily] || FONT_METRICS[FONT_FAMILY.Helvetica];
 
   const fontSizeEm = fontSize / unitsPerEm;
   const lineGap = lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender;
@@ -952,6 +953,11 @@ const FONT_METRICS = {
     unitsPerEm: 2048,
     ascender: 1977,
     descender: -480,
+  },
+  [FONT_FAMILY.Assistant]: {
+    unitsPerEm: 1000,
+    ascender: 1050,
+    descender: -500,
   },
 } as Record<number, FontMetrics>;
 
