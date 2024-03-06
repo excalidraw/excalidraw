@@ -83,6 +83,7 @@ import { appJotaiStore } from "../app-jotai";
 import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
+import { collabErrorIndicatorAtom } from "./CollabError";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
@@ -90,6 +91,8 @@ export const isOfflineAtom = atom(false);
 
 interface CollabState {
   errorMessage: string | null;
+  /** errors related to saving */
+  dialogNotifiedErrors: Record<string, boolean>;
   username: string;
   activeRoomLink: string | null;
 }
@@ -109,7 +112,7 @@ export interface CollabAPI {
   setUsername: CollabInstance["setUsername"];
   getUsername: CollabInstance["getUsername"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
-  setErrorMessage: CollabInstance["setErrorMessage"];
+  setCollabError: CollabInstance["setErrorDialog"];
 }
 
 interface CollabProps {
@@ -131,6 +134,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     super(props);
     this.state = {
       errorMessage: null,
+      dialogNotifiedErrors: {},
       username: importUsernameFromLocalStorage() || "",
       activeRoomLink: null,
     };
@@ -199,7 +203,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       setUsername: this.setUsername,
       getUsername: this.getUsername,
       getActiveRoomLink: this.getActiveRoomLink,
-      setErrorMessage: this.setErrorMessage,
+      setCollabError: this.setErrorDialog,
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
@@ -278,18 +282,35 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         this.excalidrawAPI.getAppState(),
       );
 
+      this.resetErrorIndicator();
+
       if (this.isCollaborating() && savedData && savedData.reconciledElements) {
         this.handleRemoteSceneUpdate(
           this.reconcileElements(savedData.reconciledElements),
         );
       }
     } catch (error: any) {
-      this.setState({
-        // firestore doesn't return a specific error code when size exceeded
-        errorMessage: /is longer than.*?bytes/.test(error.message)
-          ? t("errors.collabSaveFailed_sizeExceeded")
-          : t("errors.collabSaveFailed"),
-      });
+      const errorMessage = /is longer than.*?bytes/.test(error.message)
+        ? t("errors.collabSaveFailed_sizeExceeded")
+        : t("errors.collabSaveFailed");
+
+      if (
+        !this.state.dialogNotifiedErrors[errorMessage] ||
+        !this.isCollaborating()
+      ) {
+        this.setErrorDialog(errorMessage);
+        this.setState({
+          dialogNotifiedErrors: {
+            ...this.state.dialogNotifiedErrors,
+            [errorMessage]: true,
+          },
+        });
+      }
+
+      if (this.isCollaborating()) {
+        this.setErrorIndicator(errorMessage);
+      }
+
       console.error(error);
     }
   };
@@ -298,6 +319,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.queueBroadcastAllElements.cancel();
     this.queueSaveToFirebase.cancel();
     this.loadImageFiles.cancel();
+    this.resetErrorIndicator(true);
 
     this.saveCollabRoomToFirebase(
       getSyncableElements(
@@ -470,7 +492,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.portal.socket.once("connect_error", fallbackInitializationHandler);
     } catch (error: any) {
       console.error(error);
-      this.setState({ errorMessage: error.message });
+      this.setErrorDialog(error.message);
       return null;
     }
 
@@ -931,8 +953,26 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   getActiveRoomLink = () => this.state.activeRoomLink;
 
-  setErrorMessage = (errorMessage: string | null) => {
-    this.setState({ errorMessage });
+  setErrorIndicator = (errorMessage: string | null) => {
+    appJotaiStore.set(collabErrorIndicatorAtom, {
+      message: errorMessage,
+      nonce: Date.now(),
+    });
+  };
+
+  resetErrorIndicator = (resetDialogNotifiedErrors = false) => {
+    appJotaiStore.set(collabErrorIndicatorAtom, { message: null, nonce: 0 });
+    if (resetDialogNotifiedErrors) {
+      this.setState({
+        dialogNotifiedErrors: {},
+      });
+    }
+  };
+
+  setErrorDialog = (errorMessage: string | null) => {
+    this.setState({
+      errorMessage,
+    });
   };
 
   render() {
@@ -941,7 +981,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     return (
       <>
         {errorMessage != null && (
-          <ErrorDialog onClose={() => this.setState({ errorMessage: null })}>
+          <ErrorDialog onClose={() => this.setErrorDialog(null)}>
             {errorMessage}
           </ErrorDialog>
         )}
