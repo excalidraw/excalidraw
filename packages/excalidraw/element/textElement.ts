@@ -953,6 +953,11 @@ const FONT_METRICS = {
     ascender: 1977,
     descender: -480,
   },
+  [FONT_FAMILY.Assistant]: {
+    unitsPerEm: 1000,
+    ascender: 1050,
+    descender: -500,
+  },
 } as Record<number, FontMetrics>;
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
