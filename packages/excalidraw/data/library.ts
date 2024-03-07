@@ -525,7 +525,7 @@ class AdapterTransaction {
 let lastSavedLibraryItemsHash = 0;
 let librarySaveCounter = 0;
 
-const getLibraryItemsHash = (items: LibraryItems) => {
+export const getLibraryItemsHash = (items: LibraryItems) => {
   return hashString(
     items
       .map((item) => {
