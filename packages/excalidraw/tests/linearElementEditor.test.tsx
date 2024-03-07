@@ -8,7 +8,9 @@ import {
 import { Excalidraw } from "../index";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
@@ -26,8 +28,11 @@ import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 
-const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(
+  InteractiveCanvas,
+  "renderInteractiveScene",
+);
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const { h } = window;
 const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
