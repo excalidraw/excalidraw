@@ -47,7 +47,9 @@ type LibraryUpdate = {
 // such as schema version
 export type LibraryPersistedData = { libraryItems: LibraryItems };
 
-const onLibraryUpdateEmitter = new Emitter<[update: LibraryUpdate]>();
+const onLibraryUpdateEmitter = new Emitter<
+  [update: LibraryUpdate, libraryItems: LibraryItems]
+>();
 
 export interface LibraryPersistenceAdapter {
   /**
@@ -202,6 +204,7 @@ class Library {
         // for internal use in `useHandleLibrary` hook
         onLibraryUpdateEmitter.trigger(
           createLibraryUpdate(prevLibraryItems, nextLibraryItems),
+          nextLibraryItems,
         );
       } catch (error) {
         console.error(error);
@@ -846,7 +849,8 @@ export const useHandleLibrary = (
     () => {
       // on update, merge with current library items and persist
       // -----------------------------------------------------------------------
-      const unsubOnLibraryUpdate = onLibraryUpdateEmitter.on(async (update) => {
+      const unsubOnLibraryUpdate = onLibraryUpdateEmitter.on(
+        async (update, nextLibraryItems) => {
         const isLoaded = isLibraryLoadedRef.current;
         // we want to operate with the latest adapter, but we don't want this
         // effect to rerun on every adapter change in case host apps' adapter
@@ -855,8 +859,17 @@ export const useHandleLibrary = (
           ("adapter" in optsRef.current && optsRef.current.adapter) || null;
         try {
           if (adapter) {
+              if (
+                // if nextLibraryItems hash identical to previously saved hash,
+                // exit early, even if actual upstream state ends up being
+                // different (e.g. has more data than we have locally), as it'd
+                // be low-impact scenario.
+                lastSavedLibraryItemsHash !=
+                getLibraryItemsHash(nextLibraryItems)
+              ) {
             await persistLibraryUpdate(adapter, update);
           }
+            }
         } catch (error: any) {
           console.error(
             `couldn't persist library update: ${error.message}`,
@@ -872,7 +885,8 @@ export const useHandleLibrary = (
             });
           }
         }
-      });
+        },
+      );
 
       const onUnload = (event: Event) => {
         if (librarySaveCounter) {
