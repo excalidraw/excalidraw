@@ -258,9 +258,8 @@ export const saveToFirebase = async (
 
     const prevDocData = snapshot.data() as FirebaseStoredScene;
     const prevElements = getSyncableElements(
-      await decryptElements(prevDocData, roomKey),
+      restoreElements(await decryptElements(prevDocData, roomKey), null),
     );
-
     const reconciledElements = getSyncableElements(
       reconcileElements(elements, prevElements, appState),
     );
@@ -287,7 +286,7 @@ export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
   socket: Socket | null,
-): Promise<readonly ExcalidrawElement[] | null> => {
+): Promise<readonly SyncableExcalidrawElement[] | null> => {
   const firebase = await loadFirestore();
   const db = firebase.firestore();
 
@@ -298,14 +297,14 @@ export const loadFromFirebase = async (
   }
   const storedScene = doc.data() as FirebaseStoredScene;
   const elements = getSyncableElements(
-    await decryptElements(storedScene, roomKey),
+    restoreElements(await decryptElements(storedScene, roomKey), null),
   );
 
   if (socket) {
     FirebaseSceneVersionCache.set(socket, elements);
   }
 
-  return restoreElements(elements, null);
+  return elements;
 };
 
 export const loadFilesFromFirebase = async (

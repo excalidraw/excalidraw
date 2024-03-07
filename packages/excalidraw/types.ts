@@ -20,6 +20,7 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
+  OrderedExcalidrawElement,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -182,7 +183,22 @@ export type InteractiveCanvasAppState = Readonly<
   }
 >;
 
-export interface AppState {
+export type ObservedAppState = ObservedStandaloneAppState &
+  ObservedElementsAppState;
+
+export type ObservedStandaloneAppState = {
+  name: AppState["name"];
+  viewBackgroundColor: AppState["viewBackgroundColor"];
+};
+
+export type ObservedElementsAppState = {
+  editingGroupId: AppState["editingGroupId"];
+  selectedElementIds: AppState["selectedElementIds"];
+  selectedGroupIds: AppState["selectedGroupIds"];
+  editingLinearElement: AppState["editingLinearElement"];
+};
+
+export type AppState = {
   contextMenu: {
     items: ContextMenuItems;
     top: number;
@@ -323,7 +339,7 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the clientIds of the users following the current user */
   followedBy: Set<SocketId>;
-}
+};
 
 export type UIAppState = Omit<
   AppState,
@@ -405,7 +421,7 @@ export type OnUserFollowedPayload = {
 
 export interface ExcalidrawProps {
   onChange?: (
-    elements: readonly ExcalidrawElement[],
+    elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
@@ -481,7 +497,7 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  commitToHistory?: boolean;
+  commitToStore?: boolean;
 };
 
 export enum UserIdleState {

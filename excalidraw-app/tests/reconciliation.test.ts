@@ -1,21 +1,23 @@
 import { expect } from "chai";
-import { PRECEDING_ELEMENT_KEY } from "../../packages/excalidraw/constants";
-import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../../packages/excalidraw/element/types";
 import {
   BroadcastedExcalidrawElement,
-  ReconciledElements,
   reconcileElements,
 } from "../../excalidraw-app/collab/reconciliation";
 import { randomInteger } from "../../packages/excalidraw/random";
 import { AppState } from "../../packages/excalidraw/types";
 import { cloneJSON } from "../../packages/excalidraw/utils";
+import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
 
 type Id = string;
 type ElementLike = {
   id: string;
   version: number;
   versionNonce: number;
-  [PRECEDING_ELEMENT_KEY]?: string | null;
+  index: string;
 };
 
 type Cache = Record<string, ExcalidrawElement | undefined>;
@@ -24,19 +26,14 @@ const createElement = (opts: { uid: string } | ElementLike) => {
   let uid: string;
   let id: string;
   let version: number | null;
-  let parent: string | null = null;
   let versionNonce: number | null = null;
   if ("uid" in opts) {
-    const match = opts.uid.match(
-      /^(?:\((\^|\w+)\))?(\w+)(?::(\d+))?(?:\((\w+)\))?$/,
-    )!;
-    parent = match[1];
-    id = match[2];
-    version = match[3] ? parseInt(match[3]) : null;
+    const match = opts.uid.match(/^(\w+)(?::(\d+))?$/)!;
+    id = match[1];
+    version = match[2] ? parseInt(match[2]) : null;
     uid = version ? `${id}:${version}` : id;
   } else {
     ({ id, version, versionNonce } = opts);
-    parent = parent || null;
     uid = id;
   }
   return {
@@ -44,116 +41,92 @@ const createElement = (opts: { uid: string } | ElementLike) => {
     id,
     version,
     versionNonce: versionNonce || randomInteger(),
-    [PRECEDING_ELEMENT_KEY]: parent || null,
   };
 };
 
-const idsToElements = (
-  ids: (Id | ElementLike)[],
-  cache: Cache = {},
-): readonly ExcalidrawElement[] => {
-  return ids.reduce((acc, _uid, idx) => {
-    const {
-      uid,
-      id,
-      version,
-      [PRECEDING_ELEMENT_KEY]: parent,
-      versionNonce,
-    } = createElement(typeof _uid === "string" ? { uid: _uid } : _uid);
-    const cached = cache[uid];
-    const elem = {
-      id,
-      version: version ?? 0,
-      versionNonce,
-      ...cached,
-      [PRECEDING_ELEMENT_KEY]: parent,
-    } as BroadcastedExcalidrawElement;
-    // @ts-ignore
-    cache[uid] = elem;
-    acc.push(elem);
-    return acc;
-  }, [] as ExcalidrawElement[]);
-};
-
-const addParents = (elements: BroadcastedExcalidrawElement[]) => {
-  return elements.map((el, idx, els) => {
-    el[PRECEDING_ELEMENT_KEY] = els[idx - 1]?.id || "^";
-    return el;
-  });
-};
-
-const cleanElements = (elements: ReconciledElements) => {
-  return elements.map((el) => {
-    // @ts-ignore
-    delete el[PRECEDING_ELEMENT_KEY];
-    // @ts-ignore
-    delete el.next;
-    // @ts-ignore
-    delete el.prev;
-    return el;
-  });
+const idsToElements = (ids: (Id | ElementLike)[], cache: Cache = {}) => {
+  return syncInvalidIndices(
+    ids.reduce((acc, _uid) => {
+      const { uid, id, version, versionNonce } = createElement(
+        typeof _uid === "string" ? { uid: _uid } : _uid,
+      );
+      const cached = cache[uid];
+      const elem = {
+        id,
+        version: version ?? 0,
+        versionNonce,
+        ...cached,
+      } as ExcalidrawElement;
+      // @ts-ignore
+      cache[uid] = elem;
+      acc.push(elem);
+      return acc;
+    }, [] as ExcalidrawElement[]),
+  );
 };
 
 const test = <U extends `${string}:${"L" | "R"}`>(
   local: (Id | ElementLike)[],
   remote: (Id | ElementLike)[],
   target: U[],
-  bidirectional = true,
 ) => {
   const cache: Cache = {};
   const _local = idsToElements(local, cache);
   const _remote = idsToElements(remote, cache);
-  const _target = target.map((uid) => {
-    const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
-    return (source === "L" ? _local : _remote).find((e) => e.id === id)!;
-  }) as any as ReconciledElements;
-  const remoteReconciled = reconcileElements(_local, _remote, {} as AppState);
-  expect(target.length).equal(remoteReconciled.length);
-  expect(cleanElements(remoteReconciled)).deep.equal(
-    cleanElements(_target),
+
+  const reconciled = reconcileElements(
+    cloneJSON(_local),
+    cloneJSON(_remote) as BroadcastedExcalidrawElement[],
+    {} as AppState,
+  );
+
+  const reconciledIds = reconciled.map((x) => x.id);
+  const reconciledIndices = reconciled.map((x) => x.index);
+
+  expect(target.length).equal(reconciled.length);
+  expect(reconciledIndices.length).equal(new Set([...reconciledIndices]).size); // expect no duplicated indices
+  expect(reconciledIds).deep.equal(
+    target.map((uid) => {
+      const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
+      const element = (source === "L" ? _local : _remote).find(
+        (e) => e.id === id,
+      )!;
+
+      return element.id;
+    }),
     "remote reconciliation",
   );
 
-  const __local = cleanElements(cloneJSON(_remote) as ReconciledElements);
-  const __remote = addParents(cleanElements(cloneJSON(remoteReconciled)));
-  if (bidirectional) {
-    try {
-      expect(
-        cleanElements(
-          reconcileElements(
-            cloneJSON(__local),
-            cloneJSON(__remote),
-            {} as AppState,
-          ),
-        ),
-      ).deep.equal(cleanElements(remoteReconciled), "local re-reconciliation");
-    } catch (error: any) {
-      console.error("local original", __local);
-      console.error("remote reconciled", __remote);
-      throw error;
-    }
+  // convergent reconciliation on the remote client
+  try {
+    expect(
+      reconcileElements(
+        cloneJSON(_remote),
+        cloneJSON(_local as BroadcastedExcalidrawElement[]),
+        {} as AppState,
+      ).map((x) => x.id),
+    ).deep.equal(reconciledIds, "convergent reconciliation");
+  } catch (error: any) {
+    console.error("local original", _remote);
+    console.error("remote original", _local);
+    throw error;
+  }
+
+  // bidirectional re-reconciliation on remote client
+  try {
+    expect(
+      reconcileElements(
+        cloneJSON(_remote),
+        cloneJSON(reconciled as unknown as BroadcastedExcalidrawElement[]),
+        {} as AppState,
+      ).map((x) => x.id),
+    ).deep.equal(reconciledIds, "local re-reconciliation");
+  } catch (error: any) {
+    console.error("local original", _remote);
+    console.error("remote reconciled", reconciled);
+    throw error;
   }
 };
-
-export const findIndex = <T>(
-  array: readonly T[],
-  cb: (element: T, index: number, array: readonly T[]) => boolean,
-  fromIndex: number = 0,
-) => {
-  if (fromIndex < 0) {
-    fromIndex = array.length + fromIndex;
-  }
-  fromIndex = Math.min(array.length, Math.max(fromIndex, 0));
-  let index = fromIndex - 1;
-  while (++index < array.length) {
-    if (cb(array[index], index, array)) {
-      return index;
-    }
-  }
-  return -1;
-};
-
-// -----------------------------------------------------------------------------
 
 describe("elements reconciliation", () => {
   it("reconcileElements()", () => {
@@ -168,25 +141,13 @@ describe("elements reconciliation", () => {
     //  :L means local element was resolved
     //  :R means remote element was resolved
     //
-    // if a remote element is prefixed with parentheses, the enclosed string:
-    //  (^) means the element is the first element in the array
-    //  (<id>) means the element is preceded by <id> element
-    //
     // if versions are missing, it defaults to version 0
     // -------------------------------------------------------------------------
-
-    // non-annotated elements
-    // -------------------------------------------------------------------------
-    // usually when we sync elements they should always be annotated with
-    // their (preceding elements) parents, but let's test a couple of cases when
-    // they're not for whatever reason (remote clients are on older version...),
-    // in which case the first synced element either replaces existing element
-    // or is pushed at the end of the array
 
     test(["A:1", "B:1", "C:1"], ["B:2"], ["A:L", "B:R", "C:L"]);
     test(["A:1", "B:1", "C"], ["B:2", "A:2"], ["B:R", "A:R", "C:L"]);
     test(["A:2", "B:1", "C"], ["B:2", "A:1"], ["A:L", "B:R", "C:L"]);
-    test(["A:1", "B:1"], ["C:1"], ["A:L", "B:L", "C:R"]);
+    test(["A:1", "C:1"], ["B:1"], ["A:L", "B:R", "C:L"]);
     test(["A", "B"], ["A:1"], ["A:R", "B:L"]);
     test(["A"], ["A", "B"], ["A:L", "B:R"]);
     test(["A"], ["A:1", "B"], ["A:R", "B:R"]);
@@ -194,23 +155,18 @@ describe("elements reconciliation", () => {
     test(["A:2"], ["B", "A:1"], ["A:L", "B:R"]);
     test(["A:1"], ["B", "A:2"], ["B:R", "A:R"]);
     test(["A"], ["A:1"], ["A:R"]);
-
-    // C isn't added to the end because it follows B (even if B was resolved
-    // to local version)
-    test(["A", "B:1", "D"], ["B", "C:2", "A"], ["B:L", "C:R", "A:R", "D:L"]);
+    test(["A", "B:1", "D"], ["B", "C:2", "A"], ["C:R", "A:R", "B:L", "D:L"]);
 
     // some of the following tests are kinda arbitrary and they're less
     // likely to happen in real-world cases
-
     test(["A", "B"], ["B:1", "A:1"], ["B:R", "A:R"]);
     test(["A:2", "B:2"], ["B:1", "A:1"], ["A:L", "B:L"]);
     test(["A", "B", "C"], ["A", "B:2", "G", "C"], ["A:L", "B:R", "G:R", "C:L"]);
-    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:L", "B:R", "G:R", "C:L"]);
-    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:L", "B:R", "G:R", "C:L"]);
+    test(["A", "B", "C"], ["A", "B:2", "G"], ["A:R", "B:R", "C:L", "G:R"]);
     test(
       ["A:2", "B:2", "C"],
       ["D", "B:1", "A:3"],
-      ["B:L", "A:R", "C:L", "D:R"],
+      ["D:R", "B:L", "A:R", "C:L"],
     );
     test(
       ["A:2", "B:2", "C"],
@@ -220,115 +176,124 @@ describe("elements reconciliation", () => {
     test(
       ["A", "B", "C", "D", "E", "F"],
       ["A", "B:2", "X", "E:2", "F", "Y"],
-      ["A:L", "B:R", "X:R", "E:R", "F:L", "Y:R", "C:L", "D:L"],
+      ["A:L", "B:R", "X:R", "C:L", "E:R", "D:L", "F:L", "Y:R"],
     );
 
-    // annotated elements
-    // -------------------------------------------------------------------------
-
+    // fractional elements (previously annotated)
     test(
       ["A", "B", "C"],
-      ["(B)X", "(A)Y", "(Y)Z"],
-      ["A:L", "B:L", "X:R", "Y:R", "Z:R", "C:L"],
+      ["A", "B", "X", "Y", "Z"],
+      ["A:R", "B:R", "C:L", "X:R", "Y:R", "Z:R"],
     );
 
-    test(["A"], ["(^)X", "Y"], ["X:R", "Y:R", "A:L"]);
-    test(["A"], ["(^)X", "Y", "Z"], ["X:R", "Y:R", "Z:R", "A:L"]);
-
-    test(
-      ["A", "B"],
-      ["(A)C", "(^)D", "F"],
-      ["A:L", "C:R", "D:R", "F:R", "B:L"],
-    );
+    test(["A"], ["X", "Y"], ["A:L", "X:R", "Y:R"]);
+    test(["A"], ["X", "Y", "Z"], ["A:L", "X:R", "Y:R", "Z:R"]);
+    test(["A", "B"], ["C", "D", "F"], ["A:L", "C:R", "B:L", "D:R", "F:R"]);
 
     test(
       ["A", "B", "C", "D"],
-      ["(B)C:1", "B", "D:1"],
+      ["C:1", "B", "D:1"],
       ["A:L", "C:R", "B:L", "D:R"],
     );
-
     test(
       ["A", "B", "C"],
-      ["(^)X", "(A)Y", "(B)Z"],
-      ["X:R", "A:L", "Y:R", "B:L", "Z:R", "C:L"],
+      ["X", "A", "Y", "B", "Z"],
+      ["X:R", "A:R", "Y:R", "B:L", "C:L", "Z:R"],
     );
-
     test(
       ["B", "A", "C"],
-      ["(^)X", "(A)Y", "(B)Z"],
-      ["X:R", "B:L", "A:L", "Y:R", "Z:R", "C:L"],
+      ["X", "A", "Y", "B", "Z"],
+      ["X:R", "A:R", "C:L", "Y:R", "B:R", "Z:R"],
     );
-
-    test(["A", "B"], ["(A)X", "(A)Y"], ["A:L", "X:R", "Y:R", "B:L"]);
-
+    test(["A", "B"], ["A", "X", "Y"], ["A:R", "B:L", "X:R", "Y:R"]);
     test(
       ["A", "B", "C", "D", "E"],
-      ["(A)X", "(C)Y", "(D)Z"],
-      ["A:L", "X:R", "B:L", "C:L", "Y:R", "D:L", "Z:R", "E:L"],
+      ["A", "X", "C", "Y", "D", "Z"],
+      ["A:R", "B:L", "X:R", "C:R", "Y:R", "D:R", "E:L", "Z:R"],
     );
-
     test(
       ["X", "Y", "Z"],
-      ["(^)A", "(A)B", "(B)C", "(C)X", "(X)D", "(D)Y", "(Y)Z"],
+      ["A", "B", "C"],
+      ["A:R", "X:L", "B:R", "Y:L", "C:R", "Z:L"],
+    );
+    test(
+      ["X", "Y", "Z"],
+      ["A", "B", "C", "X", "D", "Y", "Z"],
       ["A:R", "B:R", "C:R", "X:L", "D:R", "Y:L", "Z:L"],
     );
-
     test(
       ["A", "B", "C", "D", "E"],
-      ["(C)X", "(A)Y", "(D)E:1"],
-      ["A:L", "B:L", "C:L", "X:R", "Y:R", "D:L", "E:R"],
+      ["C", "X", "A", "Y", "D", "E:1"],
+      ["B:L", "C:L", "X:R", "A:R", "Y:R", "D:R", "E:R"],
     );
-
     test(
       ["C:1", "B", "D:1"],
       ["A", "B", "C:1", "D:1"],
-      ["A:R", "B:L", "C:L", "D:L"],
-    );
-
-    test(
-      ["A", "B", "C", "D"],
-      ["(A)C:1", "(C)B", "(B)D:1"],
-      ["A:L", "C:R", "B:L", "D:R"],
-    );
-
-    test(
-      ["A", "B", "C", "D"],
-      ["(A)C:1", "(C)B", "(B)D:1"],
-      ["A:L", "C:R", "B:L", "D:R"],
+      ["A:R", "B:R", "C:R", "D:R"],
     );
 
     test(
       ["C:1", "B", "D:1"],
-      ["(^)A", "(A)B", "(B)C:2", "(C)D:1"],
+      ["A", "B", "C:2", "D:1"],
       ["A:R", "B:L", "C:R", "D:L"],
     );
 
     test(
       ["A", "B", "C", "D"],
-      ["(C)X", "(B)Y", "(A)Z"],
-      ["A:L", "B:L", "C:L", "X:R", "Y:R", "Z:R", "D:L"],
+      ["A", "C:1", "B", "D:1"],
+      ["A:L", "C:R", "B:L", "D:R"],
     );
 
-    test(["A", "B", "C", "D"], ["(A)B:1", "C:1"], ["A:L", "B:R", "C:R", "D:L"]);
-    test(["A", "B", "C", "D"], ["(A)C:1", "B:1"], ["A:L", "C:R", "B:R", "D:L"]);
     test(
       ["A", "B", "C", "D"],
-      ["(A)C:1", "B", "D:1"],
-      ["A:L", "C:R", "B:L", "D:R"],
+      ["C", "X", "B", "Y", "A", "Z"],
+      ["C:R", "D:L", "X:R", "B:R", "Y:R", "A:R", "Z:R"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "B:1", "C:1"],
+      ["A:R", "B:R", "C:R", "D:L"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "C:1", "B:1"],
+      ["A:R", "C:R", "B:R", "D:L"],
+    );
+
+    test(
+      ["A", "B", "C", "D"],
+      ["A", "C:1", "B", "D:1"],
+      ["A:R", "C:R", "B:R", "D:R"],
     );
 
     test(["A:1", "B:1", "C"], ["B:2"], ["A:L", "B:R", "C:L"]);
     test(["A:1", "B:1", "C"], ["B:2", "C:2"], ["A:L", "B:R", "C:R"]);
-
-    test(["A", "B"], ["(A)C", "(B)D"], ["A:L", "C:R", "B:L", "D:R"]);
-    test(["A", "B"], ["(X)C", "(X)D"], ["A:L", "B:L", "C:R", "D:R"]);
-    test(["A", "B"], ["(X)C", "(A)D"], ["A:L", "D:R", "B:L", "C:R"]);
-    test(["A", "B"], ["(A)B:1"], ["A:L", "B:R"]);
-    test(["A:2", "B"], ["(A)B:1"], ["A:L", "B:R"]);
+    test(["A", "B"], ["A", "C", "B", "D"], ["A:R", "C:R", "B:R", "D:R"]);
+    test(["A", "B"], ["B", "C", "D"], ["A:L", "B:R", "C:R", "D:R"]);
+    test(["A", "B"], ["C", "D"], ["A:L", "C:R", "B:L", "D:R"]);
+    test(["A", "B"], ["A", "B:1"], ["A:L", "B:R"]);
+    test(["A:2", "B"], ["A", "B:1"], ["A:L", "B:R"]);
     test(["A:2", "B:2"], ["B:1"], ["A:L", "B:L"]);
     test(["A:2", "B:2"], ["B:1", "C"], ["A:L", "B:L", "C:R"]);
-    test(["A:2", "B:2"], ["(A)C", "B:1"], ["A:L", "C:R", "B:L"]);
-    test(["A:2", "B:2"], ["(A)C", "B:1"], ["A:L", "C:R", "B:L"]);
+    test(["A:2", "B:2"], ["A", "C", "B:1"], ["A:L", "B:L", "C:R"]);
+
+    // concurrent convergency
+    test(["A", "B", "C"], ["A", "B", "D"], ["A:R", "B:R", "C:L", "D:R"]);
+    test(["A", "B", "E"], ["A", "B", "D"], ["A:R", "B:R", "D:R", "E:L"]);
+    test(
+      ["A", "B", "C"],
+      ["A", "B", "D", "E"],
+      ["A:R", "B:R", "C:L", "D:R", "E:R"],
+    );
+    test(
+      ["A", "B", "E"],
+      ["A", "B", "D", "C"],
+      ["A:R", "B:R", "D:R", "E:L", "C:R"],
+    );
+    test(["A", "B"], ["B", "D"], ["A:L", "B:R", "D:R"]);
+    test(["C", "A", "B"], ["C", "B", "D"], ["C:R", "A:L", "B:R", "D:R"]);
   });
 
   it("test identical elements reconciliation", () => {
@@ -338,8 +303,8 @@ describe("elements reconciliation", () => {
       expected: Id[],
     ) => {
       const ret = reconcileElements(
-        local as any as ExcalidrawElement[],
-        remote as any as ExcalidrawElement[],
+        local as unknown as OrderedExcalidrawElement[],
+        remote as unknown as BroadcastedExcalidrawElement[],
         {} as AppState,
       );
 
@@ -350,35 +315,24 @@ describe("elements reconciliation", () => {
       expect(ret.map((x) => x.id)).to.deep.equal(expected);
     };
 
-    // identical id/version/versionNonce
+    // identical id/version/versionNonce/index
     // -------------------------------------------------------------------------
 
     testIdentical(
-      [{ id: "A", version: 1, versionNonce: 1 }],
-      [{ id: "A", version: 1, versionNonce: 1 }],
+      [{ id: "A", version: 1, versionNonce: 1, index: "a0" }],
+      [{ id: "A", version: 1, versionNonce: 1, index: "a0" }],
       ["A"],
     );
     testIdentical(
       [
-        { id: "A", version: 1, versionNonce: 1 },
-        { id: "B", version: 1, versionNonce: 1 },
+        { id: "A", version: 1, versionNonce: 1, index: "a0" },
+        { id: "B", version: 1, versionNonce: 1, index: "a0" },
       ],
       [
-        { id: "B", version: 1, versionNonce: 1 },
-        { id: "A", version: 1, versionNonce: 1 },
+        { id: "B", version: 1, versionNonce: 1, index: "a0" },
+        { id: "A", version: 1, versionNonce: 1, index: "a0" },
       ],
-      ["B", "A"],
-    );
-    testIdentical(
-      [
-        { id: "A", version: 1, versionNonce: 1 },
-        { id: "B", version: 1, versionNonce: 1 },
-      ],
-      [
-        { id: "B", version: 1, versionNonce: 1 },
-        { id: "A", version: 1, versionNonce: 1 },
-      ],
-      ["B", "A"],
+      ["A", "B"],
     );
 
     // actually identical (arrays and element objects)
@@ -389,13 +343,13 @@ describe("elements reconciliation", () => {
         id: "A",
         version: 1,
         versionNonce: 1,
-        [PRECEDING_ELEMENT_KEY]: null,
+        index: "a0",
       },
       {
         id: "B",
         version: 1,
         versionNonce: 1,
-        [PRECEDING_ELEMENT_KEY]: null,
+        index: "a0",
       },
     ];
 
@@ -408,13 +362,13 @@ describe("elements reconciliation", () => {
       id: "A",
       version: 1,
       versionNonce: 1,
-      [PRECEDING_ELEMENT_KEY]: null,
+      index: "a0",
     };
     const el2 = {
       id: "B",
       version: 1,
       versionNonce: 1,
-      [PRECEDING_ELEMENT_KEY]: null,
+      index: "a0",
     };
     testIdentical([el1, el2], [el2, el1], ["A", "B"]);
   });

@@ -17,7 +17,11 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
@@ -27,6 +31,8 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
+import { syncMovedIndices } from "../fractionalIndex";
+import { StoreAction } from "./types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -69,7 +75,7 @@ export const actionGroup = register({
     });
     if (selectedElements.length < 2) {
       // nothing to group
-      return { appState, elements, commitToHistory: false };
+      return { appState, elements, storeAction: StoreAction.NONE };
     }
     // if everything is already grouped into 1 group, there is nothing to do
     const selectedGroupIds = getSelectedGroupIds(appState);
@@ -89,7 +95,7 @@ export const actionGroup = register({
       ]);
       if (combinedSet.size === elementIdsInGroup.size) {
         // no incremental ids in the selected ids
-        return { appState, elements, commitToHistory: false };
+        return { appState, elements, storeAction: StoreAction.NONE };
       }
     }
 
@@ -131,18 +137,19 @@ export const actionGroup = register({
     // to the z order of the highest element in the layer stack
     const elementsInGroup = getElementsInGroup(nextElements, newGroupId);
     const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
-    const lastGroupElementIndex = nextElements.lastIndexOf(lastElementInGroup);
+    const lastGroupElementIndex = nextElements.lastIndexOf(
+      lastElementInGroup as OrderedExcalidrawElement,
+    );
     const elementsAfterGroup = nextElements.slice(lastGroupElementIndex + 1);
     const elementsBeforeGroup = nextElements
       .slice(0, lastGroupElementIndex)
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    nextElements = [
-      ...elementsBeforeGroup,
-      ...elementsInGroup,
-      ...elementsAfterGroup,
-    ];
+    const reorderedElements = syncMovedIndices(
+      [...elementsBeforeGroup, ...elementsInGroup, ...elementsAfterGroup],
+      arrayToMap(elementsInGroup),
+    );
 
     return {
       appState: {
@@ -153,8 +160,8 @@ export const actionGroup = register({
           getNonDeletedElements(nextElements),
         ),
       },
-      elements: nextElements,
-      commitToHistory: true,
+      elements: reorderedElements,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   contextItemLabel: "labels.group",
@@ -183,7 +190,7 @@ export const actionUngroup = register({
     const elementsMap = arrayToMap(elements);
 
     if (groupIds.length === 0) {
-      return { appState, elements, commitToHistory: false };
+      return { appState, elements, storeAction: StoreAction.NONE };
     }
 
     let nextElements = [...elements];
@@ -256,7 +263,7 @@ export const actionUngroup = register({
     return {
       appState: { ...appState, ...updateAppState },
       elements: nextElements,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

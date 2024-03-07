@@ -1,105 +1,125 @@
-import { Action, ActionResult } from "./types";
+import { useEffect, useState } from "react";
+import { Action, ActionResult, StoreAction } from "./types";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import History, { HistoryEntry } from "../history";
-import { ExcalidrawElement } from "../element/types";
+import { History, HistoryChangedEvent } from "../history";
 import { AppState } from "../types";
 import { KEYS } from "../keys";
-import { newElementWith } from "../element/mutateElement";
-import { fixBindingsAfterDeletion } from "../element/binding";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
+import { SceneElementsMap } from "../element/types";
+import { IStore } from "../store";
 
 const writeData = (
-  prevElements: readonly ExcalidrawElement[],
-  appState: AppState,
-  updater: () => HistoryEntry | null,
+  appState: Readonly<AppState>,
+  updater: () => [SceneElementsMap, AppState] | void,
 ): ActionResult => {
-  const commitToHistory = false;
   if (
     !appState.multiElement &&
     !appState.resizingElement &&
     !appState.editingElement &&
     !appState.draggingElement
   ) {
-    const data = updater();
-    if (data === null) {
-      return { commitToHistory };
+    const result = updater();
+
+    if (!result) {
+      return { storeAction: StoreAction.NONE };
     }
 
-    const prevElementMap = arrayToMap(prevElements);
-    const nextElements = data.elements;
-    const nextElementMap = arrayToMap(nextElements);
-
-    const deletedElements = prevElements.filter(
-      (prevElement) => !nextElementMap.has(prevElement.id),
-    );
-    const elements = nextElements
-      .map((nextElement) =>
-        newElementWith(
-          prevElementMap.get(nextElement.id) || nextElement,
-          nextElement,
-        ),
-      )
-      .concat(
-        deletedElements.map((prevElement) =>
-          newElementWith(prevElement, { isDeleted: true }),
-        ),
-      );
-    fixBindingsAfterDeletion(elements, deletedElements);
+    const [nextElementsMap, nextAppState] = result;
+    const nextElements = Array.from(nextElementsMap.values());
 
     return {
-      elements,
-      appState: { ...appState, ...data.appState },
-      commitToHistory,
-      syncHistory: true,
+      appState: nextAppState,
+      elements: nextElements,
+      storeAction: StoreAction.UPDATE,
     };
   }
-  return { commitToHistory };
+
+  return { storeAction: StoreAction.NONE };
 };
 
-type ActionCreator = (history: History) => Action;
+const useEmitter = (emitter: History["onHistoryChangeEmitter"]) => {
+  const [event, setEvent] = useState<HistoryChangedEvent>({
+    isUndoStackEmpty: true,
+    isRedoStackEmpty: true,
+  });
 
-export const createUndoAction: ActionCreator = (history) => ({
+  useEffect(() => {
+    const unsubscribe = emitter.on((historyChangedEvent) => {
+      setEvent(historyChangedEvent);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [emitter]);
+
+  return event;
+};
+
+type ActionCreator = (history: History, store: IStore) => Action;
+
+export const createUndoAction: ActionCreator = (history, store) => ({
   name: "undo",
   trackEvent: { category: "history" },
   perform: (elements, appState) =>
-    writeData(elements, appState, () => history.undoOnce()),
+    writeData(appState, () =>
+      history.undo(
+        arrayToMap(elements) as SceneElementsMap, // TODO: refactor action manager to already include `SceneElementsMap`
+        appState,
+        store.snapshot,
+      ),
+    ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     event.key.toLowerCase() === KEYS.Z &&
     !event.shiftKey,
-  PanelComponent: ({ updateData, data }) => (
-    <ToolButton
-      type="button"
-      icon={UndoIcon}
-      aria-label={t("buttons.undo")}
-      onClick={updateData}
-      size={data?.size || "medium"}
-    />
-  ),
-  commitToHistory: () => false,
+  PanelComponent: ({ updateData, data }) => {
+    const { isUndoStackEmpty } = useEmitter(history.onHistoryChangeEmitter);
+
+    return (
+      <ToolButton
+        type="button"
+        icon={UndoIcon}
+        aria-label={t("buttons.undo")}
+        onClick={updateData}
+        size={data?.size || "medium"}
+        disabled={isUndoStackEmpty}
+      />
+    );
+  },
 });
 
-export const createRedoAction: ActionCreator = (history) => ({
+export const createRedoAction: ActionCreator = (history, store) => ({
   name: "redo",
   trackEvent: { category: "history" },
   perform: (elements, appState) =>
-    writeData(elements, appState, () => history.redoOnce()),
+    writeData(appState, () =>
+      history.redo(
+        arrayToMap(elements) as SceneElementsMap, // TODO: refactor action manager to already include `SceneElementsMap`
+        appState,
+        store.snapshot,
+      ),
+    ),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&
       event.key.toLowerCase() === KEYS.Z) ||
     (isWindows && event.ctrlKey && !event.shiftKey && event.key === KEYS.Y),
-  PanelComponent: ({ updateData, data }) => (
-    <ToolButton
-      type="button"
-      icon={RedoIcon}
-      aria-label={t("buttons.redo")}
-      onClick={updateData}
-      size={data?.size || "medium"}
-    />
-  ),
-  commitToHistory: () => false,
+  PanelComponent: ({ updateData, data }) => {
+    const { isRedoStackEmpty } = useEmitter(history.onHistoryChangeEmitter);
+
+    return (
+      <ToolButton
+        type="button"
+        icon={RedoIcon}
+        aria-label={t("buttons.redo")}
+        onClick={updateData}
+        size={data?.size || "medium"}
+        disabled={isRedoStackEmpty}
+      />
+    );
+  },
 });

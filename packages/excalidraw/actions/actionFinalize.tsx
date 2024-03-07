@@ -16,6 +16,7 @@ import {
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import { AppState } from "../types";
 import { resetCursor } from "../cursor";
+import { StoreAction } from "./types";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -52,7 +53,7 @@ export const actionFinalize = register({
             cursorButton: "up",
             editingLinearElement: null,
           },
-          commitToHistory: true,
+          storeAction: StoreAction.CAPTURE,
         };
       }
     }
@@ -195,7 +196,10 @@ export const actionFinalize = register({
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
-      commitToHistory: appState.activeTool.type === "freedraw",
+      storeAction:
+        appState.activeTool.type === "freedraw"
+          ? StoreAction.CAPTURE
+          : StoreAction.NONE,
     };
   },
   keyTest: (event, appState) =>

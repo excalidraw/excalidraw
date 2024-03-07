@@ -14,6 +14,7 @@ import { isSomeElementSelected } from "../scene";
 import { AppClassProperties, AppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
+import { StoreAction } from "./types";
 
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
@@ -57,7 +58,7 @@ export const distributeHorizontally = register({
         space: "between",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -87,7 +88,7 @@ export const distributeVertically = register({
         space: "between",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

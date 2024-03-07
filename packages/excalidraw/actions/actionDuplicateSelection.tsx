@@ -14,7 +14,7 @@ import {
 } from "../groups";
 import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
-import { ActionResult } from "./types";
+import { ActionResult, StoreAction } from "./types";
 import { GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
@@ -31,6 +31,7 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
+import { syncMovedIndices } from "../fractionalIndex";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -51,13 +52,13 @@ export const actionDuplicateSelection = register({
       return {
         elements,
         appState: ret.appState,
-        commitToHistory: true,
+        storeAction: StoreAction.CAPTURE,
       };
     }
 
     return {
       ...duplicateElements(elements, appState),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   contextItemLabel: "labels.duplicateSelection",
@@ -89,6 +90,7 @@ const duplicateElements = (
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
+  const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
   const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
@@ -100,6 +102,7 @@ const duplicateElements = (
         y: element.y + GRID_SIZE / 2,
       },
     );
+    duplicatedElementsMap.set(newElement.id, newElement);
     oldIdToDuplicatedId.set(element.id, newElement.id);
     oldElements.push(element);
     newElements.push(newElement);
@@ -237,8 +240,10 @@ const duplicateElements = (
   }
 
   // step (3)
-
-  const finalElements = finalElementsReversed.reverse();
+  const finalElements = syncMovedIndices(
+    finalElementsReversed.reverse(),
+    arrayToMap(newElements),
+  );
 
   // ---------------------------------------------------------------------------
 

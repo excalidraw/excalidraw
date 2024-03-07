@@ -36,7 +36,6 @@ import {
   InteractiveCanvasAppState,
 } from "../types";
 import { mutateElement } from "./mutateElement";
-import History from "../history";
 
 import {
   bindOrUnbindLinearElement,
@@ -50,6 +49,7 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { IStore } from "../store";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -642,7 +642,7 @@ export class LinearElementEditor {
   static handlePointerDown(
     event: React.PointerEvent<HTMLElement>,
     appState: AppState,
-    history: History,
+    store: IStore,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
     elements: readonly NonDeletedExcalidrawElement[],
@@ -699,7 +699,7 @@ export class LinearElementEditor {
         });
         ret.didAddPoint = true;
       }
-      history.resumeRecording();
+      store.shouldCaptureIncrement();
       ret.linearElementEditor = {
         ...linearElementEditor,
         pointerDownState: {

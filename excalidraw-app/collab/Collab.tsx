@@ -10,6 +10,7 @@ import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
+  OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import {
   getSceneVersion,
@@ -70,7 +71,8 @@ import {
 } from "../../packages/excalidraw/element/typeChecks";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import {
-  ReconciledElements,
+  BroadcastedExcalidrawElement,
+  ReconciledExcalidrawElement,
   reconcileElements as _reconcileElements,
 } from "./reconciliation";
 import { decryptData } from "../../packages/excalidraw/data/encryption";
@@ -356,7 +358,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       this.excalidrawAPI.updateScene({
         elements,
-        commitToHistory: false,
       });
     }
   };
@@ -429,7 +430,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
-  ): Promise<ImportedDataState | null> => {
+  ) => {
     if (!this.state.username) {
       import("@excalidraw/random-username").then(({ getRandomUsername }) => {
         const username = getRandomUsername();
@@ -455,7 +456,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
     }
 
-    const scenePromise = resolvablePromise<ImportedDataState | null>();
+    // TODO: `ImportedDataState` type here seems abused
+    const scenePromise = resolvablePromise<
+      | (ImportedDataState & { elements: readonly OrderedExcalidrawElement[] })
+      | null
+    >();
 
     this.setIsCollaborating(true);
     LocalData.pauseSave("collaboration");
@@ -497,14 +502,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         }
         return element;
       });
-      // remove deleted elements from elements array & history to ensure we don't
+      // remove deleted elements from elements array to ensure we don't
       // expose potentially sensitive user data in case user manually deletes
       // existing elements (or clears scene), which would otherwise be persisted
       // to database even if deleted before creating the room.
-      this.excalidrawAPI.history.clear();
       this.excalidrawAPI.updateScene({
         elements,
-        commitToHistory: true,
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
@@ -539,9 +542,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               this.initializeRoom({ fetchScene: false });
               const remoteElements = decryptedData.payload.elements;
               const reconciledElements = this.reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements, {
-                init: true,
-              });
+              this.handleRemoteSceneUpdate(reconciledElements);
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
@@ -702,15 +703,17 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private reconcileElements = (
     remoteElements: readonly ExcalidrawElement[],
-  ): ReconciledElements => {
+  ): ReconciledExcalidrawElement[] => {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
-
-    remoteElements = restoreElements(remoteElements, null);
+    const restoredRemoteElements = restoreElements(
+      remoteElements,
+      null,
+    ) as BroadcastedExcalidrawElement[];
 
     const reconciledElements = _reconcileElements(
       localElements,
-      remoteElements,
+      restoredRemoteElements,
       appState,
     );
 
@@ -741,19 +744,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   }, LOAD_IMAGES_TIMEOUT);
 
   private handleRemoteSceneUpdate = (
-    elements: ReconciledElements,
-    { init = false }: { init?: boolean } = {},
+    elements: ReconciledExcalidrawElement[],
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
-      commitToHistory: !!init,
     });
-
-    // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-    // when we receive any messages from another peer. This UX can be pretty rough -- if you
-    // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-    // right now we think this is the right tradeoff.
-    this.excalidrawAPI.history.clear();
 
     this.loadImageFiles();
   };
@@ -887,7 +882,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.portal.broadcastIdleChange(userState);
   };
 
-  broadcastElements = (elements: readonly ExcalidrawElement[]) => {
+  broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
@@ -898,7 +893,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   };
 
-  syncElements = (elements: readonly ExcalidrawElement[]) => {
+  syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
     this.broadcastElements(elements);
     this.queueSaveToFirebase();
   };

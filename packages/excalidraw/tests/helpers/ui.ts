@@ -113,6 +113,18 @@ export class Keyboard {
     Keyboard.codeDown(code);
     Keyboard.codeUp(code);
   };
+
+  static undo = () => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
+
+  static redo = () => {
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
 }
 
 const getElementPointForSelection = (element: ExcalidrawElement): Point => {

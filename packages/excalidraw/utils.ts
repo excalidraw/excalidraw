@@ -669,6 +669,18 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
+/**
+ * Transform array into an object, use only when array order is irrelevant.
+ */
+export const arrayToObject = <T>(
+  array: readonly T[],
+  predicate?: (value: T) => string,
+) =>
+  array.reduce((acc, value) => {
+    acc[predicate ? predicate(value) : (value as string)] = value;
+    return acc;
+  }, {} as { [key: string]: T });
+
 export const isTestEnv = () => import.meta.env.MODE === "test";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {

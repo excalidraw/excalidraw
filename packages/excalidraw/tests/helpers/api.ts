@@ -69,9 +69,18 @@ export class API {
     return selectedElements[0];
   };
 
-  static getStateHistory = () => {
+  static getUndoStack = () => {
     // @ts-ignore
-    return h.history.stateHistory;
+    return h.history.undoStack;
+  };
+
+  static getRedoStack = () => {
+    // @ts-ignore
+    return h.history.redoStack;
+  };
+
+  static getSnapshot = () => {
+    return Array.from(h.store.snapshot.elements.values());
   };
 
   static clearSelection = () => {
@@ -103,6 +112,7 @@ export class API {
     id?: string;
     isDeleted?: boolean;
     frameId?: ExcalidrawElement["id"] | null;
+    index?: ExcalidrawElement["index"];
     groupIds?: string[];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
@@ -170,6 +180,7 @@ export class API {
       x,
       y,
       frameId: rest.frameId ?? null,
+      index: rest.index ?? null,
       angle: rest.angle ?? 0,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:

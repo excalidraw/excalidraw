@@ -14,9 +14,9 @@ import {
 } from "../packages/excalidraw/constants";
 import { loadFromBlob } from "../packages/excalidraw/data/blob";
 import {
-  ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
+  OrderedExcalidrawElement,
   Theme,
 } from "../packages/excalidraw/element/types";
 import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
@@ -85,7 +85,10 @@ import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
-import { reconcileElements } from "./collab/reconciliation";
+import {
+  BroadcastedExcalidrawElement,
+  reconcileElements,
+} from "./collab/reconciliation";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
@@ -253,7 +256,7 @@ const initializeScene = async (opts: {
         },
         elements: reconcileElements(
           scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted(),
+          excalidrawAPI.getSceneElementsIncludingDeleted() as BroadcastedExcalidrawElement[],
           excalidrawAPI.getAppState(),
         ),
       },
@@ -413,7 +416,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               ...restore(data.scene, null, null, { repairBindings: true }),
-              commitToHistory: true,
+              commitToStore: true,
             });
           }
         });
@@ -559,7 +562,7 @@ const ExcalidrawWrapper = () => {
   }, [theme]);
 
   const onChange = (
-    elements: readonly ExcalidrawElement[],
+    elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => {

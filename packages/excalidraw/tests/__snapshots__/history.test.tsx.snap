@@ -1,0 +1,6915 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`history > initializing scene should end up with no history entry > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {
+    "id1": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": false,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": true,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > initializing scene should end up with no history entry > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "A",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > initializing scene should end up with no history entry > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id1",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 10,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > initializing scene should end up with no history entry > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id1": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id1" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 0,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > initializing scene should end up with no history entry > [end of test] number of elements 1`] = `2`;
+
+exports[`history > initializing scene should end up with no history entry > [end of test] number of renders 1`] = `8`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should remove remotely added bound text when it's container is removed through the history > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should remove remotely added bound text when it's container is removed through the history > [end of test] element 0 1`] = `
+{
+  "angle": 180,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id51",
+      "type": "text",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id50",
+  "index": "a0",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "width": 100,
+  "x": 200,
+  "y": 200,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should remove remotely added bound text when it's container is removed through the history > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": "id50",
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id51",
+  "index": "a1",
+  "isDeleted": true,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "que pasa",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "que pasa",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 3,
+  "verticalAlign": "top",
+  "width": 100,
+  "x": 15,
+  "y": 15,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should remove remotely added bound text when it's container is removed through the history > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "id50" => Delta {
+            "deleted": {
+              "angle": 0,
+              "isDeleted": false,
+              "x": 10,
+              "y": 10,
+            },
+            "inserted": {
+              "angle": 180,
+              "isDeleted": true,
+              "x": 200,
+              "y": 200,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should remove remotely added bound text when it's container is removed through the history > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should remove remotely added bound text when it's container is removed through the history > [end of test] number of renders 1`] = `8`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely added bound text when it's container is added through the history > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely added bound text when it's container is added through the history > [end of test] element 0 1`] = `
+{
+  "angle": 180,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id53",
+      "type": "text",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id52",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 100,
+  "x": 200,
+  "y": 200,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely added bound text when it's container is added through the history > [end of test] element 1 1`] = `
+{
+  "angle": 180,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": "id52",
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": "id53",
+  "index": "a1",
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "que pasa",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "que pasa",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 5,
+  "verticalAlign": "top",
+  "width": 80,
+  "x": 205,
+  "y": 205,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely added bound text when it's container is added through the history > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "id52" => Delta {
+            "deleted": {
+              "boundElements": [],
+              "isDeleted": false,
+            },
+            "inserted": {
+              "boundElements": [],
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+  ],
+  "undoStack": [],
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely added bound text when it's container is added through the history > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely added bound text when it's container is added through the history > [end of test] number of renders 1`] = `7`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely deleted container when it's bound text element is updated through the history > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely deleted container when it's bound text element is updated through the history > [end of test] element 0 1`] = `
+{
+  "angle": 90,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id54",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 8,
+  "width": 100,
+  "x": 200,
+  "y": 200,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely deleted container when it's bound text element is updated through the history > [end of test] element 1 1`] = `
+{
+  "angle": 90,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": "id55",
+  "index": "a1",
+  "isDeleted": true,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "que pasa",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "que pasa",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 8,
+  "verticalAlign": "top",
+  "width": 80,
+  "x": 205,
+  "y": 205,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely deleted container when it's bound text element is updated through the history > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id55" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "containerId": "id54",
+              "customData": undefined,
+              "fillStyle": "solid",
+              "fontFamily": 1,
+              "fontSize": 20,
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "lineHeight": 1.25,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "originalText": "que pasa",
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "text": "que pasa",
+              "textAlign": "left",
+              "type": "text",
+              "verticalAlign": "top",
+              "width": 100,
+              "x": 15,
+              "y": 15,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {
+          "id54" => Delta {
+            "deleted": {
+              "boundElements": null,
+            },
+            "inserted": {
+              "boundElements": [
+                {
+                  "id": "id55",
+                  "type": "text",
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  ],
+  "undoStack": [],
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely deleted container when it's bound text element is updated through the history > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should restore remotely deleted container when it's bound text element is updated through the history > [end of test] number of renders 1`] = `9`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "any",
+      "type": "arrow",
+    },
+    {
+      "id": "id58",
+      "type": "text",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id56",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": "id56",
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": "id58",
+  "index": "a1",
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "ola",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "ola",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 6,
+  "verticalAlign": "top",
+  "width": 30,
+  "x": 15,
+  "y": 15,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id57",
+  "index": "a2",
+  "isDeleted": true,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "que pasa",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "que pasa",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 3,
+  "verticalAlign": "top",
+  "width": 100,
+  "x": 15,
+  "y": 15,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id58" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "containerId": "id56",
+              "customData": undefined,
+              "fillStyle": "solid",
+              "fontFamily": 1,
+              "fontSize": 20,
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "lineHeight": 1.25,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "originalText": "ola",
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "text": "ola",
+              "textAlign": "left",
+              "type": "text",
+              "verticalAlign": "top",
+              "width": 100,
+              "x": 0,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {
+          "id56" => Delta {
+            "deleted": {
+              "boundElements": null,
+            },
+            "inserted": {
+              "boundElements": [
+                {
+                  "id": "id58",
+                  "type": "text",
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] number of elements 1`] = `3`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should unbind existing text elements when bound text element is added through the history > [end of test] number of renders 1`] = `8`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update bound text element when it's container was updated on remote after it's added through the history > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update bound text element when it's container was updated on remote after it's added through the history > [end of test] element 0 1`] = `
+{
+  "angle": 45,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id62",
+      "type": "text",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 35,
+  "id": "id61",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 7,
+  "width": 100,
+  "x": 50,
+  "y": 50,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update bound text element when it's container was updated on remote after it's added through the history > [end of test] element 1 1`] = `
+{
+  "angle": 45,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": "id61",
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": "id62",
+  "index": "a1",
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "que pasa",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "que pasa",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 6,
+  "verticalAlign": "top",
+  "width": 80,
+  "x": 55,
+  "y": 55,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update bound text element when it's container was updated on remote after it's added through the history > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id62" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "containerId": "id61",
+              "customData": undefined,
+              "fillStyle": "solid",
+              "fontFamily": 1,
+              "fontSize": 20,
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "lineHeight": 1.25,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "originalText": "que pasa",
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "text": "que pasa",
+              "textAlign": "left",
+              "type": "text",
+              "verticalAlign": "top",
+              "width": 100,
+              "x": 15,
+              "y": 15,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {
+          "id61" => Delta {
+            "deleted": {
+              "boundElements": null,
+            },
+            "inserted": {
+              "boundElements": [
+                {
+                  "id": "id62",
+                  "type": "text",
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update bound text element when it's container was updated on remote after it's added through the history > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update bound text element when it's container was updated on remote after it's added through the history > [end of test] number of renders 1`] = `8`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update remotely added bound text when it's container was updated through the history > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update remotely added bound text when it's container was updated through the history > [end of test] element 0 1`] = `
+{
+  "angle": 90,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id60",
+      "type": "text",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id59",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "width": 100,
+  "x": 30,
+  "y": 30,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update remotely added bound text when it's container was updated through the history > [end of test] element 1 1`] = `
+{
+  "angle": 90,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "containerId": "id59",
+  "customData": undefined,
+  "fillStyle": "solid",
+  "fontFamily": 1,
+  "fontSize": 20,
+  "frameId": null,
+  "groupIds": [],
+  "height": 25,
+  "id": "id60",
+  "index": "a1",
+  "isDeleted": false,
+  "lineHeight": 1.25,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "originalText": "que pasa",
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "text": "que pasa",
+  "textAlign": "left",
+  "type": "text",
+  "updated": 1,
+  "version": 3,
+  "verticalAlign": "top",
+  "width": 80,
+  "x": 35,
+  "y": 35,
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update remotely added bound text when it's container was updated through the history > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id59" => Delta {
+            "deleted": {
+              "angle": 0,
+              "boundElements": [],
+              "x": 10,
+              "y": 10,
+            },
+            "inserted": {
+              "angle": 90,
+              "boundElements": [],
+              "x": 30,
+              "y": 30,
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update remotely added bound text when it's container was updated through the history > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > conflicts in bound text elements and containers > should update remotely added bound text when it's container was updated through the history > [end of test] number of renders 1`] = `9`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore his remotely deleted element > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": "elementBackground",
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id23": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore his remotely deleted element > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#ffec99",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id23",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore his remotely deleted element > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id23": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id23" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id23" => Delta {
+            "deleted": {
+              "backgroundColor": "transparent",
+            },
+            "inserted": {
+              "backgroundColor": "#ffec99",
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore his remotely deleted element > [end of test] number of elements 1`] = `1`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore his remotely deleted element > [end of test] number of renders 1`] = `11`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore the element he deleted back to the state at the time of removal > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore the element he deleted back to the state at the time of removal > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id24",
+  "index": "a0",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore the element he deleted back to the state at the time of removal > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id24": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id24" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id24": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {},
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "id24" => Delta {
+            "deleted": {
+              "isDeleted": false,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore the element he deleted back to the state at the time of removal > [end of test] number of elements 1`] = `1`;
+
+exports[`history > multiplayer undo/redo > should allow the element author to restore the element he deleted back to the state at the time of removal > [end of test] number of renders 1`] = `12`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": "elementBackground",
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {
+    "id27": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id27": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id25",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#ffc9c9",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id26",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 20,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#ffc9c9",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id27",
+  "index": "a2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 50,
+  "y": 50,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id25": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id25" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id25": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id26": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id26" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 20,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id26" => Delta {
+            "deleted": {
+              "backgroundColor": "transparent",
+            },
+            "inserted": {
+              "backgroundColor": "#ffc9c9",
+            },
+          },
+        },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id26": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id27": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id27" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "#ffc9c9",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a2",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 30,
+              "y": 30,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id27" => Delta {
+            "deleted": {
+              "x": 30,
+              "y": 30,
+            },
+            "inserted": {
+              "x": 50,
+              "y": 50,
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of elements 1`] = `3`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `23`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {
+    "id30": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id30": true,
+    "id31": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id29",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id30",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "width": 100,
+  "x": 20,
+  "y": 20,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id31",
+  "index": "a2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "width": 100,
+  "x": 30,
+  "y": 30,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id29": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id29" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 10,
+              "y": 10,
+            },
+          },
+          "id30" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 20,
+              "y": 20,
+            },
+          },
+          "id31" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a2",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 30,
+              "y": 30,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id29": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id30": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id31": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] number of elements 1`] = `3`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when selection changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `15`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id36": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id35",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id37",
+  "index": "a2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 100,
+  "x": 30,
+  "y": 30,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id36",
+  "index": "a3",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 10,
+  "width": 100,
+  "x": 20,
+  "y": 20,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id36": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id35" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 10,
+              "y": 10,
+            },
+          },
+          "id36" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 20,
+              "y": 20,
+            },
+          },
+          "id37" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a2",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 30,
+              "y": 30,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id36" => Delta {
+            "deleted": {
+              "index": "a1",
+            },
+            "inserted": {
+              "index": "a3",
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] number of elements 1`] = `3`;
+
+exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change > [end of test] number of renders 1`] = `13`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {
+    "id44": true,
+    "id45": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {
+    "id44": true,
+    "id45": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id44",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 90,
+  "y": 90,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id45",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 110,
+  "y": 110,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id49",
+  "index": "a2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#a5d8ff",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id44": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id44" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 10,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id44": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id45": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id45" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 30,
+              "y": 30,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id45": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id44": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id45": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id44" => Delta {
+            "deleted": {
+              "x": 10,
+              "y": 10,
+            },
+            "inserted": {
+              "x": 90,
+              "y": 90,
+            },
+          },
+          "id45" => Delta {
+            "deleted": {
+              "x": 30,
+              "y": 30,
+            },
+            "inserted": {
+              "x": 110,
+              "y": 110,
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] number of elements 1`] = `3`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] number of renders 1`] = `27`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "freedraw",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id39",
+  "index": "a0",
+  "isDeleted": false,
+  "lastCommittedPoint": [
+    50,
+    50,
+  ],
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      20,
+      20,
+    ],
+    [
+      50,
+      50,
+    ],
+    [
+      50,
+      50,
+    ],
+  ],
+  "pressures": [
+    0,
+    0,
+    0,
+    0,
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "simulatePressure": false,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "freedraw",
+  "updated": 1,
+  "version": 8,
+  "width": 50,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id40",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#a5d8ff",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id39" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 50,
+              "index": "a0",
+              "isDeleted": false,
+              "lastCommittedPoint": [
+                50,
+                50,
+              ],
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  20,
+                  20,
+                ],
+                [
+                  50,
+                  50,
+                ],
+                [
+                  50,
+                  50,
+                ],
+              ],
+              "pressures": [
+                0,
+                0,
+                0,
+                0,
+              ],
+              "roughness": 1,
+              "roundness": null,
+              "simulatePressure": false,
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "freedraw",
+              "width": 50,
+              "x": 10,
+              "y": 10,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] number of renders 1`] = `10`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {
+    "id41": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 90,
+  "id": "id41",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 90,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id43",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#a5d8ff",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id41": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id41" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 10,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id41" => Delta {
+            "deleted": {
+              "height": 10,
+              "width": 10,
+            },
+            "inserted": {
+              "height": 90,
+              "width": 90,
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] number of renders 1`] = `14`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": "elementBackground",
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {
+    "id19": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id19",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 7,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#ffc9c9",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id20",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#a5d8ff",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id19" => Delta {
+            "deleted": {
+              "backgroundColor": "transparent",
+            },
+            "inserted": {
+              "backgroundColor": "#ffc9c9",
+            },
+          },
+        },
+      },
+    },
+  ],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id19": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id19" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of elements 1`] = `2`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of renders 1`] = `11`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "#ffc9c9",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": "elementBackground",
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id21": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#ffc9c9",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id21",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#ffec99",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 7,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id21": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id21" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id21" => Delta {
+            "deleted": {
+              "backgroundColor": "transparent",
+            },
+            "inserted": {
+              "backgroundColor": "#ffc9c9",
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of elements 1`] = `1`;
+
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of renders 1`] = `10`;
+
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "#a5d8ff",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": "elementBackground",
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id22": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id22",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 13,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id22" => Delta {
+            "deleted": {
+              "backgroundColor": "#d0bfff",
+            },
+            "inserted": {
+              "backgroundColor": "#ffec99",
+            },
+          },
+        },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id22" => Delta {
+            "deleted": {
+              "backgroundColor": "transparent",
+            },
+            "inserted": {
+              "backgroundColor": "#d0bfff",
+            },
+          },
+        },
+      },
+    },
+  ],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id22": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id22" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of elements 1`] = `1`;
+
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of renders 1`] = `16`;
+
+exports[`history > scene import via drag&drop should create new history entry > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": -50,
+  "scrollY": -50,
+  "scrolledOutside": false,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": false,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#000",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > scene import via drag&drop should create new history entry > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "A",
+  "index": "a0",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > scene import via drag&drop should create new history entry > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [],
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "B",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > scene import via drag&drop should create new history entry > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "viewBackgroundColor": "#FFF",
+          },
+          "inserted": {
+            "viewBackgroundColor": "#000",
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "B" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": [],
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 0,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {
+          "A" => Delta {
+            "deleted": {
+              "isDeleted": false,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > scene import via drag&drop should create new history entry > [end of test] number of elements 1`] = `2`;
+
+exports[`history > scene import via drag&drop should create new history entry > [end of test] number of renders 1`] = `6`;
+
+exports[`history > should clear the redo stack on a new history entry > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id18": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > should clear the redo stack on a new history entry > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id17",
+  "index": "a0",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 4,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > should clear the redo stack on a new history entry > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id18",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "width": 10,
+  "x": 20,
+  "y": 0,
+}
+`;
+
+exports[`history > should clear the redo stack on a new history entry > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id18": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id18" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 20,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > should clear the redo stack on a new history entry > [end of test] number of elements 1`] = `2`;
+
+exports[`history > should clear the redo stack on a new history entry > [end of test] number of renders 1`] = `10`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {
+    "id8": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id7",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 5,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id8",
+  "index": "a1",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 8,
+  "width": 10,
+  "x": 20,
+  "y": 20,
+}
+`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id9",
+  "index": "a2",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 8,
+  "width": 10,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id7": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id7" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id7": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id8": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id8" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 20,
+              "y": 20,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id8": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id9": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id9" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a2",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 40,
+              "y": 40,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id9": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id8": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id9": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id8": true,
+              "id9": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {},
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "id8" => Delta {
+            "deleted": {
+              "isDeleted": false,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+          "id9" => Delta {
+            "deleted": {
+              "isDeleted": false,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] number of elements 1`] = `3`;
+
+exports[`history > undo/redo supports basic element creation, selection and deletion > [end of test] number of renders 1`] = `30`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {
+    "id12": true,
+  },
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": true,
+  "selectedElementIds": {
+    "id12": true,
+    "id14": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id13",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "width": 10,
+  "x": 20,
+  "y": 20,
+}
+`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id12",
+  "index": "a2",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "width": 10,
+  "x": 10,
+  "y": 0,
+}
+`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id14",
+  "index": "a3",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 9,
+  "width": 10,
+  "x": 40,
+  "y": 40,
+}
+`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id12": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id12" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 10,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id12": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id13": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id13" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 20,
+              "y": 20,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id13": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id14": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id14" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 10,
+              "index": "a2",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 10,
+              "x": 40,
+              "y": 40,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id14" => Delta {
+            "deleted": {
+              "index": "a2",
+            },
+            "inserted": {
+              "index": "a0V",
+            },
+          },
+        },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id14": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id12": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id14": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id12" => Delta {
+            "deleted": {
+              "index": "a0",
+            },
+            "inserted": {
+              "index": "a2",
+            },
+          },
+          "id14" => Delta {
+            "deleted": {
+              "index": "a0V",
+            },
+            "inserted": {
+              "index": "a3",
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] number of elements 1`] = `3`;
+
+exports[`history > undo/redo supports z-index actions > [end of test] number of renders 1`] = `23`;
+
+exports[`history > undo/redo works properly with groups > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 1,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "selectedElementIds": {
+    "id4_copy_copy": true,
+    "id5_copy_copy": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {
+    "A_copy": true,
+  },
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showStats": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [
+    "A",
+  ],
+  "height": 100,
+  "id": "id4",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [
+    "A",
+  ],
+  "height": 100,
+  "id": "id5",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 2,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [
+    "A_copy",
+  ],
+  "height": 100,
+  "id": "id4_copy_copy",
+  "index": "a1G",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] element 3 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [
+    "A_copy",
+  ],
+  "height": 100,
+  "id": "id5_copy_copy",
+  "index": "a1V",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] element 4 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id4_copy",
+  "index": "a2",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] element 5 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id5_copy",
+  "index": "a3",
+  "isDeleted": true,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "width": 100,
+  "x": 10,
+  "y": 10,
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] history 1`] = `
+History {
+  "onHistoryChangeEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+            "selectedGroupIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id4": true,
+              "id5": true,
+            },
+            "selectedGroupIds": {
+              "A": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id4" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [
+                "A",
+              ],
+              "height": 100,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 0,
+              "y": 0,
+            },
+          },
+          "id5" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [
+                "A",
+              ],
+              "height": 100,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 0,
+              "y": 0,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id4": true,
+              "id5": true,
+            },
+            "selectedGroupIds": {
+              "A": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id4_copy_copy": true,
+              "id5_copy_copy": true,
+            },
+            "selectedGroupIds": {
+              "A_copy": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "id4_copy_copy" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [
+                "A_copy",
+              ],
+              "height": 100,
+              "index": "a1G",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 10,
+              "y": 10,
+            },
+          },
+          "id5_copy_copy" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [
+                "A_copy",
+              ],
+              "height": 100,
+              "index": "a1V",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 100,
+              "x": 10,
+              "y": 10,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > undo/redo works properly with groups > [end of test] number of elements 1`] = `6`;
+
+exports[`history > undo/redo works properly with groups > [end of test] number of renders 1`] = `10`;
