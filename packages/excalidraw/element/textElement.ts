@@ -31,7 +31,7 @@ import { getElementAbsoluteCoords } from ".";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
 
-import { ExtractSetType } from "../utility-types";
+import { ExtractSetType, MakeBrand } from "../utility-types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
@@ -928,38 +928,50 @@ const DEFAULT_LINE_HEIGHT = {
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
 };
 
-type FontMetrics = {
-  unitsPerEm: number; // head.unitsPerEm
-  ascender: number; // sTypoAscender
-  descender: number; // sTypoDescender
-};
+/** OS/2 sTypoAscender, https://learn.microsoft.com/en-us/typography/opentype/spec/os2#stypoascender */
+type sTypoAscender = number & MakeBrand<"sTypoAscender">;
+
+/** OS/2 sTypoDescender, https://learn.microsoft.com/en-us/typography/opentype/spec/os2#stypodescender */
+type sTypoDescender = number & MakeBrand<"sTypoDescender">;
+
+/** head.unitsPerEm, usually either 1000 or 2048 */
+type unitsPerEm = number & MakeBrand<"unitsPerEm">;
 
 /**
  * Hardcoded metrics for default fonts, read by https://opentype.js.org/font-inspector.html.
- * For custom fonts, read these metrics on load and extend this object.
+ * For custom fonts, read these metrics from OS/2 table and extend this object.
+ *
+ * WARN: opentype does NOT open WOFF2 correctly, make sure to convert WOFF2 to TTF first.
  */
-const FONT_METRICS = {
+export const FONT_METRICS: Record<
+  number,
+  {
+    unitsPerEm: number;
+    ascender: sTypoAscender;
+    descender: sTypoDescender;
+  }
+> = {
   [FONT_FAMILY.Virgil]: {
-    unitsPerEm: 1000,
-    ascender: 886,
-    descender: -374,
+    unitsPerEm: 1000 as unitsPerEm,
+    ascender: 886 as sTypoAscender,
+    descender: -374 as sTypoDescender,
   },
   [FONT_FAMILY.Helvetica]: {
-    unitsPerEm: 2048,
-    ascender: 1577,
-    descender: -471,
+    unitsPerEm: 2048 as unitsPerEm,
+    ascender: 1577 as sTypoAscender,
+    descender: -471 as sTypoDescender,
   },
   [FONT_FAMILY.Cascadia]: {
-    unitsPerEm: 2048,
-    ascender: 1977,
-    descender: -480,
+    unitsPerEm: 2048 as unitsPerEm,
+    ascender: 1977 as sTypoAscender,
+    descender: -480 as sTypoDescender,
   },
   [FONT_FAMILY.Assistant]: {
-    unitsPerEm: 1000,
-    ascender: 1050,
-    descender: -500,
+    unitsPerEm: 1000 as unitsPerEm,
+    ascender: 1021 as sTypoAscender,
+    descender: -287 as sTypoDescender,
   },
-} as Record<number, FontMetrics>;
+};
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
   if (fontFamily in DEFAULT_LINE_HEIGHT) {
