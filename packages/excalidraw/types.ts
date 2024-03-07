@@ -173,8 +173,6 @@ type _CommonCanvasAppState = {
 export type StaticCanvasAppState = Readonly<
   _CommonCanvasAppState & {
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
-    /** null indicates transparent bg */
-    viewBackgroundColor: AppState["viewBackgroundColor"] | null;
     exportScale: AppState["exportScale"];
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];

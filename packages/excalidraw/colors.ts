@@ -1,27 +1,25 @@
 import oc from "open-color";
-import type { Merge } from "./utility-types";
-
-// FIXME can't put to utils.ts rn because of circular dependency
-const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(
-  source: R,
-  keys: K,
-) => {
-  return keys.reduce((acc, key: K[number]) => {
-    if (key in source) {
-      acc[key] = source[key];
-    }
-    return acc;
-  }, {} as Pick<R, K[number]>) as Pick<R, K[number]>;
-};
+import {
+  COLOR_WHITE,
+  COLOR_CHARCOAL_BLACK,
+  COLOR_TRANSPARENT,
+} from "./constants";
+import { type Merge } from "./utility-types";
+import { pick } from "./utils";
 
 export type ColorPickerColor =
-  | Exclude<keyof oc, "indigo" | "lime">
+  | Exclude<keyof oc, "indigo" | "lime" | "black">
   | "transparent"
+  | "charcoal"
   | "bronze";
 export type ColorTuple = readonly [string, string, string, string, string];
 export type ColorPalette = Merge<
   Record<ColorPickerColor, ColorTuple>,
-  { black: "#1e1e1e"; white: "#ffffff"; transparent: "transparent" }
+  {
+    charcoal: typeof COLOR_CHARCOAL_BLACK;
+    white: typeof COLOR_WHITE;
+    transparent: typeof COLOR_TRANSPARENT;
+  }
 >;
 
 // used general type instead of specific type (ColorPalette) to support custom colors
@@ -41,7 +39,7 @@ export const CANVAS_PALETTE_SHADE_INDEXES = [0, 1, 2, 3, 4] as const;
 export const getSpecificColorShades = (
   color: Exclude<
     ColorPickerColor,
-    "transparent" | "white" | "black" | "bronze"
+    "transparent" | "charcoal" | "black" | "white" | "bronze"
   >,
   indexArr: Readonly<ColorShadesIndexes>,
 ) => {
@@ -49,9 +47,9 @@ export const getSpecificColorShades = (
 };
 
 export const COLOR_PALETTE = {
-  transparent: "transparent",
-  black: "#1e1e1e",
-  white: "#ffffff",
+  transparent: COLOR_TRANSPARENT,
+  charcoal: COLOR_CHARCOAL_BLACK,
+  white: COLOR_WHITE,
   // open-colors
   gray: getSpecificColorShades("gray", ELEMENTS_PALETTE_SHADE_INDEXES),
   red: getSpecificColorShades("red", ELEMENTS_PALETTE_SHADE_INDEXES),
@@ -87,7 +85,7 @@ const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
 
 // ORDER matters for positioning in quick picker
 export const DEFAULT_ELEMENT_STROKE_PICKS = [
-  COLOR_PALETTE.black,
+  COLOR_PALETTE.charcoal,
   COLOR_PALETTE.red[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
   COLOR_PALETTE.green[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
   COLOR_PALETTE.blue[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
@@ -125,7 +123,7 @@ export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
   gray: COLOR_PALETTE.gray,
-  black: COLOR_PALETTE.black,
+  charcoal: COLOR_PALETTE.charcoal,
   bronze: COLOR_PALETTE.bronze,
   // rest
   ...COMMON_ELEMENT_SHADES,
@@ -136,7 +134,7 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
   gray: COLOR_PALETTE.gray,
-  black: COLOR_PALETTE.black,
+  charcoal: COLOR_PALETTE.charcoal,
   bronze: COLOR_PALETTE.bronze,
 
   ...COMMON_ELEMENT_SHADES,

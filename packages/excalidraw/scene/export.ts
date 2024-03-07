@@ -5,6 +5,7 @@ import type {
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
+  Theme,
 } from "../element/types";
 import type { Bounds } from "../element/bounds";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
@@ -12,7 +13,9 @@ import { renderSceneToSvg } from "../renderer/staticSvgScene";
 import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import type { AppState, BinaryFiles } from "../types";
 import {
+  COLOR_WHITE,
   DEFAULT_EXPORT_PADDING,
+  DEFAULT_ZOOM_VALUE,
   FRAME_STYLE,
   FONT_FAMILY,
   SVG_NS,
@@ -25,6 +28,7 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import { restoreAppState } from "../data/restore";
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
@@ -149,36 +153,204 @@ const prepareElementsForRender = ({
   return nextElements;
 };
 
-export const exportToCanvas = async (
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-  files: BinaryFiles,
-  {
-    exportBackground,
-    exportPadding = DEFAULT_EXPORT_PADDING,
-    viewBackgroundColor,
-    exportingFrame,
-  }: {
-    exportBackground: boolean;
-    exportPadding?: number;
-    viewBackgroundColor: string;
-    exportingFrame?: ExcalidrawFrameLikeElement | null;
-  },
-  createCanvas: (
+export type ExportToCanvasData = {
+  elements: readonly NonDeletedExcalidrawElement[];
+  appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
+  files: BinaryFiles | null;
+};
+
+export type ExportToCanvasConfig = {
+  theme?: Theme;
+  /**
+   * Canvas background. Valid values are:
+   *
+   * - `undefined` - the background of "appState.viewBackgroundColor" is used.
+   * - `false` - no background is used (set to "transparent").
+   * - `string` - should be a valid CSS color.
+   *
+   * @default undefined
+   */
+  canvasBackgroundColor?: string | false;
+  /**
+   * Canvas padding in pixels. Affected by `scale`.
+   *
+   * When `fit` is set to `none`, padding is added to the content bounding box
+   * (including if you set `width` or `height` or `maxWidthOrHeight` or
+   * `widthOrHeight`).
+   *
+   * When `fit` set to `contain`, padding is subtracted from the content
+   * bounding box (ensuring the size doesn't exceed the supplied values, with
+   * the exeception of using alongside `scale` as noted above), and the padding
+   * serves as a minimum distance between the content and the canvas edges, as
+   * it may exceed the supplied padding value from one side or the other in
+   * order to maintain the aspect ratio. It is recommended to set `position`
+   * to `center` when using `fit=contain`.
+   *
+   * When `fit` is set to `cover`, padding is disabled (set to 0).
+   *
+   * When `fit` is set to `none` and either `width` or `height` or
+   * `maxWidthOrHeight` is set, padding is simply adding to the bounding box
+   * and the content may overflow the canvas, thus right or bottom padding
+   * may be ignored.
+   *
+   * @default 0
+   */
+  padding?: number;
+  // -------------------------------------------------------------------------
+  /**
+   * Makes sure the canvas content fits into a frame of width/height no larger
+   * than this value, while maintaining the aspect ratio.
+   *
+   * Final dimensions can get smaller/larger if used in conjunction with
+   * `scale`.
+   */
+  maxWidthOrHeight?: number;
+  /**
+   * Scale the canvas content to be excatly this many pixels wide/tall,
+   * maintaining the aspect ratio.
+   *
+   * Cannot be used in conjunction with `maxWidthOrHeight`.
+   *
+   * Final dimensions can get smaller/larger if used in conjunction with
+   * `scale`.
+   */
+  widthOrHeight?: number;
+  // -------------------------------------------------------------------------
+  /**
+   * Width of the frame. Supply `x` or `y` if you want to ofsset the canvas
+   * content.
+   *
+   * If `width` omitted but `height` supplied, `width` is calculated from the
+   * the content's bounding box to preserve the aspect ratio.
+   *
+   * Defaults to the content bounding box width when both `width` and `height`
+   * are omitted.
+   */
+  width?: number;
+  /**
+   * Height of the frame.
+   *
+   * If `height` omitted but `width` supplied, `height` is calculated from the
+   * content's bounding box to preserve the aspect ratio.
+   *
+   * Defaults to the content bounding box height when both `width` and `height`
+   * are omitted.
+   */
+  height?: number;
+  /**
+   * Left canvas offset. By default the coordinate is relative to the canvas.
+   * You can switch to content coordinates by setting `origin` to `content`.
+   *
+   * Defaults to the `x` postion of the content bounding box.
+   */
+  x?: number;
+  /**
+   * Top canvas offset. By default the coordinate is relative to the canvas.
+   * You can switch to content coordinates by setting `origin` to `content`.
+   *
+   * Defaults to the `y` postion of the content bounding box.
+   */
+  y?: number;
+  /**
+   * Indicates the coordinate system of the `x` and `y` values.
+   *
+   * - `canvas` - `x` and `y` are relative to the canvas [0, 0] position.
+   * - `content` - `x` and `y` are relative to the content bounding box.
+   *
+   * @default "canvas"
+   */
+  origin?: "canvas" | "content";
+  /**
+   * If dimensions specified and `x` and `y` are not specified, this indicates
+   * how the canvas should be scaled.
+   *
+   * Behavior aligns with the `object-fit` CSS property.
+   *
+   * - `none`    - no scaling.
+   * - `contain` - scale to fit the frame. Includes `padding`.
+   * - `cover`   - scale to fill the frame while maintaining aspect ratio. If
+   *               content overflows, it will be cropped.
+   *
+   * If `maxWidthOrHeight` or `widthOrHeight` is set, `fit` is ignored.
+   *
+   * @default "contain" unless `width`, `height`, `maxWidthOrHeight`, or
+   * `widthOrHeight` is specified in which case `none` is the default (can be
+   * changed). If `x` or `y` are specified, `none` is forced.
+   */
+  fit?: "none" | "contain" | "cover";
+  /**
+   * When either `x` or `y` are not specified, indicates how the canvas should
+   * be aligned on the respective axis.
+   *
+   * - `none`   - canvas aligned to top left.
+   * - `center` - canvas is centered on the axis which is not specified
+   *              (or both).
+   *
+   * If `maxWidthOrHeight` or `widthOrHeight` is set, `position` is ignored.
+   *
+   * @default "center"
+   */
+  position?: "center" | "topLeft";
+  // -------------------------------------------------------------------------
+  /**
+   * A multiplier to increase/decrease the frame dimensions
+   * (content resolution).
+   *
+   * For example, if your canvas is 300x150 and you set scale to 2, the
+   * resulting size will be 600x300.
+   *
+   * @default 1
+   */
+  scale?: number;
+  /**
+   * If you need to suply your own canvas, e.g. in test environments or in
+   * Node.js.
+   *
+   * Do not set `canvas.width/height` or modify the canvas context as that's
+   * handled by Excalidraw.
+   *
+   * Defaults to `document.createElement("canvas")`.
+   */
+  createCanvas?: () => HTMLCanvasElement;
+  /**
+   * If you want to supply `width`/`height` dynamically (or derive from the
+   * content bounding box), you can use this function.
+   *
+   * Ignored if `maxWidthOrHeight`, `width`, or `height` is set.
+   */
+  getDimensions?: (
     width: number,
     height: number,
-  ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = width * appState.exportScale;
-    canvas.height = height * appState.exportScale;
-    return { canvas, scale: appState.exportScale };
-  },
-  loadFonts: () => Promise<void> = async () => {
-    await Fonts.loadElementsFonts(elements);
-  },
-) => {
-  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
-  await loadFonts();
+  ) => { width: number; height: number; scale?: number };
+
+  exportingFrame?: ExcalidrawFrameLikeElement | null;
+
+  loadFonts?: () => Promise<void>;
+};
+
+/**
+ * This API is usually used as a precursor to searializing to Blob or PNG,
+ * but can also be used to create a canvas for other purposes.
+ */
+export const exportToCanvas = async ({
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+  config?: ExportToCanvasConfig;
+}) => {
+  // clone
+  const cfg = Object.assign({}, config);
+
+  const { files } = data;
+  const { exportingFrame } = cfg;
+
+  const elements = data.elements;
+
+  // initialize defaults
+  // ---------------------------------------------------------------------------
+
+  const appState = restoreAppState(data.appState, null);
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
@@ -198,24 +370,220 @@ export const exportToCanvas = async (
   });
 
   if (exportingFrame) {
-    exportPadding = 0;
+    cfg.padding = 0;
   }
 
-  const [minX, minY, width, height] = getCanvasSize(
+  cfg.fit =
+    cfg.fit ??
+    (cfg.width != null ||
+    cfg.height != null ||
+    cfg.maxWidthOrHeight != null ||
+    cfg.widthOrHeight != null
+      ? "contain"
+      : "none");
+
+  const containPadding = cfg.fit === "contain";
+
+  if (cfg.x != null || cfg.x != null) {
+    cfg.fit = "none";
+  }
+
+  if (cfg.fit === "cover") {
+    if (cfg.padding && !import.meta.env.PROD) {
+      console.warn("`padding` is ignored when `fit` is set to `cover`");
+    }
+    cfg.padding = 0;
+  }
+
+  cfg.padding = cfg.padding ?? 0;
+  cfg.scale = cfg.scale ?? 1;
+
+  cfg.origin = cfg.origin ?? "canvas";
+  cfg.position = cfg.position ?? "center";
+
+  if (cfg.maxWidthOrHeight != null && cfg.widthOrHeight != null) {
+    if (!import.meta.env.PROD) {
+      console.warn("`maxWidthOrHeight` is ignored when `widthOrHeight` is set");
+    }
+    cfg.maxWidthOrHeight = undefined;
+  }
+
+  if (
+    (cfg.maxWidthOrHeight != null || cfg.width != null || cfg.height != null) &&
+    cfg.getDimensions
+  ) {
+    if (!import.meta.env.PROD) {
+      console.warn(
+        "`getDimensions` is ignored when `width`, `height`, or `maxWidthOrHeight` is set",
+      );
+    }
+    cfg.getDimensions = undefined;
+  }
+  // ---------------------------------------------------------------------------
+
+  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
+  if (cfg.loadFonts) {
+    await cfg.loadFonts();
+  } else {
+    await Fonts.loadElementsFonts(elements);
+  }
+
+  // value used to scale the canvas context. By default, we use this to
+  // make the canvas fit into the frame (e.g. for `cfg.fit` set to `contain`).
+  // If `cfg.scale` is set, we multiply the resulting canvasScale by it to
+  // scale the output further.
+  let canvasScale = 1;
+
+  const origCanvasSize = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
-    exportPadding,
   );
 
-  const { canvas, scale = 1 } = createCanvas(width, height);
+  // cfg.x = undefined;
+  // cfg.y = undefined;
 
-  const defaultAppState = getDefaultAppState();
+  // variables for original content bounding box
+  const [origX, origY, origWidth, origHeight] = origCanvasSize;
+  // variables for target bounding box
+  let [x, y, width, height] = origCanvasSize;
+
+  if (cfg.width != null) {
+    width = cfg.width;
+
+    if (cfg.padding && containPadding) {
+      width -= cfg.padding * 2;
+    }
+
+    if (cfg.height) {
+      height = cfg.height;
+      if (cfg.padding && containPadding) {
+        height -= cfg.padding * 2;
+      }
+    } else {
+      // if height not specified, scale the original height to match the new
+      // width while maintaining aspect ratio
+      height *= width / origWidth;
+    }
+  } else if (cfg.height != null) {
+    height = cfg.height;
+
+    if (cfg.padding && containPadding) {
+      height -= cfg.padding * 2;
+    }
+    // width not specified, so scale the original width to match the new
+    // height while maintaining aspect ratio
+    width *= height / origHeight;
+  }
+
+  if (cfg.maxWidthOrHeight != null || cfg.widthOrHeight != null) {
+    if (containPadding && cfg.padding) {
+      if (cfg.maxWidthOrHeight != null) {
+        cfg.maxWidthOrHeight -= cfg.padding * 2;
+      } else if (cfg.widthOrHeight != null) {
+        cfg.widthOrHeight -= cfg.padding * 2;
+      }
+    }
+
+    const max = Math.max(width, height);
+    if (cfg.widthOrHeight != null) {
+      // calculate by how much do we need to scale the canvas to fit into the
+      // target dimension (e.g. target: max 50px, actual: 70x100px => scale: 0.5)
+      canvasScale = cfg.widthOrHeight / max;
+    } else if (cfg.maxWidthOrHeight != null) {
+      canvasScale = cfg.maxWidthOrHeight < max ? cfg.maxWidthOrHeight / max : 1;
+    }
+
+    width *= canvasScale;
+    height *= canvasScale;
+  } else if (cfg.getDimensions) {
+    const ret = cfg.getDimensions(width, height);
+
+    width = ret.width;
+    height = ret.height;
+    cfg.scale = ret.scale ?? cfg.scale;
+  } else if (
+    containPadding &&
+    cfg.padding &&
+    cfg.width == null &&
+    cfg.height == null
+  ) {
+    const whRatio = width / height;
+    width -= cfg.padding * 2;
+    height -= (cfg.padding * 2) / whRatio;
+  }
+
+  if (
+    (cfg.fit === "contain" && !cfg.maxWidthOrHeight) ||
+    (containPadding && cfg.padding)
+  ) {
+    if (cfg.fit === "contain") {
+      const wRatio = width / origWidth;
+      const hRatio = height / origHeight;
+      // scale the orig canvas to fit in the target frame
+      canvasScale = Math.min(wRatio, hRatio);
+    } else {
+      const wRatio = (width - cfg.padding * 2) / width;
+      const hRatio = (height - cfg.padding * 2) / height;
+      canvasScale = Math.min(wRatio, hRatio);
+    }
+  } else if (cfg.fit === "cover") {
+    const wRatio = width / origWidth;
+    const hRatio = height / origHeight;
+    // scale the orig canvas to fill the the target frame
+    // (opposite of "contain")
+    canvasScale = Math.max(wRatio, hRatio);
+  }
+
+  x = cfg.x ?? origX;
+  y = cfg.y ?? origY;
+
+  // if we switch to "content" coords, we need to offset cfg-supplied
+  // coords by the x/y of content bounding box
+  if (cfg.origin === "content") {
+    if (cfg.x != null) {
+      x += origX;
+    }
+    if (cfg.y != null) {
+      y += origY;
+    }
+  }
+
+  // Centering the content to the frame.
+  // We divide width/height by canvasScale so that we calculate in the original
+  // aspect ratio dimensions.
+  if (cfg.position === "center") {
+    x -=
+      width / canvasScale / 2 -
+      (cfg.x == null ? origWidth : width + cfg.padding * 2) / 2;
+    y -=
+      height / canvasScale / 2 -
+      (cfg.y == null ? origHeight : height + cfg.padding * 2) / 2;
+  }
+
+  const canvas = cfg.createCanvas
+    ? cfg.createCanvas()
+    : document.createElement("canvas");
+
+  // rescale padding based on current canvasScale factor so that the resulting
+  // padding is kept the same as supplied by user (with the exception of
+  // `cfg.scale` being set, which also scales the padding)
+  const normalizedPadding = cfg.padding / canvasScale;
+
+  // scale the whole frame by cfg.scale (on top of whatever canvasScale we
+  // calculated above)
+  canvasScale *= cfg.scale;
+
+  width *= cfg.scale;
+  height *= cfg.scale;
+
+  canvas.width = width + cfg.padding * 2 * cfg.scale;
+  canvas.height = height + cfg.padding * 2 * cfg.scale;
 
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),
     fileIds: getInitializedImageElements(elementsForRender).map(
       (element) => element.fileId,
     ),
-    files,
+    files: files || {},
   });
 
   renderStaticScene({
@@ -228,19 +596,29 @@ export const exportToCanvas = async (
       arrayToMap(syncInvalidIndices(elements)),
     ),
     visibleElements: elementsForRender,
-    scale,
     appState: {
       ...appState,
       frameRendering,
-      viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
-      zoom: defaultAppState.zoom,
+      width,
+      height,
+      offsetLeft: 0,
+      offsetTop: 0,
+      scrollX: -x + normalizedPadding,
+      scrollY: -y + normalizedPadding,
+      zoom: { value: DEFAULT_ZOOM_VALUE },
+
       shouldCacheIgnoreZoom: false,
-      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+      theme: cfg.theme || THEME.LIGHT,
     },
+    scale: canvasScale,
     renderConfig: {
-      canvasBackgroundColor: viewBackgroundColor,
+      canvasBackgroundColor:
+        cfg.canvasBackgroundColor === false
+          ? // null indicates transparent background
+            null
+          : cfg.canvasBackgroundColor ||
+            appState.viewBackgroundColor ||
+            COLOR_WHITE,
       imageCache,
       renderGrid: false,
       isExporting: true,
@@ -254,19 +632,24 @@ export const exportToCanvas = async (
   return canvas;
 };
 
-export const exportToSvg = async (
-  elements: readonly NonDeletedExcalidrawElement[],
-  appState: {
-    exportBackground: boolean;
-    exportPadding?: number;
-    exportScale?: number;
-    viewBackgroundColor: string;
-    exportWithDarkMode?: boolean;
-    exportEmbedScene?: boolean;
-    frameRendering?: AppState["frameRendering"];
-  },
-  files: BinaryFiles | null,
-  opts?: {
+export const exportToSvg = async ({
+  data,
+  config,
+}: {
+  data: {
+    elements: readonly NonDeletedExcalidrawElement[];
+    appState: {
+      exportBackground: boolean;
+      exportPadding?: number;
+      exportScale?: number;
+      viewBackgroundColor: string;
+      exportWithDarkMode?: boolean;
+      exportEmbedScene?: boolean;
+      frameRendering?: AppState["frameRendering"];
+    };
+    files: BinaryFiles | null;
+  };
+  config?: {
     /**
      * if true, all embeddables passed in will be rendered when possible.
      */
@@ -274,11 +657,18 @@ export const exportToSvg = async (
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
-  },
-): Promise<SVGSVGElement> => {
+  };
+}): Promise<SVGSVGElement> => {
+  // clone
+  const cfg = Object.assign({}, config);
+
+  cfg.exportingFrame = cfg.exportingFrame ?? null;
+
+  const elements = data.elements;
+
   const frameRendering = getFrameRenderingConfig(
-    opts?.exportingFrame ?? null,
-    appState.frameRendering ?? null,
+    cfg?.exportingFrame ?? null,
+    data.appState.frameRendering ?? null,
   );
 
   let {
@@ -287,18 +677,16 @@ export const exportToSvg = async (
     viewBackgroundColor,
     exportScale = 1,
     exportEmbedScene,
-  } = appState;
-
-  const { exportingFrame = null } = opts || {};
+  } = data.appState;
 
   const elementsForRender = prepareElementsForRender({
     elements,
-    exportingFrame,
+    exportingFrame: cfg.exportingFrame,
     exportWithDarkMode,
     frameRendering,
   });
 
-  if (exportingFrame) {
+  if (cfg.exportingFrame) {
     exportPadding = 0;
   }
 
@@ -313,17 +701,26 @@ export const exportToSvg = async (
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.
-        text: serializeAsJSON(elements, appState, files || {}, "local"),
+        text: serializeAsJSON(
+          elements,
+          data.appState,
+          data.files || {},
+          "local",
+        ),
       });
     } catch (error: any) {
       console.error(error);
     }
   }
 
-  const [minX, minY, width, height] = getCanvasSize(
-    exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
-    exportPadding,
+  let [minX, minY, width, height] = getCanvasSize(
+    cfg.exportingFrame
+      ? [cfg.exportingFrame]
+      : getRootElements(elementsForRender),
   );
+
+  width += exportPadding * 2;
+  height += exportPadding * 2;
 
   // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -355,7 +752,7 @@ export const exportToSvg = async (
           width="${frame.width}"
           height="${frame.height}"
           ${
-            exportingFrame
+            cfg.exportingFrame
               ? ""
               : `rx=${FRAME_STYLE.radius} ry=${FRAME_STYLE.radius}`
           }
@@ -364,7 +761,7 @@ export const exportToSvg = async (
         </clipPath>`;
   }
 
-  const fontFaces = !opts?.skipInliningFonts
+  const fontFaces = !cfg?.skipInliningFonts
     ? await Fonts.generateFontFaceDeclarations(elements)
     : [];
 
@@ -381,7 +778,7 @@ export const exportToSvg = async (
   `;
 
   // render background rect
-  if (appState.exportBackground && viewBackgroundColor) {
+  if (data.appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
@@ -393,14 +790,14 @@ export const exportToSvg = async (
 
   const rsvg = rough.svg(svgRoot);
 
-  const renderEmbeddables = opts?.renderEmbeddables ?? false;
+  const renderEmbeddables = cfg.renderEmbeddables ?? false;
 
   renderSceneToSvg(
     elementsForRender,
     toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
     rsvg,
     svgRoot,
-    files || {},
+    data.files || {},
     {
       offsetX,
       offsetY,
@@ -416,7 +813,7 @@ export const exportToSvg = async (
               .map((element) => [element.id, true]),
           )
         : new Map(),
-      reuseImages: opts?.reuseImages ?? true,
+      reuseImages: cfg?.reuseImages ?? true,
     },
   );
 
@@ -424,25 +821,12 @@ export const exportToSvg = async (
 };
 
 // calculate smallest area to fit the contents in
-const getCanvasSize = (
+export const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
-  exportPadding: number,
 ): Bounds => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding * 2;
+  const width = distance(minX, maxX);
+  const height = distance(minY, maxY);
 
   return [minX, minY, width, height];
-};
-
-export const getExportSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  exportPadding: number,
-  scale: number,
-): [number, number] => {
-  const [, , width, height] = getCanvasSize(elements, exportPadding).map(
-    (dimension) => Math.trunc(dimension * scale),
-  );
-
-  return [width, height];
 };

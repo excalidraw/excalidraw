@@ -91,12 +91,16 @@ export const convertMermaidToExcalidraw = async ({
     };
 
     const canvas = await exportToCanvas({
-      elements: data.current.elements,
-      files: data.current.files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight:
-        Math.max(parent.offsetWidth, parent.offsetHeight) *
-        window.devicePixelRatio,
+      data: {
+        elements: data.current.elements,
+        files: data.current.files,
+      },
+      config: {
+        padding: DEFAULT_EXPORT_PADDING,
+        maxWidthOrHeight:
+          Math.max(parent.offsetWidth, parent.offsetHeight) *
+          window.devicePixelRatio,
+      },
     });
     // if converting to blob fails, there's some problem that will
     // likely prevent preview and export (e.g. canvas too big)
