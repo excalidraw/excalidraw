@@ -11,14 +11,18 @@ export const libraryItemSvgsCache = atom<SvgCache>(new Map());
 
 const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
   return await exportToSvg({
-    elements,
-    appState: {
-      exportBackground: false,
-      viewBackgroundColor: COLOR_PALETTE.white,
+    data: {
+      elements,
+      appState: {
+        exportBackground: false,
+        viewBackgroundColor: COLOR_PALETTE.white,
+      },
+      files: null,
     },
-    files: null,
-    renderEmbeddables: false,
-    skipInliningFonts: true,
+    config: {
+      renderEmbeddables: false,
+      skipInliningFonts: true,
+    },
   });
 };
 

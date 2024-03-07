@@ -204,7 +204,7 @@ export const colorPickerKeyNavHandler = ({
       });
 
       if (!baseColorName) {
-        onChange(COLOR_PALETTE.black);
+        onChange(COLOR_PALETTE.charcoal);
       }
     }
 

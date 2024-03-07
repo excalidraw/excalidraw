@@ -1,11 +1,8 @@
 import type { Radians } from "../math";
 import { pointFrom } from "../math";
+import { DEFAULT_CHART_COLOR_INDEX, getAllColorsSpecificShade } from "./colors";
 import {
-  COLOR_PALETTE,
-  DEFAULT_CHART_COLOR_INDEX,
-  getAllColorsSpecificShade,
-} from "./colors";
-import {
+  COLOR_CHARCOAL_BLACK,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   VERTICAL_ALIGN,
@@ -173,7 +170,7 @@ const commonProps = {
   fontSize: DEFAULT_FONT_SIZE,
   opacity: 100,
   roughness: 1,
-  strokeColor: COLOR_PALETTE.black,
+  strokeColor: COLOR_CHARCOAL_BLACK,
   roundness: null,
   strokeStyle: "solid",
   strokeWidth: 1,
@@ -324,7 +321,7 @@ const chartBaseElements = (
         y: y - chartHeight,
         width: chartWidth,
         height: chartHeight,
-        strokeColor: COLOR_PALETTE.black,
+        strokeColor: COLOR_CHARCOAL_BLACK,
         fillStyle: "solid",
         opacity: 6,
       })

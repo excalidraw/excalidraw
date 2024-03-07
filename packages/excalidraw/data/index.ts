@@ -81,46 +81,54 @@ export const prepareElementsForExport = (
   };
 };
 
-export const exportCanvas = async (
-  type: Omit<ExportType, "backend">,
-  elements: ExportedElements,
-  appState: AppState,
-  files: BinaryFiles,
-  {
-    exportBackground,
-    exportPadding = DEFAULT_EXPORT_PADDING,
-    viewBackgroundColor,
-    name = appState.name || DEFAULT_FILENAME,
-    fileHandle = null,
-    exportingFrame = null,
-  }: {
+export const exportAsImage = async ({
+  type,
+  data,
+  config,
+}: {
+  type: Omit<ExportType, "backend">;
+  data: {
+    elements: ExportedElements;
+    appState: AppState;
+    files: BinaryFiles;
+  };
+  config: {
     exportBackground: boolean;
-    exportPadding?: number;
+    padding?: number;
     viewBackgroundColor: string;
     /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
-  },
-) => {
-  if (elements.length === 0) {
+  };
+}) => {
+  // clone
+  const cfg = Object.assign({}, config);
+
+  cfg.padding = cfg.padding ?? DEFAULT_EXPORT_PADDING;
+  cfg.fileHandle = cfg.fileHandle ?? null;
+  cfg.exportingFrame = cfg.exportingFrame ?? null;
+  cfg.name = cfg.name || DEFAULT_FILENAME;
+
+  if (data.elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const svgPromise = exportToSvg(
-      elements,
-      {
-        exportBackground,
-        exportWithDarkMode: appState.exportWithDarkMode,
-        viewBackgroundColor,
-        exportPadding,
-        exportScale: appState.exportScale,
-        exportEmbedScene: appState.exportEmbedScene && type === "svg",
+    const svgPromise = exportToSvg({
+      data: {
+        elements: data.elements,
+        appState: {
+          exportBackground: cfg.exportBackground,
+          exportWithDarkMode: data.appState.exportWithDarkMode,
+          viewBackgroundColor: data.appState.viewBackgroundColor,
+          exportPadding: cfg.padding,
+          exportScale: data.appState.exportScale,
+          exportEmbedScene: data.appState.exportEmbedScene && type === "svg",
+        },
+        files: data.files,
       },
-      files,
-      { exportingFrame },
-    );
-
+      config: { exportingFrame: cfg.exportingFrame },
+    });
     if (type === "svg") {
       return fileSave(
         svgPromise.then((svg) => {
@@ -128,9 +136,9 @@ export const exportCanvas = async (
         }),
         {
           description: "Export to SVG",
-          name,
-          extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
-          fileHandle,
+          name: cfg.name,
+          extension: data.appState.exportEmbedScene ? "excalidraw.svg" : "svg",
+          fileHandle: cfg.fileHandle,
         },
       );
     } else if (type === "clipboard-svg") {
@@ -144,22 +152,33 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, files, {
-    exportBackground,
-    viewBackgroundColor,
-    exportPadding,
-    exportingFrame,
+  const tempCanvas = exportToCanvas({
+    data,
+    config: {
+      canvasBackgroundColor: !cfg.exportBackground
+        ? false
+        : cfg.viewBackgroundColor,
+      padding: cfg.padding,
+      theme: data.appState.exportWithDarkMode ? "dark" : "light",
+      scale: data.appState.exportScale,
+      fit: "none",
+      exportingFrame: cfg.exportingFrame,
+    },
   });
 
   if (type === "png") {
-    let blob = canvasToBlob(tempCanvas);
-
-    if (appState.exportEmbedScene) {
-      blob = blob.then((blob) =>
+    const blob = canvasToBlob(tempCanvas);
+    if (data.appState.exportEmbedScene) {
+      blob.then((blob) =>
         import("./image").then(({ encodePngMetadata }) =>
           encodePngMetadata({
             blob,
-            metadata: serializeAsJSON(elements, appState, files, "local"),
+            metadata: serializeAsJSON(
+              data.elements,
+              data.appState,
+              data.files,
+              "local",
+            ),
           }),
         ),
       );
@@ -167,11 +186,11 @@ export const exportCanvas = async (
 
     return fileSave(blob, {
       description: "Export to PNG",
-      name,
+      name: cfg.name,
       // FIXME reintroduce `excalidraw.png` when most people upgrade away
       // from 111.0.5563.64 (arm64), see #6349
       extension: /* appState.exportEmbedScene ? "excalidraw.png" : */ "png",
-      fileHandle,
+      fileHandle: cfg.fileHandle,
     });
   } else if (type === "clipboard") {
     try {

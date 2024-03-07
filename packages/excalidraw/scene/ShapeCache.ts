@@ -8,7 +8,8 @@ import { elementWithCanvasCache } from "../renderer/renderElement";
 import { _generateElementShape } from "./Shape";
 import type { ElementShape, ElementShapes } from "./types";
 import { COLOR_PALETTE } from "../colors";
-import type { AppState, EmbedsValidationStatus } from "../types";
+import type { EmbedsValidationStatus } from "../types";
+import type { StaticCanvasRenderConfig } from "./types";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -50,7 +51,7 @@ export class ShapeCache {
     element: T,
     renderConfig: {
       isExporting: boolean;
-      canvasBackgroundColor: AppState["viewBackgroundColor"];
+      canvasBackgroundColor: StaticCanvasRenderConfig["canvasBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
     } | null,
   ) => {

@@ -10,13 +10,13 @@ import { useDevice } from "../components/App";
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
-import { getExportSize } from "../scene/export";
+import { getCanvasSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import type { Theme } from "../element/types";
+import type { NonDeletedExcalidrawElement, Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
 import { StoreAction } from "../store";
@@ -57,6 +57,18 @@ export const actionChangeExportScale = register({
     const exportedElements = exportSelected
       ? getSelectedElements(elements, appState)
       : elements;
+
+    const getExportSize = (
+      elements: readonly NonDeletedExcalidrawElement[],
+      padding: number,
+      scale: number,
+    ): [number, number] => {
+      const [, , width, height] = getCanvasSize(elements).map((dimension) =>
+        Math.trunc(dimension * scale),
+      );
+
+      return [width + padding * 2, height + padding * 2];
+    };
 
     return (
       <>
