@@ -7217,7 +7217,6 @@ class App extends React.Component<AppProps, AppState> {
                 })
                 .map((element) => element.id),
             );
-            const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
             const elements = this.scene.getElementsIncludingDeleted();
 
@@ -7234,7 +7233,6 @@ class App extends React.Component<AppProps, AppState> {
                   groupIdMap,
                   element,
                 );
-                duplicatedElementsMap.set(element.id, element);
                 const origElement = pointerDownState.originalElements.get(
                   element.id,
                 )!;

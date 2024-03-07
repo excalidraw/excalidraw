@@ -44,14 +44,14 @@ export const reconcileElements = (
     | readonly SyncableExcalidrawElement[],
   localAppState: AppState,
 ): ReconciledExcalidrawElement[] => {
-  const localElementsData = arrayToMap(localElements);
+  const localElementsMap = arrayToMap(localElements);
   const reconciledElements: OrderedExcalidrawElement[] = [];
   const added = new Set<string>();
 
   // process remote elements
   for (const remoteElement of remoteElements) {
     if (!added.has(remoteElement.id)) {
-      const localElement = localElementsData.get(remoteElement.id);
+      const localElement = localElementsMap.get(remoteElement.id);
       const discardRemoteElement = shouldDiscardRemoteElement(
         localAppState,
         localElement,

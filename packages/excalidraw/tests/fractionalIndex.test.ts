@@ -745,7 +745,7 @@ function test(
     // clone due to mutation
     const clonedElements = elements.map((x) => deepCopyElement(x));
 
-    // Act
+    // act
     const syncedElements = movedElements
       ? syncMovedIndices(clonedElements, movedElements)
       : syncInvalidIndices(clonedElements);
