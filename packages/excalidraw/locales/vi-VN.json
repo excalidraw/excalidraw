@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "Không thể kết nối với máy chủ hợp tác. Hãy tải lại trang và thử lại.",
     "importLibraryError": "Không thể tải thư viện",
+    "saveLibraryError": "",
     "collabSaveFailed": "Không thể lưu vào cơ sở dữ liệu. Nếu vấn đề tiếp tục xảy ra, bạn nên lưu tệp vào máy để đảm bảo bạn không bị mất công việc.",
     "collabSaveFailed_sizeExceeded": "Không thể lưu vào cơ sở dữ liệu, canvas có vẻ quá lớn. Bạn nên lưu tệp cục bộ để đảm bảo bạn không bị mất công việc.",
     "imageToolNotSupported": "",
