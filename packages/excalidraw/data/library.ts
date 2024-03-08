@@ -857,14 +857,14 @@ export const useHandleLibrary = (
       // -----------------------------------------------------------------------
       const unsubOnLibraryUpdate = onLibraryUpdateEmitter.on(
         async (update, nextLibraryItems) => {
-        const isLoaded = isLibraryLoadedRef.current;
-        // we want to operate with the latest adapter, but we don't want this
-        // effect to rerun on every adapter change in case host apps' adapter
-        // isn't stable
-        const adapter =
-          ("adapter" in optsRef.current && optsRef.current.adapter) || null;
-        try {
-          if (adapter) {
+          const isLoaded = isLibraryLoadedRef.current;
+          // we want to operate with the latest adapter, but we don't want this
+          // effect to rerun on every adapter change in case host apps' adapter
+          // isn't stable
+          const adapter =
+            ("adapter" in optsRef.current && optsRef.current.adapter) || null;
+          try {
+            if (adapter) {
               if (
                 // if nextLibraryItems hash identical to previously saved hash,
                 // exit early, even if actual upstream state ends up being
@@ -873,24 +873,24 @@ export const useHandleLibrary = (
                 lastSavedLibraryItemsHash !=
                 getLibraryItemsHash(nextLibraryItems)
               ) {
-            await persistLibraryUpdate(adapter, update);
-          }
+                await persistLibraryUpdate(adapter, update);
+              }
             }
-        } catch (error: any) {
-          console.error(
-            `couldn't persist library update: ${error.message}`,
-            update,
-          );
+          } catch (error: any) {
+            console.error(
+              `couldn't persist library update: ${error.message}`,
+              update,
+            );
 
-          // currently we only show error if an editor is loaded
-          if (isLoaded && optsRef.current.excalidrawAPI) {
-            optsRef.current.excalidrawAPI.updateScene({
-              appState: {
-                errorMessage: t("errors.saveLibraryError"),
-              },
-            });
+            // currently we only show error if an editor is loaded
+            if (isLoaded && optsRef.current.excalidrawAPI) {
+              optsRef.current.excalidrawAPI.updateScene({
+                appState: {
+                  errorMessage: t("errors.saveLibraryError"),
+                },
+              });
+            }
           }
-        }
         },
       );
 
