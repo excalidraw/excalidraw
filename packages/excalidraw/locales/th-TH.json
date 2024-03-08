@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "ไม่สามารถเชื่อต่อกับ collab เซิร์ฟเวอร์ได้ โปรดลองโหลดหน้านี้ใหม่และลองอีกครั้ง",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
