@@ -89,6 +89,8 @@ import {
   TOOL_TYPE,
   EDITOR_LS_KEYS,
   isIOS,
+  CANVAS_TRANSLATE_AMOUNT,
+  CANVAS_SHIFT_TRANSLATE_AMOUNT,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -3805,6 +3807,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.viewModeEnabled) {
+        if (isArrowKey(event.key)) {
+          event.preventDefault();
+          this.scrollCanvasInUsingArrowKeys(event);
+        }
         return;
       }
 
@@ -3991,6 +3997,56 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  private scrollCanvasInUsingArrowKeys = (
+    event: React.KeyboardEvent | KeyboardEvent,
+  ) => {
+    const { viewModePressedKeys } = this.state;
+    let { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } = viewModePressedKeys;
+
+    if (event.key === KEYS.ARROW_UP && !ArrowUp) {
+      ArrowUp = true;
+    }
+    if (event.key === KEYS.ARROW_DOWN && !ArrowDown) {
+      ArrowDown = true;
+    }
+    if (event.key === KEYS.ARROW_LEFT && !ArrowLeft) {
+      ArrowLeft = true;
+    }
+    if (event.key === KEYS.ARROW_RIGHT && !ArrowRight) {
+      ArrowRight = true;
+    }
+
+    const step =
+      (this.state.gridSize &&
+        (event.shiftKey ? CANVAS_TRANSLATE_AMOUNT : this.state.gridSize)) ||
+      (event.shiftKey
+        ? CANVAS_SHIFT_TRANSLATE_AMOUNT
+        : CANVAS_TRANSLATE_AMOUNT);
+
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (ArrowUp) offsetY = step;
+    if (ArrowDown) offsetY = -step;
+    if (ArrowLeft) offsetX = step;
+    if (ArrowRight) offsetX = -step;
+
+    this.translateCanvas({
+      scrollX: this.state.scrollX + offsetX,
+      scrollY: this.state.scrollY + offsetY,
+    });
+
+    this.setState({
+      viewModePressedKeys: {
+        ...viewModePressedKeys,
+        ArrowUp,
+        ArrowDown,
+        ArrowLeft,
+        ArrowRight,
+      },
+    });
+  };
+
   private onWheel = withBatchedUpdates((event: WheelEvent) => {
     // prevent browser pinch zoom on DOM elements
     if (!(event.target instanceof HTMLCanvasElement) && event.ctrlKey) {
@@ -4019,6 +4075,10 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
+      if (this.state.viewModeEnabled) {
+        this.releasePressedKeysInViewMod(event);
+      }
+
       const selectedElements = this.scene.getSelectedElements(this.state);
       const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
@@ -4031,6 +4091,56 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBindings: [] });
     }
   });
+
+  private releasePressedKeysInViewMod = (
+    event: React.KeyboardEvent | KeyboardEvent,
+  ) => {
+    const { viewModePressedKeys } = this.state;
+    const { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } = viewModePressedKeys;
+
+    if (event.key == KEYS.ARROW_LEFT && ArrowLeft) {
+      this.setAppState({
+        viewModePressedKeys: {
+          ...viewModePressedKeys,
+          ArrowLeft: false,
+        },
+      });
+
+      return;
+    }
+
+    if (event.key == KEYS.ARROW_RIGHT && ArrowRight) {
+      this.setAppState({
+        viewModePressedKeys: {
+          ...viewModePressedKeys,
+          ArrowRight: false,
+        },
+      });
+
+      return;
+    }
+
+    if (event.key == KEYS.ARROW_UP && ArrowUp) {
+      this.setAppState({
+        viewModePressedKeys: {
+          ...viewModePressedKeys,
+          ArrowUp: false,
+        },
+      });
+
+      return;
+    }
+    if (event.key == KEYS.ARROW_DOWN && ArrowDown) {
+      this.setAppState({
+        viewModePressedKeys: {
+          ...viewModePressedKeys,
+          ArrowDown: false,
+        },
+      });
+
+      return;
+    }
+  };
 
   // We purposely widen the `tool` type so this helper can be called with
   // any tool without having to type check it

@@ -145,6 +145,8 @@ export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
+export const CANVAS_TRANSLATE_AMOUNT = 4;
+export const CANVAS_SHIFT_TRANSLATE_AMOUNT = 10;
 
 export const GRID_SIZE = 20; // TODO make it configurable?
 
