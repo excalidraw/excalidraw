@@ -39,8 +39,8 @@ import { hashElementsVersion, hashString } from "../element";
 type LibraryUpdate = {
   /** deleted library items since last onLibraryChange event */
   deletedItems: Map<LibraryItem["id"], LibraryItem>;
-  /** all currently non-deleted items in the library */
-  libraryItems: Map<LibraryItem["id"], LibraryItem>;
+  /** newly added items in the library */
+  addedItems: Map<LibraryItem["id"], LibraryItem>;
 };
 
 // an object so that we can later add more properties to it without breaking,
@@ -135,12 +135,10 @@ export const mergeLibraryItems = (
 };
 
 /**
- * Returns { deletedItems, libraryItems } maps, where `libraryItems` are
- * all non-deleted items that are currently in the library, and `deletedItems`
- * are all items there deleted since last onLibraryChange event.
+ * Returns { deletedItems, addedItems } maps of all added and deleted items
+ * since last onLibraryChange event.
  *
- * Host apps are recommended to merge `libraryItems` with whatever state they
- * have, while removing from the resulting state all items from `deletedItems`.
+ * Host apps are recommended to diff with the latest state they have.
  */
 const createLibraryUpdate = (
   prevLibraryItems: LibraryItems,
@@ -150,12 +148,20 @@ const createLibraryUpdate = (
 
   const update: LibraryUpdate = {
     deletedItems: new Map<LibraryItem["id"], LibraryItem>(),
-    libraryItems: nextItemsMap,
+    addedItems: new Map<LibraryItem["id"], LibraryItem>(),
   };
 
   for (const item of prevLibraryItems) {
     if (!nextItemsMap.has(item.id)) {
       update.deletedItems.set(item.id, item);
+    }
+  }
+
+  const prevItemsMap = arrayToMap(prevLibraryItems);
+
+  for (const item of nextLibraryItems) {
+    if (!prevItemsMap.has(item.id)) {
+      update.addedItems.set(item.id, item);
     }
   }
 
@@ -567,7 +573,7 @@ const persistLibraryUpdate = async (
       // 3. some other race condition, e.g. during init where emit updates
       //    for partial updates (e.g. you install a 3rd party library and
       //    init from DB only after — we emit events for both updates)
-      for (const [id, item] of update.libraryItems) {
+      for (const [id, item] of update.addedItems) {
         if (nextLibraryItemsMap.has(id)) {
           // replace item with latest version
           // TODO we could prefer the newer item instead
