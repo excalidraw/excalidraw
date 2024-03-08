@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "Kan geen verbinding maken met de collab server. Herlaad de pagina en probeer het opnieuw.",
     "importLibraryError": "Kon bibliotheek niet laden",
+    "saveLibraryError": "",
     "collabSaveFailed": "Kan niet opslaan in de backend database. Als de problemen blijven bestaan, moet u het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "collabSaveFailed_sizeExceeded": "Kan de backend database niet opslaan, het canvas lijkt te groot te zijn. U moet het bestand lokaal opslaan om ervoor te zorgen dat u uw werk niet verliest.",
     "imageToolNotSupported": "",
