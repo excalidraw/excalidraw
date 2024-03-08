@@ -216,6 +216,7 @@
     "failedToFetchImage": "Échec de récupération de l'image.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
+    "saveLibraryError": "",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
     "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
     "imageToolNotSupported": "Les images sont désactivées.",
