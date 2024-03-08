@@ -216,7 +216,7 @@
     "failedToFetchImage": "Pridobivanje slike ni uspelo.",
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
-    "saveLibraryError": "",
+    "saveLibraryError": "Knjižnice ni bilo mogoče shraniti v shrambo. Prosimo, shranite svojo knjižnico v datoteko lokalno, da ne boste izgubili sprememb.",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
     "imageToolNotSupported": "Slike so onemogočene.",
