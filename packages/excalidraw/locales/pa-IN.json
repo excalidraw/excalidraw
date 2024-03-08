@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "",
     "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
