@@ -870,7 +870,7 @@ export const useHandleLibrary = (
                 // exit early, even if actual upstream state ends up being
                 // different (e.g. has more data than we have locally), as it'd
                 // be low-impact scenario.
-                lastSavedLibraryItemsHash !=
+                lastSavedLibraryItemsHash !==
                 getLibraryItemsHash(nextLibraryItems)
               ) {
                 await persistLibraryUpdate(adapter, update);
