@@ -73,9 +73,9 @@ export type DataURL = string & { _brand: "DataURL" };
 
 export type BinaryFileData = {
   mimeType:
-    | ValueOf<typeof IMAGE_MIME_TYPES>
-    // future user or unknown file type
-    | typeof MIME_TYPES.binary;
+  | ValueOf<typeof IMAGE_MIME_TYPES>
+  // future user or unknown file type
+  | typeof MIME_TYPES.binary;
   id: FileId;
   dataURL: DataURL;
   /**
@@ -117,13 +117,13 @@ export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
 export type ActiveTool =
   | {
-      type: ToolType;
-      customType: null;
-    }
+    type: ToolType;
+    customType: null;
+  }
   | {
-      type: "custom";
-      customType: string;
-    };
+    type: "custom";
+    customType: string;
+  };
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -255,17 +255,17 @@ export interface AppState {
   openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
-    | null
-    | { name: "imageExport" | "help" | "jsonExport" }
-    | {
-        name: "settings";
-        source:
-          | "tool" // when magicframe tool is selected
-          | "generation" // when magicframe generate button is clicked
-          | "settings"; // when AI settings dialog is explicitly invoked
-        tab: "text-to-diagram" | "diagram-to-code";
-      }
-    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" };
+  | null
+  | { name: "imageExport" | "help" | "jsonExport" }
+  | {
+    name: "settings";
+    source:
+    | "tool" // when magicframe tool is selected
+    | "generation" // when magicframe generate button is clicked
+    | "settings"; // when AI settings dialog is explicitly invoked
+    tab: "text-to-diagram" | "diagram-to-code";
+  }
+  | { name: "ttd"; tab: "text-to-diagram" | "mermaid" };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -285,6 +285,12 @@ export interface AppState {
   theme: Theme;
   gridSize: number | null;
   viewModeEnabled: boolean;
+  viewModePressedKeys: {
+    ArrowLeft: boolean;
+    ArrowRight: boolean;
+    ArrowUp: boolean;
+    ArrowDown: boolean;
+  }
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -301,14 +307,14 @@ export interface AppState {
   showStats: boolean;
   currentChartType: ChartType;
   pasteDialog:
-    | {
-        shown: false;
-        data: null;
-      }
-    | {
-        shown: true;
-        data: Spreadsheet;
-      };
+  | {
+    shown: false;
+    data: null;
+  }
+  | {
+    shown: true;
+    data: Spreadsheet;
+  };
   /** imageElement waiting to be placed on canvas */
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
@@ -379,11 +385,11 @@ export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
 
 export type LibraryItemsSource =
   | ((
-      currentLibraryItems: LibraryItems,
-    ) =>
-      | Blob
-      | LibraryItems_anyVersion
-      | Promise<LibraryItems_anyVersion | Blob>)
+    currentLibraryItems: LibraryItems,
+  ) =>
+    | Blob
+    | LibraryItems_anyVersion
+    | Promise<LibraryItems_anyVersion | Blob>)
   | Blob
   | LibraryItems_anyVersion
   | Promise<LibraryItems_anyVersion | Blob>;
@@ -393,8 +399,8 @@ export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,
   {
     libraryItems?:
-      | Required<ImportedDataState>["libraryItems"]
-      | Promise<Required<ImportedDataState>["libraryItems"]>;
+    | Required<ImportedDataState>["libraryItems"]
+    | Promise<Required<ImportedDataState>["libraryItems"]>;
   }
 >;
 
@@ -410,9 +416,9 @@ export interface ExcalidrawProps {
     files: BinaryFiles,
   ) => void;
   initialData?:
-    | ExcalidrawInitialDataState
-    | null
-    | Promise<ExcalidrawInitialDataState | null>;
+  | ExcalidrawInitialDataState
+  | null
+  | Promise<ExcalidrawInitialDataState | null>;
   excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
@@ -465,11 +471,11 @@ export interface ExcalidrawProps {
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
   validateEmbeddable?:
-    | boolean
-    | string[]
-    | RegExp
-    | RegExp[]
-    | ((link: string) => boolean | undefined);
+  | boolean
+  | string[]
+  | RegExp
+  | RegExp[]
+  | ((link: string) => boolean | undefined);
   renderEmbeddable?: (
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
