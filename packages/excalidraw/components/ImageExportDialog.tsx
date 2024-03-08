@@ -128,19 +128,25 @@ const ImageExportModal = ({
     };
 
     exportToCanvas({
-      elements: exportedElements,
-      appState: {
-        ...appStateSnapshot,
-        name: projectName,
-        exportBackground: exportWithBackground,
-        exportWithDarkMode,
-        exportScale,
-        exportEmbedScene: embedScene,
+      data: {
+        elements: exportedElements,
+        appState: {
+          ...appStateSnapshot,
+          name: projectName,
+          exportEmbedScene: embedScene,
+        },
+        files,
       },
-      files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
-      exportingFrame,
+      config: {
+        canvasBackgroundColor: exportWithBackground
+          ? appStateSnapshot.viewBackgroundColor
+          : false,
+        padding: DEFAULT_EXPORT_PADDING,
+        theme: exportWithDarkMode ? "dark" : "light",
+        scale: exportScale,
+        maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+        exportingFrame,
+      },
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {

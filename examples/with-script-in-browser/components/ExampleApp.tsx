@@ -370,10 +370,12 @@ export default function ExampleApp({
       return false;
     }
     await exportToClipboard({
-      elements: excalidrawAPI.getSceneElements(),
-      appState: excalidrawAPI.getAppState(),
-      files: excalidrawAPI.getFiles(),
-      type,
+      data: {
+        elements: excalidrawAPI.getSceneElements(),
+        appState: excalidrawAPI.getAppState(),
+        files: excalidrawAPI.getFiles(),
+      },
+      type: "json",
     });
     window.alert(`Copied to clipboard as ${type} successfully`);
   };
@@ -826,15 +828,17 @@ export default function ExampleApp({
                 return;
               }
               const svg = await exportToSvg({
-                elements: excalidrawAPI?.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                  exportEmbedScene,
-                  width: 300,
-                  height: 100,
+                data: {
+                  elements: excalidrawAPI?.getSceneElements(),
+                  appState: {
+                    ...initialData.appState,
+                    exportWithDarkMode,
+                    exportEmbedScene,
+                    width: 300,
+                    height: 100,
+                  },
+                  files: excalidrawAPI?.getFiles(),
                 },
-                files: excalidrawAPI?.getFiles(),
               });
               appRef.current.querySelector(".export-svg").innerHTML =
                 svg.outerHTML;
@@ -850,14 +854,18 @@ export default function ExampleApp({
                 return;
               }
               const blob = await exportToBlob({
-                elements: excalidrawAPI?.getSceneElements(),
-                mimeType: "image/png",
-                appState: {
-                  ...initialData.appState,
-                  exportEmbedScene,
-                  exportWithDarkMode,
+                data: {
+                  elements: excalidrawAPI?.getSceneElements(),
+                  appState: {
+                    ...initialData.appState,
+                    exportEmbedScene,
+                    exportWithDarkMode,
+                  },
+                  files: excalidrawAPI?.getFiles(),
                 },
-                files: excalidrawAPI?.getFiles(),
+                config: {
+                  mimeType: "image/png",
+                },
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}

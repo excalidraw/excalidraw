@@ -1,5 +1,4 @@
-import { MIME_TYPES } from "@excalidraw/common";
-import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
+import { COLOR_WHITE, MIME_TYPES } from "@excalidraw/common";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
@@ -17,96 +16,52 @@ import {
 } from "@excalidraw/excalidraw/scene/export";
 
 import type {
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  NonDeleted,
-} from "@excalidraw/element/types";
-import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+  ExportToCanvasConfig,
+  ExportToCanvasData,
+} from "@excalidraw/excalidraw/scene/export";
+
+import { getNonDeletedElements } from "../../excalidraw";
 
 export { MIME_TYPES };
 
-type ExportOpts = {
-  elements: readonly NonDeleted<ExcalidrawElement>[];
-  appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
-  files: BinaryFiles | null;
-  maxWidthOrHeight?: number;
-  exportingFrame?: ExcalidrawFrameLikeElement | null;
-  getDimensions?: (
-    width: number,
-    height: number,
-  ) => { width: number; height: number; scale?: number };
+type ExportToBlobConfig = ExportToCanvasConfig & {
+  mimeType?: string;
+  quality?: number;
 };
 
-export const exportToCanvas = ({
-  elements,
-  appState,
-  files,
-  maxWidthOrHeight,
-  getDimensions,
-  exportPadding,
-  exportingFrame,
-}: ExportOpts & {
-  exportPadding?: number;
+type ExportToSvgConfig = Pick<
+  ExportToCanvasConfig,
+  "canvasBackgroundColor" | "padding" | "theme" | "exportingFrame"
+> & {
+  /**
+   * if true, all embeddables passed in will be rendered when possible.
+   */
+  renderEmbeddables?: boolean;
+  skipInliningFonts?: true;
+  reuseImages?: boolean;
+};
+
+export const exportToCanvas = async ({
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+  config?: ExportToCanvasConfig;
 }) => {
-  const restoredElements = restoreElements(elements, null, {
-    deleteInvisibleElements: true,
+  return _exportToCanvas({
+    data,
+    config,
   });
-  const restoredAppState = restoreAppState(appState, null);
-
-  const { exportBackground, viewBackgroundColor } = restoredAppState;
-  return _exportToCanvas(
-    restoredElements,
-    { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
-    files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
-    (width: number, height: number) => {
-      const canvas = document.createElement("canvas");
-
-      if (maxWidthOrHeight) {
-        if (typeof getDimensions === "function") {
-          console.warn(
-            "`getDimensions()` is ignored when `maxWidthOrHeight` is supplied.",
-          );
-        }
-
-        const max = Math.max(width, height);
-
-        // if content is less then maxWidthOrHeight, fallback on supplied scale
-        const scale =
-          maxWidthOrHeight < max
-            ? maxWidthOrHeight / max
-            : appState?.exportScale ?? 1;
-
-        canvas.width = width * scale;
-        canvas.height = height * scale;
-
-        return {
-          canvas,
-          scale,
-        };
-      }
-
-      const ret = getDimensions?.(width, height) || { width, height };
-
-      canvas.width = ret.width;
-      canvas.height = ret.height;
-
-      return {
-        canvas,
-        scale: ret.scale ?? 1,
-      };
-    },
-  );
 };
 
-export const exportToBlob = async (
-  opts: ExportOpts & {
-    mimeType?: string;
-    quality?: number;
-    exportPadding?: number;
-  },
-): Promise<Blob> => {
-  let { mimeType = MIME_TYPES.png, quality } = opts;
+export const exportToBlob = async ({
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+  config?: ExportToBlobConfig;
+}): Promise<Blob> => {
+  let { mimeType = MIME_TYPES.png, quality } = config || {};
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
     console.warn(`"quality" will be ignored for "${MIME_TYPES.png}" mimeType`);
@@ -117,17 +72,17 @@ export const exportToBlob = async (
     mimeType = MIME_TYPES.jpg;
   }
 
-  if (mimeType === MIME_TYPES.jpg && !opts.appState?.exportBackground) {
+  if (mimeType === MIME_TYPES.jpg && !config?.canvasBackgroundColor === false) {
     console.warn(
       `Defaulting "exportBackground" to "true" for "${MIME_TYPES.jpg}" mimeType`,
     );
-    opts = {
-      ...opts,
-      appState: { ...opts.appState, exportBackground: true },
+    config = {
+      ...config,
+      canvasBackgroundColor: data.appState?.viewBackgroundColor || COLOR_WHITE,
     };
   }
 
-  const canvas = await exportToCanvas(opts);
+  const canvas = await _exportToCanvas({ data, config });
 
   quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
@@ -140,7 +95,7 @@ export const exportToBlob = async (
         if (
           blob &&
           mimeType === MIME_TYPES.png &&
-          opts.appState?.exportEmbedScene
+          data.appState?.exportEmbedScene
         ) {
           blob = await encodePngMetadata({
             blob,
@@ -148,9 +103,9 @@ export const exportToBlob = async (
               // NOTE as long as we're using the Scene hack, we need to ensure
               // we pass the original, uncloned elements when serializing
               // so that we keep ids stable
-              opts.elements,
-              opts.appState,
-              opts.files || {},
+              data.elements,
+              data.appState,
+              data.files || {},
               "local",
             ),
           });
@@ -164,52 +119,50 @@ export const exportToBlob = async (
 };
 
 export const exportToSvg = async ({
-  elements,
-  appState = getDefaultAppState(),
-  files = {},
-  exportPadding,
-  renderEmbeddables,
-  exportingFrame,
-  skipInliningFonts,
-  reuseImages,
-}: Omit<ExportOpts, "getDimensions"> & {
-  exportPadding?: number;
-  renderEmbeddables?: boolean;
-  skipInliningFonts?: true;
-  reuseImages?: boolean;
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+  config?: ExportToSvgConfig;
 }): Promise<SVGSVGElement> => {
-  const restoredElements = restoreElements(elements, null, {
+  const restoredElements = restoreElements(data.elements, null, {
     deleteInvisibleElements: true,
   });
-  const restoredAppState = restoreAppState(appState, null);
+  const restoredAppState = restoreAppState(data.appState, null);
 
-  const exportAppState = {
-    ...restoredAppState,
-    exportPadding,
-  };
+  const appState = { ...restoredAppState, exportPadding: config?.padding };
+  const elements = getNonDeletedElements(restoredElements);
+  const files = data.files || {};
 
-  return _exportToSvg(restoredElements, exportAppState, files, {
-    exportingFrame,
-    renderEmbeddables,
-    skipInliningFonts,
-    reuseImages,
+  return _exportToSvg({
+    data: { elements, appState, files },
+    config: {
+      exportingFrame: config?.exportingFrame,
+      renderEmbeddables: config?.renderEmbeddables,
+      skipInliningFonts: config?.skipInliningFonts,
+      reuseImages: config?.reuseImages,
+    },
   });
 };
 
-export const exportToClipboard = async (
-  opts: ExportOpts & {
-    mimeType?: string;
-    quality?: number;
-    type: "png" | "svg" | "json";
-  },
-) => {
-  if (opts.type === "svg") {
-    const svg = await exportToSvg(opts);
+export const exportToClipboard = async ({
+  type,
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+} & (
+  | { type: "png"; config?: ExportToBlobConfig }
+  | { type: "svg"; config?: ExportToSvgConfig }
+  | { type: "json"; config?: never }
+)) => {
+  if (type === "svg") {
+    const svg = await exportToSvg({ data, config });
     await copyTextToSystemClipboard(svg.outerHTML);
-  } else if (opts.type === "png") {
-    await copyBlobToClipboardAsPng(exportToBlob(opts));
-  } else if (opts.type === "json") {
-    await copyToClipboard(opts.elements, opts.files);
+  } else if (type === "png") {
+    await copyBlobToClipboardAsPng(exportToBlob({ data, config }));
+  } else if (type === "json") {
+    await copyToClipboard(data.elements, data.files);
   } else {
     throw new Error("Invalid export type");
   }

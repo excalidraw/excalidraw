@@ -5,6 +5,12 @@ import { degreesToRadians } from "@excalidraw/math";
 
 import type { Degrees } from "@excalidraw/math";
 
+import {
+  COLOR_WHITE,
+  COLOR_CHARCOAL_BLACK,
+  COLOR_TRANSPARENT,
+} from "./constants";
+
 // ---------------------------------------------------------------------------
 // Dark mode color transformation
 // ---------------------------------------------------------------------------
@@ -141,9 +147,9 @@ export const DEFAULT_ELEMENT_STROKE_COLOR_INDEX = 4;
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX = 1;
 
 export const COLOR_PALETTE = {
-  transparent: "transparent",
-  black: "#1e1e1e",
-  white: "#ffffff",
+  transparent: COLOR_TRANSPARENT,
+  charcoal: COLOR_CHARCOAL_BLACK,
+  white: COLOR_WHITE,
   // open-color from https://github.com/yeun/open-color/blob/master/open-color.js
   // corresponds to indexes [0,2,4,6,8] (weights: 50, 200, 400, 600, 800)
   gray: ["#f8f9fa", "#e9ecef", "#ced4da", "#868e96", "#343a40"],
@@ -182,7 +188,7 @@ const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
 
 // ORDER matters for positioning in quick picker
 export const DEFAULT_ELEMENT_STROKE_PICKS = [
-  COLOR_PALETTE.black,
+  COLOR_PALETTE.charcoal,
   COLOR_PALETTE.red[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
   COLOR_PALETTE.green[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
   COLOR_PALETTE.blue[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
@@ -219,7 +225,7 @@ export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
   gray: COLOR_PALETTE.gray,
-  black: COLOR_PALETTE.black,
+  charcoal: COLOR_PALETTE.charcoal,
   bronze: COLOR_PALETTE.bronze,
   // rest
   ...COMMON_ELEMENT_SHADES,
@@ -230,7 +236,7 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
   gray: COLOR_PALETTE.gray,
-  black: COLOR_PALETTE.black,
+  charcoal: COLOR_PALETTE.charcoal,
   bronze: COLOR_PALETTE.bronze,
 
   ...COMMON_ELEMENT_SHADES,

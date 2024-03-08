@@ -5,11 +5,15 @@ import { newTextElement } from "@excalidraw/element";
 import type { ChartType } from "@excalidraw/element/types";
 
 import { trackEvent } from "../analytics";
-import { isSpreadsheetValidForChartType, renderSpreadsheet } from "../charts";
+import {
+  isSpreadsheetValidForChartType,
+  renderSpreadsheet,
+} from "../charts/index";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
 
 import { useUIAppState } from "../context/ui-appState";
+import { COLOR_WHITE } from "../../common/src";
 
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
@@ -18,7 +22,7 @@ import "./PasteChartDialog.scss";
 
 import { bucketFillIcon } from "./icons";
 
-import type { ChartElements, Spreadsheet } from "../charts";
+import type { ChartElements, Spreadsheet } from "../charts/index";
 
 type OnPlainTextPaste = (rawText: string) => void;
 
@@ -72,18 +76,19 @@ const ChartPreviewBtn = (props: {
     const previewNode = previewRef.current!;
 
     (async () => {
-      svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: false,
-          viewBackgroundColor: "#fff",
-          exportWithDarkMode: theme === "dark",
+      svg = await exportToSvg({
+        data: {
+          elements,
+          appState: {
+            exportBackground: false,
+            viewBackgroundColor: COLOR_WHITE,
+          },
+          files: null,
         },
-        null, // files
-        {
+        config: {
           skipInliningFonts: true,
         },
-      );
+      });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
       previewNode.appendChild(svg);
@@ -134,18 +139,19 @@ const PlainTextPreviewBtn = (props: {
     const previewNode = previewRef.current!;
 
     (async () => {
-      const svg = await exportToSvg(
-        [textElement],
-        {
-          exportBackground: false,
-          viewBackgroundColor: "#fff",
-          exportWithDarkMode: theme === "dark",
+      const svg = await exportToSvg({
+        data: {
+          elements: [textElement],
+          appState: {
+            exportBackground: false,
+            viewBackgroundColor: COLOR_WHITE,
+          },
+          files: null,
         },
-        null,
-        {
+        config: {
           skipInliningFonts: true,
         },
-      );
+      });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
       previewNode.appendChild(svg);

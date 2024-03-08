@@ -4,8 +4,9 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getFileHandleType, isImageFileHandleType } from "./blob";
 
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { exportCanvas, prepareElementsForExport } from ".";
+import { prepareElementsForExport } from ".";
+
+import { exportAsImage } from ".";
 
 import type { AppState, BinaryFiles } from "../types";
 
@@ -41,12 +42,16 @@ export const resaveAsImageWithScene = async (
     false,
   );
 
-  await exportCanvas(fileHandleType, exportedElements, appState, files, {
-    exportBackground,
-    viewBackgroundColor,
-    name: filename,
-    fileHandle,
-    exportingFrame,
+  await exportAsImage({
+    type: fileHandleType,
+    data: { elements: exportedElements, appState, files },
+    config: {
+      exportBackground,
+      viewBackgroundColor,
+      name: filename,
+      fileHandle,
+      exportingFrame,
+    },
   });
 
   return { fileHandle };
