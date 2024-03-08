@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
     "importLibraryError": "Nelze načíst knihovnu",
+    "saveLibraryError": "",
     "collabSaveFailed": "Nelze uložit do databáze na serveru. Pokud problémy přetrvávají, měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "collabSaveFailed_sizeExceeded": "Nelze uložit do databáze na serveru, plátno se zdá být příliš velké. Měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "imageToolNotSupported": "",
