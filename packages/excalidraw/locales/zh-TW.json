@@ -216,6 +216,7 @@
     "failedToFetchImage": "無法獲取圖片。",
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
     "importLibraryError": "無法載入資料庫",
+    "saveLibraryError": "",
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
     "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
     "imageToolNotSupported": "圖片已停用",
