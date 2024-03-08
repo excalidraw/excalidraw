@@ -216,6 +216,7 @@
     "failedToFetchImage": "无法获取图片。",
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
     "importLibraryError": "无法加载素材库",
+    "saveLibraryError": "",
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
     "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
     "imageToolNotSupported": "图片已被禁用。",
