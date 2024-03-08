@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
     "importLibraryError": "تعذر تحميل المكتبة",
+    "saveLibraryError": "",
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
     "imageToolNotSupported": "",
