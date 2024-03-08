@@ -216,6 +216,7 @@
     "failedToFetchImage": "Nie udało się załadować obrazu.",
     "cannotResolveCollabServer": "Nie można połączyć się z serwerem współpracy w czasie rzeczywistym. Proszę odświeżyć stronę i spróbować ponownie.",
     "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
+    "saveLibraryError": "",
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "imageToolNotSupported": "Dodawanie obrazów jest wyłączone.",
