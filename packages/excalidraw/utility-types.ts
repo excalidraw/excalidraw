@@ -62,3 +62,6 @@ export type MakeBrand<T extends string> = {
   /** @private using ~ to sort last in intellisense */
   [K in `~brand~${T}`]: T;
 };
+
+/** Maybe just promise or already fulfilled one! */
+export type MaybePromise<T> = T | Promise<T>;

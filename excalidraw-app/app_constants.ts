@@ -39,10 +39,14 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_ELEMENTS: "excalidraw",
   LOCAL_STORAGE_APP_STATE: "excalidraw-state",
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
-  LOCAL_STORAGE_LIBRARY: "excalidraw-library",
   LOCAL_STORAGE_THEME: "excalidraw-theme",
   VERSION_DATA_STATE: "version-dataState",
   VERSION_FILES: "version-files",
+
+  IDB_LIBRARY: "excalidraw-library",
+
+  // do not use apart from migrations
+  __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
 
 export const COOKIES = {
