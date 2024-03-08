@@ -216,6 +216,7 @@
     "failedToFetchImage": "Falha ao processar a imagem.",
     "cannotResolveCollabServer": "Não foi possível fazer a ligação ao servidor colaborativo. Por favor volte a carregar a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
+    "saveLibraryError": "",
     "collabSaveFailed": "Não foi possível guardar na base de dados de backend. Se os problemas persistirem, guarde o ficheiro localmente para garantir que não perde o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, parece que a a área de desenho é muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho.",
     "imageToolNotSupported": "As imagens estão desativadas.",
