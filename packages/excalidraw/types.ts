@@ -38,7 +38,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
-import { Merge, ValueOf } from "./utility-types";
+import { Merge, MaybePromise, ValueOf } from "./utility-types";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -380,21 +380,14 @@ export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
 export type LibraryItemsSource =
   | ((
       currentLibraryItems: LibraryItems,
-    ) =>
-      | Blob
-      | LibraryItems_anyVersion
-      | Promise<LibraryItems_anyVersion | Blob>)
-  | Blob
-  | LibraryItems_anyVersion
-  | Promise<LibraryItems_anyVersion | Blob>;
+    ) => MaybePromise<LibraryItems_anyVersion | Blob>)
+  | MaybePromise<LibraryItems_anyVersion | Blob>;
 // -----------------------------------------------------------------------------
 
 export type ExcalidrawInitialDataState = Merge<
   ImportedDataState,
   {
-    libraryItems?:
-      | Required<ImportedDataState>["libraryItems"]
-      | Promise<Required<ImportedDataState>["libraryItems"]>;
+    libraryItems?: MaybePromise<Required<ImportedDataState>["libraryItems"]>;
   }
 >;
 
@@ -409,10 +402,7 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
-  initialData?:
-    | ExcalidrawInitialDataState
-    | null
-    | Promise<ExcalidrawInitialDataState | null>;
+  initialData?: MaybePromise<ExcalidrawInitialDataState | null>;
   excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
@@ -643,7 +633,7 @@ export type PointerDownState = Readonly<{
 
 export type UnsubscribeCallback = () => void;
 
-export type ExcalidrawImperativeAPI = {
+export interface ExcalidrawImperativeAPI {
   updateScene: InstanceType<typeof App>["updateScene"];
   updateLibrary: InstanceType<typeof Library>["updateLibrary"];
   resetScene: InstanceType<typeof App>["resetScene"];
@@ -700,7 +690,7 @@ export type ExcalidrawImperativeAPI = {
   onUserFollow: (
     callback: (payload: OnUserFollowedPayload) => void,
   ) => UnsubscribeCallback;
-};
+}
 
 export type Device = Readonly<{
   viewport: {
