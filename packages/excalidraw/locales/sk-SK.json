@@ -216,6 +216,7 @@
     "failedToFetchImage": "Načítanie obrázka zlyhalo.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
+    "saveLibraryError": "",
     "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "imageToolNotSupported": "Obrázky sú vypnuté.",
