@@ -216,6 +216,7 @@
     "failedToFetchImage": "",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
