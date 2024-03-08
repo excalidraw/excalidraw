@@ -216,6 +216,7 @@
     "failedToFetchImage": "Fracàs de la recuperacion de l’imatge.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
+    "saveLibraryError": "",
     "collabSaveFailed": "Enregistrament impossible dins la basa de donada del backend. Se lo problèma persistís, deuriatz enregistrar lo fichièr localament per vos assegurar que perdretz pas vòstre trabalh.",
     "collabSaveFailed_sizeExceeded": "Enregistrament impossible dins la basa de donada del backend, lo canabàs sembla tròp pesuc. Deuriatz enregistrar lo fichièr localament per vos assegurar que perdretz pas vòstre trabalh.",
     "imageToolNotSupported": "Los imatges son desactivats.",
