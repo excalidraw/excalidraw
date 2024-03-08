@@ -216,6 +216,7 @@
     "failedToFetchImage": "Bild konnte nicht abgerufen werden.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
+    "saveLibraryError": "",
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "imageToolNotSupported": "Bilder sind deaktiviert.",
