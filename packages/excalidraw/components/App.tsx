@@ -2291,13 +2291,17 @@ class App extends React.Component<AppProps, AppState> {
     if (initialData?.scrollToContent) {
       scene.appState = {
         ...scene.appState,
-        ...calculateScrollCenter(scene.elements, {
-          ...scene.appState,
-          width: this.state.width,
-          height: this.state.height,
-          offsetTop: this.state.offsetTop,
-          offsetLeft: this.state.offsetLeft,
-        }),
+        ...calculateScrollCenter(
+          scene.elements,
+          {
+            ...scene.appState,
+            width: this.state.width,
+            height: this.state.height,
+            offsetTop: this.state.offsetTop,
+            offsetLeft: this.state.offsetLeft,
+          },
+          this.props.UIOptions.mode,
+        ),
       };
     }
     // FontFaceSet loadingdone event we listen on may not always fire
@@ -3524,7 +3528,11 @@ class App extends React.Component<AppProps, AppState> {
       scrollY = appState.scrollY;
     } else {
       // compute only the viewport location, without any zoom adjustment
-      const scroll = calculateScrollCenter(targetElements, this.state);
+      const scroll = calculateScrollCenter(
+        targetElements,
+        this.state,
+        this.props.UIOptions.mode,
+      );
       scrollX = scroll.scrollX;
       scrollY = scroll.scrollY;
     }

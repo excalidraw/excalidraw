@@ -526,6 +526,7 @@ export type UIOptions = Partial<{
   };
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
+  mode: "none" | "minimal" | "full" | "all";
 }>;
 
 export type AppProps = Merge<

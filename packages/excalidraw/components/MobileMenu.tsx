@@ -197,7 +197,11 @@ export const MobileMenu = ({
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({
-                      ...calculateScrollCenter(elements, appState),
+                      ...calculateScrollCenter(
+                        elements,
+                        appState,
+                        UIOptions.mode,
+                      ),
                     }));
                   }}
                 >

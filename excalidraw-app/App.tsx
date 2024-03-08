@@ -35,6 +35,7 @@ import {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
+  UIOptions,
 } from "../packages/excalidraw/types";
 import {
   debounce,
@@ -164,6 +165,7 @@ const initializeScene = async (opts: {
   } = await loadScene(null, null, localDataState);
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
+
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
@@ -691,6 +693,9 @@ const ExcalidrawWrapper = () => {
     );
   }
 
+  const uiMode = new URLSearchParams(window.location.search).get(
+    "mode",
+  ) as UIOptions["mode"];
   return (
     <div
       style={{ height: "100%" }}
@@ -732,6 +737,7 @@ const ExcalidrawWrapper = () => {
               },
             },
           },
+          mode: uiMode || "all",
         }}
         langCode={langCode}
         renderCustomStats={renderCustomStats}

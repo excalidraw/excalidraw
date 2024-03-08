@@ -234,16 +234,19 @@ const LayerUI = ({
   );
 
   const renderFixedSideContainer = () => {
-    const shouldRenderSelectedShapeActions = showSelectedShapeActions(
-      appState,
-      elements,
-    );
+    if (UIOptions.mode === "none") {
+      return null;
+    }
+
+    const shouldRenderSelectedShapeActions =
+      showSelectedShapeActions(appState, elements) &&
+      ["full", "all"].includes(UIOptions.mode!);
 
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
           <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
-            {renderCanvasActions()}
+            {UIOptions.mode === "all" && renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
           {!appState.viewModeEnabled && (
@@ -330,28 +333,30 @@ const LayerUI = ({
               )}
             </Section>
           )}
-          <div
-            className={clsx(
-              "layer-ui__wrapper__top-right zen-mode-transition",
-              {
-                "transition-right": appState.zenModeEnabled,
-              },
-            )}
-          >
-            {appState.collaborators.size > 0 && (
-              <UserList
-                collaborators={appState.collaborators}
-                userToFollow={appState.userToFollow?.socketId || null}
-              />
-            )}
-            {renderTopRightUI?.(device.editor.isMobile, appState)}
-            {!appState.viewModeEnabled &&
-              // hide button when sidebar docked
-              (!isSidebarDocked ||
-                appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
-                <tunnels.DefaultSidebarTriggerTunnel.Out />
+          {UIOptions.mode === "all" && (
+            <div
+              className={clsx(
+                "layer-ui__wrapper__top-right zen-mode-transition",
+                {
+                  "transition-right": appState.zenModeEnabled,
+                },
               )}
-          </div>
+            >
+              {appState.collaborators.size > 0 && (
+                <UserList
+                  collaborators={appState.collaborators}
+                  userToFollow={appState.userToFollow?.socketId || null}
+                />
+              )}
+              {renderTopRightUI?.(device.editor.isMobile, appState)}
+              {!appState.viewModeEnabled &&
+                // hide button when sidebar docked
+                (!isSidebarDocked ||
+                  appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
+                  <tunnels.DefaultSidebarTriggerTunnel.Out />
+                )}
+            </div>
+          )}
         </div>
       </FixedSideContainer>
     );
@@ -556,7 +561,11 @@ const LayerUI = ({
                 className="scroll-back-to-content"
                 onClick={() => {
                   setAppState((appState) => ({
-                    ...calculateScrollCenter(elements, appState),
+                    ...calculateScrollCenter(
+                      elements,
+                      appState,
+                      UIOptions.mode,
+                    ),
                   }));
                 }}
               >
