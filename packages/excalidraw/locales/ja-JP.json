@@ -216,6 +216,7 @@
     "failedToFetchImage": "画像の読み込みに失敗しました。",
     "cannotResolveCollabServer": "コラボレーションサーバに接続できませんでした。ページを再読み込みして、もう一度お試しください。",
     "importLibraryError": "ライブラリを読み込めませんでした。",
+    "saveLibraryError": "",
     "collabSaveFailed": "バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "collabSaveFailed_sizeExceeded": "キャンバスが大きすぎるため、バックエンドデータベースに保存できませんでした。問題が解決しない場合は、作業を失わないようにローカルにファイルを保存してください。",
     "imageToolNotSupported": "画像ツールは使用不可です。",
