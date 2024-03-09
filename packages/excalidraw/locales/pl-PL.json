@@ -305,8 +305,8 @@
     "or": "Lub"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Zaproś ludzi do wspólnego rysunku.",
+    "desc_privacy": "Nie martw się, sesja jest szyfrowana end-to-end i w pełni prywatna. Nawet nasz serwer nie widzi co rysujesz.",
     "button_startSession": "Rozpocznij sesję",
     "button_stopSession": "Zakończ sesję",
     "desc_inProgressIntro": "Sesja współpracy na żywo właśnie się rozpoczęła.",
@@ -529,12 +529,12 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Szybkie wyszukiwanie",
+      "empty": "Nie znaleziono użytkowników"
     },
     "hint": {
-      "text": "",
-      "followStatus": ""
+      "text": "Kliknij na użytkownika, aby obserwować",
+      "followStatus": "Obserwujesz tego użytkownika"
     }
   }
 }
