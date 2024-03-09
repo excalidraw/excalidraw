@@ -139,8 +139,8 @@
     "eyeDropper": "Wybierz kolor z płótna",
     "textToDiagram": "Generuj diagram z opisu",
     "prompt": "Opis",
-    "followUs": "",
-    "discordChat": ""
+    "followUs": "Obserwuj nas",
+    "discordChat": "Czat Discorda"
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
@@ -216,7 +216,7 @@
     "failedToFetchImage": "Nie udało się załadować obrazu.",
     "cannotResolveCollabServer": "Nie można połączyć się z serwerem współpracy w czasie rzeczywistym. Proszę odświeżyć stronę i spróbować ponownie.",
     "importLibraryError": "Wystąpił błąd w trakcie ładowania biblioteki",
-    "saveLibraryError": "",
+    "saveLibraryError": "Nie można zapisać biblioteki do pamięci. Proszę zapisać bibliotekę do pliku lokalnie, aby upewnić się, że nie stracisz zmian.",
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "imageToolNotSupported": "Dodawanie obrazów jest wyłączone.",
@@ -248,7 +248,7 @@
     "library": "Biblioteka",
     "lock": "Zablokuj wybrane narzędzie",
     "penMode": "Tryb pióra — zapobiegaj dotknięciom",
-    "link": "",
+    "link": "Dodaj/aktualizuj link dla wybranego kształtu",
     "eraser": "Gumka",
     "frame": "Ramka",
     "magicframe": "Wireframe do kodu",
@@ -302,7 +302,7 @@
     "sceneContent": "Zawartość dokumentu:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Lub"
   },
   "roomDialog": {
     "desc_intro": "",
