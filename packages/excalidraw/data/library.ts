@@ -765,6 +765,7 @@ export const useHandleLibrary = (
         initDataPromise.resolve(
           promiseTry(migrationAdapter.load)
             .then(async (libraryData) => {
+              let restoredData: LibraryItems | null = null;
               try {
                 // if no library data to migrate, assume no migration needed
                 // and skip persisting to new data store, as well as well
@@ -773,17 +774,16 @@ export const useHandleLibrary = (
                   return AdapterTransaction.getLibraryItems(adapter, "load");
                 }
 
+                restoredData = restoreLibraryItems(
+                  libraryData.libraryItems || [],
+                  "published",
+                );
+
                 // we don't queue this operation because it's running inside
                 // a promise that's running inside Library update queue itself
                 const nextItems = await persistLibraryUpdate(
                   adapter,
-                  createLibraryUpdate(
-                    [],
-                    restoreLibraryItems(
-                      libraryData.libraryItems || [],
-                      "published",
-                    ),
-                  ),
+                  createLibraryUpdate([], restoredData),
                 );
                 try {
                   await migrationAdapter.clear();
@@ -798,8 +798,8 @@ export const useHandleLibrary = (
                 console.error(
                   `couldn't migrate legacy library data: ${error.message}`,
                 );
-                // migration failed, load empty library
-                return [];
+                // migration failed, load data from previous store, if any
+                return restoredData;
               }
             })
             // errors caught during `migrationAdapter.load()`
