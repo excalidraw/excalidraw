@@ -216,7 +216,7 @@
     "failedToFetchImage": "Kunde inte hämta bilden.",
     "cannotResolveCollabServer": "Det gick inte att ansluta till samarbets-servern. Ladda om sidan och försök igen.",
     "importLibraryError": "Kunde inte ladda bibliotek",
-    "saveLibraryError": "",
+    "saveLibraryError": "Det gick inte att spara biblioteket till lagring. Spara biblioteket till en fil lokalt för att se till att du inte förlorar ändringar.",
     "collabSaveFailed": "Det gick inte att spara i backend-databasen. Om problemen kvarstår bör du spara filen lokalt för att se till att du inte förlorar ditt arbete.",
     "collabSaveFailed_sizeExceeded": "Det gick inte att spara till backend-databasen, whiteboarden verkar vara för stor. Du bör spara filen lokalt för att du inte ska förlora ditt arbete.",
     "imageToolNotSupported": "Bilder är inaktiverade.",
