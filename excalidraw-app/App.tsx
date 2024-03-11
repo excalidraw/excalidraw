@@ -318,7 +318,7 @@ const ExcalidrawWrapper = () => {
   useHandleLibrary({
     excalidrawAPI,
     adapter: LibraryIndexedDBAdapter,
-    // TODO maybe remove this in several months (shipped: 24-02-07)
+    // TODO maybe remove this in several months (shipped: 24-03-11)
     migrationAdapter: LibraryLocalStorageMigrationAdapter,
   });
 
