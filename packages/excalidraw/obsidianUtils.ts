@@ -1,3 +1,5 @@
+import { DOMElement } from "react";
+
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 let OBSIDIAN_PLUGIN:any;
 let EXCALIDRAW_CONFIG:any;
@@ -28,4 +30,13 @@ export const isExcaliBrainView = () => {
   const excalidrawView = OBSIDIAN_PLUGIN?.activeExcalidrawView;
   if(!excalidrawView) return false;
   return excalidrawView.linksAlwaysOpenInANewPane && excalidrawView.allowFrameButtonsInViewMode;
+}
+
+export const getExcalidrawContentEl = ():HTMLElement => {
+  if(!OBSIDIAN_PLUGIN) {
+    setObsidianPlugin();
+  }
+  const excalidrawView = OBSIDIAN_PLUGIN?.activeExcalidrawView;
+  if(!excalidrawView) return document.body;
+  return excalidrawView.contentEl as HTMLElement;
 }

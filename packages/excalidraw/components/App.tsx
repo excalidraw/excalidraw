@@ -415,7 +415,7 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
-import { isExcaliBrainView } from "../obsidianUtils";
+import { getExcalidrawContentEl } from "../obsidianUtils";
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import {
@@ -1408,7 +1408,7 @@ class App extends React.Component<AppProps, AppState> {
               color: "var(--color-gray-80)",
               overflow: "hidden",
               maxWidth: `${
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+                getExcalidrawContentEl().clientWidth - x1 - FRAME_NAME_EDIT_PADDING //zsviczian was document.body
               }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
@@ -2402,7 +2402,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
-      document.body;
+      getExcalidrawContentEl(); //zsviczian was document.body;
+      
 
     const prevViewportState = this.device.viewport;
 
@@ -3529,7 +3530,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   onHandToolToggle = () => {
-    this.actionManager.executeAction(actionToggleHandTool);
+    //zsviczian added timeout because button won't select otherwise
+    setTimeout(()=>this.actionManager.executeAction(actionToggleHandTool));
   };
 
   /**
@@ -4313,33 +4315,35 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    this.setState((prevState) => {
-      const commonResets = {
-        snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
-        originSnapOffset: null,
-        activeEmbeddable: null,
-      } as const;
-      if (nextActiveTool.type !== "selection") {
+    setTimeout(() => {
+      this.setState((prevState) => {
+        const commonResets = {
+          snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
+          originSnapOffset: null,
+          activeEmbeddable: null,
+        } as const;
+        if (nextActiveTool.type !== "selection") {
+          return {
+            ...prevState,
+            activeTool: nextActiveTool,
+            selectedElementIds: makeNextSelectedElementIds(
+              nextActiveTool.type === "mermaid" //zsviczian
+                ? this.state.selectedElementIds
+                : {},
+              prevState,
+            ),
+            selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+            editingGroupId: null,
+            multiElement: null,
+            ...commonResets,
+          };
+        }
         return {
           ...prevState,
           activeTool: nextActiveTool,
-          selectedElementIds: makeNextSelectedElementIds(
-            nextActiveTool.type === "mermaid" //zsviczian
-              ? this.state.selectedElementIds
-              : {},
-            prevState,
-          ),
-          selectedGroupIds: makeNextSelectedElementIds({}, prevState),
-          editingGroupId: null,
-          multiElement: null,
           ...commonResets,
         };
-      }
-      return {
-        ...prevState,
-        activeTool: nextActiveTool,
-        ...commonResets,
-      };
+      });//zsviczian added timeout because button won't select otherwise
     });
   };
 
