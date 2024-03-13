@@ -439,21 +439,21 @@ describe("textWysiwyg", () => {
           ctrlKey: true,
         }),
       );
-      expect(h.state.zoom.value).toBe(0.9);
+      expect(h.state.zoom.value).toBe(0.95);
       textarea.dispatchEvent(
         new KeyboardEvent("keydown", {
           code: CODES.NUM_SUBTRACT,
           ctrlKey: true,
         }),
       );
-      expect(h.state.zoom.value).toBe(0.8);
+      expect(h.state.zoom.value).toBe(0.9);
       textarea.dispatchEvent(
         new KeyboardEvent("keydown", {
           code: CODES.NUM_ADD,
           ctrlKey: true,
         }),
       );
-      expect(h.state.zoom.value).toBe(0.9);
+      expect(h.state.zoom.value).toBe(0.95);
       textarea.dispatchEvent(
         new KeyboardEvent("keydown", {
           code: CODES.EQUAL,

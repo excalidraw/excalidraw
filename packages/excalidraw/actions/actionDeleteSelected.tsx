@@ -11,7 +11,7 @@ import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
-import { updateActiveTool } from "../utils";
+import { getUiMode, updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
 
 const deleteSelectedElements = (
@@ -169,8 +169,13 @@ export const actionDeleteSelected = register({
   },
   contextItemLabel: "labels.delete",
   keyTest: (event, appState, elements) =>
-    (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
-    !event[KEYS.CTRL_OR_CMD],
+    getUiMode() === "all"
+      ? (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
+        !event[KEYS.CTRL_OR_CMD]
+      : // in other ui modes, only delete element on cmd+backspace (instead of just backspace)
+        // (this means cmd+backspace will no longer trigger canvas clear)
+        (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
+        event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"

@@ -1,4 +1,5 @@
 import { CODES, KEYS } from "../keys";
+import { getUiMode } from "../utils";
 import { register } from "./register";
 
 export const actionToggleZenMode = register({
@@ -23,5 +24,7 @@ export const actionToggleZenMode = register({
   },
   contextItemLabel: "buttons.zenMode",
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,
+    getUiMode() === "all"
+      ? !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z
+      : false,
 });

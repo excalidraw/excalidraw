@@ -3,7 +3,6 @@ import { ExcalidrawElement } from "../element/types";
 import { getCommonBounds, getVisibleElements } from "../element";
 
 import { getNormalizedZoom } from "./zoom";
-import { ZOOM_STEP } from "../constants";
 
 const sceneCoordsToViewportCoords = (
   { sceneX, sceneY }: { sceneX: number; sceneY: number },
@@ -86,7 +85,7 @@ export const calculateScrollCenter = (
     zoom.value > 0.2
   ) {
     zoom = {
-      value: getNormalizedZoom(zoom.value - ZOOM_STEP),
+      value: getNormalizedZoom(zoom.value - 0.02),
     };
   }
 

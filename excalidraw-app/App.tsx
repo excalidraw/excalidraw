@@ -35,7 +35,6 @@ import {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
-  UIOptions,
 } from "../packages/excalidraw/types";
 import {
   debounce,
@@ -45,7 +44,7 @@ import {
   preventUnload,
   ResolvablePromise,
   resolvablePromise,
-  isRunningInIframe,
+  getUiMode,
 } from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -93,7 +92,6 @@ import {
 } from "../packages/excalidraw/data/library";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
-import { AppFooter } from "./components/AppFooter";
 import { atom, Provider, useAtom, useAtomValue } from "jotai";
 import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { appJotaiStore } from "./app-jotai";
@@ -283,7 +281,7 @@ export const appLangCodeAtom = atom(
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
-  const isCollabDisabled = isRunningInIframe();
+  const isCollabDisabled = false;
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -693,9 +691,7 @@ const ExcalidrawWrapper = () => {
     );
   }
 
-  const uiMode = new URLSearchParams(window.location.search).get(
-    "mode",
-  ) as UIOptions["mode"];
+  const uiMode = getUiMode();
   return (
     <div
       style={{ height: "100%" }}
@@ -788,7 +784,6 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter />
         <TTDDialog
           onTextSubmit={async (input) => {
             try {

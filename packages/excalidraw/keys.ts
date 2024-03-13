@@ -1,6 +1,7 @@
 import { isDarwin } from "./constants";
+import { getUiMode } from "./utils";
 
-export const CODES = {
+const INTERNAL_CODES = {
   EQUAL: "Equal",
   MINUS: "Minus",
   NUM_ADD: "NumpadAdd",
@@ -24,7 +25,7 @@ export const CODES = {
   S: "KeyS",
 } as const;
 
-export const KEYS = {
+const INTERNAL_KEYS = {
   ARROW_DOWN: "ArrowDown",
   ARROW_LEFT: "ArrowLeft",
   ARROW_RIGHT: "ArrowRight",
@@ -79,6 +80,39 @@ export const KEYS = {
   8: "8",
   9: "9",
 } as const;
+
+// Only key combos using 1 or more of these keys will be allowed
+// when not in ui mode "all"
+const ENABLED_KEYS = new Set([
+  "ENTER",
+  "ESCAPE",
+  "DELETE",
+  "BACKSPACE",
+  "Z",
+  "CTRL_OR_CMD",
+  "SPACE",
+]);
+
+const ENABLED_CODES = new Set(["Z"]);
+
+const keysProxy = {
+  get(target: typeof INTERNAL_KEYS, key: string) {
+    return getUiMode() === "all" || ENABLED_KEYS.has(key as any)
+      ? target[key as keyof typeof INTERNAL_KEYS]
+      : "";
+  },
+};
+
+const codesProxy = {
+  get(target: typeof INTERNAL_CODES, key: string) {
+    return getUiMode() === "all" || ENABLED_CODES.has(key as any)
+      ? target[key as keyof typeof INTERNAL_CODES]
+      : "";
+  },
+};
+
+export const KEYS = new Proxy(INTERNAL_KEYS, keysProxy);
+export const CODES = new Proxy(INTERNAL_CODES, codesProxy);
 
 export type Key = keyof typeof KEYS;
 

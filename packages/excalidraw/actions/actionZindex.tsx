@@ -15,6 +15,7 @@ import {
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
 import { isDarwin } from "../constants";
 
 export const actionSendBackward = register({
@@ -34,14 +35,13 @@ export const actionSendBackward = register({
     !event.shiftKey &&
     event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
+    <ToolButton
       type="button"
-      className="zIndexButton"
+      icon={SendBackwardIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
-    >
-      {SendBackwardIcon}
-    </button>
+      aria-label={t("labels.sendBackward")}
+    />
   ),
 });
 
@@ -62,14 +62,13 @@ export const actionBringForward = register({
     !event.shiftKey &&
     event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
+    <ToolButton
       type="button"
-      className="zIndexButton"
+      icon={BringForwardIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
-    >
-      {BringForwardIcon}
-    </button>
+      aria-label={t("labels.bringForward")}
+    />
   ),
 });
 
@@ -93,18 +92,17 @@ export const actionSendToBack = register({
         event.shiftKey &&
         event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
+    <ToolButton
       type="button"
-      className="zIndexButton"
+      icon={SendToBackIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.sendToBack")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+[")
           : getShortcutKey("CtrlOrCmd+Shift+[")
       }`}
-    >
-      {SendToBackIcon}
-    </button>
+      aria-label={t("labels.sendToBack")}
+    />
   ),
 });
 
@@ -129,17 +127,16 @@ export const actionBringToFront = register({
         event.shiftKey &&
         event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
-    <button
+    <ToolButton
       type="button"
-      className="zIndexButton"
-      onClick={(event) => updateData(null)}
+      icon={BringToFrontIcon}
+      onClick={() => updateData(null)}
       title={`${t("labels.bringToFront")} — ${
         isDarwin
           ? getShortcutKey("CtrlOrCmd+Alt+]")
           : getShortcutKey("CtrlOrCmd+Shift+]")
       }`}
-    >
-      {BringToFrontIcon}
-    </button>
+      aria-label={t("labels.bringToFront")}
+    />
   ),
 });

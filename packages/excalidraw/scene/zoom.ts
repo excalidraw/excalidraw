@@ -2,7 +2,10 @@ import { MIN_ZOOM } from "../constants";
 import { AppState, NormalizedZoomValue } from "../types";
 
 export const getNormalizedZoom = (zoom: number): NormalizedZoomValue => {
-  return Math.max(MIN_ZOOM, Math.min(zoom, 30)) as NormalizedZoomValue;
+  // We round to 2 decimal places to avoid floating point math issues
+  // due to changing default zoom step to 0.05 from 0.1
+  return (Math.round(Math.max(MIN_ZOOM, Math.min(zoom, 30)) * 100) /
+    100) as NormalizedZoomValue;
 };
 
 export const getStateForZoom = (

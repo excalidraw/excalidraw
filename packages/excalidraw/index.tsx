@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { InitializeApp } from "./components/InitializeApp";
 import App from "./components/App";
-import { isShallowEqual } from "./utils";
+import { getUiMode, isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
@@ -53,7 +53,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
-  const mode = props.UIOptions?.mode ?? "all";
+  const uiMode = getUiMode();
 
   // FIXME normalize/set defaults in parent component so that the memo resolver
   // compares the same values
@@ -66,7 +66,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     tools: {
       image: props.UIOptions?.tools?.image ?? true,
     },
-    mode,
+    mode: uiMode,
   };
 
   if (canvasActions?.export) {

@@ -3,6 +3,7 @@ import "./ToolIcon.scss";
 import clsx from "clsx";
 import { ToolButtonSize } from "./ToolButton";
 import { LockedIcon, UnlockedIcon } from "./icons";
+import { getUiMode } from "../utils";
 
 type LockIconProps = {
   title?: string;
@@ -29,7 +30,7 @@ export const LockButton = (props: LockIconProps) => {
           "is-mobile": props.isMobile,
         },
       )}
-      title={`${props.title} — Q`}
+      title={`${props.title}${getUiMode() === "all" ? " — Q" : ""}`}
     >
       <input
         className="ToolIcon_type_checkbox"

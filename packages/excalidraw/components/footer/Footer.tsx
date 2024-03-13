@@ -13,6 +13,7 @@ import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
 import { UIAppState } from "../../types";
+import { getUiMode } from "../../utils";
 
 const Footer = ({
   appState,
@@ -26,6 +27,7 @@ const Footer = ({
   renderWelcomeScreen: boolean;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
+  const uiMode = getUiMode();
 
   const device = useDevice();
   const showFinalize =
@@ -78,9 +80,11 @@ const Footer = ({
       >
         <div style={{ position: "relative" }}>
           {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
-          <HelpButton
-            onClick={() => actionManager.executeAction(actionShortcuts)}
-          />
+          {uiMode === "all" && (
+            <HelpButton
+              onClick={() => actionManager.executeAction(actionShortcuts)}
+            />
+          )}
         </div>
       </div>
       <ExitZenModeAction

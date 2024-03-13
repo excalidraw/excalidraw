@@ -6,7 +6,7 @@ import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
 import Spinner from "./Spinner";
 import { PointerType } from "../element/types";
-import { isPromiseLike } from "../utils";
+import { getUiMode, isPromiseLike } from "../utils";
 
 export type ToolButtonSize = "small" | "medium";
 
@@ -54,6 +54,15 @@ type ToolButtonProps =
     });
 
 export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
+  let title = props.title;
+  if (
+    title &&
+    (title.includes("-") || title.includes("–") || title.includes("—")) &&
+    getUiMode() !== "all"
+  ) {
+    title = title.split(/[-–—]/)[0].trim();
+  }
+
   const { id: excalId } = useExcalidrawContainer();
   const innerRef = React.useRef(null);
   React.useImperativeHandle(ref, () => innerRef.current);
@@ -119,7 +128,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         style={props.style}
         data-testid={props["data-testid"]}
         hidden={props.hidden}
-        title={props.title}
+        title={title}
         aria-label={props["aria-label"]}
         type={type}
         onClick={onClick}
@@ -150,7 +159,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
   return (
     <label
       className={clsx("ToolIcon", props.className)}
-      title={props.title}
+      title={title}
       onPointerDown={(event) => {
         lastPointerTypeRef.current = event.pointerType || null;
         props.onPointerDown?.({ pointerType: event.pointerType || null });
