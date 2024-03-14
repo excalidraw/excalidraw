@@ -61,6 +61,9 @@ export type Collaborator = Readonly<{
   id?: string;
   socketId?: SocketId;
   isCurrentUser?: boolean;
+  isInCall?: boolean;
+  isSpeaking?: boolean;
+  isMuted?: boolean;
 }>;
 
 export type CollaboratorPointer = {

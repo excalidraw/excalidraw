@@ -1,4 +1,9 @@
-import { COLOR_CHARCOAL_BLACK, COLOR_WHITE } from "./constants";
+import {
+  COLOR_CHARCOAL_BLACK,
+  COLOR_VOICE_CALL,
+  COLOR_WHITE,
+  THEME,
+} from "./constants";
 import { roundRect } from "./renderer/roundRect";
 import { InteractiveCanvasRenderConfig } from "./scene/types";
 import { InteractiveCanvasAppState, SocketId, UserIdleState } from "./types";
@@ -61,6 +66,8 @@ export const renderRemoteCursors = ({
   for (const clientId in renderConfig.remotePointerViewportCoords) {
     let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
 
+    const collaborator = appState.collaborators.get(clientId as SocketId);
+
     x -= appState.offsetLeft;
     y -= appState.offsetTop;
 
@@ -113,6 +120,28 @@ export const renderRemoteCursors = ({
       context.closePath();
     }
 
+    // TODO remove the dark theme color after we stop inverting canvas colors
+    const IS_SPEAKING_COLOR =
+      appState.theme === THEME.DARK ? "#2f6330" : COLOR_VOICE_CALL;
+
+    const isSpeaking = collaborator?.isSpeaking;
+
+    if (isSpeaking) {
+      // cursor outline for currently speaking user
+      context.fillStyle = IS_SPEAKING_COLOR;
+      context.strokeStyle = IS_SPEAKING_COLOR;
+      context.lineWidth = 10;
+      context.lineJoin = "round";
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x + 0, y + 14);
+      context.lineTo(x + 4, y + 9);
+      context.lineTo(x + 11, y + 8);
+      context.closePath();
+      context.stroke();
+      context.fill();
+    }
+
     // Background (white outline) for arrow
     context.fillStyle = COLOR_WHITE;
     context.strokeStyle = COLOR_WHITE;
@@ -155,8 +184,8 @@ export const renderRemoteCursors = ({
     if (!isOutOfBounds && username) {
       context.font = "600 12px sans-serif"; // font has to be set before context.measureText()
 
-      const offsetX = width / 2;
-      const offsetY = height + 2;
+      const offsetX = (isSpeaking ? x + 0 : x) + width / 2;
+      const offsetY = (isSpeaking ? y + 0 : y) + height + 2;
       const paddingHorizontal = 5;
       const paddingVertical = 3;
       const measure = context.measureText(username);
@@ -175,6 +204,13 @@ export const renderRemoteCursors = ({
         context.fill();
         context.strokeStyle = COLOR_WHITE;
         context.stroke();
+
+        if (isSpeaking) {
+          context.beginPath();
+          context.roundRect(boxX - 2, boxY - 2, boxWidth + 4, boxHeight + 4, 8);
+          context.strokeStyle = IS_SPEAKING_COLOR;
+          context.stroke();
+        }
       } else {
         roundRect(context, boxX, boxY, boxWidth, boxHeight, 8, COLOR_WHITE);
       }
@@ -189,6 +225,32 @@ export const renderRemoteCursors = ({
           Math.floor((finalHeight - measureHeight) / 2) +
           2,
       );
+
+      // draw three vertical bars signalling someone is speaking
+      if (isSpeaking) {
+        context.fillStyle = IS_SPEAKING_COLOR;
+        const barheight = 8;
+        const margin = 8;
+        const gap = 5;
+        context.fillRect(
+          boxX + boxWidth + margin,
+          boxY + (boxHeight / 2 - barheight / 2),
+          2,
+          barheight,
+        );
+        context.fillRect(
+          boxX + boxWidth + margin + gap,
+          boxY + (boxHeight / 2 - (barheight * 2) / 2),
+          2,
+          barheight * 2,
+        );
+        context.fillRect(
+          boxX + boxWidth + margin + gap * 2,
+          boxY + (boxHeight / 2 - barheight / 2),
+          2,
+          barheight,
+        );
+      }
     }
 
     context.restore();

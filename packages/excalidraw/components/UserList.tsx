@@ -1,6 +1,6 @@
 import "./UserList.scss";
 
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import clsx from "clsx";
 import { Collaborator, SocketId } from "../types";
 import { Tooltip } from "./Tooltip";
@@ -12,6 +12,7 @@ import { Island } from "./Island";
 import { searchIcon } from "./icons";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
+import { supportsResizeObserver } from "../constants";
 
 export type GoToCollaboratorComponentProps = {
   clientId: ClientId;
@@ -23,7 +24,7 @@ export type GoToCollaboratorComponentProps = {
 /** collaborator user id or socket id (fallback) */
 type ClientId = string & { _brand: "UserId" };
 
-const FIRST_N_AVATARS = 3;
+const DEFAULT_MAX_AVATARS = 4;
 const SHOW_COLLABORATORS_FILTER_AT = 8;
 
 const ConditionalTooltipWrapper = ({
@@ -82,7 +83,13 @@ const renderCollaborator = ({
 
 type UserListUserObject = Pick<
   Collaborator,
-  "avatarUrl" | "id" | "socketId" | "username"
+  | "avatarUrl"
+  | "id"
+  | "socketId"
+  | "username"
+  | "isInCall"
+  | "isSpeaking"
+  | "isMuted"
 >;
 
 type UserListProps = {
@@ -97,6 +104,9 @@ const collaboratorComparatorKeys = [
   "id",
   "socketId",
   "username",
+  "isInCall",
+  "isSpeaking",
+  "isMuted",
 ] as const;
 
 export const UserList = React.memo(
@@ -120,6 +130,38 @@ export const UserList = React.memo(
 
     const [searchTerm, setSearchTerm] = React.useState("");
 
+    const userListWrapper = React.useRef<HTMLDivElement | null>(null);
+
+    useLayoutEffect(() => {
+      if (userListWrapper.current) {
+        const updateMaxAvatars = (width: number) => {
+          const maxAvatars = Math.max(1, Math.min(8, Math.floor(width / 38)));
+          setMaxAvatars(maxAvatars);
+        };
+
+        updateMaxAvatars(userListWrapper.current.clientWidth);
+
+        if (!supportsResizeObserver) {
+          return;
+        }
+
+        const resizeObserver = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            const { width } = entry.contentRect;
+            updateMaxAvatars(width);
+          }
+        });
+
+        resizeObserver.observe(userListWrapper.current);
+
+        return () => {
+          resizeObserver.disconnect();
+        };
+      }
+    }, []);
+
+    const [maxAvatars, setMaxAvatars] = React.useState(DEFAULT_MAX_AVATARS);
+
     if (uniqueCollaboratorsArray.length === 0) {
       return null;
     }
@@ -134,7 +176,7 @@ export const UserList = React.memo(
 
     const firstNCollaborators = uniqueCollaboratorsArray.slice(
       0,
-      FIRST_N_AVATARS,
+      maxAvatars - 1,
     );
 
     const firstNAvatarsJSX = firstNCollaborators.map(
@@ -149,7 +191,10 @@ export const UserList = React.memo(
     );
 
     return mobile ? (
-      <div className={clsx("UserList UserList_mobile", className)}>
+      <div
+        className={clsx("UserList UserList_mobile", className)}
+        style={{ [`--max-avatars` as any]: maxAvatars }}
+      >
         {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
           renderCollaborator({
             actionManager,
@@ -161,68 +206,73 @@ export const UserList = React.memo(
         )}
       </div>
     ) : (
-      <div className={clsx("UserList", className)}>
-        {firstNAvatarsJSX}
+      <div className="UserList-wrapper" ref={userListWrapper}>
+        <div
+          className={clsx("UserList", className)}
+          style={{ [`--max-avatars` as any]: maxAvatars }}
+        >
+          {firstNAvatarsJSX}
 
-        {uniqueCollaboratorsArray.length > FIRST_N_AVATARS && (
-          <Popover.Root
-            onOpenChange={(isOpen) => {
-              if (!isOpen) {
-                setSearchTerm("");
-              }
-            }}
-          >
-            <Popover.Trigger className="UserList__more">
-              +{uniqueCollaboratorsArray.length - FIRST_N_AVATARS}
-            </Popover.Trigger>
-            <Popover.Content
-              style={{
-                zIndex: 2,
-                width: "13rem",
-                textAlign: "left",
+          {uniqueCollaboratorsArray.length > maxAvatars - 1 && (
+            <Popover.Root
+              onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                  setSearchTerm("");
+                }
               }}
-              align="end"
-              sideOffset={10}
             >
-              <Island style={{ overflow: "hidden" }}>
-                {uniqueCollaboratorsArray.length >=
-                  SHOW_COLLABORATORS_FILTER_AT && (
-                  <div className="UserList__search-wrapper">
-                    {searchIcon}
-                    <input
-                      className="UserList__search"
-                      type="text"
-                      placeholder={t("userList.search.placeholder")}
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                      }}
-                    />
-                  </div>
-                )}
-                <div className="dropdown-menu UserList__collaborators">
-                  {filteredCollaborators.length === 0 && (
-                    <div className="UserList__collaborators__empty">
-                      {t("userList.search.empty")}
+              <Popover.Trigger className="UserList__more">
+                +{uniqueCollaboratorsArray.length - maxAvatars + 1}
+              </Popover.Trigger>
+              <Popover.Content
+                style={{
+                  zIndex: 2,
+                  width: "15rem",
+                  textAlign: "left",
+                }}
+                align="end"
+                sideOffset={10}
+              >
+                <Island style={{ overflow: "hidden" }}>
+                  {uniqueCollaboratorsArray.length >=
+                    SHOW_COLLABORATORS_FILTER_AT && (
+                    <div className="UserList__search-wrapper">
+                      {searchIcon}
+                      <input
+                        className="UserList__search"
+                        type="text"
+                        placeholder={t("userList.search.placeholder")}
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                        }}
+                      />
                     </div>
                   )}
-                  <div className="UserList__hint">
-                    {t("userList.hint.text")}
+                  <div className="dropdown-menu UserList__collaborators">
+                    {filteredCollaborators.length === 0 && (
+                      <div className="UserList__collaborators__empty">
+                        {t("userList.search.empty")}
+                      </div>
+                    )}
+                    <div className="UserList__hint">
+                      {t("userList.hint.text")}
+                    </div>
+                    {filteredCollaborators.map(([clientId, collaborator]) =>
+                      renderCollaborator({
+                        actionManager,
+                        collaborator,
+                        clientId,
+                        withName: true,
+                        isBeingFollowed: collaborator.socketId === userToFollow,
+                      }),
+                    )}
                   </div>
-                  {filteredCollaborators.map(([clientId, collaborator]) =>
-                    renderCollaborator({
-                      actionManager,
-                      collaborator,
-                      clientId,
-                      withName: true,
-                      isBeingFollowed: collaborator.socketId === userToFollow,
-                    }),
-                  )}
-                </div>
-              </Island>
-            </Popover.Content>
-          </Popover.Root>
-        )}
+                </Island>
+              </Popover.Content>
+            </Popover.Root>
+          )}
+        </div>
       </div>
     );
   },
@@ -236,10 +286,15 @@ export const UserList = React.memo(
       return false;
     }
 
+    const nextCollaboratorSocketIds = next.collaborators.keys();
+
     for (const [socketId, collaborator] of prev.collaborators) {
       const nextCollaborator = next.collaborators.get(socketId);
       if (
         !nextCollaborator ||
+        // this checks order of collaborators in the map is the same
+        // as previous render
+        socketId !== nextCollaboratorSocketIds.next().value ||
         !isShallowEqual(
           collaborator,
           nextCollaborator,

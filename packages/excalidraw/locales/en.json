@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Click on user to follow",
-      "followStatus": "You're currently following this user"
+      "followStatus": "You're currently following this user",
+      "inCall": "User is in a voice call",
+      "micMuted": "User's microphone is muted",
+      "isSpeaking": "User is speaking"
     }
   }
 }
