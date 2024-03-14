@@ -8,6 +8,7 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
+import { getNormalizedZoom } from "../scene";
 
 const { h } = window;
 
@@ -47,8 +48,14 @@ describe("appState", () => {
       expect(h.state.offsetTop).toBe(OFFSET_TOP);
 
       // assert scroll is in center
-      expect(h.state.scrollX).toBe(WIDTH / 2 - ELEM_WIDTH / 2);
-      // expect(h.state.scrollY).toBe(HEIGHT / 2 - ELEM_HEIGHT / 2);
+      expect(h.state.scrollX).toBe(
+        WIDTH / 2 / h.state.zoom.value - ELEM_WIDTH / 2,
+      );
+
+      // subtract 60 because offset added to make room for toolbar
+      expect(h.state.scrollY).toBe(
+        HEIGHT / 2 / h.state.zoom.value - (ELEM_HEIGHT / 2 - 60),
+      );
     });
     restoreOriginalGetBoundingClientRect();
   });

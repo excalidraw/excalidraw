@@ -1,7 +1,7 @@
 import "./ToolIcon.scss";
 
 import clsx from "clsx";
-import { ToolButtonSize } from "./ToolButton";
+import { ToolButton } from "./ToolButton";
 import { laserPointerToolIcon } from "./icons";
 
 type LaserPointerIconProps = {
@@ -12,30 +12,18 @@ type LaserPointerIconProps = {
   isMobile?: boolean;
 };
 
-const DEFAULT_SIZE: ToolButtonSize = "small";
-
 export const LaserPointerButton = (props: LaserPointerIconProps) => {
   return (
-    <label
-      className={clsx(
-        "ToolIcon ToolIcon__LaserPointer",
-        `ToolIcon_size_${DEFAULT_SIZE}`,
-        {
-          "is-mobile": props.isMobile,
-        },
-      )}
+    <ToolButton
+      className={clsx("Shape", { fillable: false })}
+      type="radio"
+      icon={laserPointerToolIcon}
+      name="editor-current-shape"
+      checked={props.checked}
       title={`${props.title}`}
-    >
-      <input
-        className="ToolIcon_type_checkbox"
-        type="checkbox"
-        name={props.name}
-        onChange={props.onChange}
-        checked={props.checked}
-        aria-label={props.title}
-        data-testid="toolbar-LaserPointer"
-      />
-      <div className="ToolIcon__icon">{laserPointerToolIcon}</div>
-    </label>
+      aria-label={`${props.title}`}
+      data-testid={`toolbar-LaserPointer`}
+      onChange={props.onChange}
+    />
   );
 };

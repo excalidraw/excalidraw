@@ -93,7 +93,8 @@ export const calculateScrollCenter = (
   let centerY = (y1 + y2) / 2;
 
   if (mode !== "none") {
-    centerY -= 20;
+    zoom = { value: getNormalizedZoom(zoom.value - 0.02) };
+    centerY -= 60;
   } else {
     centerY += 10;
   }
