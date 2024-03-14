@@ -144,6 +144,9 @@ export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
 
+export const COLOR_WHITE = "#ffffff";
+export const COLOR_CHARCOAL_BLACK = "#1e1e1e";
+
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
 export const GRID_SIZE = 20; // TODO make it configurable?
