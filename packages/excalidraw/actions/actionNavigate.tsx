@@ -44,10 +44,10 @@ export const actionGoToCollaborator = register({
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {
-    const { clientId, collaborator, withName, isBeingFollowed } =
+    const { socketId, collaborator, withName, isBeingFollowed } =
       data as GoToCollaboratorComponentProps;
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(socketId, collaborator);
 
     const statusClassNames = clsx({
       "is-followed": isBeingFollowed,

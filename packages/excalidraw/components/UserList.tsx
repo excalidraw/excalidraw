@@ -13,9 +13,10 @@ import { searchIcon } from "./icons";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
 import { supportsResizeObserver } from "../constants";
+import { MarkRequired } from "../utility-types";
 
 export type GoToCollaboratorComponentProps = {
-  clientId: ClientId;
+  socketId: SocketId;
   collaborator: Collaborator;
   withName: boolean;
   isBeingFollowed: boolean;
@@ -30,39 +31,35 @@ const SHOW_COLLABORATORS_FILTER_AT = 8;
 const ConditionalTooltipWrapper = ({
   shouldWrap,
   children,
-  clientId,
   username,
 }: {
   shouldWrap: boolean;
   children: React.ReactNode;
   username?: string | null;
-  clientId: ClientId;
 }) =>
   shouldWrap ? (
-    <Tooltip label={username || "Unknown user"} key={clientId}>
-      {children}
-    </Tooltip>
+    <Tooltip label={username || "Unknown user"}>{children}</Tooltip>
   ) : (
-    <React.Fragment key={clientId}>{children}</React.Fragment>
+    <React.Fragment>{children}</React.Fragment>
   );
 
 const renderCollaborator = ({
   actionManager,
   collaborator,
-  clientId,
+  socketId,
   withName = false,
   shouldWrapWithTooltip = false,
   isBeingFollowed,
 }: {
   actionManager: ActionManager;
   collaborator: Collaborator;
-  clientId: ClientId;
+  socketId: SocketId;
   withName?: boolean;
   shouldWrapWithTooltip?: boolean;
   isBeingFollowed: boolean;
 }) => {
   const data: GoToCollaboratorComponentProps = {
-    clientId,
+    socketId,
     collaborator,
     withName,
     isBeingFollowed,
@@ -71,8 +68,7 @@ const renderCollaborator = ({
 
   return (
     <ConditionalTooltipWrapper
-      key={clientId}
-      clientId={clientId}
+      key={socketId}
       username={collaborator.username}
       shouldWrap={shouldWrapWithTooltip}
     >
@@ -113,7 +109,10 @@ export const UserList = React.memo(
   ({ className, mobile, collaborators, userToFollow }: UserListProps) => {
     const actionManager = useExcalidrawActionManager();
 
-    const uniqueCollaboratorsMap = new Map<ClientId, Collaborator>();
+    const uniqueCollaboratorsMap = new Map<
+      ClientId,
+      MarkRequired<Collaborator, "socketId">
+    >();
 
     collaborators.forEach((collaborator, socketId) => {
       const userId = (collaborator.id || socketId) as ClientId;
@@ -124,9 +123,9 @@ export const UserList = React.memo(
       );
     });
 
-    const uniqueCollaboratorsArray = Array.from(uniqueCollaboratorsMap).filter(
-      ([_, collaborator]) => collaborator.username?.trim(),
-    );
+    const uniqueCollaboratorsArray = Array.from(
+      uniqueCollaboratorsMap.values(),
+    ).filter((collaborator) => collaborator.username?.trim());
 
     const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -165,7 +164,7 @@ export const UserList = React.memo(
     const searchTermNormalized = searchTerm.trim().toLowerCase();
 
     const filteredCollaborators = searchTermNormalized
-      ? uniqueCollaboratorsArray.filter(([, collaborator]) =>
+      ? uniqueCollaboratorsArray.filter((collaborator) =>
           collaborator.username?.toLowerCase().includes(searchTerm),
         )
       : uniqueCollaboratorsArray;
@@ -175,24 +174,23 @@ export const UserList = React.memo(
       maxAvatars - 1,
     );
 
-    const firstNAvatarsJSX = firstNCollaborators.map(
-      ([clientId, collaborator]) =>
-        renderCollaborator({
-          actionManager,
-          collaborator,
-          clientId,
-          shouldWrapWithTooltip: true,
-          isBeingFollowed: collaborator.socketId === userToFollow,
-        }),
+    const firstNAvatarsJSX = firstNCollaborators.map((collaborator) =>
+      renderCollaborator({
+        actionManager,
+        collaborator,
+        socketId: collaborator.socketId,
+        shouldWrapWithTooltip: true,
+        isBeingFollowed: collaborator.socketId === userToFollow,
+      }),
     );
 
     return mobile ? (
       <div className={clsx("UserList UserList_mobile", className)}>
-        {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
+        {uniqueCollaboratorsArray.map((collaborator) =>
           renderCollaborator({
             actionManager,
             collaborator,
-            clientId,
+            socketId: collaborator.socketId,
             shouldWrapWithTooltip: true,
             isBeingFollowed: collaborator.socketId === userToFollow,
           }),
@@ -251,11 +249,11 @@ export const UserList = React.memo(
                     <div className="UserList__hint">
                       {t("userList.hint.text")}
                     </div>
-                    {filteredCollaborators.map(([clientId, collaborator]) =>
+                    {filteredCollaborators.map((collaborator) =>
                       renderCollaborator({
                         actionManager,
                         collaborator,
-                        clientId,
+                        socketId: collaborator.socketId,
                         withName: true,
                         isBeingFollowed: collaborator.socketId === userToFollow,
                       }),

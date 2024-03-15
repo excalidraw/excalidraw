@@ -84,7 +84,7 @@ export class LaserTrails implements Trail {
       if (!this.collabTrails.has(key)) {
         trail = new AnimatedTrail(this.animationFrameHandler, this.app, {
           ...this.getTrailOptions(),
-          fill: () => getClientColor(key),
+          fill: () => getClientColor(key, collabolator),
         });
         trail.start(this.container);
 

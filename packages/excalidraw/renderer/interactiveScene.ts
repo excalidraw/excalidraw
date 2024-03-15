@@ -726,14 +726,18 @@ const _renderInteractiveScene = ({
           selectionColors.push(selectionColor);
         }
         // remote users
-        if (renderConfig.remoteSelectedElementIds[element.id]) {
+        const remoteClients = renderConfig.remoteSelectedElementIds.get(
+          element.id,
+        );
+        if (remoteClients) {
           selectionColors.push(
-            ...renderConfig.remoteSelectedElementIds[element.id].map(
-              (socketId: string) => {
-                const background = getClientColor(socketId);
-                return background;
-              },
-            ),
+            ...remoteClients.map((socketId) => {
+              const background = getClientColor(
+                socketId,
+                appState.collaborators.get(socketId),
+              );
+              return background;
+            }),
           );
         }
 
@@ -747,7 +751,7 @@ const _renderInteractiveScene = ({
             elementX2,
             elementY2,
             selectionColors,
-            dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+            dashed: !!remoteClients,
             cx,
             cy,
             activeEmbeddable:

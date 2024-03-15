@@ -6,7 +6,12 @@ import {
 } from "./constants";
 import { roundRect } from "./renderer/roundRect";
 import { InteractiveCanvasRenderConfig } from "./scene/types";
-import { InteractiveCanvasAppState, SocketId, UserIdleState } from "./types";
+import {
+  Collaborator,
+  InteractiveCanvasAppState,
+  SocketId,
+  UserIdleState,
+} from "./types";
 
 function hashToInteger(id: string) {
   let hash = 0;
@@ -21,14 +26,12 @@ function hashToInteger(id: string) {
 }
 
 export const getClientColor = (
-  /**
-   * any uniquely identifying key, such as user id or socket id
-   */
-  id: string,
+  socketId: SocketId,
+  collaborator: Collaborator | undefined,
 ) => {
   // to get more even distribution in case `id` is not uniformly distributed to
   // begin with, we hash it
-  const hash = Math.abs(hashToInteger(id));
+  const hash = Math.abs(hashToInteger(collaborator?.id || socketId));
   // we want to get a multiple of 10 number in the range of 0-360 (in other
   // words a hue value of step size 10). There are 37 such values including 0.
   const hue = (hash % 37) * 10;
@@ -63,10 +66,10 @@ export const renderRemoteCursors = ({
   normalizedHeight: number;
 }) => {
   // Paint remote pointers
-  for (const clientId in renderConfig.remotePointerViewportCoords) {
-    let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
+  for (const [socketId, pointer] of renderConfig.remotePointerViewportCoords) {
+    let { x, y } = pointer;
 
-    const collaborator = appState.collaborators.get(clientId as SocketId);
+    const collaborator = appState.collaborators.get(socketId);
 
     x -= appState.offsetLeft;
     y -= appState.offsetTop;
@@ -85,13 +88,13 @@ export const renderRemoteCursors = ({
     y = Math.max(y, 0);
     y = Math.min(y, normalizedHeight - height);
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(socketId, collaborator);
 
     context.save();
     context.strokeStyle = background;
     context.fillStyle = background;
 
-    const userState = renderConfig.remotePointerUserStates[clientId];
+    const userState = renderConfig.remotePointerUserStates.get(socketId);
     const isInactive =
       isOutOfBounds ||
       userState === UserIdleState.IDLE ||
@@ -101,10 +104,7 @@ export const renderRemoteCursors = ({
       context.globalAlpha = 0.3;
     }
 
-    if (
-      renderConfig.remotePointerButton &&
-      renderConfig.remotePointerButton[clientId] === "down"
-    ) {
+    if (renderConfig.remotePointerButton.get(socketId) === "down") {
       context.beginPath();
       context.arc(x, y, 15, 0, 2 * Math.PI, false);
       context.lineWidth = 3;
@@ -179,7 +179,7 @@ export const renderRemoteCursors = ({
       context.stroke();
     }
 
-    const username = renderConfig.remotePointerUsernames[clientId] || "";
+    const username = renderConfig.remotePointerUsernames.get(socketId) || "";
 
     if (!isOutOfBounds && username) {
       context.font = "600 12px sans-serif"; // font has to be set before context.measureText()
