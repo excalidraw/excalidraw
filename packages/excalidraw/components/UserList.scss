@@ -9,7 +9,7 @@
     display: flex;
     width: 100%;
     justify-content: flex-end;
-    pointer-events: none;
+    pointer-events: none !important;
   }
 
   .UserList {
