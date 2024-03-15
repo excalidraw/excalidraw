@@ -162,10 +162,6 @@ export const UserList = React.memo(
 
     const [maxAvatars, setMaxAvatars] = React.useState(DEFAULT_MAX_AVATARS);
 
-    if (uniqueCollaboratorsArray.length === 0) {
-      return null;
-    }
-
     const searchTermNormalized = searchTerm.trim().toLowerCase();
 
     const filteredCollaborators = searchTermNormalized
@@ -191,10 +187,7 @@ export const UserList = React.memo(
     );
 
     return mobile ? (
-      <div
-        className={clsx("UserList UserList_mobile", className)}
-        style={{ [`--max-avatars` as any]: maxAvatars }}
-      >
+      <div className={clsx("UserList UserList_mobile", className)}>
         {uniqueCollaboratorsArray.map(([clientId, collaborator]) =>
           renderCollaborator({
             actionManager,
