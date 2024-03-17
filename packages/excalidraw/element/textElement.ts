@@ -18,7 +18,6 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
-  isSafari,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -31,8 +30,8 @@ import { isTextBindableContainer } from "./typeChecks";
 import { getElementAbsoluteCoords } from ".";
 import { getSelectedElements } from "../scene";
 import { isHittingElementNotConsideringBoundingBox } from "./collision";
-import { hostPlugin } from "../components/App";
-import { ExtractSetType } from "../utility-types";
+import { hostPlugin } from "../components/App"; //zsviczian
+import { ExtractSetType, MakeBrand } from "../utility-types"; 
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
@@ -62,7 +61,6 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    baseline: textElement.baseline,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -83,7 +81,6 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
-  boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
     const maxContainerHeight = getBoundTextMaxHeight(
@@ -189,7 +186,6 @@ export const handleBindTextResize = (
     const maxWidth = getBoundTextMaxWidth(container, textElement);
     const maxHeight = getBoundTextMaxHeight(container, textElement);
     let containerHeight = container.height;
-    let nextBaseLine = textElement.baseline;
     if (
       shouldMaintainAspectRatio ||
       (transformHandleType !== "n" && transformHandleType !== "s")
@@ -208,7 +204,6 @@ export const handleBindTextResize = (
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
-      nextBaseLine = metrics.baseline;
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
@@ -237,7 +232,6 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextBaseLine,
     });
 
     if (!isArrowElement(container)) {
@@ -334,64 +328,7 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const baseline = measureBaseline(text, font, lineHeight);
-  measures.set(key, {fontSize, baseline, height, width}); //zsviczian
-
-  return { width, height, baseline };
-};
-
-export const measureBaseline = (
-  text: string,
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-  wrapInContainer?: boolean,
-) => {
-  //zsviczian - avoiding frequent dom event at the top level of the document
-  //addressess slow performance when scaling sticky notes in Obsidian popout windows
-  const textMeasureDiv = hostPlugin?.textMeasureDiv ?? document.body; //zsviczian
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
-  if (wrapInContainer) {
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.whiteSpace = "pre-wrap";
-  }
-
-  container.style.lineHeight = String(lineHeight);
-
-  container.innerText = text;
-
-  // Baseline is important for positioning text on canvas
-  textMeasureDiv.appendChild(container); //zsviczian
-
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  let baseline = span.offsetTop + span.offsetHeight;
-  const height = container.offsetHeight;
-
-  if (isSafari) {
-    const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
-    const fontSize = parseFloat(font);
-    // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
-    // from the actual canvas height
-    const domHeight = getTextHeight(text, Math.round(fontSize), lineHeight);
-    if (canvasHeight > height) {
-      baseline += canvasHeight - domHeight;
-    }
-
-    if (height > canvasHeight) {
-      baseline -= domHeight - canvasHeight;
-    }
-  }
-  textMeasureDiv.removeChild(container); //zsviczian
-  return baseline;
+  return { width, height };
 };
 
 /**
@@ -414,6 +351,24 @@ export const getLineHeightInPx = (
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
   return fontSize * lineHeight;
+};
+
+/**
+ * Calculates vertical offset for a text with alphabetic baseline.
+ */
+export const getVerticalOffset = (
+  fontFamily: ExcalidrawTextElement["fontFamily"],
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeightPx: number,
+) => {
+  const { unitsPerEm, ascender, descender } =
+    FONT_METRICS[fontFamily] || FONT_METRICS[FONT_FAMILY.Helvetica];
+
+  const fontSizeEm = fontSize / unitsPerEm;
+  const lineGap = lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender;
+
+  const verticalOffset = fontSizeEm * ascender + lineGap;
+  return verticalOffset;
 };
 
 // FIXME rename to getApproxMinContainerHeight
@@ -1013,15 +968,59 @@ const DEFAULT_LINE_HEIGHT = {
   // ~1.25 is the average for Virgil in WebKit and Blink.
   // Gecko (FF) uses ~1.28.
   [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
-  // ~1.15 is the average for Virgil in WebKit and Blink.
-  // Gecko if all over the place.
+  // ~1.15 is the average for Helvetica in WebKit and Blink.
   [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
-  // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
+  // ~1.2 is the average for Cascadia in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
   //zsviczian Average of the 3 fonts
   // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Assistant]: 1.2 as ExcalidrawTextElement["lineHeight"], //zsviczian
   [FONT_FAMILY.LocalFont]: 1.2 as ExcalidrawTextElement["lineHeight"], //zsviczian
+};
+
+/** OS/2 sTypoAscender, https://learn.microsoft.com/en-us/typography/opentype/spec/os2#stypoascender */
+type sTypoAscender = number & MakeBrand<"sTypoAscender">;
+
+/** OS/2 sTypoDescender, https://learn.microsoft.com/en-us/typography/opentype/spec/os2#stypodescender */
+type sTypoDescender = number & MakeBrand<"sTypoDescender">;
+
+/** head.unitsPerEm, usually either 1000 or 2048 */
+type unitsPerEm = number & MakeBrand<"unitsPerEm">;
+
+/**
+ * Hardcoded metrics for default fonts, read by https://opentype.js.org/font-inspector.html.
+ * For custom fonts, read these metrics from OS/2 table and extend this object.
+ *
+ * WARN: opentype does NOT open WOFF2 correctly, make sure to convert WOFF2 to TTF first.
+ */
+export const FONT_METRICS: Record<
+  number,
+  {
+    unitsPerEm: number;
+    ascender: sTypoAscender;
+    descender: sTypoDescender;
+  }
+> = {
+  [FONT_FAMILY.Virgil]: {
+    unitsPerEm: 1000 as unitsPerEm,
+    ascender: 886 as sTypoAscender,
+    descender: -374 as sTypoDescender,
+  },
+  [FONT_FAMILY.Helvetica]: {
+    unitsPerEm: 2048 as unitsPerEm,
+    ascender: 1577 as sTypoAscender,
+    descender: -471 as sTypoDescender,
+  },
+  [FONT_FAMILY.Cascadia]: {
+    unitsPerEm: 2048 as unitsPerEm,
+    ascender: 1977 as sTypoAscender,
+    descender: -480 as sTypoDescender,
+  },
+  [FONT_FAMILY.Assistant]: {
+    unitsPerEm: 1000 as unitsPerEm,
+    ascender: 1021 as sTypoAscender,
+    descender: -287 as sTypoDescender,
+  },
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
