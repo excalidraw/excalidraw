@@ -11,7 +11,7 @@ import {
   getCommonBounds,
   getElementAbsoluteCoords,
 } from "../element/bounds";
-import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
 import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import { AppState, BinaryFiles } from "../types";
 import {
@@ -38,6 +38,7 @@ import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
 import { RenderableElementsMap } from "./types";
+import { renderStaticScene } from "../renderer/staticScene";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 

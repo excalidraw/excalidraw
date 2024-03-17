@@ -179,7 +179,6 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontFamily: FontFamilyValues;
     text: string;
     rawText: string;
-    baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;

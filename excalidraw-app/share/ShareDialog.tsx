@@ -70,7 +70,7 @@ const ActiveRoomDialog = ({
     try {
       await copyTextToSystemClipboard(activeRoomLink);
     } catch (e) {
-      collabAPI.setErrorMessage(t("errors.copyToSystemClipboardFailed"));
+      collabAPI.setCollabError(t("errors.copyToSystemClipboardFailed"));
     }
 
     setJustCopied(true);

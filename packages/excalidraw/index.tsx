@@ -231,6 +231,8 @@ Excalidraw.displayName = "Excalidraw";
 
 export {
   getSceneVersion,
+  hashElementsVersion,
+  hashString,
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "./element";
@@ -241,16 +243,12 @@ export {
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";
+
 export {
   exportToCanvas,
   exportToBlob,
   exportToSvg,
-  serializeAsJSON,
-  serializeLibraryAsJSON,
-  loadLibraryFromBlob,
-  loadFromBlob,
-  loadSceneOrLibraryFromBlob,
-  getFreeDrawSvgPath,
+  exportToClipboard,
   getCommonBoundingBox, //zsviczian
   getMaximumGroups, //zsviczian
   intersectElementWithLine, //zsviczian
@@ -260,10 +258,17 @@ export {
   wrapText, //zsviczian
   getFontString, //zsviczian
   getBoundTextMaxWidth, //zsviczian
-  exportToClipboard,
-  mergeLibraryItems,
   mermaidToExcalidraw, //zsviczian
 } from "../utils/export";
+
+export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
+export {
+  loadFromBlob,
+  loadSceneOrLibraryFromBlob,
+  loadLibraryFromBlob,
+} from "./data/blob";
+export { getFreeDrawSvgPath } from "./renderer/renderElement";
+export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "./element/typeChecks";
 
 export { FONT_FAMILY, THEME, MIME_TYPES, ROUNDNESS } from "./constants";
@@ -303,4 +308,4 @@ export {
   elementsOverlappingBBox,
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
-} from "../utils/export";
+} from "../utils/withinBounds";
