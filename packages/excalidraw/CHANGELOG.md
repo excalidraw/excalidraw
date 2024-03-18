@@ -15,6 +15,10 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Add `useHandleLibrary`'s `opts.adapter` as the new recommended pattern to handle library initialization and persistence on library updates. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+- Add `useHandleLibrary`'s `opts.migrationAdapter` adapter to handle library migration during init, when migrating from one data store to another (e.g. from LocalStorage to IndexedDB). [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+- Soft-deprecate `useHandleLibrary`'s `opts.getInitialLibraryItems` in favor of `opts.adapter`. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
 - Add `onPointerUp` prop [#7638](https://github.com/excalidraw/excalidraw/pull/7638).
 
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
@@ -27,7 +31,7 @@ Please add the latest change on the top under the correct section.
 
 - `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
-- `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render.
+- `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties.
 
 - Create an `ESM` build for `@excalidraw/excalidraw`. The API is in progress and subject to change before stable release. There are some changes on how the package will be consumed
 

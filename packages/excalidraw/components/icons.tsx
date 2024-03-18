@@ -1798,7 +1798,7 @@ export const fullscreenIcon = createIcon(
 );
 
 export const eyeIcon = createIcon(
-  <g stroke="currentColor" fill="none">
+  <g stroke="currentColor" fill="none" strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
     <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
@@ -1834,6 +1834,29 @@ export const searchIcon = createIcon(
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
     <path d="M21 21l-6 -6" />
+  </g>,
+  tablerIconProps,
+);
+
+export const microphoneIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
+    <path d="M5 10a7 7 0 0 0 14 0" />
+    <path d="M8 21l8 0" />
+    <path d="M12 17l0 4" />
+  </g>,
+  tablerIconProps,
+);
+
+export const microphoneMutedIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 3l18 18" />
+    <path d="M9 5a3 3 0 0 1 6 0v5a3 3 0 0 1 -.13 .874m-2 2a3 3 0 0 1 -3.87 -2.872v-1" />
+    <path d="M5 10a7 7 0 0 0 10.846 5.85m2 -2a6.967 6.967 0 0 0 1.152 -3.85" />
+    <path d="M8 21l8 0" />
+    <path d="M12 17l0 4" />
   </g>,
   tablerIconProps,
 );
