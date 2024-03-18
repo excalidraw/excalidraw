@@ -70,6 +70,7 @@ export const saveToHttpStorage = async (
       roomId,
       roomKey,
     }),
+    credentials: "include",
   });
 
   if (!getResponse.ok && getResponse.status !== 404) {
@@ -91,6 +92,7 @@ export const saveToHttpStorage = async (
       roomKey,
       data: JSON.stringify(elements),
     }),
+    credentials: "include",
   });
 
   if (putResponse.ok) {
@@ -113,6 +115,7 @@ export const loadFromHttpStorage = async (
       roomId,
       roomKey,
     }),
+    credentials: "include",
   });
 
   const elements = await getSyncableElementsFromResponse(getResponse);
@@ -150,6 +153,7 @@ export const saveFilesToHttpStorage = async ({
             "File-Id": id,
           },
           body,
+          credentials: "include",
         });
         savedFiles.set(id, true);
       } catch (error: any) {
@@ -181,6 +185,7 @@ export const loadFilesFromHttpStorage = async (
               "Room-Key": roomKey,
               "File-Id": id,
             },
+            credentials: "include",
           },
         );
         if (response.status < 400) {
