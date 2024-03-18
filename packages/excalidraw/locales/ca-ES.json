@@ -11,8 +11,8 @@
     "copyAsPng": "Copia al porta-retalls com a PNG",
     "copyAsSvg": "Copia al porta-retalls com a SVG",
     "copyText": "Copia al porta-retalls com a text",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copia al porta-retalls",
+    "convertToCode": "Converteix a codi",
     "bringForward": "Porta endavant",
     "sendToBack": "Envia enrere",
     "bringToFront": "Porta al davant",
@@ -38,17 +38,17 @@
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Fletxa",
     "arrowhead_bar": "Barra",
-    "arrowhead_circle": "",
+    "arrowhead_circle": "Cercle",
     "arrowhead_circle_outline": "",
-    "arrowhead_triangle": "",
+    "arrowhead_triangle": "Triangle",
     "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
+    "arrowhead_diamond": "Rombe",
     "arrowhead_diamond_outline": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
     "handDrawn": "Dibuixat a mà",
-    "normal": "",
+    "normal": "Normal",
     "code": "Codi",
     "small": "Petit",
     "medium": "Mitjà",
@@ -56,7 +56,7 @@
     "veryLarge": "Molt gran",
     "solid": "Sòlid",
     "hachure": "Ratlletes",
-    "zigzag": "",
+    "zigzag": "Ziga-zaga",
     "crossHatch": "Ratlletes creuades",
     "thin": "Fi",
     "bold": "Negreta",
@@ -112,15 +112,15 @@
     "increaseFontSize": "Augmenta la mida de la lletra",
     "unbindText": "Desvincular el text",
     "bindText": "Ajusta el text al contenidor",
-    "createContainerFromText": "",
+    "createContainerFromText": "Ajusta el text al contenidor",
     "link": {
       "edit": "Edita l'enllaç",
-      "editEmbed": "",
+      "editEmbed": "Edita l'enllaç i encasta'l",
       "create": "Crea un enllaç",
-      "createEmbed": "",
+      "createEmbed": "Crea l'enllaç i encasta'l",
       "label": "Enllaç",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "Enllaça i encasta",
+      "empty": "No s'ha definit cap enllaç"
     },
     "lineEditor": {
       "edit": "Editar línia",
@@ -136,8 +136,8 @@
     "sidebarLock": "Manté la barra lateral oberta",
     "selectAllElementsInFrame": "Selecciona tots els elements del marc",
     "removeAllElementsFromFrame": "Elimina tots els elements del marc",
-    "eyeDropper": "",
-    "textToDiagram": "",
+    "eyeDropper": "Tria un color del llenç",
+    "textToDiagram": "Text a diagrama",
     "prompt": "",
     "followUs": "Seguiu-nos",
     "discordChat": "Xat de Discord"
@@ -183,7 +183,7 @@
     "publishLibrary": "Publica",
     "submit": "Envia",
     "confirm": "Confirma",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Feu clic per interactuar"
   },
   "alerts": {
     "clearReset": "S'esborrarà tot el llenç. N'esteu segur?",
@@ -219,12 +219,12 @@
     "saveLibraryError": "",
     "collabSaveFailed": "No s'ha pogut desar a la base de dades de fons. Si els problemes persisteixen, hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
     "collabSaveFailed_sizeExceeded": "No s'ha pogut desar a la base de dades de fons, sembla que el llenç és massa gran. Hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Les imatges no estan habilitades.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Sembla que feu servir el navegador Brave amb el <bold>blocatge agressiu d'indentificació única</bold> activat.",
+      "line2": "Això podria provocar problemes amb els <bold>elements de text</bold> en els vostres dissenys.",
+      "line3": "Us recomanem encaridament que desactiveu aquesta característica. Podeu seguir <link>aquests passos</link> per a fer-ho.",
+      "line4": "Si els elements de text no es mostren correctament malgrat haver desactivat aquesta opció, si us plau, obriu una <issueLink>incidència</issueLink> a la nostra pàgina de GitHub o escriviu-nos a <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "",
@@ -302,10 +302,10 @@
     "sceneContent": "Contingut de l'escena:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "O"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Convideu gent a col·laborar en el vostre disseny.",
     "desc_privacy": "No us amoïneu, la sessió està encriptada d'extrem a extrem i és totalment privada. Ni tan sols el nostre servidor pot veure què dibuixeu.",
     "button_startSession": "Inicia la sessió",
     "button_stopSession": "Atura la sessió",
@@ -339,8 +339,8 @@
     "doubleClick": "doble clic",
     "drag": "arrossega",
     "editor": "Editor",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "Edita els punts de la línia/fletxa",
+    "editText": "Edita text / afegeix etiqueta",
     "github": "Hi heu trobat un problema? Informeu-ne",
     "howto": "Seguiu les nostres guies",
     "or": "o",
@@ -453,7 +453,7 @@
     "unrecognizedLinkFormat": ""
   },
   "colors": {
-    "transparent": "",
+    "transparent": "Transparent",
     "black": "Negre",
     "white": "Blanc",
     "red": "Vermell",
@@ -535,9 +535,9 @@
     "hint": {
       "text": "Feu clic sobre un usuari per seguir-lo",
       "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "L'usuari es troba en una trucada de veu",
+      "micMuted": "El micròfon de l'usuari és silenciat",
+      "isSpeaking": "L'usuari parla ara"
     }
   }
 }
