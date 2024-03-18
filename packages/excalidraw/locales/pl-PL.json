@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Kliknij na użytkownika, aby obserwować",
-      "followStatus": "Obserwujesz tego użytkownika"
+      "followStatus": "Obserwujesz tego użytkownika",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
