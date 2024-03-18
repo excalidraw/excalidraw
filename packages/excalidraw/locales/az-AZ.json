@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "",
-      "followStatus": ""
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
