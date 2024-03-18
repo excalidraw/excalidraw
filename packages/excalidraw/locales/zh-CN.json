@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "点击关注用户",
-      "followStatus": "您已关注此用户"
+      "followStatus": "您已关注此用户",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
