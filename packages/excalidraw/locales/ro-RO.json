@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Dă clic pe un utilizator pentru a-l urmări",
-      "followStatus": "În prezent urmărești acest utilizator"
+      "followStatus": "În prezent urmărești acest utilizator",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
