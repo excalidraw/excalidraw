@@ -41,3 +41,19 @@ Excalidraw takes _100%_ of `width` and `height` of the containing block so make 
 ### Demo
 
 [Try here](https://codesandbox.io/s/excalidraw-ehlz3).
+
+
+### Self-hosting
+
+We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self-host your own client under your own domain, on Kubernetes, AWS ECS, etc.
+
+```bash
+docker build -t excalidraw/excalidraw .
+docker run --rm -dit --name excalidraw -p 5000:80 excalidraw/excalidraw:latest
+```
+
+The Docker image is free of analytics and other tracking libraries.
+
+**At the moment, self-hosting your own instance doesn't support sharing or collaboration features.**
+
+We are working towards providing a full-fledged solution for self-hosting your own Excalidraw.
