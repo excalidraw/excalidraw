@@ -535,9 +535,9 @@
     "hint": {
       "text": "点击关注用户",
       "followStatus": "您已关注此用户",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "用户在语音通话中",
+      "micMuted": "用户的麦克风已静音",
+      "isSpeaking": "用户正在说话"
     }
   }
 }
