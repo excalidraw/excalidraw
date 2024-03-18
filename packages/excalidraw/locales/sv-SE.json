@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Klicka på användaren för att följa",
-      "followStatus": "Du följer den här användaren"
+      "followStatus": "Du följer den här användaren",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
