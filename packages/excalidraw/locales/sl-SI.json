@@ -535,9 +535,9 @@
     "hint": {
       "text": "Klikni na uporabnika za sledenje",
       "followStatus": "Trenutno slediš temu uporabniku",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Uporabnik je v glasovnem klicu",
+      "micMuted": "Uporabnikov mikrofon je izklopljen",
+      "isSpeaking": "Uporabnik govori"
     }
   }
 }
