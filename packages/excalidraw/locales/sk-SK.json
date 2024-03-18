@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Kliknite na používateľa pre jeho sledovanie",
-      "followStatus": "Aktuálne sledujete tohto používateľa"
+      "followStatus": "Aktuálne sledujete tohto používateľa",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
