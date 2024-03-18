@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Haga clic en el usuario para seguir",
-      "followStatus": "Ya estás siguiendo a este usuario"
+      "followStatus": "Ya estás siguiendo a este usuario",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
