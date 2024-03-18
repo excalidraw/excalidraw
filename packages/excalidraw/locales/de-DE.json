@@ -535,9 +535,9 @@
     "hint": {
       "text": "Klicke auf Benutzer um zu folgen",
       "followStatus": "Du folgst derzeit diesem Benutzer",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Benutzer ist in einem Sprachanruf",
+      "micMuted": "Mikrofon des Benutzers ist stumm geschaltet",
+      "isSpeaking": "Benutzer spricht"
     }
   }
 }
