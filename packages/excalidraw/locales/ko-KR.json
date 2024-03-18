@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "유저를 클릭해서 따라가기",
-      "followStatus": "이 사용자를 따라가고 있습니다"
+      "followStatus": "이 사용자를 따라가고 있습니다",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
