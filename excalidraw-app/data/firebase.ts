@@ -1,6 +1,7 @@
 import {
   ExcalidrawElement,
   FileId,
+  OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import { getSceneVersion } from "../../packages/excalidraw/element";
 import Portal from "../collab/Portal";
@@ -18,10 +19,13 @@ import {
   decryptData,
 } from "../../packages/excalidraw/data/encryption";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
+import {
+  RemoteExcalidrawElement,
+  reconcileElements,
+} from "../../packages/excalidraw/data/reconcile";
 
 // private
 // -----------------------------------------------------------------------------
@@ -258,7 +262,11 @@ export const saveToFirebase = async (
       restoreElements(await decryptElements(prevStoredScene, roomKey), null),
     );
     const reconciledElements = getSyncableElements(
-      reconcileElements(elements, prevStoredElements, appState),
+      reconcileElements(
+        elements,
+        prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
+        appState,
+      ),
     );
 
     const storedScene = await createFirebaseSceneDocument(

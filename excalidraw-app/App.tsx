@@ -86,10 +86,6 @@ import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import {
-  BroadcastedExcalidrawElement,
-  reconcileElements,
-} from "./collab/reconciliation";
-import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
 } from "../packages/excalidraw/data/library";
@@ -108,6 +104,10 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+import {
+  RemoteExcalidrawElement,
+  reconcileElements,
+} from "../packages/excalidraw/data/reconcile";
 
 polyfill();
 
@@ -256,7 +256,7 @@ const initializeScene = async (opts: {
         },
         elements: reconcileElements(
           scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted() as BroadcastedExcalidrawElement[],
+          excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
           excalidrawAPI.getAppState(),
         ),
       },

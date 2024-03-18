@@ -1,23 +1,19 @@
-import { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
-import {
-  orderByFractionalIndex,
-  syncInvalidIndices,
-} from "../../packages/excalidraw/fractionalIndex";
-import { AppState } from "../../packages/excalidraw/types";
-import { MakeBrand } from "../../packages/excalidraw/utility-types";
-import { arrayToMap } from "../../packages/excalidraw/utils";
-import { SyncableExcalidrawElement } from "../data";
+import { OrderedExcalidrawElement } from "../element/types";
+import { orderByFractionalIndex, syncInvalidIndices } from "../fractionalIndex";
+import { AppState } from "../types";
+import { MakeBrand } from "../utility-types";
+import { arrayToMap } from "../utils";
 
 export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"ReconciledElement">;
 
-export type BroadcastedExcalidrawElement = OrderedExcalidrawElement &
-  MakeBrand<"BroadcastedElement">;
+export type RemoteExcalidrawElement = OrderedExcalidrawElement &
+  MakeBrand<"RemoteExcalidrawElement">;
 
 const shouldDiscardRemoteElement = (
   localAppState: AppState,
   local: OrderedExcalidrawElement | undefined,
-  remote: BroadcastedExcalidrawElement | SyncableExcalidrawElement,
+  remote: RemoteExcalidrawElement,
 ): boolean => {
   if (
     local &&
@@ -39,9 +35,7 @@ const shouldDiscardRemoteElement = (
 
 export const reconcileElements = (
   localElements: readonly OrderedExcalidrawElement[],
-  remoteElements:
-    | readonly BroadcastedExcalidrawElement[]
-    | readonly SyncableExcalidrawElement[],
+  remoteElements: readonly RemoteExcalidrawElement[],
   localAppState: AppState,
 ): ReconciledExcalidrawElement[] => {
   const localElementsMap = arrayToMap(localElements);

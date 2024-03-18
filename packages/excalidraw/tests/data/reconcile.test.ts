@@ -1,16 +1,15 @@
-import { expect } from "chai";
+import {
+  RemoteExcalidrawElement,
+  reconcileElements,
+} from "../../data/reconcile";
 import {
   ExcalidrawElement,
   OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import {
-  BroadcastedExcalidrawElement,
-  reconcileElements,
-} from "../../excalidraw-app/collab/reconciliation";
-import { randomInteger } from "../../packages/excalidraw/random";
-import { AppState } from "../../packages/excalidraw/types";
-import { cloneJSON } from "../../packages/excalidraw/utils";
-import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
+} from "../../element/types";
+import { syncInvalidIndices } from "../../fractionalIndex";
+import { randomInteger } from "../../random";
+import { AppState } from "../../types";
+import { cloneJSON } from "../../utils";
 
 type Id = string;
 type ElementLike = {
@@ -76,7 +75,7 @@ const test = <U extends `${string}:${"L" | "R"}`>(
 
   const reconciled = reconcileElements(
     cloneJSON(_local),
-    cloneJSON(_remote) as BroadcastedExcalidrawElement[],
+    cloneJSON(_remote) as RemoteExcalidrawElement[],
     {} as AppState,
   );
 
@@ -102,7 +101,7 @@ const test = <U extends `${string}:${"L" | "R"}`>(
     expect(
       reconcileElements(
         cloneJSON(_remote),
-        cloneJSON(_local as BroadcastedExcalidrawElement[]),
+        cloneJSON(_local as RemoteExcalidrawElement[]),
         {} as AppState,
       ).map((x) => x.id),
     ).deep.equal(reconciledIds, "convergent reconciliation");
@@ -117,7 +116,7 @@ const test = <U extends `${string}:${"L" | "R"}`>(
     expect(
       reconcileElements(
         cloneJSON(_remote),
-        cloneJSON(reconciled as unknown as BroadcastedExcalidrawElement[]),
+        cloneJSON(reconciled as unknown as RemoteExcalidrawElement[]),
         {} as AppState,
       ).map((x) => x.id),
     ).deep.equal(reconciledIds, "local re-reconciliation");
@@ -304,7 +303,7 @@ describe("elements reconciliation", () => {
     ) => {
       const ret = reconcileElements(
         local as unknown as OrderedExcalidrawElement[],
-        remote as unknown as BroadcastedExcalidrawElement[],
+        remote as unknown as RemoteExcalidrawElement[],
         {} as AppState,
       );
 
