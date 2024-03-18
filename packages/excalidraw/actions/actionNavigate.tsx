@@ -1,10 +1,15 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
 import { GoToCollaboratorComponentProps } from "../components/UserList";
-import { eyeIcon } from "../components/icons";
+import {
+  eyeIcon,
+  microphoneIcon,
+  microphoneMutedIcon,
+} from "../components/icons";
 import { t } from "../i18n";
 import { Collaborator } from "../types";
 import { register } from "./register";
+import clsx from "clsx";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
@@ -39,14 +44,45 @@ export const actionGoToCollaborator = register({
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {
-    const { clientId, collaborator, withName, isBeingFollowed } =
+    const { socketId, collaborator, withName, isBeingFollowed } =
       data as GoToCollaboratorComponentProps;
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(socketId, collaborator);
+
+    const statusClassNames = clsx({
+      "is-followed": isBeingFollowed,
+      "is-current-user": collaborator.isCurrentUser === true,
+      "is-speaking": collaborator.isSpeaking,
+      "is-in-call": collaborator.isInCall,
+      "is-muted": collaborator.isMuted,
+    });
+
+    const statusIconJSX = collaborator.isInCall ? (
+      collaborator.isSpeaking ? (
+        <div
+          className="UserList__collaborator-status-icon-speaking-indicator"
+          title={t("userList.hint.isSpeaking")}
+        >
+          <div />
+          <div />
+          <div />
+        </div>
+      ) : collaborator.isMuted ? (
+        <div
+          className="UserList__collaborator-status-icon-microphone-muted"
+          title={t("userList.hint.micMuted")}
+        >
+          {microphoneMutedIcon}
+        </div>
+      ) : (
+        <div title={t("userList.hint.inCall")}>{microphoneIcon}</div>
+      )
+    ) : null;
 
     return withName ? (
       <div
-        className="dropdown-menu-item dropdown-menu-item-base UserList__collaborator"
+        className={`dropdown-menu-item dropdown-menu-item-base UserList__collaborator ${statusClassNames}`}
+        style={{ [`--avatar-size` as any]: "1.5rem" }}
         onClick={() => updateData<Collaborator>(collaborator)}
       >
         <Avatar
@@ -54,32 +90,42 @@ export const actionGoToCollaborator = register({
           onClick={() => {}}
           name={collaborator.username || ""}
           src={collaborator.avatarUrl}
-          isBeingFollowed={isBeingFollowed}
-          isCurrentUser={collaborator.isCurrentUser === true}
+          className={statusClassNames}
         />
         <div className="UserList__collaborator-name">
           {collaborator.username}
         </div>
-        <div
-          className="UserList__collaborator-follow-status-icon"
-          style={{ visibility: isBeingFollowed ? "visible" : "hidden" }}
-          title={isBeingFollowed ? t("userList.hint.followStatus") : undefined}
-          aria-hidden
-        >
-          {eyeIcon}
+        <div className="UserList__collaborator-status-icons" aria-hidden>
+          {isBeingFollowed && (
+            <div
+              className="UserList__collaborator-status-icon-is-followed"
+              title={t("userList.hint.followStatus")}
+            >
+              {eyeIcon}
+            </div>
+          )}
+          {statusIconJSX}
         </div>
       </div>
     ) : (
-      <Avatar
-        color={background}
-        onClick={() => {
-          updateData(collaborator);
-        }}
-        name={collaborator.username || ""}
-        src={collaborator.avatarUrl}
-        isBeingFollowed={isBeingFollowed}
-        isCurrentUser={collaborator.isCurrentUser === true}
-      />
+      <div
+        className={`UserList__collaborator UserList__collaborator--avatar-only ${statusClassNames}`}
+      >
+        <Avatar
+          color={background}
+          onClick={() => {
+            updateData(collaborator);
+          }}
+          name={collaborator.username || ""}
+          src={collaborator.avatarUrl}
+          className={statusClassNames}
+        />
+        {statusIconJSX && (
+          <div className="UserList__collaborator-status-icon">
+            {statusIconJSX}
+          </div>
+        )}
+      </div>
     );
   },
 });

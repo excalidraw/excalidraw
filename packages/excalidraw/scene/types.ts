@@ -1,6 +1,7 @@
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import { Drawable } from "roughjs/bin/core";
 import {
+  ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
@@ -13,6 +14,8 @@ import {
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
+  SocketId,
+  UserIdleState,
 } from "../types";
 import { MakeBrand } from "../utility-types";
 
@@ -46,11 +49,11 @@ export type SVGRenderConfig = {
 export type InteractiveCanvasRenderConfig = {
   // collab-related state
   // ---------------------------------------------------------------------------
-  remoteSelectedElementIds: { [elementId: string]: string[] };
-  remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
-  remotePointerUserStates: { [id: string]: string };
-  remotePointerUsernames: { [id: string]: string };
-  remotePointerButton?: { [id: string]: string | undefined };
+  remoteSelectedElementIds: Map<ExcalidrawElement["id"], SocketId[]>;
+  remotePointerViewportCoords: Map<SocketId, { x: number; y: number }>;
+  remotePointerUserStates: Map<SocketId, UserIdleState>;
+  remotePointerUsernames: Map<SocketId, string>;
+  remotePointerButton: Map<SocketId, string | undefined>;
   selectionColor?: string;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
