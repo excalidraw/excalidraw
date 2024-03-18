@@ -77,6 +77,12 @@ export type CollaboratorPointer = {
    * @default true
    */
   renderCursor?: boolean;
+  /**
+   * Explicit laser color.
+   *
+   * @default string collaborator's cursor color
+   */
+  laserColor?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
