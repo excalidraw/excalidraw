@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "Clicar l’utilizaire per lo seguir",
-      "followStatus": "Seguissètz actualament aqueste utilizaire"
+      "followStatus": "Seguissètz actualament aqueste utilizaire",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
