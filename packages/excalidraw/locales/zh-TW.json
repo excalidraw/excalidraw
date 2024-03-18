@@ -535,9 +535,9 @@
     "hint": {
       "text": "點擊使用者以進行追蹤",
       "followStatus": "您正在追蹤此使用者",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "使用者正在語音通話中",
+      "micMuted": "使用者的麥克風已靜音",
+      "isSpeaking": "使用者說話中"
     }
   }
 }
