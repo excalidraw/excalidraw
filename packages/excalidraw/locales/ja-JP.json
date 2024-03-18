@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "ユーザーをクリックしてフォロー",
-      "followStatus": "現在このユーザーをフォローしています"
+      "followStatus": "現在このユーザーをフォローしています",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
