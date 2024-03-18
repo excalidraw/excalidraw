@@ -535,9 +535,9 @@
     "hint": {
       "text": "Dă clic pe un utilizator pentru a-l urmări",
       "followStatus": "În prezent urmărești acest utilizator",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Utilizatorul este angajat într-un apel vocal",
+      "micMuted": "Microfonul utilizatorul este pus pe mut",
+      "isSpeaking": "Utilizatorul vorbește"
     }
   }
 }
