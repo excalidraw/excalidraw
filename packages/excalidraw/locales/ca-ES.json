@@ -39,11 +39,11 @@
     "arrowhead_arrow": "Fletxa",
     "arrowhead_bar": "Barra",
     "arrowhead_circle": "Cercle",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle_outline": "Circumferència",
     "arrowhead_triangle": "Triangle",
-    "arrowhead_triangle_outline": "",
+    "arrowhead_triangle_outline": "Triangle (vora)",
     "arrowhead_diamond": "Rombe",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_diamond_outline": "Rombe (vora)",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
@@ -174,7 +174,7 @@
     "darkMode": "Mode fosc",
     "lightMode": "Mode clar",
     "zenMode": "Mode zen",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "Ajusta als objectes",
     "exitZenMode": "Surt de mode zen",
     "cancel": "Cancel·la",
     "clear": "Neteja",
@@ -213,7 +213,7 @@
     "imageInsertError": "No s'ha pogut insertar la imatge, torneu-ho a provar més tard...",
     "fileTooBig": "El fitxer és massa gros. La mida màxima permesa és {{maxSize}}.",
     "svgImageInsertError": "No ha estat possible inserir la imatge SVG. Les marques SVG semblen invàlides.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "No s'ha pogut obtenir la imatge.",
     "cannotResolveCollabServer": "No ha estat possible connectar amb el servidor collab. Si us plau recarregueu la pàgina i torneu a provar.",
     "importLibraryError": "No s'ha pogut carregar la biblioteca",
     "saveLibraryError": "",
@@ -256,7 +256,7 @@
     "laser": "Punter làser",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "Més eines",
-    "mermaidToExcalidraw": "",
+    "mermaidToExcalidraw": "Mermaid a Excalidraw",
     "magicSettings": "Configuració d'IA"
   },
   "headings": {
@@ -286,7 +286,7 @@
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
     "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
     "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "Manteniu premut CtrlOrCmd per a desactivar l'ajustament"
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -404,10 +404,10 @@
       "darkMode": "Mode fosc",
       "embedScene": "",
       "scale": "Escala",
-      "padding": ""
+      "padding": "Marge intern (padding)"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "Les dades de l’escena es desaran al fitxer PNG/SVG de manera que es pugui restaurar l’escena.\nAixò farà augmentar la mida del fitxer exportat."
     },
     "title": {
       "exportToPng": "Exporteu a PNG",
@@ -458,12 +458,12 @@
     "white": "Blanc",
     "red": "Vermell",
     "pink": "Rosa",
-    "grape": "",
-    "violet": "",
+    "grape": "Violat (raïm)",
+    "violet": "Violat",
     "gray": "Gris",
     "blue": "Blau",
     "cyan": "Cian",
-    "teal": "",
+    "teal": "Xarxet",
     "green": "Verd",
     "yellow": "Groc",
     "orange": "Taronja",
@@ -483,11 +483,11 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "Colors personalitzats més usats",
     "colors": "Colors",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "shades": "Ombres",
+    "hexCode": "Codi hexadecimal",
+    "noShades": "No hi ha ombres disponibles per a aquest color"
   },
   "overwriteConfirm": {
     "action": {
@@ -503,29 +503,29 @@
       },
       "excalidrawPlus": {
         "title": "Excalidraw+",
-        "button": "",
+        "button": "Exporta a Excalidraw+",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Carrega des d'un fitxer",
+        "button": "Carrega des d'un fitxer",
+        "description": "Carregar des d'un fitxer <bold>substituirà el contingut actual</bold>.<br></br>Podeu desar el vostre disseny abans fent servir una de les opcions més avall."
       },
       "shareableLink": {
         "title": "Carrega des d'un enllaç",
-        "button": "",
-        "description": ""
+        "button": "Substitueix el contingut",
+        "description": "Carregar un disseny extern <bold>substituirà el contingut actual</bold>.<br></br>Podeu desar el vostre disseny abans fent servir una de les opcions més avall."
       }
     }
   },
   "mermaid": {
-    "title": "",
+    "title": "Mermaid a Excalidraw",
     "button": "Inseriu",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Sintaxi de Mermaid",
+    "preview": "Previsualització"
   },
   "userList": {
     "search": {
@@ -534,7 +534,7 @@
     },
     "hint": {
       "text": "Feu clic sobre un usuari per seguir-lo",
-      "followStatus": "",
+      "followStatus": "Ara per ara seguiu aquest usuari",
       "inCall": "L'usuari es troba en una trucada de veu",
       "micMuted": "El micròfon de l'usuari és silenciat",
       "isSpeaking": "L'usuari parla ara"
