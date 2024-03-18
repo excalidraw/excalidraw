@@ -534,7 +534,10 @@
     },
     "hint": {
       "text": "點擊使用者以進行追蹤",
-      "followStatus": "您正在追蹤此使用者"
+      "followStatus": "您正在追蹤此使用者",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
     }
   }
 }
