@@ -535,9 +535,9 @@
     "hint": {
       "text": "Klicka på användaren för att följa",
       "followStatus": "Du följer den här användaren",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Användaren är i ett röstsamtal",
+      "micMuted": "Användarens mikrofon är avstängd",
+      "isSpeaking": "Användaren pratar"
     }
   }
 }
