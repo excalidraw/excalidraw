@@ -270,6 +270,7 @@ import {
   updateStable,
   addEventListener,
   normalizeEOL,
+  getUiMode,
 } from "../utils";
 import {
   createSrcDoc,
@@ -1341,7 +1342,7 @@ class App extends React.Component<AppProps, AppState> {
               padding: `${FRAME_NAME_EDIT_PADDING}px`,
               borderRadius: 4,
               boxShadow: "inset 0 0 0 1px var(--color-primary)",
-              fontFamily: "Assistant",
+              fontFamily: "ProximaNova",
               fontSize: "14px",
               transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
@@ -2318,10 +2319,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
-    return (
-      width < MQ_MAX_WIDTH_PORTRAIT ||
-      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
-    );
+    return getUiMode() === "all"
+      ? width < MQ_MAX_WIDTH_PORTRAIT ||
+          (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+      : false;
   };
 
   private refreshViewportBreakpoints = () => {

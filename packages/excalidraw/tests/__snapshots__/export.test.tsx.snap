@@ -7,16 +7,24 @@ exports[`export > exporting svg containing transformed images > svg export outpu
   <defs>
     <style class="style-fonts">
       @font-face {
-        font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
+        font-family: "ComicNeue";
+        src: url("https://draw-next.sparkwise.co/ComicNeue-Regular.woff2");
       }
       @font-face {
         font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.woff2");
+        src: url("https://draw-next.sparkwise.co/Cascadia.woff2");
       }
       @font-face {
-        font-family: "Assistant";
-        src: url("https://excalidraw.com/Assistant-Regular.woff2");
+        font-family: "ProximaNova";
+        src: url("https://draw-next.sparkwise.co/ProximaNova-Regular.woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "ProximaNova";
+        src: url("https://draw-next.sparkwise.co/ProximaNova-SemiBold.woff2");
+        font-weight: 600;
+        font-display: swap;
       }
     </style>
     

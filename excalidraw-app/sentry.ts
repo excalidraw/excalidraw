@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
-  "excalidraw.com": "production",
+  "draw-next.sparkwise.co": "production",
   "vercel.app": "staging",
 };
 

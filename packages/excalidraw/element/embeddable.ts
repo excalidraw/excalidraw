@@ -226,7 +226,7 @@ export const createPlaceholderEmbeddableLabel = (
     Math.min(element.width / 2, element.width / text.length),
     element.width / 30,
   );
-  const fontFamily = FONT_FAMILY.Helvetica;
+  const fontFamily = FONT_FAMILY.Inter;
 
   const fontString = getFontString({
     fontSize,

@@ -2,8 +2,8 @@
 
 // container in body where the actual tooltip is appended to
 .excalidraw-tooltip {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  --ui-font: ProximaNova, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Roboto, Inter, Arial, sans-serif;
   font-family: var(--ui-font);
   position: fixed;
   z-index: var(--zIndex-popup);

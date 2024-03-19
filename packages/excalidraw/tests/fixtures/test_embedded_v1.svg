@@ -4,8 +4,8 @@
   <defs>
     <style>
       @font-face {
-        font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
+        font-family: "ComicNeue";
+        src: url("https://excalidraw.com/ComicNeue.woff2");
       }
       @font-face {
         font-family: "Cascadia";
@@ -13,4 +13,4 @@
       }
     </style>
   </defs>
-  <rect x="0" y="0" width="97" height="77" fill="#ffffff"></rect><g transform="translate(10 10) rotate(0 38.5 28.5)"><text x="0" y="41" font-family="Virgil, Segoe UI Emoji" font-size="36px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">test</text></g></svg>
+  <rect x="0" y="0" width="97" height="77" fill="#ffffff"></rect><g transform="translate(10 10) rotate(0 38.5 28.5)"><text x="0" y="41" font-family="ComicNeue, Segoe UI Emoji" font-size="36px" fill="#000000" text-anchor="start" style="white-space: pre;" direction="ltr">test</text></g></svg>

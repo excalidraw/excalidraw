@@ -45,6 +45,7 @@ import {
   ResolvablePromise,
   resolvablePromise,
   getUiMode,
+  getUsernameFromSearchParams,
 } from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -228,9 +229,11 @@ const initializeScene = async (opts: {
   }
 
   if (roomLinkData && opts.collabAPI) {
-    const { excalidrawAPI } = opts;
+    const { excalidrawAPI, collabAPI } = opts;
+    const username = getUsernameFromSearchParams();
+    collabAPI.setUsername(username || "");
 
-    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+    const scene = await collabAPI.startCollaboration(roomLinkData);
 
     return {
       // when collaborating, the state may have already been updated at this

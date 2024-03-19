@@ -15,13 +15,21 @@
     --button-active-bg: var(--color-primary-darker);
 
     box-shadow: 0 0 0 1px var(--color-surface-lowest);
+    background-color: var(--sparkwise-blue-500);
+    color: white;
+    border-color: var(--sparkwise-blue-500);
+    &:hover {
+      background-color: var(--sparkwise-blue-600);
+      color: white;
+      border-color: var(--sparkwise-blue-600);
+    }
 
     flex-shrink: 0;
 
     // double .active to force specificity
     &.active.active {
-      background-color: #0fb884;
-      border-color: #0fb884;
+      background-color: var(--sparkwise-positive-500);
+      border-color: var(--sparkwise-positive-500);
 
       svg {
         color: #fff;
@@ -29,8 +37,8 @@
 
       &:hover,
       &:active {
-        background-color: #0fb884;
-        border-color: #0fb884;
+        background-color: var(--sparkwise-positive-400);
+      border-color: var(--sparkwise-positive-400);
       }
     }
   }

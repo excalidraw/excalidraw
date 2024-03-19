@@ -125,7 +125,7 @@ const addFrameLabelsAsTextElements = (
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: FONT_FAMILY.Assistant,
+        fontFamily: FONT_FAMILY.ProximaNova,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
@@ -371,7 +371,7 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  let assetPath = "https://excalidraw.com/";
+  let assetPath = "https://draw-next.sparkwise.co/";
   // Asset path needs to be determined only when using package
   if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
     assetPath =
@@ -414,16 +414,24 @@ export const exportToSvg = async (
   <defs>
     <style class="style-fonts">
       @font-face {
-        font-family: "Virgil";
-        src: url("${assetPath}Virgil.woff2");
+        font-family: "ComicNeue";
+        src: url("${assetPath}ComicNeue-Regular.woff2");
       }
       @font-face {
         font-family: "Cascadia";
         src: url("${assetPath}Cascadia.woff2");
       }
       @font-face {
-        font-family: "Assistant";
-        src: url("${assetPath}Assistant-Regular.woff2");
+        font-family: "ProximaNova";
+        src: url("${assetPath}ProximaNova-Regular.woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "ProximaNova";
+        src: url("${assetPath}ProximaNova-SemiBold.woff2");
+        font-weight: 600;
+        font-display: swap;
       }
     </style>
     ${exportingFrameClipPath}

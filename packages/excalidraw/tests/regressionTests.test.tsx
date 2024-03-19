@@ -644,7 +644,7 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil);
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.ComicNeue);
     fireEvent.click(screen.getByTitle(/code/i));
     expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia);
   });

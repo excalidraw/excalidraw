@@ -1065,6 +1065,10 @@ export const getUiMode = (): UIOptions["mode"] => {
   return _uiMode as UIOptions["mode"];
 };
 
+export const getUsernameFromSearchParams = (): string | null => {
+  return new URLSearchParams(window.location.search).get("name");
+};
+
 // -----------------------------------------------------------------------------
 type HasBrand<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

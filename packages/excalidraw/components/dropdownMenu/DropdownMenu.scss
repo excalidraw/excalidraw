@@ -38,7 +38,7 @@
       padding: 0 0.625rem;
       column-gap: 0.625rem;
       font-size: 0.875rem;
-      color: var(--color-on-surface);
+      color: var(--sparkwise-color-gray-700);
       width: 100%;
       box-sizing: border-box;
       font-weight: normal;
@@ -58,8 +58,7 @@
       }
 
       &--selected {
-        background: var(--color-primary-light);
-        --icon-fill-color: var(--color-primary-darker);
+        background: var(--sparkwise-color-gray-100);
       }
 
       &__text {
@@ -78,13 +77,13 @@
       }
 
       &:hover {
-        background-color: var(--button-hover-bg);
+        background-color: var(--sparkwise-color-gray-50);
         text-decoration: none;
       }
 
       &:active {
-        background-color: var(--button-hover-bg);
-        border-color: var(--color-brand-active);
+        background-color: var(--sparkwise-color-gray-100);
+        border-color: var(--sparkwise-color-gray-100);
       }
 
       svg {

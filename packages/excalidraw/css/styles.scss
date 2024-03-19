@@ -22,8 +22,8 @@
 }
 
 .excalidraw {
-  --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
-    Roboto, Helvetica, Arial, sans-serif;
+  --ui-font: ProximaNova, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Roboto, Inter, Arial, sans-serif;
   font-family: var(--ui-font);
 
   position: relative;
@@ -205,6 +205,9 @@
   input:focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 1px var(--color-brand-hover);
+  }
+  .buttonList label:focus-within {
+    box-shadow: 0 0 0 1px var(--sparkwise-color-gray-100);
   }
 
   .buttonList {
@@ -754,6 +757,6 @@
     color: #fff;
     font-weight: bold;
     letter-spacing: 0.6px;
-    font-family: "Assistant";
+    font-family: "ProximaNova";
   }
 }

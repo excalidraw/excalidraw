@@ -1,10 +1,14 @@
-/* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
+/* Inter */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+/* Handwritten style font */
 @font-face {
-  font-family: "Virgil";
-  src: url("Virgil.woff2");
-  font-display: swap;
+  font-family: "ComicNeue";
+  src: url("ComicNeue-Regular.woff2");
+  font-weight: 400;
 }
 
+/* Code style font */
 /* https://github.com/microsoft/cascadia-code */
 @font-face {
   font-family: "Cascadia";
@@ -12,27 +16,16 @@
   font-display: swap;
 }
 
+/* Normal style font */
 @font-face {
-  font-family: "Assistant";
-  src: url("Assistant-Regular.woff2");
+  font-family: "ProximaNova";
+  src: url("ProximaNova-Regular.woff2");
   font-display: swap;
   font-weight: 400;
 }
 @font-face {
-  font-family: "Assistant";
-  src: url("Assistant-Medium.woff2");
-  font-display: swap;
-  font-weight: 500;
-}
-@font-face {
-  font-family: "Assistant";
-  src: url("Assistant-SemiBold.woff2");
+  font-family: "ProximaNova";
+  src: url("ProximaNova-SemiBold.woff2");
   font-display: swap;
   font-weight: 600;
-}
-@font-face {
-  font-family: "Assistant";
-  src: url("Assistant-Bold.woff2");
-  font-display: swap;
-  font-weight: 700;
 }

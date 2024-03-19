@@ -53,7 +53,7 @@
       position: relative;
       width: var(--default-icon-size);
       height: var(--default-icon-size);
-      color: var(--icon-fill-color);
+      color: var(--sparkwise-color-gray-700);
     }
   }
 
@@ -159,6 +159,20 @@
     .ToolIcon__icon {
       width: var(--lg-button-size);
       height: var(--lg-button-size);
+      svg {
+        color: var(--sparkwise-color-gray-300);
+      }
+      &:hover {
+        background: var(--sparkwise-color-gray-50);
+      }
+      &:active {
+        background: var(--sparkwise-color-gray-100);
+        border: 1px solid var(--sparkwise-color-gray-100);
+  
+        svg {
+          color: var(--sparkwise-color-gray-700);
+        }
+      }
 
       @media screen and (max-width: 450px) {
         width: 1.8rem;

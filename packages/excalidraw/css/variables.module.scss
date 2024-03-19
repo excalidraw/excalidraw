@@ -23,11 +23,11 @@
   .ToolIcon_type_radio,
   .ToolIcon_type_checkbox {
     &:checked + .ToolIcon__icon {
-      background: var(--color-surface-primary-container);
+      background: var(--sparkwise-color-gray-100);
       --keybinding-color: var(--color-on-primary-container);
 
       svg {
-        color: var(--color-on-primary-container);
+        color: var(--sparkwise-color-gray-700);
       }
     }
   }
@@ -39,15 +39,15 @@
 
   .ToolIcon__icon {
     &:hover {
-      background: var(--button-hover-bg);
+      background: var(--sparkwise-color-gray-50);
     }
 
     &:active {
-      background: var(--button-hover-bg);
-      border: 1px solid var(--button-active-border);
+      background: var(--sparkwise-color-gray-100);
+      border: 1px solid var(--sparkwise-color-gray-100);
 
       svg {
-        color: var(--color-on-primary-container);
+        color: var(--sparkwise-color-gray-700);
       }
     }
   }
@@ -63,11 +63,10 @@
   box-sizing: border-box;
   border-width: 1px;
   border-style: solid;
-  border-color: var(--button-border, var(--default-border-color));
+  border-color: var(--sparkwise-color-gray-100);
   border-radius: var(--border-radius-lg);
   cursor: pointer;
-  background-color: var(--button-bg, var(--island-bg-color));
-  color: var(--button-color, var(--color-on-surface));
+  color: var(--sparkwise-color-gray-700);
   font-family: var(--ui-font);
 
   svg {
@@ -76,41 +75,22 @@
   }
 
   &:hover {
-    background-color: var(--button-hover-bg, var(--island-bg-color));
-    border-color: var(
-      --button-hover-border,
-      var(--button-border, var(--default-border-color))
-    );
-    color: var(
-      --button-hover-color,
-      var(--button-color, var(--text-primary-color, inherit))
-    );
+    background-color: var(--sparkwise-color-gray-50);
+    border-color: var(--sparkwise-color-gray-50);
+    color: var(--sparkwise-color-gray-700);
   }
 
   &:active {
-    background-color: var(--button-active-bg, var(--island-bg-color));
-    border-color: var(--button-active-border, var(--color-primary-darkest));
+    background-color: var(--sparkwise-color-gray-100);
+    border-color: var(--sparkwise-color-gray-100);
   }
 
   &.active {
-    background-color: var(
-      --button-selected-bg,
-      var(--color-surface-primary-container)
-    );
-    border-color: var(
-      --button-selected-border,
-      var(--color-surface-primary-container)
-    );
-
-    &:hover {
-      background-color: var(
-        --button-selected-hover-bg,
-        var(--color-surface-primary-container)
-      );
-    }
+    background-color: var(--sparkwise-color-gray-100);
+    border-color: var(--sparkwise-color-gray-100);
 
     svg {
-      color: var(--button-color, var(--color-on-primary-container));
+      color: var(--sparkwise-color-gray-700);
     }
   }
 }
@@ -159,10 +139,13 @@
 @mixin filledButtonOnCanvas {
   border: none;
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
-  background-color: var(--color-surface-low);
+  background-color: var(--sparkwise-color-gray-100);
 
   &:active {
-    box-shadow: 0 0 0 1px var(--color-brand-active);
+    border-color: var(--sparkwise-color-gray-100);
+  }
+  &:hover {
+    background-color: var(--sparkwise-color-gray-50);
   }
 }
 
