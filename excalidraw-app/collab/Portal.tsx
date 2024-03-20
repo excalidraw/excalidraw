@@ -190,6 +190,7 @@ class Portal {
           socketId: this.socket.id as SocketId,
           userState,
           username: this.collab.state.username,
+          userColor: this.collab.state.userColor,
         },
       };
       return this._broadcastSocketData(
@@ -213,6 +214,7 @@ class Portal {
           selectedElementIds:
             this.collab.excalidrawAPI.getAppState().selectedElementIds,
           username: this.collab.state.username,
+          userColor: this.collab.state.userColor,
         },
       };
 
@@ -235,6 +237,7 @@ class Portal {
         payload: {
           socketId: this.socket.id as SocketId,
           username: this.collab.state.username,
+          userColor: this.collab.state.userColor,
           sceneBounds: payload.sceneBounds,
         },
       };

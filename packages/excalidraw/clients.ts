@@ -23,7 +23,7 @@ export const getClientColor = (
   // words a hue value of step size 10). There are 37 such values including 0.
   const hue = (hash % 37) * 10;
   const saturation = 100;
-  const lightness = 83;
+  const lightness = 76;
 
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };

@@ -19,6 +19,8 @@ import {
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   assertNever,
+  getUserColorFromSearchParams,
+  getUsernameFromSearchParams,
   preventUnload,
   resolvablePromise,
   throttleRAF,
@@ -46,10 +48,6 @@ import {
   saveFilesToHttpStorage,
   loadFilesFromHttpStorage,
 } from "../data/httpStorage";
-import {
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-} from "../data/localStorage";
 import Portal from "./Portal";
 import { t } from "../../packages/excalidraw/i18n";
 import { UserIdleState } from "../../packages/excalidraw/types";
@@ -88,6 +86,7 @@ export const isOfflineAtom = atom(false);
 interface CollabState {
   errorMessage: string | null;
   username: string;
+  userColor: string;
   activeRoomLink: string | null;
 }
 
@@ -105,6 +104,8 @@ export interface CollabAPI {
   fetchImageFilesFromFirebase: CollabInstance["fetchImageFilesFromFirebase"];
   setUsername: CollabInstance["setUsername"];
   getUsername: CollabInstance["getUsername"];
+  setUserColor: CollabInstance["setUserColor"];
+  getUserColor: CollabInstance["getUserColor"];
   getActiveRoomLink: CollabInstance["getActiveRoomLink"];
   setErrorMessage: CollabInstance["setErrorMessage"];
 }
@@ -128,7 +129,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     super(props);
     this.state = {
       errorMessage: null,
-      username: importUsernameFromLocalStorage() || "",
+      username: getUsernameFromSearchParams() || "",
+      userColor: getUserColorFromSearchParams() || "",
       activeRoomLink: null,
     };
     this.portal = new Portal(this);
@@ -197,6 +199,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       stopCollaboration: this.stopCollaboration,
       setUsername: this.setUsername,
       getUsername: this.getUsername,
+      setUserColor: this.setUserColor,
+      getUserColor: this.getUserColor,
       getActiveRoomLink: this.getActiveRoomLink,
       setErrorMessage: this.setErrorMessage,
     };
@@ -413,10 +417,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
     if (!this.state.username) {
-      import("@excalidraw/random-username").then(({ getRandomUsername }) => {
-        const username = getRandomUsername();
-        this.setUsername(username);
-      });
+      const username = getUsernameFromSearchParams();
+      this.setUsername(username);
     }
 
     if (this.portal.socket) {
@@ -538,7 +540,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             );
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
-            const { pointer, button, username, selectedElementIds } =
+            const { pointer, button, username, selectedElementIds, userColor } =
               decryptedData.payload;
 
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
@@ -551,6 +553,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               button,
               selectedElementIds,
               username,
+              color: {
+                background: userColor,
+                stroke: userColor,
+              },
             });
 
             break;
@@ -591,10 +597,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           }
 
           case WS_SUBTYPES.IDLE_STATUS: {
-            const { userState, socketId, username } = decryptedData.payload;
+            const { userState, socketId, username, userColor } =
+              decryptedData.payload;
             this.updateCollaborator(socketId, {
               userState,
               username,
+              color: {
+                background: userColor,
+                stroke: userColor,
+              },
             });
             break;
           }
@@ -651,6 +662,17 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         this.fallbackInitializationHandler,
       );
     }
+
+    if (this.portal.socket?.id) {
+      if (!this.state.userColor) {
+        this.setUserColor(
+          getUserColorFromSearchParams(
+            this.portal.socket.id || getUsernameFromSearchParams(),
+          ),
+        );
+      }
+    }
+
     if (fetchScene && roomLinkData && this.portal.socket) {
       this.excalidrawAPI.resetScene();
 
@@ -915,10 +937,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   setUsername = (username: string) => {
     this.setState({ username });
-    saveUsernameToLocalStorage(username);
   };
 
   getUsername = () => this.state.username;
+
+  setUserColor = (userColor: string) => {
+    this.setState({ userColor });
+  };
+
+  getUserColor = () => this.state.userColor;
 
   setActiveRoomLink = (activeRoomLink: string | null) => {
     this.setState({ activeRoomLink });

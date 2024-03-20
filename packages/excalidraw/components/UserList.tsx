@@ -82,7 +82,7 @@ const renderCollaborator = ({
 
 type UserListUserObject = Pick<
   Collaborator,
-  "avatarUrl" | "id" | "socketId" | "username"
+  "avatarUrl" | "id" | "socketId" | "username" | "color"
 >;
 
 type UserListProps = {
@@ -97,6 +97,7 @@ const collaboratorComparatorKeys = [
   "id",
   "socketId",
   "username",
+  "color",
 ] as const;
 
 export const UserList = React.memo(

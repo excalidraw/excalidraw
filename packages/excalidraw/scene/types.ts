@@ -50,6 +50,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerViewportCoords: { [id: string]: { x: number; y: number } };
   remotePointerUserStates: { [id: string]: string };
   remotePointerUsernames: { [id: string]: string };
+  remotePointerColors: { [id: string]: string };
   remotePointerButton?: { [id: string]: string | undefined };
   selectionColor?: string;
   // extra options passed to the renderer

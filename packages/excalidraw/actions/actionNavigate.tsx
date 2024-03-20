@@ -39,10 +39,10 @@ export const actionGoToCollaborator = register({
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {
-    const { clientId, collaborator, withName, isBeingFollowed } =
+    const { collaborator, withName, isBeingFollowed } =
       data as GoToCollaboratorComponentProps;
 
-    const background = getClientColor(clientId);
+    const background = collaborator.color.background;
 
     return withName ? (
       <div

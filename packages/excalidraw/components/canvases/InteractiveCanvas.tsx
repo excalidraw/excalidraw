@@ -75,6 +75,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       {};
     const pointerUsernames: { [id: string]: string } = {};
     const pointerUserStates: { [id: string]: string } = {};
+    const pointerUserColors: { [id: string]: string } = {};
 
     props.appState.collaborators.forEach((user, socketId) => {
       if (user.selectedElementIds) {
@@ -93,6 +94,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       }
       if (user.userState) {
         pointerUserStates[socketId] = user.userState;
+      }
+      if (user.color) {
+        pointerUserColors[socketId] = user.color.background;
       }
       pointerViewportCoords[socketId] = sceneCoordsToViewportCoords(
         {
@@ -125,6 +129,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           remoteSelectedElementIds,
           remotePointerUsernames: pointerUsernames,
           remotePointerUserStates: pointerUserStates,
+          remotePointerColors: pointerUserColors,
           selectionColor,
           renderScrollbars: false,
         },

@@ -1,3 +1,4 @@
+import { getRandomUsername } from "@excalidraw/random-username";
 import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_UI_OPTIONS,
@@ -17,6 +18,7 @@ import {
   Zoom,
 } from "./types";
 import { ResolutionType } from "./utility-types";
+import { getClientColor } from "./clients";
 
 let mockDateTime: string | null = null;
 
@@ -1065,8 +1067,27 @@ export const getUiMode = (): UIOptions["mode"] => {
   return _uiMode as UIOptions["mode"];
 };
 
-export const getUsernameFromSearchParams = (): string | null => {
-  return new URLSearchParams(window.location.search).get("name");
+let _username: string = "";
+export const getUsernameFromSearchParams = (): string => {
+  if (!_username) {
+    _username =
+      new URLSearchParams(window.location.search).get("name") ??
+      getRandomUsername();
+  }
+  return _username;
+};
+
+let _userColor: string = "";
+export const getUserColorFromSearchParams = (id?: string): string => {
+  if (!_userColor) {
+    const param = new URLSearchParams(window.location.search).get("color");
+    if (param) {
+      _userColor = param;
+    } else if (id) {
+      _userColor = getClientColor(id);
+    }
+  }
+  return _userColor;
 };
 
 // -----------------------------------------------------------------------------

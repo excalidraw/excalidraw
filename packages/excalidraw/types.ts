@@ -50,7 +50,7 @@ export type Collaborator = Readonly<{
   selectedElementIds?: AppState["selectedElementIds"];
   username?: string | null;
   userState?: UserIdleState;
-  color?: {
+  color: {
     background: string;
     stroke: string;
   };
