@@ -19,7 +19,7 @@
     "sendBackward": "העבר שכבה אחורה",
     "delete": "מחק",
     "copyStyles": "העתק סגנון",
-    "pasteStyles": "הדבק סגנון",
+    "pasteStyles": "הדבקת סגנונות",
     "stroke": "קו מתאר",
     "background": "רקע",
     "fill": "מילוי",
@@ -46,7 +46,7 @@
     "arrowhead_diamond_outline": "",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
-    "addWatermark": "הוסף \"נוצר באמצעות Excalidraw\"",
+    "addWatermark": "הוספת „נוצר באמצעות Excalidraw”",
     "handDrawn": "ציור יד",
     "normal": "רגיל",
     "code": "קוד",
@@ -54,7 +54,7 @@
     "medium": "בינוני",
     "large": "גדול",
     "veryLarge": "גדול מאוד",
-    "solid": "מוצק",
+    "solid": "אחיד",
     "hachure": "קווים מקבילים קצרים להצגת כיוון וחדות שיפוע במפה",
     "zigzag": "זיגזג",
     "crossHatch": "קווים מוצלבים שתי וערב",
@@ -229,11 +229,11 @@
     "libraryElementTypeError": {
       "embeddable": "",
       "iframe": "",
-      "image": ""
+      "image": "תמיכה בהוספת תמונות לספרייה תושק בקרוב!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "לא ניתן להדביק (אי אפשר לקרוא מלוח המערכת).",
+    "asyncPasteFailedOnParse": "לא ניתן להדביק.",
+    "copyToSystemClipboardFailed": "לא ניתן להעתיק ללוח."
   },
   "toolBar": {
     "selection": "בחירה",
@@ -248,15 +248,15 @@
     "library": "ספריה",
     "lock": "השאר את הכלי הנבחר פעיל גם לאחר סיום הציור",
     "penMode": "מצב עט - מנע נגיעה",
-    "link": "",
+    "link": "הוספת / עדכון קישור לצורה מסוימת",
     "eraser": "מחק",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "laser": "",
+    "frame": "כלי מסגרת",
+    "magicframe": "תרשים קווי מתאר לקוד",
+    "embeddable": "הטמעה באתר",
+    "laser": "סמן לייזר",
     "hand": "יד (כלי הזזה)",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
+    "extraTools": "כלים נוספים",
+    "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
     "magicSettings": ""
   },
   "headings": {
@@ -339,8 +339,8 @@
     "doubleClick": "לחיצה כפולה",
     "drag": "גרור",
     "editor": "עורך",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "עריכת נקודות קו/חץ",
+    "editText": "עריכת טקסט / הוספת תווית",
     "github": "מצאת בעיה? דווח",
     "howto": "עקוב אחר המדריכים שלנו",
     "or": "או",
@@ -397,27 +397,27 @@
     "removeItemsFromLib": "הסר את הפריטים הנבחרים מהספריה"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "ייצוא תמונה",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "רקע",
+      "onlySelected": "רק את מה שנבחר",
+      "darkMode": "מצב כהה",
+      "embedScene": "הטמעת סצנה",
+      "scale": "קנה מידה",
+      "padding": "ריפוד"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "הייצוא יבוצע לקובץ מסוג PNG/SVG כדי שהמידע על הסצנה ישמר בו וניתן יהיה לבצע שחזור ממנו.\nיגדיל את גודל הקובץ של הייצוא."
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "ייצוא ל־PNG",
+      "exportToSvg": "ייצוא ל־SVG",
+      "copyPngToClipboard": "העתקת PNG ללוח"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "העתקה ללוח"
     }
   },
   "encrypted": {
