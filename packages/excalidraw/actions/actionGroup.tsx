@@ -18,7 +18,7 @@ import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { AppClassProperties, AppState } from "../types";
+import { AppClassProperties, AppState, UIAppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
@@ -47,7 +47,7 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: UIAppState,
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements({
@@ -61,6 +61,7 @@ const enableActionGroup = (
 
 export const actionGroup = register({
   name: "group",
+  label: "labels.group",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements({
@@ -157,7 +158,6 @@ export const actionGroup = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.group",
   predicate: (elements, appState, _, app) =>
     enableActionGroup(elements, appState, app),
   keyTest: (event) =>
@@ -177,6 +177,7 @@ export const actionGroup = register({
 
 export const actionUngroup = register({
   name: "ungroup",
+  label: "labels.ungroup",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
@@ -263,7 +264,6 @@ export const actionUngroup = register({
     event.shiftKey &&
     event[KEYS.CTRL_OR_CMD] &&
     event.key === KEYS.G.toUpperCase(),
-  contextItemLabel: "labels.ungroup",
   predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (

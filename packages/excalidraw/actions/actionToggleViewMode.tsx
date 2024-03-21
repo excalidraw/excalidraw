@@ -3,6 +3,8 @@ import { register } from "./register";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
+  label: "labels.viewMode",
+  paletteName: "Toggle view mode",
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -21,7 +23,6 @@ export const actionToggleViewMode = register({
   predicate: (elements, appState, appProps) => {
     return typeof appProps.viewModeEnabled === "undefined";
   },
-  contextItemLabel: "labels.viewMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,
 });

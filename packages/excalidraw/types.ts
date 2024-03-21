@@ -574,6 +574,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
+
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];

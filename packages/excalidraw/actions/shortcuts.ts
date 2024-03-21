@@ -36,6 +36,18 @@ export type ShortcutName =
       | "flipVertical"
       | "hyperlink"
       | "toggleElementLock"
+      | "resetZoom"
+      | "zoomOut"
+      | "zoomIn"
+      | "zoomToFit"
+      | "zoomToFitSelectionInViewport"
+      | "zoomToFitSelection"
+      | "toggleEraserTool"
+      | "toggleHandTool"
+      | "setFrameAsActiveTool"
+      | "saveFileToDisk"
+      | "saveToActiveFile"
+      | "toggleShortcuts"
     >
   | "saveScene"
   | "imageExport";
@@ -83,6 +95,18 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
   toggleElementLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
+  resetZoom: [getShortcutKey("CtrlOrCmd+0")],
+  zoomOut: [getShortcutKey("CtrlOrCmd+-")],
+  zoomIn: [getShortcutKey("CtrlOrCmd++")],
+  zoomToFitSelection: [getShortcutKey("Shift+3")],
+  zoomToFit: [getShortcutKey("Shift+1")],
+  zoomToFitSelectionInViewport: [getShortcutKey("Shift+2")],
+  toggleEraserTool: [getShortcutKey("E")],
+  toggleHandTool: [getShortcutKey("H")],
+  setFrameAsActiveTool: [getShortcutKey("F")],
+  saveFileToDisk: [getShortcutKey("CtrlOrCmd+S")],
+  saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
+  toggleShortcuts: [getShortcutKey("?")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName) => {

@@ -31,6 +31,8 @@ export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
+  target: "Elements",
+  label: "labels.copyStyles",
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = [];
@@ -54,13 +56,14 @@ export const actionCopyStyles = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.C,
 });
 
 export const actionPasteStyles = register({
   name: "pasteStyles",
+  target: "Elements",
+  label: "labels.pasteStyles",
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = JSON.parse(copiedStyles);
@@ -159,7 +162,6 @@ export const actionPasteStyles = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
 });

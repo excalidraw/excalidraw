@@ -20,6 +20,8 @@ import { updateFrameMembershipOfSelectedElements } from "../frame";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
+  target: "Elements",
+  label: "labels.flipHorizontal",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -38,11 +40,12 @@ export const actionFlipHorizontal = register({
     };
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
-  contextItemLabel: "labels.flipHorizontal",
 });
 
 export const actionFlipVertical = register({
   name: "flipVertical",
+  target: "Elements",
+  label: "labels.flipVertical",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -62,7 +65,6 @@ export const actionFlipVertical = register({
   },
   keyTest: (event) =>
     event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
-  contextItemLabel: "labels.flipVertical",
 });
 
 const flipSelectedElements = (

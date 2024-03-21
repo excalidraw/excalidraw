@@ -19,6 +19,8 @@ const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
 
 export const actionSelectAllElementsInFrame = register({
   name: "selectAllElementsInFrame",
+  target: "Elements",
+  label: "labels.selectAllElementsInFrame",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -49,13 +51,14 @@ export const actionSelectAllElementsInFrame = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.selectAllElementsInFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
   name: "removeAllElementsFromFrame",
+  target: "Elements",
+  label: "labels.removeAllElementsFromFrame",
   trackEvent: { category: "history" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -80,13 +83,14 @@ export const actionRemoveAllElementsFromFrame = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.removeAllElementsFromFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionupdateFrameRendering = register({
   name: "updateFrameRendering",
+  target: "Internal",
+  label: "labels.updateFrameRendering",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
@@ -102,12 +106,13 @@ export const actionupdateFrameRendering = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.updateFrameRendering",
   checked: (appState: AppState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({
   name: "setFrameAsActiveTool",
+  target: "Tool",
+  label: "toolBar.frame",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {

@@ -10,6 +10,7 @@ import {
   AppClassProperties,
   AppState,
   InteractiveCanvasAppState,
+  UIAppState,
 } from "./types";
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
@@ -216,9 +217,7 @@ export const getSelectedGroupForElement = (
     .filter((groupId) => groupId !== appState.editingGroupId)
     .find((groupId) => appState.selectedGroupIds[groupId]);
 
-export const getSelectedGroupIds = (
-  appState: InteractiveCanvasAppState,
-): GroupId[] =>
+export const getSelectedGroupIds = (appState: UIAppState): GroupId[] =>
   Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);

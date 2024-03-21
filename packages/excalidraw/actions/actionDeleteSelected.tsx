@@ -72,6 +72,7 @@ const handleGroupEditingState = (
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
+  label: "labels.delete",
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
     if (appState.editingLinearElement) {
@@ -168,7 +169,6 @@ export const actionDeleteSelected = register({
       ),
     };
   },
-  contextItemLabel: "labels.delete",
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],

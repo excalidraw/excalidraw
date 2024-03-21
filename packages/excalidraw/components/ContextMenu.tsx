@@ -78,17 +78,17 @@ export const ContextMenu = React.memo(
 
             const actionName = item.name;
             let label = "";
-            if (item.contextItemLabel) {
-              if (typeof item.contextItemLabel === "function") {
+            if (item.label) {
+              if (typeof item.label === "function") {
                 label = t(
-                  item.contextItemLabel(
+                  item.label(
                     elements,
                     appState,
                     actionManager.app,
                   ) as unknown as TranslationKeys,
                 );
               } else {
-                label = t(item.contextItemLabel as unknown as TranslationKeys);
+                label = t(item.label as unknown as TranslationKeys);
               }
             }
 
@@ -112,7 +112,7 @@ export const ContextMenu = React.memo(
                   })}
                 >
                   <div className="context-menu-item__label">{label}</div>
-                  <kbd className="context-menu-item__shortcut">
+                  <kbd className="context-menu-´">
                     {actionName
                       ? getShortcutFromShortcutName(actionName as ShortcutName)
                       : ""}

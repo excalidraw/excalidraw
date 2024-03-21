@@ -25,6 +25,8 @@ import { setCursor } from "../cursor";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  label: "labels.canvasBackground",
+  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -59,6 +61,8 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  label: "labels.clearCanvas",
+  paletteName: "Clear canvas",
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -95,6 +99,7 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  label: "buttons.zoomIn",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -133,6 +138,7 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  label: "buttons.zoomOut",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -171,6 +177,7 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  label: "buttons.resetZoom",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -340,6 +347,7 @@ export const zoomToFit = ({
 // size, it won't be zoomed in.
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
+  label: "labels.zoomToFitViewport",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -363,6 +371,7 @@ export const actionZoomToFitSelectionInViewport = register({
 
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
+  label: "helpDialog.zoomToSelection",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -385,6 +394,7 @@ export const actionZoomToFitSelection = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  label: "helpDialog.zoomToFit",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) =>
@@ -405,6 +415,7 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  label: "labels.toggleTheme",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
@@ -425,6 +436,7 @@ export const actionToggleTheme = register({
 
 export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
+  label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
@@ -459,6 +471,8 @@ export const actionToggleEraserTool = register({
 
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
+  label: "toolBar.hand",
+  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];

@@ -9,6 +9,8 @@ import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const actionSelectAll = register({
   name: "selectAll",
+  target: "Editor",
+  label: "labels.selectAll",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, value, app) => {
     if (appState.editingLinearElement) {
@@ -49,6 +51,5 @@ export const actionSelectAll = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.selectAll",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.A,
 });

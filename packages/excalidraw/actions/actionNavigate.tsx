@@ -8,6 +8,7 @@ import { register } from "./register";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
+  label: "Go to a collaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
   perform: (_elements, appState, collaborator: Collaborator) => {

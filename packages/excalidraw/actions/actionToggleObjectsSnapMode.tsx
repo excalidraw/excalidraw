@@ -3,6 +3,7 @@ import { register } from "./register";
 
 export const actionToggleObjectsSnapMode = register({
   name: "objectsSnapMode",
+  label: "buttons.objectsSnapMode",
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -22,7 +23,6 @@ export const actionToggleObjectsSnapMode = register({
   predicate: (elements, appState, appProps) => {
     return typeof appProps.objectsSnapModeEnabled === "undefined";
   },
-  contextItemLabel: "buttons.objectsSnapMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.S,
 });

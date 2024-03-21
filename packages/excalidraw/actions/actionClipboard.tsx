@@ -16,6 +16,7 @@ import { isFirefox } from "../constants";
 
 export const actionCopy = register({
   name: "copy",
+  label: "labels.copy",
   trackEvent: { category: "element" },
   perform: async (elements, appState, event: ClipboardEvent | null, app) => {
     const elementsToCopy = app.scene.getSelectedElements({
@@ -40,13 +41,13 @@ export const actionCopy = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.copy",
   // don't supply a shortcut since we handle this conditionally via onCopy event
   keyTest: undefined,
 });
 
 export const actionPaste = register({
   name: "paste",
+  label: "labels.paste",
   trackEvent: { category: "element" },
   perform: async (elements, appState, data, app) => {
     let types;
@@ -97,24 +98,24 @@ export const actionPaste = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.paste",
   // don't supply a shortcut since we handle this conditionally via onCopy event
   keyTest: undefined,
 });
 
 export const actionCut = register({
   name: "cut",
+  label: "labels.cut",
   trackEvent: { category: "element" },
   perform: (elements, appState, event: ClipboardEvent | null, app) => {
     actionCopy.perform(elements, appState, event, app);
     return actionDeleteSelected.perform(elements, appState, null, app);
   },
-  contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
 
 export const actionCopyAsSvg = register({
   name: "copyAsSvg",
+  label: "labels.copyAsSvg",
   trackEvent: { category: "element" },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
@@ -158,11 +159,11 @@ export const actionCopyAsSvg = register({
   predicate: (elements) => {
     return probablySupportsClipboardWriteText && elements.length > 0;
   },
-  contextItemLabel: "labels.copyAsSvg",
 });
 
 export const actionCopyAsPng = register({
   name: "copyAsPng",
+  label: "labels.copyAsPng",
   trackEvent: { category: "element" },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
@@ -217,12 +218,12 @@ export const actionCopyAsPng = register({
   predicate: (elements) => {
     return probablySupportsClipboardBlob && elements.length > 0;
   },
-  contextItemLabel: "labels.copyAsPng",
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
 });
 
 export const copyText = register({
   name: "copyText",
+  label: "labels.copyText",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements({
@@ -258,5 +259,4 @@ export const copyText = register({
         .some(isTextElement)
     );
   },
-  contextItemLabel: "labels.copyText",
 });

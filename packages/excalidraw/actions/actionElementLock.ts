@@ -10,6 +10,22 @@ const shouldLock = (elements: readonly ExcalidrawElement[]) =>
 
 export const actionToggleElementLock = register({
   name: "toggleElementLock",
+  target: "Elements",
+  label: (elements, appState, app) => {
+    const selected = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: false,
+    });
+    if (selected.length === 1 && !isFrameLikeElement(selected[0])) {
+      return selected[0].locked
+        ? "labels.elementLock.unlock"
+        : "labels.elementLock.lock";
+    }
+
+    return shouldLock(selected)
+      ? "labels.elementLock.lockAll"
+      : "labels.elementLock.unlockAll";
+  },
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -47,21 +63,6 @@ export const actionToggleElementLock = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: (elements, appState, app) => {
-    const selected = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeBoundTextElement: false,
-    });
-    if (selected.length === 1 && !isFrameLikeElement(selected[0])) {
-      return selected[0].locked
-        ? "labels.elementLock.unlock"
-        : "labels.elementLock.lock";
-    }
-
-    return shouldLock(selected)
-      ? "labels.elementLock.lockAll"
-      : "labels.elementLock.unlockAll";
-  },
   keyTest: (event, appState, elements, app) => {
     return (
       event.key.toLocaleLowerCase() === KEYS.L &&
@@ -77,6 +78,8 @@ export const actionToggleElementLock = register({
 
 export const actionUnlockAllElements = register({
   name: "unlockAllElements",
+  target: "Editor",
+  paletteName: "Unlock all elements",
   trackEvent: { category: "canvas" },
   viewMode: false,
   predicate: (elements) => {
@@ -101,5 +104,5 @@ export const actionUnlockAllElements = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.elementLock.unlockAll",
+  label: "labels.elementLock.unlockAll",
 });

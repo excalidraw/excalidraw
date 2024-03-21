@@ -43,7 +43,7 @@ export {
 export { actionCopyStyles, actionPasteStyles } from "./actionStyles";
 export {
   actionToggleCanvasMenu,
-  actionToggleEditMenu,
+  // actionToggleEditMenu,
   actionShortcuts,
 } from "./actionMenu";
 
