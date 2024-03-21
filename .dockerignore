@@ -9,3 +9,4 @@
 !packages/
 !tsconfig.json
 !yarn.lock
+!excalidraw-app/
