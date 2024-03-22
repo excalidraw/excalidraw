@@ -55,6 +55,11 @@ const saveDataStateToLocalStorage = (
   appState: AppState,
 ) => {
   try {
+    console.log(
+      "[data] Saving data state to local storage",
+      elements,
+      appState,
+    );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
       JSON.stringify(clearElementsForLocalStorage(elements)),

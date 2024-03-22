@@ -141,6 +141,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           throw new AbortError();
         }
 
+        console.log("[draw] Loading files from http storage", fileIds);
         return loadFilesFromHttpStorage(fileIds, roomId, roomKey);
       },
       saveFiles: async ({ addedFiles }) => {
@@ -416,6 +417,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
+    console.log("[draw] Starting collaboration", existingRoomLinkData);
     if (!this.state.username) {
       const username = getUsernameFromSearchParams();
       this.setUsername(username);
@@ -449,6 +451,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     );
 
     const fallbackInitializationHandler = () => {
+      console.log("[draw] Fallback initialization handler", existingRoomLinkData);
       this.initializeRoom({
         roomLinkData: existingRoomLinkData,
         fetchScene: true,
@@ -655,6 +658,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         roomLinkData: { roomId: string; roomKey: string } | null;
       }
     | { fetchScene: false; roomLinkData?: null }) => {
+    console.log("[draw] Initializing room", fetchScene, roomLinkData);
     clearTimeout(this.socketInitializationTimer!);
     if (this.portal.socket && this.fallbackInitializationHandler) {
       this.portal.socket.off(
@@ -677,6 +681,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
+        console.log("[draw] Fetching scene to initialize room");
         const elements = await loadFromHttpStorage(
           roomLinkData.roomId,
           roomLinkData.roomKey,

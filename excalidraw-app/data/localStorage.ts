@@ -44,6 +44,8 @@ export const importFromLocalStorage = () => {
       // Do nothing because appState is already null
     }
   }
+
+  console.log("[draw] Loaded from local storage", elements, appState);
   return { elements, appState };
 };
 

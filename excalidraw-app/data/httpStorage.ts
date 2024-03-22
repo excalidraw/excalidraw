@@ -64,6 +64,7 @@ export const saveToHttpStorage = async (
 
   const sceneVersion = getSceneVersion(elements);
 
+  console.log("[draw] Fetching drawing data...");
   const getResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-data`, {
     method: "POST",
     body: new URLSearchParams({
@@ -81,9 +82,16 @@ export const saveToHttpStorage = async (
     const existingElements = await getSyncableElementsFromResponse(getResponse);
 
     if (existingElements && getSceneVersion(existingElements) >= sceneVersion) {
+      console.log(
+        "[draw] Scene is already saved",
+        sceneVersion,
+        getSceneVersion(existingElements),
+      );
       return false;
     }
   }
+
+  console.log("[draw] Saving drawing data...");
 
   const putResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-data`, {
     method: "POST",
@@ -119,6 +127,8 @@ export const loadFromHttpStorage = async (
   });
 
   const elements = await getSyncableElementsFromResponse(getResponse);
+
+  console.log("[draw] Loaded scene version", getSceneVersion(elements));
 
   if (socket) {
     httpStorageSceneVersionCache.set(socket!, getSceneVersion(elements));
@@ -157,6 +167,7 @@ export const saveFilesToHttpStorage = async ({
         });
         savedFiles.set(id, true);
       } catch (error: any) {
+        console.error("Error saving file", error);
         erroredFiles.set(id, true);
       }
     }),
