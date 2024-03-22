@@ -13,8 +13,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -22,8 +22,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.copy",
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -31,8 +31,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -40,27 +40,29 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "canvas",
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "history",
         },
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -69,7 +71,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -78,7 +80,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -88,19 +90,21 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -108,8 +112,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -118,7 +122,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -127,7 +131,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -136,7 +140,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -146,8 +150,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -157,7 +161,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -167,9 +171,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -178,9 +182,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -189,8 +193,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -199,8 +203,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -209,37 +213,40 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -250,8 +257,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -259,11 +266,12 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -271,8 +279,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -4698,8 +4706,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -4707,8 +4715,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.copy",
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -4716,8 +4724,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -4725,27 +4733,29 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "canvas",
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "history",
         },
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -4754,7 +4764,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -4763,7 +4773,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -4773,19 +4783,21 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -4793,8 +4805,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -4803,7 +4815,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -4812,7 +4824,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -4821,7 +4833,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -4831,8 +4843,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -4842,7 +4854,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -4852,9 +4864,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -4863,9 +4875,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -4874,8 +4886,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -4884,8 +4896,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -4894,37 +4906,40 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -4935,8 +4950,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -4944,11 +4959,12 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -4956,8 +4972,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -5285,8 +5301,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -5294,8 +5310,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.copy",
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -5303,8 +5319,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -5312,27 +5328,29 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "canvas",
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "history",
         },
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -5341,7 +5359,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -5350,7 +5368,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -5360,19 +5378,21 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -5380,8 +5400,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -5390,7 +5410,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -5399,7 +5419,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -5408,7 +5428,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -5418,8 +5438,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -5429,7 +5449,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -5439,9 +5459,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -5450,9 +5470,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -5461,8 +5481,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -5471,8 +5491,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -5481,37 +5501,40 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -5522,8 +5545,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -5531,11 +5554,12 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -5543,8 +5567,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -5959,8 +5983,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -5969,8 +5993,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -5979,7 +6003,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -5988,7 +6012,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -5998,19 +6022,22 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       "separator",
       {
-        "contextItemLabel": "labels.selectAll",
         "keyTest": [Function],
+        "label": "labels.selectAll",
         "name": "selectAll",
         "perform": [Function],
+        "target": "Editor",
         "trackEvent": {
           "category": "canvas",
         },
       },
       {
-        "contextItemLabel": "labels.elementLock.unlockAll",
+        "label": "labels.elementLock.unlockAll",
         "name": "unlockAllElements",
+        "paletteName": "Unlock all elements",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Editor",
         "trackEvent": {
           "category": "canvas",
         },
@@ -6019,8 +6046,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       "separator",
       {
         "checked": [Function],
-        "contextItemLabel": "labels.showGrid",
         "keyTest": [Function],
+        "label": "labels.showGrid",
         "name": "gridMode",
         "perform": [Function],
         "predicate": [Function],
@@ -6032,8 +6059,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "buttons.objectsSnapMode",
         "keyTest": [Function],
+        "label": "buttons.objectsSnapMode",
         "name": "objectsSnapMode",
         "perform": [Function],
         "predicate": [Function],
@@ -6045,9 +6072,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "buttons.zenMode",
         "keyTest": [Function],
+        "label": "buttons.zenMode",
         "name": "zenMode",
+        "paletteName": "Toggle zen mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6058,9 +6086,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "labels.viewMode",
         "keyTest": [Function],
+        "label": "labels.viewMode",
         "name": "viewMode",
+        "paletteName": "Toggle view mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6071,9 +6100,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "stats.title",
         "keyTest": [Function],
+        "label": "stats.title",
         "name": "stats",
+        "paletteName": "Toggle stats",
         "perform": [Function],
         "trackEvent": {
           "category": "menu",
@@ -6214,8 +6244,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -6223,8 +6253,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copy",
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -6232,8 +6262,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -6241,27 +6271,29 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "canvas",
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "history",
         },
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -6270,7 +6302,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -6279,7 +6311,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -6289,19 +6321,21 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -6309,8 +6343,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -6319,7 +6353,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6328,7 +6362,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6337,7 +6371,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -6347,8 +6381,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -6358,7 +6392,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -6368,9 +6402,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -6379,9 +6413,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -6390,8 +6424,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -6400,8 +6434,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -6410,37 +6444,40 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -6451,8 +6488,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -6460,11 +6497,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -6472,8 +6510,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -6590,8 +6628,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -6599,8 +6637,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copy",
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -6608,8 +6646,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -6617,27 +6655,29 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "canvas",
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "history",
         },
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
         "keyTest": [Function],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -6646,7 +6686,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -6655,7 +6695,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -6665,19 +6705,21 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -6685,8 +6727,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -6695,7 +6737,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6704,7 +6746,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6713,7 +6755,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -6723,8 +6765,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -6734,7 +6776,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -6744,9 +6786,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -6755,9 +6797,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -6766,8 +6808,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -6776,8 +6818,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -6786,37 +6828,40 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -6827,8 +6872,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -6836,11 +6881,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
+        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -6848,8 +6894,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
