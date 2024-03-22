@@ -363,9 +363,9 @@ export default function CommandPalette({
   const [currentOption, setCurrentOption] = useState<CommandPaletteItem | null>(
     null,
   );
-  const [availableCommands, setAvailableCommands] = useState<
-    CommandPaletteItem[]
-  >([]);
+  const [commandsByCategory, setCommandsByCategory] = useState<
+    Record<string, CommandPaletteItem[]>
+  >({});
 
   const closeCommandPalette = () => {
     setCommandSearch("");
@@ -419,7 +419,19 @@ export default function CommandPalette({
   };
 
   useEffect(() => {
-    let matchingActions = allCommands
+    const getNextCommandsByCategory = (commands: CommandPaletteItem[]) => {
+      const nextCommandsByCategory: Record<string, CommandPaletteItem[]> = {};
+      for (const command of commands) {
+        if (nextCommandsByCategory[command.category]) {
+          nextCommandsByCategory[command.category].push(command);
+        } else {
+          nextCommandsByCategory[command.category] = [command];
+        }
+      }
+      return nextCommandsByCategory;
+    };
+
+    let matchingCommands = allCommands
       .filter((command) =>
         typeof command.predicate === "function"
           ? command.predicate(
@@ -430,21 +442,20 @@ export default function CommandPalette({
             )
           : command.predicate,
       )
-
       .sort((a, b) => a.order - b.order);
 
     if (!commandSearch) {
-      setAvailableCommands(matchingActions);
+      setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
       setCurrentOption(null);
       return;
     }
 
-    matchingActions = matchingActions.filter((item) => {
+    matchingCommands = matchingCommands.filter((item) => {
       return item.name.toLowerCase().includes(commandSearch.toLowerCase());
     });
 
-    setAvailableCommands(matchingActions);
-    setCurrentOption(matchingActions[0]);
+    setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
+    setCurrentOption(matchingCommands[0]);
   }, [commandSearch, appState, allCommands, appProps, app]);
 
   return (
@@ -479,33 +490,40 @@ export default function CommandPalette({
         </div>
 
         <div className="commands">
-          {availableCommands.map((command) => (
-            <div
-              key={command.name as string}
-              className={clsx("command-item", {
-                "selected-item": currentOption?.name === command.name,
-              })}
-              ref={(ref) => {
-                if (currentOption?.name === command.name) {
-                  ref?.scrollIntoView({
-                    block: "nearest",
-                    behavior: "instant",
-                  });
-                }
-              }}
-              onPointerDown={() => {
-                executeCommand(command);
-              }}
-            >
-              {command.name}
-              {command.shortcut && (
-                <CommandShortcutHint
-                  shortcut={command.shortcut}
-                  selected={currentOption?.name === command.name}
-                />
-              )}
-            </div>
-          ))}
+          {Object.keys(commandsByCategory).map((key) => {
+            return (
+              <div className="command-category">
+                <div className="command-category-title">{key}</div>
+                {commandsByCategory[key].map((command) => (
+                  <div
+                    key={command.name as string}
+                    className={clsx("command-item", {
+                      "selected-item": currentOption?.name === command.name,
+                    })}
+                    ref={(ref) => {
+                      if (currentOption?.name === command.name) {
+                        ref?.scrollIntoView({
+                          block: "nearest",
+                          behavior: "instant",
+                        });
+                      }
+                    }}
+                    onPointerDown={() => {
+                      executeCommand(command);
+                    }}
+                  >
+                    {command.name}
+                    {command.shortcut && (
+                      <CommandShortcutHint
+                        shortcut={command.shortcut}
+                        selected={currentOption?.name === command.name}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </div>
     </Dialog>

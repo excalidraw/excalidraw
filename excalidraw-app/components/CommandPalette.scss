@@ -52,12 +52,15 @@
       .command-category {
         display: flex;
         flex-direction: column;
+        padding: 12px 0px;
+        border-bottom: solid 1px #ebebeb;
       }
 
       .command-category-title {
-        font-size: 1.2rem;
-        border-bottom: solid 2px #3d3d3d;
-        margin: 12px 0;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0 12px;
+        margin-bottom: 6px;
       }
 
       .command-item {
@@ -67,7 +70,7 @@
         justify-content: space-between;
         align-items: center;
         box-sizing: border-box;
-        padding: 0 16px;
+        padding: 0 12px;
         border-radius: 4px;
 
         .command-item__shortcut {
