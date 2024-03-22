@@ -21,6 +21,7 @@ import {
 } from "../../packages/excalidraw/actions/shortcuts";
 import { atom, useAtomValue } from "jotai";
 import { DEFAULT_SIDEBAR } from "../../packages/excalidraw/constants";
+import { searchIcon } from "../../packages/excalidraw/components/icons";
 
 export const commandPaletteAtom = atom(false);
 
@@ -492,45 +493,52 @@ export default function CommandPalette({
         </div>
 
         <div className="commands">
-          {Object.keys(commandsByCategory).map((category, idx) => {
-            const totalCategories = Object.keys(commandsByCategory).length;
-            return (
-              <div
-                className={clsx("command-category", {
-                  "border-bottom": idx !== totalCategories - 1,
-                })}
-                key={category}
-              >
-                <div className="command-category-title">{category}</div>
-                {commandsByCategory[category].map((command) => (
-                  <div
-                    key={command.name as string}
-                    className={clsx("command-item", {
-                      "selected-item": currentOption?.name === command.name,
-                    })}
-                    ref={(ref) => {
-                      if (currentOption?.name === command.name) {
-                        ref?.scrollIntoView?.({
-                          block: "nearest",
-                        });
-                      }
-                    }}
-                    onPointerDown={() => {
-                      executeCommand(command);
-                    }}
-                  >
-                    {command.name}
-                    {command.shortcut && (
-                      <CommandShortcutHint
-                        shortcut={command.shortcut}
-                        selected={currentOption?.name === command.name}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            );
-          })}
+          {Object.keys(commandsByCategory).length > 0 ? (
+            Object.keys(commandsByCategory).map((category, idx) => {
+              const totalCategories = Object.keys(commandsByCategory).length;
+              return (
+                <div
+                  className={clsx("command-category", {
+                    "border-bottom": idx !== totalCategories - 1,
+                  })}
+                  key={category}
+                >
+                  <div className="command-category-title">{category}</div>
+                  {commandsByCategory[category].map((command) => (
+                    <div
+                      key={command.name as string}
+                      className={clsx("command-item", {
+                        "selected-item": currentOption?.name === command.name,
+                      })}
+                      ref={(ref) => {
+                        if (currentOption?.name === command.name) {
+                          ref?.scrollIntoView?.({
+                            block: "nearest",
+                          });
+                        }
+                      }}
+                      onPointerDown={() => {
+                        executeCommand(command);
+                      }}
+                    >
+                      {command.name}
+                      {command.shortcut && (
+                        <CommandShortcutHint
+                          shortcut={command.shortcut}
+                          selected={currentOption?.name === command.name}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })
+          ) : (
+            <div className="no-match">
+              <div className="search-icon">{searchIcon}</div>{" "}
+              {t("commandPalette.search.noMatch")}
+            </div>
+          )}
         </div>
       </div>
     </Dialog>

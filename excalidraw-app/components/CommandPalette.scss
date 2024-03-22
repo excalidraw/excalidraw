@@ -93,6 +93,19 @@
       .selected-item {
         background-color: var(--color-primary-light);
       }
+
+      .no-match {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 36px;
+
+        .search-icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 6px;
+        }
+      }
     }
 
     .margin-left {
