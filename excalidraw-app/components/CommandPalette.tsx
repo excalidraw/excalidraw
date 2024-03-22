@@ -435,6 +435,7 @@ export default function CommandPalette({
 
     if (!commandSearch) {
       setAvailableActions(matchingActions);
+      setCurrentOption(null);
       return;
     }
 
