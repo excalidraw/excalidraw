@@ -78,6 +78,10 @@
 
       .command-item:hover {
         background-color: var(--color-primary-light);
+
+        .shortcut-key {
+          background-color: white;
+        }
       }
 
       .selected-item {
@@ -87,13 +91,6 @@
 
     .margin-left {
       margin-left: 24px;
-    }
-
-    .checkmark::before {
-      position: absolute;
-      left: 6px;
-      margin-bottom: 1px;
-      content: "\2713";
     }
   }
 }
