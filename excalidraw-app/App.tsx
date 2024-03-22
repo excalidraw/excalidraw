@@ -926,6 +926,20 @@ const ExcalidrawWrapper = () => {
                 },
               },
               {
+                name: t("roomDialog.button_stopSession").replace(/\./g, ""),
+                category: DEFAULT_CATEGORIES.app,
+                predicate: isCollaborating,
+                order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+                execute: () => {
+                  if (collabAPI) {
+                    collabAPI.stopCollaboration();
+                    if (!collabAPI.isCollaborating()) {
+                      setShareDialogState({ isOpen: false });
+                    }
+                  }
+                },
+              },
+              {
                 name: t("exportDialog.link_button"),
                 category: DEFAULT_CATEGORIES.export,
                 order: getCategoryOrder(DEFAULT_CATEGORIES.app),
