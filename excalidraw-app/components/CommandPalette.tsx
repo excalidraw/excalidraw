@@ -492,9 +492,15 @@ export default function CommandPalette({
         </div>
 
         <div className="commands">
-          {Object.keys(commandsByCategory).map((category) => {
+          {Object.keys(commandsByCategory).map((category, idx) => {
+            const totalCategories = Object.keys(commandsByCategory).length;
             return (
-              <div className="command-category" key={category}>
+              <div
+                className={clsx("command-category", {
+                  "border-bottom": idx !== totalCategories - 1,
+                })}
+                key={category}
+              >
                 <div className="command-category-title">{category}</div>
                 {commandsByCategory[category].map((command) => (
                   <div
