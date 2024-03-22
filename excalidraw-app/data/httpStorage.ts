@@ -208,6 +208,10 @@ export const loadFilesFromHttpStorage = async (
             // TODO (Jess): consider adding:
             // lastRetrieved: metadata?.created || Date.now(),
           });
+        } else if (response.status === 403) {
+          // Note that we don't consider this an "erroredFile" because we still want
+          // other connected clients to be able to load the file
+          console.error("File access forbidden", id);
         } else {
           erroredFiles.set(id, true);
         }
