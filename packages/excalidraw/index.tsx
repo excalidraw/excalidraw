@@ -207,6 +207,8 @@ Excalidraw.displayName = "Excalidraw";
 
 export {
   getSceneVersion,
+  hashElementsVersion,
+  hashString,
   isInvisiblySmallElement,
   getNonDeletedElements,
 } from "./element";
@@ -232,10 +234,16 @@ export {
   loadLibraryFromBlob,
 } from "./data/blob";
 export { getFreeDrawSvgPath } from "./renderer/renderElement";
-export { mergeLibraryItems } from "./data/library";
+export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "./element/typeChecks";
 
-export { FONT_FAMILY, THEME, MIME_TYPES, ROUNDNESS } from "./constants";
+export {
+  FONT_FAMILY,
+  THEME,
+  MIME_TYPES,
+  ROUNDNESS,
+  DEFAULT_LASER_COLOR,
+} from "./constants";
 
 export {
   mutateElement,

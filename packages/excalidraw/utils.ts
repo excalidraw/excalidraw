@@ -14,7 +14,7 @@ import {
   UnsubscribeCallback,
   Zoom,
 } from "./types";
-import { ResolutionType } from "./utility-types";
+import { MaybePromise, ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -538,7 +538,9 @@ export const isTransparent = (color: string) => {
 };
 
 export type ResolvablePromise<T> = Promise<T> & {
-  resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
+  resolve: [T] extends [undefined]
+    ? (value?: MaybePromise<Awaited<T>>) => void
+    : (value: MaybePromise<Awaited<T>>) => void;
   reject: (error: Error) => void;
 };
 export const resolvablePromise = <T>() => {
@@ -789,6 +791,14 @@ export const isShallowEqual = <
   const aKeys = Object.keys(objA);
   const bKeys = Object.keys(objB);
   if (aKeys.length !== bKeys.length) {
+    if (debug) {
+      console.warn(
+        `%cisShallowEqual: objects don't have same properties ->`,
+        "color: #8B4000",
+        objA,
+        objB,
+      );
+    }
     return false;
   }
 
@@ -1090,3 +1100,13 @@ export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
 };
 
 // -----------------------------------------------------------------------------
+
+// Promise.try, adapted from https://github.com/sindresorhus/p-try
+export const promiseTry = async <TValue, TArgs extends unknown[]>(
+  fn: (...args: TArgs) => PromiseLike<TValue> | TValue,
+  ...args: TArgs
+): Promise<TValue> => {
+  return new Promise((resolve) => {
+    resolve(fn(...args));
+  });
+};
