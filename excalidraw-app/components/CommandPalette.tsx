@@ -443,14 +443,6 @@ export default function CommandPalette({
       return item.name.toLowerCase().includes(commandSearch.toLowerCase());
     });
 
-    if (
-      matchingActions.find((command) => command.name === "saveToActiveFile")
-    ) {
-      matchingActions = matchingActions.filter(
-        (command) => command.name !== "saveFileToDisk",
-      );
-    }
-
     setAvailableCommands(matchingActions);
     setCurrentOption(matchingActions[0]);
   }, [commandSearch, appState, allCommands, appProps, app]);
