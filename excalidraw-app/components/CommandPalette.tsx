@@ -3,7 +3,6 @@ import {
   useApp,
   useAppProps,
   useExcalidrawActionManager,
-  useExcalidrawAppState,
   useExcalidrawSetAppState,
 } from "../../packages/excalidraw/components/App";
 import { KEYS } from "../../packages/excalidraw/keys";
@@ -22,6 +21,9 @@ import {
 import { atom, useAtomValue } from "jotai";
 import { DEFAULT_SIDEBAR } from "../../packages/excalidraw/constants";
 import { searchIcon } from "../../packages/excalidraw/components/icons";
+import fuzzy from "fuzzy";
+import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
+import { AppState } from "../../packages/excalidraw/types";
 
 export const commandPaletteAtom = atom(false);
 
@@ -82,12 +84,12 @@ const CommandShortcutHint = ({
     <div className={clsx("shortcut", className)}>
       {shortcuts.map((item, idx) => {
         return (
-          <>
+          <div className="shortcut-wrapper" key={item}>
             {idx > 0 && <div className="shortcut-plus"> + </div>}
             <div className={clsx("shortcut-key", selected ? "selected" : "")}>
               {item === "$" ? "+" : item}
             </div>
-          </>
+          </div>
         );
       })}
       <div className="shortcut-desc">{children}</div>
@@ -103,7 +105,7 @@ export default function CommandPalette({
   customCommandPaletteItems: CommandPaletteItem[];
 }) {
   const app = useApp();
-  const appState = useExcalidrawAppState();
+  const uiAppState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const appProps = useAppProps();
   const actionManager = useExcalidrawActionManager();
@@ -119,7 +121,7 @@ export default function CommandPalette({
           label = t(
             action.label(
               app.scene.getNonDeletedElements(),
-              appState,
+              uiAppState as AppState,
               app,
             ) as unknown as TranslationKeys,
           );
@@ -132,7 +134,7 @@ export default function CommandPalette({
 
     let commandsFromActions: CommandPaletteItem[] = [];
 
-    if (appState && app.scene && actionManager) {
+    if (uiAppState && app.scene && actionManager) {
       const elementsCommands: CommandPaletteItem[] = [
         actionManager.actions.group,
         actionManager.actions.ungroup,
@@ -218,7 +220,7 @@ export default function CommandPalette({
         predicate: true,
         order: getCategoryOrder(DEFAULT_CATEGORIES.app),
         execute: () => {
-          if (appState.openSidebar) {
+          if (uiAppState.openSidebar) {
             setAppState({
               openSidebar: null,
             });
@@ -354,16 +356,15 @@ export default function CommandPalette({
   }, [
     app,
     appProps,
-    appState,
+    uiAppState,
     actionManager,
     setAppState,
     customCommandPaletteItems,
   ]);
 
   const [commandSearch, setCommandSearch] = useState("");
-  const [currentOption, setCurrentOption] = useState<CommandPaletteItem | null>(
-    null,
-  );
+  const [currentCommand, setCurrentCommand] =
+    useState<CommandPaletteItem | null>(null);
   const [commandsByCategory, setCommandsByCategory] = useState<
     Record<string, CommandPaletteItem[]>
   >({});
@@ -381,42 +382,42 @@ export default function CommandPalette({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
-    const availableCommands = Object.values(commandsByCategory).flat();
+    const matchingCommands = Object.values(commandsByCategory).flat();
 
     if (event.key === KEYS.ARROW_UP) {
       event.preventDefault();
-      if (currentOption === null && availableCommands.length > 0) {
-        setCurrentOption(availableCommands[0]);
+      if (currentCommand === null && matchingCommands.length > 0) {
+        setCurrentCommand(matchingCommands[0]);
       } else {
-        const index = availableCommands.findIndex(
-          (item) => item.name === currentOption!.name,
+        const index = matchingCommands.findIndex(
+          (item) => item.name === currentCommand!.name,
         );
         const nextIndex =
           index === 0
-            ? availableCommands.length - 1
-            : (index - 1) % availableCommands.length;
-        const nextItem = availableCommands[nextIndex];
+            ? matchingCommands.length - 1
+            : (index - 1) % matchingCommands.length;
+        const nextItem = matchingCommands[nextIndex];
         if (nextItem) {
-          setCurrentOption(nextItem);
+          setCurrentCommand(nextItem);
         }
       }
     } else if (event.key === KEYS.ARROW_DOWN) {
       event.preventDefault();
-      if (currentOption === null && availableCommands.length > 0) {
-        setCurrentOption(availableCommands[0]);
+      if (currentCommand === null && matchingCommands.length > 0) {
+        setCurrentCommand(matchingCommands[0]);
       } else {
-        const index = availableCommands.findIndex(
-          (item) => item.name === currentOption!.name,
+        const index = matchingCommands.findIndex(
+          (item) => item.name === currentCommand!.name,
         );
-        const nextIndex = (index + 1) % availableCommands.length;
-        const nextItem = availableCommands[nextIndex];
+        const nextIndex = (index + 1) % matchingCommands.length;
+        const nextItem = matchingCommands[nextIndex];
         if (nextItem) {
-          setCurrentOption(nextItem);
+          setCurrentCommand(nextItem);
         }
       }
     } else if (event.key === KEYS.ENTER) {
-      if (currentOption) {
-        executeCommand(currentOption);
+      if (currentCommand) {
+        executeCommand(currentCommand);
       }
     }
   };
@@ -439,7 +440,7 @@ export default function CommandPalette({
         typeof command.predicate === "function"
           ? command.predicate(
               app.scene.getNonDeletedElements(),
-              appState,
+              uiAppState as AppState,
               appProps,
               app,
             )
@@ -449,17 +450,25 @@ export default function CommandPalette({
 
     if (!commandSearch) {
       setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
-      setCurrentOption(null);
+      setCurrentCommand(null);
       return;
     }
 
-    matchingCommands = matchingCommands.filter((item) => {
-      return item.name.toLowerCase().includes(commandSearch.toLowerCase());
-    });
+    matchingCommands = fuzzy
+      .filter(commandSearch, matchingCommands, {
+        extract: (command) => command.name,
+        pre: "<b>",
+        post: "</b>",
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((item) => ({
+        ...item.original,
+        name: item.string,
+      }));
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
-    setCurrentOption(matchingCommands[0]);
-  }, [commandSearch, appState, allCommands, appProps, app]);
+    setCurrentCommand(matchingCommands[0]);
+  }, [commandSearch, uiAppState, allCommands, appProps, app]);
 
   return (
     <Dialog
@@ -508,10 +517,10 @@ export default function CommandPalette({
                     <div
                       key={command.name as string}
                       className={clsx("command-item", {
-                        "selected-item": currentOption?.name === command.name,
+                        "selected-item": currentCommand?.name === command.name,
                       })}
                       ref={(ref) => {
-                        if (currentOption?.name === command.name) {
+                        if (currentCommand?.name === command.name) {
                           ref?.scrollIntoView?.({
                             block: "nearest",
                           });
@@ -521,11 +530,15 @@ export default function CommandPalette({
                         executeCommand(command);
                       }}
                     >
-                      {command.name}
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: command.name,
+                        }}
+                      />
                       {command.shortcut && (
                         <CommandShortcutHint
                           shortcut={command.shortcut}
-                          selected={currentOption?.name === command.name}
+                          selected={currentCommand?.name === command.name}
                         />
                       )}
                     </div>

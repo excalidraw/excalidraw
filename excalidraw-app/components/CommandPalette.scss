@@ -16,6 +16,10 @@
       height: 16px;
       font-size: 10px;
 
+      .shortcut-wrapper {
+        display: flex;
+      }
+
       .shortcut-plus {
         margin: 0px 4px;
       }
@@ -110,6 +114,10 @@
 
     .margin-left {
       margin-left: 24px;
+    }
+
+    b {
+      font-weight: 700;
     }
   }
 }
