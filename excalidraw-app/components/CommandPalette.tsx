@@ -380,6 +380,8 @@ export default function CommandPalette({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
+    const availableCommands = Object.values(commandsByCategory).flat();
+
     if (event.key === KEYS.ARROW_UP) {
       event.preventDefault();
       if (currentOption === null && availableCommands.length > 0) {
