@@ -18,7 +18,7 @@ import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { AppClassProperties, UIAppState } from "../types";
+import { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
@@ -47,7 +47,7 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
-  appState: UIAppState,
+  appState: AppState,
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements({

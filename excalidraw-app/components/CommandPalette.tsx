@@ -3,6 +3,7 @@ import {
   useApp,
   useAppProps,
   useExcalidrawActionManager,
+  useExcalidrawAppState,
   useExcalidrawSetAppState,
 } from "../../packages/excalidraw/components/App";
 import { KEYS } from "../../packages/excalidraw/keys";
@@ -19,7 +20,6 @@ import {
   getShortcutFromShortcutName,
 } from "../../packages/excalidraw/actions/shortcuts";
 import { atom, useAtomValue } from "jotai";
-import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import { DEFAULT_SIDEBAR } from "../../packages/excalidraw/constants";
 
 export const commandPaletteAtom = atom(false);
@@ -102,7 +102,7 @@ export default function CommandPalette({
   customCommandPaletteItems: CommandPaletteItem[];
 }) {
   const app = useApp();
-  const appState = useUIAppState();
+  const appState = useExcalidrawAppState();
   const setAppState = useExcalidrawSetAppState();
   const appProps = useAppProps();
   const actionManager = useExcalidrawActionManager();
@@ -506,7 +506,6 @@ export default function CommandPalette({
                       if (currentOption?.name === command.name) {
                         ref?.scrollIntoView?.({
                           block: "nearest",
-                          behavior: "instant",
                         });
                       }
                     }}

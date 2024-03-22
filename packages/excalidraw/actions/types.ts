@@ -5,7 +5,6 @@ import {
   AppState,
   ExcalidrawProps,
   BinaryFiles,
-  UIAppState,
 } from "../types";
 import { MarkOptional } from "../utility-types";
 
@@ -148,7 +147,7 @@ export interface Action {
     | string
     | ((
         elements: readonly ExcalidrawElement[],
-        appState: Readonly<UIAppState>,
+        appState: Readonly<AppState>,
         app: AppClassProperties,
       ) => string);
   PanelComponent?: React.FC<PanelComponentProps>;
@@ -162,7 +161,7 @@ export interface Action {
   ) => boolean;
   predicate?: (
     elements: readonly ExcalidrawElement[],
-    appState: UIAppState,
+    appState: AppState,
     appProps: ExcalidrawProps,
     app: AppClassProperties,
   ) => boolean;
