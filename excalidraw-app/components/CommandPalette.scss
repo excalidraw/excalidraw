@@ -86,14 +86,6 @@
         }
       }
 
-      .command-item:hover {
-        background-color: var(--color-primary-light);
-
-        .shortcut-key {
-          background-color: white;
-        }
-      }
-
       .selected-item {
         background-color: var(--color-primary-light);
       }
