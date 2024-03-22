@@ -50,7 +50,8 @@ export type ShortcutName =
       | "toggleShortcuts"
     >
   | "saveScene"
-  | "imageExport";
+  | "imageExport"
+  | "commandPalette";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
@@ -58,6 +59,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
   clearCanvas: [getShortcutKey("CtrlOrCmd+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
+  commandPalette: [getShortcutKey("CtrlOrCmd+P")],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],

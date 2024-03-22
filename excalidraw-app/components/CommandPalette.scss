@@ -1,0 +1,99 @@
+@import "../../packages/excalidraw/css/variables.module.scss";
+
+.excalidraw {
+  .CommandPalette {
+    .shortcuts-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .shortcut {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 16px;
+      font-size: 10px;
+
+      .shortcut-plus {
+        margin: 0px 4px;
+      }
+
+      .shortcut-key {
+        padding: 0px 4px;
+        height: 16px;
+        line-height: 16px;
+        color: #3d3d3d;
+        border-radius: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--color-primary-light);
+      }
+
+      .selected {
+        background-color: white;
+      }
+
+      .shortcut-desc {
+        margin-left: 4px;
+        color: #999999;
+      }
+    }
+
+    .commands {
+      height: 360px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      margin-top: 12px;
+      color: var(--popup-text-color);
+
+      .command-category {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .command-category-title {
+        font-size: 1.2rem;
+        border-bottom: solid 2px #3d3d3d;
+        margin: 12px 0;
+      }
+
+      .command-item {
+        color: var(--popup-text-color);
+        height: 36px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+        padding: 0 16px;
+        border-radius: 4px;
+
+        .command-item__shortcut {
+          color: var(--popup-text-color);
+          opacity: 0.6;
+        }
+      }
+
+      .command-item:hover {
+        background-color: var(--color-primary-light);
+      }
+
+      .selected-item {
+        background-color: var(--color-primary-light);
+      }
+    }
+
+    .margin-left {
+      margin-left: 24px;
+    }
+
+    .checkmark::before {
+      position: absolute;
+      left: 6px;
+      margin-bottom: 1px;
+      content: "\2713";
+    }
+  }
+}

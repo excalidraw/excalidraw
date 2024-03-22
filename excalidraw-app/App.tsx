@@ -105,6 +105,12 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+import CommandPalette, {
+  DEFAULT_CATEGORIES,
+  commandPaletteAtom,
+  getCategoryOrder,
+} from "./components/CommandPalette";
+import { KEYS } from "../packages/excalidraw/keys";
 
 polyfill();
 
@@ -302,6 +308,8 @@ const ExcalidrawWrapper = () => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
   }, []);
+
+  const [commandPalette, setCommandPalette] = useAtom(commandPaletteAtom);
 
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
@@ -538,6 +546,19 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   useEffect(() => {
+    const commandPaletteShortcut = (
+      event: KeyboardEvent | React.KeyboardEvent,
+    ) => {
+      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.P) {
+        event.preventDefault();
+        setCommandPalette((value) => !value);
+      }
+    };
+    window.addEventListener("keydown", commandPaletteShortcut);
+    return () => window.removeEventListener("keydown", commandPaletteShortcut);
+  }, [setCommandPalette]);
+
+  useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
@@ -764,6 +785,7 @@ const ExcalidrawWrapper = () => {
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
+          toggleCommandPalette={() => setCommandPalette((value) => !value)}
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
         />
@@ -887,6 +909,61 @@ const ExcalidrawWrapper = () => {
           <ErrorDialog onClose={() => setErrorMessage("")}>
             {errorMessage}
           </ErrorDialog>
+        )}
+
+        {commandPalette && (
+          <CommandPalette
+            onClose={() => setCommandPalette(false)}
+            customCommandPaletteItems={[
+              {
+                name: t("labels.liveCollaboration").replace(/\./g, ""),
+                category: DEFAULT_CATEGORIES.app,
+                predicate: !isCollaborating,
+                order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+                execute: () => {
+                  setShareDialogState({
+                    isOpen: true,
+                    type: "collaborationOnly",
+                  });
+                },
+              },
+              {
+                name: t("exportDialog.link_button"),
+                category: DEFAULT_CATEGORIES.export,
+                order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+                predicate: true,
+                execute: async () => {
+                  if (excalidrawAPI) {
+                    try {
+                      await onExportToBackend(
+                        excalidrawAPI.getSceneElements(),
+                        excalidrawAPI.getAppState(),
+                        excalidrawAPI.getFiles(),
+                      );
+                    } catch (error: any) {
+                      setErrorMessage(error.message);
+                    }
+                  }
+                },
+              },
+              {
+                name: t("overwriteConfirm.action.excalidrawPlus.button"),
+                category: DEFAULT_CATEGORIES.export,
+                predicate: true,
+                order: getCategoryOrder(DEFAULT_CATEGORIES.export),
+                execute: () => {
+                  if (excalidrawAPI) {
+                    exportToExcalidrawPlus(
+                      excalidrawAPI.getSceneElements(),
+                      excalidrawAPI.getAppState(),
+                      excalidrawAPI.getFiles(),
+                      excalidrawAPI.getName(),
+                    );
+                  }
+                },
+              },
+            ]}
+          />
         )}
       </Excalidraw>
     </div>

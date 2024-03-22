@@ -540,5 +540,16 @@
       "text": "Click on user to follow",
       "followStatus": "You're currently following this user"
     }
+  },
+  "commandPalette": {
+    "title": "Command palette",
+    "shortcuts": {
+      "select": "Select",
+      "execute": "Execute",
+      "close": "Close"
+    },
+    "search": {
+      "placeholder": "Search menus, commands, and discover hidden gems"
+    }
   }
 }

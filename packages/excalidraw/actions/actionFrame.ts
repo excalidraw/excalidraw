@@ -3,13 +3,16 @@ import { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
-import { AppClassProperties, AppState } from "../types";
+import { AppClassProperties, AppState, UIAppState } from "../types";
 import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 
-const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
+const isSingleFrameSelected = (
+  appState: UIAppState,
+  app: AppClassProperties,
+) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
   return (

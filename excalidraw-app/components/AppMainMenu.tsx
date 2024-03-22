@@ -1,10 +1,16 @@
 import React from "react";
-import { PlusPromoIcon } from "../../packages/excalidraw/components/icons";
+import {
+  PlusPromoIcon,
+  command,
+} from "../../packages/excalidraw/components/icons";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
+import { getShortcutFromShortcutName } from "../../packages/excalidraw/actions/shortcuts";
+import { t } from "../../packages/excalidraw/i18n";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
+  toggleCommandPalette: () => void;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
 }> = React.memo((props) => {
@@ -21,6 +27,13 @@ export const AppMainMenu: React.FC<{
         />
       )}
 
+      <MainMenu.Item
+        icon={command}
+        onSelect={() => props.toggleCommandPalette()}
+        shortcut={getShortcutFromShortcutName("commandPalette")}
+      >
+        {t("commandPalette.title")}
+      </MainMenu.Item>
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />

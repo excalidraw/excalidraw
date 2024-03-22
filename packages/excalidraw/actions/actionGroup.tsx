@@ -18,7 +18,7 @@ import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
 import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { AppClassProperties, AppState, UIAppState } from "../types";
+import { AppClassProperties, UIAppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
