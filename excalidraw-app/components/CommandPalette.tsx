@@ -363,7 +363,7 @@ export default function CommandPalette({
   const [currentOption, setCurrentOption] = useState<CommandPaletteItem | null>(
     null,
   );
-  const [availableActions, setAvailableActions] = useState<
+  const [availableCommands, setAvailableCommands] = useState<
     CommandPaletteItem[]
   >([]);
 
@@ -382,31 +382,31 @@ export default function CommandPalette({
   const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
     if (event.key === KEYS.ARROW_UP) {
       event.preventDefault();
-      if (currentOption === null && availableActions.length > 0) {
-        setCurrentOption(availableActions[0]);
+      if (currentOption === null && availableCommands.length > 0) {
+        setCurrentOption(availableCommands[0]);
       } else {
-        const index = availableActions.findIndex(
+        const index = availableCommands.findIndex(
           (item) => item.name === currentOption!.name,
         );
         const nextIndex =
           index === 0
-            ? availableActions.length - 1
-            : (index - 1) % availableActions.length;
-        const nextItem = availableActions[nextIndex];
+            ? availableCommands.length - 1
+            : (index - 1) % availableCommands.length;
+        const nextItem = availableCommands[nextIndex];
         if (nextItem) {
           setCurrentOption(nextItem);
         }
       }
     } else if (event.key === KEYS.ARROW_DOWN) {
       event.preventDefault();
-      if (currentOption === null && availableActions.length > 0) {
-        setCurrentOption(availableActions[0]);
+      if (currentOption === null && availableCommands.length > 0) {
+        setCurrentOption(availableCommands[0]);
       } else {
-        const index = availableActions.findIndex(
+        const index = availableCommands.findIndex(
           (item) => item.name === currentOption!.name,
         );
-        const nextIndex = (index + 1) % availableActions.length;
-        const nextItem = availableActions[nextIndex];
+        const nextIndex = (index + 1) % availableCommands.length;
+        const nextItem = availableCommands[nextIndex];
         if (nextItem) {
           setCurrentOption(nextItem);
         }
@@ -434,7 +434,7 @@ export default function CommandPalette({
       .sort((a, b) => a.order - b.order);
 
     if (!commandSearch) {
-      setAvailableActions(matchingActions);
+      setAvailableCommands(matchingActions);
       setCurrentOption(null);
       return;
     }
@@ -451,7 +451,7 @@ export default function CommandPalette({
       );
     }
 
-    setAvailableActions(matchingActions);
+    setAvailableCommands(matchingActions);
     setCurrentOption(matchingActions[0]);
   }, [commandSearch, appState, allCommands, appProps, app]);
 
@@ -487,7 +487,7 @@ export default function CommandPalette({
         </div>
 
         <div className="commands">
-          {availableActions.map((command) => (
+          {availableCommands.map((command) => (
             <div
               key={command.name as string}
               className={clsx("command-item", {
