@@ -492,11 +492,11 @@ export default function CommandPalette({
         </div>
 
         <div className="commands">
-          {Object.keys(commandsByCategory).map((key) => {
+          {Object.keys(commandsByCategory).map((category) => {
             return (
-              <div className="command-category">
-                <div className="command-category-title">{key}</div>
-                {commandsByCategory[key].map((command) => (
+              <div className="command-category" key={category}>
+                <div className="command-category-title">{category}</div>
+                {commandsByCategory[category].map((command) => (
                   <div
                     key={command.name as string}
                     className={clsx("command-item", {
@@ -504,7 +504,7 @@ export default function CommandPalette({
                     })}
                     ref={(ref) => {
                       if (currentOption?.name === command.name) {
-                        ref?.scrollIntoView({
+                        ref?.scrollIntoView?.({
                           block: "nearest",
                           behavior: "instant",
                         });
