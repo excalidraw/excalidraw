@@ -17,7 +17,7 @@ import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import { EDITOR_LS_KEYS } from "../../constants";
+import { EDITOR_LS_KEYS, EVENT } from "../../constants";
 import { debounce } from "../../utils";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
@@ -65,6 +65,23 @@ const MermaidToExcalidraw = ({
     },
     [],
   );
+
+  const syncText = () => {
+    setText(
+      EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
+        MERMAID_EXAMPLE,
+    );
+  };
+
+  useEffect(() => {
+    window.addEventListener(EVENT.FOCUS, syncText);
+    document.addEventListener(EVENT.VISIBILITY_CHANGE, syncText);
+
+    return () => {
+      window.removeEventListener(EVENT.FOCUS, syncText);
+      document.removeEventListener(EVENT.VISIBILITY_CHANGE, syncText);
+    };
+  }, []);
 
   const onInsertToEditor = () => {
     insertToEditor({

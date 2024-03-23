@@ -180,7 +180,7 @@ const APP_STATE_STORAGE_CONF = (<
   openMenu: { browser: true, export: false, server: false },
   openPopup: { browser: false, export: false, server: false },
   openSidebar: { browser: true, export: false, server: false },
-  openDialog: { browser: false, export: false, server: false },
+  openDialog: { browser: true, export: false, server: false },
   pasteDialog: { browser: false, export: false, server: false },
   previousSelectedElementIds: { browser: true, export: false, server: false },
   resizingElement: { browser: false, export: false, server: false },
