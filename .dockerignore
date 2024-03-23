@@ -1,4 +1,5 @@
 *
+!excalidraw-app/
 !.env.development
 !.env.production
 !.eslintrc.json
