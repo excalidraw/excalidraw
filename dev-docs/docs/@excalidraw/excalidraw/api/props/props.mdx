@@ -28,7 +28,7 @@ All `props` are _optional_.
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
 | [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
-| [`validateEmbeddable`](#validateEmbeddable) | string[] | `boolean | RegExp | RegExp[] | ((link: string) => boolean | undefined)` | \_ | use for custom src url validation |
+| [`validateEmbeddable`](#validateembeddable) | `string[]` &#124; `boolean` &#124; `RegExp` &#124; `RegExp[]` &#124; <code>((link: string) => boolean &#124; undefined)</code> | \_ | use for custom src url validation |
 | [`renderEmbeddable`](/docs/@excalidraw/excalidraw/api/props/render-props#renderEmbeddable) | `function` | \_ | Render function that can override the built-in `<iframe>` |
 
 ### Storing custom data on Excalidraw elements
