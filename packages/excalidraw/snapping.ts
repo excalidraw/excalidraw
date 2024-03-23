@@ -788,8 +788,8 @@ const createPointSnapLines = (
   nearestSnapsX: Snaps,
   nearestSnapsY: Snaps,
 ): PointSnapLine[] => {
-  const snapsX = {} as { [key: string]: Point[] };
-  const snapsY = {} as { [key: string]: Point[] };
+  const snapsX = {} as Record<string, Point[]>;
+  const snapsY = {} as Record<string, Point[]>;
 
   if (nearestSnapsX.length > 0) {
     for (const snap of nearestSnapsX) {
