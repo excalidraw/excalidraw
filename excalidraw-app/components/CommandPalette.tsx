@@ -560,7 +560,7 @@ function CommandPaletteInner({
                     onClick={() => {
                       executeCommand(command);
                     }}
-                    onMouseOver={() => {
+                    onMouseEnter={() => {
                       setCurrentCommand(command);
                     }}
                   >
