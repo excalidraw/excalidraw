@@ -6,7 +6,7 @@ const reComboHalfMarksRange = "\\ufe20-\\ufe2f";
 const rsComboSymbolsRange = "\\u20d0-\\u20ff";
 const rsComboRange =
   rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;
-const rsCombo = "[" + rsComboRange + "]";
+const rsCombo = `[${rsComboRange}]`;
 
 const reComboMark = RegExp(rsCombo, "g");
 
@@ -72,7 +72,7 @@ const deburredLetters = {
 
 export const deburr = (str: string) => {
   return str
-    .replace(reLatin, function (key: string) {
+    .replace(reLatin, (key: string) => {
       return deburredLetters[key as keyof typeof deburredLetters] || key;
     })
     .replace(reComboMark, "");
