@@ -1839,53 +1839,16 @@ export const searchIcon = createIcon(
 );
 
 export const commandIcon = createIcon(
-  <svg viewBox="0 0 256 256">
-    <path
-      d="M180,48h0a28,28,0,0,1,28,28v0a28,28,0,0,1-28,28H152a0,0,0,0,1,0,0V76a28,28,0,0,1,28-28Z"
-      fill="none"
-      stroke="#000"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="12"
-    />
-    <path
-      d="M48,48H76a28,28,0,0,1,28,28v0a28,28,0,0,1-28,28h0A28,28,0,0,1,48,76V48A0,0,0,0,1,48,48Z"
-      fill="none"
-      stroke="#000"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="12"
-      transform="translate(152 152) rotate(180)"
-    />
-    <path
-      d="M152,152h28a28,28,0,0,1,28,28v0a28,28,0,0,1-28,28h0a28,28,0,0,1-28-28V152A0,0,0,0,1,152,152Z"
-      fill="none"
-      stroke="#000"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="12"
-    />
-    <path
-      d="M76,152h0a28,28,0,0,1,28,28v0a28,28,0,0,1-28,28H48a0,0,0,0,1,0,0V180A28,28,0,0,1,76,152Z"
-      fill="none"
-      stroke="#000"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="12"
-      transform="translate(152 360) rotate(-180)"
-    />
-    <rect
-      fill="none"
-      height="48"
-      stroke="#000"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="12"
-      width="48"
-      x="104"
-      y="104"
-    />
-  </svg>,
+  <g
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="14"
+    stroke="currentColor"
+  >
+    <path d="M180 48h0a28 28 0 0 1 28 28v0a28 28 0 0 1-28 28h-28 0V76a28 28 0 0 1 28-28ZM104 104H76a28 28 0 0 1-28-28h0a28 28 0 0 1 28-28h0a28 28 0 0 1 28 28v28h0ZM152 152h28a28 28 0 0 1 28 28v0a28 28 0 0 1-28 28h0a28 28 0 0 1-28-28v-28h0ZM76 208h0a28 28 0 0 1-28-28h0a28 28 0 0 1 28-28h28v28a28 28 0 0 1-28 28ZM104 104h48v48h-48z" />
+  </g>,
+  { width: 256, height: 256 },
 );
 
 export const microphoneIcon = createIcon(
