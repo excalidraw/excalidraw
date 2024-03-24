@@ -514,7 +514,7 @@ function CommandPaletteInner({
     <Dialog
       onCloseRequest={() => closeCommandPalette()}
       closeOnClickOutside
-      title={t("commandPalette.title")}
+      title={false}
       size={"small"}
       autofocus
     >
