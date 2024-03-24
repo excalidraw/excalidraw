@@ -16,7 +16,7 @@ import {
   ShortcutName,
   getShortcutFromShortcutName,
 } from "../../packages/excalidraw/actions/shortcuts";
-import { DEFAULT_SIDEBAR } from "../../packages/excalidraw/constants";
+import { DEFAULT_SIDEBAR, EVENT } from "../../packages/excalidraw/constants";
 import { searchIcon } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -105,7 +105,12 @@ export default function CommandPalette(props: CommandPaletteProps) {
     const commandPaletteShortcut = (
       event: KeyboardEvent | React.KeyboardEvent,
     ) => {
-      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.P) {
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key === KEYS.P &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
         event.preventDefault();
         event.stopPropagation();
         setAppState((appState) => ({
@@ -116,11 +121,11 @@ export default function CommandPalette(props: CommandPaletteProps) {
         }));
       }
     };
-    window.addEventListener("keydown", commandPaletteShortcut, {
+    window.addEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
       capture: true,
     });
     return () =>
-      window.removeEventListener("keydown", commandPaletteShortcut, {
+      window.removeEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
         capture: true,
       });
   }, [setAppState]);
