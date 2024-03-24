@@ -21,6 +21,7 @@ import { searchIcon } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import { AppState } from "../../packages/excalidraw/types";
+import { getShortcutKey } from "../../packages/excalidraw/utils";
 
 import "./CommandPalette.scss";
 
@@ -529,10 +530,10 @@ function CommandPaletteInner({
         <CommandShortcutHint shortcut="↑↓">
           {t("commandPalette.shortcuts.select")}
         </CommandShortcutHint>
-        <CommandShortcutHint shortcut="↵" className="margin-left">
+        <CommandShortcutHint shortcut="↵">
           {t("commandPalette.shortcuts.execute")}
         </CommandShortcutHint>
-        <CommandShortcutHint shortcut="⌘+P" className="margin-left">
+        <CommandShortcutHint shortcut={getShortcutKey("CtrlOrCmd+P")}>
           {t("commandPalette.shortcuts.close")}
         </CommandShortcutHint>
       </div>
