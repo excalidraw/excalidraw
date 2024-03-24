@@ -66,12 +66,10 @@ export const getCategoryOrder = (category: string) => {
 
 const CommandShortcutHint = ({
   shortcut,
-  selected,
   className,
   children,
 }: {
   shortcut: string;
-  selected?: boolean;
   className?: string;
   children?: React.ReactNode;
 }) => {
@@ -83,9 +81,7 @@ const CommandShortcutHint = ({
         return (
           <div className="shortcut-wrapper" key={item}>
             {idx > 0 && <div className="shortcut-plus"> + </div>}
-            <div className={clsx("shortcut-key", selected ? "selected" : "")}>
-              {item === "$" ? "+" : item}
-            </div>
+            <div className="shortcut-key">{item === "$" ? "+" : item}</div>
           </div>
         );
       })}
@@ -560,7 +556,7 @@ function CommandPaletteInner({
                         });
                       }
                     }}
-                    onPointerDown={() => {
+                    onClick={() => {
                       executeCommand(command);
                     }}
                     onMouseOver={() => {
@@ -573,10 +569,7 @@ function CommandPaletteInner({
                       }}
                     />
                     {command.shortcut && (
-                      <CommandShortcutHint
-                        shortcut={command.shortcut}
-                        selected={currentCommand?.name === command.name}
-                      />
+                      <CommandShortcutHint shortcut={command.shortcut} />
                     )}
                   </div>
                 ))}

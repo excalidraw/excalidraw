@@ -2,6 +2,8 @@
 
 .excalidraw {
   .command-palette-dialog {
+    user-select: none;
+
     .Modal__content {
       height: 100%;
       max-height: 750px;
@@ -43,8 +45,6 @@
       .shortcut-key {
         padding: 0px 4px;
         height: 16px;
-        line-height: 16px;
-        color: #3d3d3d;
         border-radius: 2px;
         display: flex;
         justify-content: center;
@@ -52,13 +52,9 @@
         background-color: var(--color-primary-light);
       }
 
-      .selected {
-        background-color: white;
-      }
-
       .shortcut-desc {
         margin-left: 4px;
-        color: #999999;
+        color: var(--color-gray-50);
       }
     }
 
@@ -72,6 +68,7 @@
         display: flex;
         flex-direction: column;
         padding: 12px 0px;
+        margin-right: 0.25rem;
       }
 
       .command-category-title {
@@ -89,15 +86,24 @@
         box-sizing: border-box;
         padding: 0 12px;
         border-radius: 4px;
+        cursor: pointer;
 
-        .command-item__shortcut {
-          color: var(--popup-text-color);
-          opacity: 0.6;
+        &:active {
+          background-color: var(--color-primary-light-darker);
         }
       }
 
       .selected-item {
         background-color: var(--color-primary-light);
+
+        .shortcut-key {
+          color: var(--color-gray-100);
+
+          background-color: #fff;
+          @at-root .excalidraw.theme--dark#{&} {
+            background-color: var(--color-gray-20);
+          }
+        }
       }
 
       .no-match {
