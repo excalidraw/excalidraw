@@ -22,6 +22,7 @@ import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import { AppState } from "../../packages/excalidraw/types";
 import { getShortcutKey } from "../../packages/excalidraw/utils";
+import { deburr } from "../../packages/excalidraw/deburr";
 
 import "./CommandPalette.scss";
 
@@ -492,8 +493,9 @@ function CommandPaletteInner({
     }
 
     matchingCommands = fuzzy
-      .filter(commandSearch, matchingCommands, {
-        extract: (command) => command.name,
+      .filter(deburr(commandSearch.trim()), matchingCommands, {
+        // TODO precache deburred names?
+        extract: (command) => deburr(command.name),
         pre: "<b>",
         post: "</b>",
       })
