@@ -517,85 +517,84 @@ function CommandPaletteInner({
       title={false}
       size={"small"}
       autofocus
+      className="command-palette-dialog"
     >
-      <div className="CommandPalette">
-        <TextField
-          value={commandSearch}
-          placeholder={t("commandPalette.search.placeholder")}
-          onChange={(value) => {
-            setCommandSearch(value);
-          }}
-          onKeyDown={handleKeyDown}
-          selectOnRender
-        />
+      <TextField
+        value={commandSearch}
+        placeholder={t("commandPalette.search.placeholder")}
+        onChange={(value) => {
+          setCommandSearch(value);
+        }}
+        onKeyDown={handleKeyDown}
+        selectOnRender
+      />
 
-        <div className="shortcuts-wrapper">
-          <CommandShortcutHint shortcut="↑↓">
-            {t("commandPalette.shortcuts.select")}
-          </CommandShortcutHint>
-          <CommandShortcutHint shortcut="↵" className="margin-left">
-            {t("commandPalette.shortcuts.execute")}
-          </CommandShortcutHint>
-          <CommandShortcutHint shortcut="⌘+P" className="margin-left">
-            {t("commandPalette.shortcuts.close")}
-          </CommandShortcutHint>
-        </div>
+      <div className="shortcuts-wrapper">
+        <CommandShortcutHint shortcut="↑↓">
+          {t("commandPalette.shortcuts.select")}
+        </CommandShortcutHint>
+        <CommandShortcutHint shortcut="↵" className="margin-left">
+          {t("commandPalette.shortcuts.execute")}
+        </CommandShortcutHint>
+        <CommandShortcutHint shortcut="⌘+P" className="margin-left">
+          {t("commandPalette.shortcuts.close")}
+        </CommandShortcutHint>
+      </div>
 
-        <div className="commands">
-          {Object.keys(commandsByCategory).length > 0 ? (
-            Object.keys(commandsByCategory).map((category, idx) => {
-              const totalCategories = Object.keys(commandsByCategory).length;
-              return (
-                <div
-                  className={clsx("command-category", {
-                    "border-bottom": idx !== totalCategories - 1,
-                  })}
-                  key={category}
-                >
-                  <div className="command-category-title">{category}</div>
-                  {commandsByCategory[category].map((command) => (
+      <div className="commands">
+        {Object.keys(commandsByCategory).length > 0 ? (
+          Object.keys(commandsByCategory).map((category, idx) => {
+            const totalCategories = Object.keys(commandsByCategory).length;
+            return (
+              <div
+                className={clsx("command-category", {
+                  "border-bottom": idx !== totalCategories - 1,
+                })}
+                key={category}
+              >
+                <div className="command-category-title">{category}</div>
+                {commandsByCategory[category].map((command) => (
+                  <div
+                    key={command.name as string}
+                    className={clsx("command-item", {
+                      "selected-item": currentCommand?.name === command.name,
+                    })}
+                    ref={(ref) => {
+                      if (currentCommand?.name === command.name) {
+                        ref?.scrollIntoView?.({
+                          block: "nearest",
+                        });
+                      }
+                    }}
+                    onPointerDown={() => {
+                      executeCommand(command);
+                    }}
+                    onMouseOver={() => {
+                      setCurrentCommand(command);
+                    }}
+                  >
                     <div
-                      key={command.name as string}
-                      className={clsx("command-item", {
-                        "selected-item": currentCommand?.name === command.name,
-                      })}
-                      ref={(ref) => {
-                        if (currentCommand?.name === command.name) {
-                          ref?.scrollIntoView?.({
-                            block: "nearest",
-                          });
-                        }
+                      dangerouslySetInnerHTML={{
+                        __html: command.name,
                       }}
-                      onPointerDown={() => {
-                        executeCommand(command);
-                      }}
-                      onMouseOver={() => {
-                        setCurrentCommand(command);
-                      }}
-                    >
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: command.name,
-                        }}
+                    />
+                    {command.shortcut && (
+                      <CommandShortcutHint
+                        shortcut={command.shortcut}
+                        selected={currentCommand?.name === command.name}
                       />
-                      {command.shortcut && (
-                        <CommandShortcutHint
-                          shortcut={command.shortcut}
-                          selected={currentCommand?.name === command.name}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              );
-            })
-          ) : (
-            <div className="no-match">
-              <div className="search-icon">{searchIcon}</div>{" "}
-              {t("commandPalette.search.noMatch")}
-            </div>
-          )}
-        </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })
+        ) : (
+          <div className="no-match">
+            <div className="search-icon">{searchIcon}</div>{" "}
+            {t("commandPalette.search.noMatch")}
+          </div>
+        )}
       </div>
     </Dialog>
   );
