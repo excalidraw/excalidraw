@@ -7,6 +7,7 @@ import {
   useAppProps,
 } from "../App";
 import {
+  commandIcon,
   ExportIcon,
   ExportImageIcon,
   HelpIcon,
@@ -116,6 +117,24 @@ export const SaveAsImage = () => {
   );
 };
 SaveAsImage.displayName = "SaveAsImage";
+
+export const CommandPalette = () => {
+  const setAppState = useExcalidrawSetAppState();
+  const { t } = useI18n();
+
+  return (
+    <DropdownMenuItem
+      icon={commandIcon}
+      data-testid="command-palette-button"
+      onSelect={() => setAppState({ openDialog: { name: "commandPalette" } })}
+      shortcut={getShortcutFromShortcutName("commandPalette")}
+      aria-label={t("commandPalette.title")}
+    >
+      {t("commandPalette.title")}
+    </DropdownMenuItem>
+  );
+};
+CommandPalette.displayName = "CommandPalette";
 
 export const Help = () => {
   const { t } = useI18n();

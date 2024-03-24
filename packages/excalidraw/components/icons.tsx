@@ -1838,7 +1838,7 @@ export const searchIcon = createIcon(
   tablerIconProps,
 );
 
-export const command = createIcon(
+export const commandIcon = createIcon(
   <svg viewBox="0 0 256 256">
     <path
       d="M180,48h0a28,28,0,0,1,28,28v0a28,28,0,0,1-28,28H152a0,0,0,0,1,0,0V76a28,28,0,0,1,28-28Z"

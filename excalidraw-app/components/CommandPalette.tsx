@@ -8,9 +8,7 @@ import {
 import { KEYS } from "../../packages/excalidraw/keys";
 import { Dialog } from "../../packages/excalidraw/components/Dialog";
 import { TextField } from "../../packages/excalidraw/components/TextField";
-
 import clsx from "clsx";
-import "./CommandPalette.scss";
 import { getSelectedElements } from "../../packages/excalidraw/scene";
 import { Action } from "../../packages/excalidraw/actions/types";
 import { TranslationKeys, t } from "../../packages/excalidraw/i18n";
@@ -18,14 +16,13 @@ import {
   ShortcutName,
   getShortcutFromShortcutName,
 } from "../../packages/excalidraw/actions/shortcuts";
-import { atom, useAtomValue } from "jotai";
 import { DEFAULT_SIDEBAR } from "../../packages/excalidraw/constants";
 import { searchIcon } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import { AppState } from "../../packages/excalidraw/types";
 
-export const commandPaletteAtom = atom(false);
+import "./CommandPalette.scss";
 
 export type CommandPaletteItem = {
   name: string;
@@ -97,20 +94,52 @@ const CommandShortcutHint = ({
   );
 };
 
-export default function CommandPalette({
-  onClose,
-  customCommandPaletteItems,
-}: {
-  onClose: () => void;
+type CommandPaletteProps = {
   customCommandPaletteItems: CommandPaletteItem[];
-}) {
+};
+export default function CommandPalette(props: CommandPaletteProps) {
+  const uiAppState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  useEffect(() => {
+    const commandPaletteShortcut = (
+      event: KeyboardEvent | React.KeyboardEvent,
+    ) => {
+      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.P) {
+        event.preventDefault();
+        event.stopPropagation();
+        setAppState((appState) => ({
+          openDialog:
+            appState.openDialog?.name === "commandPalette"
+              ? null
+              : { name: "commandPalette" },
+        }));
+      }
+    };
+    window.addEventListener("keydown", commandPaletteShortcut, {
+      capture: true,
+    });
+    return () =>
+      window.removeEventListener("keydown", commandPaletteShortcut, {
+        capture: true,
+      });
+  }, [setAppState]);
+
+  if (uiAppState.openDialog?.name !== "commandPalette") {
+    return null;
+  }
+
+  return <CommandPaletteInner {...props} />;
+}
+
+function CommandPaletteInner({
+  customCommandPaletteItems,
+}: CommandPaletteProps) {
   const app = useApp();
   const uiAppState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const appProps = useAppProps();
   const actionManager = useExcalidrawActionManager();
-
-  const isPaletteVisible = useAtomValue(commandPaletteAtom);
 
   const [allCommands, setAllCommands] = useState<CommandPaletteItem[]>([]);
   useEffect(() => {
@@ -369,15 +398,21 @@ export default function CommandPalette({
     Record<string, CommandPaletteItem[]>
   >({});
 
-  const closeCommandPalette = () => {
+  const closeCommandPalette = (cb?: () => void) => {
+    setAppState(
+      {
+        openDialog: null,
+      },
+      cb,
+    );
     setCommandSearch("");
-    onClose();
   };
 
   const executeCommand = (command: CommandPaletteItem) => {
-    if (isPaletteVisible) {
-      command.execute();
-      closeCommandPalette();
+    if (uiAppState.openDialog?.name === "commandPalette") {
+      closeCommandPalette(() => {
+        command.execute();
+      });
     }
   };
 
