@@ -41,8 +41,7 @@ export const DEFAULT_CATEGORIES = {
   tool: "Tool",
   editor: "Editor",
   elements: "Elements",
-  social: "Social",
-  promotion: "Promotion",
+  links: "Links",
 };
 
 export const getCategoryOrder = (category: string) => {
@@ -57,10 +56,8 @@ export const getCategoryOrder = (category: string) => {
       return 4;
     case DEFAULT_CATEGORIES.elements:
       return 5;
-    case DEFAULT_CATEGORIES.social:
+    case DEFAULT_CATEGORIES.links:
       return 6;
-    case DEFAULT_CATEGORIES.promotion:
-      return 7;
     default:
       return 10;
   }
@@ -278,7 +275,7 @@ function CommandPaletteInner({
       },
       {
         name: "GitHub",
-        category: DEFAULT_CATEGORIES.social,
+        category: DEFAULT_CATEGORIES.links,
         predicate: true,
         order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         execute: () => {
@@ -287,8 +284,8 @@ function CommandPaletteInner({
       },
       {
         name: t("labels.followUs"),
-        category: DEFAULT_CATEGORIES.social,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.social),
+        category: DEFAULT_CATEGORIES.links,
+        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         predicate: true,
         execute: () => {
           window.open("https://x.com/excalidraw", "_blank");
@@ -296,8 +293,8 @@ function CommandPaletteInner({
       },
       {
         name: t("labels.discordChat"),
-        category: DEFAULT_CATEGORIES.social,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.social),
+        category: DEFAULT_CATEGORIES.links,
+        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         predicate: true,
         execute: () => {
           window.open("https://discord.gg/UexuTaE", "_blank");
@@ -305,8 +302,8 @@ function CommandPaletteInner({
       },
       {
         name: t("overwriteConfirm.action.excalidrawPlus.title"),
-        category: DEFAULT_CATEGORIES.promotion,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.promotion),
+        category: DEFAULT_CATEGORIES.links,
+        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         predicate: true,
         execute: () => {
           window.open(
