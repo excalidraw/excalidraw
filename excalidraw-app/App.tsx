@@ -894,7 +894,7 @@ const ExcalidrawWrapper = () => {
         <CommandPalette
           customCommandPaletteItems={[
             {
-              name: t("labels.liveCollaboration").replace(/\./g, ""),
+              name: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
               predicate: !isCollaborating,
               order: getCategoryOrder(DEFAULT_CATEGORIES.app),
@@ -906,9 +906,9 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: t("roomDialog.button_stopSession").replace(/\./g, ""),
+              name: t("roomDialog.button_stopSession"),
               category: DEFAULT_CATEGORIES.app,
-              predicate: isCollaborating,
+              predicate: () => !!collabAPI?.isCollaborating(),
               order: getCategoryOrder(DEFAULT_CATEGORIES.app),
               execute: () => {
                 if (collabAPI) {
@@ -920,7 +920,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: t("exportDialog.link_button"),
+              name: `${t("exportDialog.link_button")}...`,
               category: DEFAULT_CATEGORIES.export,
               order: getCategoryOrder(DEFAULT_CATEGORIES.export),
               predicate: true,

@@ -267,7 +267,7 @@ function CommandPaletteInner({
         },
       },
       {
-        name: t("overwriteConfirm.action.exportToImage.title"),
+        name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
         category: DEFAULT_CATEGORIES.export,
         shortcut: getShortcutFromShortcutName("imageExport"),
         predicate: true,
@@ -280,7 +280,7 @@ function CommandPaletteInner({
         name: "GitHub",
         category: DEFAULT_CATEGORIES.social,
         predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.social),
+        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         execute: () => {
           window.open("https://github.com/excalidraw/excalidraw", "_blank");
         },
@@ -340,7 +340,7 @@ function CommandPaletteInner({
         },
       },
       {
-        name: t("labels.textToDiagram"),
+        name: `${t("labels.textToDiagram")}...`,
         category: DEFAULT_CATEGORIES.tool,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
         predicate: true,
@@ -355,7 +355,7 @@ function CommandPaletteInner({
         },
       },
       {
-        name: t("toolBar.mermaidToExcalidraw"),
+        name: `${t("toolBar.mermaidToExcalidraw")}...`,
         category: DEFAULT_CATEGORIES.tool,
         predicate: true,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
@@ -370,7 +370,7 @@ function CommandPaletteInner({
         },
       },
       {
-        name: t("toolBar.magicframe"),
+        name: `${t("toolBar.magicframe")}...`,
         category: DEFAULT_CATEGORIES.tool,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
         predicate: true,
