@@ -343,7 +343,7 @@ function CommandPaletteInner({
         name: `${t("labels.textToDiagram")}...`,
         category: DEFAULT_CATEGORIES.tool,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        predicate: true,
+        predicate: appProps.aiEnabled,
         execute: () => {
           setAppState((state) => ({
             ...state,
@@ -357,7 +357,7 @@ function CommandPaletteInner({
       {
         name: `${t("toolBar.mermaidToExcalidraw")}...`,
         category: DEFAULT_CATEGORIES.tool,
-        predicate: true,
+        predicate: appProps.aiEnabled,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
         execute: () => {
           setAppState((state) => ({
@@ -373,7 +373,7 @@ function CommandPaletteInner({
         name: `${t("toolBar.magicframe")}...`,
         category: DEFAULT_CATEGORIES.tool,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        predicate: true,
+        predicate: appProps.aiEnabled,
         execute: () => {
           app.onMagicframeToolSelect();
         },
