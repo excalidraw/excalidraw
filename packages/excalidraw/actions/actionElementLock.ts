@@ -10,7 +10,6 @@ const shouldLock = (elements: readonly ExcalidrawElement[]) =>
 
 export const actionToggleElementLock = register({
   name: "toggleElementLock",
-  target: "Elements",
   label: (elements, appState, app) => {
     const selected = app.scene.getSelectedElements({
       selectedElementIds: appState.selectedElementIds,
@@ -29,8 +28,9 @@ export const actionToggleElementLock = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    return !selectedElements.some(
-      (element) => element.locked && element.frameId,
+    return (
+      selectedElements.length > 0 &&
+      !selectedElements.some((element) => element.locked && element.frameId)
     );
   },
   perform: (elements, appState, _, app) => {
@@ -78,7 +78,6 @@ export const actionToggleElementLock = register({
 
 export const actionUnlockAllElements = register({
   name: "unlockAllElements",
-  target: "Editor",
   paletteName: "Unlock all elements",
   trackEvent: { category: "canvas" },
   viewMode: false,

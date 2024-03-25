@@ -23,23 +23,37 @@ import {
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
-import { AppState, ToolType } from "../../packages/excalidraw/types";
-import { getShortcutKey } from "../../packages/excalidraw/utils";
+import { AppProps, AppState, ToolType } from "../../packages/excalidraw/types";
+import {
+  capitalizeString,
+  getShortcutKey,
+} from "../../packages/excalidraw/utils";
 import { atom, useAtom } from "jotai";
 import { deburr } from "../../packages/excalidraw/deburr";
 
 import "./CommandPalette.scss";
 import { MarkRequired } from "../../packages/excalidraw/utility-types";
+import { InlineIcon } from "../../packages/excalidraw/components/InlineIcon";
+import { SHAPES } from "../../packages/excalidraw/shapes";
 
 export type CommandPaletteItem = {
   name: string;
-  /** string we should match against when searching (deburred name + aliases) */
+  /** additional keywords to match against
+   * (appended to haystack, not displayed) */
+  keywords?: string[];
+  /**
+   * string we should match against when searching
+   * (deburred name + keywords)
+   */
   haystack?: string;
+  icon?: React.ReactNode;
   category: string;
   order: number;
-  predicate: boolean | Action["predicate"];
+  predicate?: boolean | Action["predicate"];
   shortcut?: string;
-  execute: () => void;
+  execute: (
+    event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
+  ) => void;
 };
 
 export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
@@ -155,6 +169,9 @@ function CommandPaletteInner({
   >([]);
 
   useEffect(() => {
+    if (!uiAppState || !app.scene || !actionManager) {
+      return;
+    }
     const getActionLabel = (action: Action) => {
       let label = "";
       if (action.label) {
@@ -175,104 +192,124 @@ function CommandPaletteInner({
 
     let commandsFromActions: CommandPaletteItem[] = [];
 
-    if (uiAppState && app.scene && actionManager) {
-      const elementsCommands: CommandPaletteItem[] = [
-        actionManager.actions.group,
-        actionManager.actions.ungroup,
-        actionManager.actions.cut,
-        actionManager.actions.deleteSelectedElements,
-        actionManager.actions.copyStyles,
-        actionManager.actions.pasteStyles,
-        actionManager.actions.sendBackward,
-        actionManager.actions.sendToBack,
-        actionManager.actions.bringForward,
-        actionManager.actions.bringToFront,
-        actionManager.actions.alignTop,
-        actionManager.actions.alignBottom,
-        actionManager.actions.alignLeft,
-        actionManager.actions.alignRight,
-        actionManager.actions.duplicateSelection,
-        actionManager.actions.flipHorizontal,
-        actionManager.actions.flipVertical,
-        actionManager.actions.zoomToFitSelection,
-        actionManager.actions.zoomToFitSelectionInViewport,
-        actionManager.actions.increaseFontSize,
-        actionManager.actions.decreaseFontSize,
-      ].map((action: Action) => ({
-        name: getActionLabel(action),
-        category: DEFAULT_CATEGORIES.elements,
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        predicate: action.predicate
-          ? action.predicate
-          : (elements, appState, appProps, app) => {
-              const selectedElements = getSelectedElements(elements, appState);
-              return selectedElements.length > 0;
-            },
-        order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
-        execute: () => {
-          actionManager.executeAction(action, "commandPalette");
-        },
-      }));
+    const elementsCommands: CommandPaletteItem[] = [
+      actionManager.actions.group,
+      actionManager.actions.ungroup,
+      actionManager.actions.cut,
+      actionManager.actions.deleteSelectedElements,
+      actionManager.actions.copyStyles,
+      actionManager.actions.pasteStyles,
+      actionManager.actions.sendBackward,
+      actionManager.actions.sendToBack,
+      actionManager.actions.bringForward,
+      actionManager.actions.bringToFront,
+      actionManager.actions.alignTop,
+      actionManager.actions.alignBottom,
+      actionManager.actions.alignLeft,
+      actionManager.actions.alignRight,
+      actionManager.actions.duplicateSelection,
+      actionManager.actions.flipHorizontal,
+      actionManager.actions.flipVertical,
+      actionManager.actions.zoomToFitSelection,
+      actionManager.actions.zoomToFitSelectionInViewport,
+      actionManager.actions.increaseFontSize,
+      actionManager.actions.decreaseFontSize,
+    ].map((action: Action) => ({
+      name: getActionLabel(action),
+      keywords: action.keywords,
+      category: DEFAULT_CATEGORIES.elements,
+      shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
+      predicate: action.predicate
+        ? action.predicate
+        : (elements, appState, appProps, app) => {
+            const selectedElements = getSelectedElements(elements, appState);
+            return selectedElements.length > 0;
+          },
+      order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
+      execute: () => {
+        actionManager.executeAction(action, "commandPalette");
+      },
+    }));
 
-      const toolCommands: CommandPaletteItem[] = [
-        actionManager.actions.toggleHandTool,
-        actionManager.actions.setFrameAsActiveTool,
-        actionManager.actions.toggleEraserTool,
-      ].map((action) => ({
-        name: getActionLabel(action),
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        category: DEFAULT_CATEGORIES.tool,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        predicate: true,
-        execute: () => actionManager.executeAction(action, "commandPalette"),
-      }));
+    const toolCommands: CommandPaletteItem[] = [
+      actionManager.actions.toggleHandTool,
+      actionManager.actions.setFrameAsActiveTool,
+    ].map((action) => ({
+      name: getActionLabel(action),
+      shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
+      category: DEFAULT_CATEGORIES.tool,
+      order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+      predicate: action.predicate,
+      keywords: action.keywords,
+      icon: action.icon,
+      execute: () => actionManager.executeAction(action, "commandPalette"),
+    }));
 
-      const editorCommands: CommandPaletteItem[] = [
-        actionManager.actions.undo,
-        actionManager.actions.redo,
-        actionManager.actions.clearCanvas,
-        actionManager.actions.toggleTheme,
-        actionManager.actions.zoomIn,
-        actionManager.actions.zoomOut,
-        actionManager.actions.zoomToFit,
-        actionManager.actions.resetZoom,
-        actionManager.actions.zenMode,
-        actionManager.actions.viewMode,
-        actionManager.actions.objectsSnapMode,
-        actionManager.actions.toggleShortcuts,
-        actionManager.actions.toggleElementLock,
-        actionManager.actions.unlockAllElements,
-        actionManager.actions.stats,
-      ].map((action) => ({
-        name: getActionLabel(action),
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        category: DEFAULT_CATEGORIES.editor,
-        predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
-        execute: () => actionManager.executeAction(action, "commandPalette"),
-      }));
+    const editorCommands: CommandPaletteItem[] = [
+      actionManager.actions.undo,
+      actionManager.actions.redo,
+      actionManager.actions.clearCanvas,
+      actionManager.actions.toggleTheme,
+      actionManager.actions.zoomIn,
+      actionManager.actions.zoomOut,
+      actionManager.actions.zoomToFit,
+      actionManager.actions.resetZoom,
+      actionManager.actions.zenMode,
+      actionManager.actions.viewMode,
+      actionManager.actions.objectsSnapMode,
+      actionManager.actions.toggleShortcuts,
+      actionManager.actions.selectAll,
+      actionManager.actions.toggleElementLock,
+      actionManager.actions.unlockAllElements,
+      actionManager.actions.stats,
+    ].map((action) => ({
+      name: getActionLabel(action),
+      keywords: action.keywords,
+      shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
+      category: DEFAULT_CATEGORIES.editor,
+      predicate: action.predicate,
+      order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
+      execute: () => actionManager.executeAction(action, "commandPalette"),
+    }));
 
-      const exportCommands: CommandPaletteItem[] = [
-        actionManager.actions.copyAsPng,
-        actionManager.actions.copyAsSvg,
-        actionManager.actions.saveToActiveFile,
-        actionManager.actions.saveFileToDisk,
-      ].map((action) => ({
-        name: getActionLabel(action),
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
+    const exportCommands: CommandPaletteItem[] = [
+      actionManager.actions.saveToActiveFile,
+      actionManager.actions.saveFileToDisk,
+      actionManager.actions.copyAsPng,
+      actionManager.actions.copyAsSvg,
+    ].map((action) => ({
+      name: getActionLabel(action),
+      shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
+      category: DEFAULT_CATEGORIES.export,
+      order: getCategoryOrder(DEFAULT_CATEGORIES.export),
+      predicate: action.predicate,
+      keywords: action.keywords,
+      execute: () => actionManager.executeAction(action, "commandPalette"),
+    }));
+
+    commandsFromActions = [
+      ...elementsCommands,
+      ...editorCommands,
+      {
+        name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
         category: DEFAULT_CATEGORIES.export,
+        shortcut: getShortcutFromShortcutName("imageExport"),
         order: getCategoryOrder(DEFAULT_CATEGORIES.export),
-        predicate: action.predicate ?? true,
-        execute: () => actionManager.executeAction(action, "commandPalette"),
-      }));
-
-      commandsFromActions = [
-        ...elementsCommands,
-        ...toolCommands,
-        ...editorCommands,
-        ...exportCommands,
-      ];
-    }
+        keywords: [
+          "export",
+          "image",
+          "png",
+          "jpeg",
+          "svg",
+          "clipboard",
+          "picture",
+        ],
+        execute: () => {
+          setAppState({ openDialog: { name: "imageExport" } });
+        },
+      },
+      ...exportCommands,
+    ];
 
     const toolBarCommands: CommandPaletteItem[] = (
       [
@@ -322,69 +359,45 @@ function CommandPaletteInner({
           }
         },
       },
-      {
-        name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
-        category: DEFAULT_CATEGORIES.export,
-        shortcut: getShortcutFromShortcutName("imageExport"),
-        predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.export),
-        execute: () => {
-          setAppState({ openDialog: { name: "imageExport" } });
-        },
-      },
-      {
-        name: "GitHub",
-        category: DEFAULT_CATEGORIES.links,
-        predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        execute: () => {
-          window.open(
-            "https://github.com/excalidraw/excalidraw",
-            "_blank",
-            "noopener noreferrer",
-          );
-        },
-      },
-      {
-        name: t("labels.followUs"),
-        category: DEFAULT_CATEGORIES.links,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        predicate: true,
-        execute: () => {
-          window.open(
-            "https://x.com/excalidraw",
-            "_blank",
-            "noopener noreferrer",
-          );
-        },
-      },
-      {
-        name: t("labels.discordChat"),
-        category: DEFAULT_CATEGORIES.links,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        predicate: true,
-        execute: () => {
-          window.open(
-            "https://discord.gg/UexuTaE",
-            "_blank",
-            "noopener noreferrer",
-          );
-        },
-      },
-      {
-        name: t("overwriteConfirm.action.excalidrawPlus.title"),
-        category: DEFAULT_CATEGORIES.links,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        predicate: true,
-        execute: () => {
-          window.open(
-            `${
-              import.meta.env.VITE_APP_PLUS_LP
-            }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`,
-            "_blank",
-          );
-        },
-      },
+      ...SHAPES.reduce((acc: CommandPaletteItem[], shape) => {
+        const { value, icon, key, numericKey } = shape;
+
+        if (
+          appProps.UIOptions.tools?.[
+            value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
+          ] === false
+        ) {
+          return acc;
+        }
+
+        const letter =
+          key && capitalizeString(typeof key === "string" ? key : key[0]);
+        const shortcut = letter || numericKey;
+
+        const command: CommandPaletteItem = {
+          name: t(`toolBar.${value}`),
+          category: DEFAULT_CATEGORIES.tool,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          shortcut,
+          icon,
+          keywords: ["toolbar"],
+          execute: (event) => {
+            if (value === "image") {
+              app.setActiveTool({
+                type: value,
+                insertOnCanvasDirectly: event.type === EVENT.KEYDOWN,
+              });
+            } else {
+              app.setActiveTool({ type: value });
+            }
+          },
+        };
+
+        acc.push(command);
+
+        return acc;
+      }, []),
+      ...toolCommands,
       {
         name: t("toolBar.lock"),
         category: DEFAULT_CATEGORIES.tool,
@@ -443,7 +456,9 @@ function CommandPaletteInner({
         ...customCommandPaletteItems,
       ].map((command) => ({
         ...command,
-        haystack: deburr(command.name),
+        haystack: `${deburr(command.name)} ${
+          command.keywords?.join(" ") || ""
+        }`,
       })),
     );
   }, [
@@ -473,10 +488,13 @@ function CommandPaletteInner({
     setCommandSearch("");
   };
 
-  const executeCommand = (command: CommandPaletteItem) => {
+  const executeCommand = (
+    command: CommandPaletteItem,
+    event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
+  ) => {
     if (uiAppState.openDialog?.name === "commandPalette") {
       closeCommandPalette(() => {
-        command.execute();
+        command.execute(event);
         setLastUsed(command);
       });
     }
@@ -558,7 +576,7 @@ function CommandPaletteInner({
 
     if (event.key === KEYS.ENTER) {
       if (currentCommand) {
-        executeCommand(currentCommand);
+        executeCommand(currentCommand, event);
       }
     }
   };
@@ -585,7 +603,7 @@ function CommandPaletteInner({
               appProps,
               app,
             )
-          : command.predicate,
+          : command.predicate ?? true,
       )
       .sort((a, b) => a.order - b.order);
 
@@ -658,7 +676,7 @@ function CommandPaletteInner({
             <CommandItem
               command={lastUsed}
               isSelected={lastUsed.name === currentCommand?.name}
-              onClick={() => executeCommand(lastUsed)}
+              onClick={(event) => executeCommand(lastUsed, event)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
             />
           </div>
@@ -674,7 +692,7 @@ function CommandPaletteInner({
                     key={command.name}
                     command={command}
                     isSelected={command.name === currentCommand?.name}
-                    onClick={() => executeCommand(command)}
+                    onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
                   />
                 ))}
@@ -701,7 +719,7 @@ const CommandItem = ({
   command: CommandPaletteItem;
   isSelected: boolean;
   onMouseMove: () => void;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
 }) => {
   return (
     <div
@@ -718,7 +736,10 @@ const CommandItem = ({
       onClick={onClick}
       onMouseMove={onMouseMove}
     >
-      <div>{command.name}</div>
+      <div className="name">
+        {command.icon && <InlineIcon icon={command.icon} />}
+        {command.name}
+      </div>
       {command.shortcut && <CommandShortcutHint shortcut={command.shortcut} />}
     </div>
   );

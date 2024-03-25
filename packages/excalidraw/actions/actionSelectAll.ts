@@ -9,7 +9,6 @@ import { excludeElementsInFramesFromSelection } from "../scene/selection";
 
 export const actionSelectAll = register({
   name: "selectAll",
-  target: "Editor",
   label: "labels.selectAll",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, value, app) => {

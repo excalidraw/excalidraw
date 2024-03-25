@@ -95,6 +95,12 @@
         &:active {
           background-color: var(--color-primary-light-darker);
         }
+
+        .name {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+        }
       }
 
       .selected-item {
