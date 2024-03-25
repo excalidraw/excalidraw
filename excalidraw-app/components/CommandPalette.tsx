@@ -493,14 +493,9 @@ function CommandPaletteInner({
       .filter(deburr(commandSearch.trim()), matchingCommands, {
         // TODO precache deburred names?
         extract: (command) => deburr(command.name),
-        pre: "<b>",
-        post: "</b>",
       })
       .sort((a, b) => b.score - a.score)
-      .map((item) => ({
-        ...item.original,
-        name: item.string,
-      }));
+      .map((item) => item.original);
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0]);
@@ -563,11 +558,7 @@ function CommandPaletteInner({
                       setCurrentCommand(command);
                     }}
                   >
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: command.name,
-                      }}
-                    />
+                    <div>{command.name}</div>
                     {command.shortcut && (
                       <CommandShortcutHint shortcut={command.shortcut} />
                     )}
