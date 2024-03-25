@@ -1853,10 +1853,11 @@ export const commandIcon = createIcon(
 
 export const clockIcon = createIcon(
   <g>
-    <path d="M16,31A15,15,0,1,1,31,16,15,15,0,0,1,16,31ZM16,3A13,13,0,1,0,29,16,13,13,0,0,0,16,3Z" />
-    <path d="M20.24,21.66l-4.95-4.95A1,1,0,0,1,15,16V8h2v7.59l4.66,4.65Z" />
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+    <path d="M12 7v5l3 3" />
   </g>,
-  { width: 32, height: 32 },
+  tablerIconProps,
 );
 
 export const microphoneIcon = createIcon(
