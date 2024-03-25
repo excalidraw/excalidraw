@@ -338,7 +338,11 @@ function CommandPaletteInner({
         predicate: true,
         order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         execute: () => {
-          window.open("https://github.com/excalidraw/excalidraw", "_blank");
+          window.open(
+            "https://github.com/excalidraw/excalidraw",
+            "_blank",
+            "noopener noreferrer",
+          );
         },
       },
       {
@@ -347,7 +351,11 @@ function CommandPaletteInner({
         order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         predicate: true,
         execute: () => {
-          window.open("https://x.com/excalidraw", "_blank");
+          window.open(
+            "https://x.com/excalidraw",
+            "_blank",
+            "noopener noreferrer",
+          );
         },
       },
       {
@@ -356,7 +364,11 @@ function CommandPaletteInner({
         order: getCategoryOrder(DEFAULT_CATEGORIES.links),
         predicate: true,
         execute: () => {
-          window.open("https://discord.gg/UexuTaE", "_blank");
+          window.open(
+            "https://discord.gg/UexuTaE",
+            "_blank",
+            "noopener noreferrer",
+          );
         },
       },
       {
