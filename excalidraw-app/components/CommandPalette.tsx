@@ -88,7 +88,6 @@ const CommandShortcutHint = ({
       {shortcuts.map((item, idx) => {
         return (
           <div className="shortcut-wrapper" key={item}>
-            {idx > 0 && <div className="shortcut-plus"> + </div>}
             <div className="shortcut-key">{item === "$" ? "+" : item}</div>
           </div>
         );
