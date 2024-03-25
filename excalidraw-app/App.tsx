@@ -922,7 +922,7 @@ const ExcalidrawWrapper = () => {
             {
               name: t("exportDialog.link_button"),
               category: DEFAULT_CATEGORIES.export,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+              order: getCategoryOrder(DEFAULT_CATEGORIES.export),
               predicate: true,
               execute: async () => {
                 if (excalidrawAPI) {
