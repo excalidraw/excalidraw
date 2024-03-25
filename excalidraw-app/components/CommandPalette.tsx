@@ -25,9 +25,12 @@ import { getShortcutKey } from "../../packages/excalidraw/utils";
 import { deburr } from "../../packages/excalidraw/deburr";
 
 import "./CommandPalette.scss";
+import { MarkRequired } from "../../packages/excalidraw/utility-types";
 
 export type CommandPaletteItem = {
   name: string;
+  /** string we should match against when searching (deburred name + aliases) */
+  haystack?: string;
   category: string;
   order: number;
   predicate: boolean | Action["predicate"];
@@ -141,7 +144,9 @@ function CommandPaletteInner({
   const appProps = useAppProps();
   const actionManager = useExcalidrawActionManager();
 
-  const [allCommands, setAllCommands] = useState<CommandPaletteItem[]>([]);
+  const [allCommands, setAllCommands] = useState<
+    MarkRequired<CommandPaletteItem, "haystack">[]
+  >([]);
   useEffect(() => {
     const getActionLabel = (action: Action) => {
       let label = "";
@@ -377,11 +382,16 @@ function CommandPaletteInner({
       },
     ];
 
-    setAllCommands([
-      ...commandsFromActions,
-      ...additionalCommands,
-      ...customCommandPaletteItems,
-    ]);
+    setAllCommands(
+      [
+        ...commandsFromActions,
+        ...additionalCommands,
+        ...customCommandPaletteItems,
+      ].map((command) => ({
+        ...command,
+        haystack: deburr(command.name),
+      })),
+    );
   }, [
     app,
     appProps,
@@ -491,8 +501,7 @@ function CommandPaletteInner({
 
     matchingCommands = fuzzy
       .filter(deburr(commandSearch.trim()), matchingCommands, {
-        // TODO precache deburred names?
-        extract: (command) => deburr(command.name),
+        extract: (command) => command.haystack,
       })
       .sort((a, b) => b.score - a.score)
       .map((item) => item.original);
