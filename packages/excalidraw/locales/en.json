@@ -552,6 +552,7 @@
       "execute": "Execute",
       "close": "Close"
     },
+    "recents": "Recently used",
     "search": {
       "placeholder": "Search menus, commands, and discover hidden gems",
       "noMatch": "No matching commands..."

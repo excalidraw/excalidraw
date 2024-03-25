@@ -17,11 +17,15 @@ import {
   getShortcutFromShortcutName,
 } from "../../packages/excalidraw/actions/shortcuts";
 import { DEFAULT_SIDEBAR, EVENT } from "../../packages/excalidraw/constants";
-import { searchIcon } from "../../packages/excalidraw/components/icons";
+import {
+  clockIcon,
+  searchIcon,
+} from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import { AppState } from "../../packages/excalidraw/types";
 import { getShortcutKey } from "../../packages/excalidraw/utils";
+import { atom, useAtom } from "jotai";
 import { deburr } from "../../packages/excalidraw/deburr";
 
 import "./CommandPalette.scss";
@@ -37,6 +41,8 @@ export type CommandPaletteItem = {
   shortcut?: string;
   execute: () => void;
 };
+
+export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
 export const DEFAULT_CATEGORIES = {
   app: "App",
@@ -144,9 +150,11 @@ function CommandPaletteInner({
   const appProps = useAppProps();
   const actionManager = useExcalidrawActionManager();
 
+  const [lastUsed, setLastUsed] = useAtom(lastUsedPaletteItem);
   const [allCommands, setAllCommands] = useState<
     MarkRequired<CommandPaletteItem, "haystack">[]
   >([]);
+
   useEffect(() => {
     const getActionLabel = (action: Action) => {
       let label = "";
@@ -398,6 +406,7 @@ function CommandPaletteInner({
     uiAppState,
     actionManager,
     setAppState,
+    lastUsed,
     customCommandPaletteItems,
   ]);
 
@@ -422,45 +431,86 @@ function CommandPaletteInner({
     if (uiAppState.openDialog?.name === "commandPalette") {
       closeCommandPalette(() => {
         command.execute();
+        setLastUsed(command);
       });
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
     const matchingCommands = Object.values(commandsByCategory).flat();
+    const considerLastUsed = lastUsed && !commandSearch;
 
     if (event.key === KEYS.ARROW_UP) {
       event.preventDefault();
-      if (currentCommand === null && matchingCommands.length > 0) {
-        setCurrentCommand(matchingCommands[0]);
+      const index = matchingCommands.findIndex(
+        (item) => item.name === currentCommand?.name,
+      );
+
+      if (considerLastUsed) {
+        if (index === 0) {
+          setCurrentCommand(lastUsed);
+          return;
+        }
+
+        if (currentCommand === lastUsed) {
+          const nextItem = matchingCommands[matchingCommands.length - 1];
+          if (nextItem) {
+            setCurrentCommand(nextItem);
+          }
+          return;
+        }
+      }
+
+      let nextIndex;
+
+      if (index === -1) {
+        nextIndex = matchingCommands.length - 1;
       } else {
-        const index = matchingCommands.findIndex(
-          (item) => item.name === currentCommand!.name,
-        );
-        const nextIndex =
+        nextIndex =
           index === 0
             ? matchingCommands.length - 1
             : (index - 1) % matchingCommands.length;
-        const nextItem = matchingCommands[nextIndex];
-        if (nextItem) {
-          setCurrentCommand(nextItem);
-        }
       }
-    } else if (event.key === KEYS.ARROW_DOWN) {
+
+      const nextItem = matchingCommands[nextIndex];
+      if (nextItem) {
+        setCurrentCommand(nextItem);
+      }
+
+      return;
+    }
+
+    if (event.key === KEYS.ARROW_DOWN) {
       event.preventDefault();
-      if (currentCommand === null && matchingCommands.length > 0) {
-        setCurrentCommand(matchingCommands[0]);
-      } else {
-        const index = matchingCommands.findIndex(
-          (item) => item.name === currentCommand!.name,
-        );
-        const nextIndex = (index + 1) % matchingCommands.length;
-        const nextItem = matchingCommands[nextIndex];
-        if (nextItem) {
-          setCurrentCommand(nextItem);
+      const index = matchingCommands.findIndex(
+        (item) => item.name === currentCommand?.name,
+      );
+
+      if (considerLastUsed) {
+        if (!currentCommand || index === matchingCommands.length - 1) {
+          setCurrentCommand(lastUsed);
+          return;
+        }
+
+        if (currentCommand === lastUsed) {
+          const nextItem = matchingCommands[0];
+          if (nextItem) {
+            setCurrentCommand(nextItem);
+          }
+          return;
         }
       }
-    } else if (event.key === KEYS.ENTER) {
+
+      const nextIndex = (index + 1) % matchingCommands.length;
+      const nextItem = matchingCommands[nextIndex];
+      if (nextItem) {
+        setCurrentCommand(nextItem);
+      }
+
+      return;
+    }
+
+    if (event.key === KEYS.ENTER) {
       if (currentCommand) {
         executeCommand(currentCommand);
       }
@@ -494,7 +544,11 @@ function CommandPaletteInner({
       .sort((a, b) => a.order - b.order);
 
     if (!commandSearch) {
-      setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
+      setCommandsByCategory(
+        getNextCommandsByCategory(
+          matchingCommands.filter((command) => command.name !== lastUsed?.name),
+        ),
+      );
       setCurrentCommand(null);
       return;
     }
@@ -508,7 +562,7 @@ function CommandPaletteInner({
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0]);
-  }, [commandSearch, uiAppState, allCommands, appProps, app]);
+  }, [commandSearch, uiAppState, allCommands, appProps, app, lastUsed]);
 
   return (
     <Dialog
@@ -542,43 +596,48 @@ function CommandPaletteInner({
       </div>
 
       <div className="commands">
+        {lastUsed && !commandSearch && (
+          <div className="command-category">
+            <div className="command-category-title">
+              {t("commandPalette.recents")}
+              <div
+                className="icon"
+                style={{
+                  marginLeft: "6px",
+                }}
+              >
+                {clockIcon}
+              </div>
+            </div>
+            <CommandItem
+              command={lastUsed}
+              isSelected={lastUsed.name === currentCommand?.name}
+              onClick={() => executeCommand(lastUsed)}
+              onMouseMove={() => setCurrentCommand(lastUsed)}
+            />
+          </div>
+        )}
+
         {Object.keys(commandsByCategory).length > 0 ? (
           Object.keys(commandsByCategory).map((category, idx) => {
             return (
               <div className="command-category" key={category}>
                 <div className="command-category-title">{category}</div>
                 {commandsByCategory[category].map((command) => (
-                  <div
-                    key={command.name as string}
-                    className={clsx("command-item", {
-                      "selected-item": currentCommand?.name === command.name,
-                    })}
-                    ref={(ref) => {
-                      if (currentCommand?.name === command.name) {
-                        ref?.scrollIntoView?.({
-                          block: "nearest",
-                        });
-                      }
-                    }}
-                    onClick={() => {
-                      executeCommand(command);
-                    }}
-                    onMouseEnter={() => {
-                      setCurrentCommand(command);
-                    }}
-                  >
-                    <div>{command.name}</div>
-                    {command.shortcut && (
-                      <CommandShortcutHint shortcut={command.shortcut} />
-                    )}
-                  </div>
+                  <CommandItem
+                    key={command.name}
+                    command={command}
+                    isSelected={command.name === currentCommand?.name}
+                    onClick={() => executeCommand(command)}
+                    onMouseMove={() => setCurrentCommand(command)}
+                  />
                 ))}
               </div>
             );
           })
         ) : (
           <div className="no-match">
-            <div className="search-icon">{searchIcon}</div>{" "}
+            <div className="icon">{searchIcon}</div>{" "}
             {t("commandPalette.search.noMatch")}
           </div>
         )}
@@ -586,3 +645,35 @@ function CommandPaletteInner({
     </Dialog>
   );
 }
+
+const CommandItem = ({
+  command,
+  isSelected,
+  onMouseMove,
+  onClick,
+}: {
+  command: CommandPaletteItem;
+  isSelected: boolean;
+  onMouseMove: () => void;
+  onClick: () => void;
+}) => {
+  return (
+    <div
+      className={clsx("command-item", {
+        "selected-item": isSelected,
+      })}
+      ref={(ref) => {
+        if (isSelected) {
+          ref?.scrollIntoView?.({
+            block: "nearest",
+          });
+        }
+      }}
+      onClick={onClick}
+      onMouseMove={onMouseMove}
+    >
+      <div>{command.name}</div>
+      {command.shortcut && <CommandShortcutHint shortcut={command.shortcut} />}
+    </div>
+  );
+};

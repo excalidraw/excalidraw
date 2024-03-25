@@ -76,6 +76,8 @@
         font-size: 1rem;
         font-weight: 600;
         margin-bottom: 6px;
+        display: flex;
+        align-items: center;
       }
 
       .command-item {
@@ -112,13 +114,13 @@
         justify-content: center;
         align-items: center;
         margin-top: 36px;
-
-        .search-icon {
-          width: 16px;
-          height: 16px;
-          margin-right: 6px;
-        }
       }
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
     }
   }
 }
