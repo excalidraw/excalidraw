@@ -57,11 +57,11 @@ export const getCategoryOrder = (category: string) => {
   switch (category) {
     case DEFAULT_CATEGORIES.app:
       return 1;
-    case DEFAULT_CATEGORIES.export:
+    case DEFAULT_CATEGORIES.editor:
       return 2;
     case DEFAULT_CATEGORIES.tool:
       return 3;
-    case DEFAULT_CATEGORIES.editor:
+    case DEFAULT_CATEGORIES.export:
       return 4;
     case DEFAULT_CATEGORIES.elements:
       return 5;
