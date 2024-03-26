@@ -62,6 +62,12 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "keyTest": [Function],
+        "keywords": [
+          "export",
+          "png",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
@@ -71,6 +77,11 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
@@ -80,6 +91,11 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
@@ -271,7 +287,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -4755,6 +4770,12 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "keyTest": [Function],
+        "keywords": [
+          "export",
+          "png",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
@@ -4764,6 +4785,11 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
@@ -4773,6 +4799,11 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
@@ -4964,7 +4995,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -5350,6 +5380,12 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "keyTest": [Function],
+        "keywords": [
+          "export",
+          "png",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
@@ -5359,6 +5395,11 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
@@ -5368,6 +5409,11 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
@@ -5559,7 +5605,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -5994,6 +6039,12 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       "separator",
       {
         "keyTest": [Function],
+        "keywords": [
+          "export",
+          "png",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
@@ -6003,6 +6054,11 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         },
       },
       {
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
@@ -6012,6 +6068,11 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         },
       },
       {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
@@ -6026,7 +6087,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "label": "labels.selectAll",
         "name": "selectAll",
         "perform": [Function],
-        "target": "Editor",
         "trackEvent": {
           "category": "canvas",
         },
@@ -6037,7 +6097,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "paletteName": "Unlock all elements",
         "perform": [Function],
         "predicate": [Function],
-        "target": "Editor",
         "trackEvent": {
           "category": "canvas",
         },
@@ -6293,6 +6352,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "keyTest": [Function],
+        "keywords": [
+          "export",
+          "png",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
@@ -6302,6 +6367,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
@@ -6311,6 +6381,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
@@ -6502,7 +6577,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },
@@ -6677,6 +6751,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "keyTest": [Function],
+        "keywords": [
+          "export",
+          "png",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
@@ -6686,6 +6766,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
@@ -6695,6 +6780,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
         "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
@@ -6886,7 +6976,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
-        "target": "Elements",
         "trackEvent": {
           "category": "element",
         },

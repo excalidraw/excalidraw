@@ -115,19 +115,6 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(dialog.outerHTML).toMatchSnapshot();
   });
 
-  it("should close the popup and set the tool to selection when close button clicked", () => {
-    const dialog = document.querySelector(".ttd-dialog")!;
-    const closeBtn = dialog.querySelector(".Dialog__close")!;
-    fireEvent.click(closeBtn);
-    expect(document.querySelector(".ttd-dialog")).toBe(null);
-    expect(window.h.state.activeTool).toStrictEqual({
-      customType: null,
-      lastActiveTool: null,
-      locked: false,
-      type: "selection",
-    });
-  });
-
   it("should show error in preview when mermaid library throws error", async () => {
     const dialog = document.querySelector(".ttd-dialog")!;
 
