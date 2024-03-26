@@ -23,6 +23,7 @@ import {
   clockIcon,
   searchIcon,
   boltIcon,
+  bucketFillIcon,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -340,8 +341,10 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.stroke"),
+          name: t("labels.changeStroke"),
+          keywords: ["color", "outline"],
           category: DEFAULT_CATEGORIES.elements,
+          icon: bucketFillIcon,
           predicate: (elements, appState) => {
             const selectedElements = getSelectedElements(elements, appState);
             return (
@@ -357,7 +360,9 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.background"),
+          name: t("labels.changeBackground"),
+          keywords: ["color", "fill"],
+          icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.elements,
           predicate: (elements, appState) => {
             const selectedElements = getSelectedElements(elements, appState);
@@ -375,6 +380,8 @@ function CommandPaletteInner({
         },
         {
           name: t("labels.canvasBackground"),
+          keywords: ["color"],
+          icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.editor,
           execute: () => {
             setAppState((prevState) => ({

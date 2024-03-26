@@ -289,7 +289,7 @@ export const actionChangeStrokeColor = register({
 
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
-  label: "labels.background",
+  label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
