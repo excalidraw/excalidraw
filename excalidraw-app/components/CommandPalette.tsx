@@ -42,6 +42,13 @@ import {
   canChangeStrokeColor,
 } from "../../packages/excalidraw/components/Actions";
 
+const escapeHTMLAngleBrackets = (str: string) => {
+  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
+// used to demarcate command name from keywords so we can strip on render
+const KEYWORDS_SEPARATOR = "|||";
+
 export type CommandPaletteItem = {
   name: string;
   /** additional keywords to match against
@@ -482,12 +489,16 @@ function CommandPaletteInner({
         ...commandsFromActions,
         ...additionalCommands,
         ...customCommandPaletteItems,
-      ].map((command) => ({
-        ...command,
-        haystack: `${deburr(command.name)} ${
-          command.keywords?.join(" ") || ""
-        }`,
-      }));
+      ].map((command) => {
+        const sanitizedName = escapeHTMLAngleBrackets(command.name);
+        return {
+          ...command,
+          name: sanitizedName,
+          haystack: `${deburr(sanitizedName)}${KEYWORDS_SEPARATOR}${
+            command.keywords?.join(" ") || ""
+          }`,
+        };
+      });
 
       setAllCommands(allCommands);
       setLastUsed(
@@ -499,6 +510,8 @@ function CommandPaletteInner({
     appProps,
     uiAppState,
     actionManager,
+    setAllCommands,
+    lastUsed?.name,
     setLastUsed,
     setAppState,
     customCommandPaletteItems,
@@ -668,16 +681,22 @@ function CommandPaletteInner({
       return;
     }
 
+    const _query = deburr(commandSearch.replace(/[<>-_| ]/g, ""));
     matchingCommands = fuzzy
-      .filter(deburr(commandSearch.trim()), matchingCommands, {
+      .filter(_query, matchingCommands, {
         extract: (command) => command.haystack,
+        pre: "<b>",
+        post: "</b>",
       })
       .sort((a, b) => b.score - a.score)
-      .map((item) => item.original);
+      .map((item) => ({
+        ...item.original,
+        name: item.string,
+      }));
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0]);
-  }, [commandSearch, allCommands, isCommandAvailable]);
+  }, [commandSearch, allCommands, isCommandAvailable, lastUsed]);
 
   return (
     <Dialog
@@ -796,7 +815,11 @@ const CommandItem = ({
     >
       <div className="name">
         {command.icon && <InlineIcon icon={command.icon} />}
-        {command.name}
+        <div
+          dangerouslySetInnerHTML={{
+            __html: command.name.split(KEYWORDS_SEPARATOR)[0],
+          }}
+        />
       </div>
       {command.shortcut && <CommandShortcutHint shortcut={command.shortcut} />}
     </div>
