@@ -22,6 +22,7 @@ import {
   UnlockedIcon,
   clockIcon,
   searchIcon,
+  boltIcon,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -493,6 +494,7 @@ function CommandPaletteInner({
         const sanitizedName = escapeHTMLAngleBrackets(command.name);
         return {
           ...command,
+          icon: command.icon || boltIcon,
           name: sanitizedName,
           haystack: `${deburr(sanitizedName)}${KEYWORDS_SEPARATOR}${
             command.keywords?.join(" ") || ""
