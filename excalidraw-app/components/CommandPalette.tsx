@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useApp,
   useAppProps,
@@ -30,6 +30,7 @@ import { AppProps, AppState } from "../../packages/excalidraw/types";
 import {
   capitalizeString,
   getShortcutKey,
+  isWritableElement,
 } from "../../packages/excalidraw/utils";
 import { atom, useAtom } from "jotai";
 import { deburr } from "../../packages/excalidraw/deburr";
@@ -42,6 +43,7 @@ import {
   canChangeBackgroundColor,
   canChangeStrokeColor,
 } from "../../packages/excalidraw/components/Actions";
+import { useStableCallback } from "../../packages/excalidraw/hooks/useStableCallback";
 
 export type CommandPaletteItem = {
   name: string;
@@ -117,6 +119,15 @@ const CommandShortcutHint = ({
   );
 };
 
+const isCommandPaletteToggleShortcut = (event: KeyboardEvent) => {
+  return (
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key === KEYS.P &&
+    !event.altKey &&
+    !event.shiftKey
+  );
+};
+
 type CommandPaletteProps = {
   customCommandPaletteItems: CommandPaletteItem[];
 };
@@ -126,15 +137,8 @@ export const CommandPalette = (props: CommandPaletteProps) => {
   const setAppState = useExcalidrawSetAppState();
 
   useEffect(() => {
-    const commandPaletteShortcut = (
-      event: KeyboardEvent | React.KeyboardEvent,
-    ) => {
-      if (
-        event[KEYS.CTRL_OR_CMD] &&
-        event.key === KEYS.P &&
-        !event.altKey &&
-        !event.shiftKey
-      ) {
+    const commandPaletteShortcut = (event: KeyboardEvent) => {
+      if (isCommandPaletteToggleShortcut(event)) {
         event.preventDefault();
         event.stopPropagation();
         setAppState((appState) => ({
@@ -174,6 +178,8 @@ function CommandPaletteInner({
   const [allCommands, setAllCommands] = useState<
     MarkRequired<CommandPaletteItem, "haystack" | "order">[]
   >([]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!uiAppState || !app.scene || !actionManager) {
@@ -531,7 +537,7 @@ function CommandPaletteInner({
     }
   };
 
-  const isCommandAvailable = useCallback(
+  const isCommandAvailable = useStableCallback(
     (command: CommandPaletteItem) => {
       return typeof command.predicate === "function"
         ? command.predicate(
@@ -542,10 +548,23 @@ function CommandPaletteInner({
           )
         : command.predicate === undefined || command.predicate;
     },
-    [app, appProps, uiAppState],
   );
 
-  const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
+  const handleKeyDown = useStableCallback((event: KeyboardEvent) => {
+    const ignoreAlphanumerics =
+      isWritableElement(event.target) ||
+      isCommandPaletteToggleShortcut(event) ||
+      event.key === KEYS.ESCAPE;
+
+    if (
+      ignoreAlphanumerics &&
+      event.key !== KEYS.ARROW_UP &&
+      event.key !== KEYS.ARROW_DOWN &&
+      event.key !== KEYS.ENTER
+    ) {
+      return;
+    }
+
     const matchingCommands = Object.values(commandsByCategory).flat();
     const shouldConsiderLastUsed =
       lastUsed && !commandSearch && isCommandAvailable(lastUsed);
@@ -625,7 +644,32 @@ function CommandPaletteInner({
         executeCommand(currentCommand, event);
       }
     }
-  };
+
+    if (ignoreAlphanumerics) {
+      return;
+    }
+
+    // prevent regular editor shortcuts
+    event.stopPropagation();
+
+    // if alphanumeric keypress and we're not inside the input, focus it
+    if (/^[a-zA-Z0-9]$/.test(event.key)) {
+      inputRef?.current?.focus();
+      return;
+    }
+
+    event.preventDefault();
+  });
+
+  useEffect(() => {
+    window.addEventListener(EVENT.KEYDOWN, handleKeyDown, {
+      capture: true,
+    });
+    return () =>
+      window.removeEventListener(EVENT.KEYDOWN, handleKeyDown, {
+        capture: true,
+      });
+  }, [handleKeyDown]);
 
   useEffect(() => {
     const getNextCommandsByCategory = (commands: CommandPaletteItem[]) => {
@@ -688,8 +732,8 @@ function CommandPaletteInner({
         onChange={(value) => {
           setCommandSearch(value);
         }}
-        onKeyDown={handleKeyDown}
         selectOnRender
+        ref={inputRef}
       />
 
       {!app.device.viewport.isMobile && (
