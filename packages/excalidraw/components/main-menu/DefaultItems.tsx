@@ -7,7 +7,7 @@ import {
   useAppProps,
 } from "../App";
 import {
-  commandIcon,
+  boltIcon,
   ExportIcon,
   ExportImageIcon,
   HelpIcon,
@@ -124,7 +124,7 @@ export const CommandPalette = () => {
 
   return (
     <DropdownMenuItem
-      icon={commandIcon}
+      icon={boltIcon}
       data-testid="command-palette-button"
       onSelect={() => setAppState({ openDialog: { name: "commandPalette" } })}
       shortcut={getShortcutFromShortcutName("commandPalette")}

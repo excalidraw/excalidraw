@@ -1833,19 +1833,6 @@ export const searchIcon = createIcon(
   tablerIconProps,
 );
 
-export const commandIcon = createIcon(
-  <g
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="14"
-    stroke="currentColor"
-  >
-    <path d="M180 48h0a28 28 0 0 1 28 28v0a28 28 0 0 1-28 28h-28 0V76a28 28 0 0 1 28-28ZM104 104H76a28 28 0 0 1-28-28h0a28 28 0 0 1 28-28h0a28 28 0 0 1 28 28v28h0ZM152 152h28a28 28 0 0 1 28 28v0a28 28 0 0 1-28 28h0a28 28 0 0 1-28-28v-28h0ZM76 208h0a28 28 0 0 1-28-28h0a28 28 0 0 1 28-28h28v28a28 28 0 0 1-28 28ZM104 104h48v48h-48z" />
-  </g>,
-  { width: 256, height: 256 },
-);
-
 export const clockIcon = createIcon(
   <g>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
