@@ -451,7 +451,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     );
 
     const fallbackInitializationHandler = () => {
-      console.log("[draw] Fallback initialization handler", existingRoomLinkData);
+      console.log(
+        "[draw] Fallback initialization handler",
+        existingRoomLinkData,
+      );
       this.initializeRoom({
         roomLinkData: existingRoomLinkData,
         fetchScene: true,

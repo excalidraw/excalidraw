@@ -5,6 +5,7 @@ import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import PostHogProvider from "./components/PostHogProvider";
 import {
   APP_NAME,
   EVENT,
@@ -104,6 +105,7 @@ import { openConfirmModal } from "../packages/excalidraw/components/OverwriteCon
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
+import { usePostHog } from "posthog-js/react";
 
 polyfill();
 
@@ -287,6 +289,7 @@ const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
   const isCollabDisabled = false;
+  const posthog = usePostHog();
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -681,19 +684,10 @@ const ExcalidrawWrapper = () => {
   // cases where it still happens, and while we disallow self-embedding
   // by not whitelisting our own origin, this serves as an additional guard
   if (isSelfEmbedding) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          height: "100%",
-        }}
-      >
-        <h1>I'm not a pretzel!</h1>
-      </div>
-    );
+    // Sparkwise note: Any one-time automatic reload will count as "self-embedding".
+    // In our case, we are not self-embedding, and any reloads that may happen should
+    // not be considered self-embedding and sould not block the user from using the app.
+    posthog.capture("Self-embedding detected");
   }
 
   const uiMode = getUiMode();
@@ -894,7 +888,9 @@ const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
-        <ExcalidrawWrapper />
+        <PostHogProvider>
+          <ExcalidrawWrapper />
+        </PostHogProvider>
       </Provider>
     </TopErrorBoundary>
   );
