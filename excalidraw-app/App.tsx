@@ -893,18 +893,18 @@ const ExcalidrawWrapper = () => {
 
         <CommandPalette
           customCommandPaletteItems={[
-            // {
-            //   name: t("labels.liveCollaboration"),
-            //   category: DEFAULT_CATEGORIES.app,
-            //   predicate: !isCollaborating,
-            //   order: getCategoryOrder(DEFAULT_CATEGORIES.app),
-            //   execute: () => {
-            //     setShareDialogState({
-            //       isOpen: true,
-            //       type: "collaborationOnly",
-            //     });
-            //   },
-            // },
+            {
+              name: t("labels.liveCollaboration"),
+              category: DEFAULT_CATEGORIES.app,
+              predicate: !isCollaborating,
+              order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+              execute: () => {
+                setShareDialogState({
+                  isOpen: true,
+                  type: "collaborationOnly",
+                });
+              },
+            },
             {
               name: t("roomDialog.button_stopSession"),
               category: DEFAULT_CATEGORIES.app,
