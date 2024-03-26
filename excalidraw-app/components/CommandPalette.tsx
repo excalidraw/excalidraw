@@ -180,6 +180,7 @@ function CommandPaletteInner({
         actionManager.actions.group,
         actionManager.actions.ungroup,
         actionManager.actions.cut,
+        actionManager.actions.copy,
         actionManager.actions.deleteSelectedElements,
         actionManager.actions.copyStyles,
         actionManager.actions.pasteStyles,
