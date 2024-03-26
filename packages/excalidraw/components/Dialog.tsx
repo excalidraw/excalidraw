@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
-import { t } from "../i18n";
 import {
   useExcalidrawContainer,
   useDevice,
@@ -9,7 +8,6 @@ import {
 } from "./App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
-import { back, CloseIcon } from "./icons";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { queryFocusableElements } from "../utils";

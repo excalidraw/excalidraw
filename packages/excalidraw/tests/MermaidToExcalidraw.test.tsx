@@ -1,4 +1,4 @@
-import { act, fireEvent, render, waitFor } from "./test-utils";
+import { act, render, waitFor } from "./test-utils";
 import { Excalidraw } from "../index";
 import React from "react";
 import { expect, vi } from "vitest";
