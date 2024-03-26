@@ -179,8 +179,6 @@ function CommandPaletteInner({
       const elementsCommands: CommandPaletteItem[] = [
         actionManager.actions.group,
         actionManager.actions.ungroup,
-        actionManager.actions.copy,
-        actionManager.actions.paste,
         actionManager.actions.sendBackward,
         actionManager.actions.sendToBack,
         actionManager.actions.bringForward,
