@@ -107,7 +107,8 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
-import CommandPalette, {
+import {
+  CommandPalette,
   DEFAULT_CATEGORIES,
   getCategoryOrder,
 } from "./components/CommandPalette";

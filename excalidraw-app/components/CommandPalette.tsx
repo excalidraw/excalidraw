@@ -132,7 +132,8 @@ const CommandShortcutHint = ({
 type CommandPaletteProps = {
   customCommandPaletteItems: CommandPaletteItem[];
 };
-export default function CommandPalette(props: CommandPaletteProps) {
+
+export const CommandPalette = (props: CommandPaletteProps) => {
   const uiAppState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
@@ -170,7 +171,7 @@ export default function CommandPalette(props: CommandPaletteProps) {
   }
 
   return <CommandPaletteInner {...props} />;
-}
+};
 
 function CommandPaletteInner({
   customCommandPaletteItems,
