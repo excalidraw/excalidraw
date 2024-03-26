@@ -731,7 +731,7 @@ function CommandPaletteInner({
           <CommandShortcutHint shortcut="↵">
             {t("commandPalette.shortcuts.confirm")}
           </CommandShortcutHint>
-          <CommandShortcutHint shortcut={getShortcutKey("CtrlOrCmd+P")}>
+          <CommandShortcutHint shortcut={getShortcutKey("Esc")}>
             {t("commandPalette.shortcuts.close")}
           </CommandShortcutHint>
         </div>
