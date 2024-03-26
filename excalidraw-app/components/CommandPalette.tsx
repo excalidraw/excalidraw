@@ -67,7 +67,7 @@ export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 export const DEFAULT_CATEGORIES = {
   app: "App",
   export: "Export",
-  tool: "Tool",
+  tools: "Tools",
   editor: "Editor",
   elements: "Elements",
   links: "Links",
@@ -79,7 +79,7 @@ export const getCategoryOrder = (category: string) => {
       return 1;
     case DEFAULT_CATEGORIES.editor:
       return 2;
-    case DEFAULT_CATEGORIES.tool:
+    case DEFAULT_CATEGORIES.tools:
       return 3;
     case DEFAULT_CATEGORIES.export:
       return 4;
@@ -244,8 +244,8 @@ function CommandPaletteInner({
       ].map((action) => ({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        category: DEFAULT_CATEGORIES.tool,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+        category: DEFAULT_CATEGORIES.tools,
+        order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
         predicate: action.predicate,
         keywords: action.keywords,
         icon: action.icon,
@@ -407,8 +407,8 @@ function CommandPaletteInner({
 
           const command: CommandPaletteItem = {
             name: t(`toolBar.${value}`),
-            category: DEFAULT_CATEGORIES.tool,
-            order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+            category: DEFAULT_CATEGORIES.tools,
+            order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
             shortcut,
             icon,
             keywords: ["toolbar"],
@@ -431,9 +431,9 @@ function CommandPaletteInner({
         ...toolCommands,
         {
           name: t("toolBar.lock"),
-          category: DEFAULT_CATEGORIES.tool,
+          category: DEFAULT_CATEGORIES.tools,
           icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           shortcut: KEYS.Q.toLocaleUpperCase(),
           predicate: true,
           execute: () => {
@@ -442,8 +442,8 @@ function CommandPaletteInner({
         },
         {
           name: `${t("labels.textToDiagram")}...`,
-          category: DEFAULT_CATEGORIES.tool,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          category: DEFAULT_CATEGORIES.tools,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           predicate: appProps.aiEnabled,
           execute: () => {
             setAppState((state) => ({
@@ -457,9 +457,9 @@ function CommandPaletteInner({
         },
         {
           name: `${t("toolBar.mermaidToExcalidraw")}...`,
-          category: DEFAULT_CATEGORIES.tool,
+          category: DEFAULT_CATEGORIES.tools,
           predicate: appProps.aiEnabled,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           execute: () => {
             setAppState((state) => ({
               ...state,
@@ -472,8 +472,8 @@ function CommandPaletteInner({
         },
         {
           name: `${t("toolBar.magicframe")}...`,
-          category: DEFAULT_CATEGORIES.tool,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          category: DEFAULT_CATEGORIES.tools,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           predicate: appProps.aiEnabled,
           execute: () => {
             app.onMagicframeToolSelect();
