@@ -729,7 +729,7 @@ function CommandPaletteInner({
             {t("commandPalette.shortcuts.select")}
           </CommandShortcutHint>
           <CommandShortcutHint shortcut="↵">
-            {t("commandPalette.shortcuts.execute")}
+            {t("commandPalette.shortcuts.confirm")}
           </CommandShortcutHint>
           <CommandShortcutHint shortcut={getShortcutKey("CtrlOrCmd+P")}>
             {t("commandPalette.shortcuts.close")}
