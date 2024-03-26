@@ -103,7 +103,7 @@
         }
       }
 
-      .selected-item {
+      .item-selected {
         background-color: var(--color-primary-light);
 
         .shortcut-key {
@@ -114,6 +114,11 @@
             background-color: var(--color-gray-20);
           }
         }
+      }
+
+      .item-disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
       }
 
       .no-match {

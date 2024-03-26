@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   useApp,
   useAppProps,
@@ -322,7 +322,6 @@ function CommandPaletteInner({
         {
           name: t("labels.excalidrawLib"),
           category: DEFAULT_CATEGORIES.app,
-          predicate: true,
           order: getCategoryOrder(DEFAULT_CATEGORIES.app),
           execute: () => {
             if (uiAppState.openSidebar) {
@@ -378,7 +377,6 @@ function CommandPaletteInner({
         {
           name: t("labels.canvasBackground"),
           category: DEFAULT_CATEGORIES.editor,
-          predicate: true,
           order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
           execute: () => {
             setAppState((prevState) => ({
@@ -435,7 +433,6 @@ function CommandPaletteInner({
           icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
           order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           shortcut: KEYS.Q.toLocaleUpperCase(),
-          predicate: true,
           execute: () => {
             app.toggleLock();
           },
@@ -481,17 +478,20 @@ function CommandPaletteInner({
         },
       ];
 
-      setAllCommands(
-        [
-          ...commandsFromActions,
-          ...additionalCommands,
-          ...customCommandPaletteItems,
-        ].map((command) => ({
-          ...command,
-          haystack: `${deburr(command.name)} ${
-            command.keywords?.join(" ") || ""
-          }`,
-        })),
+      const allCommands = [
+        ...commandsFromActions,
+        ...additionalCommands,
+        ...customCommandPaletteItems,
+      ].map((command) => ({
+        ...command,
+        haystack: `${deburr(command.name)} ${
+          command.keywords?.join(" ") || ""
+        }`,
+      }));
+
+      setAllCommands(allCommands);
+      setLastUsed(
+        allCommands.find((command) => command.name === lastUsed?.name) ?? null,
       );
     }
   }, [
@@ -499,8 +499,8 @@ function CommandPaletteInner({
     appProps,
     uiAppState,
     actionManager,
+    setLastUsed,
     setAppState,
-    lastUsed,
     customCommandPaletteItems,
   ]);
 
@@ -538,9 +538,24 @@ function CommandPaletteInner({
     }
   };
 
+  const isCommandAvailable = useCallback(
+    (command: CommandPaletteItem) => {
+      return typeof command.predicate === "function"
+        ? command.predicate(
+            app.scene.getNonDeletedElements(),
+            uiAppState as AppState,
+            appProps,
+            app,
+          )
+        : command.predicate === undefined || command.predicate;
+    },
+    [app, appProps, uiAppState],
+  );
+
   const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
     const matchingCommands = Object.values(commandsByCategory).flat();
-    const considerLastUsed = lastUsed && !commandSearch;
+    const shouldConsiderLastUsed =
+      lastUsed && !commandSearch && isCommandAvailable(lastUsed);
 
     if (event.key === KEYS.ARROW_UP) {
       event.preventDefault();
@@ -548,7 +563,7 @@ function CommandPaletteInner({
         (item) => item.name === currentCommand?.name,
       );
 
-      if (considerLastUsed) {
+      if (shouldConsiderLastUsed) {
         if (index === 0) {
           setCurrentCommand(lastUsed);
           return;
@@ -588,7 +603,7 @@ function CommandPaletteInner({
         (item) => item.name === currentCommand?.name,
       );
 
-      if (considerLastUsed) {
+      if (shouldConsiderLastUsed) {
         if (!currentCommand || index === matchingCommands.length - 1) {
           setCurrentCommand(lastUsed);
           return;
@@ -633,22 +648,20 @@ function CommandPaletteInner({
     };
 
     let matchingCommands = allCommands
-      .filter((command) =>
-        typeof command.predicate === "function"
-          ? command.predicate(
-              app.scene.getNonDeletedElements(),
-              uiAppState as AppState,
-              appProps,
-              app,
-            )
-          : command.predicate ?? true,
-      )
+      .filter(isCommandAvailable)
       .sort((a, b) => a.order - b.order);
+
+    const shouldConsiderLastUsed =
+      !commandSearch && lastUsed && isCommandAvailable(lastUsed);
 
     if (!commandSearch) {
       setCommandsByCategory(
         getNextCommandsByCategory(
-          matchingCommands.filter((command) => command.name !== lastUsed?.name),
+          shouldConsiderLastUsed
+            ? matchingCommands.filter(
+                (command) => command.name !== lastUsed?.name,
+              )
+            : matchingCommands,
         ),
       );
       setCurrentCommand(null);
@@ -664,7 +677,7 @@ function CommandPaletteInner({
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0]);
-  }, [commandSearch, uiAppState, allCommands, appProps, app, lastUsed]);
+  }, [commandSearch, allCommands, isCommandAvailable]);
 
   return (
     <Dialog
@@ -715,6 +728,7 @@ function CommandPaletteInner({
               command={lastUsed}
               isSelected={lastUsed.name === currentCommand?.name}
               onClick={(event) => executeCommand(lastUsed, event)}
+              disabled={!isCommandAvailable(lastUsed)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
             />
           </div>
@@ -751,28 +765,34 @@ function CommandPaletteInner({
 const CommandItem = ({
   command,
   isSelected,
+  disabled,
   onMouseMove,
   onClick,
 }: {
   command: CommandPaletteItem;
   isSelected: boolean;
+  disabled?: boolean;
   onMouseMove: () => void;
   onClick: (event: React.MouseEvent) => void;
 }) => {
+  const noop = () => {};
+
   return (
     <div
       className={clsx("command-item", {
-        "selected-item": isSelected,
+        "item-selected": isSelected,
+        "item-disabled": disabled,
       })}
       ref={(ref) => {
-        if (isSelected) {
+        if (isSelected && !disabled) {
           ref?.scrollIntoView?.({
             block: "nearest",
           });
         }
       }}
-      onClick={onClick}
-      onMouseMove={onMouseMove}
+      onClick={disabled ? noop : onClick}
+      onMouseMove={disabled ? noop : onMouseMove}
+      title={disabled ? t("commandPalette.itemNotAvailable") : ""}
     >
       <div className="name">
         {command.icon && <InlineIcon icon={command.icon} />}
