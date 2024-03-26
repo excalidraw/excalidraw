@@ -723,17 +723,19 @@ function CommandPaletteInner({
         selectOnRender
       />
 
-      <div className="shortcuts-wrapper">
-        <CommandShortcutHint shortcut="↑↓">
-          {t("commandPalette.shortcuts.select")}
-        </CommandShortcutHint>
-        <CommandShortcutHint shortcut="↵">
-          {t("commandPalette.shortcuts.execute")}
-        </CommandShortcutHint>
-        <CommandShortcutHint shortcut={getShortcutKey("CtrlOrCmd+P")}>
-          {t("commandPalette.shortcuts.close")}
-        </CommandShortcutHint>
-      </div>
+      {!app.device.viewport.isMobile && (
+        <div className="shortcuts-wrapper">
+          <CommandShortcutHint shortcut="↑↓">
+            {t("commandPalette.shortcuts.select")}
+          </CommandShortcutHint>
+          <CommandShortcutHint shortcut="↵">
+            {t("commandPalette.shortcuts.execute")}
+          </CommandShortcutHint>
+          <CommandShortcutHint shortcut={getShortcutKey("CtrlOrCmd+P")}>
+            {t("commandPalette.shortcuts.close")}
+          </CommandShortcutHint>
+        </div>
+      )}
 
       <div className="commands">
         {lastUsed && !commandSearch && (
@@ -755,6 +757,7 @@ function CommandPaletteInner({
               onClick={(event) => executeCommand(lastUsed, event)}
               disabled={!isCommandAvailable(lastUsed)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
+              showShortcut={!app.device.viewport.isMobile}
             />
           </div>
         )}
@@ -771,6 +774,7 @@ function CommandPaletteInner({
                     isSelected={command.name === currentCommand?.name}
                     onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
+                    showShortcut={!app.device.viewport.isMobile}
                   />
                 ))}
               </div>
@@ -793,12 +797,14 @@ const CommandItem = ({
   disabled,
   onMouseMove,
   onClick,
+  showShortcut,
 }: {
   command: CommandPaletteItem;
   isSelected: boolean;
   disabled?: boolean;
   onMouseMove: () => void;
   onClick: (event: React.MouseEvent) => void;
+  showShortcut: boolean;
 }) => {
   const noop = () => {};
 
@@ -829,7 +835,9 @@ const CommandItem = ({
           }}
         />
       </div>
-      {command.shortcut && <CommandShortcutHint shortcut={command.shortcut} />}
+      {showShortcut && command.shortcut && (
+        <CommandShortcutHint shortcut={command.shortcut} />
+      )}
     </div>
   );
 };
