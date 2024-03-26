@@ -115,14 +115,6 @@ export const Dialog = (props: DialogProps) => {
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
         )}
-        <button
-          className="Dialog__close"
-          onClick={onClose}
-          title={t("buttons.close")}
-          aria-label={t("buttons.close")}
-        >
-          {isFullscreen ? back : CloseIcon}
-        </button>
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>
