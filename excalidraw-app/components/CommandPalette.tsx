@@ -67,6 +67,10 @@ export type CommandPaletteItem = {
   execute: (
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => void;
+  /** when fuzzy matched, we wrap matched bits of the name in <b> and </b> to highlight
+   *  and fuzzyName is the result string
+   */
+  _fuzzyName?: string;
 };
 
 export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
@@ -691,7 +695,7 @@ function CommandPaletteInner({
       .sort((a, b) => b.score - a.score)
       .map((item) => ({
         ...item.original,
-        name: item.string,
+        _fuzzyName: item.string,
       }));
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
@@ -817,7 +821,9 @@ const CommandItem = ({
         {command.icon && <InlineIcon icon={command.icon} />}
         <div
           dangerouslySetInnerHTML={{
-            __html: command.name.split(KEYWORDS_SEPARATOR)[0],
+            __html: (command._fuzzyName ?? command.name).split(
+              KEYWORDS_SEPARATOR,
+            )[0],
           }}
         />
       </div>
