@@ -113,14 +113,13 @@ const CommandShortcutHint = ({
   className?: string;
   children?: React.ReactNode;
 }) => {
-  const shortcuts = shortcut.replace("++", "+$").split("+");
-
+  const shortcuts = shortcut.split(/(?<!\+)(?:\+)/g);
   return (
     <div className={clsx("shortcut", className)}>
-      {shortcuts.map((item, idx) => {
+      {shortcuts.map((item) => {
         return (
           <div className="shortcut-wrapper" key={item}>
-            <div className="shortcut-key">{item === "$" ? "+" : item}</div>
+            <div className="shortcut-key">{item}</div>
           </div>
         );
       })}
