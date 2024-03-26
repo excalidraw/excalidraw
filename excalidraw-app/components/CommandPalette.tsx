@@ -23,7 +23,7 @@ import {
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
-import { AppProps, AppState, ToolType } from "../../packages/excalidraw/types";
+import { AppProps, AppState } from "../../packages/excalidraw/types";
 import {
   capitalizeString,
   getShortcutKey,
@@ -61,7 +61,7 @@ export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 export const DEFAULT_CATEGORIES = {
   app: "App",
   export: "Export",
-  tool: "Tool",
+  tool: "Tools",
   editor: "Editor",
   elements: "Elements",
   links: "Links",
@@ -311,34 +311,7 @@ function CommandPaletteInner({
       ...exportCommands,
     ];
 
-    const toolBarCommands: CommandPaletteItem[] = (
-      [
-        ["selection", KEYS[1]],
-        ["rectangle", KEYS[2]],
-        ["diamond", KEYS[3]],
-        ["ellipse", KEYS[4]],
-        ["line", KEYS[5]],
-        ["arrow", KEYS[6]],
-        ["freedraw", KEYS[7]],
-        ["text", KEYS[8]],
-        ["image", KEYS[9]],
-        ["laser", KEYS.K],
-      ] as Array<[ToolType, string]>
-    ).map(([name, key]) => ({
-      name: t(`toolBar.${name}` as any),
-      category: DEFAULT_CATEGORIES.tool,
-      shortcut: key,
-      predicate: true,
-      order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-      execute: () => {
-        app.setActiveTool({
-          type: name as ToolType,
-        });
-      },
-    }));
-
     const additionalCommands: CommandPaletteItem[] = [
-      ...toolBarCommands,
       {
         name: t("labels.excalidrawLib"),
         category: DEFAULT_CATEGORIES.app,
