@@ -1,5 +1,5 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import { handIcon, ZoomInIcon, ZoomOutIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
@@ -474,6 +474,7 @@ export const actionToggleHandTool = register({
   label: "toolBar.hand",
   paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
+  icon: handIcon,
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 

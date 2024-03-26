@@ -18,28 +18,48 @@ import {
 } from "../../packages/excalidraw/actions/shortcuts";
 import { DEFAULT_SIDEBAR, EVENT } from "../../packages/excalidraw/constants";
 import {
+  LockedIcon,
+  UnlockedIcon,
   clockIcon,
   searchIcon,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
-import { AppState, ToolType } from "../../packages/excalidraw/types";
-import { getShortcutKey } from "../../packages/excalidraw/utils";
+import { AppProps, AppState } from "../../packages/excalidraw/types";
+import {
+  capitalizeString,
+  getShortcutKey,
+} from "../../packages/excalidraw/utils";
 import { atom, useAtom } from "jotai";
 import { deburr } from "../../packages/excalidraw/deburr";
 
 import "./CommandPalette.scss";
 import { MarkRequired } from "../../packages/excalidraw/utility-types";
+import { InlineIcon } from "../../packages/excalidraw/components/InlineIcon";
+import { SHAPES } from "../../packages/excalidraw/shapes";
+import {
+  canChangeBackgroundColor,
+  canChangeStrokeColor,
+} from "../../packages/excalidraw/components/Actions";
 
 export type CommandPaletteItem = {
   name: string;
-  /** string we should match against when searching (deburred name + aliases) */
+  /** additional keywords to match against
+   * (appended to haystack, not displayed) */
+  keywords?: string[];
+  /**
+   * string we should match against when searching
+   * (deburred name + keywords)
+   */
   haystack?: string;
+  icon?: React.ReactNode;
   category: string;
   order: number;
-  predicate: boolean | Action["predicate"];
+  predicate?: boolean | Action["predicate"];
   shortcut?: string;
-  execute: () => void;
+  execute: (
+    event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
+  ) => void;
 };
 
 export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
@@ -155,6 +175,9 @@ function CommandPaletteInner({
   >([]);
 
   useEffect(() => {
+    if (!uiAppState || !app.scene || !actionManager) {
+      return;
+    }
     const getActionLabel = (action: Action) => {
       let label = "";
       if (action.label) {
@@ -218,13 +241,14 @@ function CommandPaletteInner({
       const toolCommands: CommandPaletteItem[] = [
         actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
-        actionManager.actions.toggleEraserTool,
       ].map((action) => ({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.tool,
         order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        predicate: true,
+        predicate: action.predicate,
+        keywords: action.keywords,
+        icon: action.icon,
         execute: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
@@ -241,200 +265,235 @@ function CommandPaletteInner({
         actionManager.actions.viewMode,
         actionManager.actions.objectsSnapMode,
         actionManager.actions.toggleShortcuts,
+        actionManager.actions.selectAll,
         actionManager.actions.toggleElementLock,
         actionManager.actions.unlockAllElements,
         actionManager.actions.stats,
       ].map((action) => ({
         name: getActionLabel(action),
+        keywords: action.keywords,
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.editor,
-        predicate: true,
+        predicate: action.predicate,
         order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
         execute: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
       const exportCommands: CommandPaletteItem[] = [
-        actionManager.actions.copyAsPng,
-        actionManager.actions.copyAsSvg,
         actionManager.actions.saveToActiveFile,
         actionManager.actions.saveFileToDisk,
+        actionManager.actions.copyAsPng,
+        actionManager.actions.copyAsSvg,
       ].map((action) => ({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.export,
         order: getCategoryOrder(DEFAULT_CATEGORIES.export),
-        predicate: action.predicate ?? true,
+        predicate: action.predicate,
+        keywords: action.keywords,
         execute: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
       commandsFromActions = [
         ...elementsCommands,
-        ...toolCommands,
         ...editorCommands,
+        {
+          name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
+          category: DEFAULT_CATEGORIES.export,
+          shortcut: getShortcutFromShortcutName("imageExport"),
+          order: getCategoryOrder(DEFAULT_CATEGORIES.export),
+          keywords: [
+            "export",
+            "image",
+            "png",
+            "jpeg",
+            "svg",
+            "clipboard",
+            "picture",
+          ],
+          execute: () => {
+            setAppState({ openDialog: { name: "imageExport" } });
+          },
+        },
         ...exportCommands,
       ];
-    }
 
-    const toolBarCommands: CommandPaletteItem[] = (
-      [
-        ["selection", KEYS[1]],
-        ["rectangle", KEYS[2]],
-        ["diamond", KEYS[3]],
-        ["ellipse", KEYS[4]],
-        ["line", KEYS[5]],
-        ["arrow", KEYS[6]],
-        ["freedraw", KEYS[7]],
-        ["text", KEYS[8]],
-        ["image", KEYS[9]],
-        ["laser", KEYS.K],
-      ] as Array<[ToolType, string]>
-    ).map(([name, key]) => ({
-      name: t(`toolBar.${name}` as any),
-      category: DEFAULT_CATEGORIES.tool,
-      shortcut: key,
-      predicate: true,
-      order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-      execute: () => {
-        app.setActiveTool({
-          type: name as ToolType,
-        });
-      },
-    }));
+      const additionalCommands: CommandPaletteItem[] = [
+        {
+          name: t("labels.excalidrawLib"),
+          category: DEFAULT_CATEGORIES.app,
+          predicate: true,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+          execute: () => {
+            if (uiAppState.openSidebar) {
+              setAppState({
+                openSidebar: null,
+              });
+            } else {
+              setAppState({
+                openSidebar: {
+                  name: DEFAULT_SIDEBAR.name,
+                  tab: DEFAULT_SIDEBAR.defaultTab,
+                },
+              });
+            }
+          },
+        },
+        {
+          name: t("labels.stroke"),
+          category: DEFAULT_CATEGORIES.elements,
+          predicate: (elements, appState) => {
+            const selectedElements = getSelectedElements(elements, appState);
+            return (
+              selectedElements.length > 0 &&
+              canChangeStrokeColor(appState, selectedElements)
+            );
+          },
+          order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
+          execute: () => {
+            setAppState((prevState) => ({
+              openMenu: prevState.openMenu === "shape" ? null : "shape",
+              openPopup: "elementStroke",
+            }));
+          },
+        },
+        {
+          name: t("labels.background"),
+          category: DEFAULT_CATEGORIES.elements,
+          predicate: (elements, appState) => {
+            const selectedElements = getSelectedElements(elements, appState);
+            return (
+              selectedElements.length > 0 &&
+              canChangeBackgroundColor(appState, selectedElements)
+            );
+          },
+          order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
+          execute: () => {
+            setAppState((prevState) => ({
+              openMenu: prevState.openMenu === "shape" ? null : "shape",
+              openPopup: "elementBackground",
+            }));
+          },
+        },
+        {
+          name: t("labels.canvasBackground"),
+          category: DEFAULT_CATEGORIES.editor,
+          predicate: true,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
+          execute: () => {
+            setAppState((prevState) => ({
+              openMenu: prevState.openMenu === "canvas" ? null : "canvas",
+              openPopup: "canvasBackground",
+            }));
+          },
+        },
+        ...SHAPES.reduce((acc: CommandPaletteItem[], shape) => {
+          const { value, icon, key, numericKey } = shape;
 
-    const additionalCommands: CommandPaletteItem[] = [
-      ...toolBarCommands,
-      {
-        name: t("labels.excalidrawLib"),
-        category: DEFAULT_CATEGORIES.app,
-        predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.app),
-        execute: () => {
-          if (uiAppState.openSidebar) {
-            setAppState({
-              openSidebar: null,
-            });
-          } else {
-            setAppState({
-              openSidebar: {
-                name: DEFAULT_SIDEBAR.name,
-                tab: DEFAULT_SIDEBAR.defaultTab,
-              },
-            });
+          if (
+            appProps.UIOptions.tools?.[
+              value as Extract<
+                typeof value,
+                keyof AppProps["UIOptions"]["tools"]
+              >
+            ] === false
+          ) {
+            return acc;
           }
-        },
-      },
-      {
-        name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
-        category: DEFAULT_CATEGORIES.export,
-        shortcut: getShortcutFromShortcutName("imageExport"),
-        predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.export),
-        execute: () => {
-          setAppState({ openDialog: { name: "imageExport" } });
-        },
-      },
-      {
-        name: "GitHub",
-        category: DEFAULT_CATEGORIES.links,
-        predicate: true,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        execute: () => {
-          window.open("https://github.com/excalidraw/excalidraw", "_blank");
-        },
-      },
-      {
-        name: t("labels.followUs"),
-        category: DEFAULT_CATEGORIES.links,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        predicate: true,
-        execute: () => {
-          window.open("https://x.com/excalidraw", "_blank");
-        },
-      },
-      {
-        name: t("labels.discordChat"),
-        category: DEFAULT_CATEGORIES.links,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        predicate: true,
-        execute: () => {
-          window.open("https://discord.gg/UexuTaE", "_blank");
-        },
-      },
-      {
-        name: t("overwriteConfirm.action.excalidrawPlus.title"),
-        category: DEFAULT_CATEGORIES.links,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.links),
-        predicate: true,
-        execute: () => {
-          window.open(
-            `${
-              import.meta.env.VITE_APP_PLUS_LP
-            }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`,
-            "_blank",
-          );
-        },
-      },
-      {
-        name: t("toolBar.lock"),
-        category: DEFAULT_CATEGORIES.tool,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        shortcut: KEYS.Q.toLocaleUpperCase(),
-        predicate: true,
-        execute: () => {
-          app.toggleLock();
-        },
-      },
-      {
-        name: `${t("labels.textToDiagram")}...`,
-        category: DEFAULT_CATEGORIES.tool,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        predicate: appProps.aiEnabled,
-        execute: () => {
-          setAppState((state) => ({
-            ...state,
-            openDialog: {
-              name: "ttd",
-              tab: "text-to-diagram",
-            },
-          }));
-        },
-      },
-      {
-        name: `${t("toolBar.mermaidToExcalidraw")}...`,
-        category: DEFAULT_CATEGORIES.tool,
-        predicate: appProps.aiEnabled,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        execute: () => {
-          setAppState((state) => ({
-            ...state,
-            openDialog: {
-              name: "ttd",
-              tab: "mermaid",
-            },
-          }));
-        },
-      },
-      {
-        name: `${t("toolBar.magicframe")}...`,
-        category: DEFAULT_CATEGORIES.tool,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
-        predicate: appProps.aiEnabled,
-        execute: () => {
-          app.onMagicframeToolSelect();
-        },
-      },
-    ];
 
-    setAllCommands(
-      [
-        ...commandsFromActions,
-        ...additionalCommands,
-        ...customCommandPaletteItems,
-      ].map((command) => ({
-        ...command,
-        haystack: deburr(command.name),
-      })),
-    );
+          const letter =
+            key && capitalizeString(typeof key === "string" ? key : key[0]);
+          const shortcut = letter || numericKey;
+
+          const command: CommandPaletteItem = {
+            name: t(`toolBar.${value}`),
+            category: DEFAULT_CATEGORIES.tool,
+            order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+            shortcut,
+            icon,
+            keywords: ["toolbar"],
+            execute: (event) => {
+              if (value === "image") {
+                app.setActiveTool({
+                  type: value,
+                  insertOnCanvasDirectly: event.type === EVENT.KEYDOWN,
+                });
+              } else {
+                app.setActiveTool({ type: value });
+              }
+            },
+          };
+
+          acc.push(command);
+
+          return acc;
+        }, []),
+        ...toolCommands,
+        {
+          name: t("toolBar.lock"),
+          category: DEFAULT_CATEGORIES.tool,
+          icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          shortcut: KEYS.Q.toLocaleUpperCase(),
+          predicate: true,
+          execute: () => {
+            app.toggleLock();
+          },
+        },
+        {
+          name: `${t("labels.textToDiagram")}...`,
+          category: DEFAULT_CATEGORIES.tool,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          predicate: appProps.aiEnabled,
+          execute: () => {
+            setAppState((state) => ({
+              ...state,
+              openDialog: {
+                name: "ttd",
+                tab: "text-to-diagram",
+              },
+            }));
+          },
+        },
+        {
+          name: `${t("toolBar.mermaidToExcalidraw")}...`,
+          category: DEFAULT_CATEGORIES.tool,
+          predicate: appProps.aiEnabled,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          execute: () => {
+            setAppState((state) => ({
+              ...state,
+              openDialog: {
+                name: "ttd",
+                tab: "mermaid",
+              },
+            }));
+          },
+        },
+        {
+          name: `${t("toolBar.magicframe")}...`,
+          category: DEFAULT_CATEGORIES.tool,
+          order: getCategoryOrder(DEFAULT_CATEGORIES.tool),
+          predicate: appProps.aiEnabled,
+          execute: () => {
+            app.onMagicframeToolSelect();
+          },
+        },
+      ];
+
+      setAllCommands(
+        [
+          ...commandsFromActions,
+          ...additionalCommands,
+          ...customCommandPaletteItems,
+        ].map((command) => ({
+          ...command,
+          haystack: `${deburr(command.name)} ${
+            command.keywords?.join(" ") || ""
+          }`,
+        })),
+      );
+    }
   }, [
     app,
     appProps,
@@ -462,11 +521,19 @@ function CommandPaletteInner({
     setCommandSearch("");
   };
 
-  const executeCommand = (command: CommandPaletteItem) => {
+  const executeCommand = (
+    command: CommandPaletteItem,
+    event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
+  ) => {
     if (uiAppState.openDialog?.name === "commandPalette") {
+      document.body.classList.add("excalidraw-animations-disabled");
       closeCommandPalette(() => {
-        command.execute();
+        command.execute(event);
         setLastUsed(command);
+
+        requestAnimationFrame(() => {
+          document.body.classList.remove("excalidraw-animations-disabled");
+        });
       });
     }
   };
@@ -547,7 +614,7 @@ function CommandPaletteInner({
 
     if (event.key === KEYS.ENTER) {
       if (currentCommand) {
-        executeCommand(currentCommand);
+        executeCommand(currentCommand, event);
       }
     }
   };
@@ -574,7 +641,7 @@ function CommandPaletteInner({
               appProps,
               app,
             )
-          : command.predicate,
+          : command.predicate ?? true,
       )
       .sort((a, b) => a.order - b.order);
 
@@ -647,7 +714,7 @@ function CommandPaletteInner({
             <CommandItem
               command={lastUsed}
               isSelected={lastUsed.name === currentCommand?.name}
-              onClick={() => executeCommand(lastUsed)}
+              onClick={(event) => executeCommand(lastUsed, event)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
             />
           </div>
@@ -663,7 +730,7 @@ function CommandPaletteInner({
                     key={command.name}
                     command={command}
                     isSelected={command.name === currentCommand?.name}
-                    onClick={() => executeCommand(command)}
+                    onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
                   />
                 ))}
@@ -690,7 +757,7 @@ const CommandItem = ({
   command: CommandPaletteItem;
   isSelected: boolean;
   onMouseMove: () => void;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
 }) => {
   return (
     <div
@@ -707,7 +774,10 @@ const CommandItem = ({
       onClick={onClick}
       onMouseMove={onMouseMove}
     >
-      <div>{command.name}</div>
+      <div className="name">
+        {command.icon && <InlineIcon icon={command.icon} />}
+        {command.name}
+      </div>
       {command.shortcut && <CommandShortcutHint shortcut={command.shortcut} />}
     </div>
   );

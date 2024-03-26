@@ -159,6 +159,7 @@ export const actionCopyAsSvg = register({
   predicate: (elements) => {
     return probablySupportsClipboardWriteText && elements.length > 0;
   },
+  keywords: ["svg", "clipboard", "copy"],
 });
 
 export const actionCopyAsPng = register({
@@ -219,6 +220,7 @@ export const actionCopyAsPng = register({
     return probablySupportsClipboardBlob && elements.length > 0;
   },
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
+  keywords: ["export", "png", "clipboard", "copy"],
 });
 
 export const copyText = register({
@@ -259,4 +261,5 @@ export const copyText = register({
         .some(isTextElement)
     );
   },
+  keywords: ["text", "clipboard", "copy"],
 });

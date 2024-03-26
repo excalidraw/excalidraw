@@ -8,6 +8,7 @@ import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
+import { frameToolIcon } from "../components/icons";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -117,6 +118,7 @@ export const actionSetFrameAsActiveTool = register({
   target: "Tool",
   label: "toolBar.frame",
   trackEvent: { category: "toolbar" },
+  icon: frameToolIcon,
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "frame",

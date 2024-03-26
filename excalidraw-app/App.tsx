@@ -111,6 +111,12 @@ import CommandPalette, {
   DEFAULT_CATEGORIES,
   getCategoryOrder,
 } from "./components/CommandPalette";
+import {
+  GithubIcon,
+  XBrandIcon,
+  DiscordIcon,
+  ExcalLogo,
+} from "../packages/excalidraw/components/icons";
 
 polyfill();
 
@@ -896,8 +902,15 @@ const ExcalidrawWrapper = () => {
             {
               name: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
-              predicate: !isCollaborating,
               order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+              keywords: [
+                "team",
+                "multiplayer",
+                "share",
+                "public",
+                "session",
+                "invite",
+              ],
               execute: () => {
                 setShareDialogState({
                   isOpen: true,
@@ -910,6 +923,15 @@ const ExcalidrawWrapper = () => {
               category: DEFAULT_CATEGORIES.app,
               predicate: () => !!collabAPI?.isCollaborating(),
               order: getCategoryOrder(DEFAULT_CATEGORIES.app),
+              keywords: [
+                "stop",
+                "session",
+                "end",
+                "leave",
+                "close",
+                "exit",
+                "collaboration",
+              ],
               execute: () => {
                 if (collabAPI) {
                   collabAPI.stopCollaboration();
@@ -924,6 +946,15 @@ const ExcalidrawWrapper = () => {
               category: DEFAULT_CATEGORIES.export,
               order: getCategoryOrder(DEFAULT_CATEGORIES.export),
               predicate: true,
+              keywords: [
+                "link",
+                "shareable",
+                "readonly",
+                "export",
+                "publish",
+                "snapshot",
+                "url",
+              ],
               execute: async () => {
                 if (excalidrawAPI) {
                   try {
@@ -939,10 +970,91 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
+              name: "GitHub",
+              icon: GithubIcon,
+              category: DEFAULT_CATEGORIES.links,
+              predicate: true,
+              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
+              keywords: [
+                "issues",
+                "bugs",
+                "requests",
+                "report",
+                "features",
+                "social",
+                "community",
+              ],
+              execute: () => {
+                window.open(
+                  "https://github.com/excalidraw/excalidraw",
+                  "_blank",
+                  "noopener noreferrer",
+                );
+              },
+            },
+            {
+              name: t("labels.followUs"),
+              icon: XBrandIcon,
+              category: DEFAULT_CATEGORIES.links,
+              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
+              predicate: true,
+              keywords: ["twitter", "contact", "social", "community"],
+              execute: () => {
+                window.open(
+                  "https://x.com/excalidraw",
+                  "_blank",
+                  "noopener noreferrer",
+                );
+              },
+            },
+            {
+              name: t("labels.discordChat"),
+              category: DEFAULT_CATEGORIES.links,
+              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
+              predicate: true,
+              icon: DiscordIcon,
+              keywords: [
+                "chat",
+                "talk",
+                "contact",
+                "bugs",
+                "requests",
+                "report",
+                "feedback",
+                "suggestions",
+                "social",
+                "community",
+              ],
+              execute: () => {
+                window.open(
+                  "https://discord.gg/UexuTaE",
+                  "_blank",
+                  "noopener noreferrer",
+                );
+              },
+            },
+            {
+              name: t("overwriteConfirm.action.excalidrawPlus.title"),
+              category: DEFAULT_CATEGORIES.links,
+              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
+              predicate: true,
+              icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
+              keywords: ["plus", "subscription", "login", "signin"],
+              execute: () => {
+                window.open(
+                  `${
+                    import.meta.env.VITE_APP_PLUS_LP
+                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
+                  "_blank",
+                );
+              },
+            },
+            {
               name: t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
               predicate: true,
               order: getCategoryOrder(DEFAULT_CATEGORIES.export),
+              keywords: ["plus", "export", "save", "backup"],
               execute: () => {
                 if (excalidrawAPI) {
                   exportToExcalidrawPlus(

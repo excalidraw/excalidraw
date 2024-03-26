@@ -150,6 +150,8 @@ export interface Action {
         appState: Readonly<AppState>,
         app: AppClassProperties,
       ) => string);
+  keywords?: string[];
+  icon?: React.ReactNode;
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
