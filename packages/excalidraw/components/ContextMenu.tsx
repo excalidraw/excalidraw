@@ -112,7 +112,7 @@ export const ContextMenu = React.memo(
                   })}
                 >
                   <div className="context-menu-item__label">{label}</div>
-                  <kbd className="context-menu-´">
+                  <kbd className="context-menu-item__shortcut">
                     {actionName
                       ? getShortcutFromShortcutName(actionName as ShortcutName)
                       : ""}
