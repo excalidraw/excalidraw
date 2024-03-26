@@ -493,9 +493,14 @@ function CommandPaletteInner({
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => {
     if (uiAppState.openDialog?.name === "commandPalette") {
+      document.body.classList.add("excalidraw-animations-disabled");
       closeCommandPalette(() => {
         command.execute(event);
         setLastUsed(command);
+
+        requestAnimationFrame(() => {
+          document.body.classList.remove("excalidraw-animations-disabled");
+        });
       });
     }
   };
