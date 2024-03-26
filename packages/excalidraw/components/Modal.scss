@@ -23,6 +23,9 @@
 
     .Island {
       padding: 2.5rem;
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
     }
 
     &.animations-disabled {
@@ -68,7 +71,7 @@
 
     border: 1px solid var(--dialog-border-color);
     box-shadow: var(--modal-shadow);
-    border-radius: 6px;
+    border-radius: 0.75rem;
     box-sizing: border-box;
 
     &:focus {

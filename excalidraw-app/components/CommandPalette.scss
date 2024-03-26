@@ -89,7 +89,7 @@
         align-items: center;
         box-sizing: border-box;
         padding: 0 12px;
-        border-radius: 4px;
+        border-radius: var(--border-radius-lg);
         cursor: pointer;
 
         &:active {
@@ -104,16 +104,7 @@
       }
 
       .item-selected {
-        background-color: var(--color-primary-light);
-
-        .shortcut-key {
-          color: var(--color-gray-100);
-
-          background-color: #fff;
-          @at-root .excalidraw.theme--dark#{&} {
-            background-color: var(--color-gray-20);
-          }
-        }
+        background-color: var(--color-surface-mid);
       }
 
       .item-disabled {
