@@ -43,13 +43,6 @@ import {
   canChangeStrokeColor,
 } from "../../packages/excalidraw/components/Actions";
 
-const escapeHTMLAngleBrackets = (str: string) => {
-  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-};
-
-// used to demarcate command name from keywords so we can strip on render
-const KEYWORDS_SEPARATOR = "|||";
-
 export type CommandPaletteItem = {
   name: string;
   /** additional keywords to match against
@@ -68,10 +61,6 @@ export type CommandPaletteItem = {
   execute: (
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => void;
-  /** when fuzzy matched, we wrap matched bits of the name in <b> and </b> to highlight
-   *  and fuzzyName is the result string
-   */
-  _fuzzyName?: string;
 };
 
 export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
@@ -481,13 +470,11 @@ function CommandPaletteInner({
         ...additionalCommands,
         ...customCommandPaletteItems,
       ].map((command) => {
-        const sanitizedName = escapeHTMLAngleBrackets(command.name);
         return {
           ...command,
           icon: command.icon || boltIcon,
-          name: sanitizedName,
           order: getCategoryOrder(command.category),
-          haystack: `${deburr(sanitizedName)}${KEYWORDS_SEPARATOR}${
+          haystack: `${deburr(command.name)} ${
             command.keywords?.join(" ") || ""
           }`,
         };
@@ -678,14 +665,9 @@ function CommandPaletteInner({
     matchingCommands = fuzzy
       .filter(_query, matchingCommands, {
         extract: (command) => command.haystack,
-        pre: "<b>",
-        post: "</b>",
       })
       .sort((a, b) => b.score - a.score)
-      .map((item) => ({
-        ...item.original,
-        _fuzzyName: item.string,
-      }));
+      .map((item) => item.original);
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0]);
@@ -814,13 +796,7 @@ const CommandItem = ({
     >
       <div className="name">
         {command.icon && <InlineIcon icon={command.icon} />}
-        <div
-          dangerouslySetInnerHTML={{
-            __html: (command._fuzzyName ?? command.name).split(
-              KEYWORDS_SEPARATOR,
-            )[0],
-          }}
-        />
+        {command.name}
       </div>
       {showShortcut && command.shortcut && (
         <CommandShortcutHint shortcut={command.shortcut} />
