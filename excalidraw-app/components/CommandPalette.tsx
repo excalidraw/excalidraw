@@ -695,20 +695,20 @@ function CommandPaletteInner({
       .filter(isCommandAvailable)
       .sort((a, b) => a.order - b.order);
 
-    const shouldConsiderLastUsed =
+    const showLastUsed =
       !commandSearch && lastUsed && isCommandAvailable(lastUsed);
 
     if (!commandSearch) {
       setCommandsByCategory(
         getNextCommandsByCategory(
-          shouldConsiderLastUsed
+          showLastUsed
             ? matchingCommands.filter(
                 (command) => command.name !== lastUsed?.name,
               )
             : matchingCommands,
         ),
       );
-      setCurrentCommand(null);
+      setCurrentCommand(showLastUsed ? lastUsed : matchingCommands[0] || null);
       return;
     }
 
