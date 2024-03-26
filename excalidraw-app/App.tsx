@@ -110,7 +110,6 @@ import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
-  getCategoryOrder,
 } from "./components/CommandPalette";
 import {
   GithubIcon,
@@ -903,7 +902,6 @@ const ExcalidrawWrapper = () => {
             {
               name: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.app),
               keywords: [
                 "team",
                 "multiplayer",
@@ -923,7 +921,6 @@ const ExcalidrawWrapper = () => {
               name: t("roomDialog.button_stopSession"),
               category: DEFAULT_CATEGORIES.app,
               predicate: () => !!collabAPI?.isCollaborating(),
-              order: getCategoryOrder(DEFAULT_CATEGORIES.app),
               keywords: [
                 "stop",
                 "session",
@@ -945,7 +942,6 @@ const ExcalidrawWrapper = () => {
             {
               name: `${t("exportDialog.link_button")}...`,
               category: DEFAULT_CATEGORIES.export,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.export),
               predicate: true,
               keywords: [
                 "link",
@@ -975,7 +971,6 @@ const ExcalidrawWrapper = () => {
               icon: GithubIcon,
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
               keywords: [
                 "issues",
                 "bugs",
@@ -997,7 +992,6 @@ const ExcalidrawWrapper = () => {
               name: t("labels.followUs"),
               icon: XBrandIcon,
               category: DEFAULT_CATEGORIES.links,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
               predicate: true,
               keywords: ["twitter", "contact", "social", "community"],
               execute: () => {
@@ -1011,7 +1005,6 @@ const ExcalidrawWrapper = () => {
             {
               name: t("labels.discordChat"),
               category: DEFAULT_CATEGORIES.links,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
               predicate: true,
               icon: DiscordIcon,
               keywords: [
@@ -1037,7 +1030,6 @@ const ExcalidrawWrapper = () => {
             {
               name: t("overwriteConfirm.action.excalidrawPlus.title"),
               category: DEFAULT_CATEGORIES.links,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.links),
               predicate: true,
               icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
               keywords: ["plus", "subscription", "login", "signin"],
@@ -1054,7 +1046,6 @@ const ExcalidrawWrapper = () => {
               name: t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
               predicate: true,
-              order: getCategoryOrder(DEFAULT_CATEGORIES.export),
               keywords: ["plus", "export", "save", "backup"],
               execute: () => {
                 if (excalidrawAPI) {

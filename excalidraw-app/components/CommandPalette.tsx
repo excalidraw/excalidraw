@@ -62,7 +62,7 @@ export type CommandPaletteItem = {
   haystack?: string;
   icon?: React.ReactNode;
   category: string;
-  order: number;
+  order?: number;
   predicate?: boolean | Action["predicate"];
   shortcut?: string;
   execute: (
@@ -184,7 +184,7 @@ function CommandPaletteInner({
 
   const [lastUsed, setLastUsed] = useAtom(lastUsedPaletteItem);
   const [allCommands, setAllCommands] = useState<
-    MarkRequired<CommandPaletteItem, "haystack">[]
+    MarkRequired<CommandPaletteItem, "haystack" | "order">[]
   >([]);
 
   useEffect(() => {
@@ -245,7 +245,6 @@ function CommandPaletteInner({
               const selectedElements = getSelectedElements(elements, appState);
               return selectedElements.length > 0;
             },
-        order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
         execute: () => {
           actionManager.executeAction(action, "commandPalette");
         },
@@ -258,7 +257,6 @@ function CommandPaletteInner({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.tools,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
         predicate: action.predicate,
         keywords: action.keywords,
         icon: action.icon,
@@ -288,7 +286,6 @@ function CommandPaletteInner({
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.editor,
         predicate: action.predicate,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
         execute: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
@@ -301,7 +298,6 @@ function CommandPaletteInner({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.export,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.export),
         predicate: action.predicate,
         keywords: action.keywords,
         execute: () => actionManager.executeAction(action, "commandPalette"),
@@ -314,7 +310,6 @@ function CommandPaletteInner({
           name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
           category: DEFAULT_CATEGORIES.export,
           shortcut: getShortcutFromShortcutName("imageExport"),
-          order: getCategoryOrder(DEFAULT_CATEGORIES.export),
           keywords: [
             "export",
             "image",
@@ -335,7 +330,6 @@ function CommandPaletteInner({
         {
           name: t("labels.excalidrawLib"),
           category: DEFAULT_CATEGORIES.app,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.app),
           execute: () => {
             if (uiAppState.openSidebar) {
               setAppState({
@@ -361,7 +355,6 @@ function CommandPaletteInner({
               canChangeStrokeColor(appState, selectedElements)
             );
           },
-          order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
           execute: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "shape" ? null : "shape",
@@ -379,7 +372,6 @@ function CommandPaletteInner({
               canChangeBackgroundColor(appState, selectedElements)
             );
           },
-          order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
           execute: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "shape" ? null : "shape",
@@ -390,7 +382,6 @@ function CommandPaletteInner({
         {
           name: t("labels.canvasBackground"),
           category: DEFAULT_CATEGORIES.editor,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
           execute: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "canvas" ? null : "canvas",
@@ -419,7 +410,6 @@ function CommandPaletteInner({
           const command: CommandPaletteItem = {
             name: t(`toolBar.${value}`),
             category: DEFAULT_CATEGORIES.tools,
-            order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
             shortcut,
             icon,
             keywords: ["toolbar"],
@@ -444,7 +434,6 @@ function CommandPaletteInner({
           name: t("toolBar.lock"),
           category: DEFAULT_CATEGORIES.tools,
           icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           shortcut: KEYS.Q.toLocaleUpperCase(),
           execute: () => {
             app.toggleLock();
@@ -453,7 +442,6 @@ function CommandPaletteInner({
         {
           name: `${t("labels.textToDiagram")}...`,
           category: DEFAULT_CATEGORIES.tools,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           predicate: appProps.aiEnabled,
           execute: () => {
             setAppState((state) => ({
@@ -469,7 +457,6 @@ function CommandPaletteInner({
           name: `${t("toolBar.mermaidToExcalidraw")}...`,
           category: DEFAULT_CATEGORIES.tools,
           predicate: appProps.aiEnabled,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           execute: () => {
             setAppState((state) => ({
               ...state,
@@ -483,7 +470,6 @@ function CommandPaletteInner({
         {
           name: `${t("toolBar.magicframe")}...`,
           category: DEFAULT_CATEGORIES.tools,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           predicate: appProps.aiEnabled,
           execute: () => {
             app.onMagicframeToolSelect();
@@ -501,6 +487,7 @@ function CommandPaletteInner({
           ...command,
           icon: command.icon || boltIcon,
           name: sanitizedName,
+          order: getCategoryOrder(command.category),
           haystack: `${deburr(sanitizedName)}${KEYWORDS_SEPARATOR}${
             command.keywords?.join(" ") || ""
           }`,
