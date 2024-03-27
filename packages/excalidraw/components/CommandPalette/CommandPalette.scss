@@ -65,6 +65,7 @@
       box-sizing: border-box;
       margin-top: 12px;
       color: var(--popup-text-color);
+      user-select: none;
 
       .command-category {
         display: flex;
@@ -93,7 +94,7 @@
         cursor: pointer;
 
         &:active {
-          background-color: var(--color-primary-light-darker);
+          background-color: var(--color-surface-low);
         }
 
         .name {
