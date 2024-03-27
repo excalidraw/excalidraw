@@ -1,9 +1,9 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import {
-  clearIcon,
   handIcon,
   MoonIcon,
   SunIcon,
+  TrashIcon,
   zoomAreaIcon,
   ZoomInIcon,
   ZoomOutIcon,
@@ -71,8 +71,8 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
-  icon: clearIcon,
   paletteName: "Clear canvas",
+  icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -431,8 +431,11 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
-  label: "labels.toggleTheme",
-  icon: (appState) => (appState.theme === THEME.LIGHT ? SunIcon : MoonIcon),
+  label: (_, appState) => {
+    return appState.theme === "dark" ? "buttons.lightMode" : "buttons.darkMode";
+  },
+  keywords: ["toggle", "dark", "light", "mode", "theme"],
+  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {

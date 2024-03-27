@@ -7898,7 +7898,9 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7906,19 +7908,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
               stroke="none"
             />
             <path
-              d="M8 3h-2l-3 9"
+              d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"
             />
             <path
-              d="M16 3h2l3 9"
-            />
-            <path
-              d="M3 12v7a1 1 0 0 0 1 1h4.586a1 1 0 0 0 .707 -.293l2 -2a1 1 0 0 1 1.414 0l2 2a1 1 0 0 0 .707 .293h4.586a1 1 0 0 0 1 -1v-7h-18z"
-            />
-            <path
-              d="M7 16h1"
-            />
-            <path
-              d="M16 16h1"
+              d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
             />
           </g>
         </svg>,

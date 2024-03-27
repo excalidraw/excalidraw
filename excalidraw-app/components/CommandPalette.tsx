@@ -340,7 +340,7 @@ function CommandPaletteInner({
           },
         },
         {
-          name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
+          name: t("buttons.exportImage"),
           category: DEFAULT_CATEGORIES.export,
           icon: ExportImageIcon,
           shortcut: getShortcutFromShortcutName("imageExport"),
@@ -362,7 +362,7 @@ function CommandPaletteInner({
 
       const additionalCommands: CommandPaletteItem[] = [
         {
-          name: t("labels.excalidrawLib"),
+          name: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,
           icon: LibraryIcon,
           execute: () => {
