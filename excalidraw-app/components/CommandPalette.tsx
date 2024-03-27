@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useApp,
   useAppProps,
@@ -23,6 +23,7 @@ import {
   clockIcon,
   searchIcon,
   boltIcon,
+  bucketFillIcon,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -30,6 +31,7 @@ import { AppProps, AppState } from "../../packages/excalidraw/types";
 import {
   capitalizeString,
   getShortcutKey,
+  isWritableElement,
 } from "../../packages/excalidraw/utils";
 import { atom, useAtom } from "jotai";
 import { deburr } from "../../packages/excalidraw/deburr";
@@ -42,13 +44,7 @@ import {
   canChangeBackgroundColor,
   canChangeStrokeColor,
 } from "../../packages/excalidraw/components/Actions";
-
-const escapeHTMLAngleBrackets = (str: string) => {
-  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-};
-
-// used to demarcate command name from keywords so we can strip on render
-const KEYWORDS_SEPARATOR = "|||";
+import { useStableCallback } from "../../packages/excalidraw/hooks/useStableCallback";
 
 export type CommandPaletteItem = {
   name: string;
@@ -62,16 +58,12 @@ export type CommandPaletteItem = {
   haystack?: string;
   icon?: React.ReactNode;
   category: string;
-  order: number;
+  order?: number;
   predicate?: boolean | Action["predicate"];
   shortcut?: string;
   execute: (
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => void;
-  /** when fuzzy matched, we wrap matched bits of the name in <b> and </b> to highlight
-   *  and fuzzyName is the result string
-   */
-  _fuzzyName?: string;
 };
 
 export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
@@ -113,14 +105,13 @@ const CommandShortcutHint = ({
   className?: string;
   children?: React.ReactNode;
 }) => {
-  const shortcuts = shortcut.replace("++", "+$").split("+");
-
+  const shortcuts = shortcut.split(/(?<!\+)(?:\+)/g);
   return (
     <div className={clsx("shortcut", className)}>
-      {shortcuts.map((item, idx) => {
+      {shortcuts.map((item) => {
         return (
           <div className="shortcut-wrapper" key={item}>
-            <div className="shortcut-key">{item === "$" ? "+" : item}</div>
+            <div className="shortcut-key">{item}</div>
           </div>
         );
       })}
@@ -129,23 +120,26 @@ const CommandShortcutHint = ({
   );
 };
 
+const isCommandPaletteToggleShortcut = (event: KeyboardEvent) => {
+  return (
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key === KEYS.P &&
+    !event.altKey &&
+    !event.shiftKey
+  );
+};
+
 type CommandPaletteProps = {
   customCommandPaletteItems: CommandPaletteItem[];
 };
-export default function CommandPalette(props: CommandPaletteProps) {
+
+export const CommandPalette = (props: CommandPaletteProps) => {
   const uiAppState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
   useEffect(() => {
-    const commandPaletteShortcut = (
-      event: KeyboardEvent | React.KeyboardEvent,
-    ) => {
-      if (
-        event[KEYS.CTRL_OR_CMD] &&
-        event.key === KEYS.P &&
-        !event.altKey &&
-        !event.shiftKey
-      ) {
+    const commandPaletteShortcut = (event: KeyboardEvent) => {
+      if (isCommandPaletteToggleShortcut(event)) {
         event.preventDefault();
         event.stopPropagation();
         setAppState((appState) => ({
@@ -170,7 +164,7 @@ export default function CommandPalette(props: CommandPaletteProps) {
   }
 
   return <CommandPaletteInner {...props} />;
-}
+};
 
 function CommandPaletteInner({
   customCommandPaletteItems,
@@ -183,8 +177,10 @@ function CommandPaletteInner({
 
   const [lastUsed, setLastUsed] = useAtom(lastUsedPaletteItem);
   const [allCommands, setAllCommands] = useState<
-    MarkRequired<CommandPaletteItem, "haystack">[]
+    MarkRequired<CommandPaletteItem, "haystack" | "order">[]
   >([]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!uiAppState || !app.scene || !actionManager) {
@@ -244,7 +240,6 @@ function CommandPaletteInner({
               const selectedElements = getSelectedElements(elements, appState);
               return selectedElements.length > 0;
             },
-        order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
         execute: () => {
           actionManager.executeAction(action, "commandPalette");
         },
@@ -257,7 +252,6 @@ function CommandPaletteInner({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.tools,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
         predicate: action.predicate,
         keywords: action.keywords,
         icon: action.icon,
@@ -287,7 +281,6 @@ function CommandPaletteInner({
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.editor,
         predicate: action.predicate,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
         execute: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
@@ -300,7 +293,6 @@ function CommandPaletteInner({
         name: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.export,
-        order: getCategoryOrder(DEFAULT_CATEGORIES.export),
         predicate: action.predicate,
         keywords: action.keywords,
         execute: () => actionManager.executeAction(action, "commandPalette"),
@@ -313,7 +305,6 @@ function CommandPaletteInner({
           name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
           category: DEFAULT_CATEGORIES.export,
           shortcut: getShortcutFromShortcutName("imageExport"),
-          order: getCategoryOrder(DEFAULT_CATEGORIES.export),
           keywords: [
             "export",
             "image",
@@ -334,7 +325,6 @@ function CommandPaletteInner({
         {
           name: t("labels.excalidrawLib"),
           category: DEFAULT_CATEGORIES.app,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.app),
           execute: () => {
             if (uiAppState.openSidebar) {
               setAppState({
@@ -351,8 +341,10 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.stroke"),
+          name: t("labels.changeStroke"),
+          keywords: ["color", "outline"],
           category: DEFAULT_CATEGORIES.elements,
+          icon: bucketFillIcon,
           predicate: (elements, appState) => {
             const selectedElements = getSelectedElements(elements, appState);
             return (
@@ -360,7 +352,6 @@ function CommandPaletteInner({
               canChangeStrokeColor(appState, selectedElements)
             );
           },
-          order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
           execute: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "shape" ? null : "shape",
@@ -369,7 +360,9 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.background"),
+          name: t("labels.changeBackground"),
+          keywords: ["color", "fill"],
+          icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.elements,
           predicate: (elements, appState) => {
             const selectedElements = getSelectedElements(elements, appState);
@@ -378,7 +371,6 @@ function CommandPaletteInner({
               canChangeBackgroundColor(appState, selectedElements)
             );
           },
-          order: getCategoryOrder(DEFAULT_CATEGORIES.elements),
           execute: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "shape" ? null : "shape",
@@ -388,8 +380,9 @@ function CommandPaletteInner({
         },
         {
           name: t("labels.canvasBackground"),
+          keywords: ["color"],
+          icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.editor,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.editor),
           execute: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "canvas" ? null : "canvas",
@@ -418,7 +411,6 @@ function CommandPaletteInner({
           const command: CommandPaletteItem = {
             name: t(`toolBar.${value}`),
             category: DEFAULT_CATEGORIES.tools,
-            order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
             shortcut,
             icon,
             keywords: ["toolbar"],
@@ -443,7 +435,6 @@ function CommandPaletteInner({
           name: t("toolBar.lock"),
           category: DEFAULT_CATEGORIES.tools,
           icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           shortcut: KEYS.Q.toLocaleUpperCase(),
           execute: () => {
             app.toggleLock();
@@ -452,7 +443,6 @@ function CommandPaletteInner({
         {
           name: `${t("labels.textToDiagram")}...`,
           category: DEFAULT_CATEGORIES.tools,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           predicate: appProps.aiEnabled,
           execute: () => {
             setAppState((state) => ({
@@ -468,7 +458,6 @@ function CommandPaletteInner({
           name: `${t("toolBar.mermaidToExcalidraw")}...`,
           category: DEFAULT_CATEGORIES.tools,
           predicate: appProps.aiEnabled,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           execute: () => {
             setAppState((state) => ({
               ...state,
@@ -482,7 +471,6 @@ function CommandPaletteInner({
         {
           name: `${t("toolBar.magicframe")}...`,
           category: DEFAULT_CATEGORIES.tools,
-          order: getCategoryOrder(DEFAULT_CATEGORIES.tools),
           predicate: appProps.aiEnabled,
           execute: () => {
             app.onMagicframeToolSelect();
@@ -495,12 +483,11 @@ function CommandPaletteInner({
         ...additionalCommands,
         ...customCommandPaletteItems,
       ].map((command) => {
-        const sanitizedName = escapeHTMLAngleBrackets(command.name);
         return {
           ...command,
           icon: command.icon || boltIcon,
-          name: sanitizedName,
-          haystack: `${deburr(sanitizedName)}${KEYWORDS_SEPARATOR}${
+          order: getCategoryOrder(command.category),
+          haystack: `${deburr(command.name)} ${
             command.keywords?.join(" ") || ""
           }`,
         };
@@ -557,7 +544,7 @@ function CommandPaletteInner({
     }
   };
 
-  const isCommandAvailable = useCallback(
+  const isCommandAvailable = useStableCallback(
     (command: CommandPaletteItem) => {
       return typeof command.predicate === "function"
         ? command.predicate(
@@ -568,10 +555,23 @@ function CommandPaletteInner({
           )
         : command.predicate === undefined || command.predicate;
     },
-    [app, appProps, uiAppState],
   );
 
-  const handleKeyDown = (event: React.KeyboardEvent | KeyboardEvent) => {
+  const handleKeyDown = useStableCallback((event: KeyboardEvent) => {
+    const ignoreAlphanumerics =
+      isWritableElement(event.target) ||
+      isCommandPaletteToggleShortcut(event) ||
+      event.key === KEYS.ESCAPE;
+
+    if (
+      ignoreAlphanumerics &&
+      event.key !== KEYS.ARROW_UP &&
+      event.key !== KEYS.ARROW_DOWN &&
+      event.key !== KEYS.ENTER
+    ) {
+      return;
+    }
+
     const matchingCommands = Object.values(commandsByCategory).flat();
     const shouldConsiderLastUsed =
       lastUsed && !commandSearch && isCommandAvailable(lastUsed);
@@ -651,7 +651,32 @@ function CommandPaletteInner({
         executeCommand(currentCommand, event);
       }
     }
-  };
+
+    if (ignoreAlphanumerics) {
+      return;
+    }
+
+    // prevent regular editor shortcuts
+    event.stopPropagation();
+
+    // if alphanumeric keypress and we're not inside the input, focus it
+    if (/^[a-zA-Z0-9]$/.test(event.key)) {
+      inputRef?.current?.focus();
+      return;
+    }
+
+    event.preventDefault();
+  });
+
+  useEffect(() => {
+    window.addEventListener(EVENT.KEYDOWN, handleKeyDown, {
+      capture: true,
+    });
+    return () =>
+      window.removeEventListener(EVENT.KEYDOWN, handleKeyDown, {
+        capture: true,
+      });
+  }, [handleKeyDown]);
 
   useEffect(() => {
     const getNextCommandsByCategory = (
@@ -684,20 +709,20 @@ function CommandPaletteInner({
       .filter(isCommandAvailable)
       .sort((a, b) => a.order - b.order);
 
-    const shouldConsiderLastUsed =
+    const showLastUsed =
       !commandSearch && lastUsed && isCommandAvailable(lastUsed);
 
     if (!commandSearch) {
       setCommandsByCategory(
         getNextCommandsByCategory(
-          shouldConsiderLastUsed
+          showLastUsed
             ? matchingCommands.filter(
                 (command) => command.name !== lastUsed?.name,
               )
             : matchingCommands,
         ),
       );
-      setCurrentCommand(null);
+      setCurrentCommand(showLastUsed ? lastUsed : matchingCommands[0] || null);
       return;
     }
 
@@ -705,14 +730,9 @@ function CommandPaletteInner({
     matchingCommands = fuzzy
       .filter(_query, matchingCommands, {
         extract: (command) => command.haystack,
-        pre: "<b>",
-        post: "</b>",
       })
       .sort((a, b) => b.score - a.score)
-      .map((item) => ({
-        ...item.original,
-        _fuzzyName: item.string,
-      }));
+      .map((item) => item.original);
 
     const nextCommandsByCategory = getNextCommandsByCategory(
       matchingCommands,
@@ -739,21 +759,23 @@ function CommandPaletteInner({
         onChange={(value) => {
           setCommandSearch(value);
         }}
-        onKeyDown={handleKeyDown}
         selectOnRender
+        ref={inputRef}
       />
 
-      <div className="shortcuts-wrapper">
-        <CommandShortcutHint shortcut="↑↓">
-          {t("commandPalette.shortcuts.select")}
-        </CommandShortcutHint>
-        <CommandShortcutHint shortcut="↵">
-          {t("commandPalette.shortcuts.execute")}
-        </CommandShortcutHint>
-        <CommandShortcutHint shortcut={getShortcutKey("CtrlOrCmd+P")}>
-          {t("commandPalette.shortcuts.close")}
-        </CommandShortcutHint>
-      </div>
+      {!app.device.viewport.isMobile && (
+        <div className="shortcuts-wrapper">
+          <CommandShortcutHint shortcut="↑↓">
+            {t("commandPalette.shortcuts.select")}
+          </CommandShortcutHint>
+          <CommandShortcutHint shortcut="↵">
+            {t("commandPalette.shortcuts.confirm")}
+          </CommandShortcutHint>
+          <CommandShortcutHint shortcut={getShortcutKey("Esc")}>
+            {t("commandPalette.shortcuts.close")}
+          </CommandShortcutHint>
+        </div>
+      )}
 
       <div className="commands">
         {lastUsed && !commandSearch && (
@@ -775,6 +797,7 @@ function CommandPaletteInner({
               onClick={(event) => executeCommand(lastUsed, event)}
               disabled={!isCommandAvailable(lastUsed)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
+              showShortcut={!app.device.viewport.isMobile}
             />
           </div>
         )}
@@ -791,6 +814,7 @@ function CommandPaletteInner({
                     isSelected={command.name === currentCommand?.name}
                     onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
+                    showShortcut={!app.device.viewport.isMobile}
                   />
                 ))}
               </div>
@@ -813,12 +837,14 @@ const CommandItem = ({
   disabled,
   onMouseMove,
   onClick,
+  showShortcut,
 }: {
   command: CommandPaletteItem;
   isSelected: boolean;
   disabled?: boolean;
   onMouseMove: () => void;
   onClick: (event: React.MouseEvent) => void;
+  showShortcut: boolean;
 }) => {
   const noop = () => {};
 
@@ -841,15 +867,11 @@ const CommandItem = ({
     >
       <div className="name">
         {command.icon && <InlineIcon icon={command.icon} />}
-        <div
-          dangerouslySetInnerHTML={{
-            __html: (command._fuzzyName ?? command.name).split(
-              KEYWORDS_SEPARATOR,
-            )[0],
-          }}
-        />
+        {command.name}
       </div>
-      {command.shortcut && <CommandShortcutHint shortcut={command.shortcut} />}
+      {showShortcut && command.shortcut && (
+        <CommandShortcutHint shortcut={command.shortcut} />
+      )}
     </div>
   );
 };

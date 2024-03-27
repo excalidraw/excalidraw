@@ -14,6 +14,8 @@ import { queryFocusableElements } from "../utils";
 import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { jotaiScope } from "../jotai";
+import { t } from "../i18n";
+import { CloseIcon } from "./icons";
 
 export type DialogSize = number | "small" | "regular" | "wide" | undefined;
 
@@ -112,6 +114,16 @@ export const Dialog = (props: DialogProps) => {
           <h2 id={`${id}-dialog-title`} className="Dialog__title">
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
+        )}
+        {isFullscreen && (
+          <button
+            className="Dialog__close"
+            onClick={onClose}
+            title={t("buttons.close")}
+            aria-label={t("buttons.close")}
+          >
+            {CloseIcon}
+          </button>
         )}
         <div className="Dialog__content">{props.children}</div>
       </Island>

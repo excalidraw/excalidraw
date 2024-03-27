@@ -21,7 +21,9 @@
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
+    "changeStroke": "Change stroke color",
     "background": "Background",
+    "changeBackground": "Change background color",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
     "strokeStyle": "Stroke style",
@@ -549,7 +551,7 @@
     "title": "Command palette",
     "shortcuts": {
       "select": "Select",
-      "execute": "Execute",
+      "confirm": "Confirm",
       "close": "Close"
     },
     "recents": "Recently used",

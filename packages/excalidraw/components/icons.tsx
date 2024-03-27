@@ -539,6 +539,16 @@ export const palette = createIcon(
   "M204.3 5C104.9 24.4 24.8 104.3 5.2 203.4c-37 187 131.7 326.4 258.8 306.7 41.2-6.4 61.4-54.6 42.5-91.7-23.1-45.4 9.9-98.4 60.9-98.4h79.7c35.8 0 64.8-29.6 64.9-65.3C511.5 97.1 368.1-26.9 204.3 5zM96 320c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm32-128c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128-64c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128 64c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z",
 );
 
+export const bucketFillIcon = createIcon(
+  <g strokeWidth={1.25}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 16l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z" />
+    <path d="M13.737 9.737c2.299 -2.3 3.23 -5.095 2.081 -6.245c-1.15 -1.15 -3.945 -.217 -6.244 2.082c-2.3 2.299 -3.231 5.095 -2.082 6.244c1.15 1.15 3.946 .218 6.245 -2.081z" />
+    <path d="M7.492 11.818c.362 .362 .768 .676 1.208 .934l6.895 4.047c1.078 .557 2.255 -.075 3.692 -1.512c1.437 -1.437 2.07 -2.614 1.512 -3.692c-.372 -.718 -1.72 -3.017 -4.047 -6.895a6.015 6.015 0 0 0 -.934 -1.208" />
+  </g>,
+  tablerIconProps,
+);
+
 export const ExportImageIcon = createIcon(
   <g strokeWidth="1.25">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -932,11 +942,6 @@ export const CloseIcon = createIcon(
     </defs>
   </>,
   modifiedTablerIconProps,
-);
-
-export const back = createIcon(
-  "M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z",
-  { width: 320, height: 512, style: { marginLeft: "-0.2rem" }, mirror: true },
 );
 
 export const clone = createIcon(
@@ -1836,19 +1841,6 @@ export const searchIcon = createIcon(
     <path d="M21 21l-6 -6" />
   </g>,
   tablerIconProps,
-);
-
-export const commandIcon = createIcon(
-  <g
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="14"
-    stroke="currentColor"
-  >
-    <path d="M180 48h0a28 28 0 0 1 28 28v0a28 28 0 0 1-28 28h-28 0V76a28 28 0 0 1 28-28ZM104 104H76a28 28 0 0 1-28-28h0a28 28 0 0 1 28-28h0a28 28 0 0 1 28 28v28h0ZM152 152h28a28 28 0 0 1 28 28v0a28 28 0 0 1-28 28h0a28 28 0 0 1-28-28v-28h0ZM76 208h0a28 28 0 0 1-28-28h0a28 28 0 0 1 28-28h28v28a28 28 0 0 1-28 28ZM104 104h48v48h-48z" />
-  </g>,
-  { width: 256, height: 256 },
 );
 
 export const clockIcon = createIcon(

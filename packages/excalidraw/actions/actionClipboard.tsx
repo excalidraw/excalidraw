@@ -220,7 +220,7 @@ export const actionCopyAsPng = register({
     return probablySupportsClipboardBlob && elements.length > 0;
   },
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
-  keywords: ["export", "png", "clipboard", "copy"],
+  keywords: ["png", "clipboard", "copy"],
 });
 
 export const copyText = register({
