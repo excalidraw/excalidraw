@@ -34,7 +34,6 @@ import {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
-  UIAppState,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
@@ -1550,20 +1549,6 @@ export class LinearElementEditor {
     }
 
     return coords;
-  };
-
-  static canEditLinearElement = (
-    selectedElements: NonDeleted<ExcalidrawElement>[],
-    appState: UIAppState,
-  ) => {
-    return (
-      !appState.editingLinearElement ||
-      appState.editingLinearElement.elementId !== selectedElements[0].id
-    );
-  };
-
-  static canExitEditingLinearElement = (appState: UIAppState) => {
-    return appState.editingLinearElement !== null;
   };
 }
 

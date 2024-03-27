@@ -3706,18 +3706,6 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  public editLinearElement(linearElement: NonDeleted<ExcalidrawLinearElement>) {
-    this.setAppState({
-      editingLinearElement: new LinearElementEditor(linearElement),
-    });
-  }
-
-  public exitEditingLinearElement() {
-    this.setAppState({
-      editingLinearElement: null,
-    });
-  }
-
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
@@ -3872,13 +3860,16 @@ class App extends React.Component<AppProps, AppState> {
           if (event[KEYS.CTRL_OR_CMD]) {
             if (isLinearElement(selectedElement)) {
               if (
-                LinearElementEditor.canEditLinearElement(
-                  selectedElements,
-                  this.state,
-                )
+                !this.state.editingLinearElement ||
+                this.state.editingLinearElement.elementId !==
+                  selectedElements[0].id
               ) {
                 this.history.resumeRecording();
-                this.editLinearElement(selectedElement);
+                this.setState({
+                  editingLinearElement: new LinearElementEditor(
+                    selectedElement,
+                  ),
+                });
               }
             }
           } else if (
@@ -4593,15 +4584,13 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         event[KEYS.CTRL_OR_CMD] &&
-        LinearElementEditor.canEditLinearElement(selectedElements, this.state)
+        (!this.state.editingLinearElement ||
+          this.state.editingLinearElement.elementId !== selectedElements[0].id)
       ) {
         this.history.resumeRecording();
-        this.editLinearElement(selectedElements[0]);
-        return;
-      } else if (
-        this.state.editingLinearElement &&
-        this.state.editingLinearElement.elementId === selectedElements[0].id
-      ) {
+        this.setState({
+          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+        });
         return;
       }
     }
@@ -8204,8 +8193,8 @@ class App extends React.Component<AppProps, AppState> {
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
-        if (LinearElementEditor.canExitEditingLinearElement(this.state)) {
-          this.exitEditingLinearElement();
+        if (this.state.editingLinearElement) {
+          this.setState({ editingLinearElement: null });
         } else {
           // Deselect selected elements
           this.setState({

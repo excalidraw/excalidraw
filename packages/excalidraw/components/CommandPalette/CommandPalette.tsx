@@ -28,7 +28,6 @@ import {
   mermaidLogoIcon,
   brainIconThin,
   MagicIconThin,
-  LineIcon,
   LibraryIcon,
 } from "../icons";
 import fuzzy from "fuzzy";
@@ -47,8 +46,6 @@ import { SHAPES } from "../../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { actionClearCanvas, actionLink } from "../../actions";
-import { LinearElementEditor } from "../../element/linearElementEditor";
-import { isLinearElement } from "../..";
 import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 
@@ -247,6 +244,7 @@ function CommandPaletteInner({
         actionManager.actions.zoomToFitSelectionInViewport,
         actionManager.actions.increaseFontSize,
         actionManager.actions.decreaseFontSize,
+        actionManager.actions.toggleLinearEditor,
         actionLink,
       ].map((action: Action) => ({
         label: getActionLabel(action),
@@ -511,39 +509,6 @@ function CommandPaletteInner({
           predicate: appProps.aiEnabled,
           perform: () => {
             app.onMagicframeToolSelect();
-          },
-        },
-        {
-          label: t("labels.lineEditor.edit"),
-          category: DEFAULT_CATEGORIES.elements,
-          icon: LineIcon,
-          predicate: () =>
-            LinearElementEditor.canEditLinearElement(
-              getSelectedElements(
-                app.scene.getNonDeletedElements(),
-                uiAppState,
-              ),
-              uiAppState,
-            ),
-          perform: () => {
-            const selectedElements = getSelectedElements(
-              app.scene.getNonDeletedElements(),
-              uiAppState,
-            );
-            const firstElement = selectedElements[0];
-            if (isLinearElement(firstElement)) {
-              app.editLinearElement(firstElement);
-            }
-          },
-        },
-        {
-          label: t("labels.lineEditor.exit"),
-          category: DEFAULT_CATEGORIES.elements,
-          icon: LineIcon,
-          predicate: () =>
-            LinearElementEditor.canExitEditingLinearElement(uiAppState),
-          perform: () => {
-            app.exitEditingLinearElement();
           },
         },
       ];
