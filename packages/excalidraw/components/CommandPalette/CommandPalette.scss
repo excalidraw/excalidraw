@@ -1,12 +1,19 @@
 @import "../../css/variables.module.scss";
 
+$verticalBreakpoint: 861px;
+
 .excalidraw {
   .command-palette-dialog {
     user-select: none;
 
     .Modal__content {
-      height: 100%;
-      max-height: 750px;
+      height: auto;
+      max-height: 100%;
+
+      @media screen and (min-width: $verticalBreakpoint) {
+        max-height: 750px;
+        height: 100%;
+      }
 
       .Island {
         height: 100%;
