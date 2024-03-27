@@ -118,8 +118,6 @@ import {
   ExcalLogo,
   usersIcon,
   LinkIcon,
-  share,
-  shareIOS,
   exportToPlus,
 } from "../packages/excalidraw/components/icons";
 
