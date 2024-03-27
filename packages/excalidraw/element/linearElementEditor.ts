@@ -51,7 +51,6 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
-import { getSelectedElements } from "../scene";
 
 const editorMidPointsCache: {
   version: number | null;
