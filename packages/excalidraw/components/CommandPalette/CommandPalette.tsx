@@ -135,7 +135,7 @@ const isCommandPaletteToggleShortcut = (event: KeyboardEvent) => {
 };
 
 type CommandPaletteProps = {
-  customCommandPaletteItems: CommandPaletteItem[];
+  customCommandPaletteItems?: CommandPaletteItem[];
 };
 
 export const CommandPalette = (props: CommandPaletteProps) => {
@@ -516,7 +516,7 @@ function CommandPaletteInner({
       const allCommands = [
         ...commandsFromActions,
         ...additionalCommands,
-        ...customCommandPaletteItems,
+        ...(customCommandPaletteItems || []),
       ].map((command) => {
         return {
           ...command,
