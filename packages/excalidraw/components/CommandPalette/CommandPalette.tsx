@@ -89,11 +89,11 @@ const getCategoryOrder = (category: string) => {
   switch (category) {
     case DEFAULT_CATEGORIES.app:
       return 1;
-    case DEFAULT_CATEGORIES.editor:
-      return 2;
-    case DEFAULT_CATEGORIES.tools:
-      return 3;
     case DEFAULT_CATEGORIES.export:
+      return 2;
+    case DEFAULT_CATEGORIES.editor:
+      return 3;
+    case DEFAULT_CATEGORIES.tools:
       return 4;
     case DEFAULT_CATEGORIES.elements:
       return 5;
@@ -556,7 +556,7 @@ function CommandPaletteInner({
         return {
           ...command,
           icon: command.icon || boltIcon,
-          order: getCategoryOrder(command.category),
+          order: command.order ?? getCategoryOrder(command.category),
           haystack: `${deburr(command.label)} ${
             command.keywords?.join(" ") || ""
           }`,
