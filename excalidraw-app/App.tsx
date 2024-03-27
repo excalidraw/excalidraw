@@ -47,6 +47,7 @@ import {
 } from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
+  isExcalidrawPlusSignedUser,
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
@@ -117,8 +118,8 @@ import {
   DiscordIcon,
   ExcalLogo,
   usersIcon,
-  LinkIcon,
   exportToPlus,
+  share,
 } from "../packages/excalidraw/components/icons";
 
 polyfill();
@@ -705,6 +706,45 @@ const ExcalidrawWrapper = () => {
     );
   }
 
+  const ExcalidrawPlusCommand = {
+    name: "Excalidraw+",
+    category: DEFAULT_CATEGORIES.links,
+    predicate: true,
+    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
+    keywords: ["plus", "cloud", "server"],
+    execute: () => {
+      window.open(
+        `${
+          import.meta.env.VITE_APP_PLUS_LP
+        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
+        "_blank",
+      );
+    },
+  };
+  const ExcalidrawPlusAppCommand = {
+    name: t("labels.signin"),
+    category: DEFAULT_CATEGORIES.links,
+    predicate: true,
+    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
+    keywords: [
+      "excalidraw",
+      "plus",
+      "cloud",
+      "server",
+      "signin",
+      "login",
+      "signup",
+    ],
+    execute: () => {
+      window.open(
+        `${
+          import.meta.env.VITE_APP_PLUS_APP
+        }?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
+        "_blank",
+      );
+    },
+  };
+
   return (
     <div
       style={{ height: "100%" }}
@@ -944,10 +984,10 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: `${t("exportDialog.link_button")}...`,
-              category: DEFAULT_CATEGORIES.export,
+              name: t("labels.share"),
+              category: DEFAULT_CATEGORIES.app,
               predicate: true,
-              icon: LinkIcon,
+              icon: share,
               keywords: [
                 "link",
                 "shareable",
@@ -956,19 +996,11 @@ const ExcalidrawWrapper = () => {
                 "publish",
                 "snapshot",
                 "url",
+                "collaborate",
+                "invite",
               ],
               execute: async () => {
-                if (excalidrawAPI) {
-                  try {
-                    await onExportToBackend(
-                      excalidrawAPI.getSceneElements(),
-                      excalidrawAPI.getAppState(),
-                      excalidrawAPI.getFiles(),
-                    );
-                  } catch (error: any) {
-                    setErrorMessage(error.message);
-                  }
-                }
+                setShareDialogState({ isOpen: true, type: "share" });
               },
             },
             {
@@ -1032,21 +1064,15 @@ const ExcalidrawWrapper = () => {
                 );
               },
             },
-            {
-              name: t("overwriteConfirm.action.excalidrawPlus.title"),
-              category: DEFAULT_CATEGORIES.links,
-              predicate: true,
-              icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
-              keywords: ["plus", "subscription", "login", "signin"],
-              execute: () => {
-                window.open(
-                  `${
-                    import.meta.env.VITE_APP_PLUS_LP
-                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=command_palette`,
-                  "_blank",
-                );
-              },
-            },
+            ...(isExcalidrawPlusSignedUser
+              ? [
+                  {
+                    ...ExcalidrawPlusAppCommand,
+                    name: "Sign in / Go to Excalidraw+",
+                  },
+                ]
+              : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
+
             {
               name: t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
