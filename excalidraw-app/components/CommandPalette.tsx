@@ -29,6 +29,7 @@ import {
   mermaidLogoIcon,
   brainIconThin,
   MagicIconThin,
+  LineIcon,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -50,6 +51,9 @@ import {
   canChangeStrokeColor,
 } from "../../packages/excalidraw/components/Actions";
 import { useStableCallback } from "../../packages/excalidraw/hooks/useStableCallback";
+import { actionLink } from "../../packages/excalidraw/actions";
+import { LinearElementEditor } from "../../packages/excalidraw/element/linearElementEditor";
+import { isLinearElement } from "../../packages/excalidraw";
 
 export type CommandPaletteItem = {
   name: string;
@@ -235,6 +239,8 @@ function CommandPaletteInner({
         actionManager.actions.alignBottom,
         actionManager.actions.alignLeft,
         actionManager.actions.alignRight,
+        actionManager.actions.alignVerticallyCentered,
+        actionManager.actions.alignHorizontallyCentered,
         actionManager.actions.duplicateSelection,
         actionManager.actions.flipHorizontal,
         actionManager.actions.flipVertical,
@@ -242,6 +248,7 @@ function CommandPaletteInner({
         actionManager.actions.zoomToFitSelectionInViewport,
         actionManager.actions.increaseFontSize,
         actionManager.actions.decreaseFontSize,
+        actionLink,
       ].map((action: Action) => ({
         name: getActionLabel(action),
         icon: getActionIcon(action),
@@ -494,6 +501,39 @@ function CommandPaletteInner({
           predicate: appProps.aiEnabled,
           execute: () => {
             app.onMagicframeToolSelect();
+          },
+        },
+        {
+          name: t("labels.lineEditor.edit"),
+          category: DEFAULT_CATEGORIES.elements,
+          icon: LineIcon,
+          predicate: () =>
+            LinearElementEditor.canEditLinearElement(
+              getSelectedElements(
+                app.scene.getNonDeletedElements(),
+                uiAppState,
+              ),
+              uiAppState,
+            ),
+          execute: () => {
+            const selectedElements = getSelectedElements(
+              app.scene.getNonDeletedElements(),
+              uiAppState,
+            );
+            const firstElement = selectedElements[0];
+            if (isLinearElement(firstElement)) {
+              app.editLinearElement(firstElement);
+            }
+          },
+        },
+        {
+          name: t("labels.lineEditor.exit"),
+          category: DEFAULT_CATEGORIES.elements,
+          icon: LineIcon,
+          predicate: () =>
+            LinearElementEditor.canExitEditingLinearElement(uiAppState),
+          execute: () => {
+            app.exitEditingLinearElement();
           },
         },
       ];

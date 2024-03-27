@@ -11,6 +11,7 @@ import { register } from "./register";
 export const actionLink = register({
   name: "hyperlink",
   label: (elements, appState) => getContextMenuLabel(elements, appState),
+  icon: LinkIcon,
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
       return false;

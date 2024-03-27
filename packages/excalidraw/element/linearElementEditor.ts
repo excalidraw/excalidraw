@@ -34,6 +34,7 @@ import {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
+  UIAppState,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
@@ -50,6 +51,7 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { getSelectedElements } from "../scene";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1549,6 +1551,20 @@ export class LinearElementEditor {
     }
 
     return coords;
+  };
+
+  static canEditLinearElement = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    appState: UIAppState,
+  ) => {
+    return (
+      !appState.editingLinearElement ||
+      appState.editingLinearElement.elementId !== selectedElements[0].id
+    );
+  };
+
+  static canExitEditingLinearElement = (appState: UIAppState) => {
+    return appState.editingLinearElement !== null;
   };
 }
 

@@ -3706,6 +3706,18 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  public editLinearElement(linearElement: NonDeleted<ExcalidrawLinearElement>) {
+    this.setAppState({
+      editingLinearElement: new LinearElementEditor(linearElement),
+    });
+  }
+
+  public exitEditingLinearElement() {
+    this.setAppState({
+      editingLinearElement: null,
+    });
+  }
+
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
@@ -3860,16 +3872,13 @@ class App extends React.Component<AppProps, AppState> {
           if (event[KEYS.CTRL_OR_CMD]) {
             if (isLinearElement(selectedElement)) {
               if (
-                !this.state.editingLinearElement ||
-                this.state.editingLinearElement.elementId !==
-                  selectedElements[0].id
+                LinearElementEditor.canEditLinearElement(
+                  selectedElements,
+                  this.state,
+                )
               ) {
                 this.history.resumeRecording();
-                this.setState({
-                  editingLinearElement: new LinearElementEditor(
-                    selectedElement,
-                  ),
-                });
+                this.editLinearElement(selectedElement);
               }
             }
           } else if (
@@ -4584,13 +4593,10 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         event[KEYS.CTRL_OR_CMD] &&
-        (!this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !== selectedElements[0].id)
+        LinearElementEditor.canEditLinearElement(selectedElements, this.state)
       ) {
         this.history.resumeRecording();
-        this.setState({
-          editingLinearElement: new LinearElementEditor(selectedElements[0]),
-        });
+        this.editLinearElement(selectedElements[0]);
         return;
       } else if (
         this.state.editingLinearElement &&
@@ -8198,8 +8204,8 @@ class App extends React.Component<AppProps, AppState> {
           (!hitElement &&
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
-        if (this.state.editingLinearElement) {
-          this.setState({ editingLinearElement: null });
+        if (LinearElementEditor.canExitEditingLinearElement(this.state)) {
+          this.exitEditingLinearElement();
         } else {
           // Deselect selected elements
           this.setState({
