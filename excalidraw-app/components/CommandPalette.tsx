@@ -654,7 +654,10 @@ function CommandPaletteInner({
   };
 
   useEffect(() => {
-    const getNextCommandsByCategory = (commands: CommandPaletteItem[]) => {
+    const getNextCommandsByCategory = (
+      commands: CommandPaletteItem[],
+      orderByCount = false,
+    ) => {
       const nextCommandsByCategory: Record<string, CommandPaletteItem[]> = {};
       for (const command of commands) {
         if (nextCommandsByCategory[command.category]) {
@@ -663,6 +666,17 @@ function CommandPaletteInner({
           nextCommandsByCategory[command.category] = [command];
         }
       }
+
+      if (orderByCount) {
+        return Object.fromEntries(
+          Array.from(Object.entries(nextCommandsByCategory)).sort(
+            ([, itemsA], [, itemsB]) => {
+              return itemsB.length - itemsA.length;
+            },
+          ),
+        );
+      }
+
       return nextCommandsByCategory;
     };
 
@@ -700,8 +714,14 @@ function CommandPaletteInner({
         _fuzzyName: item.string,
       }));
 
-    setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
-    setCurrentCommand(matchingCommands[0]);
+    const nextCommandsByCategory = getNextCommandsByCategory(
+      matchingCommands,
+      true,
+    );
+    const firstCommand =
+      Object.values(nextCommandsByCategory)?.[0]?.[0] ?? null;
+    setCommandsByCategory(nextCommandsByCategory);
+    setCurrentCommand(firstCommand);
   }, [commandSearch, allCommands, isCommandAvailable, lastUsed]);
 
   return (
