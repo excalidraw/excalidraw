@@ -1,5 +1,14 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { handIcon, ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import {
+  clearIcon,
+  handIcon,
+  MoonIcon,
+  SunIcon,
+  zoomAreaIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  ZoomResetIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
@@ -62,6 +71,7 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
+  icon: clearIcon,
   paletteName: "Clear canvas",
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
@@ -101,6 +111,7 @@ export const actionZoomIn = register({
   name: "zoomIn",
   label: "buttons.zoomIn",
   viewMode: true,
+  icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
@@ -139,6 +150,7 @@ export const actionZoomIn = register({
 export const actionZoomOut = register({
   name: "zoomOut",
   label: "buttons.zoomOut",
+  icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -178,6 +190,7 @@ export const actionZoomOut = register({
 export const actionResetZoom = register({
   name: "resetZoom",
   label: "buttons.resetZoom",
+  icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -348,6 +361,7 @@ export const zoomToFit = ({
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
   label: "labels.zoomToFitViewport",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -372,6 +386,7 @@ export const actionZoomToFitSelectionInViewport = register({
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
   label: "helpDialog.zoomToSelection",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -395,6 +410,7 @@ export const actionZoomToFitSelection = register({
 export const actionZoomToFit = register({
   name: "zoomToFit",
   label: "helpDialog.zoomToFit",
+  icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) =>
@@ -416,6 +432,7 @@ export const actionZoomToFit = register({
 export const actionToggleTheme = register({
   name: "toggleTheme",
   label: "labels.toggleTheme",
+  icon: (appState) => (appState.theme === THEME.LIGHT ? SunIcon : MoonIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {

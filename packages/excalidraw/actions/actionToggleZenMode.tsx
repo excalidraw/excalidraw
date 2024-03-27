@@ -1,9 +1,11 @@
+import { coffeeIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 
 export const actionToggleZenMode = register({
   name: "zenMode",
   label: "buttons.zenMode",
+  icon: coffeeIcon,
   paletteName: "Toggle zen mode",
   viewMode: true,
   trackEvent: {

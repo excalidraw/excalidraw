@@ -25,14 +25,15 @@ import {
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 import { ExcalidrawTextElement } from "../element/types";
+import { paintIcon } from "../components/icons";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
-  target: "Elements",
   label: "labels.copyStyles",
+  icon: paintIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = [];
@@ -62,8 +63,8 @@ export const actionCopyStyles = register({
 
 export const actionPasteStyles = register({
   name: "pasteStyles",
-  target: "Elements",
   label: "labels.pasteStyles",
+  icon: paintIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = JSON.parse(copiedStyles);

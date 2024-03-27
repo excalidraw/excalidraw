@@ -49,6 +49,7 @@ import {
   ArrowheadCircleOutlineIcon,
   ArrowheadDiamondIcon,
   ArrowheadDiamondOutlineIcon,
+  fontSizeIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -682,6 +683,7 @@ export const actionChangeFontSize = register({
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
   label: "labels.decreaseFontSize",
+  icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
@@ -705,6 +707,7 @@ export const actionDecreaseFontSize = register({
 export const actionIncreaseFontSize = register({
   name: "increaseFontSize",
   label: "labels.increaseFontSize",
+  icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>

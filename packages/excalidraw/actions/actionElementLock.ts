@@ -1,7 +1,9 @@
+import { LockedIcon, UnlockedIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -24,6 +26,10 @@ export const actionToggleElementLock = register({
     return shouldLock(selected)
       ? "labels.elementLock.lockAll"
       : "labels.elementLock.unlockAll";
+  },
+  icon: (appState, elements) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return shouldLock(selectedElements) ? LockedIcon : UnlockedIcon;
   },
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
@@ -81,8 +87,13 @@ export const actionUnlockAllElements = register({
   paletteName: "Unlock all elements",
   trackEvent: { category: "canvas" },
   viewMode: false,
-  predicate: (elements) => {
-    return elements.some((element) => element.locked);
+  icon: UnlockedIcon,
+  predicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return (
+      selectedElements.length === 0 &&
+      elements.some((element) => element.locked)
+    );
   },
   perform: (elements, appState) => {
     const lockedElements = elements.filter((el) => el.locked);

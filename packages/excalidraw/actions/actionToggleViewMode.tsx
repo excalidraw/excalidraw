@@ -1,3 +1,4 @@
+import { stereoGlassesIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 
@@ -5,6 +6,7 @@ export const actionToggleViewMode = register({
   name: "viewMode",
   label: "labels.viewMode",
   paletteName: "Toggle view mode",
+  icon: stereoGlassesIcon,
   viewMode: true,
   trackEvent: {
     category: "canvas",

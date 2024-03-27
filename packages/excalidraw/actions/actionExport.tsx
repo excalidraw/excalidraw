@@ -1,4 +1,4 @@
-import { questionCircle, saveAs } from "../components/icons";
+import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
@@ -133,6 +133,7 @@ export const actionChangeExportEmbedScene = register({
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   label: "buttons.save",
+  icon: ExportIcon,
   trackEvent: { category: "export" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -187,6 +188,7 @@ export const actionSaveToActiveFile = register({
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
   label: "exportDialog.disk_title",
+  icon: ExportIcon,
   viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {

@@ -1,9 +1,11 @@
 import { register } from "./register";
 import { CODES, KEYS } from "../keys";
+import { abacusIcon } from "../components/icons";
 
 export const actionToggleStats = register({
   name: "stats",
   label: "stats.title",
+  icon: abacusIcon,
   paletteName: "Toggle stats",
   viewMode: true,
   trackEvent: { category: "menu" },

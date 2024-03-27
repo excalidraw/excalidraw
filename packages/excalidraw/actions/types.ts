@@ -5,6 +5,7 @@ import {
   AppState,
   ExcalidrawProps,
   BinaryFiles,
+  UIAppState,
 } from "../types";
 import { MarkOptional } from "../utility-types";
 
@@ -151,7 +152,12 @@ export interface Action {
         app: AppClassProperties,
       ) => string);
   keywords?: string[];
-  icon?: React.ReactNode;
+  icon?:
+    | React.ReactNode
+    | ((
+        appState: UIAppState,
+        elements: readonly ExcalidrawElement[],
+      ) => React.ReactNode);
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;

@@ -24,6 +24,11 @@ import {
   searchIcon,
   boltIcon,
   bucketFillIcon,
+  templateIcon,
+  ExportImageIcon,
+  mermaidLogoIcon,
+  brainIconThin,
+  MagicIconThin,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -204,6 +209,13 @@ function CommandPaletteInner({
       return label;
     };
 
+    const getActionIcon = (action: Action) => {
+      if (typeof action.icon === "function") {
+        return action.icon(uiAppState, app.scene.getNonDeletedElements());
+      }
+      return action.icon;
+    };
+
     let commandsFromActions: CommandPaletteItem[] = [];
 
     if (uiAppState && app.scene && actionManager) {
@@ -232,6 +244,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
       ].map((action: Action) => ({
         name: getActionLabel(action),
+        icon: getActionIcon(action),
         category: DEFAULT_CATEGORIES.elements,
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         predicate: action.predicate
@@ -254,7 +267,7 @@ function CommandPaletteInner({
         category: DEFAULT_CATEGORIES.tools,
         predicate: action.predicate,
         keywords: action.keywords,
-        icon: action.icon,
+        icon: getActionIcon(action),
         execute: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
@@ -265,8 +278,8 @@ function CommandPaletteInner({
         actionManager.actions.toggleTheme,
         actionManager.actions.zoomIn,
         actionManager.actions.zoomOut,
-        actionManager.actions.zoomToFit,
         actionManager.actions.resetZoom,
+        actionManager.actions.zoomToFit,
         actionManager.actions.zenMode,
         actionManager.actions.viewMode,
         actionManager.actions.objectsSnapMode,
@@ -278,6 +291,7 @@ function CommandPaletteInner({
       ].map((action) => ({
         name: getActionLabel(action),
         keywords: action.keywords,
+        icon: getActionIcon(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.editor,
         predicate: action.predicate,
@@ -291,6 +305,7 @@ function CommandPaletteInner({
         actionManager.actions.copyAsSvg,
       ].map((action) => ({
         name: getActionLabel(action),
+        icon: getActionIcon(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.export,
         predicate: action.predicate,
@@ -304,6 +319,7 @@ function CommandPaletteInner({
         {
           name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
           category: DEFAULT_CATEGORIES.export,
+          icon: ExportImageIcon,
           shortcut: getShortcutFromShortcutName("imageExport"),
           keywords: [
             "export",
@@ -325,6 +341,7 @@ function CommandPaletteInner({
         {
           name: t("labels.excalidrawLib"),
           category: DEFAULT_CATEGORIES.app,
+          icon: templateIcon,
           execute: () => {
             if (uiAppState.openSidebar) {
               setAppState({
@@ -443,6 +460,7 @@ function CommandPaletteInner({
         {
           name: `${t("labels.textToDiagram")}...`,
           category: DEFAULT_CATEGORIES.tools,
+          icon: brainIconThin,
           predicate: appProps.aiEnabled,
           execute: () => {
             setAppState((state) => ({
@@ -457,6 +475,7 @@ function CommandPaletteInner({
         {
           name: `${t("toolBar.mermaidToExcalidraw")}...`,
           category: DEFAULT_CATEGORIES.tools,
+          icon: mermaidLogoIcon,
           predicate: appProps.aiEnabled,
           execute: () => {
             setAppState((state) => ({
@@ -471,6 +490,7 @@ function CommandPaletteInner({
         {
           name: `${t("toolBar.magicframe")}...`,
           category: DEFAULT_CATEGORIES.tools,
+          icon: MagicIconThin,
           predicate: appProps.aiEnabled,
           execute: () => {
             app.onMagicframeToolSelect();

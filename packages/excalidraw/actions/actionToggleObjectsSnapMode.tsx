@@ -1,9 +1,11 @@
+import { magnetIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 
 export const actionToggleObjectsSnapMode = register({
   name: "objectsSnapMode",
   label: "buttons.objectsSnapMode",
+  icon: magnetIcon,
   viewMode: true,
   trackEvent: {
     category: "canvas",

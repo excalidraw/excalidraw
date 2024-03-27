@@ -116,6 +116,11 @@ import {
   XBrandIcon,
   DiscordIcon,
   ExcalLogo,
+  usersIcon,
+  LinkIcon,
+  share,
+  shareIOS,
+  exportToPlus,
 } from "../packages/excalidraw/components/icons";
 
 polyfill();
@@ -910,6 +915,7 @@ const ExcalidrawWrapper = () => {
                 "session",
                 "invite",
               ],
+              icon: usersIcon,
               execute: () => {
                 setShareDialogState({
                   isOpen: true,
@@ -943,6 +949,7 @@ const ExcalidrawWrapper = () => {
               name: `${t("exportDialog.link_button")}...`,
               category: DEFAULT_CATEGORIES.export,
               predicate: true,
+              icon: LinkIcon,
               keywords: [
                 "link",
                 "shareable",
@@ -1045,6 +1052,7 @@ const ExcalidrawWrapper = () => {
             {
               name: t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
+              icon: exportToPlus,
               predicate: true,
               keywords: ["plus", "export", "save", "backup"],
               execute: () => {
