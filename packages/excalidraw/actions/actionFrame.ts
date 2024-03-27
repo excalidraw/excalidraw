@@ -115,6 +115,7 @@ export const actionSetFrameAsActiveTool = register({
   label: "toolBar.frame",
   trackEvent: { category: "toolbar" },
   icon: frameToolIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "frame",

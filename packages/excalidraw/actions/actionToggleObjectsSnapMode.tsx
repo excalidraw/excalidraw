@@ -6,7 +6,7 @@ export const actionToggleObjectsSnapMode = register({
   name: "objectsSnapMode",
   label: "buttons.objectsSnapMode",
   icon: magnetIcon,
-  viewMode: true,
+  viewMode: false,
   trackEvent: {
     category: "canvas",
     predicate: (appState) => !appState.objectsSnapModeEnabled,

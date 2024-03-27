@@ -681,6 +681,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
+        "category": "Elements",
         "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
@@ -5881,6 +5882,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
+        "category": "Elements",
         "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
@@ -6983,6 +6985,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
+        "category": "Elements",
         "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
@@ -7710,6 +7713,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "trackEvent": {
           "category": "canvas",
         },
+        "viewMode": false,
       },
       {
         "icon": <svg
@@ -7830,7 +7834,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           "category": "canvas",
           "predicate": [Function],
         },
-        "viewMode": true,
+        "viewMode": false,
       },
       {
         "checked": [Function],
@@ -8796,6 +8800,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "category": "Elements",
         "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
@@ -9687,6 +9692,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "category": "Elements",
         "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],

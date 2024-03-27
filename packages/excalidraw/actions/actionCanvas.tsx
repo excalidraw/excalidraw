@@ -495,6 +495,7 @@ export const actionToggleHandTool = register({
   paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
   icon: handIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 

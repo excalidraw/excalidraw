@@ -13,6 +13,7 @@ export const actionSelectAll = register({
   label: "labels.selectAll",
   icon: selectAllIcon,
   trackEvent: { category: "canvas" },
+  viewMode: false,
   perform: (elements, appState, value, app) => {
     if (appState.editingLinearElement) {
       return false;

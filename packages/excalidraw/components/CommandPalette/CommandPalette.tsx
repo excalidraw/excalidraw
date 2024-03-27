@@ -66,6 +66,8 @@ type CommandPaletteItem = {
   order?: number;
   predicate?: boolean | Action["predicate"];
   shortcut?: string;
+  /** if false, command will not show while in view mode */
+  viewMode?: boolean;
   perform: (
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => void;
@@ -218,6 +220,30 @@ function CommandPaletteInner({
 
     let commandsFromActions: CommandPaletteItem[] = [];
 
+    const actionToCommand = (
+      action: Action,
+      category: string,
+      transformer?: (
+        command: CommandPaletteItem,
+        action: Action,
+      ) => CommandPaletteItem,
+    ): CommandPaletteItem => {
+      const command: CommandPaletteItem = {
+        label: getActionLabel(action),
+        icon: getActionIcon(action),
+        category,
+        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
+        keywords: action.keywords,
+        predicate: action.predicate,
+        viewMode: action.viewMode,
+        perform: () => {
+          actionManager.executeAction(action, "commandPalette");
+        },
+      };
+
+      return transformer ? transformer(command, action) : command;
+    };
+
     if (uiAppState && app.scene && actionManager) {
       const elementsCommands: CommandPaletteItem[] = [
         actionManager.actions.group,
@@ -246,34 +272,28 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionManager.actions.toggleLinearEditor,
         actionLink,
-      ].map((action: Action) => ({
-        label: getActionLabel(action),
-        icon: getActionIcon(action),
-        category: DEFAULT_CATEGORIES.elements,
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        predicate: action.predicate
-          ? action.predicate
-          : (elements, appState, appProps, app) => {
-              const selectedElements = getSelectedElements(elements, appState);
-              return selectedElements.length > 0;
-            },
-        perform: () => {
-          actionManager.executeAction(action, "commandPalette");
-        },
-      }));
-
+      ].map((action: Action) =>
+        actionToCommand(
+          action,
+          DEFAULT_CATEGORIES.elements,
+          (command, action) => ({
+            ...command,
+            predicate: action.predicate
+              ? action.predicate
+              : (elements, appState, appProps, app) => {
+                  const selectedElements = getSelectedElements(
+                    elements,
+                    appState,
+                  );
+                  return selectedElements.length > 0;
+                },
+          }),
+        ),
+      );
       const toolCommands: CommandPaletteItem[] = [
         actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
-      ].map((action) => ({
-        label: getActionLabel(action),
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        category: DEFAULT_CATEGORIES.tools,
-        predicate: action.predicate,
-        keywords: action.keywords,
-        icon: getActionIcon(action),
-        perform: () => actionManager.executeAction(action, "commandPalette"),
-      }));
+      ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
 
       const editorCommands: CommandPaletteItem[] = [
         actionManager.actions.undo,
@@ -291,30 +311,14 @@ function CommandPaletteInner({
         actionManager.actions.toggleElementLock,
         actionManager.actions.unlockAllElements,
         actionManager.actions.stats,
-      ].map((action) => ({
-        label: getActionLabel(action),
-        keywords: action.keywords,
-        icon: getActionIcon(action),
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        category: DEFAULT_CATEGORIES.editor,
-        predicate: action.predicate,
-        perform: () => actionManager.executeAction(action, "commandPalette"),
-      }));
+      ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.editor));
 
       const exportCommands: CommandPaletteItem[] = [
         actionManager.actions.saveToActiveFile,
         actionManager.actions.saveFileToDisk,
         actionManager.actions.copyAsPng,
         actionManager.actions.copyAsSvg,
-      ].map((action) => ({
-        label: getActionLabel(action),
-        icon: getActionIcon(action),
-        shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
-        category: DEFAULT_CATEGORIES.export,
-        predicate: action.predicate,
-        keywords: action.keywords,
-        perform: () => actionManager.executeAction(action, "commandPalette"),
-      }));
+      ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.export));
 
       commandsFromActions = [
         ...elementsCommands,
@@ -327,6 +331,7 @@ function CommandPaletteInner({
           ),
           category: DEFAULT_CATEGORIES.editor,
           keywords: ["delete", "destroy"],
+          viewMode: false,
           perform: () => {
             jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
           },
@@ -357,6 +362,7 @@ function CommandPaletteInner({
           label: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,
           icon: LibraryIcon,
+          viewMode: false,
           perform: () => {
             if (uiAppState.openSidebar) {
               setAppState({
@@ -377,6 +383,7 @@ function CommandPaletteInner({
           keywords: ["color", "outline"],
           category: DEFAULT_CATEGORIES.elements,
           icon: bucketFillIcon,
+          viewMode: false,
           predicate: (elements, appState) => {
             const selectedElements = getSelectedElements(elements, appState);
             return (
@@ -396,6 +403,7 @@ function CommandPaletteInner({
           keywords: ["color", "fill"],
           icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.elements,
+          viewMode: false,
           predicate: (elements, appState) => {
             const selectedElements = getSelectedElements(elements, appState);
             return (
@@ -415,6 +423,7 @@ function CommandPaletteInner({
           keywords: ["color"],
           icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.editor,
+          viewMode: false,
           perform: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "canvas" ? null : "canvas",
@@ -446,6 +455,7 @@ function CommandPaletteInner({
             shortcut,
             icon,
             keywords: ["toolbar"],
+            viewMode: false,
             perform: (event) => {
               if (value === "image") {
                 app.setActiveTool({
@@ -468,6 +478,7 @@ function CommandPaletteInner({
           category: DEFAULT_CATEGORIES.tools,
           icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
           shortcut: KEYS.Q.toLocaleUpperCase(),
+          viewMode: false,
           perform: () => {
             app.toggleLock();
           },
@@ -476,6 +487,7 @@ function CommandPaletteInner({
           label: `${t("labels.textToDiagram")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: brainIconThin,
+          viewMode: false,
           predicate: appProps.aiEnabled,
           perform: () => {
             setAppState((state) => ({
@@ -491,6 +503,7 @@ function CommandPaletteInner({
           label: `${t("toolBar.mermaidToExcalidraw")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: mermaidLogoIcon,
+          viewMode: false,
           predicate: appProps.aiEnabled,
           perform: () => {
             setAppState((state) => ({
@@ -506,6 +519,7 @@ function CommandPaletteInner({
           label: `${t("toolBar.magicframe")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: MagicIconThin,
+          viewMode: false,
           predicate: appProps.aiEnabled,
           perform: () => {
             app.onMagicframeToolSelect();
@@ -582,6 +596,10 @@ function CommandPaletteInner({
 
   const isCommandAvailable = useStableCallback(
     (command: CommandPaletteItem) => {
+      if (command.viewMode === false && uiAppState.viewModeEnabled) {
+        return false;
+      }
+
       return typeof command.predicate === "function"
         ? command.predicate(
             app.scene.getNonDeletedElements(),
