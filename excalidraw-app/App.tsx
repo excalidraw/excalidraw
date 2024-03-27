@@ -707,12 +707,12 @@ const ExcalidrawWrapper = () => {
   }
 
   const ExcalidrawPlusCommand = {
-    name: "Excalidraw+",
+    label: "Excalidraw+",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
     keywords: ["plus", "cloud", "server"],
-    execute: () => {
+    perform: () => {
       window.open(
         `${
           import.meta.env.VITE_APP_PLUS_LP
@@ -722,7 +722,7 @@ const ExcalidrawWrapper = () => {
     },
   };
   const ExcalidrawPlusAppCommand = {
-    name: t("labels.signin"),
+    label: t("labels.signin"),
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
@@ -735,7 +735,7 @@ const ExcalidrawWrapper = () => {
       "login",
       "signup",
     ],
-    execute: () => {
+    perform: () => {
       window.open(
         `${
           import.meta.env.VITE_APP_PLUS_APP
@@ -943,7 +943,7 @@ const ExcalidrawWrapper = () => {
         <CommandPalette
           customCommandPaletteItems={[
             {
-              name: t("labels.liveCollaboration"),
+              label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
               keywords: [
                 "team",
@@ -954,7 +954,7 @@ const ExcalidrawWrapper = () => {
                 "invite",
               ],
               icon: usersIcon,
-              execute: () => {
+              perform: () => {
                 setShareDialogState({
                   isOpen: true,
                   type: "collaborationOnly",
@@ -962,7 +962,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: t("roomDialog.button_stopSession"),
+              label: t("roomDialog.button_stopSession"),
               category: DEFAULT_CATEGORIES.app,
               predicate: () => !!collabAPI?.isCollaborating(),
               keywords: [
@@ -974,7 +974,7 @@ const ExcalidrawWrapper = () => {
                 "exit",
                 "collaboration",
               ],
-              execute: () => {
+              perform: () => {
                 if (collabAPI) {
                   collabAPI.stopCollaboration();
                   if (!collabAPI.isCollaborating()) {
@@ -984,7 +984,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: t("labels.share"),
+              label: t("labels.share"),
               category: DEFAULT_CATEGORIES.app,
               predicate: true,
               icon: share,
@@ -999,12 +999,12 @@ const ExcalidrawWrapper = () => {
                 "collaborate",
                 "invite",
               ],
-              execute: async () => {
+              perform: async () => {
                 setShareDialogState({ isOpen: true, type: "share" });
               },
             },
             {
-              name: "GitHub",
+              label: "GitHub",
               icon: GithubIcon,
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
@@ -1017,7 +1017,7 @@ const ExcalidrawWrapper = () => {
                 "social",
                 "community",
               ],
-              execute: () => {
+              perform: () => {
                 window.open(
                   "https://github.com/excalidraw/excalidraw",
                   "_blank",
@@ -1026,12 +1026,12 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: t("labels.followUs"),
+              label: t("labels.followUs"),
               icon: XBrandIcon,
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
               keywords: ["twitter", "contact", "social", "community"],
-              execute: () => {
+              perform: () => {
                 window.open(
                   "https://x.com/excalidraw",
                   "_blank",
@@ -1040,7 +1040,7 @@ const ExcalidrawWrapper = () => {
               },
             },
             {
-              name: t("labels.discordChat"),
+              label: t("labels.discordChat"),
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
               icon: DiscordIcon,
@@ -1056,7 +1056,7 @@ const ExcalidrawWrapper = () => {
                 "social",
                 "community",
               ],
-              execute: () => {
+              perform: () => {
                 window.open(
                   "https://discord.gg/UexuTaE",
                   "_blank",
@@ -1068,18 +1068,18 @@ const ExcalidrawWrapper = () => {
               ? [
                   {
                     ...ExcalidrawPlusAppCommand,
-                    name: "Sign in / Go to Excalidraw+",
+                    label: "Sign in / Go to Excalidraw+",
                   },
                 ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
 
             {
-              name: t("overwriteConfirm.action.excalidrawPlus.button"),
+              label: t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
               icon: exportToPlus,
               predicate: true,
               keywords: ["plus", "export", "save", "backup"],
-              execute: () => {
+              perform: () => {
                 if (excalidrawAPI) {
                   exportToExcalidrawPlus(
                     excalidrawAPI.getSceneElements(),

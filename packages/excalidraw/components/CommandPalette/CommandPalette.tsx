@@ -55,7 +55,7 @@ import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import "./CommandPalette.scss";
 
 type CommandPaletteItem = {
-  name: string;
+  label: string;
   /** additional keywords to match against
    * (appended to haystack, not displayed) */
   keywords?: string[];
@@ -69,7 +69,7 @@ type CommandPaletteItem = {
   order?: number;
   predicate?: boolean | Action["predicate"];
   shortcut?: string;
-  execute: (
+  perform: (
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => void;
 };
@@ -249,7 +249,7 @@ function CommandPaletteInner({
         actionManager.actions.decreaseFontSize,
         actionLink,
       ].map((action: Action) => ({
-        name: getActionLabel(action),
+        label: getActionLabel(action),
         icon: getActionIcon(action),
         category: DEFAULT_CATEGORIES.elements,
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
@@ -259,7 +259,7 @@ function CommandPaletteInner({
               const selectedElements = getSelectedElements(elements, appState);
               return selectedElements.length > 0;
             },
-        execute: () => {
+        perform: () => {
           actionManager.executeAction(action, "commandPalette");
         },
       }));
@@ -268,13 +268,13 @@ function CommandPaletteInner({
         actionManager.actions.toggleHandTool,
         actionManager.actions.setFrameAsActiveTool,
       ].map((action) => ({
-        name: getActionLabel(action),
+        label: getActionLabel(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.tools,
         predicate: action.predicate,
         keywords: action.keywords,
         icon: getActionIcon(action),
-        execute: () => actionManager.executeAction(action, "commandPalette"),
+        perform: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
       const editorCommands: CommandPaletteItem[] = [
@@ -294,13 +294,13 @@ function CommandPaletteInner({
         actionManager.actions.unlockAllElements,
         actionManager.actions.stats,
       ].map((action) => ({
-        name: getActionLabel(action),
+        label: getActionLabel(action),
         keywords: action.keywords,
         icon: getActionIcon(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.editor,
         predicate: action.predicate,
-        execute: () => actionManager.executeAction(action, "commandPalette"),
+        perform: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
       const exportCommands: CommandPaletteItem[] = [
@@ -309,32 +309,32 @@ function CommandPaletteInner({
         actionManager.actions.copyAsPng,
         actionManager.actions.copyAsSvg,
       ].map((action) => ({
-        name: getActionLabel(action),
+        label: getActionLabel(action),
         icon: getActionIcon(action),
         shortcut: getShortcutFromShortcutName(action.name as ShortcutName),
         category: DEFAULT_CATEGORIES.export,
         predicate: action.predicate,
         keywords: action.keywords,
-        execute: () => actionManager.executeAction(action, "commandPalette"),
+        perform: () => actionManager.executeAction(action, "commandPalette"),
       }));
 
       commandsFromActions = [
         ...elementsCommands,
         ...editorCommands,
         {
-          name: getActionLabel(actionClearCanvas),
+          label: getActionLabel(actionClearCanvas),
           icon: getActionIcon(actionClearCanvas),
           shortcut: getShortcutFromShortcutName(
             actionClearCanvas.name as ShortcutName,
           ),
           category: DEFAULT_CATEGORIES.editor,
           keywords: ["delete", "destroy"],
-          execute: () => {
+          perform: () => {
             jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
           },
         },
         {
-          name: t("buttons.exportImage"),
+          label: t("buttons.exportImage"),
           category: DEFAULT_CATEGORIES.export,
           icon: ExportImageIcon,
           shortcut: getShortcutFromShortcutName("imageExport"),
@@ -347,7 +347,7 @@ function CommandPaletteInner({
             "clipboard",
             "picture",
           ],
-          execute: () => {
+          perform: () => {
             setAppState({ openDialog: { name: "imageExport" } });
           },
         },
@@ -356,10 +356,10 @@ function CommandPaletteInner({
 
       const additionalCommands: CommandPaletteItem[] = [
         {
-          name: t("toolBar.library"),
+          label: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,
           icon: LibraryIcon,
-          execute: () => {
+          perform: () => {
             if (uiAppState.openSidebar) {
               setAppState({
                 openSidebar: null,
@@ -375,7 +375,7 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.changeStroke"),
+          label: t("labels.changeStroke"),
           keywords: ["color", "outline"],
           category: DEFAULT_CATEGORIES.elements,
           icon: bucketFillIcon,
@@ -386,7 +386,7 @@ function CommandPaletteInner({
               canChangeStrokeColor(appState, selectedElements)
             );
           },
-          execute: () => {
+          perform: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "shape" ? null : "shape",
               openPopup: "elementStroke",
@@ -394,7 +394,7 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.changeBackground"),
+          label: t("labels.changeBackground"),
           keywords: ["color", "fill"],
           icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.elements,
@@ -405,7 +405,7 @@ function CommandPaletteInner({
               canChangeBackgroundColor(appState, selectedElements)
             );
           },
-          execute: () => {
+          perform: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "shape" ? null : "shape",
               openPopup: "elementBackground",
@@ -413,11 +413,11 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.canvasBackground"),
+          label: t("labels.canvasBackground"),
           keywords: ["color"],
           icon: bucketFillIcon,
           category: DEFAULT_CATEGORIES.editor,
-          execute: () => {
+          perform: () => {
             setAppState((prevState) => ({
               openMenu: prevState.openMenu === "canvas" ? null : "canvas",
               openPopup: "canvasBackground",
@@ -443,12 +443,12 @@ function CommandPaletteInner({
           const shortcut = letter || numericKey;
 
           const command: CommandPaletteItem = {
-            name: t(`toolBar.${value}`),
+            label: t(`toolBar.${value}`),
             category: DEFAULT_CATEGORIES.tools,
             shortcut,
             icon,
             keywords: ["toolbar"],
-            execute: (event) => {
+            perform: (event) => {
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
@@ -466,20 +466,20 @@ function CommandPaletteInner({
         }, []),
         ...toolCommands,
         {
-          name: t("toolBar.lock"),
+          label: t("toolBar.lock"),
           category: DEFAULT_CATEGORIES.tools,
           icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
           shortcut: KEYS.Q.toLocaleUpperCase(),
-          execute: () => {
+          perform: () => {
             app.toggleLock();
           },
         },
         {
-          name: `${t("labels.textToDiagram")}...`,
+          label: `${t("labels.textToDiagram")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: brainIconThin,
           predicate: appProps.aiEnabled,
-          execute: () => {
+          perform: () => {
             setAppState((state) => ({
               ...state,
               openDialog: {
@@ -490,11 +490,11 @@ function CommandPaletteInner({
           },
         },
         {
-          name: `${t("toolBar.mermaidToExcalidraw")}...`,
+          label: `${t("toolBar.mermaidToExcalidraw")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: mermaidLogoIcon,
           predicate: appProps.aiEnabled,
-          execute: () => {
+          perform: () => {
             setAppState((state) => ({
               ...state,
               openDialog: {
@@ -505,16 +505,16 @@ function CommandPaletteInner({
           },
         },
         {
-          name: `${t("toolBar.magicframe")}...`,
+          label: `${t("toolBar.magicframe")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: MagicIconThin,
           predicate: appProps.aiEnabled,
-          execute: () => {
+          perform: () => {
             app.onMagicframeToolSelect();
           },
         },
         {
-          name: t("labels.lineEditor.edit"),
+          label: t("labels.lineEditor.edit"),
           category: DEFAULT_CATEGORIES.elements,
           icon: LineIcon,
           predicate: () =>
@@ -525,7 +525,7 @@ function CommandPaletteInner({
               ),
               uiAppState,
             ),
-          execute: () => {
+          perform: () => {
             const selectedElements = getSelectedElements(
               app.scene.getNonDeletedElements(),
               uiAppState,
@@ -537,12 +537,12 @@ function CommandPaletteInner({
           },
         },
         {
-          name: t("labels.lineEditor.exit"),
+          label: t("labels.lineEditor.exit"),
           category: DEFAULT_CATEGORIES.elements,
           icon: LineIcon,
           predicate: () =>
             LinearElementEditor.canExitEditingLinearElement(uiAppState),
-          execute: () => {
+          perform: () => {
             app.exitEditingLinearElement();
           },
         },
@@ -557,7 +557,7 @@ function CommandPaletteInner({
           ...command,
           icon: command.icon || boltIcon,
           order: getCategoryOrder(command.category),
-          haystack: `${deburr(command.name)} ${
+          haystack: `${deburr(command.label)} ${
             command.keywords?.join(" ") || ""
           }`,
         };
@@ -565,7 +565,8 @@ function CommandPaletteInner({
 
       setAllCommands(allCommands);
       setLastUsed(
-        allCommands.find((command) => command.name === lastUsed?.name) ?? null,
+        allCommands.find((command) => command.label === lastUsed?.label) ??
+          null,
       );
     }
   }, [
@@ -574,7 +575,7 @@ function CommandPaletteInner({
     uiAppState,
     actionManager,
     setAllCommands,
-    lastUsed?.name,
+    lastUsed?.label,
     setLastUsed,
     setAppState,
     customCommandPaletteItems,
@@ -604,7 +605,7 @@ function CommandPaletteInner({
     if (uiAppState.openDialog?.name === "commandPalette") {
       document.body.classList.add("excalidraw-animations-disabled");
       closeCommandPalette(() => {
-        command.execute(event);
+        command.perform(event);
         setLastUsed(command);
 
         requestAnimationFrame(() => {
@@ -649,7 +650,7 @@ function CommandPaletteInner({
     if (event.key === KEYS.ARROW_UP) {
       event.preventDefault();
       const index = matchingCommands.findIndex(
-        (item) => item.name === currentCommand?.name,
+        (item) => item.label === currentCommand?.label,
       );
 
       if (shouldConsiderLastUsed) {
@@ -689,7 +690,7 @@ function CommandPaletteInner({
     if (event.key === KEYS.ARROW_DOWN) {
       event.preventDefault();
       const index = matchingCommands.findIndex(
-        (item) => item.name === currentCommand?.name,
+        (item) => item.label === currentCommand?.label,
       );
 
       if (shouldConsiderLastUsed) {
@@ -774,7 +775,7 @@ function CommandPaletteInner({
         getNextCommandsByCategory(
           showLastUsed
             ? matchingCommands.filter(
-                (command) => command.name !== lastUsed?.name,
+                (command) => command.label !== lastUsed?.label,
               )
             : matchingCommands,
         ),
@@ -844,7 +845,7 @@ function CommandPaletteInner({
             </div>
             <CommandItem
               command={lastUsed}
-              isSelected={lastUsed.name === currentCommand?.name}
+              isSelected={lastUsed.label === currentCommand?.label}
               onClick={(event) => executeCommand(lastUsed, event)}
               disabled={!isCommandAvailable(lastUsed)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
@@ -860,9 +861,9 @@ function CommandPaletteInner({
                 <div className="command-category-title">{category}</div>
                 {commandsByCategory[category].map((command) => (
                   <CommandItem
-                    key={command.name}
+                    key={command.label}
                     command={command}
-                    isSelected={command.name === currentCommand?.name}
+                    isSelected={command.label === currentCommand?.label}
                     onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
                     showShortcut={!app.device.viewport.isMobile}
@@ -918,7 +919,7 @@ const CommandItem = ({
     >
       <div className="name">
         {command.icon && <InlineIcon icon={command.icon} />}
-        {command.name}
+        {command.label}
       </div>
       {showShortcut && command.shortcut && (
         <CommandShortcutHint shortcut={command.shortcut} />
