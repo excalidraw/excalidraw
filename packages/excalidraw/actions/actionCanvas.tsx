@@ -10,7 +10,7 @@ import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { AppState, NormalizedZoomValue } from "../types";
-import { getShortcutKey, updateActiveTool } from "../utils";
+import { getShortcutKey, getUiMode, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
@@ -117,7 +117,7 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      className="zoom-in-button zoom-button"
+      className={`zoom-in-button zoom-button ui-mode-${getUiMode()}`}
       icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
@@ -155,7 +155,7 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => (
     <ToolButton
       type="button"
-      className="zoom-out-button zoom-button"
+      className={`zoom-out-button zoom-button ui-mode-${getUiMode()}`}
       icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
@@ -194,7 +194,7 @@ export const actionResetZoom = register({
     <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
       <ToolButton
         type="button"
-        className="reset-zoom-button zoom-button"
+        className={`reset-zoom-button zoom-button ui-mode-${getUiMode()}`}
         title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
         onClick={() => {

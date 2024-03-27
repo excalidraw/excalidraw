@@ -10,11 +10,21 @@
   border-radius: 0 !important;
   background-color: var(--sparkwise-color-gray-100) !important;
   font-size: 0.875rem !important;
-  width: var(--lg-button-size);
-  height: var(--lg-button-size);
+
+  width: var(--md-button-size);
+  height: var(--md-button-size);
   svg {
-    width: var(--lg-icon-size) !important;
-    height: var(--lg-icon-size) !important;
+    width: var(--md-icon-size) !important;
+    height: var(--md-icon-size) !important;
+  }
+
+  &.ui-mode-all {
+    width: var(--lg-button-size);
+    height: var(--lg-button-size);
+    svg {
+      width: var(--lg-icon-size) !important;
+      height: var(--lg-icon-size) !important;
+    }
   }
 
   .ToolIcon__icon {

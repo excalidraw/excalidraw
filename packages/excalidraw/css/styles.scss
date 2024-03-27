@@ -315,6 +315,7 @@
   .shapes-section {
     position: relative;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     pointer-events: none !important;
@@ -351,15 +352,19 @@
 
   .App-menu_bottom {
     position: absolute;
-    bottom: 1rem;
+    bottom: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
     box-sizing: border-box;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
 
+    &.ui-mode-all {
+      bottom: 1rem;
+      padding: 0 1rem;
+    }
     &--transition-left {
       section {
         width: 185px;

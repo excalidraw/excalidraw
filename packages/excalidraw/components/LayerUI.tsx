@@ -256,6 +256,12 @@ const LayerUI = ({
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <>
+                  <HintViewer
+                    appState={appState}
+                    isMobile={device.editor.isMobile}
+                    device={device}
+                    app={app}
+                  />
                   <div style={{ position: "relative" }}>
                     {renderWelcomeScreen && (
                       <tunnels.WelcomeScreenToolbarHintTunnel.Out />
@@ -324,12 +330,6 @@ const LayerUI = ({
                       </Stack.Row>
                     </Stack.Col>
                   </div>
-                  <HintViewer
-                    appState={appState}
-                    isMobile={device.editor.isMobile}
-                    device={device}
-                    app={app}
-                  />
                 </>
               )}
             </Section>

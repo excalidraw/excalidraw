@@ -6,10 +6,11 @@ import {
   isTextBindableContainer,
   isTextElement,
 } from "../element/typeChecks";
-import { getShortcutKey } from "../utils";
+import { getShortcutKey, getUiMode } from "../utils";
 import { isEraserActive } from "../appState";
 
 import "./HintViewer.scss";
+import clsx from "clsx";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -136,9 +137,10 @@ export const HintViewer = ({
   }
 
   hint = getShortcutKey(hint);
+  const uiMode = getUiMode();
 
   return (
-    <div className="HintViewer">
+    <div className={clsx("HintViewer", { "ui-mode-all": uiMode === "all" })}>
       <span>{hint}</span>
     </div>
   );

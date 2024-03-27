@@ -54,7 +54,7 @@ describe("appState", () => {
 
       // subtract 60 because offset added to make room for toolbar
       expect(h.state.scrollY).toBe(
-        HEIGHT / 2 / h.state.zoom.value - (ELEM_HEIGHT / 2 - 60),
+        HEIGHT / 2 / h.state.zoom.value - (ELEM_HEIGHT / 2 - 30),
       );
     });
     restoreOriginalGetBoundingClientRect();

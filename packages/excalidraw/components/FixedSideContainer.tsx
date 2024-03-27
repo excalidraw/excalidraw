@@ -2,6 +2,7 @@ import "./FixedSideContainer.scss";
 
 import React from "react";
 import clsx from "clsx";
+import { getUiMode } from "../utils";
 
 type FixedSideContainerProps = {
   children: React.ReactNode;
@@ -13,14 +14,18 @@ export const FixedSideContainer = ({
   children,
   side,
   className,
-}: FixedSideContainerProps) => (
-  <div
-    className={clsx(
-      "FixedSideContainer",
-      `FixedSideContainer_side_${side}`,
-      className,
-    )}
-  >
-    {children}
-  </div>
-);
+}: FixedSideContainerProps) => {
+  const uiMode = getUiMode();
+  return (
+    <div
+      className={clsx(
+        "FixedSideContainer",
+        `FixedSideContainer_side_${side}`,
+        className,
+        { "ui-mode-all": uiMode === "all" },
+      )}
+    >
+      {children}
+    </div>
+  );
+};

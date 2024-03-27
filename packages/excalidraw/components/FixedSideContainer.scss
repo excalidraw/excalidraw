@@ -11,11 +11,18 @@
   }
 
   .FixedSideContainer_side_top {
-    left: var(--editor-container-padding);
-    top: var(--editor-container-padding);
-    right: var(--editor-container-padding);
-    bottom: var(--editor-container-padding);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
     z-index: 2;
+
+    &.ui-mode-all {
+      left: var(--editor-container-padding);
+      top: var(--editor-container-padding);
+      right: var(--editor-container-padding);
+      bottom: var(--editor-container-padding);
+    }
   }
 
   .FixedSideContainer_side_top.zen-mode {
