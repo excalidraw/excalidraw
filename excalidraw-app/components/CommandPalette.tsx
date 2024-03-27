@@ -699,10 +699,7 @@ function CommandPaletteInner({
   }, [handleKeyDown]);
 
   useEffect(() => {
-    const getNextCommandsByCategory = (
-      commands: CommandPaletteItem[],
-      orderByCount = false,
-    ) => {
+    const getNextCommandsByCategory = (commands: CommandPaletteItem[]) => {
       const nextCommandsByCategory: Record<string, CommandPaletteItem[]> = {};
       for (const command of commands) {
         if (nextCommandsByCategory[command.category]) {
@@ -710,16 +707,6 @@ function CommandPaletteInner({
         } else {
           nextCommandsByCategory[command.category] = [command];
         }
-      }
-
-      if (orderByCount) {
-        return Object.fromEntries(
-          Array.from(Object.entries(nextCommandsByCategory)).sort(
-            ([, itemsA], [, itemsB]) => {
-              return itemsB.length - itemsA.length;
-            },
-          ),
-        );
       }
 
       return nextCommandsByCategory;
@@ -754,14 +741,8 @@ function CommandPaletteInner({
       .sort((a, b) => b.score - a.score)
       .map((item) => item.original);
 
-    const nextCommandsByCategory = getNextCommandsByCategory(
-      matchingCommands,
-      true,
-    );
-    const firstCommand =
-      Object.values(nextCommandsByCategory)?.[0]?.[0] ?? null;
-    setCommandsByCategory(nextCommandsByCategory);
-    setCurrentCommand(firstCommand);
+    setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
+    setCurrentCommand(matchingCommands[0] ?? null);
   }, [commandSearch, allCommands, isCommandAvailable, lastUsed]);
 
   return (
