@@ -23,6 +23,8 @@ Please add the latest change on the top under the correct section.
 
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
 
+- Add CommandPalette component for users to quickly find and discover commands to speed up their workflow. Apart from the core commands built into the component, custom command items can be passed as a prop. [#7804](https://github.com/excalidraw/excalidraw/pull/7804)
+
 ### Fixes
 
 - Keep customData when converting to ExcalidrawElement. [#7656](https://github.com/excalidraw/excalidraw/pull/7656)
