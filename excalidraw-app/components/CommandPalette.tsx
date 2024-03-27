@@ -24,12 +24,12 @@ import {
   searchIcon,
   boltIcon,
   bucketFillIcon,
-  templateIcon,
   ExportImageIcon,
   mermaidLogoIcon,
   brainIconThin,
   MagicIconThin,
   LineIcon,
+  LibraryIcon,
 } from "../../packages/excalidraw/components/icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
@@ -348,7 +348,7 @@ function CommandPaletteInner({
         {
           name: t("labels.excalidrawLib"),
           category: DEFAULT_CATEGORIES.app,
-          icon: templateIcon,
+          icon: LibraryIcon,
           execute: () => {
             if (uiAppState.openSidebar) {
               setAppState({
