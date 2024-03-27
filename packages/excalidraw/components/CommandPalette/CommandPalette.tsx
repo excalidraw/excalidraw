@@ -4,19 +4,19 @@ import {
   useAppProps,
   useExcalidrawActionManager,
   useExcalidrawSetAppState,
-} from "../../packages/excalidraw/components/App";
-import { KEYS } from "../../packages/excalidraw/keys";
-import { Dialog } from "../../packages/excalidraw/components/Dialog";
-import { TextField } from "../../packages/excalidraw/components/TextField";
+} from "../App";
+import { KEYS } from "../../keys";
+import { Dialog } from "../Dialog";
+import { TextField } from "../TextField";
 import clsx from "clsx";
-import { getSelectedElements } from "../../packages/excalidraw/scene";
-import { Action } from "../../packages/excalidraw/actions/types";
-import { TranslationKeys, t } from "../../packages/excalidraw/i18n";
+import { getSelectedElements } from "../../scene";
+import { Action } from "../../actions/types";
+import { TranslationKeys, t } from "../../i18n";
 import {
   ShortcutName,
   getShortcutFromShortcutName,
-} from "../../packages/excalidraw/actions/shortcuts";
-import { DEFAULT_SIDEBAR, EVENT } from "../../packages/excalidraw/constants";
+} from "../../actions/shortcuts";
+import { DEFAULT_SIDEBAR, EVENT } from "../../constants";
 import {
   LockedIcon,
   UnlockedIcon,
@@ -30,37 +30,31 @@ import {
   MagicIconThin,
   LineIcon,
   LibraryIcon,
-} from "../../packages/excalidraw/components/icons";
+} from "../icons";
 import fuzzy from "fuzzy";
-import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
-import { AppProps, AppState } from "../../packages/excalidraw/types";
+import { useUIAppState } from "../../context/ui-appState";
+import { AppProps, AppState } from "../../types";
 import {
   capitalizeString,
   getShortcutKey,
   isWritableElement,
-} from "../../packages/excalidraw/utils";
+} from "../../utils";
 import { atom, useAtom } from "jotai";
-import { deburr } from "../../packages/excalidraw/deburr";
+import { deburr } from "../../deburr";
+import { MarkRequired } from "../../utility-types";
+import { InlineIcon } from "../InlineIcon";
+import { SHAPES } from "../../shapes";
+import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
+import { useStableCallback } from "../../hooks/useStableCallback";
+import { actionClearCanvas, actionLink } from "../../actions";
+import { LinearElementEditor } from "../../element/linearElementEditor";
+import { isLinearElement } from "../..";
+import { jotaiStore } from "../../jotai";
+import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 
 import "./CommandPalette.scss";
-import { MarkRequired } from "../../packages/excalidraw/utility-types";
-import { InlineIcon } from "../../packages/excalidraw/components/InlineIcon";
-import { SHAPES } from "../../packages/excalidraw/shapes";
-import {
-  canChangeBackgroundColor,
-  canChangeStrokeColor,
-} from "../../packages/excalidraw/components/Actions";
-import { useStableCallback } from "../../packages/excalidraw/hooks/useStableCallback";
-import {
-  actionClearCanvas,
-  actionLink,
-} from "../../packages/excalidraw/actions";
-import { LinearElementEditor } from "../../packages/excalidraw/element/linearElementEditor";
-import { isLinearElement } from "../../packages/excalidraw";
-import { jotaiStore } from "../../packages/excalidraw/jotai";
-import { activeConfirmDialogAtom } from "../../packages/excalidraw/components/ActiveConfirmDialog";
 
-export type CommandPaletteItem = {
+type CommandPaletteItem = {
   name: string;
   /** additional keywords to match against
    * (appended to haystack, not displayed) */
@@ -80,7 +74,7 @@ export type CommandPaletteItem = {
   ) => void;
 };
 
-export const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
+const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
 export const DEFAULT_CATEGORIES = {
   app: "App",
@@ -91,7 +85,7 @@ export const DEFAULT_CATEGORIES = {
   links: "Links",
 };
 
-export const getCategoryOrder = (category: string) => {
+const getCategoryOrder = (category: string) => {
   switch (category) {
     case DEFAULT_CATEGORIES.app:
       return 1;

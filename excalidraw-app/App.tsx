@@ -111,7 +111,7 @@ import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
-} from "./components/CommandPalette";
+} from "../packages/excalidraw/components/CommandPalette/CommandPalette";
 import {
   GithubIcon,
   XBrandIcon,
