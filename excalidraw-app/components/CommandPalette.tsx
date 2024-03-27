@@ -51,9 +51,14 @@ import {
   canChangeStrokeColor,
 } from "../../packages/excalidraw/components/Actions";
 import { useStableCallback } from "../../packages/excalidraw/hooks/useStableCallback";
-import { actionLink } from "../../packages/excalidraw/actions";
+import {
+  actionClearCanvas,
+  actionLink,
+} from "../../packages/excalidraw/actions";
 import { LinearElementEditor } from "../../packages/excalidraw/element/linearElementEditor";
 import { isLinearElement } from "../../packages/excalidraw";
+import { jotaiStore } from "../../packages/excalidraw/jotai";
+import { activeConfirmDialogAtom } from "../../packages/excalidraw/components/ActiveConfirmDialog";
 
 export type CommandPaletteItem = {
   name: string;
@@ -281,7 +286,6 @@ function CommandPaletteInner({
       const editorCommands: CommandPaletteItem[] = [
         actionManager.actions.undo,
         actionManager.actions.redo,
-        actionManager.actions.clearCanvas,
         actionManager.actions.toggleTheme,
         actionManager.actions.zoomIn,
         actionManager.actions.zoomOut,
@@ -323,6 +327,18 @@ function CommandPaletteInner({
       commandsFromActions = [
         ...elementsCommands,
         ...editorCommands,
+        {
+          name: getActionLabel(actionClearCanvas),
+          icon: getActionIcon(actionClearCanvas),
+          shortcut: getShortcutFromShortcutName(
+            actionClearCanvas.name as ShortcutName,
+          ),
+          category: DEFAULT_CATEGORIES.editor,
+          keywords: ["delete", "destroy"],
+          execute: () => {
+            jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+          },
+        },
         {
           name: `${t("overwriteConfirm.action.exportToImage.title")}...`,
           category: DEFAULT_CATEGORIES.export,
