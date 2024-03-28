@@ -21,9 +21,9 @@
     "copyStyles": "Kopiraj slog",
     "pasteStyles": "Prilepi slog",
     "stroke": "Poteza",
-    "changeStroke": "",
+    "changeStroke": "Spremeni barvo poteze",
     "background": "Ozadje",
-    "changeBackground": "",
+    "changeBackground": "Spremeni barvo ozadja",
     "fill": "Polnilo",
     "strokeWidth": "Debelina poteze",
     "strokeStyle": "Slog poteze",
@@ -74,7 +74,7 @@
     "canvasColors": "Uporabljeno na platnu",
     "canvasBackground": "Ozadje platna",
     "drawingCanvas": "Platno za risanje",
-    "clearCanvas": "",
+    "clearCanvas": "Počisti platno",
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "Nalaganje knjižnice ...",
     "libraries": "Brskaj po knjižnicah",
     "loadingScene": "Nalaganje scene...",
-    "loadScene": "",
+    "loadScene": "Naloži sceno iz datoteke",
     "align": "Poravnava",
     "alignTop": "Poravnaj na vrh",
     "alignBottom": "Poravnaj na dno",
@@ -109,7 +109,7 @@
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
-    "toggleTheme": "",
+    "toggleTheme": "Preklapljanje med svetlo/temno temo",
     "personalLib": "Osebna knjižnica",
     "excalidrawLib": "Knjižnica Excalidraw",
     "decreaseFontSize": "Zmanjšaj velikost pisave",
@@ -145,9 +145,9 @@
     "prompt": "Poziv",
     "followUs": "Sledi nas",
     "discordChat": "Klepet v Discordu",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "Približaj na vidno polje",
+    "zoomToFitSelection": "Približaj na izbor",
+    "zoomToFit": "Približaj na vse elemente"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paleta ukazov",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Izberi",
+      "confirm": "Potrdi",
+      "close": "Zapri"
     },
-    "recents": "",
+    "recents": "Nedavno uporabljeno",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Išči po menijih, ukazih in odkrij skrite funkcije",
+      "noMatch": "Ni ustreznih ukazov ..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Ukaz ni na voljo ...",
     "shortcutHint": ""
   }
 }
