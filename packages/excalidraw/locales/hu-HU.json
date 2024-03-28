@@ -21,7 +21,9 @@
     "copyStyles": "Stílus másolása",
     "pasteStyles": "Stílus beillesztése",
     "stroke": "Körvonal",
+    "changeStroke": "",
     "background": "Háttér",
+    "changeBackground": "",
     "fill": "Kitöltés",
     "strokeWidth": "Körvonal vastagsága",
     "strokeStyle": "Körvonal stílusa",
@@ -72,6 +74,7 @@
     "canvasColors": "Rajzvászonon használt",
     "canvasBackground": "Vászon háttérszíne",
     "drawingCanvas": "Rajzvászon",
+    "clearCanvas": "",
     "layers": "Rétegek",
     "actions": "Műveletek",
     "language": "Nyelv",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Könyvtár betöltése…",
     "libraries": "Könyvtárak böngészése",
     "loadingScene": "Jelenet betöltése…",
+    "loadScene": "",
     "align": "Igazítás",
     "alignTop": "Felülre igazítás",
     "alignBottom": "Alulra igazítás",
@@ -105,7 +109,7 @@
     "share": "Megosztás",
     "showStroke": "Körvonal színválasztó megjelenítése",
     "showBackground": "Háttérszín-választó megjelenítése",
-    "toggleTheme": "Téma váltása",
+    "toggleTheme": "",
     "personalLib": "Személyes könyvtár",
     "excalidrawLib": "Excalidraw könyvtár",
     "decreaseFontSize": "Betűméret csökkentése",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
