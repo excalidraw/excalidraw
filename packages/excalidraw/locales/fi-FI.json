@@ -21,7 +21,9 @@
     "copyStyles": "Kopioi tyyli",
     "pasteStyles": "Liitä tyyli",
     "stroke": "Piirto",
+    "changeStroke": "",
     "background": "Tausta",
+    "changeBackground": "",
     "fill": "Täyttö",
     "strokeWidth": "Viivan leveys",
     "strokeStyle": "Viivan tyyli",
@@ -72,6 +74,7 @@
     "canvasColors": "Käytössä piirtoalueella",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
+    "clearCanvas": "",
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Ladataan kirjastoa…",
     "libraries": "Selaa kirjastoja",
     "loadingScene": "Ladataan työtä…",
+    "loadScene": "",
     "align": "Tasaa",
     "alignTop": "Tasaa ylös",
     "alignBottom": "Tasaa alas",
@@ -105,7 +109,7 @@
     "share": "Jaa",
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
-    "toggleTheme": "Vaihda teema",
+    "toggleTheme": "",
     "personalLib": "Oma kirjasto",
     "excalidrawLib": "Excalidraw kirjasto",
     "decreaseFontSize": "Pienennä kirjasinkokoa",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
