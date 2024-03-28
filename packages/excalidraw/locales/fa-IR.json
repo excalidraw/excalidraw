@@ -21,7 +21,9 @@
     "copyStyles": "کپی سبک",
     "pasteStyles": "جای گذاری سبک",
     "stroke": "حاشیه",
+    "changeStroke": "",
     "background": "پس زمینه",
+    "changeBackground": "",
     "fill": "رنگ آمیزی",
     "strokeWidth": "ضخامت حاشیه",
     "strokeStyle": "استایل حاشیه",
@@ -72,6 +74,7 @@
     "canvasColors": "رنگ های بوم",
     "canvasBackground": "بوم",
     "drawingCanvas": "بوم نقاشی",
+    "clearCanvas": "",
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "بارگذاری کتابخانه…",
     "libraries": "مرور کردن کتابخانه ها",
     "loadingScene": "باگذاری صحنه…",
+    "loadScene": "",
     "align": "تراز",
     "alignTop": "تراز به بالا",
     "alignBottom": "تراز به پایین",
@@ -105,7 +109,7 @@
     "share": "اشتراک‌گذاری",
     "showStroke": "نمایش انتخاب کننده رنگ حاشیه",
     "showBackground": "نمایش انتخاب کننده رنگ پس زمینه",
-    "toggleTheme": "تغییر تم",
+    "toggleTheme": "",
     "personalLib": "کتابخانه شخصی",
     "excalidrawLib": "کتابخانه",
     "decreaseFontSize": "کاهش اندازه فونت",
@@ -140,7 +144,10 @@
     "textToDiagram": "متن به دیاگرام",
     "prompt": "فوری",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
