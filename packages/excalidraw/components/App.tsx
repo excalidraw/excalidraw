@@ -413,6 +413,7 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3732,6 +3733,22 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key === KEYS.P &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        this.setToast({
+          message: t("commandPalette.shortcutHint", {
+            shortcutOne: getShortcutFromShortcutName("commandPalette"),
+            shortcutTwo: getShortcutFromShortcutName("commandPalette", 1),
+          }),
+        });
+        event.preventDefault();
+        return;
       }
 
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {

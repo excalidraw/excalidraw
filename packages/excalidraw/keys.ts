@@ -45,6 +45,7 @@ export const KEYS = {
   PERIOD: ".",
   COMMA: ",",
   SUBTRACT: "-",
+  SLASH: "/",
 
   A: "a",
   C: "c",

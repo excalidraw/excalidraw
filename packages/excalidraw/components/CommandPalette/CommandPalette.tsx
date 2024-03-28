@@ -108,10 +108,10 @@ const CommandShortcutHint = ({
 
 const isCommandPaletteToggleShortcut = (event: KeyboardEvent) => {
   return (
-    event[KEYS.CTRL_OR_CMD] &&
-    event.key === KEYS.P &&
     !event.altKey &&
-    !event.shiftKey
+    event[KEYS.CTRL_OR_CMD] &&
+    ((event.shiftKey && event.key.toLowerCase() === KEYS.P) ||
+      event.key === KEYS.SLASH)
   );
 };
 

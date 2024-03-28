@@ -59,7 +59,10 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   loadScene: [getShortcutKey("CtrlOrCmd+O")],
   clearCanvas: [getShortcutKey("CtrlOrCmd+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
-  commandPalette: [getShortcutKey("CtrlOrCmd+P")],
+  commandPalette: [
+    getShortcutKey("CtrlOrCmd+Shift+P"),
+    getShortcutKey("CtrlOrCmd+/"),
+  ],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
   paste: [getShortcutKey("CtrlOrCmd+V")],
@@ -111,8 +114,10 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   toggleShortcuts: [getShortcutKey("?")],
 };
 
-export const getShortcutFromShortcutName = (name: ShortcutName) => {
+export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {
   const shortcuts = shortcutMap[name];
   // if multiple shortcuts available, take the first one
-  return shortcuts && shortcuts.length > 0 ? shortcuts[0] : "";
+  return shortcuts && shortcuts.length > 0
+    ? shortcuts[idx] || shortcuts[0]
+    : "";
 };
