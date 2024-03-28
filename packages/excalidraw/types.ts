@@ -281,7 +281,8 @@ export interface AppState {
           | "settings"; // when AI settings dialog is explicitly invoked
         tab: "text-to-diagram" | "diagram-to-code";
       }
-    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" };
+    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
+    | { name: "commandPalette" };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -580,6 +581,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
+  toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
