@@ -21,7 +21,9 @@
     "copyStyles": "ஒயில்களை நகலெடு",
     "pasteStyles": "ஒயில்களை ஒட்டு",
     "stroke": "கீறல்",
+    "changeStroke": "",
     "background": "பின்புலம்",
+    "changeBackground": "",
     "fill": "நிரப்பல்",
     "strokeWidth": "கீறல் அகலம்",
     "strokeStyle": "கீறல் ஒயில்",
@@ -72,6 +74,7 @@
     "canvasColors": "கித்தானில் பயன்படுத்தப்பட்டது",
     "canvasBackground": "கித்தான் பின்னணி",
     "drawingCanvas": "கித்தான் வரைகிறது",
+    "clearCanvas": "",
     "layers": "அடுக்குகள்",
     "actions": "செயல்கள்",
     "language": "மொழி",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "நூலகத்தை ஏற்றுகிறது…",
     "libraries": "நூலகங்களை உலாவு",
     "loadingScene": "காட்சியை ஏற்றுகிறது…",
+    "loadScene": "",
     "align": "சீரமை",
     "alignTop": "மேலே சீரமை",
     "alignBottom": "கீழே சீரமை",
@@ -105,7 +109,7 @@
     "share": "பகிர்",
     "showStroke": "கீறல் நிற எடுப்பானைக் காட்டு",
     "showBackground": "பின்னணி நிற எடுப்பானைக் காட்டு",
-    "toggleTheme": "தோற்றத்தை நிலைமாற்று",
+    "toggleTheme": "",
     "personalLib": "தனக்குரிய நூலகம்",
     "excalidrawLib": "எக்ஸ்கேலிட்ரா நூலகம்",
     "decreaseFontSize": "எழுத்துரு அளவைக் குறை",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "இதுவரை உருப்படிகள் சேரக்கப்படவில்லை...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
