@@ -21,7 +21,9 @@
     "copyStyles": "Sao chép định dạng",
     "pasteStyles": "Dán định dạng",
     "stroke": "Nét",
+    "changeStroke": "",
     "background": "Nền",
+    "changeBackground": "",
     "fill": "",
     "strokeWidth": "Độ dày nét",
     "strokeStyle": "Kiểu nét",
@@ -72,6 +74,7 @@
     "canvasColors": "Đã dùng trên canvas",
     "canvasBackground": "Nền canvas",
     "drawingCanvas": "Canvas vẽ",
+    "clearCanvas": "",
     "layers": "Lớp",
     "actions": "Chức năng",
     "language": "Ngôn ngữ",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Đang tải thư viện…",
     "libraries": "Xem thư viện",
     "loadingScene": "Đang tải về…",
+    "loadScene": "",
     "align": "Căn chỉnh",
     "alignTop": "Căn trên",
     "alignBottom": "Căn dưới",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Chưa có món nào...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
