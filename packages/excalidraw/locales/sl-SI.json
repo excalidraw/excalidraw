@@ -560,6 +560,6 @@
       "noMatch": "Ni ustreznih ukazov ..."
     },
     "itemNotAvailable": "Ukaz ni na voljo ...",
-    "shortcutHint": ""
+    "shortcutHint": "Za paleto ukazov uporabi {{shortcut}}"
   }
 }
