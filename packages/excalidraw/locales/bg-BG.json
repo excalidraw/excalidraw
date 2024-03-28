@@ -21,7 +21,9 @@
     "copyStyles": "Копирайте стилове",
     "pasteStyles": "Постави стилове",
     "stroke": "Щрих",
+    "changeStroke": "",
     "background": "Фон",
+    "changeBackground": "",
     "fill": "Наситеност",
     "strokeWidth": "Ширина на щриха",
     "strokeStyle": "Стил на линия",
@@ -72,6 +74,7 @@
     "canvasColors": "Използван на платно",
     "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
+    "clearCanvas": "",
     "layers": "Слоеве",
     "actions": "Действия",
     "language": "Език",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Зареждане на библиотеката…",
     "libraries": "Разглеждане на библиотеките",
     "loadingScene": "Зареждане на сцена…",
+    "loadScene": "",
     "align": "Подравняване",
     "alignTop": "Подравняване отгоре",
     "alignBottom": "Подравняване отдолу",
@@ -105,7 +109,7 @@
     "share": "Сподели",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "Включи тема",
+    "toggleTheme": "",
     "personalLib": "Лична Библиотека",
     "excalidrawLib": "Excalidraw Библиотека",
     "decreaseFontSize": "Намали размера на шрифта",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Няма добавени неща все още...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
