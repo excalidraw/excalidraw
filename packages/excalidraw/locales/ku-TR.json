@@ -21,7 +21,9 @@
     "copyStyles": "لەبەرگرتنەوەی ستایل",
     "pasteStyles": "دانانەوەی ستایل",
     "stroke": "هێڵکار",
+    "changeStroke": "",
     "background": "پاشبنەما",
+    "changeBackground": "",
     "fill": "پڕکردنەوە",
     "strokeWidth": "پانی هێڵکاری",
     "strokeStyle": "ستایلی هێڵکاری",
@@ -72,6 +74,7 @@
     "canvasColors": "بەکارهاتووە لەسەر تابلۆ",
     "canvasBackground": "پاشبنەمای تابلۆ",
     "drawingCanvas": "کێشانی تابلۆ",
+    "clearCanvas": "",
     "layers": "چینەکان",
     "actions": "کردارەکان",
     "language": "زمان",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "...بارکردنی کتێبخانە",
     "libraries": "گەڕانی کتێبخانە",
     "loadingScene": "...بارکردنی دیمەنەکە",
+    "loadScene": "",
     "align": "لاچەنکردن",
     "alignTop": "لاچەنکردن بۆ سەرەوە",
     "alignBottom": "لاچەنکردن بۆ خوارەوە",
@@ -105,7 +109,7 @@
     "share": "هاوبەشی پێکردن",
     "showStroke": "ڕەنگهەڵگری هێڵکار نیشانبدە",
     "showBackground": "ڕەنگهەڵگری باکگراوند نیشانبدە",
-    "toggleTheme": "دۆخی ڕوکار بگۆڕە",
+    "toggleTheme": "",
     "personalLib": "کتێبخانەی کەسی",
     "excalidrawLib": "کتێبخانەی Excalidraw",
     "decreaseFontSize": "کەمکردنەوەی قەبارەی فۆنت",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
