@@ -21,7 +21,9 @@
     "copyStyles": "Kopier stiler",
     "pasteStyles": "Lim inn stiler",
     "stroke": "Strek",
+    "changeStroke": "",
     "background": "Bakgrunn",
+    "changeBackground": "",
     "fill": "Fyll",
     "strokeWidth": "Strektykkelse",
     "strokeStyle": "Strekstil",
@@ -72,6 +74,7 @@
     "canvasColors": "Brukes på lerretet",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
+    "clearCanvas": "",
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Laster bibliotek…",
     "libraries": "Bla gjennom biblioteker",
     "loadingScene": "Laster inn scene…",
+    "loadScene": "",
     "align": "Juster",
     "alignTop": "Juster øverst",
     "alignBottom": "Juster nederst",
@@ -105,7 +109,7 @@
     "share": "Del",
     "showStroke": "Vis fargevelger for kantfarge",
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
-    "toggleTheme": "Veksle tema",
+    "toggleTheme": "",
     "personalLib": "Personlig bibliotek",
     "excalidrawLib": "Excalidraw-bibliotek",
     "decreaseFontSize": "Reduser skriftstørrelse",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
