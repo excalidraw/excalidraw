@@ -21,7 +21,9 @@
     "copyStyles": "Copiar los estiles",
     "pasteStyles": "Pegar los estils",
     "stroke": "Contorn",
+    "changeStroke": "",
     "background": "Rèireplan",
+    "changeBackground": "",
     "fill": "Empliment",
     "strokeWidth": "Largor de contorn",
     "strokeStyle": "Estil de contorn",
@@ -72,6 +74,7 @@
     "canvasColors": "Utilizada suls canabassses",
     "canvasBackground": "Rèireplan del canabàs",
     "drawingCanvas": "Zòna de dessenh",
+    "clearCanvas": "",
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Cargament de la bibliotèca…",
     "libraries": "Percórrer las bibliotècas",
     "loadingScene": "Cargament de la scèna…",
+    "loadScene": "",
     "align": "Alinhament",
     "alignTop": "Alinhar ennaut",
     "alignBottom": "Alinhar enbàs",
@@ -105,7 +109,7 @@
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
-    "toggleTheme": "Alternar tèma",
+    "toggleTheme": "",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
     "decreaseFontSize": "Reduire talha polissa",
@@ -140,7 +144,10 @@
     "textToDiagram": "Tèxte pel diagram",
     "prompt": "Fenèstra de dialòg",
     "followUs": "Seguissètz-nos",
-    "discordChat": "Chat Discord"
+    "discordChat": "Chat Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
