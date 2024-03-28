@@ -21,7 +21,9 @@
     "copyStyles": "ចម្លងរចនាប័ទ្ម",
     "pasteStyles": "បិទភ្ជាប់រចនាប័ទ្ម",
     "stroke": "ខ្វាច់",
+    "changeStroke": "",
     "background": "ផ្ទៃខាងក្រោយ",
+    "changeBackground": "",
     "fill": "បំពេញ",
     "strokeWidth": "ទទឹងខ្វាច់",
     "strokeStyle": "រចនាប័ទ្មរបស់ខ្វាច់",
@@ -72,6 +74,7 @@
     "canvasColors": "ប្រើលើបាវ",
     "canvasBackground": "ផ្ទៃខាងក្រោយបាវ",
     "drawingCanvas": "តំបន់គំនូរ",
+    "clearCanvas": "",
     "layers": "ស្រទាប់",
     "actions": "សកម្មភាព",
     "language": "ភាសា",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "កំពុងផ្ទុកបណ្ណាល័យ...",
     "libraries": "រកមើលបណ្ណាល័យ",
     "loadingScene": "កំពុង​ផ្ទុក​ស៊ីន...",
+    "loadScene": "",
     "align": "តម្រឹម",
     "alignTop": "តម្រឹមផ្នែកខាងលើ",
     "alignBottom": "តម្រឹមផ្នែកខាងក្រោម",
@@ -105,7 +109,7 @@
     "share": "ចែករំលែក",
     "showStroke": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ខ្វាច់",
     "showBackground": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ផ្ទៃខាងក្រោយ",
-    "toggleTheme": "បិទ/បើកប្រធានបទ",
+    "toggleTheme": "",
     "personalLib": "បណ្ណាល័យផ្ទាល់ខ្លួន",
     "excalidrawLib": "បណ្ណាល័យ Excalidraw",
     "decreaseFontSize": "បន្ថយទំហំពុម្ពអក្សរ",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
