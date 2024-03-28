@@ -21,7 +21,9 @@
     "copyStyles": "Copiere stiluri",
     "pasteStyles": "Lipire stiluri",
     "stroke": "Contur",
+    "changeStroke": "",
     "background": "Fundal",
+    "changeBackground": "",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
     "strokeStyle": "Stilul conturului",
@@ -72,6 +74,7 @@
     "canvasColors": "Folosite pe pânză",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
+    "clearCanvas": "",
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Se încarcă biblioteca…",
     "libraries": "Răsfoiește bibliotecile",
     "loadingScene": "Se încarcă scena…",
+    "loadScene": "",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
     "alignBottom": "Aliniere jos",
@@ -105,7 +109,7 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
-    "toggleTheme": "Comutare temă",
+    "toggleTheme": "",
     "personalLib": "Biblioteca personală",
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Micșorează dimensiunea fontului",
@@ -140,7 +144,10 @@
     "textToDiagram": "Text la diagramă",
     "prompt": "Mesaj sistem",
     "followUs": "Urmărește-ne",
-    "discordChat": "Conversații pe Discord"
+    "discordChat": "Conversații pe Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -539,5 +546,20 @@
       "micMuted": "Microfonul utilizatorul este pus pe mut",
       "isSpeaking": "Utilizatorul vorbește"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
