@@ -21,7 +21,9 @@
     "copyStyles": "Salin gaya",
     "pasteStyles": "Tempelkan gaya",
     "stroke": "Guratan",
+    "changeStroke": "",
     "background": "Latar",
+    "changeBackground": "",
     "fill": "Isian",
     "strokeWidth": "Lebar guratan",
     "strokeStyle": "Gaya guratan",
@@ -72,6 +74,7 @@
     "canvasColors": "Digunakan di kanvas",
     "canvasBackground": "Latar Kanvas",
     "drawingCanvas": "Kanvas",
+    "clearCanvas": "",
     "layers": "Lapisan",
     "actions": "Aksi",
     "language": "Bahasa",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Memuat pustaka…",
     "libraries": "Telusur pustaka",
     "loadingScene": "Memuat pemandangan…",
+    "loadScene": "",
     "align": "Perataan",
     "alignTop": "Rata atas",
     "alignBottom": "Rata bawah",
@@ -105,7 +109,7 @@
     "share": "Bagikan",
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
-    "toggleTheme": "Ubah tema",
+    "toggleTheme": "",
     "personalLib": "Pustaka Pribadi",
     "excalidrawLib": "Pustaka Excalidraw",
     "decreaseFontSize": "Kecilkan ukuran font",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
