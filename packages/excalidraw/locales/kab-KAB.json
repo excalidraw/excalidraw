@@ -21,7 +21,9 @@
     "copyStyles": "Nɣel iɣunab",
     "pasteStyles": "Senṭeḍ iɣunab",
     "stroke": "Azizdew",
+    "changeStroke": "",
     "background": "Agilal",
+    "changeBackground": "",
     "fill": "Taččart",
     "strokeWidth": "Tehri n yizirig",
     "strokeStyle": "Aɣanib n tizirig",
@@ -72,6 +74,7 @@
     "canvasColors": "Yettwaseqdec di teɣzut n usuneɣ",
     "canvasBackground": "Agilal n teɣzut n usuneɣ",
     "drawingCanvas": "Taɣzut n usuneɣ",
+    "clearCanvas": "",
     "layers": "Tissiyin",
     "actions": "Tigawin",
     "language": "Tutlayt",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Asali n temkarḍit…",
     "libraries": "Snirem timkarḍiyin",
     "loadingScene": "Asali n usayes…",
+    "loadScene": "",
     "align": "Reyyec",
     "alignTop": "Areyyec uksawen",
     "alignBottom": "Areyyec ukessar",
@@ -105,7 +109,7 @@
     "share": "Bḍu",
     "showStroke": "Beqqeḍ amelqaḍ n yini n yizirig",
     "showBackground": "Beqqeḍ amelqaḍ n yini n ugilal",
-    "toggleTheme": "Snifel asentel",
+    "toggleTheme": "",
     "personalLib": "Tamkarḍit tudmawant",
     "excalidrawLib": "Tamkarḍit n Excalidraw",
     "decreaseFontSize": "Senqes tiddi n tsefsit",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
