@@ -27,7 +27,6 @@ import {
   ExportImageIcon,
   mermaidLogoIcon,
   brainIconThin,
-  MagicIconThin,
   LibraryIcon,
 } from "../icons";
 import fuzzy from "fuzzy";
@@ -515,16 +514,16 @@ function CommandPaletteInner({
             }));
           },
         },
-        {
-          label: `${t("toolBar.magicframe")}...`,
-          category: DEFAULT_CATEGORIES.tools,
-          icon: MagicIconThin,
-          viewMode: false,
-          predicate: appProps.aiEnabled,
-          perform: () => {
-            app.onMagicframeToolSelect();
-          },
-        },
+        // {
+        //   label: `${t("toolBar.magicframe")}...`,
+        //   category: DEFAULT_CATEGORIES.tools,
+        //   icon: MagicIconThin,
+        //   viewMode: false,
+        //   predicate: appProps.aiEnabled,
+        //   perform: () => {
+        //     app.onMagicframeToolSelect();
+        //   },
+        // },
       ];
 
       const allCommands = [
