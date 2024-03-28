@@ -4,6 +4,7 @@ import svgrPlugin from "vite-plugin-svgr";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
+import { createHtmlPlugin } from "vite-plugin-html";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
@@ -188,6 +189,9 @@ export default defineConfig({
           },
         ],
       },
+    }),
+    createHtmlPlugin({
+      minify: true,
     }),
   ],
   publicDir: "../public",
