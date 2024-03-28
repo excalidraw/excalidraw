@@ -37,7 +37,6 @@ import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 
 import "./DefaultItems.scss";
-import { isFirefox } from "../../constants";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -128,11 +127,7 @@ export const CommandPalette = () => {
       icon={boltIcon}
       data-testid="command-palette-button"
       onSelect={() => setAppState({ openDialog: { name: "commandPalette" } })}
-      shortcut={
-        isFirefox
-          ? getShortcutFromShortcutName("commandPalette", 1)
-          : getShortcutFromShortcutName("commandPalette")
-      }
+      shortcut={getShortcutFromShortcutName("commandPalette")}
       aria-label={t("commandPalette.title")}
     >
       {t("commandPalette.title")}
