@@ -21,7 +21,9 @@
     "copyStyles": "Αντιγραφή εμφάνισης",
     "pasteStyles": "Επικόλληση εμφάνισης",
     "stroke": "Μολυβιά",
+    "changeStroke": "",
     "background": "Φόντο",
+    "changeBackground": "",
     "fill": "Γέμισμα",
     "strokeWidth": "Πάχος μολυβιάς",
     "strokeStyle": "Στυλ περιγράμματος",
@@ -72,6 +74,7 @@
     "canvasColors": "Χρησιμοποείται στον καμβά",
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
+    "clearCanvas": "",
     "layers": "Στρώματα",
     "actions": "Ενέργειες",
     "language": "Γλώσσα",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης…",
     "libraries": "Άλλες βιβλιοθήκες",
     "loadingScene": "Φόρτωση σκηνής…",
+    "loadScene": "",
     "align": "Στοίχιση",
     "alignTop": "Στοίχιση πάνω",
     "alignBottom": "Στοίχιση κάτω",
@@ -105,7 +109,7 @@
     "share": "Κοινοποίηση",
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
-    "toggleTheme": "Εναλλαγή θέματος",
+    "toggleTheme": "",
     "personalLib": "Προσωπική Βιβλιοθήκη",
     "excalidrawLib": "Βιβλιοθήκη Excalidraw",
     "decreaseFontSize": "Μείωση μεγέθους γραμματοσειράς",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
