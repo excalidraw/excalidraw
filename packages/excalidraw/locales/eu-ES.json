@@ -21,7 +21,9 @@
     "copyStyles": "Kopiatu estiloak",
     "pasteStyles": "Itsatsi estiloak",
     "stroke": "Marra",
+    "changeStroke": "",
     "background": "Atzeko planoa",
+    "changeBackground": "",
     "fill": "Bete",
     "strokeWidth": "Marraren zabalera",
     "strokeStyle": "Marraren estiloa",
@@ -72,6 +74,7 @@
     "canvasColors": "Oihalean erabilita",
     "canvasBackground": "Oihalaren atzeko planoa",
     "drawingCanvas": "Marrazteko oihala",
+    "clearCanvas": "",
     "layers": "Geruzak",
     "actions": "Ekintzak",
     "language": "Hizkuntza",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Liburutegia kargatzen…",
     "libraries": "Arakatu liburutegiak",
     "loadingScene": "Eszena kargatzen…",
+    "loadScene": "",
     "align": "Lerrokatu",
     "alignTop": "Lerrokatu goian",
     "alignBottom": "Lerrokatu behean",
@@ -105,7 +109,7 @@
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
-    "toggleTheme": "Aldatu gaia",
+    "toggleTheme": "",
     "personalLib": "Liburutegi pertsonala",
     "excalidrawLib": "Excalidraw liburutegia",
     "decreaseFontSize": "Txikitu letra tamaina",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
