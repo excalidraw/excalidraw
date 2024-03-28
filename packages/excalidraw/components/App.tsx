@@ -3684,17 +3684,29 @@ class App extends React.Component<AppProps, AppState> {
     tab,
     force,
   }: {
-    name: SidebarName;
+    name: SidebarName | null;
     tab?: SidebarTabName;
     force?: boolean;
   }): boolean => {
     let nextName;
     if (force === undefined) {
-      nextName = this.state.openSidebar?.name === name ? null : name;
+      nextName =
+        this.state.openSidebar?.name === name &&
+        this.state.openSidebar?.tab === tab
+          ? null
+          : name;
     } else {
       nextName = force ? name : null;
     }
-    this.setState({ openSidebar: nextName ? { name: nextName, tab } : null });
+
+    const nextState: AppState["openSidebar"] = nextName
+      ? { name: nextName }
+      : null;
+    if (nextState && tab) {
+      nextState.tab = tab;
+    }
+
+    this.setState({ openSidebar: nextState });
 
     return !!nextName;
   };
