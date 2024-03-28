@@ -168,8 +168,8 @@ function CommandPaletteInner({
 
   const [lastUsed, setLastUsed] = useAtom(lastUsedPaletteItem);
   const [allCommands, setAllCommands] = useState<
-    MarkRequired<CommandPaletteItem, "haystack" | "order">[]
-  >([]);
+    MarkRequired<CommandPaletteItem, "haystack" | "order">[] | null
+  >(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -720,6 +720,10 @@ function CommandPaletteInner({
   }, [handleKeyDown]);
 
   useEffect(() => {
+    if (!allCommands) {
+      return;
+    }
+
     const getNextCommandsByCategory = (commands: CommandPaletteItem[]) => {
       const nextCommandsByCategory: Record<string, CommandPaletteItem[]> = {};
       for (const command of commands) {
@@ -844,12 +848,12 @@ function CommandPaletteInner({
               </div>
             );
           })
-        ) : (
+        ) : allCommands ? (
           <div className="no-match">
             <div className="icon">{searchIcon}</div>{" "}
             {t("commandPalette.search.noMatch")}
           </div>
-        )}
+        ) : null}
       </div>
     </Dialog>
   );
