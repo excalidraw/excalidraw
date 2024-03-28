@@ -1,6 +1,6 @@
 import React from "react";
 import { DEFAULT_SIDEBAR } from "../../constants";
-import { DefaultSidebar, Excalidraw, Sidebar } from "../../index";
+import { Excalidraw, Sidebar } from "../../index";
 import {
   fireEvent,
   GlobalTestState,
