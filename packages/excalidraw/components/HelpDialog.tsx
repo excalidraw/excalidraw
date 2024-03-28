@@ -281,10 +281,14 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             />
             <Shortcut
               label={t("commandPalette.title")}
-              shortcuts={[
-                getShortcutFromShortcutName("commandPalette"),
-                getShortcutFromShortcutName("commandPalette", 1),
-              ]}
+              shortcuts={
+                isFirefox
+                  ? [getShortcutFromShortcutName("commandPalette", 1)]
+                  : [
+                      getShortcutFromShortcutName("commandPalette"),
+                      getShortcutFromShortcutName("commandPalette", 1),
+                    ]
+              }
             />
           </ShortcutIsland>
           <ShortcutIsland
