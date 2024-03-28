@@ -21,7 +21,9 @@
     "copyStyles": "Копіювати стилі",
     "pasteStyles": "Вставити стилі",
     "stroke": "Контур",
+    "changeStroke": "",
     "background": "Тло",
+    "changeBackground": "",
     "fill": "Заповнити",
     "strokeWidth": "Товщина контуру",
     "strokeStyle": "Стиль контуру",
@@ -72,6 +74,7 @@
     "canvasColors": "Використовується на полотні",
     "canvasBackground": "Тло полотна",
     "drawingCanvas": "Полотно",
+    "clearCanvas": "",
     "layers": "Шари",
     "actions": "Дії",
     "language": "Мова",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Завантаження бібліотеки…",
     "libraries": "Всі бібліотеки",
     "loadingScene": "Завантаження сцени…",
+    "loadScene": "",
     "align": "Вирівнювання",
     "alignTop": "Вирівняти по верхньому краю",
     "alignBottom": "Вирівняти по нижньому краю",
@@ -105,7 +109,7 @@
     "share": "Поділитися",
     "showStroke": "Показати палітру для контура",
     "showBackground": "Показати палітру для фону",
-    "toggleTheme": "Перемкнути тему",
+    "toggleTheme": "",
     "personalLib": "Персональна бібліотека",
     "excalidrawLib": "Бібліотека Excalidraw",
     "decreaseFontSize": "Зменшити розмір шрифту",
@@ -140,7 +144,10 @@
     "textToDiagram": "Діаграма з тексту",
     "prompt": "Запит",
     "followUs": "Підписатися",
-    "discordChat": "Чат в Discord"
+    "discordChat": "Чат в Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Тут поки пусто...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
