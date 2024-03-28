@@ -21,7 +21,9 @@
     "copyStyles": "Kopiera stil",
     "pasteStyles": "Klistra in stil",
     "stroke": "Linje",
+    "changeStroke": "",
     "background": "Bakgrund",
+    "changeBackground": "",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
     "strokeStyle": "Linjestil",
@@ -72,6 +74,7 @@
     "canvasColors": "Används på canvas",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
+    "clearCanvas": "",
     "layers": "Lager",
     "actions": "Åtgärder",
     "language": "Språk",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Laddar bibliotek…",
     "libraries": "Bläddra i bibliotek",
     "loadingScene": "Laddar skiss…",
+    "loadScene": "",
     "align": "Justera",
     "alignTop": "Justera överkant",
     "alignBottom": "Justera underkant",
@@ -105,7 +109,7 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
-    "toggleTheme": "Växla tema",
+    "toggleTheme": "",
     "personalLib": "Personligt bibliotek",
     "excalidrawLib": "Excalidraw bibliotek",
     "decreaseFontSize": "Minska fontstorleken",
@@ -140,7 +144,10 @@
     "textToDiagram": "Text till diagram",
     "prompt": "Inmatning",
     "followUs": "Följ oss",
-    "discordChat": "Discord chat"
+    "discordChat": "Discord chat",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
@@ -539,5 +546,20 @@
       "micMuted": "Användarens mikrofon är avstängd",
       "isSpeaking": "Användaren pratar"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
