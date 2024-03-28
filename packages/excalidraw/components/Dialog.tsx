@@ -58,10 +58,12 @@ export const Dialog = (props: DialogProps) => {
 
     const focusableElements = queryFocusableElements(islandNode);
 
-    if (focusableElements.length > 0 && props.autofocus !== false) {
-      // If there's an element other than close, focus it.
-      (focusableElements[1] || focusableElements[0]).focus();
-    }
+    setTimeout(() => {
+      if (focusableElements.length > 0 && props.autofocus !== false) {
+        // If there's an element other than close, focus it.
+        (focusableElements[1] || focusableElements[0]).focus();
+      }
+    });
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === KEYS.TAB) {

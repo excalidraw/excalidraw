@@ -702,7 +702,9 @@ function CommandPaletteInner({
 
     if (event.key === KEYS.ENTER) {
       if (currentCommand) {
-        executeCommand(currentCommand, event);
+        setTimeout(() => {
+          executeCommand(currentCommand, event);
+        });
       }
     }
 
