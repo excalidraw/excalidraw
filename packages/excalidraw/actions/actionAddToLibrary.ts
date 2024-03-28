@@ -58,5 +58,5 @@ export const actionAddToLibrary = register({
         };
       });
   },
-  contextItemLabel: "labels.addToLibrary",
+  label: "labels.addToLibrary",
 });

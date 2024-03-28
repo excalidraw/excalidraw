@@ -49,6 +49,7 @@ const distributeSelectedElements = (
 
 export const distributeHorizontally = register({
   name: "distributeHorizontally",
+  label: "labels.distributeHorizontally",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -79,6 +80,7 @@ export const distributeHorizontally = register({
 
 export const distributeVertically = register({
   name: "distributeVertically",
+  label: "labels.distributeVertically",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {

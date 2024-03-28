@@ -13,8 +13,42 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M9.15 14.85l8.85 -10.85"
+            />
+            <path
+              d="M6 4l8.85 10.85"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -22,8 +56,31 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.copy",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -31,8 +88,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -40,7 +97,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -49,7 +106,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -59,8 +116,50 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+            <path
+              d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"
+            />
+            <path
+              d="M11 21v-6l3 6v-6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "keywords": [
+          "png",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -69,7 +168,49 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+            />
+            <path
+              d="M10 15l2 6l2 -6"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -78,7 +219,12 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -88,8 +234,39 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
         "trackEvent": {
@@ -97,8 +274,39 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
         "trackEvent": {
@@ -108,8 +316,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -118,7 +327,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -127,7 +336,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -136,7 +345,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -146,8 +355,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -157,7 +367,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -167,9 +377,50 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                clipRule="evenodd"
+                d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -178,9 +429,48 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
+                fill="currentColor"
+              />
+              <path
+                d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -189,8 +479,72 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+            >
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <mask
+                fill="#fff"
+                id="SendToBackIcon"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                  fillRule="evenodd"
+                />
+              </mask>
+              <path
+                clipRule="evenodd"
+                d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
+                fill="currentColor"
+                mask="url(#SendToBackIcon)"
+              />
+              <path
+                d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -199,8 +553,45 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
+                fill="currentColor"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -209,8 +600,39 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M12 3l0 18"
+            />
+            <path
+              d="M16 7l0 10l5 0l-5 -10"
+            />
+            <path
+              d="M8 7l0 10l-5 0l5 -10"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
         "trackEvent": {
@@ -218,8 +640,39 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 12l18 0"
+            />
+            <path
+              d="M7 16l10 0l-10 5l0 -5"
+            />
+            <path
+              d="M7 8l10 0l-10 -5l0 5"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
         "trackEvent": {
@@ -228,7 +681,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "category": "Elements",
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
@@ -238,8 +692,30 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416"
+            />
+            <path
+              d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -250,8 +726,31 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -259,8 +758,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
       },
       {
-        "contextItemLabel": [Function],
+        "icon": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
@@ -271,8 +771,24 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+            strokeWidth="1.25"
+          />
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -4698,8 +5214,42 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M9.15 14.85l8.85 -10.85"
+            />
+            <path
+              d="M6 4l8.85 10.85"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -4707,8 +5257,31 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.copy",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -4716,8 +5289,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -4725,7 +5298,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -4734,7 +5307,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -4744,8 +5317,50 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+            <path
+              d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"
+            />
+            <path
+              d="M11 21v-6l3 6v-6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "keywords": [
+          "png",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -4754,7 +5369,49 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+            />
+            <path
+              d="M10 15l2 6l2 -6"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -4763,7 +5420,12 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -4773,8 +5435,39 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
         "trackEvent": {
@@ -4782,8 +5475,39 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
         "trackEvent": {
@@ -4793,8 +5517,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -4803,7 +5528,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -4812,7 +5537,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -4821,7 +5546,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -4831,8 +5556,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -4842,7 +5568,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -4852,9 +5578,50 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                clipRule="evenodd"
+                d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -4863,9 +5630,48 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
+                fill="currentColor"
+              />
+              <path
+                d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -4874,8 +5680,72 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+            >
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <mask
+                fill="#fff"
+                id="SendToBackIcon"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                  fillRule="evenodd"
+                />
+              </mask>
+              <path
+                clipRule="evenodd"
+                d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
+                fill="currentColor"
+                mask="url(#SendToBackIcon)"
+              />
+              <path
+                d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -4884,8 +5754,45 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
+                fill="currentColor"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -4894,8 +5801,39 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M12 3l0 18"
+            />
+            <path
+              d="M16 7l0 10l5 0l-5 -10"
+            />
+            <path
+              d="M8 7l0 10l-5 0l5 -10"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
         "trackEvent": {
@@ -4903,8 +5841,39 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 12l18 0"
+            />
+            <path
+              d="M7 16l10 0l-10 5l0 -5"
+            />
+            <path
+              d="M7 8l10 0l-10 -5l0 5"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
         "trackEvent": {
@@ -4913,7 +5882,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "category": "Elements",
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
@@ -4923,8 +5893,30 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416"
+            />
+            <path
+              d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -4935,8 +5927,31 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -4944,8 +5959,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         },
       },
       {
-        "contextItemLabel": [Function],
+        "icon": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
@@ -4956,8 +5972,24 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+            strokeWidth="1.25"
+          />
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -5285,8 +6317,42 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M9.15 14.85l8.85 -10.85"
+            />
+            <path
+              d="M6 4l8.85 10.85"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -5294,8 +6360,31 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.copy",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -5303,8 +6392,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -5312,7 +6401,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -5321,7 +6410,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -5331,8 +6420,50 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+            <path
+              d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"
+            />
+            <path
+              d="M11 21v-6l3 6v-6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "keywords": [
+          "png",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -5341,7 +6472,49 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+            />
+            <path
+              d="M10 15l2 6l2 -6"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -5350,7 +6523,12 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -5360,8 +6538,39 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
         "trackEvent": {
@@ -5369,8 +6578,39 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
         "trackEvent": {
@@ -5380,8 +6620,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -5390,7 +6631,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -5399,7 +6640,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -5408,7 +6649,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -5418,8 +6659,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -5429,7 +6671,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -5439,9 +6681,50 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                clipRule="evenodd"
+                d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -5450,9 +6733,48 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
+                fill="currentColor"
+              />
+              <path
+                d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -5461,8 +6783,72 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+            >
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <mask
+                fill="#fff"
+                id="SendToBackIcon"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                  fillRule="evenodd"
+                />
+              </mask>
+              <path
+                clipRule="evenodd"
+                d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
+                fill="currentColor"
+                mask="url(#SendToBackIcon)"
+              />
+              <path
+                d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -5471,8 +6857,45 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
+                fill="currentColor"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -5481,8 +6904,39 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M12 3l0 18"
+            />
+            <path
+              d="M16 7l0 10l5 0l-5 -10"
+            />
+            <path
+              d="M8 7l0 10l-5 0l5 -10"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
         "trackEvent": {
@@ -5490,8 +6944,39 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 12l18 0"
+            />
+            <path
+              d="M7 16l10 0l-10 5l0 -5"
+            />
+            <path
+              d="M7 8l10 0l-10 -5l0 5"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
         "trackEvent": {
@@ -5500,7 +6985,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "category": "Elements",
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
@@ -5510,8 +6996,30 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416"
+            />
+            <path
+              d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -5522,8 +7030,31 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -5531,8 +7062,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         },
       },
       {
-        "contextItemLabel": [Function],
+        "icon": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
@@ -5543,8 +7075,24 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+            strokeWidth="1.25"
+          />
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -5959,8 +7507,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -5969,8 +7517,50 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+            <path
+              d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"
+            />
+            <path
+              d="M11 21v-6l3 6v-6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "keywords": [
+          "png",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -5979,7 +7569,49 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+            />
+            <path
+              d="M10 15l2 6l2 -6"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -5988,7 +7620,12 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -5998,17 +7635,142 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       "separator",
       {
-        "contextItemLabel": "labels.selectAll",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z"
+            />
+            <path
+              d="M12 20v.01"
+            />
+            <path
+              d="M16 20v.01"
+            />
+            <path
+              d="M8 20v.01"
+            />
+            <path
+              d="M4 20v.01"
+            />
+            <path
+              d="M4 16v.01"
+            />
+            <path
+              d="M4 12v.01"
+            />
+            <path
+              d="M4 8v.01"
+            />
+            <path
+              d="M4 4v.01"
+            />
+            <path
+              d="M8 4v.01"
+            />
+            <path
+              d="M12 4v.01"
+            />
+            <path
+              d="M16 4v.01"
+            />
+            <path
+              d="M20 4v.01"
+            />
+            <path
+              d="M20 8v.01"
+            />
+            <path
+              d="M20 12v.01"
+            />
+            <path
+              d="M20 16v.01"
+            />
+            <path
+              d="M20 20v.01"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.selectAll",
         "name": "selectAll",
         "perform": [Function],
         "trackEvent": {
           "category": "canvas",
         },
+        "viewMode": false,
       },
       {
-        "contextItemLabel": "labels.elementLock.unlockAll",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g>
+            <path
+              d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            />
+            <path
+              d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            />
+            <mask
+              height={9}
+              id="UnlockedIcon"
+              maskUnits="userSpaceOnUse"
+              style={
+                {
+                  "maskType": "alpha",
+                }
+              }
+              width={9}
+              x={6}
+              y={1}
+            >
+              <path
+                d="M6.399 9.561V5.175c0-.93.401-1.823 1.116-2.48a3.981 3.981 0 0 1 2.693-1.028c1.01 0 1.98.37 2.694 1.027.715.658 1.116 1.55 1.116 2.481"
+                fill="#fff"
+                stroke="none"
+              />
+            </mask>
+            <g
+              mask="url(#UnlockedIcon)"
+            >
+              <path
+                d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
+                fill="currentColor"
+                stroke="none"
+              />
+            </g>
+          </g>
+        </svg>,
+        "label": "labels.elementLock.unlockAll",
         "name": "unlockAllElements",
+        "paletteName": "Unlock all elements",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6019,8 +7781,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       "separator",
       {
         "checked": [Function],
-        "contextItemLabel": "labels.showGrid",
         "keyTest": [Function],
+        "label": "labels.showGrid",
         "name": "gridMode",
         "perform": [Function],
         "predicate": [Function],
@@ -6032,8 +7794,39 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "buttons.objectsSnapMode",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 13v-8a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v8a2 2 0 0 0 6 0v-8a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v8a8 8 0 0 1 -16 0"
+            />
+            <path
+              d="M4 8l5 0"
+            />
+            <path
+              d="M15 8l4 0"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "buttons.objectsSnapMode",
         "name": "objectsSnapMode",
         "perform": [Function],
         "predicate": [Function],
@@ -6041,13 +7834,51 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           "category": "canvas",
           "predicate": [Function],
         },
-        "viewMode": true,
+        "viewMode": false,
       },
       {
         "checked": [Function],
-        "contextItemLabel": "buttons.zenMode",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"
+            />
+            <path
+              d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"
+            />
+            <path
+              d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"
+            />
+            <path
+              d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"
+            />
+            <path
+              d="M16.746 16.726a3 3 0 1 0 .252 -5.555"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "buttons.zenMode",
         "name": "zenMode",
+        "paletteName": "Toggle zen mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6058,9 +7889,40 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "labels.viewMode",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"
+            />
+            <path
+              d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.viewMode",
         "name": "viewMode",
+        "paletteName": "Toggle view mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6071,9 +7933,65 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       },
       {
         "checked": [Function],
-        "contextItemLabel": "stats.title",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3v18"
+            />
+            <path
+              d="M19 21v-18"
+            />
+            <path
+              d="M5 7h14"
+            />
+            <path
+              d="M5 15h14"
+            />
+            <path
+              d="M8 13v4"
+            />
+            <path
+              d="M11 13v4"
+            />
+            <path
+              d="M16 13v4"
+            />
+            <path
+              d="M14 5v4"
+            />
+            <path
+              d="M11 5v4"
+            />
+            <path
+              d="M8 5v4"
+            />
+            <path
+              d="M3 21h18"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "stats.title",
         "name": "stats",
+        "paletteName": "Toggle stats",
         "perform": [Function],
         "trackEvent": {
           "category": "menu",
@@ -6214,8 +8132,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M9.15 14.85l8.85 -10.85"
+            />
+            <path
+              d="M6 4l8.85 10.85"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -6223,8 +8175,31 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copy",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -6232,8 +8207,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -6241,7 +8216,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -6250,7 +8225,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -6260,8 +8235,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+            <path
+              d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"
+            />
+            <path
+              d="M11 21v-6l3 6v-6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "keywords": [
+          "png",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -6270,7 +8287,49 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+            />
+            <path
+              d="M10 15l2 6l2 -6"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -6279,7 +8338,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -6289,8 +8353,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
         "trackEvent": {
@@ -6298,8 +8393,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
         "trackEvent": {
@@ -6309,8 +8435,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -6319,7 +8446,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6328,7 +8455,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6337,7 +8464,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -6347,8 +8474,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -6358,7 +8486,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -6368,9 +8496,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                clipRule="evenodd"
+                d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -6379,9 +8548,48 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
+                fill="currentColor"
+              />
+              <path
+                d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -6390,8 +8598,72 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+            >
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <mask
+                fill="#fff"
+                id="SendToBackIcon"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                  fillRule="evenodd"
+                />
+              </mask>
+              <path
+                clipRule="evenodd"
+                d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
+                fill="currentColor"
+                mask="url(#SendToBackIcon)"
+              />
+              <path
+                d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -6400,8 +8672,45 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
+                fill="currentColor"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -6410,8 +8719,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M12 3l0 18"
+            />
+            <path
+              d="M16 7l0 10l5 0l-5 -10"
+            />
+            <path
+              d="M8 7l0 10l-5 0l5 -10"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
         "trackEvent": {
@@ -6419,8 +8759,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 12l18 0"
+            />
+            <path
+              d="M7 16l10 0l-10 5l0 -5"
+            />
+            <path
+              d="M7 8l10 0l-10 -5l0 5"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
         "trackEvent": {
@@ -6429,7 +8800,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "category": "Elements",
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
@@ -6439,8 +8811,30 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416"
+            />
+            <path
+              d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -6451,8 +8845,31 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -6460,8 +8877,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": [Function],
+        "icon": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
@@ -6472,8 +8890,24 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+            strokeWidth="1.25"
+          />
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {
@@ -6590,8 +9024,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "contextMenu": {
     "items": [
       {
-        "contextItemLabel": "labels.cut",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+            />
+            <path
+              d="M9.15 14.85l8.85 -10.85"
+            />
+            <path
+              d="M6 4l8.85 10.85"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.cut",
         "name": "cut",
         "perform": [Function],
         "trackEvent": {
@@ -6599,8 +9067,31 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copy",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": undefined,
+        "label": "labels.copy",
         "name": "copy",
         "perform": [Function],
         "trackEvent": {
@@ -6608,8 +9099,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.paste",
         "keyTest": undefined,
+        "label": "labels.paste",
         "name": "paste",
         "perform": [Function],
         "trackEvent": {
@@ -6617,7 +9108,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.selectAllElementsInFrame",
+        "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -6626,7 +9117,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.removeAllElementsFromFrame",
+        "label": "labels.removeAllElementsFromFrame",
         "name": "removeAllElementsFromFrame",
         "perform": [Function],
         "predicate": [Function],
@@ -6636,8 +9127,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyAsPng",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+            <path
+              d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"
+            />
+            <path
+              d="M11 21v-6l3 6v-6"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "keywords": [
+          "png",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsPng",
         "name": "copyAsPng",
         "perform": [Function],
         "predicate": [Function],
@@ -6646,7 +9179,49 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyAsSvg",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M14 3v4a1 1 0 0 0 1 1h4"
+            />
+            <path
+              d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"
+            />
+            <path
+              d="M4 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+            />
+            <path
+              d="M10 15l2 6l2 -6"
+            />
+            <path
+              d="M20 15h-1a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2h1v-3"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "svg",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyAsSvg",
         "name": "copyAsSvg",
         "perform": [Function],
         "predicate": [Function],
@@ -6655,7 +9230,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.copyText",
+        "keywords": [
+          "text",
+          "clipboard",
+          "copy",
+        ],
+        "label": "labels.copyText",
         "name": "copyText",
         "perform": [Function],
         "predicate": [Function],
@@ -6665,8 +9245,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.copyStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.copyStyles",
         "name": "copyStyles",
         "perform": [Function],
         "trackEvent": {
@@ -6674,8 +9285,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.pasteStyles",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M19 6h1a2 2 0 0 1 2 2a5 5 0 0 1 -5 5l-5 0v2"
+            />
+            <path
+              d="M10 15m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.pasteStyles",
         "name": "pasteStyles",
         "perform": [Function],
         "trackEvent": {
@@ -6685,8 +9327,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.group",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.group",
         "name": "group",
         "perform": [Function],
         "predicate": [Function],
@@ -6695,7 +9338,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.unbindText",
+        "label": "labels.unbindText",
         "name": "unbindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6704,7 +9347,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.bindText",
+        "label": "labels.bindText",
         "name": "bindText",
         "perform": [Function],
         "predicate": [Function],
@@ -6713,7 +9356,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.createContainerFromText",
+        "label": "labels.createContainerFromText",
         "name": "wrapTextInContainer",
         "perform": [Function],
         "predicate": [Function],
@@ -6723,8 +9366,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.ungroup",
+        "icon": [Function],
         "keyTest": [Function],
+        "label": "labels.ungroup",
         "name": "ungroup",
         "perform": [Function],
         "predicate": [Function],
@@ -6734,7 +9378,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.addToLibrary",
+        "label": "labels.addToLibrary",
         "name": "addToLibrary",
         "perform": [Function],
         "trackEvent": {
@@ -6744,9 +9388,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendBackward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                clipRule="evenodd"
+                d="M6.944 12.5H12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.621-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.768-.622-1.39-1.39-1.39Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.sendBackward",
         "name": "sendBackward",
         "perform": [Function],
         "trackEvent": {
@@ -6755,9 +9440,48 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringForward",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M13.889 4.167H8.333c-.767 0-1.389.622-1.389 1.389v5.555c0 .767.622 1.389 1.39 1.389h5.555c.767 0 1.389-.622 1.389-1.389V5.556c0-.767-.622-1.39-1.39-1.39Z"
+                fill="currentColor"
+              />
+              <path
+                d="M12.5 12.5v1.389a1.389 1.389 0 0 1-1.389 1.389H5.556a1.389 1.389 0 0 1-1.39-1.39V8.334a1.389 1.389 0 0 1 1.39-1.389h1.388"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyPriority": 40,
         "keyTest": [Function],
+        "label": "labels.bringForward",
         "name": "bringForward",
         "perform": [Function],
         "trackEvent": {
@@ -6766,8 +9490,72 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.sendToBack",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+            >
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+              <mask
+                fill="#fff"
+                id="SendToBackIcon"
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                  fillRule="evenodd"
+                />
+              </mask>
+              <path
+                clipRule="evenodd"
+                d="M9.167 5.833v2.06a2.941 2.941 0 0 0 2.94 2.94h2.06v.393a2.941 2.941 0 0 1-2.941 2.94h-.393v-2.058a2.941 2.941 0 0 0-2.94-2.941h-2.06v-.393a2.941 2.941 0 0 1 2.942-2.94h.392Z"
+                fill="currentColor"
+                fillRule="evenodd"
+              />
+              <path
+                d="M9.167 5.833h1.25v-1.25h-1.25v1.25Zm5 5h1.25v-1.25h-1.25v1.25Zm-3.334 3.334h-1.25v1.25h1.25v-1.25Zm-5-5h-1.25v1.25h1.25v-1.25Zm2.084-3.334v2.06h2.5v-2.06h-2.5Zm0 2.06a4.191 4.191 0 0 0 4.19 4.19v-2.5a1.691 1.691 0 0 1-1.69-1.69h-2.5Zm4.19 4.19h2.06v-2.5h-2.06v2.5Zm.81-1.25v.393h2.5v-.393h-2.5Zm0 .393c0 .933-.758 1.69-1.691 1.69v2.5a4.191 4.191 0 0 0 4.19-4.19h-2.5Zm-1.691 1.69h-.393v2.5h.393v-2.5Zm.857 1.25v-2.058h-2.5v2.059h2.5Zm0-2.058a4.191 4.191 0 0 0-4.19-4.191v2.5c.933 0 1.69.757 1.69 1.69h2.5Zm-4.19-4.191h-2.06v2.5h2.06v-2.5Zm-.81 1.25v-.393h-2.5v.393h2.5Zm0-.393c0-.934.758-1.69 1.692-1.69v-2.5a4.191 4.191 0 0 0-4.192 4.19h2.5Zm1.692-1.69h.392v-2.5h-.392v2.5Z"
+                fill="currentColor"
+                mask="url(#SendToBackIcon)"
+              />
+              <path
+                d="M12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+                stroke="currentColor"
+                strokeWidth="1.25"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.sendToBack",
         "name": "sendToBack",
         "perform": [Function],
         "trackEvent": {
@@ -6776,8 +9564,45 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.bringToFront",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <React.Fragment>
+            <g
+              clipPath="url(#a)"
+              stroke="currentColor"
+              strokeWidth="1.25"
+            >
+              <path
+                d="M8.775 6.458h2.45a2.316 2.316 0 0 1 2.317 2.316v2.452a2.316 2.316 0 0 1-2.316 2.316H8.774a2.316 2.316 0 0 1-2.317-2.316V8.774a2.316 2.316 0 0 1 2.317-2.316Z"
+                fill="currentColor"
+              />
+              <path
+                d="M5.441 9.792h2.451a2.316 2.316 0 0 1 2.316 2.316v2.45a2.316 2.316 0 0 1-2.316 2.317h-2.45a2.316 2.316 0 0 1-2.317-2.316v-2.451a2.316 2.316 0 0 1 2.316-2.316ZM12.108 3.125h2.45a2.316 2.316 0 0 1 2.317 2.316v2.451a2.316 2.316 0 0 1-2.316 2.316h-2.451a2.316 2.316 0 0 1-2.316-2.316v-2.45a2.316 2.316 0 0 1 2.316-2.317Z"
+              />
+            </g>
+            <defs>
+              <clipPath
+                id="a"
+              >
+                <path
+                  d="M0 0h20v20H0z"
+                  fill="#fff"
+                />
+              </clipPath>
+            </defs>
+          </React.Fragment>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.bringToFront",
         "name": "bringToFront",
         "perform": [Function],
         "trackEvent": {
@@ -6786,8 +9611,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": "labels.flipHorizontal",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M12 3l0 18"
+            />
+            <path
+              d="M16 7l0 10l5 0l-5 -10"
+            />
+            <path
+              d="M8 7l0 10l-5 0l5 -10"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipHorizontal",
         "name": "flipHorizontal",
         "perform": [Function],
         "trackEvent": {
@@ -6795,8 +9651,39 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": "labels.flipVertical",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.25}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 12l18 0"
+            />
+            <path
+              d="M7 16l10 0l-10 5l0 -5"
+            />
+            <path
+              d="M7 8l10 0l-10 -5l0 5"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
         "trackEvent": {
@@ -6805,7 +9692,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "contextItemLabel": [Function],
+        "category": "Elements",
+        "label": [Function],
         "name": "toggleLinearEditor",
         "perform": [Function],
         "predicate": [Function],
@@ -6815,8 +9703,30 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M8.333 11.667a2.917 2.917 0 0 0 4.167 0l3.333-3.334a2.946 2.946 0 1 0-4.166-4.166l-.417.416"
+            />
+            <path
+              d="M11.667 8.333a2.917 2.917 0 0 0-4.167 0l-3.333 3.334a2.946 2.946 0 0 0 4.166 4.166l.417-.416"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": [Function],
         "name": "hyperlink",
         "perform": [Function],
         "predicate": [Function],
@@ -6827,8 +9737,31 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.duplicateSelection",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M14.375 6.458H8.958a2.5 2.5 0 0 0-2.5 2.5v5.417a2.5 2.5 0 0 0 2.5 2.5h5.417a2.5 2.5 0 0 0 2.5-2.5V8.958a2.5 2.5 0 0 0-2.5-2.5Z"
+            />
+            <path
+              clipRule="evenodd"
+              d="M11.667 3.125c.517 0 .986.21 1.325.55.34.338.55.807.55 1.325v1.458H8.333c-.485 0-.927.185-1.26.487-.343.312-.57.75-.609 1.24l-.005 5.357H5a1.87 1.87 0 0 1-1.326-.55 1.87 1.87 0 0 1-.549-1.325V5c0-.518.21-.987.55-1.326.338-.34.807-.549 1.325-.549h6.667Z"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.duplicateSelection",
         "name": "duplicateSelection",
         "perform": [Function],
         "trackEvent": {
@@ -6836,8 +9769,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
       },
       {
-        "contextItemLabel": [Function],
+        "icon": [Function],
         "keyTest": [Function],
+        "label": [Function],
         "name": "toggleElementLock",
         "perform": [Function],
         "predicate": [Function],
@@ -6848,8 +9782,24 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       "separator",
       {
         "PanelComponent": [Function],
-        "contextItemLabel": "labels.delete",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          viewBox="0 0 20 20"
+        >
+          <path
+            d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
+            strokeWidth="1.25"
+          />
+        </svg>,
         "keyTest": [Function],
+        "label": "labels.delete",
         "name": "deleteSelectedElements",
         "perform": [Function],
         "trackEvent": {

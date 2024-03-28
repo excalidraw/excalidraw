@@ -7,6 +7,7 @@ import "./HelpDialog.scss";
 import { ExternalLinkIcon } from "./icons";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { isDarwin, isFirefox, isWindows } from "../constants";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -277,6 +278,13 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("stats.title")}
               shortcuts={[getShortcutKey("Alt+/")]}
+            />
+            <Shortcut
+              label={t("commandPalette.title")}
+              shortcuts={[
+                getShortcutFromShortcutName("commandPalette"),
+                getShortcutFromShortcutName("commandPalette", 1),
+              ]}
             />
           </ShortcutIsland>
           <ShortcutIsland

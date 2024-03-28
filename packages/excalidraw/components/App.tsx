@@ -413,6 +413,7 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3746,6 +3747,22 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key === KEYS.P &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        this.setToast({
+          message: t("commandPalette.shortcutHint", {
+            shortcutOne: getShortcutFromShortcutName("commandPalette"),
+            shortcutTwo: getShortcutFromShortcutName("commandPalette", 1),
+          }),
+        });
+        event.preventDefault();
+        return;
+      }
+
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
         IS_PLAIN_PASTE = event.shiftKey;
         clearTimeout(IS_PLAIN_PASTE_TIMER);
@@ -4604,11 +4621,6 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
-      } else if (
-        this.state.editingLinearElement &&
-        this.state.editingLinearElement.elementId === selectedElements[0].id
-      ) {
-        return;
       }
     }
 
@@ -4781,7 +4793,11 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
-          const newWindow = window.open(undefined, target);
+          const newWindow = window.open(
+            undefined,
+            target,
+            "noopener noreferrer",
+          );
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;

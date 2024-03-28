@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ActionManager } from "../actions/manager";
 import {
+  ExcalidrawElement,
   ExcalidrawElementType,
   NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
@@ -45,6 +46,40 @@ import {
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
 
+export const canChangeStrokeColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  let commonSelectedType: ExcalidrawElementType | null =
+    targetElements[0]?.type || null;
+
+  for (const element of targetElements) {
+    if (element.type !== commonSelectedType) {
+      commonSelectedType = null;
+      break;
+    }
+  }
+
+  return (
+    (hasStrokeColor(appState.activeTool.type) &&
+      appState.activeTool.type !== "image" &&
+      commonSelectedType !== "image" &&
+      commonSelectedType !== "frame" &&
+      commonSelectedType !== "magicframe") ||
+    targetElements.some((element) => hasStrokeColor(element.type))
+  );
+};
+
+export const canChangeBackgroundColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  return (
+    hasBackground(appState.activeTool.type) ||
+    targetElements.some((element) => hasBackground(element.type))
+  );
+};
+
 export const SelectedShapeActions = ({
   appState,
   elementsMap,
@@ -75,35 +110,17 @@ export const SelectedShapeActions = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
-  const showChangeBackgroundIcons =
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
 
-  let commonSelectedType: ExcalidrawElementType | null =
-    targetElements[0]?.type || null;
-
-  for (const element of targetElements) {
-    if (element.type !== commonSelectedType) {
-      commonSelectedType = null;
-      break;
-    }
-  }
-
   return (
     <div className="panelColumn">
       <div>
-        {((hasStrokeColor(appState.activeTool.type) &&
-          appState.activeTool.type !== "image" &&
-          commonSelectedType !== "image" &&
-          commonSelectedType !== "frame" &&
-          commonSelectedType !== "magicframe") ||
-          targetElements.some((element) => hasStrokeColor(element.type))) &&
+        {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
       </div>
-      {showChangeBackgroundIcons && (
+      {canChangeBackgroundColor(appState, targetElements) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {showFillIcons && renderAction("changeFillStyle")}

@@ -10,6 +10,10 @@
     background-color: var(--back-color);
     border-color: var(--border-color);
 
+    &:hover {
+      transition: all 150ms ease-out;
+    }
+
     .Spinner {
       --spinner-color: var(--color-surface-lowest);
       position: absolute;
@@ -202,8 +206,6 @@
     font-family: var(--font-family);
 
     user-select: none;
-
-    transition: all 150ms ease-out;
 
     &--size-large {
       font-weight: 600;

@@ -42,13 +42,15 @@ const MenuContent = ({
       }
     };
 
-    document.addEventListener(EVENT.KEYDOWN, onKeyDown, {
+    const option = {
       // so that we can stop propagation of the event before it reaches
       // event handlers that were bound before this one
       capture: true,
-    });
+    };
+
+    document.addEventListener(EVENT.KEYDOWN, onKeyDown, option);
     return () => {
-      document.removeEventListener(EVENT.KEYDOWN, onKeyDown);
+      document.removeEventListener(EVENT.KEYDOWN, onKeyDown, option);
     };
   }, [callbacksRef]);
 

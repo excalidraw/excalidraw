@@ -17,9 +17,12 @@ import {
   unbindLinearElements,
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
+import { flipHorizontal, flipVertical } from "../components/icons";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
+  label: "labels.flipHorizontal",
+  icon: flipHorizontal,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -38,11 +41,12 @@ export const actionFlipHorizontal = register({
     };
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
-  contextItemLabel: "labels.flipHorizontal",
 });
 
 export const actionFlipVertical = register({
   name: "flipVertical",
+  label: "labels.flipVertical",
+  icon: flipVertical,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -62,7 +66,6 @@ export const actionFlipVertical = register({
   },
   keyTest: (event) =>
     event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
-  contextItemLabel: "labels.flipVertical",
 });
 
 const flipSelectedElements = (

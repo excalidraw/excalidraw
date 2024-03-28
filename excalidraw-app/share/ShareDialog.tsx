@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
 import { trackEvent } from "../../packages/excalidraw/analytics";
@@ -22,6 +22,7 @@ import { activeRoomLinkAtom, CollabAPI } from "../collab/Collab";
 import { atom, useAtom, useAtomValue } from "jotai";
 
 import "./ShareDialog.scss";
+import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
@@ -275,6 +276,14 @@ export const ShareDialog = (props: {
 }) => {
   const [shareDialogState, setShareDialogState] = useAtom(shareDialogStateAtom);
 
+  const { openDialog } = useUIAppState();
+
+  useEffect(() => {
+    if (openDialog) {
+      setShareDialogState({ isOpen: false });
+    }
+  }, [openDialog, setShareDialogState]);
+
   if (!shareDialogState.isOpen) {
     return null;
   }
@@ -285,6 +294,6 @@ export const ShareDialog = (props: {
       collabAPI={props.collabAPI}
       onExportToBackend={props.onExportToBackend}
       type={shareDialogState.type}
-    ></ShareDialogInner>
+    />
   );
 };

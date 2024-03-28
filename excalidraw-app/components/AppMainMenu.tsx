@@ -20,7 +20,7 @@ export const AppMainMenu: React.FC<{
           onSelect={() => props.onCollabDialogOpen()}
         />
       )}
-
+      <MainMenu.DefaultItems.CommandPalette />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />

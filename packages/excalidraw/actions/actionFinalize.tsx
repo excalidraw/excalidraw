@@ -19,6 +19,7 @@ import { resetCursor } from "../cursor";
 
 export const actionFinalize = register({
   name: "finalize",
+  label: "",
   trackEvent: false,
   perform: (
     elements,

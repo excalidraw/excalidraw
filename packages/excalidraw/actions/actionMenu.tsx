@@ -1,4 +1,4 @@
-import { HamburgerMenuIcon, palette } from "../components/icons";
+import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
@@ -7,6 +7,7 @@ import { KEYS } from "../keys";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
+  label: "buttons.menu",
   trackEvent: { category: "menu" },
   perform: (_, appState) => ({
     appState: {
@@ -28,6 +29,7 @@ export const actionToggleCanvasMenu = register({
 
 export const actionToggleEditMenu = register({
   name: "toggleEditMenu",
+  label: "buttons.edit",
   trackEvent: { category: "menu" },
   perform: (_elements, appState) => ({
     appState: {
@@ -53,6 +55,8 @@ export const actionToggleEditMenu = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
+  label: "welcomeScreen.defaults.helpHint",
+  icon: HelpIconThin,
   viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
