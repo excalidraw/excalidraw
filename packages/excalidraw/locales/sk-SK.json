@@ -21,7 +21,9 @@
     "copyStyles": "Kopírovať štýly",
     "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
+    "changeStroke": "",
     "background": "Pozadie",
+    "changeBackground": "",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
     "strokeStyle": "Štýl obrysu",
@@ -72,6 +74,7 @@
     "canvasColors": "Použité na plátne",
     "canvasBackground": "Pozadie plátna",
     "drawingCanvas": "Kresliace plátno",
+    "clearCanvas": "",
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Načítavanie knižnice…",
     "libraries": "Prehliadať knižnice",
     "loadingScene": "Načítavanie scény…",
+    "loadScene": "",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -105,7 +109,7 @@
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
-    "toggleTheme": "Prepnúť tému",
+    "toggleTheme": "",
     "personalLib": "Moja knižnica",
     "excalidrawLib": "Excalidraw knižnica",
     "decreaseFontSize": "Zmenšiť veľkosť písma",
@@ -140,7 +144,10 @@
     "textToDiagram": "Text na diagram",
     "prompt": "Inštrukcia",
     "followUs": "Sledujte nás",
-    "discordChat": "Discord chat"
+    "discordChat": "Discord chat",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
