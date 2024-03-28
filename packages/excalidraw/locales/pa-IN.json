@@ -21,7 +21,9 @@
     "copyStyles": "ਸਟਾਇਲ ਕਾਪੀ ਕਰੋ",
     "pasteStyles": "ਸਟਾਇਲ ਪੇਸਟ ਕਰੋ",
     "stroke": "ਰੇਖਾ",
+    "changeStroke": "",
     "background": "ਬੈਕਗਰਾਉਂਡ",
+    "changeBackground": "",
     "fill": "ਭਰਨਾ",
     "strokeWidth": "ਰੇਖਾ ਦੀ ਚੌੜਾਈ",
     "strokeStyle": "ਰੇਖਾ ਦਾ ਸਟਾਇਲ",
@@ -72,6 +74,7 @@
     "canvasColors": "ਕੈਨਵਸ 'ਤੇ ਵਰਤਿਆ",
     "canvasBackground": "ਕੈਨਵਸ ਦਾ ਬੈਕਗਰਾਉਂਡ",
     "drawingCanvas": "ਡਰਾਇੰਗ ਕੈਨਵਸ",
+    "clearCanvas": "",
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ…",
     "libraries": "ਲਾਇਬ੍ਰੇਰੀਆਂ ਬਰਾਉਜ਼ ਕਰੋ",
     "loadingScene": "ਦ੍ਰਿਸ਼ ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ…",
+    "loadScene": "",
     "align": "ਇਕਸਾਰ",
     "alignTop": "ਉੱਪਰ ਇਕਸਾਰ ਕਰੋ",
     "alignBottom": "ਹੇਠਾਂ ਇਕਸਾਰ ਕਰੋ",
@@ -105,7 +109,7 @@
     "share": "ਸਾਂਝਾ ਕਰੋ",
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
-    "toggleTheme": "ਥੀਮ ਬਦਲੋ",
+    "toggleTheme": "",
     "personalLib": "ਨਿੱਜੀ ਲਾਇਬ੍ਰੇਰੀ",
     "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ",
     "decreaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਘਟਾਓ",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਚੀਜ ਜੋੜੀ ਨਹੀਂ ਗਈ...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
