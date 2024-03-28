@@ -21,7 +21,9 @@
     "copyStyles": "Stilleri kopyala",
     "pasteStyles": "Stilleri yapıştır",
     "stroke": "Vurgu",
+    "changeStroke": "",
     "background": "Arka plan",
+    "changeBackground": "",
     "fill": "Doldur",
     "strokeWidth": "Kontur genişliği",
     "strokeStyle": "Kontur stili",
@@ -72,6 +74,7 @@
     "canvasColors": "Tuvalin üzerinde kullanıldı",
     "canvasBackground": "Tuval arka planı",
     "drawingCanvas": "Çizim tuvali",
+    "clearCanvas": "",
     "layers": "Katmanlar",
     "actions": "Eylemler",
     "language": "Dil",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Kütüphane yükleniyor…",
     "libraries": "Kütüphanelere gözat",
     "loadingScene": "Sahne yükleniyor…",
+    "loadScene": "",
     "align": "Hizala",
     "alignTop": "Yukarı hizala",
     "alignBottom": "Aşağı hizala",
@@ -105,7 +109,7 @@
     "share": "Paylaş",
     "showStroke": "Kontur için renk seçiciyi göster",
     "showBackground": "Arkaplan için renk seçiciyi göster",
-    "toggleTheme": "Temayı etkinleştir/devre dışı bırak",
+    "toggleTheme": "",
     "personalLib": "Kişisel Kitaplık",
     "excalidrawLib": "Excalidraw Kitaplığı",
     "decreaseFontSize": "Yazı Tipi Boyutunu Küçült",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
