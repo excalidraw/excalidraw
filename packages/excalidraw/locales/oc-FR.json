@@ -544,17 +544,17 @@
       "followStatus": "Seguissètz actualament aqueste utilizaire",
       "inCall": "",
       "micMuted": "",
-      "isSpeaking": ""
+      "isSpeaking": "La persona parla"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paleta de comanda",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Seleccionar",
+      "confirm": "Confirmar",
+      "close": "Tampar"
     },
-    "recents": "",
+    "recents": "Utilizada recentament",
     "search": {
       "placeholder": "",
       "noMatch": ""
