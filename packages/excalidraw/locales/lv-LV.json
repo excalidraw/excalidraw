@@ -21,7 +21,9 @@
     "copyStyles": "Kopēt stilus",
     "pasteStyles": "Ielīmēt stilus",
     "stroke": "Svītras krāsa",
+    "changeStroke": "",
     "background": "Fona krāsa",
+    "changeBackground": "",
     "fill": "Aizpildījums",
     "strokeWidth": "Svītras platums",
     "strokeStyle": "Svītras stils",
@@ -72,6 +74,7 @@
     "canvasColors": "Izmantots tāfelei",
     "canvasBackground": "Ainas fons",
     "drawingCanvas": "Tāfele",
+    "clearCanvas": "",
     "layers": "Slāņi",
     "actions": "Darbības",
     "language": "Valoda",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Ielādē bibliotēku…",
     "libraries": "Apskatīt bibliotēkas",
     "loadingScene": "Ielādē ainu…",
+    "loadScene": "",
     "align": "Līdzināt",
     "alignTop": "Līdzināt augšpusē",
     "alignBottom": "Līdzināt lejā",
@@ -105,7 +109,7 @@
     "share": "Kopīgot",
     "showStroke": "Rādīt svītras krāsas atlasītāju",
     "showBackground": "Rādīt fona krāsas atlasītāju",
-    "toggleTheme": "Pārslēgt krāsu tēmu",
+    "toggleTheme": "",
     "personalLib": "Personīgā bibliotēka",
     "excalidrawLib": "Excalidraw bibliotēka",
     "decreaseFontSize": "Samazināt fonta izmēru",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Neviena vienība vēl nav pievienota...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
