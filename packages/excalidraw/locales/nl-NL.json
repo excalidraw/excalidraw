@@ -21,7 +21,9 @@
     "copyStyles": "Kopieer opmaak",
     "pasteStyles": "Plak opmaak",
     "stroke": "Lijn",
+    "changeStroke": "",
     "background": "Achtergrond",
+    "changeBackground": "",
     "fill": "Invulling",
     "strokeWidth": "Lijnbreedte",
     "strokeStyle": "Lijnstijl",
@@ -72,6 +74,7 @@
     "canvasColors": "Gebruikt op canvas",
     "canvasBackground": "Canvas achtergrond",
     "drawingCanvas": "Canvas",
+    "clearCanvas": "",
     "layers": "Lagen",
     "actions": "Acties",
     "language": "Taal",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Bibliotheek laden…",
     "libraries": "Blader door bibliotheken",
     "loadingScene": "Scène laden…",
+    "loadScene": "",
     "align": "Uitlijnen",
     "alignTop": "Boven uitlijnen",
     "alignBottom": "Onder uitlijnen",
@@ -105,7 +109,7 @@
     "share": "Deel",
     "showStroke": "Toon lijn kleur kiezer",
     "showBackground": "Toon achtergrondkleur kiezer",
-    "toggleTheme": "Thema aan/uit",
+    "toggleTheme": "",
     "personalLib": "Persoonlijke bibliotheek",
     "excalidrawLib": "Excalidraw bibliotheek",
     "decreaseFontSize": "Letters verkleinen",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "Volg ons",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
