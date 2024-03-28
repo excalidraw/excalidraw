@@ -21,7 +21,9 @@
     "copyStyles": "スタイルのコピー",
     "pasteStyles": "スタイルの貼り付け",
     "stroke": "線",
+    "changeStroke": "",
     "background": "背景",
+    "changeBackground": "",
     "fill": "塗りつぶし",
     "strokeWidth": "線の太さ",
     "strokeStyle": "線の種類",
@@ -72,6 +74,7 @@
     "canvasColors": "キャンバス上で使用",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
+    "clearCanvas": "",
     "layers": "レイヤー",
     "actions": "操作",
     "language": "言語",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "ライブラリを読み込み中…",
     "libraries": "ライブラリを参照する",
     "loadingScene": "シーンを読み込み中…",
+    "loadScene": "",
     "align": "配置",
     "alignTop": "上揃え",
     "alignBottom": "下揃え",
@@ -105,7 +109,7 @@
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
-    "toggleTheme": "テーマの切り替え",
+    "toggleTheme": "",
     "personalLib": "個人ライブラリ",
     "excalidrawLib": "Excalidrawライブラリ",
     "decreaseFontSize": "フォントサイズを縮小",
@@ -140,7 +144,10 @@
     "textToDiagram": "テキストからダイアグラムを生成",
     "prompt": "プロンプト",
     "followUs": "フォローする",
-    "discordChat": "Discord チャット"
+    "discordChat": "Discord チャット",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
