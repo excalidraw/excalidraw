@@ -1,4 +1,13 @@
 import React from "react";
+import { actionToggleStats } from "../actions";
+import { ActionManager } from "../actions/manager";
+import { isHandToolActive } from "../appState";
+import { useTunnels } from "../context/tunnels";
+import { showSelectedShapeActions } from "../element";
+import { NonDeletedExcalidrawElement } from "../element/types";
+import { t } from "../i18n";
+import { calculateScrollCenter } from "../scene";
+import { SCROLLBAR_MARGIN, SCROLLBAR_WIDTH } from "../scene/scrollbars";
 import {
   AppClassProperties,
   AppProps,
@@ -7,25 +16,16 @@ import {
   ExcalidrawProps,
   UIAppState,
 } from "../types";
-import { ActionManager } from "../actions/manager";
-import { t } from "../i18n";
-import Stack from "./Stack";
-import { showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { FixedSideContainer } from "./FixedSideContainer";
-import { Island } from "./Island";
-import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import { Section } from "./Section";
-import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+import { FixedSideContainer } from "./FixedSideContainer";
+import { HandButton } from "./HandButton";
+import { HintViewer } from "./HintViewer";
+import { Island } from "./Island";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
+import { Section } from "./Section";
+import Stack from "./Stack";
 import { Stats } from "./Stats";
-import { actionToggleStats } from "../actions";
-import { HandButton } from "./HandButton";
-import { isHandToolActive } from "../appState";
-import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
   appState: UIAppState;
@@ -80,7 +80,7 @@ export const MobileMenu = ({
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar App-toolbar--mobile">
+                <Island draggable padding={1} className="App-toolbar App-toolbar--mobile">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
@@ -176,7 +176,7 @@ export const MobileMenu = ({
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
         }}
       >
-        <Island padding={0}>
+        <Island draggable padding={0}>
           {appState.openMenu === "shape" &&
           !appState.viewModeEnabled &&
           showSelectedShapeActions(appState, elements) ? (
