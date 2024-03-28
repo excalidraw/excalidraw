@@ -78,6 +78,7 @@ import { appJotaiStore } from "../app-jotai";
 import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
+import * as Sentry from "@sentry/browser";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
@@ -691,6 +692,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           this.portal.socket,
         );
         if (elements) {
+          if (elements.length === 0) {
+            Sentry.captureMessage("Empty scene received from server", {
+              level: Sentry.Severity.Warning,
+            });
+          }
           this.setLastBroadcastedOrReceivedSceneVersion(
             getSceneVersion(elements),
           );
