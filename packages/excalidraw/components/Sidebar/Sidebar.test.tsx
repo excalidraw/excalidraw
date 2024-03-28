@@ -85,7 +85,7 @@ describe("Sidebar", () => {
       });
     });
 
-    it("should toggle sidebar using props.toggleMenu()", async () => {
+    it("should toggle sidebar using excalidrawAPI.toggleSidebar()", async () => {
       const { container } = await render(
         <Excalidraw>
           <Sidebar name="customSidebar">
@@ -157,6 +157,20 @@ describe("Sidebar", () => {
         // make sure only one sidebar is rendered
         const sidebars = container.querySelectorAll(".sidebar");
         expect(sidebars.length).toBe(1);
+      });
+
+      // closing sidebar using `{ name: null }`
+      // -------------------------------------------------------------------------
+      expect(window.h.app.toggleSidebar({ name: "customSidebar" })).toBe(true);
+      await waitFor(() => {
+        const node = container.querySelector("#test-sidebar-content");
+        expect(node).not.toBe(null);
+      });
+
+      expect(window.h.app.toggleSidebar({ name: null })).toBe(false);
+      await waitFor(() => {
+        const node = container.querySelector("#test-sidebar-content");
+        expect(node).toBe(null);
       });
     });
   });
@@ -325,6 +339,72 @@ describe("Sidebar", () => {
         { width: 1920, height: 1080 },
         async () => {
           await assertSidebarDockButton(false);
+        },
+      );
+    });
+  });
+
+  describe("Sidebar.tab", () => {
+    it("should toggle sidebars tabs correctly", async () => {
+      const { container } = await render(
+        <Excalidraw>
+          <Sidebar name="custom" docked>
+            <Sidebar.Tabs>
+              <Sidebar.Tab tab="library">Library</Sidebar.Tab>
+              <Sidebar.Tab tab="comments">Comments</Sidebar.Tab>
+            </Sidebar.Tabs>
+          </Sidebar>
+        </Excalidraw>,
+      );
+
+      await withExcalidrawDimensions(
+        { width: 1920, height: 1080 },
+        async () => {
+          expect(
+            container.querySelector<HTMLElement>(
+              "[role=tabpanel][data-testid=library]",
+            ),
+          ).toBeNull();
+
+          // open library sidebar
+          expect(
+            window.h.app.toggleSidebar({ name: "custom", tab: "library" }),
+          ).toBe(true);
+          expect(
+            container.querySelector<HTMLElement>(
+              "[role=tabpanel][data-testid=library]",
+            ),
+          ).not.toBeNull();
+
+          // switch to comments tab
+          expect(
+            window.h.app.toggleSidebar({ name: "custom", tab: "comments" }),
+          ).toBe(true);
+          expect(
+            container.querySelector<HTMLElement>(
+              "[role=tabpanel][data-testid=comments]",
+            ),
+          ).not.toBeNull();
+
+          // toggle sidebar closed
+          expect(
+            window.h.app.toggleSidebar({ name: "custom", tab: "comments" }),
+          ).toBe(false);
+          expect(
+            container.querySelector<HTMLElement>(
+              "[role=tabpanel][data-testid=comments]",
+            ),
+          ).toBeNull();
+
+          // toggle sidebar open
+          expect(
+            window.h.app.toggleSidebar({ name: "custom", tab: "comments" }),
+          ).toBe(true);
+          expect(
+            container.querySelector<HTMLElement>(
+              "[role=tabpanel][data-testid=comments]",
+            ),
+          ).not.toBeNull();
         },
       );
     });
