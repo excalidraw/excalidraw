@@ -21,7 +21,9 @@
     "copyStyles": "Copiar os estilos",
     "pasteStyles": "Colar os estilos",
     "stroke": "Contorno",
+    "changeStroke": "",
     "background": "Fundo",
+    "changeBackground": "",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
     "strokeStyle": "Estilo do traço",
@@ -72,6 +74,7 @@
     "canvasColors": "Usado na tela",
     "canvasBackground": "Fundo da tela",
     "drawingCanvas": "Tela de desenho",
+    "clearCanvas": "",
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Carregando biblioteca…",
     "libraries": "Procurar bibliotecas",
     "loadingScene": "Carregando cena…",
+    "loadScene": "",
     "align": "Alinhamento",
     "alignTop": "Alinhar ao topo",
     "alignBottom": "Alinhar embaixo",
@@ -105,7 +109,7 @@
     "share": "Compartilhar",
     "showStroke": "Exibir seletor de cores do traço",
     "showBackground": "Exibir seletor de cores do fundo",
-    "toggleTheme": "Alternar tema",
+    "toggleTheme": "",
     "personalLib": "Biblioteca Pessoal",
     "excalidrawLib": "Biblioteca do Excalidraw",
     "decreaseFontSize": "Diminuir o tamanho da fonte",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
