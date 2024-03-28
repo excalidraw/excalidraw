@@ -21,7 +21,9 @@
     "copyStyles": "ডিজাইন কপি করুন",
     "pasteStyles": "ডিজাইন পেস্ট করুন",
     "stroke": "রেখাংশ",
+    "changeStroke": "",
     "background": "পটভূমি",
+    "changeBackground": "",
     "fill": "রং",
     "strokeWidth": "রেখাংশের বেধ",
     "strokeStyle": "রেখাংশের ডিজাইন",
@@ -72,6 +74,7 @@
     "canvasColors": "ক্যানভাসের রং",
     "canvasBackground": "ক্যানভাসের পটভূমি",
     "drawingCanvas": "ব্যবহৃত ক্যানভাস",
+    "clearCanvas": "",
     "layers": "মাত্রা",
     "actions": "ক্রিয়া",
     "language": "ভাষা",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "সংগ্রহ তৈরি হচ্ছে",
     "libraries": "সংগ্রহ দেখুন",
     "loadingScene": "দৃশ্য তৈরি হচ্ছে",
+    "loadScene": "",
     "align": "পংক্তিবিন্যাস",
     "alignTop": "উপর পংক্তি",
     "alignBottom": "নিম্ন পংক্তি",
@@ -105,7 +109,7 @@
     "share": "ভাগ করুন",
     "showStroke": "",
     "showBackground": "পটভূমির রঙ নির্বাচনকারী অপশন দেখান",
-    "toggleTheme": "থিম পরিবর্তন করুন",
+    "toggleTheme": "",
     "personalLib": "ব্যক্তিগত লাইব্রেরি",
     "excalidrawLib": "এক্সক্যালিড্র লাইব্রেরি",
     "decreaseFontSize": "লেখনীর মাত্রা কমান",
@@ -140,7 +144,10 @@
     "textToDiagram": "লেখা থেকে ডায়াগ্রাম",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
