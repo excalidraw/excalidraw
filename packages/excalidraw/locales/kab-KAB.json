@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
@@ -212,9 +214,9 @@
     "fileTooBig": "Afaylu meqqer aṭas. Tiddi tafellayt yurgen d {{maxSize}}.",
     "svgImageInsertError": "D awezɣi tugra n tugna SVG. Acraḍ SVG yettban-d d armeɣtu.",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG armeɣtu.",
     "cannotResolveCollabServer": "Ulamek tuqqna s aqeddac n umyalel. Ma ulac uɣilif ales asali n usebter sakin eɛreḍ tikkelt-nniḍen.",
     "importLibraryError": "Ur d-ssalay ara tamkarḍit",
+    "saveLibraryError": "",
     "collabSaveFailed": "Ulamek asekles deg uzadur n yisefka deg ugilal. Ma ikemmel wugur, isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "collabSaveFailed_sizeExceeded": "Ulamek asekles deg uzadur n yisefka deg ugilal, taɣzut n usuneɣ tettban-d temqer aṭas. Isefk ad teskelseḍ afaylu s wudem adigan akken ad tetḥeqqeḍ ur tesruḥuyeḍ ara amahil-inek•inem.",
     "imageToolNotSupported": "",
@@ -246,7 +248,7 @@
     "library": "Tamkarḍit",
     "lock": "Eǧǧ afecku n tefrayt yermed mbaɛd asuneɣ",
     "penMode": "Askar n yimru - gdel tanalit",
-    "link": "Rnu/leqqem aseɣwen i talɣa yettwafernen",
+    "link": "",
     "eraser": "Sfeḍ",
     "frame": "",
     "magicframe": "",
@@ -299,9 +301,12 @@
     "openIssueMessage": "Nḥuder aṭas akken ur nseddu ara talɣut n usayes-inek (m) di tuccḍa. Ma yella asayes-inek (m) mačči d amaẓlay, ttxil-k (m) xemmem ad ḍefreḍ <button>afecku n weḍfar n yibugen.</button> Ma ulac uɣilif seddu talɣut ukessar-agi s wenɣal akked usenṭeḍ di GitHub issue.",
     "sceneContent": "Agbur n usayes:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Tzemreḍ ad d-teɛerḍeḍ medden ɣer usayes-inek (m) amiran akken ad ttekkin yid-k.",
-    "desc_privacy": "Ur tqelliq ara, tiɣimit tsseqdac awgelhen ixef s ixef, dɣa ayen ara tsunɣeḍ ad iqqim d amaẓlay. Ula d aqeddac-nneɣ ur yezmir ara ad iwali acu txeddemeḍ.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Bdu tiɣimit",
     "button_stopSession": "Ḥbes tiɣimit",
     "desc_inProgressIntro": "Tiɣimit n umɛawen s srid tetteddu akka tura.",
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

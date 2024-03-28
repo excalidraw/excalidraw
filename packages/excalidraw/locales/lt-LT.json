@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "",
@@ -212,9 +214,9 @@
     "fileTooBig": "Per didelis failas. Didžiausias leidžiamas dydis yra {{maxSize}}.",
     "svgImageInsertError": "Nepavyko įtraukti SVG paveiksliuko. Panašu, jog SVG yra nevalidus.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Nevalidus SVG.",
     "cannotResolveCollabServer": "Nepavyko prisijungti prie serverio bendradarbiavimui. Perkrauk puslapį ir pabandyk prisijungti dar kartą.",
     "importLibraryError": "Nepavyko įkelti bibliotekos",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -246,7 +248,7 @@
     "library": "Biblioteka",
     "lock": "Baigus piešti, išlaikyti pasirinktą įrankį",
     "penMode": "Rašyklio režimas - neleisti prisilietimų",
-    "link": "Pridėti / Atnaujinti pasirinktos figūros nuorodą",
+    "link": "",
     "eraser": "Trintukas",
     "frame": "",
     "magicframe": "",
@@ -298,6 +300,9 @@
     "trackedToSentry": "",
     "openIssueMessage": "",
     "sceneContent": ""
+  },
+  "shareDialog": {
+    "or": ""
   },
   "roomDialog": {
     "desc_intro": "",
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

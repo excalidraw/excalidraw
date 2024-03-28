@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
@@ -212,9 +214,9 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "ไฟล์ SVG ผิดพลาด",
     "cannotResolveCollabServer": "ไม่สามารถเชื่อต่อกับ collab เซิร์ฟเวอร์ได้ โปรดลองโหลดหน้านี้ใหม่และลองอีกครั้ง",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -298,6 +300,9 @@
     "trackedToSentry": "",
     "openIssueMessage": "",
     "sceneContent": ""
+  },
+  "shareDialog": {
+    "or": ""
   },
   "roomDialog": {
     "desc_intro": "",
@@ -410,8 +415,8 @@
       "copyPngToClipboard": "คัดลอก PNG ไปยังคลิปบอร์ด"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "คัดลอกไปยังคลิปบอร์ด"
     }
   },
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

@@ -11,8 +11,8 @@
     "copyAsPng": "পীএনজী ছবির মতন কপি করুন",
     "copyAsSvg": "এসভীজী ছবির মতন কপি করুন",
     "copyText": "লিখিত তথ্যের মতন কপি করুন",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "পিএনজি ছবি ক্লিপবোর্ডে কপি করুন",
+    "convertToCode": "কোডে রূপান্তর করুন",
     "bringForward": "অধিকতর সামনে আনুন",
     "sendToBack": "অধিকতর পিছনে নিয়ে যান",
     "bringToFront": "সবার সামনে আনুন",
@@ -38,12 +38,12 @@
     "arrowhead_none": "কিছু না",
     "arrowhead_arrow": "তীর",
     "arrowhead_bar": "রেখাংশ",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "বৃত্ত",
+    "arrowhead_circle_outline": "বৃত্তীয় (প্রান্তরেখা) প্রান্তরেখা",
     "arrowhead_triangle": "ত্রিভূজ",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "ত্রিভুজ (প্রান্তরেখা) প্রান্তরেখা",
+    "arrowhead_diamond": "হীরক",
+    "arrowhead_diamond_outline": "হীরক (প্রান্তরেখা)",
     "fontSize": "লেখনীর মাত্রা",
     "fontFamily": "লেখনীর হরফ",
     "addWatermark": "এক্সক্যালিড্র দ্বারা প্রস্তুত",
@@ -104,27 +104,27 @@
     "viewMode": "দৃশ্য",
     "share": "ভাগ করুন",
     "showStroke": "",
-    "showBackground": "",
-    "toggleTheme": "",
-    "personalLib": "",
-    "excalidrawLib": "",
+    "showBackground": "পটভূমির রঙ নির্বাচনকারী অপশন দেখান",
+    "toggleTheme": "থিম পরিবর্তন করুন",
+    "personalLib": "ব্যক্তিগত লাইব্রেরি",
+    "excalidrawLib": "এক্সক্যালিড্র লাইব্রেরি",
     "decreaseFontSize": "লেখনীর মাত্রা কমান",
     "increaseFontSize": "লেখনীর মাত্রা বাড়ান",
-    "unbindText": "",
-    "bindText": "",
+    "unbindText": "লেখার জোড় খুলুন",
+    "bindText": "কন্টেইনারের সাথে লেখা জোড়া লাগান",
     "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
-      "editEmbed": "",
+      "editEmbed": "লিংক এডিট ও এম্বেড করুন",
       "create": "লিঙ্ক তৈরী",
-      "createEmbed": "",
+      "createEmbed": "লিংক তৈরি ও এম্বেড করুন",
       "label": "লিঙ্ক নামকরণ",
-      "labelEmbed": "",
-      "empty": ""
+      "labelEmbed": "লিংক ও এম্বেড",
+      "empty": "কোন লিংক সেট করা নেই"
     },
     "lineEditor": {
-      "edit": "",
-      "exit": ""
+      "edit": "লাইন সম্পাদনা করুন",
+      "exit": "লাইন সম্পাদনা ত্যাগ করুন"
     },
     "elementLock": {
       "lock": "আবদ্ধ করুন",
@@ -134,11 +134,13 @@
     },
     "statusPublished": "প্রকাশিত",
     "sidebarLock": "লক",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
-    "eyeDropper": "",
-    "textToDiagram": "",
-    "prompt": ""
+    "selectAllElementsInFrame": "ফ্রেমের ভিতরের সব উপকরণ বাছাই করুন",
+    "removeAllElementsFromFrame": "ফ্রেম থেকে সব উপকরণ মুছুন",
+    "eyeDropper": "ক্যানভাস থেকে রঙ বাছাই করুন",
+    "textToDiagram": "লেখা থেকে ডায়াগ্রাম",
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
@@ -212,9 +214,9 @@
     "fileTooBig": "ফাইলটি খুব বড়। সর্বাধিক অনুমোদিত আকার হল {{maxSize}}৷",
     "svgImageInsertError": "এসভীজী ছবি সন্নিবেশ করা যায়নি। এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "failedToFetchImage": "",
-    "invalidSVGString": "এসভীজী মার্কআপটি অবৈধ মনে হচ্ছে৷",
     "cannotResolveCollabServer": "কোল্যাব সার্ভারের সাথে সংযোগ করা যায়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
     "importLibraryError": "সংগ্রহ লোড করা যায়নি",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -246,7 +248,7 @@
     "library": "সংগ্রহ",
     "lock": "আঁকার পরে নির্বাচিত টুল সক্রিয় রাখুন",
     "penMode": "",
-    "link": "একটি নির্বাচিত আকৃতির জন্য লিঙ্ক যোগ বা আপডেট করুন",
+    "link": "",
     "eraser": "ঝাড়ন",
     "frame": "",
     "magicframe": "",
@@ -299,9 +301,12 @@
     "openIssueMessage": "আমরা ত্রুটিতে আপনার দৃশ্যের তথ্য অন্তর্ভুক্ত না করার জন্য খুব সতর্ক ছিলাম। আপনার দৃশ্য ব্যক্তিগত না হলে, আমাদের অনুসরণ করার কথা বিবেচনা করুন <button>ত্রুটি ইতিবৃত্ত।</button> অনুগ্রহ করে GitHub ইস্যুতে অনুলিপি এবং পেস্ট করে নীচের তথ্য অন্তর্ভুক্ত করুন।",
     "sceneContent": "দৃশ্য বিষয়বস্তু:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "আপনি আপনার সাথে সহযোগিতা করার জন্য আপনার বর্তমান দৃশ্যে লোকেদের আমন্ত্রণ জানাতে পারেন৷",
-    "desc_privacy": "চিন্তা করবেন না, সেশনটি এন্ড-টু-এন্ড এনক্রিপশন ব্যবহার করে, তাই আপনি যা আঁকবেন তা গোপন থাকবে। এমনকি আমাদের সার্ভার আপনি যা নিয়ে এসেছেন তা দেখতে সক্ষম হবে না।",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "সেশন শুরু করুন",
     "button_stopSession": "সেশন বন্ধ করুন",
     "desc_inProgressIntro": "লাইভ-সহযোগীতার সেশন এখন চলছে।",
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

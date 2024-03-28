@@ -39,11 +39,11 @@
     "arrowhead_arrow": "Flèche",
     "arrowhead_bar": "Barre",
     "arrowhead_circle": "Cercle",
-    "arrowhead_circle_outline": "Contour du cercle",
+    "arrowhead_circle_outline": "Cercle (contour)",
     "arrowhead_triangle": "Triangle",
     "arrowhead_triangle_outline": "Triangle (contour)",
     "arrowhead_diamond": "Losange",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_diamond_outline": "Losange (contour)",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
@@ -136,9 +136,11 @@
     "sidebarLock": "Maintenir la barre latérale ouverte",
     "selectAllElementsInFrame": "Sélectionner tous les éléments du cadre",
     "removeAllElementsFromFrame": "Supprimer tous les éléments du cadre",
-    "eyeDropper": "Choisir la couleur depuis la toile",
-    "textToDiagram": "Texte vers Diagramme",
-    "prompt": "Consignes"
+    "eyeDropper": "Choisir la couleur depuis le canevas",
+    "textToDiagram": "Texte vers diagramme",
+    "prompt": "Demander",
+    "followUs": "Suivez-nous",
+    "discordChat": "Salon Discord"
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -212,9 +214,9 @@
     "fileTooBig": "Le fichier est trop volumineux. La taille maximale autorisée est de {{maxSize}}.",
     "svgImageInsertError": "Impossible d'insérer l'image SVG. Le balisage SVG semble invalide.",
     "failedToFetchImage": "Échec de récupération de l'image.",
-    "invalidSVGString": "SVG invalide.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
+    "saveLibraryError": "",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
     "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
     "imageToolNotSupported": "Les images sont désactivées.",
@@ -226,7 +228,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Les éléments intégrés ne peuvent pas être ajoutés à la librairie.",
-      "iframe": "",
+      "iframe": "Les éléments IFrame ne peuvent pas être ajoutés à la bibliothèque.",
       "image": "Le support pour l'ajout d'images à la librairie arrive bientôt !"
     },
     "asyncPasteFailedOnRead": "Impossible de coller (impossible de lire le presse-papiers système).",
@@ -246,10 +248,10 @@
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Mode stylo - évite le toucher",
-    "link": "Ajouter/mettre à jour le lien pour une forme sélectionnée",
+    "link": "",
     "eraser": "Gomme",
     "frame": "Outil de cadre",
-    "magicframe": "",
+    "magicframe": "Modèle en fil de fer vers code",
     "embeddable": "Intégration Web",
     "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
@@ -299,9 +301,12 @@
     "openIssueMessage": "Nous avons fait très attention à ne pas inclure les informations de votre scène dans l'erreur. Si votre scène n'est pas privée, veuillez envisager de poursuivre sur notre <button>outil de suivi des bugs.</button> Veuillez inclure les informations ci-dessous en les copiant-collant dans le ticket GitHub.",
     "sceneContent": "Contenu de la scène :"
   },
+  "shareDialog": {
+    "or": "Ou"
+  },
   "roomDialog": {
-    "desc_intro": "Vous pouvez inviter des personnes à collaborer avec vous sur votre scène actuelle.",
-    "desc_privacy": "Pas d'inquiétude, la session utilise le chiffrement de bout en bout, donc tout ce que vous dessinez restera privé. Même notre serveur ne pourra voir ce que vous faites.",
+    "desc_intro": "Invitez des personnes à collaborer sur votre dessin.",
+    "desc_privacy": "Ne vous inquiétez pas, la session est chiffrée de bout en bout et entièrement privée. Même notre serveur ne peut pas voir ce que vous dessinez.",
     "button_startSession": "Démarrer la session",
     "button_stopSession": "Arrêter la session",
     "desc_inProgressIntro": "La session de collaboration en direct est maintenant en cours.",
@@ -518,8 +523,21 @@
   "mermaid": {
     "title": "De Mermaid à Excalidraw",
     "button": "Insérer",
-    "description": "",
+    "description": "Actuellement, seuls les diagrammes <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> et <classLink>de classe </classLink>sont pris en charge. Les autres types seront rendus en tant qu'image dans Excalidraw.",
     "syntax": "Syntaxe Mermaid",
     "preview": "Prévisualisation"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Recherche rapide",
+      "empty": "Aucun utilisateurs trouvé"
+    },
+    "hint": {
+      "text": "Cliquez sur l'utilisateur pour le suivre",
+      "followStatus": "Vous suivez actuellement cet utilisateur",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

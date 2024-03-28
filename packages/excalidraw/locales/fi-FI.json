@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
@@ -212,9 +214,9 @@
     "fileTooBig": "Tiedosto on liian suuri. Suurin sallittu koko on {{maxSize}}.",
     "svgImageInsertError": "SVG- kuvaa ei voitu lisätä. Tiedoston SVG-sisältö näyttää virheelliseltä.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Virheellinen SVG.",
     "cannotResolveCollabServer": "Yhteyden muodostaminen collab-palvelimeen epäonnistui. Virkistä sivu ja yritä uudelleen.",
     "importLibraryError": "Kokoelman lataaminen epäonnistui",
+    "saveLibraryError": "",
     "collabSaveFailed": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
     "collabSaveFailed_sizeExceeded": "Ei voitu tallentaan palvelimen tietokantaan. Jos ongelmia esiintyy, sinun kannatta tallentaa tallentaa tiedosto paikallisesti varmistaaksesi, että et menetä työtäsi.",
     "imageToolNotSupported": "",
@@ -246,7 +248,7 @@
     "library": "Kirjasto",
     "lock": "Pidä valittu työkalu aktiivisena piirron jälkeen",
     "penMode": "Kynätila - estä kosketus",
-    "link": "Lisää/päivitä linkki valitulle muodolle",
+    "link": "",
     "eraser": "Poistotyökalu",
     "frame": "",
     "magicframe": "",
@@ -299,9 +301,12 @@
     "openIssueMessage": "Olimme varovaisia emmekä sisällyttäneet tietoa piirroksestasi virheeseen. Mikäli piirroksesi ei ole yksityinen, harkitsethan kertovasi meille <button>virheenseurantajärjestelmässämme.</button> Sisällytä alla olevat tiedot kopioimalla ne GitHub-ongelmaan.",
     "sceneContent": "Piirroksen tiedot:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Voit kutsua ihmisiä piirrokseesi tekemään yhteistyötä kanssasi.",
-    "desc_privacy": "Älä huoli, istunto käyttää päästä-päähän-salausta, joten mitä tahansa piirrätkin, se pysyy salassa. Edes palvelimemme eivät näe mitä keksit.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Aloita istunto",
     "button_stopSession": "Lopeta istunto",
     "desc_inProgressIntro": "Jaettu istunto on nyt käynnissä.",
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

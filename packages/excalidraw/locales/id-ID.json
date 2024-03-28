@@ -48,7 +48,7 @@
     "fontFamily": "Jenis font",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
     "handDrawn": "Tulisan tangan",
-    "normal": "Normal",
+    "normal": "",
     "code": "Kode",
     "small": "Kecil",
     "medium": "Sedang",
@@ -56,7 +56,7 @@
     "veryLarge": "Sangat besar",
     "solid": "Padat",
     "hachure": "Garis-garis",
-    "zigzag": "Zigzag",
+    "zigzag": "",
     "crossHatch": "Asiran silang",
     "thin": "Lembut",
     "bold": "Tebal",
@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "Hapus semua elemen dari bingkai",
     "eyeDropper": "Ambil warna dari kanvas",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -161,9 +163,9 @@
     "zoomIn": "Besarkan",
     "zoomOut": "Kecilkan",
     "resetZoom": "Reset Pembesaran",
-    "menu": "Menu",
+    "menu": "",
     "done": "Selesai",
-    "edit": "Edit",
+    "edit": "",
     "undo": "Urungkan",
     "redo": "Ulangi",
     "resetLibrary": "Reset pustaka",
@@ -212,9 +214,9 @@
     "fileTooBig": "File terlalu besar. Ukuran maksimum yang dibolehkan {{maxSize}}.",
     "svgImageInsertError": "Tidak dapat menyisipkan gambar SVG. Markup SVG sepertinya tidak valid.",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG tidak valid.",
     "cannotResolveCollabServer": "Tidak dapat terhubung ke server kolab. Muat ulang laman dan coba lagi.",
     "importLibraryError": "Tidak dapat memuat pustaka",
+    "saveLibraryError": "",
     "collabSaveFailed": "Tidak dapat menyimpan ke dalam basis data server. Jika masih berlanjut, Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "collabSaveFailed_sizeExceeded": "Tidak dapat menyimpan ke dalam basis data server, tampaknya ukuran kanvas terlalu besar. Anda sebaiknya simpan berkas Anda secara lokal untuk memastikan pekerjaan Anda tidak hilang.",
     "imageToolNotSupported": "",
@@ -246,7 +248,7 @@
     "library": "Pustaka",
     "lock": "Biarkan alat yang dipilih aktif setelah menggambar",
     "penMode": "Mode pena - mencegah sentuhan",
-    "link": "Tambah/Perbarui tautan untuk bentuk yang dipilih",
+    "link": "",
     "eraser": "Penghapus",
     "frame": "Alat bingkai",
     "magicframe": "",
@@ -299,9 +301,12 @@
     "openIssueMessage": "Kami sangat berhati-hati untuk tidak menyertakan informasi pemandangan Anda pada kesalahan. Jika pemandangan Anda tidak bersifat pribadi, mohon pertimbangkan menindak lanjut pada <button>pelacak bug.</button> Mohon sertakan informasi dibawah ini dengan menyalin dan menempelkan di Github issue.",
     "sceneContent": "Pemandangan konten:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Anda dapat mengundang orang ke pemandangan Anda saat ini untuk berkolaborasi dengan Anda.",
-    "desc_privacy": "Jangan khawatir, sesi menggunakan enkripsi end-to-end, sehingga apa pun yang Anda gambar akan tetap bersifat pribadi. Bahkan server kami tidak dapat melihat apa yang Anda lakukan.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
@@ -333,7 +338,7 @@
     "documentation": "Dokumentasi",
     "doubleClick": "klik-ganda",
     "drag": "seret",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "Edit titik garis/panah",
     "editText": "Edit teks / tambah label",
     "github": "Menemukan masalah? Kirimkan",
@@ -410,8 +415,8 @@
       "copyPngToClipboard": "Salin PNG ke papan klip"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Salin ke papan klip"
     }
   },
@@ -428,7 +433,7 @@
     "selected": "Terpilih",
     "storage": "Penyimpanan",
     "title": "Statistik untuk nerd",
-    "total": "Total",
+    "total": "",
     "version": "Versi",
     "versionCopy": "Klik untuk salin",
     "versionNotAvailable": "Versi tidak tersedia",
@@ -452,13 +457,13 @@
     "black": "Hitam",
     "white": "Putih",
     "red": "Merah",
-    "pink": "Pink",
+    "pink": "",
     "grape": "Ungu",
-    "violet": "Violet",
+    "violet": "",
     "gray": "Abu-abu",
     "blue": "Biru",
-    "cyan": "Cyan",
-    "teal": "Teal",
+    "cyan": "",
+    "teal": "",
     "green": "Hijau",
     "yellow": "Kuning",
     "orange": "Jingga",
@@ -497,7 +502,7 @@
         "description": "Ekspor data pemandangan ke file yang dapat Anda dapat impor nanti."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Ekspor ke Excalidraw+",
         "description": "Simpan pemandangan ke ruang kerja Excalidraw+ Anda."
       }
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

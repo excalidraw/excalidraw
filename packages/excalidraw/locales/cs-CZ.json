@@ -55,7 +55,7 @@
     "large": "Velké",
     "veryLarge": "Velmi velké",
     "solid": "Plný",
-    "hachure": "Hachure",
+    "hachure": "",
     "zigzag": "Klikatě",
     "crossHatch": "Křížový šrafování",
     "thin": "Tenký",
@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Vyberte barvu z plátna",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
@@ -161,7 +163,7 @@
     "zoomIn": "Přiblížit",
     "zoomOut": "Oddálit",
     "resetZoom": "Resetovat přiblížení",
-    "menu": "Menu",
+    "menu": "",
     "done": "Hotovo",
     "edit": "Upravit",
     "undo": "Zpět",
@@ -212,9 +214,9 @@
     "fileTooBig": "Soubor je příliš velký. Maximální povolená velikost je {{maxSize}}.",
     "svgImageInsertError": "Nelze vložit SVG obrázek. Značení SVG je neplatné.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Neplatný SVG.",
     "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
     "importLibraryError": "Nelze načíst knihovnu",
+    "saveLibraryError": "",
     "collabSaveFailed": "Nelze uložit do databáze na serveru. Pokud problémy přetrvávají, měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "collabSaveFailed_sizeExceeded": "Nelze uložit do databáze na serveru, plátno se zdá být příliš velké. Měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "imageToolNotSupported": "",
@@ -242,11 +244,11 @@
     "arrow": "Šipka",
     "line": "Čára",
     "freedraw": "Kreslení",
-    "text": "Text",
+    "text": "",
     "library": "Knihovna",
     "lock": "Po kreslení ponechat vybraný nástroj aktivní",
     "penMode": "Režim Pera - zabránit dotyku",
-    "link": "Přidat/aktualizovat odkaz pro vybraný tvar",
+    "link": "",
     "eraser": "Guma",
     "frame": "",
     "magicframe": "",
@@ -299,9 +301,12 @@
     "openIssueMessage": "Byli jsme velmi opatrní, abychom neuváděli informace o Vaší scéně. Pokud vaše scéna není soukromá, zvažte prosím sledování na našem <button>bug trackeru</button>. Uveďte prosím níže uvedené informace kopírováním a vložením do problému na GitHubu.",
     "sceneContent": "Obsah scény:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Můžete pozvat lidi na vaši aktuální scénu ke spolupráci s vámi.",
-    "desc_privacy": "Nebojte se, relace používá end-to-end šifrování, takže cokoliv nakreslíte zůstane soukromé. Ani náš server nebude schopen vidět, s čím budete pracovat.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Zahájit relaci",
     "button_stopSession": "Ukončit relaci",
     "desc_inProgressIntro": "Živá spolupráce právě probíhá.",
@@ -333,7 +338,7 @@
     "documentation": "Dokumentace",
     "doubleClick": "dvojklik",
     "drag": "tažení",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "Upravit body linií/šipek",
     "editText": "Upravit text / přidat popis",
     "github": "Našel jsi problém? Nahlaš ho",
@@ -410,8 +415,8 @@
       "copyPngToClipboard": "Kopírovat PNG do schránky"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Kopírovat do schránky"
     }
   },
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }

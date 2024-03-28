@@ -138,7 +138,9 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": ""
   },
   "library": {
     "noItems": "",
@@ -212,9 +214,9 @@
     "fileTooBig": "Файл өте үлкен. Максималды рұқсат етілген көлем {{maxSize}}.",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -298,6 +300,9 @@
     "trackedToSentry": "",
     "openIssueMessage": "",
     "sceneContent": ""
+  },
+  "shareDialog": {
+    "or": ""
   },
   "roomDialog": {
     "desc_intro": "",
@@ -521,5 +526,18 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
   }
 }
