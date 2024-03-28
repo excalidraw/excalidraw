@@ -21,7 +21,9 @@
     "copyStyles": "העתק סגנון",
     "pasteStyles": "הדבקת סגנונות",
     "stroke": "קו מתאר",
+    "changeStroke": "",
     "background": "רקע",
+    "changeBackground": "",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
     "strokeStyle": "סגנון קו המתאר",
@@ -72,6 +74,7 @@
     "canvasColors": "בשימוש בקנבס",
     "canvasBackground": "רקע קנבס",
     "drawingCanvas": "קנבס ציור",
+    "clearCanvas": "",
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "טוען ספריה…",
     "libraries": "עיין בספריות",
     "loadingScene": "טוען תצוגה…",
+    "loadScene": "",
     "align": "יישר",
     "alignTop": "יישר למעלה",
     "alignBottom": "יישר למטה",
@@ -105,7 +109,7 @@
     "share": "שתף",
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
-    "toggleTheme": "שינוי ערכת העיצוב",
+    "toggleTheme": "",
     "personalLib": "ספריה פרטית",
     "excalidrawLib": "הספריה של Excalidraw",
     "decreaseFontSize": "הקטן את גודל הגופן",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
