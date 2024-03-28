@@ -3757,6 +3757,21 @@ class App extends React.Component<AppProps, AppState> {
         }, 100);
       }
 
+      // remove selections on escape press
+      if (event.key === KEYS.ESCAPE) {
+        // Don't deselect text right after editing it
+        if (isWritableElement(event.target)) {
+          return;
+        }
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+          editingGroupId: null,
+        });
+        event.preventDefault();
+        return;
+      }
+
       // prevent browser zoom in input fields
       if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
         if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
