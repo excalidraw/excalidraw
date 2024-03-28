@@ -21,7 +21,9 @@
     "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
+    "changeStroke": "",
     "background": "背景",
+    "changeBackground": "",
     "fill": "填充",
     "strokeWidth": "描边宽度",
     "strokeStyle": "边框样式",
@@ -72,6 +74,7 @@
     "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
+    "clearCanvas": "",
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "正在加载素材库…",
     "libraries": "浏览素材库",
     "loadingScene": "正在加载绘图…",
+    "loadScene": "",
     "align": "对齐",
     "alignTop": "顶部对齐",
     "alignBottom": "底端对齐",
@@ -105,7 +109,7 @@
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
-    "toggleTheme": "切换主题",
+    "toggleTheme": "",
     "personalLib": "个人素材库",
     "excalidrawLib": "Excalidraw 素材库",
     "decreaseFontSize": "缩小字体大小",
@@ -140,7 +144,10 @@
     "textToDiagram": "文字至图表",
     "prompt": "Prompt",
     "followUs": "关注我们",
-    "discordChat": "Discord 群组"
+    "discordChat": "Discord 群组",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -539,5 +546,20 @@
       "micMuted": "用户的麦克风已静音",
       "isSpeaking": "用户正在说话"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
