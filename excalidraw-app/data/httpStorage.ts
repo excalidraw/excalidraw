@@ -16,6 +16,7 @@ import {
 } from "../../packages/excalidraw/element/types";
 import { decompressData } from "../../packages/excalidraw/data/encode";
 import Portal from "../collab/Portal";
+import * as Sentry from "@sentry/browser";
 
 export const encryptElements = async (
   elements: readonly ExcalidrawElement[],
@@ -64,7 +65,6 @@ export const saveToHttpStorage = async (
 
   const sceneVersion = getSceneVersion(elements);
 
-  console.log("[draw] Fetching drawing data...");
   const getResponse = await fetch(`${HTTP_STORAGE_BACKEND_URL}/drawing-data`, {
     method: "POST",
     body: new URLSearchParams({
@@ -167,6 +167,7 @@ export const saveFilesToHttpStorage = async ({
         });
         savedFiles.set(id, true);
       } catch (error: any) {
+        Sentry.captureException(error);
         console.error("Error saving file", error);
         erroredFiles.set(id, true);
       }
@@ -222,12 +223,16 @@ export const loadFilesFromHttpStorage = async (
         } else if (response.status === 403) {
           // Note that we don't consider this an "erroredFile" because we still want
           // other connected clients to be able to load the file
+          Sentry.captureException(new Error(`File access forbidden ${id}`));
           console.error("File access forbidden", id);
         } else {
+          Sentry.captureException(new Error(`Error loading file ${id}`));
+          console.error("Error loading file", id);
           erroredFiles.set(id, true);
         }
       } catch (error: any) {
         erroredFiles.set(id, true);
+        Sentry.captureException(error);
         console.error(error);
       }
     }),

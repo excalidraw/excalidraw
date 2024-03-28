@@ -66,6 +66,18 @@ export default defineConfig({
         globIgnores: ["fonts.css", "**/locales/**", "service-worker.js"],
         runtimeCaching: [
           {
+            // For index.html revalidate with server if new version available before using cached
+            urlPattern: new RegExp("index.html"),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-cache",
+              expiration: {
+                maxEntries: 1,
+                maxAgeSeconds: 60*5,
+              },
+            },
+          },
+          {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
             handler: "CacheFirst",
             options: {
