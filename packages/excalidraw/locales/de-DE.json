@@ -21,9 +21,9 @@
     "copyStyles": "Formatierung kopieren",
     "pasteStyles": "Formatierung übernehmen",
     "stroke": "Strich",
-    "changeStroke": "",
+    "changeStroke": "Strichfarbe ändern",
     "background": "Hintergrund",
-    "changeBackground": "",
+    "changeBackground": "Hintergrundfarbe ändern",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
     "strokeStyle": "Konturstil",
@@ -74,7 +74,7 @@
     "canvasColors": "Auf Leinwand verwendet",
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Leinwand",
-    "clearCanvas": "",
+    "clearCanvas": "Zeichenfläche löschen",
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
     "loadingScene": "Lade Zeichnung…",
-    "loadScene": "",
+    "loadScene": "Szene aus Datei laden",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -109,7 +109,7 @@
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
-    "toggleTheme": "",
+    "toggleTheme": "Helles/dunkles Design umschalten",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw Bibliothek",
     "decreaseFontSize": "Schriftgröße verkleinern",
@@ -145,9 +145,9 @@
     "prompt": "Eingabe",
     "followUs": "Folge uns",
     "discordChat": "Discord-Chat",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "Zoom auf Ansicht anpassen",
+    "zoomToFitSelection": "Zoom auf Auswahl anpassen",
+    "zoomToFit": "Zoom auf alle Elemente anpassen"
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Befehlspalette",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Auswählen",
+      "confirm": "Bestätigen",
+      "close": "Schließen"
     },
-    "recents": "",
+    "recents": "Zuletzt verwendet",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Suche in Menüs und Befehlen, entdecke versteckte Funktionen",
+      "noMatch": "Keine passenden Befehle..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Befehl ist nicht verfügbar...",
     "shortcutHint": ""
   }
 }
