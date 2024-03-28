@@ -28,8 +28,6 @@ import {
   actionShortcuts,
   actionToggleTheme,
 } from "../../actions";
-
-import "./DefaultItems.scss";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -37,6 +35,8 @@ import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
+
+import "./DefaultItems.scss";
 
 export const LoadScene = () => {
   const { t } = useI18n();

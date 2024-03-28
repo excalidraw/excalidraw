@@ -1090,6 +1090,7 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
+            CommandPalette.defaultItems.toggleTheme,
           ]}
         />
       </Excalidraw>

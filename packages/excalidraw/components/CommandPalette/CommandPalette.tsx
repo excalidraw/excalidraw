@@ -31,7 +31,7 @@ import {
 } from "../icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../context/ui-appState";
-import { AppProps, AppState } from "../../types";
+import { AppProps, AppState, UIAppState } from "../../types";
 import {
   capitalizeString,
   getShortcutKey,
@@ -47,30 +47,10 @@ import { useStableCallback } from "../../hooks/useStableCallback";
 import { actionClearCanvas, actionLink } from "../../actions";
 import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
+import { CommandPaletteItem } from "./types";
+import * as defaultItems from "./defaultCommandPaletteItems";
 
 import "./CommandPalette.scss";
-
-type CommandPaletteItem = {
-  label: string;
-  /** additional keywords to match against
-   * (appended to haystack, not displayed) */
-  keywords?: string[];
-  /**
-   * string we should match against when searching
-   * (deburred name + keywords)
-   */
-  haystack?: string;
-  icon?: React.ReactNode;
-  category: string;
-  order?: number;
-  predicate?: boolean | Action["predicate"];
-  shortcut?: string;
-  /** if false, command will not show while in view mode */
-  viewMode?: boolean;
-  perform: (
-    event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
-  ) => void;
-};
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
@@ -139,38 +119,43 @@ type CommandPaletteProps = {
   customCommandPaletteItems?: CommandPaletteItem[];
 };
 
-export const CommandPalette = (props: CommandPaletteProps) => {
-  const uiAppState = useUIAppState();
-  const setAppState = useExcalidrawSetAppState();
+export const CommandPalette = Object.assign(
+  (props: CommandPaletteProps) => {
+    const uiAppState = useUIAppState();
+    const setAppState = useExcalidrawSetAppState();
 
-  useEffect(() => {
-    const commandPaletteShortcut = (event: KeyboardEvent) => {
-      if (isCommandPaletteToggleShortcut(event)) {
-        event.preventDefault();
-        event.stopPropagation();
-        setAppState((appState) => ({
-          openDialog:
-            appState.openDialog?.name === "commandPalette"
-              ? null
-              : { name: "commandPalette" },
-        }));
-      }
-    };
-    window.addEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
-      capture: true,
-    });
-    return () =>
-      window.removeEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
+    useEffect(() => {
+      const commandPaletteShortcut = (event: KeyboardEvent) => {
+        if (isCommandPaletteToggleShortcut(event)) {
+          event.preventDefault();
+          event.stopPropagation();
+          setAppState((appState) => ({
+            openDialog:
+              appState.openDialog?.name === "commandPalette"
+                ? null
+                : { name: "commandPalette" },
+          }));
+        }
+      };
+      window.addEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
         capture: true,
       });
-  }, [setAppState]);
+      return () =>
+        window.removeEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
+          capture: true,
+        });
+    }, [setAppState]);
 
-  if (uiAppState.openDialog?.name !== "commandPalette") {
-    return null;
-  }
+    if (uiAppState.openDialog?.name !== "commandPalette") {
+      return null;
+    }
 
-  return <CommandPaletteInner {...props} />;
-};
+    return <CommandPaletteInner {...props} />;
+  },
+  {
+    defaultItems,
+  },
+);
 
 function CommandPaletteInner({
   customCommandPaletteItems,
@@ -297,7 +282,6 @@ function CommandPaletteInner({
       const editorCommands: CommandPaletteItem[] = [
         actionManager.actions.undo,
         actionManager.actions.redo,
-        actionManager.actions.toggleTheme,
         actionManager.actions.zoomIn,
         actionManager.actions.zoomOut,
         actionManager.actions.resetZoom,
@@ -455,7 +439,7 @@ function CommandPaletteInner({
             icon,
             keywords: ["toolbar"],
             viewMode: false,
-            perform: (event) => {
+            perform: ({ event }) => {
               if (value === "image") {
                 app.setActiveTool({
                   type: value,
@@ -583,7 +567,7 @@ function CommandPaletteInner({
     if (uiAppState.openDialog?.name === "commandPalette") {
       document.body.classList.add("excalidraw-animations-disabled");
       closeCommandPalette(() => {
-        command.perform(event);
+        command.perform({ actionManager, event });
         setLastUsed(command);
 
         requestAnimationFrame(() => {
@@ -834,6 +818,7 @@ function CommandPaletteInner({
               disabled={!isCommandAvailable(lastUsed)}
               onMouseMove={() => setCurrentCommand(lastUsed)}
               showShortcut={!app.device.viewport.isMobile}
+              appState={uiAppState}
             />
           </div>
         )}
@@ -851,6 +836,7 @@ function CommandPaletteInner({
                     onClick={(event) => executeCommand(command, event)}
                     onMouseMove={() => setCurrentCommand(command)}
                     showShortcut={!app.device.viewport.isMobile}
+                    appState={uiAppState}
                   />
                 ))}
               </div>
@@ -874,6 +860,7 @@ const CommandItem = ({
   onMouseMove,
   onClick,
   showShortcut,
+  appState,
 }: {
   command: CommandPaletteItem;
   isSelected: boolean;
@@ -881,6 +868,7 @@ const CommandItem = ({
   onMouseMove: () => void;
   onClick: (event: React.MouseEvent) => void;
   showShortcut: boolean;
+  appState: UIAppState;
 }) => {
   const noop = () => {};
 
@@ -902,7 +890,15 @@ const CommandItem = ({
       title={disabled ? t("commandPalette.itemNotAvailable") : ""}
     >
       <div className="name">
-        {command.icon && <InlineIcon icon={command.icon} />}
+        {command.icon && (
+          <InlineIcon
+            icon={
+              typeof command.icon === "function"
+                ? command.icon(appState)
+                : command.icon
+            }
+          />
+        )}
         {command.label}
       </div>
       {showShortcut && command.shortcut && (
