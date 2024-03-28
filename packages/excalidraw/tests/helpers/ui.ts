@@ -287,9 +287,16 @@ const transform = (
   keyboardModifiers: KeyboardModifiers = {},
 ) => {
   const elements = Array.isArray(element) ? element : [element];
-  mouse.select(elements);
+  h.setState({
+    selectedElementIds: elements.reduce(
+      (acc, e) => ({
+        ...acc,
+        [e.id]: true,
+      }),
+      {},
+    ),
+  });
   let handleCoords: TransformHandle | undefined;
-
   if (elements.length === 1) {
     handleCoords = getTransformHandles(
       elements[0],

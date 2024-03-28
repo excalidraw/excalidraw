@@ -34,8 +34,11 @@ import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
-import { maxBindingGap } from "../element/collision";
-import { SuggestedBinding, SuggestedPointBinding } from "../element/binding";
+import {
+  maxBindingGap,
+  SuggestedBinding,
+  SuggestedPointBinding,
+} from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   bootstrapCanvas,

@@ -299,13 +299,6 @@ export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
   ];
 };
 
-export const pointRelativeTo = (
-  element: ExcalidrawElement,
-  absoluteCoords: Point,
-): Point => {
-  return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
-};
-
 export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it

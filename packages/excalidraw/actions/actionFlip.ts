@@ -7,7 +7,7 @@ import {
   NonDeletedSceneElementsMap,
 } from "../element/types";
 import { resizeMultipleElements } from "../element/resizeElements";
-import { AppState } from "../types";
+import { AppClassProperties, AppState } from "../types";
 import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
@@ -29,6 +29,7 @@ export const actionFlipHorizontal = register({
           app.scene.getNonDeletedElementsMap(),
           appState,
           "horizontal",
+          app,
         ),
         appState,
         app,
@@ -52,6 +53,7 @@ export const actionFlipVertical = register({
           app.scene.getNonDeletedElementsMap(),
           appState,
           "vertical",
+          app,
         ),
         appState,
         app,
@@ -70,6 +72,7 @@ const flipSelectedElements = (
   elementsMap: NonDeletedSceneElementsMap,
   appState: Readonly<AppState>,
   flipDirection: "horizontal" | "vertical",
+  app: AppClassProperties,
 ) => {
   const selectedElements = getSelectedElements(
     getNonDeletedElements(elements),
@@ -86,6 +89,7 @@ const flipSelectedElements = (
     elementsMap,
     appState,
     flipDirection,
+    app,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);
@@ -101,6 +105,7 @@ const flipElements = (
   elementsMap: NonDeletedSceneElementsMap,
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
+  app: AppClassProperties,
 ): ExcalidrawElement[] => {
   const { minX, minY, maxX, maxY } = getCommonBoundingBox(selectedElements);
 
@@ -115,7 +120,7 @@ const flipElements = (
   );
 
   isBindingEnabled(appState)
-    ? bindOrUnbindSelectedElements(selectedElements, elements, elementsMap)
+    ? bindOrUnbindSelectedElements(selectedElements, app)
     : unbindLinearElements(selectedElements, elementsMap);
 
   return selectedElements;
