@@ -21,7 +21,9 @@
     "copyStyles": "คัดลอกรูปแบบ",
     "pasteStyles": "วางรูปแบบ",
     "stroke": "เส้นขอบ",
+    "changeStroke": "",
     "background": "พื้นหลัง",
+    "changeBackground": "",
     "fill": "เติมสี",
     "strokeWidth": "น้ำหนักเส้นขอบ",
     "strokeStyle": "รูปแบบเส้น",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
+    "clearCanvas": "",
     "layers": "",
     "actions": "การกระทำ",
     "language": "ภาษา",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "กำลังโหลดคลัง...",
     "libraries": "",
     "loadingScene": "กำลังโหลดฉาก",
+    "loadScene": "",
     "align": "จัดตำแหน่ง",
     "alignTop": "จัดชิดด้านบน",
     "alignBottom": "จัดชิดด้านล่าง",
@@ -105,7 +109,7 @@
     "share": "แชร์",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "สลับธีม",
+    "toggleTheme": "",
     "personalLib": "คลังของฉัน",
     "excalidrawLib": "คลังของ Excalidraw",
     "decreaseFontSize": "ลดขนาดตัวอักษร",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
