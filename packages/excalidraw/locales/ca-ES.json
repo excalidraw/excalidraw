@@ -21,7 +21,9 @@
     "copyStyles": "Copia els estils",
     "pasteStyles": "Enganxa els estils",
     "stroke": "Color del traç",
+    "changeStroke": "",
     "background": "Color del fons",
+    "changeBackground": "",
     "fill": "Estil del fons",
     "strokeWidth": "Amplada del traç",
     "strokeStyle": "Estil del traç",
@@ -72,6 +74,7 @@
     "canvasColors": "Usat al llenç",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
+    "clearCanvas": "",
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "S'està carregant la biblioteca…",
     "libraries": "Explora les biblioteques",
     "loadingScene": "S'està carregant l'escena…",
+    "loadScene": "",
     "align": "Alinea",
     "alignTop": "Alinea a la part superior",
     "alignBottom": "Alinea a la part inferior",
@@ -105,7 +109,7 @@
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
-    "toggleTheme": "Activa o desactiva el tema",
+    "toggleTheme": "",
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
     "decreaseFontSize": "Redueix la mida de la lletra",
@@ -140,7 +144,10 @@
     "textToDiagram": "Text a diagrama",
     "prompt": "",
     "followUs": "Seguiu-nos",
-    "discordChat": "Xat de Discord"
+    "discordChat": "Xat de Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -539,5 +546,20 @@
       "micMuted": "El micròfon de l'usuari és silenciat",
       "isSpeaking": "L'usuari parla ara"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
