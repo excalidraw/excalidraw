@@ -280,5 +280,3 @@ export {
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
 } from "../utils/withinBounds";
-
-export { CommandPalette } from "./components/CommandPalette/CommandPalette";
