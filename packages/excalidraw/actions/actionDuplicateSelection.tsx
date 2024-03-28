@@ -34,6 +34,8 @@ import {
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
+  label: "labels.duplicateSelection",
+  icon: DuplicateIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsMap = app.scene.getNonDeletedElementsMap();
@@ -60,7 +62,6 @@ export const actionDuplicateSelection = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.duplicateSelection",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton

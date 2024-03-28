@@ -1,9 +1,12 @@
+import { magnetIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 
 export const actionToggleObjectsSnapMode = register({
   name: "objectsSnapMode",
-  viewMode: true,
+  label: "buttons.objectsSnapMode",
+  icon: magnetIcon,
+  viewMode: false,
   trackEvent: {
     category: "canvas",
     predicate: (appState) => !appState.objectsSnapModeEnabled,
@@ -22,7 +25,6 @@ export const actionToggleObjectsSnapMode = register({
   predicate: (elements, appState, appProps) => {
     return typeof appProps.objectsSnapModeEnabled === "undefined";
   },
-  contextItemLabel: "buttons.objectsSnapMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.S,
 });
