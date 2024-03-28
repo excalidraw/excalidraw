@@ -533,6 +533,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               this.handleRemoteSceneUpdate(reconciledElements, {
                 init: true,
               });
+              if (reconciledElements.length === 0) {
+                console.log("[draw] Received empty scene from socket payload");
+                Sentry.captureMessage(
+                  "Received empty scene from socket payload",
+                  {
+                    level: Sentry.Severity.Warning,
+                  },
+                );
+              }
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
