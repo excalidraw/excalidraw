@@ -21,7 +21,9 @@
     "copyStyles": "複製樣式",
     "pasteStyles": "套用樣式",
     "stroke": "筆跡顏色",
+    "changeStroke": "",
     "background": "填充顏色",
+    "changeBackground": "",
     "fill": "背景樣式",
     "strokeWidth": "筆跡寬度",
     "strokeStyle": "筆跡線條",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "畫布背景顏色",
     "drawingCanvas": "畫布",
+    "clearCanvas": "",
     "layers": "圖層",
     "actions": "動作",
     "language": "🌏 語言",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "正在載入作品庫…",
     "libraries": "瀏覽作品庫",
     "loadingScene": "載入畫布中…",
+    "loadScene": "",
     "align": "物件對齊",
     "alignTop": "水平置頂",
     "alignBottom": "水平置底",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
