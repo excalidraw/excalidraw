@@ -14,9 +14,9 @@ import {
 } from "../packages/excalidraw/constants";
 import { loadFromBlob } from "../packages/excalidraw/data/blob";
 import {
-  ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
+  OrderedExcalidrawElement,
   Theme,
 } from "../packages/excalidraw/element/types";
 import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
@@ -87,7 +87,6 @@ import {
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
-import { reconcileElements } from "./collab/reconciliation";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
@@ -107,6 +106,10 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
+import {
+  RemoteExcalidrawElement,
+  reconcileElements,
+} from "../packages/excalidraw/data/reconcile";
 
 polyfill();
 
@@ -255,7 +258,7 @@ const initializeScene = async (opts: {
         },
         elements: reconcileElements(
           scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted(),
+          excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
           excalidrawAPI.getAppState(),
         ),
       },
@@ -567,7 +570,7 @@ const ExcalidrawWrapper = () => {
   }, [theme]);
 
   const onChange = (
-    elements: readonly ExcalidrawElement[],
+    elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => {

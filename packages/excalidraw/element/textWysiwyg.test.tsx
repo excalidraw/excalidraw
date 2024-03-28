@@ -1454,7 +1454,7 @@ describe("textWysiwyg", () => {
           strokeWidth: 2,
           type: "rectangle",
           updated: 1,
-          version: 1,
+          version: 2,
           width: 610,
           x: 15,
           y: 25,
