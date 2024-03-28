@@ -21,7 +21,9 @@
     "copyStyles": "Скопировать стили",
     "pasteStyles": "Вставить стили",
     "stroke": "Обводка",
+    "changeStroke": "",
     "background": "Фон",
+    "changeBackground": "",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
     "strokeStyle": "Стиль обводки",
@@ -72,6 +74,7 @@
     "canvasColors": "Используется на холсте",
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Полотно",
+    "clearCanvas": "",
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Загрузка библиотеки…",
     "libraries": "Просмотреть библиотеки",
     "loadingScene": "Загрузка сцены…",
+    "loadScene": "",
     "align": "Выровнять",
     "alignTop": "Выровнять по верхнему краю",
     "alignBottom": "Выровнять по нижнему краю",
@@ -105,7 +109,7 @@
     "share": "Поделиться",
     "showStroke": "Показать выбор цвета обводки",
     "showBackground": "Показать выбор цвета фона",
-    "toggleTheme": "Переключить тему",
+    "toggleTheme": "",
     "personalLib": "Личная библиотека",
     "excalidrawLib": "Библиотека Excalidraw",
     "decreaseFontSize": "Уменьшить шрифт",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "Подписаться",
-    "discordChat": "Чат в Discord"
+    "discordChat": "Чат в Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -539,5 +546,20 @@
       "micMuted": "Микрофон пользователя заглушен",
       "isSpeaking": "Пользователь говорит"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
