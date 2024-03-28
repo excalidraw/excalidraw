@@ -21,7 +21,9 @@
     "copyStyles": "अंदाज़ की प्रतिलिपि बनायें",
     "pasteStyles": "अंदाज़ चिपकाये",
     "stroke": "रेखा",
+    "changeStroke": "",
     "background": "पृष्ठभूमि",
+    "changeBackground": "",
     "fill": "भरें",
     "strokeWidth": "रेखा की चौड़ाई",
     "strokeStyle": "स्ट्रोक का अंदाज़",
@@ -72,6 +74,7 @@
     "canvasColors": "कॅनवास पर प्रयोगित",
     "canvasBackground": "चित्रपटल पृष्ठभूमि",
     "drawingCanvas": "चित्रपटल",
+    "clearCanvas": "",
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "समूहकोष खुल रहा है",
     "libraries": "समूह कोष पड़तालें",
     "loadingScene": "दृश्य खुल रहा है",
+    "loadScene": "",
     "align": "संरेखित करें",
     "alignTop": "ऊपर संरेखित करें",
     "alignBottom": "नीचे संरेखित करें",
@@ -105,7 +109,7 @@
     "share": "साझा करें",
     "showStroke": "कूँची रंग चयक दिखायें",
     "showBackground": "पृष्ठभूमि रंग चयक दिखाये",
-    "toggleTheme": "संरचना पलटे",
+    "toggleTheme": "",
     "personalLib": "वैयक्तिक समूहकोष",
     "excalidrawLib": "एक्सकेलीड्रॉ समूहकोष",
     "decreaseFontSize": "अक्षर आकार घटायें",
@@ -140,7 +144,10 @@
     "textToDiagram": "पाठ से रेखाचित्र",
     "prompt": "प्रश्न",
     "followUs": "हमारा अनुकरण करें",
-    "discordChat": "डिस्कॉर्ड संवाद"
+    "discordChat": "डिस्कॉर्ड संवाद",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "अभी तक कोई अवयव जोडा नहीं गया.",
@@ -539,5 +546,20 @@
       "micMuted": "व्यक्ति का माइक्रोफ़ोन अभी मूक अवस्था मैं हैं",
       "isSpeaking": "व्यक्ति अभी बोलने मैं व्यस्त हैं"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
