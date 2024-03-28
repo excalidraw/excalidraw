@@ -21,7 +21,9 @@
     "copyStyles": "ပုံစံကူး",
     "pasteStyles": "ပုံစံထား",
     "stroke": "မျဉ်း",
+    "changeStroke": "",
     "background": "နောက်ခံ",
+    "changeBackground": "",
     "fill": "ဖြည့်",
     "strokeWidth": "မျဉ်းအထူ",
     "strokeStyle": "မျဉ်းပုံစံ",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
+    "clearCanvas": "",
     "layers": "အလွှာများ",
     "actions": "လုပ်ဆောင်ချက်များ",
     "language": "ဘာသာစကား",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်…",
     "libraries": "စာကြည့်တိုက်တွင်ရှာဖွေပါ",
     "loadingScene": "မြင်ကွင်းဖော်နေသည်…",
+    "loadScene": "",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
     "alignBottom": "အခြေညှိ",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
