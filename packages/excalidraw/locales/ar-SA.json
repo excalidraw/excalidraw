@@ -21,7 +21,9 @@
     "copyStyles": "نسخ الأنماط",
     "pasteStyles": "لصق الأنماط",
     "stroke": "الخط",
+    "changeStroke": "",
     "background": "الخلفية",
+    "changeBackground": "",
     "fill": "التعبئة",
     "strokeWidth": "سُمك الخط",
     "strokeStyle": "نمط الخط",
@@ -72,6 +74,7 @@
     "canvasColors": "تستخدم على القماش",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
+    "clearCanvas": "",
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "جارٍ تحميل المكتبة…",
     "libraries": "تصفح المكتبات",
     "loadingScene": "جاري تحميل المشهد…",
+    "loadScene": "",
     "align": "محاذاة",
     "alignTop": "محاذاة إلى اﻷعلى",
     "alignBottom": "محاذاة إلى اﻷسفل",
@@ -105,7 +109,7 @@
     "share": "مشاركة",
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
-    "toggleTheme": "غير النمط",
+    "toggleTheme": "",
     "personalLib": "المكتبة الشخصية",
     "excalidrawLib": "مكتبتنا",
     "decreaseFontSize": "تصغير حجم الخط",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
