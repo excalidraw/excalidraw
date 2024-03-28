@@ -565,6 +565,8 @@ function CommandPaletteInner({
     event: React.MouseEvent | React.KeyboardEvent | KeyboardEvent,
   ) => {
     if (uiAppState.openDialog?.name === "commandPalette") {
+      event.stopPropagation();
+      event.preventDefault();
       document.body.classList.add("excalidraw-animations-disabled");
       closeCommandPalette(() => {
         command.perform({ actionManager, event });
