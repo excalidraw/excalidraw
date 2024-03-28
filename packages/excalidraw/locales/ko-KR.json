@@ -21,7 +21,9 @@
     "copyStyles": "스타일 복사하기",
     "pasteStyles": "스타일 붙여넣기",
     "stroke": "선 색상",
+    "changeStroke": "",
     "background": "배경색",
+    "changeBackground": "",
     "fill": "채우기",
     "strokeWidth": "선 굵기",
     "strokeStyle": "선",
@@ -72,6 +74,7 @@
     "canvasColors": "캔버스에서 사용되었음",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
+    "clearCanvas": "",
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "라이브러리 불러오는 중…",
     "libraries": "라이브러리 찾기",
     "loadingScene": "화면 불러오는 중…",
+    "loadScene": "",
     "align": "정렬",
     "alignTop": "상단 정렬",
     "alignBottom": "하단 정렬",
@@ -105,7 +109,7 @@
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
-    "toggleTheme": "테마 전환",
+    "toggleTheme": "",
     "personalLib": "개인 라이브러리",
     "excalidrawLib": "Excalidraw 라이브러리",
     "decreaseFontSize": "폰트 사이즈 줄이기",
@@ -140,7 +144,10 @@
     "textToDiagram": "텍스트를 표로 만들기",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
