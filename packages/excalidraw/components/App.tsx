@@ -3755,8 +3755,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setToast({
           message: t("commandPalette.shortcutHint", {
-            shortcutOne: getShortcutFromShortcutName("commandPalette"),
-            shortcutTwo: getShortcutFromShortcutName("commandPalette", 1),
+            shortcut: getShortcutFromShortcutName("commandPalette"),
           }),
         });
         event.preventDefault();

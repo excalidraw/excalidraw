@@ -60,8 +60,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   clearCanvas: [getShortcutKey("CtrlOrCmd+Delete")],
   imageExport: [getShortcutKey("CtrlOrCmd+Shift+E")],
   commandPalette: [
-    getShortcutKey("CtrlOrCmd+Shift+P"),
     getShortcutKey("CtrlOrCmd+/"),
+    getShortcutKey("CtrlOrCmd+Shift+P"),
   ],
   cut: [getShortcutKey("CtrlOrCmd+X")],
   copy: [getShortcutKey("CtrlOrCmd+C")],
