@@ -21,7 +21,9 @@
     "copyStyles": "Kopiraj slog",
     "pasteStyles": "Prilepi slog",
     "stroke": "Poteza",
+    "changeStroke": "",
     "background": "Ozadje",
+    "changeBackground": "",
     "fill": "Polnilo",
     "strokeWidth": "Debelina poteze",
     "strokeStyle": "Slog poteze",
@@ -72,6 +74,7 @@
     "canvasColors": "Uporabljeno na platnu",
     "canvasBackground": "Ozadje platna",
     "drawingCanvas": "Platno za risanje",
+    "clearCanvas": "",
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Nalaganje knjižnice ...",
     "libraries": "Brskaj po knjižnicah",
     "loadingScene": "Nalaganje scene...",
+    "loadScene": "",
     "align": "Poravnava",
     "alignTop": "Poravnaj na vrh",
     "alignBottom": "Poravnaj na dno",
@@ -105,7 +109,7 @@
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
-    "toggleTheme": "Obrni temo",
+    "toggleTheme": "",
     "personalLib": "Osebna knjižnica",
     "excalidrawLib": "Knjižnica Excalidraw",
     "decreaseFontSize": "Zmanjšaj velikost pisave",
@@ -140,7 +144,10 @@
     "textToDiagram": "Besedilo v diagram",
     "prompt": "Poziv",
     "followUs": "Sledi nas",
-    "discordChat": "Klepet v Discordu"
+    "discordChat": "Klepet v Discordu",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -539,5 +546,20 @@
       "micMuted": "Uporabnikov mikrofon je izklopljen",
       "isSpeaking": "Uporabnik govori"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
