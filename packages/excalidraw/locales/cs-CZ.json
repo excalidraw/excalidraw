@@ -21,7 +21,9 @@
     "copyStyles": "Kopírovat styly",
     "pasteStyles": "Vložit styly",
     "stroke": "Obrys",
+    "changeStroke": "",
     "background": "Pozadí",
+    "changeBackground": "",
     "fill": "Výplň",
     "strokeWidth": "Tloušťka tahu",
     "strokeStyle": "Styl tahu",
@@ -72,6 +74,7 @@
     "canvasColors": "Použito na plátně",
     "canvasBackground": "Pozadí plátna",
     "drawingCanvas": "Kreslicí plátno",
+    "clearCanvas": "",
     "layers": "Vrstvy",
     "actions": "Akce",
     "language": "Jazyk",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Načítání knihovny…",
     "libraries": "Procházet knihovny",
     "loadingScene": "Načítání scény…",
+    "loadScene": "",
     "align": "Zarovnání",
     "alignTop": "Zarovnat nahoru",
     "alignBottom": "Zarovnat dolů",
@@ -105,7 +109,7 @@
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
-    "toggleTheme": "Přepnout tmavý řežim",
+    "toggleTheme": "",
     "personalLib": "Osobní knihovna",
     "excalidrawLib": "Exkalidraw knihovna",
     "decreaseFontSize": "Zmenšit písmo",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
