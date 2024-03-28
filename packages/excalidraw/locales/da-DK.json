@@ -21,7 +21,9 @@
     "copyStyles": "Kopier stil",
     "pasteStyles": "Indsæt stil",
     "stroke": "Linje",
+    "changeStroke": "",
     "background": "Baggrund",
+    "changeBackground": "",
     "fill": "Udfyld",
     "strokeWidth": "Linjebredde",
     "strokeStyle": "Linjeform",
@@ -72,6 +74,7 @@
     "canvasColors": "Brugt på lærred",
     "canvasBackground": "Lærredsbaggrund",
     "drawingCanvas": "Tegnelærred",
+    "clearCanvas": "",
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Sprog",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "",
     "libraries": "",
     "loadingScene": "",
+    "loadScene": "",
     "align": "",
     "alignTop": "",
     "alignBottom": "",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
