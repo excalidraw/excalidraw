@@ -21,7 +21,9 @@
     "copyStyles": "Kopijuoti stilius",
     "pasteStyles": "Įklijuoti stilius",
     "stroke": "Linija",
+    "changeStroke": "",
     "background": "Fonas",
+    "changeBackground": "",
     "fill": "Užpildymas",
     "strokeWidth": "Linijos storis",
     "strokeStyle": "Linijos stilius",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "Drobės fonas",
     "drawingCanvas": "",
+    "clearCanvas": "",
     "layers": "Sluoksniai",
     "actions": "Veiksmai",
     "language": "Kalba",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "",
     "libraries": "Naršyti bibliotekas",
     "loadingScene": "",
+    "loadScene": "",
     "align": "Lygiuoti",
     "alignTop": "Lygiuoti viršuje",
     "alignBottom": "Lygiuoti apačioje",
@@ -140,7 +144,10 @@
     "textToDiagram": "",
     "prompt": "",
     "followUs": "",
-    "discordChat": ""
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
