@@ -21,7 +21,9 @@
     "copyStyles": "शैली कॉपी करा",
     "pasteStyles": "कॉपी केलेली शैली वापरा",
     "stroke": "रेघे चा रंग",
+    "changeStroke": "",
     "background": "पार्श्वभूमी",
+    "changeBackground": "",
     "fill": "भरा",
     "strokeWidth": "रेघ रुंदी",
     "strokeStyle": "रेघ शैली",
@@ -72,6 +74,7 @@
     "canvasColors": "कॅनवास वर वापरलेले",
     "canvasBackground": "पटल पार्श्वभूमि",
     "drawingCanvas": "चित्र पटल",
+    "clearCanvas": "",
     "layers": "स्तर",
     "actions": "क्रिया",
     "language": "भाषा",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "संग्रह लोड होत आहे…",
     "libraries": "संग्रह देखे",
     "loadingScene": "दृश्य लोड होत आहे…",
+    "loadScene": "",
     "align": "संरेखित करा",
     "alignTop": "वर संरेखित करा",
     "alignBottom": "खाली संरेखित करा",
@@ -105,7 +109,7 @@
     "share": "सामायिक करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
-    "toggleTheme": "शैली बदला",
+    "toggleTheme": "",
     "personalLib": "वैयक्तिक संग्रह",
     "excalidrawLib": "एक्सकेलीड्रॉ संग्रह",
     "decreaseFontSize": "अक्षर आकार छोटा करा",
@@ -140,7 +144,10 @@
     "textToDiagram": "लिपि पासून चित्र",
     "prompt": "प्रश्न",
     "followUs": "आमचं अनुकरण करा",
-    "discordChat": "डिस्कोर्ड संवाद"
+    "discordChat": "डिस्कोर्ड संवाद",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
@@ -539,5 +546,20 @@
       "micMuted": "व्यक्ति चा माइक्रोफ़ोन सध्या मूक केलेला आहे",
       "isSpeaking": "व्यक्ति सध्या बोलत आहे"
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
