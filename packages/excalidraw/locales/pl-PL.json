@@ -21,7 +21,9 @@
     "copyStyles": "Kopiuj style",
     "pasteStyles": "Wklej style",
     "stroke": "Kolor obramowania",
+    "changeStroke": "",
     "background": "Kolor wypełnienia",
+    "changeBackground": "",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
     "strokeStyle": "Styl obrysu",
@@ -72,6 +74,7 @@
     "canvasColors": "Używane na płótnie",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
+    "clearCanvas": "",
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
@@ -90,6 +93,7 @@
     "libraryLoadingMessage": "Wczytywanie biblioteki…",
     "libraries": "Przeglądaj biblioteki",
     "loadingScene": "Wczytywanie sceny…",
+    "loadScene": "",
     "align": "Wyrównaj",
     "alignTop": "Wyrównaj do góry",
     "alignBottom": "Wyrównaj do dołu",
@@ -105,7 +109,7 @@
     "share": "Udostępnij",
     "showStroke": "Pokaż próbnik kolorów obrysu",
     "showBackground": "Pokaż próbnik koloru tła",
-    "toggleTheme": "Przełącz motyw",
+    "toggleTheme": "",
     "personalLib": "Biblioteka prywatna",
     "excalidrawLib": "Biblioteka Excalidraw",
     "decreaseFontSize": "Zmniejsz rozmiar czcionki",
@@ -140,7 +144,10 @@
     "textToDiagram": "Generuj diagram z opisu",
     "prompt": "Opis",
     "followUs": "Obserwuj nas",
-    "discordChat": "Czat Discorda"
+    "discordChat": "Czat Discorda",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
@@ -539,5 +546,20 @@
       "micMuted": "",
       "isSpeaking": ""
     }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
