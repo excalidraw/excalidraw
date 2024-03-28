@@ -560,6 +560,6 @@
       "noMatch": "No matching commands..."
     },
     "itemNotAvailable": "Command is not available...",
-    "shortcutHint": "For Command palette, use {{shortcutOne}} or {{shortcutTwo}}"
+    "shortcutHint": "For Command palette, use {{shortcut}}"
   }
 }
