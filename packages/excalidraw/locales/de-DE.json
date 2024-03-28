@@ -560,6 +560,6 @@
       "noMatch": "Keine passenden Befehle..."
     },
     "itemNotAvailable": "Befehl ist nicht verfügbar...",
-    "shortcutHint": ""
+    "shortcutHint": "Benutze {{shortcut}} für Befehlspalette"
   }
 }
