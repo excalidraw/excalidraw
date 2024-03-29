@@ -23,7 +23,7 @@
     "stroke": "Обводка",
     "changeStroke": "",
     "background": "Фон",
-    "changeBackground": "",
+    "changeBackground": "Изменить цвет фона",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
     "strokeStyle": "Стиль обводки",
@@ -74,7 +74,7 @@
     "canvasColors": "Используется на холсте",
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Полотно",
-    "clearCanvas": "",
+    "clearCanvas": "Очистить холст",
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "Загрузка библиотеки…",
     "libraries": "Просмотреть библиотеки",
     "loadingScene": "Загрузка сцены…",
-    "loadScene": "",
+    "loadScene": "Загрузить сцену из файла",
     "align": "Выровнять",
     "alignTop": "Выровнять по верхнему краю",
     "alignBottom": "Выровнять по нижнему краю",
@@ -109,7 +109,7 @@
     "share": "Поделиться",
     "showStroke": "Показать выбор цвета обводки",
     "showBackground": "Показать выбор цвета фона",
-    "toggleTheme": "",
+    "toggleTheme": "Переключить светлую/темную тему",
     "personalLib": "Личная библиотека",
     "excalidrawLib": "Библиотека Excalidraw",
     "decreaseFontSize": "Уменьшить шрифт",
@@ -146,7 +146,7 @@
     "followUs": "Подписаться",
     "discordChat": "Чат в Discord",
     "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
+    "zoomToFitSelection": "Увеличить до выделенного",
     "zoomToFit": ""
   },
   "library": {
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Палитра команд",
     "shortcuts": {
       "select": "",
       "confirm": "",
-      "close": ""
+      "close": "Закрыть"
     },
-    "recents": "",
+    "recents": "Недавно использованные",
     "search": {
       "placeholder": "",
       "noMatch": ""
     },
     "itemNotAvailable": "",
-    "shortcutHint": ""
+    "shortcutHint": "Используйте {{shortcut}} для командной палитры"
   }
 }
