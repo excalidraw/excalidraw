@@ -145,9 +145,9 @@
     "prompt": "Inmatning",
     "followUs": "Följ oss",
     "discordChat": "Discord chat",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "Zooma för att passa in i vyn",
+    "zoomToFitSelection": "Zooma för att passa urval",
+    "zoomToFit": "Zooma för att rymma alla element"
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Kommandopalett",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Välj",
+      "confirm": "Bekräfta",
+      "close": "Stäng"
     },
-    "recents": "",
+    "recents": "Nyligen använda",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Sök menyer, kommandon och upptäck dolda pärlor",
+      "noMatch": "Inga matchande kommandon..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Kommandot är inte tillgängligt...",
     "shortcutHint": "För kommandopalett, använd {{shortcut}}"
   }
 }
