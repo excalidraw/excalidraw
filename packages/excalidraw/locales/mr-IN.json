@@ -74,7 +74,7 @@
     "canvasColors": "कॅनवास वर वापरलेले",
     "canvasBackground": "पटल पार्श्वभूमि",
     "drawingCanvas": "चित्र पटल",
-    "clearCanvas": "",
+    "clearCanvas": "पटल स्वच्छ करा",
     "layers": "स्तर",
     "actions": "क्रिया",
     "language": "भाषा",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "संग्रह लोड होत आहे…",
     "libraries": "संग्रह देखे",
     "loadingScene": "दृश्य लोड होत आहे…",
-    "loadScene": "",
+    "loadScene": "फ़ाइल पासून दृश्य लोड करा",
     "align": "संरेखित करा",
     "alignTop": "वर संरेखित करा",
     "alignBottom": "खाली संरेखित करा",
@@ -109,7 +109,7 @@
     "share": "सामायिक करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
-    "toggleTheme": "",
+    "toggleTheme": "उजेड़ाची किव्हा अंधाराची प्रणाली बदला",
     "personalLib": "वैयक्तिक संग्रह",
     "excalidrawLib": "एक्सकेलीड्रॉ संग्रह",
     "decreaseFontSize": "अक्षर आकार छोटा करा",
@@ -145,9 +145,9 @@
     "prompt": "प्रश्न",
     "followUs": "आमचं अनुकरण करा",
     "discordChat": "डिस्कोर्ड संवाद",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "पूर्ण दृश्यरूप आकार",
+    "zoomToFitSelection": "निवडी प्रयंत दृश्यरूप आकार करा",
+    "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा"
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "आदेशांचं चयन पलट",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "निवडा",
+      "confirm": "निश्चित करा",
+      "close": "बंद करा"
     },
-    "recents": "",
+    "recents": "अलिकडेच वापरलेले",
     "search": {
-      "placeholder": "",
+      "placeholder": "निवड़क, आदेश शोधा आणि लपलेले नग प्राप्त करा",
       "noMatch": ""
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "आदेश उपलब्ध नाही...",
     "shortcutHint": ""
   }
 }
