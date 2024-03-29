@@ -5,7 +5,6 @@ import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
-import PostHogProvider from "./components/PostHogProvider";
 import {
   APP_NAME,
   EVENT,
@@ -888,9 +887,7 @@ const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
-        <PostHogProvider>
-          <ExcalidrawWrapper />
-        </PostHogProvider>
+        <ExcalidrawWrapper />
       </Provider>
     </TopErrorBoundary>
   );
