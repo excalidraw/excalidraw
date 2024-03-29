@@ -21,9 +21,9 @@
     "copyStyles": "Copiere stiluri",
     "pasteStyles": "Lipire stiluri",
     "stroke": "Contur",
-    "changeStroke": "",
+    "changeStroke": "Modificare culoare contur",
     "background": "Fundal",
-    "changeBackground": "",
+    "changeBackground": "Modificare culoare de contur",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
     "strokeStyle": "Stilul conturului",
@@ -74,7 +74,7 @@
     "canvasColors": "Folosite pe pânză",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
-    "clearCanvas": "",
+    "clearCanvas": "Ștergere pânză",
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "Se încarcă biblioteca…",
     "libraries": "Răsfoiește bibliotecile",
     "loadingScene": "Se încarcă scena…",
-    "loadScene": "",
+    "loadScene": "Încărcare scenă din fișier",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
     "alignBottom": "Aliniere jos",
@@ -109,7 +109,7 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
-    "toggleTheme": "",
+    "toggleTheme": "Comutare temă luminoasă/întunecată",
     "personalLib": "Biblioteca personală",
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Micșorează dimensiunea fontului",
@@ -145,9 +145,9 @@
     "prompt": "Mesaj sistem",
     "followUs": "Urmărește-ne",
     "discordChat": "Conversații pe Discord",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "Transfocare pentru a se potrivi în poarta de vizualizare",
+    "zoomToFitSelection": "Transfocare pentru a cuprinde selecția",
+    "zoomToFit": "Transfocare pentru a cuprinde toate elementele"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -358,7 +358,7 @@
     "textNewLine": "Adaugă o linie nouă (editor de text)",
     "title": "Ajutor",
     "view": "Vizualizare",
-    "zoomToFit": "Transfocare pentru a cuprinde totul",
+    "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
     "zoomToSelection": "Transfocare la selecție",
     "toggleElementLock": "Blocare/deblocare selecție",
     "movePageUpDown": "Deplasare pagină sus/jos",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paletă de comenzi",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Selectare",
+      "confirm": "Confirmare",
+      "close": "Închidere"
     },
-    "recents": "",
+    "recents": "Utilizate recent",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Caută meniuri, comenzi și descoperă nestemate ascunse",
+      "noMatch": "Nicio comandă potrivită..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Comanda nu este disponibilă...",
+    "shortcutHint": "Pentru paleta de comenzi, folosește {{shortcut}}"
   }
 }
