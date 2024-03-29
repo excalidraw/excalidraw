@@ -145,9 +145,9 @@
     "prompt": "提示詞",
     "followUs": "追蹤我們",
     "discordChat": "Discord 聊天室",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "縮放至符合 viewport",
+    "zoomToFitSelection": "縮放至符合選取區",
+    "zoomToFit": "縮放至顯示所有元素"
   },
   "library": {
     "noItems": "尚未加入任何物件...",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "指令面板",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "選取",
+      "confirm": "確認",
+      "close": "關閉"
     },
-    "recents": "",
+    "recents": "最近使用",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "搜尋選單與指令並找出隱藏功能",
+      "noMatch": "沒有符合的指令…"
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "指令無法使用…",
     "shortcutHint": ""
   }
 }
