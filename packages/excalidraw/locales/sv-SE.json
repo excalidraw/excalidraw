@@ -21,9 +21,9 @@
     "copyStyles": "Kopiera stil",
     "pasteStyles": "Klistra in stil",
     "stroke": "Linje",
-    "changeStroke": "",
+    "changeStroke": "Ändra streckfärg",
     "background": "Bakgrund",
-    "changeBackground": "",
+    "changeBackground": "Ändra bakgrundsfärg",
     "fill": "Fyllnad",
     "strokeWidth": "Linjebredd",
     "strokeStyle": "Linjestil",
@@ -74,7 +74,7 @@
     "canvasColors": "Används på canvas",
     "canvasBackground": "Canvas-bakgrund",
     "drawingCanvas": "Ritar canvas",
-    "clearCanvas": "",
+    "clearCanvas": "Rensa canvas",
     "layers": "Lager",
     "actions": "Åtgärder",
     "language": "Språk",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "Laddar bibliotek…",
     "libraries": "Bläddra i bibliotek",
     "loadingScene": "Laddar skiss…",
-    "loadScene": "",
+    "loadScene": "Ladda scen från fil",
     "align": "Justera",
     "alignTop": "Justera överkant",
     "alignBottom": "Justera underkant",
@@ -109,7 +109,7 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
-    "toggleTheme": "",
+    "toggleTheme": "Växla ljus/mörkt tema",
     "personalLib": "Personligt bibliotek",
     "excalidrawLib": "Excalidraw bibliotek",
     "decreaseFontSize": "Minska fontstorleken",
@@ -560,6 +560,6 @@
       "noMatch": ""
     },
     "itemNotAvailable": "",
-    "shortcutHint": ""
+    "shortcutHint": "För kommandopalett, använd {{shortcut}}"
   }
 }
