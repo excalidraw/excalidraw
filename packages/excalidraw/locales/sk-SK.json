@@ -21,9 +21,9 @@
     "copyStyles": "Kopírovať štýly",
     "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
-    "changeStroke": "",
+    "changeStroke": "Zmeniť farbu orámovania",
     "background": "Pozadie",
-    "changeBackground": "",
+    "changeBackground": "Zmeniť farbu pozadia",
     "fill": "Výplň",
     "strokeWidth": "Hrúbka obrysu",
     "strokeStyle": "Štýl obrysu",
@@ -74,7 +74,7 @@
     "canvasColors": "Použité na plátne",
     "canvasBackground": "Pozadie plátna",
     "drawingCanvas": "Kresliace plátno",
-    "clearCanvas": "",
+    "clearCanvas": "Vyčistiť plátno",
     "layers": "Vrstvy",
     "actions": "Akcie",
     "language": "Jazyk",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "Načítavanie knižnice…",
     "libraries": "Prehliadať knižnice",
     "loadingScene": "Načítavanie scény…",
-    "loadScene": "",
+    "loadScene": "Načítať scénu zo súboru",
     "align": "Zarovnanie",
     "alignTop": "Zarovnať nahor",
     "alignBottom": "Zarovnať nadol",
@@ -109,7 +109,7 @@
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
-    "toggleTheme": "",
+    "toggleTheme": "Prepnúť svetlú/tmavú tému",
     "personalLib": "Moja knižnica",
     "excalidrawLib": "Excalidraw knižnica",
     "decreaseFontSize": "Zmenšiť veľkosť písma",
@@ -145,9 +145,9 @@
     "prompt": "Inštrukcia",
     "followUs": "Sledujte nás",
     "discordChat": "Discord chat",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "Priblížiť na veľkosť zobrazenia",
+    "zoomToFitSelection": "Priblížiť na výber",
+    "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky"
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
@@ -223,7 +223,7 @@
     "failedToFetchImage": "Načítanie obrázka zlyhalo.",
     "cannotResolveCollabServer": "Nepodarilo sa pripojiť ku kolaboračnému serveru. Prosím obnovte stránku a skúste to znovu.",
     "importLibraryError": "Nepodarilo sa načítať knižnicu",
-    "saveLibraryError": "",
+    "saveLibraryError": "Nepodarilo sa uložiť knižnicu. Prosím uložte si vašu knižnicu lokálne do súboru, aby ste nestratili zmeny.",
     "collabSaveFailed": "Uloženie do databázy sa nepodarilo. Ak tento problém pretrváva uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "collabSaveFailed_sizeExceeded": "Uloženie do databázy sa nepodarilo, pretože veľkosť plátna je príliš veľká. Uložte si váš súbor lokálne aby ste nestratili vašu prácu.",
     "imageToolNotSupported": "Obrázky sú vypnuté.",
@@ -542,24 +542,24 @@
     "hint": {
       "text": "Kliknite na používateľa pre jeho sledovanie",
       "followStatus": "Aktuálne sledujete tohto používateľa",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Používateľ je účastník hovoru",
+      "micMuted": "Používateľ má stlmený mikrofón",
+      "isSpeaking": "Používateľ hovorí"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paleta príkazov",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Vybrať",
+      "confirm": "Potvrdiť",
+      "close": "Zavrieť"
     },
-    "recents": "",
+    "recents": "Nedávno použité",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Prehľadávajte menu, príkazy a objavte skryté poklady",
+      "noMatch": "Žiadne vyhovujúce príkazy..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Príkaz nie je dostupný...",
+    "shortcutHint": "Použite paletu príkazov pomocou {{shortcut}}"
   }
 }
