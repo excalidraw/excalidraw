@@ -21,9 +21,9 @@
     "copyStyles": "Copia els estils",
     "pasteStyles": "Enganxa els estils",
     "stroke": "Color del traç",
-    "changeStroke": "",
+    "changeStroke": "Canvia el color del traç",
     "background": "Color del fons",
-    "changeBackground": "",
+    "changeBackground": "Canvia el color de fons",
     "fill": "Estil del fons",
     "strokeWidth": "Amplada del traç",
     "strokeStyle": "Estil del traç",
@@ -74,7 +74,7 @@
     "canvasColors": "Usat al llenç",
     "canvasBackground": "Fons del llenç",
     "drawingCanvas": "Llenç de dibuix",
-    "clearCanvas": "",
+    "clearCanvas": "Neteja el llenç",
     "layers": "Capes",
     "actions": "Accions",
     "language": "Llengua",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "S'està carregant la biblioteca…",
     "libraries": "Explora les biblioteques",
     "loadingScene": "S'està carregant l'escena…",
-    "loadScene": "",
+    "loadScene": "Carrega una escena des d'un fitxer",
     "align": "Alinea",
     "alignTop": "Alinea a la part superior",
     "alignBottom": "Alinea a la part inferior",
@@ -109,7 +109,7 @@
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
-    "toggleTheme": "",
+    "toggleTheme": "Alternar tema clar i fosc",
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
     "decreaseFontSize": "Redueix la mida de la lletra",
@@ -142,12 +142,12 @@
     "removeAllElementsFromFrame": "Elimina tots els elements del marc",
     "eyeDropper": "Tria un color del llenç",
     "textToDiagram": "Text a diagrama",
-    "prompt": "",
+    "prompt": "Prompt",
     "followUs": "Seguiu-nos",
     "discordChat": "Xat de Discord",
     "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitSelection": "Zoom per veure la selecció",
+    "zoomToFit": "Zoom per veure tots els elements"
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -186,7 +186,7 @@
     "cancel": "Cancel·la",
     "clear": "Neteja",
     "remove": "Suprimeix",
-    "embed": "",
+    "embed": "Commuta incrustació",
     "publishLibrary": "Publica",
     "submit": "Envia",
     "confirm": "Confirma",
@@ -550,16 +550,16 @@
   "commandPalette": {
     "title": "",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Selecciona",
+      "confirm": "Confirma",
+      "close": "Tanca"
     },
-    "recents": "",
+    "recents": "Usats recentment",
     "search": {
       "placeholder": "",
-      "noMatch": ""
+      "noMatch": "No hi ha ordres coincidents..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Ordre no disponible...",
     "shortcutHint": ""
   }
 }
