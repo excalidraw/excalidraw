@@ -21,9 +21,9 @@
     "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
-    "changeStroke": "",
+    "changeStroke": "更改描边颜色",
     "background": "背景",
-    "changeBackground": "",
+    "changeBackground": "更改背景颜色",
     "fill": "填充",
     "strokeWidth": "描边宽度",
     "strokeStyle": "边框样式",
@@ -74,7 +74,7 @@
     "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
-    "clearCanvas": "",
+    "clearCanvas": "清除画布",
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "正在加载素材库…",
     "libraries": "浏览素材库",
     "loadingScene": "正在加载绘图…",
-    "loadScene": "",
+    "loadScene": "从文件加载绘图",
     "align": "对齐",
     "alignTop": "顶部对齐",
     "alignBottom": "底端对齐",
@@ -109,7 +109,7 @@
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
-    "toggleTheme": "",
+    "toggleTheme": "切换浅色/深色主题",
     "personalLib": "个人素材库",
     "excalidrawLib": "Excalidraw 素材库",
     "decreaseFontSize": "缩小字体大小",
@@ -145,9 +145,9 @@
     "prompt": "Prompt",
     "followUs": "关注我们",
     "discordChat": "Discord 群组",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "缩放以适应视图",
+    "zoomToFitSelection": "缩放以适应选区",
+    "zoomToFit": "缩放以适应所有元素"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "命令面板",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "选择",
+      "confirm": "确定",
+      "close": "关闭"
     },
-    "recents": "",
+    "recents": "最近使用",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "搜索菜单、命令、探索隐藏功能",
+      "noMatch": "没有匹配的命令……"
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "命令不可用……",
+    "shortcutHint": "用 {{shortcut}} 打开命令面板"
   }
 }
