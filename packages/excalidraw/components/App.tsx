@@ -4150,6 +4150,10 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               editingFrame: selectedElement.id,
             });
+          } else if (isEmbeddableElement(selectedElement)) {//zsviczian
+            this.setState({
+              activeEmbeddable: { element: selectedElement, state: "active" }
+            });
           }
         }
       } else if (
@@ -5181,9 +5185,13 @@ class App extends React.Component<AppProps, AppState> {
       event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
+    const isPenFreedraw = this.state.activeTool.type === "freedraw" && event.pointerType === "pen"; //zsviczian
     if (!this.state.draggingElement && !this.state.multiElement) {
       if (isOverScrollBar) {
         resetCursor(this.interactiveCanvas);
+      } else if (isPenFreedraw && this.interactiveCanvas) {
+        //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1659
+        this.interactiveCanvas.style.cursor = "none";
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
       }
