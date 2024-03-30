@@ -21,9 +21,9 @@
     "copyStyles": "शैली कॉपी करा",
     "pasteStyles": "कॉपी केलेली शैली वापरा",
     "stroke": "रेघे चा रंग",
-    "changeStroke": "",
+    "changeStroke": "रेषेचा रंग बदला",
     "background": "पार्श्वभूमी",
-    "changeBackground": "",
+    "changeBackground": "पार्श्वभूमीचा रंग बदला",
     "fill": "भरा",
     "strokeWidth": "रेघ रुंदी",
     "strokeStyle": "रेघ शैली",
@@ -312,7 +312,7 @@
     "or": ""
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "तुमच्या चित्रात सहभागी व्हायला लोकांना आमंत्रित करा.",
     "desc_privacy": "",
     "button_startSession": "सत्र सुरु करा",
     "button_stopSession": "सत्र थाम्बवा",
