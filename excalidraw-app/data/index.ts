@@ -33,7 +33,7 @@ import {
   WS_SUBTYPES,
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
+import { saveFilesToHttpStorage } from "./httpStorage";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
@@ -284,6 +284,9 @@ export const exportToBackend = async (
   appState: Partial<AppState>,
   files: BinaryFiles,
 ): Promise<ExportToBackendResult> => {
+  return { url: null, errorMessage: "Not implemented" };
+
+  /*
   const encryptionKey = await generateEncryptionKey("string");
 
   const payload = await compressData(
@@ -307,6 +310,7 @@ export const exportToBackend = async (
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });
 
+    // TODO (JESS): Replace this with actual backend URL for exporting
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
       body: payload.buffer,
@@ -319,10 +323,12 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
-      await saveFilesToFirebase({
-        prefix: `/files/shareLinks/${json.id}`,
-        files: filesToUpload,
-      });
+      // TODO (Jess): Replace this with actual backend URL for exporting
+      // await saveFilesToHttpStorage({
+      //   files: filesToUpload,
+      //   roomId: json.id,
+      //   roomKey: encryptionKey,
+      // });
 
       return { url: urlString, errorMessage: null };
     } else if (json.error_class === "RequestTooLargeError") {
@@ -338,4 +344,5 @@ export const exportToBackend = async (
 
     return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   }
+  */
 };
