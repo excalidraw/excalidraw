@@ -23,6 +23,20 @@
 
     .Island {
       padding: 2.5rem;
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    &.animations-disabled {
+      .Modal__background {
+        animation: none;
+      }
+
+      .Modal__content {
+        animation: none;
+        opacity: 1;
+      }
     }
   }
 
@@ -35,7 +49,7 @@
     z-index: 1;
     background-color: rgba(#121212, 0.2);
 
-    animation: Modal__background__fade-in 0.125s linear forwards;
+    animation: Modal__background__fade-in 0.1s linear forwards;
   }
 
   .Modal__content {
@@ -47,7 +61,8 @@
 
     opacity: 0;
     transform: translateY(10px);
-    animation: Modal__content_fade-in 0.1s ease-out 0.05s forwards;
+    animation: Modal__content_fade-in 0.025s ease-out 0s forwards;
+
     position: relative;
     overflow-y: auto;
 
@@ -56,7 +71,7 @@
 
     border: 1px solid var(--dialog-border-color);
     box-shadow: var(--modal-shadow);
-    border-radius: 6px;
+    border-radius: 0.75rem;
     box-sizing: border-box;
 
     &:focus {

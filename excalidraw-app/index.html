@@ -78,7 +78,7 @@
       }
     </style>
     <!------------------------------------------------------------------------->
-    <% if ("%PROD%" === "true") { %>
+    <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -122,7 +122,8 @@
     />
 
     <link rel="stylesheet" href="/fonts/fonts.css" type="text/css" />
-    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%"==="true" ) { %>
+    <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
+    VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
@@ -196,7 +197,8 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
-    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%" !== 'true') { %>
+    <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
+    VITE_APP_DEV_DISABLE_LIVE_RELOAD != true) { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking

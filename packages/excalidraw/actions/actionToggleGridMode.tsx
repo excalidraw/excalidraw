@@ -5,6 +5,7 @@ import { AppState } from "../types";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
+  label: "labels.showGrid",
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -24,6 +25,5 @@ export const actionToggleGridMode = register({
   predicate: (element, appState, props) => {
     return typeof props.gridModeEnabled === "undefined";
   },
-  contextItemLabel: "labels.showGrid",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.code === CODES.QUOTE,
 });
