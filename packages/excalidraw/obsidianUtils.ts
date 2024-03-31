@@ -40,3 +40,11 @@ export const getExcalidrawContentEl = ():HTMLElement => {
   if(!excalidrawView) return document.body;
   return excalidrawView.contentEl as HTMLElement;
 }
+
+export const hideFreedrawPenmodeCursor = () => {
+  if(!OBSIDIAN_PLUGIN) {
+    setObsidianPlugin();
+  }
+  if(!OBSIDIAN_PLUGIN) return true;
+  return !OBSIDIAN_PLUGIN.settings.penModeCrosshairVisible;
+}

@@ -415,7 +415,7 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
-import { getExcalidrawContentEl } from "../obsidianUtils";
+import { getExcalidrawContentEl, hideFreedrawPenmodeCursor } from "../obsidianUtils";
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import {
@@ -5189,7 +5189,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.state.draggingElement && !this.state.multiElement) {
       if (isOverScrollBar) {
         resetCursor(this.interactiveCanvas);
-      } else if (isPenFreedraw && this.interactiveCanvas) {
+      } else if (isPenFreedraw && this.interactiveCanvas && hideFreedrawPenmodeCursor()) {
         //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1659
         this.interactiveCanvas.style.cursor = "none";
       } else {
