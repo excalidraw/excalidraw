@@ -133,10 +133,11 @@ export const HintViewer = ({
     app,
   });
   if (!hint) {
-    return null;
+    hint = "";
+  } else {
+    hint = getShortcutKey(hint);
   }
 
-  hint = getShortcutKey(hint);
   const uiMode = getUiMode();
 
   return (
