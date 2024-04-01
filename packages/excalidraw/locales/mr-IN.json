@@ -309,7 +309,7 @@
     "sceneContent": "दृश्य विषय:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "किंव्हा"
   },
   "roomDialog": {
     "desc_intro": "तुमच्या चित्रात सहभागी व्हायला लोकांना आमंत्रित करा.",
@@ -560,6 +560,6 @@
       "noMatch": ""
     },
     "itemNotAvailable": "आदेश उपलब्ध नाही...",
-    "shortcutHint": ""
+    "shortcutHint": "आदेश फलक साठी, {{shortcut}} वापरा"
   }
 }
