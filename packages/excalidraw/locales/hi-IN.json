@@ -21,9 +21,9 @@
     "copyStyles": "अंदाज़ की प्रतिलिपि बनायें",
     "pasteStyles": "अंदाज़ चिपकाये",
     "stroke": "रेखा",
-    "changeStroke": "",
+    "changeStroke": "कूँची का रंग बदले",
     "background": "पृष्ठभूमि",
-    "changeBackground": "",
+    "changeBackground": "पृष्ठभूमि का रंग बदले",
     "fill": "भरें",
     "strokeWidth": "रेखा की चौड़ाई",
     "strokeStyle": "स्ट्रोक का अंदाज़",
@@ -74,7 +74,7 @@
     "canvasColors": "कॅनवास पर प्रयोगित",
     "canvasBackground": "चित्रपटल पृष्ठभूमि",
     "drawingCanvas": "चित्रपटल",
-    "clearCanvas": "",
+    "clearCanvas": "चित्रपलट स्वच्छ करे",
     "layers": "परतें",
     "actions": "कार्रवाई",
     "language": "भाषा",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "समूहकोष खुल रहा है",
     "libraries": "समूह कोष पड़तालें",
     "loadingScene": "दृश्य खुल रहा है",
-    "loadScene": "",
+    "loadScene": "फ़ाइल से दृश्य लायें",
     "align": "संरेखित करें",
     "alignTop": "ऊपर संरेखित करें",
     "alignBottom": "नीचे संरेखित करें",
@@ -109,7 +109,7 @@
     "share": "साझा करें",
     "showStroke": "कूँची रंग चयक दिखायें",
     "showBackground": "पृष्ठभूमि रंग चयक दिखाये",
-    "toggleTheme": "",
+    "toggleTheme": "अंधेरी/उजेलि संरचना पलटे",
     "personalLib": "वैयक्तिक समूहकोष",
     "excalidrawLib": "एक्सकेलीड्रॉ समूहकोष",
     "decreaseFontSize": "अक्षर आकार घटायें",
@@ -145,9 +145,9 @@
     "prompt": "प्रश्न",
     "followUs": "हमारा अनुकरण करें",
     "discordChat": "डिस्कॉर्ड संवाद",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "दृश्यचौखट में पूरी तरह से बैठने के लिए झूम करें.",
+    "zoomToFitSelection": "चयन पूरा दिखने इतना झूम करे",
+    "zoomToFit": "सभी तत्व दिखे इतना झूम करें"
   },
   "library": {
     "noItems": "अभी तक कोई अवयव जोडा नहीं गया.",
@@ -548,18 +548,18 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "आदेश फ़लक",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "चुनें",
+      "confirm": "पुष्टि करें",
+      "close": "बंद करें"
     },
-    "recents": "",
+    "recents": "हाल ही में उपयोग किया गया",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "मेनू, आदेशों कों धूंड़े और गुप्त नग प्राप्त करें",
+      "noMatch": "कोई आदेश मेल नाही खा सका....."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "आदेश उपलब्ध नाही हैं.",
     "shortcutHint": "आदेश फलक के लिए, {{shortcut}} का उपयोग कीजिए"
   }
 }
