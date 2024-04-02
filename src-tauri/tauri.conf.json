@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 768,
         "resizable": true,
         "title": "excalidraw",
-        "width": 800
+        "width": 1024
       }
     ]
   }
