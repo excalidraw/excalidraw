@@ -1,4 +1,4 @@
-import { AppState, ExcalidrawProps, Point } from "../../types";
+import { AppState, ExcalidrawProps, Point, UIAppState } from "../../types";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -332,10 +332,10 @@ const getCoordsForPopover = (
 
 export const getContextMenuLabel = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: UIAppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
-  const label = selectedElements[0]!.link
+  const label = selectedElements[0]?.link
     ? isEmbeddableElement(selectedElements[0])
       ? "labels.link.editEmbed"
       : "labels.link.edit"

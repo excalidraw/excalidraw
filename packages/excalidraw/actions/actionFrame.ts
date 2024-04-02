@@ -3,13 +3,17 @@ import { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
-import { AppClassProperties, AppState } from "../types";
+import { AppClassProperties, AppState, UIAppState } from "../types";
 import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
+import { frameToolIcon } from "../components/icons";
 
-const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
+const isSingleFrameSelected = (
+  appState: UIAppState,
+  app: AppClassProperties,
+) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
   return (
@@ -19,6 +23,7 @@ const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
 
 export const actionSelectAllElementsInFrame = register({
   name: "selectAllElementsInFrame",
+  label: "labels.selectAllElementsInFrame",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -49,13 +54,13 @@ export const actionSelectAllElementsInFrame = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.selectAllElementsInFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
   name: "removeAllElementsFromFrame",
+  label: "labels.removeAllElementsFromFrame",
   trackEvent: { category: "history" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -80,13 +85,13 @@ export const actionRemoveAllElementsFromFrame = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.removeAllElementsFromFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionupdateFrameRendering = register({
   name: "updateFrameRendering",
+  label: "labels.updateFrameRendering",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
@@ -102,13 +107,15 @@ export const actionupdateFrameRendering = register({
       commitToHistory: false,
     };
   },
-  contextItemLabel: "labels.updateFrameRendering",
   checked: (appState: AppState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({
   name: "setFrameAsActiveTool",
+  label: "toolBar.frame",
   trackEvent: { category: "toolbar" },
+  icon: frameToolIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "frame",
