@@ -11,8 +11,8 @@
     "copyAsPng": "העתק ללוח כ PNG",
     "copyAsSvg": "העתק ללוח כ SVG",
     "copyText": "העתק ללוח כטקסט",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "העתקת המקור ללוח הגזירים",
+    "convertToCode": "המרה לקוד",
     "bringForward": "הבא שכבה קדימה",
     "sendToBack": "שלח אחורה",
     "bringToFront": "העבר לחזית",
@@ -264,7 +264,7 @@
     "hand": "יד (כלי הזזה)",
     "extraTools": "כלים נוספים",
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
-    "magicSettings": ""
+    "magicSettings": "הגדרות בינה מלאכותית"
   },
   "headings": {
     "canvasActions": "פעולות קנבאס",
@@ -309,7 +309,7 @@
     "sceneContent": "תוכן הקנבאס:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "או"
   },
   "roomDialog": {
     "desc_intro": "",
@@ -461,20 +461,20 @@
   },
   "colors": {
     "transparent": "שקוף",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
+    "black": "שחור",
+    "white": "לבן",
+    "red": "אדום",
+    "pink": "ורוד",
+    "grape": "ענבים",
+    "violet": "סגול",
+    "gray": "אפור",
+    "blue": "כחול",
+    "cyan": "ציאן",
     "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "green": "ירוק",
+    "yellow": "צהוב",
+    "orange": "כתום",
+    "bronze": "ברונזה"
   },
   "welcomeScreen": {
     "app": {
@@ -490,38 +490,38 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
+    "mostUsedCustomColors": "הצבעים המותאמים הכי נפוצים",
+    "colors": "צבעים",
+    "shades": "הצללות",
+    "hexCode": "קוד הקסדצימלי",
     "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "ייצוא כתמונה",
+        "button": "ייצוא כתמונה",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "שמירה לכונן",
+        "button": "שמירה לכונן",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+‎",
+        "button": "ייצוא ל־Excalidraw+‎",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "טעינה מקובץ",
+        "button": "טעינה מקובץ",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
+        "title": "טעינה מקישור",
         "button": "",
         "description": ""
       }
@@ -536,8 +536,8 @@
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "חיפוש מהיר",
+      "empty": "לא נמצאו משתמשים"
     },
     "hint": {
       "text": "",
@@ -550,16 +550,16 @@
   "commandPalette": {
     "title": "",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "בחירה",
+      "confirm": "אישור",
+      "close": "סגירה"
     },
-    "recents": "",
+    "recents": "בשימוש לאחרונה",
     "search": {
       "placeholder": "",
-      "noMatch": ""
+      "noMatch": "אין פקודות תואמות…"
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "הפקודה לא זמינה…",
     "shortcutHint": ""
   }
 }
