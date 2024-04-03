@@ -1,6 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.17.1",
+  "name": "@james.kwon/excalidraw",
+  "version": "0.17.2",
   "main": "./dist/prod/index.js",
   "type": "module",
   "module": "./dist/prod/index.js",
@@ -23,7 +23,7 @@
     "access": "public"
   },
   "description": "Excalidraw as a React component",
-  "repository": "https://github.com/excalidraw/excalidraw",
+  "repository": "https://github.com/crecow/excalidraw",
   "license": "MIT",
   "keywords": [
     "excalidraw",
@@ -122,8 +122,8 @@
     "ts-loader": "9.3.1",
     "typescript": "4.9.4"
   },
-  "bugs": "https://github.com/excalidraw/excalidraw/issues",
-  "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
+  "bugs": "https://github.com/crecow/excalidraw/issues",
+  "homepage": "https://github.com/crecow/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
     "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types",
