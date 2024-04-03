@@ -3748,11 +3748,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // remove selections on escape press
-      if (event.key === KEYS.ESCAPE) {
-        // Don't deselect text right after editing it
-        if (isWritableElement(event.target)) {
-          return;
-        }
+      if (
+        event.key === KEYS.ESCAPE &&
+        // unless we're dragging or finalizing an action
+        !(
+          this.state.draggingElement ||
+          isWritableElement(event.target) ||
+          this.state.editingElement ||
+          ["freedraw", "eraser"].includes(this.state.activeTool.type)
+        )
+      ) {
         this.setState({
           selectedElementIds: {},
           selectedGroupIds: {},
