@@ -8,7 +8,7 @@
     "@excalidraw/excalidraw": "*"
   },
   "devDependencies": {
-    "vite": "5.2.7",
+    "vite": "5.2.8",
     "typescript": "^5"
   },
   "scripts": {
