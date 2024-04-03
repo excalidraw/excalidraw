@@ -5,10 +5,16 @@ import {
   AppState,
   ExcalidrawProps,
   BinaryFiles,
+  UIAppState,
 } from "../types";
 import { MarkOptional } from "../utility-types";
 
-export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
+export type ActionSource =
+  | "ui"
+  | "keyboard"
+  | "contextMenu"
+  | "api"
+  | "commandPalette";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -125,7 +131,8 @@ export type ActionName =
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer"
-  | "toggleLaserPointerTool";
+  | "toggleLaserPointerTool" //zsviczian
+  | "commandPalette";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -138,6 +145,20 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: ActionName;
+  label:
+    | string
+    | ((
+        elements: readonly ExcalidrawElement[],
+        appState: Readonly<AppState>,
+        app: AppClassProperties,
+      ) => string);
+  keywords?: string[];
+  icon?:
+    | React.ReactNode
+    | ((
+        appState: UIAppState,
+        elements: readonly ExcalidrawElement[],
+      ) => React.ReactNode);
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
@@ -147,13 +168,6 @@ export interface Action {
     elements: readonly ExcalidrawElement[],
     app: AppClassProperties,
   ) => boolean;
-  contextItemLabel?:
-    | string
-    | ((
-        elements: readonly ExcalidrawElement[],
-        appState: Readonly<AppState>,
-        app: AppClassProperties,
-      ) => string);
   predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,

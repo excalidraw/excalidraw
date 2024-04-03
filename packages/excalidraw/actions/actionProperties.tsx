@@ -52,6 +52,7 @@ import {
   ArrowheadCircleOutlineIcon,
   ArrowheadDiamondIcon,
   ArrowheadDiamondOutlineIcon,
+  fontSizeIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -241,6 +242,7 @@ const changeFontSize = (
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
+  label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     //zsviczian added containers
@@ -314,6 +316,7 @@ export const actionChangeStrokeColor = register({
 
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
+  label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -365,6 +368,7 @@ export const actionChangeBackgroundColor = register({
 
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
+  label: "labels.fill",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     trackEvent(
@@ -442,6 +446,7 @@ export const actionChangeFillStyle = register({
 
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
+  label: "labels.strokeWidth",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -501,6 +506,7 @@ export const actionChangeStrokeWidth = register({
 
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
+  label: "labels.sloppiness",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -552,6 +558,7 @@ export const actionChangeSloppiness = register({
 
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
+  label: "labels.strokeStyle",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -602,6 +609,7 @@ export const actionChangeStrokeStyle = register({
 
 export const actionChangeOpacity = register({
   name: "changeOpacity",
+  label: "labels.opacity",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -756,6 +764,7 @@ export const getFontSize = (size:number, zoom: number):number => {
 
 export const actionChangeFontSize = register({
   name: "changeFontSize",
+  label: "labels.fontSize",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
@@ -858,6 +867,8 @@ export const actionChangeFontSize = register({
 
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
+  label: "labels.decreaseFontSize",
+  icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
@@ -880,6 +891,8 @@ export const actionDecreaseFontSize = register({
 
 export const actionIncreaseFontSize = register({
   name: "increaseFontSize",
+  label: "labels.increaseFontSize",
+  icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
@@ -898,6 +911,7 @@ export const actionIncreaseFontSize = register({
 
 export const actionChangeFontFamily = register({
   name: "changeFontFamily",
+  label: "labels.fontFamily",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return {
@@ -1011,6 +1025,7 @@ export const actionChangeFontFamily = register({
 
 export const actionChangeTextAlign = register({
   name: "changeTextAlign",
+  label: "Change text alignment",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return {
@@ -1100,6 +1115,7 @@ export const actionChangeTextAlign = register({
 
 export const actionChangeVerticalAlign = register({
   name: "changeVerticalAlign",
+  label: "Change vertical alignment",
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     return {
@@ -1189,6 +1205,7 @@ export const actionChangeVerticalAlign = register({
 
 export const actionChangeRoundness = register({
   name: "changeRoundness",
+  label: "Change edge roundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -1327,6 +1344,7 @@ const getArrowheadOptions = (flip: boolean) => {
 
 export const actionChangeArrowhead = register({
   name: "changeArrowhead",
+  label: "Change arrowheads",
   trackEvent: false,
   perform: (
     elements,

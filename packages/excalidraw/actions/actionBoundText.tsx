@@ -36,7 +36,7 @@ import { register } from "./register";
 
 export const actionUnbindText = register({
   name: "unbindText",
-  contextItemLabel: "labels.unbindText",
+  label: "labels.unbindText",
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -91,7 +91,7 @@ export const actionUnbindText = register({
 
 export const actionBindText = register({
   name: "bindText",
-  contextItemLabel: "labels.bindText",
+  label: "labels.bindText",
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -203,7 +203,7 @@ const pushContainerBelowText = (
 
 export const actionWrapTextInContainer = register({
   name: "wrapTextInContainer",
-  contextItemLabel: "labels.createContainerFromText",
+  label: "labels.createContainerFromText",
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
