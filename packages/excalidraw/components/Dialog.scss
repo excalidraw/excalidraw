@@ -37,6 +37,12 @@
       width: 1.5rem;
       height: 1.5rem;
     }
+
+    & + .Dialog__content {
+      --offset: 28px;
+      height: calc(100% - var(--offset)) !important;
+      margin-top: var(--offset) !important;
+    }
   }
 
   .Dialog--fullscreen {

@@ -791,6 +791,14 @@ export const isShallowEqual = <
   const aKeys = Object.keys(objA);
   const bKeys = Object.keys(objB);
   if (aKeys.length !== bKeys.length) {
+    if (debug) {
+      console.warn(
+        `%cisShallowEqual: objects don't have same properties ->`,
+        "color: #8B4000",
+        objA,
+        objB,
+      );
+    }
     return false;
   }
 

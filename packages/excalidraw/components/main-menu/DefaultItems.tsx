@@ -7,6 +7,7 @@ import {
   useAppProps,
 } from "../App";
 import {
+  boltIcon,
   ExportIcon,
   ExportImageIcon,
   HelpIcon,
@@ -27,8 +28,6 @@ import {
   actionShortcuts,
   actionToggleTheme,
 } from "../../actions";
-
-import "./DefaultItems.scss";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -36,6 +35,8 @@ import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
+
+import "./DefaultItems.scss";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -116,6 +117,24 @@ export const SaveAsImage = () => {
   );
 };
 SaveAsImage.displayName = "SaveAsImage";
+
+export const CommandPalette = () => {
+  const setAppState = useExcalidrawSetAppState();
+  const { t } = useI18n();
+
+  return (
+    <DropdownMenuItem
+      icon={boltIcon}
+      data-testid="command-palette-button"
+      onSelect={() => setAppState({ openDialog: { name: "commandPalette" } })}
+      shortcut={getShortcutFromShortcutName("commandPalette")}
+      aria-label={t("commandPalette.title")}
+    >
+      {t("commandPalette.title")}
+    </DropdownMenuItem>
+  );
+};
+CommandPalette.displayName = "CommandPalette";
 
 export const Help = () => {
   const { t } = useI18n();

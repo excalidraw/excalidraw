@@ -1,5 +1,14 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import {
+  handIcon,
+  MoonIcon,
+  SunIcon,
+  TrashIcon,
+  zoomAreaIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  ZoomResetIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
@@ -29,6 +38,8 @@ import { setCursor } from "../cursor";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  label: "labels.canvasBackground",
+  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -71,6 +82,9 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  label: "labels.clearCanvas",
+  paletteName: "Clear canvas",
+  icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -113,7 +127,9 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  label: "buttons.zoomIn",
   viewMode: true,
+  icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
@@ -151,6 +167,8 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  label: "buttons.zoomOut",
+  icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -189,6 +207,8 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  label: "buttons.resetZoom",
+  icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -359,6 +379,8 @@ export const zoomToFit = ({
 // size, it won't be zoomed in.
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
+  label: "labels.zoomToFitViewport",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -382,6 +404,8 @@ export const actionZoomToFitSelectionInViewport = register({
 
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
+  label: "helpDialog.zoomToSelection",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -404,6 +428,8 @@ export const actionZoomToFitSelection = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  label: "helpDialog.zoomToFit",
+  icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) =>
@@ -424,6 +450,11 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  label: (_, appState) => {
+    return appState.theme === "dark" ? "buttons.lightMode" : "buttons.darkMode";
+  },
+  keywords: ["toggle", "dark", "light", "mode", "theme"],
+  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value, app) => {
@@ -451,6 +482,7 @@ export const actionToggleTheme = register({
 
 export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
+  label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
@@ -485,7 +517,11 @@ export const actionToggleEraserTool = register({
 
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
+  label: "toolBar.hand",
+  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
+  icon: handIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 

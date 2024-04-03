@@ -15,7 +15,7 @@ import {
 } from "../scene/scrollbars";
 
 import { renderSelectionElement } from "../renderer/renderElement";
-import { getClientColor } from "../clients";
+import { getClientColor, renderRemoteCursors } from "../clients";
 import {
   isSelectedViaGroup,
   getSelectedGroupIds,
@@ -29,7 +29,7 @@ import {
   TransformHandleType,
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import { InteractiveCanvasAppState, Point, UserIdleState } from "../types";
+import { InteractiveCanvasAppState, Point } from "../types";
 import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
 
 import { renderSnaps } from "../renderer/renderSnaps";
@@ -726,14 +726,18 @@ const _renderInteractiveScene = ({
           selectionColors.push(selectionColor);
         }
         // remote users
-        if (renderConfig.remoteSelectedElementIds[element.id]) {
+        const remoteClients = renderConfig.remoteSelectedElementIds.get(
+          element.id,
+        );
+        if (remoteClients) {
           selectionColors.push(
-            ...renderConfig.remoteSelectedElementIds[element.id].map(
-              (socketId: string) => {
-                const background = getClientColor(socketId);
-                return background;
-              },
-            ),
+            ...remoteClients.map((socketId) => {
+              const background = getClientColor(
+                socketId,
+                appState.collaborators.get(socketId),
+              );
+              return background;
+            }),
           );
         }
 
@@ -747,7 +751,7 @@ const _renderInteractiveScene = ({
             elementX2,
             elementY2,
             selectionColors,
-            dashed: !!renderConfig.remoteSelectedElementIds[element.id],
+            dashed: !!remoteClients,
             cx,
             cy,
             activeEmbeddable:
@@ -858,143 +862,13 @@ const _renderInteractiveScene = ({
   // Reset zoom
   context.restore();
 
-  // Paint remote pointers
-  for (const clientId in renderConfig.remotePointerViewportCoords) {
-    let { x, y } = renderConfig.remotePointerViewportCoords[clientId];
-
-    x -= appState.offsetLeft;
-    y -= appState.offsetTop;
-
-    const width = 11;
-    const height = 14;
-
-    const isOutOfBounds =
-      x < 0 ||
-      x > normalizedWidth - width ||
-      y < 0 ||
-      y > normalizedHeight - height;
-
-    x = Math.max(x, 0);
-    x = Math.min(x, normalizedWidth - width);
-    y = Math.max(y, 0);
-    y = Math.min(y, normalizedHeight - height);
-
-    const background = getClientColor(clientId);
-
-    context.save();
-    context.strokeStyle = background;
-    context.fillStyle = background;
-
-    const userState = renderConfig.remotePointerUserStates[clientId];
-    const isInactive =
-      isOutOfBounds ||
-      userState === UserIdleState.IDLE ||
-      userState === UserIdleState.AWAY;
-
-    if (isInactive) {
-      context.globalAlpha = 0.3;
-    }
-
-    if (
-      renderConfig.remotePointerButton &&
-      renderConfig.remotePointerButton[clientId] === "down"
-    ) {
-      context.beginPath();
-      context.arc(x, y, 15, 0, 2 * Math.PI, false);
-      context.lineWidth = 3;
-      context.strokeStyle = "#ffffff88";
-      context.stroke();
-      context.closePath();
-
-      context.beginPath();
-      context.arc(x, y, 15, 0, 2 * Math.PI, false);
-      context.lineWidth = 1;
-      context.strokeStyle = background;
-      context.stroke();
-      context.closePath();
-    }
-
-    // Background (white outline) for arrow
-    context.fillStyle = oc.white;
-    context.strokeStyle = oc.white;
-    context.lineWidth = 6;
-    context.lineJoin = "round";
-    context.beginPath();
-    context.moveTo(x, y);
-    context.lineTo(x + 0, y + 14);
-    context.lineTo(x + 4, y + 9);
-    context.lineTo(x + 11, y + 8);
-    context.closePath();
-    context.stroke();
-    context.fill();
-
-    // Arrow
-    context.fillStyle = background;
-    context.strokeStyle = background;
-    context.lineWidth = 2;
-    context.lineJoin = "round";
-    context.beginPath();
-    if (isInactive) {
-      context.moveTo(x - 1, y - 1);
-      context.lineTo(x - 1, y + 15);
-      context.lineTo(x + 5, y + 10);
-      context.lineTo(x + 12, y + 9);
-      context.closePath();
-      context.fill();
-    } else {
-      context.moveTo(x, y);
-      context.lineTo(x + 0, y + 14);
-      context.lineTo(x + 4, y + 9);
-      context.lineTo(x + 11, y + 8);
-      context.closePath();
-      context.fill();
-      context.stroke();
-    }
-
-    const username = renderConfig.remotePointerUsernames[clientId] || "";
-
-    if (!isOutOfBounds && username) {
-      context.font = "600 12px sans-serif"; // font has to be set before context.measureText()
-
-      const offsetX = x + width / 2;
-      const offsetY = y + height + 2;
-      const paddingHorizontal = 5;
-      const paddingVertical = 3;
-      const measure = context.measureText(username);
-      const measureHeight =
-        measure.actualBoundingBoxDescent + measure.actualBoundingBoxAscent;
-      const finalHeight = Math.max(measureHeight, 12);
-
-      const boxX = offsetX - 1;
-      const boxY = offsetY - 1;
-      const boxWidth = measure.width + 2 + paddingHorizontal * 2 + 2;
-      const boxHeight = finalHeight + 2 + paddingVertical * 2 + 2;
-      if (context.roundRect) {
-        context.beginPath();
-        context.roundRect(boxX, boxY, boxWidth, boxHeight, 8);
-        context.fillStyle = background;
-        context.fill();
-        context.strokeStyle = oc.white;
-        context.stroke();
-      } else {
-        roundRect(context, boxX, boxY, boxWidth, boxHeight, 8, oc.white);
-      }
-      context.fillStyle = oc.black;
-
-      context.fillText(
-        username,
-        offsetX + paddingHorizontal + 1,
-        offsetY +
-          paddingVertical +
-          measure.actualBoundingBoxAscent +
-          Math.floor((finalHeight - measureHeight) / 2) +
-          2,
-      );
-    }
-
-    context.restore();
-    context.closePath();
-  }
+  renderRemoteCursors({
+    context,
+    renderConfig,
+    appState,
+    normalizedWidth,
+    normalizedHeight,
+  });
 
   // Paint scrollbars
   let scrollBars;

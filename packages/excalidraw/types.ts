@@ -63,12 +63,28 @@ export type Collaborator = Readonly<{
   id?: string;
   socketId?: SocketId;
   isCurrentUser?: boolean;
+  isInCall?: boolean;
+  isSpeaking?: boolean;
+  isMuted?: boolean;
 }>;
 
 export type CollaboratorPointer = {
   x: number;
   y: number;
   tool: "pointer" | "laser";
+  /**
+   * Whether to render cursor + username. Useful when you only want to render
+   * laser trail.
+   *
+   * @default true
+   */
+  renderCursor?: boolean;
+  /**
+   * Explicit laser color.
+   *
+   * @default string collaborator's cursor color
+   */
+  laserColor?: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -271,7 +287,8 @@ export interface AppState {
           | "settings"; // when AI settings dialog is explicitly invoked
         tab: "text-to-diagram" | "diagram-to-code";
       }
-    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" };
+    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
+    | { name: "commandPalette" };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -348,9 +365,9 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-  /** the user's clientId & username who is being followed on the canvas */
+  /** the user's socket id & username who is being followed on the canvas */
   userToFollow: UserToFollow | null;
-  /** the clientIds of the users following the current user */
+  /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
 }
 
@@ -624,6 +641,7 @@ export type AppClassProperties = {
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   setSelection: App["setSelection"]; //zsviczian
   togglePenMode: App["togglePenMode"];
+  toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];

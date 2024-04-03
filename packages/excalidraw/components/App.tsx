@@ -90,6 +90,7 @@ import {
   TOOL_TYPE,
   EDITOR_LS_KEYS,
   isIOS,
+  supportsResizeObserver,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -422,6 +423,7 @@ import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -486,9 +488,6 @@ export const useExcalidrawSetAppState = () =>
   useContext(ExcalidrawSetAppStateContext);
 export const useExcalidrawActionManager = () =>
   useContext(ExcalidrawActionManagerContext);
-
-const supportsResizeObserver =
-  typeof window !== "undefined" && "ResizeObserver" in window;
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -3918,17 +3917,29 @@ class App extends React.Component<AppProps, AppState> {
     tab,
     force,
   }: {
-    name: SidebarName;
+    name: SidebarName | null;
     tab?: SidebarTabName;
     force?: boolean;
   }): boolean => {
     let nextName;
     if (force === undefined) {
-      nextName = this.state.openSidebar?.name === name ? null : name;
+      nextName =
+        this.state.openSidebar?.name === name &&
+        this.state.openSidebar?.tab === tab
+          ? null
+          : name;
     } else {
       nextName = force ? name : null;
     }
-    this.setState({ openSidebar: nextName ? { name: nextName, tab } : null });
+
+    const nextState: AppState["openSidebar"] = nextName
+      ? { name: nextName }
+      : null;
+    if (nextState && tab) {
+      nextState.tab = tab;
+    }
+
+    this.setState({ openSidebar: nextState });
 
     return !!nextName;
   };
@@ -3969,6 +3980,21 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key === KEYS.P &&
+        !event.shiftKey &&
+        !event.altKey
+      ) {
+        this.setToast({
+          message: t("commandPalette.shortcutHint", {
+            shortcut: getShortcutFromShortcutName("commandPalette"),
+          }),
+        });
+        event.preventDefault();
+        return;
       }
 
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
@@ -4906,11 +4932,6 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
-      } else if (
-        this.state.editingLinearElement &&
-        this.state.editingLinearElement.elementId === selectedElements[0].id
-      ) {
-        return;
       }
     }
 
@@ -5083,7 +5104,11 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
-          const newWindow = window.open(undefined, target);
+          const newWindow = window.open(
+            undefined,
+            target,
+            "noopener noreferrer",
+          );
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;

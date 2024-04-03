@@ -1,7 +1,9 @@
+import { LockedIcon, UnlockedIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -10,11 +12,31 @@ const shouldLock = (elements: readonly ExcalidrawElement[]) =>
 
 export const actionToggleElementLock = register({
   name: "toggleElementLock",
+  label: (elements, appState, app) => {
+    const selected = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: false,
+    });
+    if (selected.length === 1 && !isFrameLikeElement(selected[0])) {
+      return selected[0].locked
+        ? "labels.elementLock.unlock"
+        : "labels.elementLock.lock";
+    }
+
+    return shouldLock(selected)
+      ? "labels.elementLock.lockAll"
+      : "labels.elementLock.unlockAll";
+  },
+  icon: (appState, elements) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return shouldLock(selectedElements) ? LockedIcon : UnlockedIcon;
+  },
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    return !selectedElements.some(
-      (element) => element.locked && element.frameId,
+    return (
+      selectedElements.length > 0 &&
+      !selectedElements.some((element) => element.locked && element.frameId)
     );
   },
   perform: (elements, appState, _, app) => {
@@ -47,21 +69,6 @@ export const actionToggleElementLock = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: (elements, appState, app) => {
-    const selected = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeBoundTextElement: false,
-    });
-    if (selected.length === 1 && !isFrameLikeElement(selected[0])) {
-      return selected[0].locked
-        ? "labels.elementLock.unlock"
-        : "labels.elementLock.lock";
-    }
-
-    return shouldLock(selected)
-      ? "labels.elementLock.lockAll"
-      : "labels.elementLock.unlockAll";
-  },
   keyTest: (event, appState, elements, app) => {
     return (
       event.key.toLocaleLowerCase() === KEYS.L &&
@@ -77,10 +84,16 @@ export const actionToggleElementLock = register({
 
 export const actionUnlockAllElements = register({
   name: "unlockAllElements",
+  paletteName: "Unlock all elements",
   trackEvent: { category: "canvas" },
   viewMode: false,
-  predicate: (elements) => {
-    return elements.some((element) => element.locked);
+  icon: UnlockedIcon,
+  predicate: (elements, appState) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    return (
+      selectedElements.length === 0 &&
+      elements.some((element) => element.locked)
+    );
   },
   perform: (elements, appState) => {
     const lockedElements = elements.filter((el) => el.locked);
@@ -101,5 +114,5 @@ export const actionUnlockAllElements = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.elementLock.unlockAll",
+  label: "labels.elementLock.unlockAll",
 });
