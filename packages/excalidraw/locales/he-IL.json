@@ -21,9 +21,9 @@
     "copyStyles": "העתק סגנון",
     "pasteStyles": "הדבקת סגנונות",
     "stroke": "קו מתאר",
-    "changeStroke": "",
+    "changeStroke": "החלפת צבע קו מתאר",
     "background": "רקע",
-    "changeBackground": "",
+    "changeBackground": "החלפת צבע הרקע",
     "fill": "מילוי",
     "strokeWidth": "עובי קו מתאר",
     "strokeStyle": "סגנון קו המתאר",
@@ -40,12 +40,12 @@
     "arrowhead_none": "ללא",
     "arrowhead_arrow": "חץ",
     "arrowhead_bar": "קצה אנכי",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "עיגול",
+    "arrowhead_circle_outline": "עיגול (קו מתאר)",
     "arrowhead_triangle": "משולש",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "משולש (קו מתאר)",
+    "arrowhead_diamond": "יהלום",
+    "arrowhead_diamond_outline": "יהלום (קו מתאר)",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
     "addWatermark": "הוספת „נוצר באמצעות Excalidraw”",
@@ -93,7 +93,7 @@
     "libraryLoadingMessage": "טוען ספריה…",
     "libraries": "עיין בספריות",
     "loadingScene": "טוען תצוגה…",
-    "loadScene": "",
+    "loadScene": "טעינת סצנה מקובץ",
     "align": "יישר",
     "alignTop": "יישר למעלה",
     "alignBottom": "יישר למטה",
@@ -109,7 +109,7 @@
     "share": "שתף",
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
-    "toggleTheme": "",
+    "toggleTheme": "החלפת מצב מואר/חשוך",
     "personalLib": "ספריה פרטית",
     "excalidrawLib": "הספריה של Excalidraw",
     "decreaseFontSize": "הקטן את גודל הגופן",
@@ -141,8 +141,8 @@
     "selectAllElementsInFrame": "בחר את כל האלמנטים במסגרת",
     "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
     "eyeDropper": "",
-    "textToDiagram": "",
-    "prompt": "",
+    "textToDiagram": "טקסט לתרשים",
+    "prompt": "בקשה",
     "followUs": "",
     "discordChat": "",
     "zoomToFitViewport": "",
@@ -220,13 +220,13 @@
     "imageInsertError": "לא ניתן היה להוסיף את התמונה. אנא נסה שוב מאוחר יותר...",
     "fileTooBig": "הקובץ גדול מדי. הגודל המירבי המותר הינו {{maxSize}}.",
     "svgImageInsertError": "לא ניתן היה להוסיף את תמונת ה-SVG. הסימונים בתוך קובץ ה-SVG עשויים להיות שגויים.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "משיכת התמונה נכשלה.",
     "cannotResolveCollabServer": "לא הצלחתי להתחבר לשרת השיתוף. אנא רענן את הדף ונסה שוב.",
     "importLibraryError": "לא ניתן היה לטעון את הספריה",
     "saveLibraryError": "",
     "collabSaveFailed": "לא הצלחתי להתחבר למסד הנתונים האחורי. אם הבעיה ממשיכה, כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
     "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "תמונות מושבתות.",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -470,7 +470,7 @@
     "gray": "אפור",
     "blue": "כחול",
     "cyan": "ציאן",
-    "teal": "",
+    "teal": "ירוק-כחול",
     "green": "ירוק",
     "yellow": "צהוב",
     "orange": "כתום",
@@ -494,24 +494,24 @@
     "colors": "צבעים",
     "shades": "הצללות",
     "hexCode": "קוד הקסדצימלי",
-    "noShades": ""
+    "noShades": "אין הצללות זמינות לצבע הזה"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
         "title": "ייצוא כתמונה",
         "button": "ייצוא כתמונה",
-        "description": ""
+        "description": "ייצוא נתוני הסצנה כתמונה אותה אפשר לייבא בהמשך."
       },
       "saveToDisk": {
         "title": "שמירה לכונן",
         "button": "שמירה לכונן",
-        "description": ""
+        "description": "ייצוא נתוני הסצנה לקובץ אותו אפשר לייבא בהמשך."
       },
       "excalidrawPlus": {
         "title": "Excalidraw+‎",
         "button": "ייצוא ל־Excalidraw+‎",
-        "description": ""
+        "description": "שמירת הסצנה לסביבת העבודה שלך ב־+Excalidraw."
       }
     },
     "modal": {
@@ -522,17 +522,17 @@
       },
       "shareableLink": {
         "title": "טעינה מקישור",
-        "button": "",
+        "button": "החלפת התוכן שלי",
         "description": ""
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "Mermaid ל־Excalidraw",
+    "button": "הוספה",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "תחביר Mermaid",
+    "preview": "תצוגה מקדימה"
   },
   "userList": {
     "search": {
