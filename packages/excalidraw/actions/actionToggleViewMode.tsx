@@ -1,6 +1,7 @@
 import { eyeIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
+import { StoreAction } from "./types";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
@@ -18,7 +19,7 @@ export const actionToggleViewMode = register({
         ...appState,
         viewModeEnabled: !this.checked!(appState),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.viewModeEnabled,

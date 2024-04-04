@@ -199,7 +199,25 @@ export type InteractiveCanvasAppState = Readonly<
   }
 >;
 
-export interface AppState {
+export type ObservedAppState = ObservedStandaloneAppState &
+  ObservedElementsAppState;
+
+export type ObservedStandaloneAppState = {
+  name: AppState["name"];
+  viewBackgroundColor: AppState["viewBackgroundColor"];
+};
+
+export type ObservedElementsAppState = {
+  editingGroupId: AppState["editingGroupId"];
+  selectedElementIds: AppState["selectedElementIds"];
+  selectedGroupIds: AppState["selectedGroupIds"];
+  // Avoiding storing whole instance, as it could lead into state incosistencies, empty undos/redos and etc.
+  editingLinearElementId: LinearElementEditor["elementId"] | null;
+  // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
+  selectedLinearElementId: LinearElementEditor["elementId"] | null;
+};
+
+export type AppState = {
   contextMenu: {
     items: ContextMenuItems;
     top: number;
@@ -341,7 +359,7 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
-}
+};
 
 export type UIAppState = Omit<
   AppState,
@@ -489,7 +507,7 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  commitToHistory?: boolean;
+  commitToStore?: boolean;
 };
 
 export enum UserIdleState {

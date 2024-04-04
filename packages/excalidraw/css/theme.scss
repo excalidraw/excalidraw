@@ -98,6 +98,8 @@
   --color-gray-90: #1e1e1e;
   --color-gray-100: #121212;
 
+  --color-disabled: var(--color-gray-40);
+
   --color-warning: #fceeca;
   --color-warning-dark: #f5c354;
   --color-warning-darker: #f3ab2c;
@@ -207,6 +209,8 @@
     --color-primary-light: #4f4d6f;
     --color-primary-light-darker: #43415e;
     --color-primary-hover: #bbb8ff;
+
+    --color-disabled: var(--color-gray-70);
 
     --color-text-warning: var(--color-gray-80);
 

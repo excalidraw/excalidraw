@@ -7,6 +7,7 @@ import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
+import { StoreAction } from "./types";
 
 export const actionLink = register({
   name: "hyperlink",
@@ -24,7 +25,7 @@ export const actionLink = register({
         showHyperlinkPopup: "editor",
         openMenu: null,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   trackEvent: { category: "hyperlink", action: "click" },

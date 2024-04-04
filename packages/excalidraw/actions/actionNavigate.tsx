@@ -10,6 +10,7 @@ import { t } from "../i18n";
 import { Collaborator } from "../types";
 import { register } from "./register";
 import clsx from "clsx";
+import { StoreAction } from "./types";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
@@ -27,7 +28,7 @@ export const actionGoToCollaborator = register({
           ...appState,
           userToFollow: null,
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
 
@@ -41,7 +42,7 @@ export const actionGoToCollaborator = register({
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {
