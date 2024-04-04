@@ -636,9 +636,9 @@ export const focusNearestParent = (element: HTMLInputElement) => {
 };
 
 export const preventUnload = (event: BeforeUnloadEvent) => {
-  event.preventDefault();
+  // event.preventDefault();
   // NOTE: modern browsers no longer allow showing a custom message here
-  event.returnValue = "";
+  // event.returnValue = "";
 };
 
 export const bytesToHexString = (bytes: Uint8Array) => {
