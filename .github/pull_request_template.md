@@ -2,10 +2,6 @@
 
 ...
 
-## Link to Asana task (or indicate if this is a release)
-
-https://app.asana.com/...
-
 ## Tests to be performed
 
 - [ ] Pre-merge - ...
