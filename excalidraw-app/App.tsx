@@ -318,8 +318,8 @@ const themeRedurer = (state: ThemeState, action: ThemeAction) => {
             ? "dark"
             : "light"
           : action.appTheme;
-      console.log(action.appTheme, theme);
       return { ...state, appTheme: action.appTheme, theme };
+
     case "SET_THEME":
       document.documentElement.classList.toggle(
         "dark",
@@ -329,6 +329,7 @@ const themeRedurer = (state: ThemeState, action: ThemeAction) => {
       const appTheme =
         state.appTheme !== "system" ? action.theme : state.appTheme;
       return { ...state, theme: action.theme, appTheme };
+
     default:
       return state;
   }
