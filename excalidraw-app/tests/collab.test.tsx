@@ -7,6 +7,8 @@ import {
 import ExcalidrawApp from "../App";
 import { API } from "../../packages/excalidraw/tests/helpers/api";
 import { createUndoAction } from "../../packages/excalidraw/actions/actionHistory";
+import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
+
 const { h } = window;
 
 Object.defineProperty(window, "crypto", {
@@ -61,14 +63,14 @@ describe("collaboration", () => {
     await render(<ExcalidrawApp />);
     // To update the scene with deleted elements before starting collab
     updateSceneData({
-      elements: [
+      elements: syncInvalidIndices([
         API.createElement({ type: "rectangle", id: "A" }),
         API.createElement({
           type: "rectangle",
           id: "B",
           isDeleted: true,
         }),
-      ],
+      ]),
     });
     await waitFor(() => {
       expect(h.elements).toEqual([

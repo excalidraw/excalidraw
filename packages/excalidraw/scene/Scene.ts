@@ -6,6 +6,8 @@ import {
   ElementsMapOrArray,
   SceneElementsMap,
   NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
+  Ordered,
 } from "../element/types";
 import { isNonDeletedElement } from "../element";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -14,7 +16,14 @@ import { getSelectedElements } from "./selection";
 import { AppState } from "../types";
 import { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
+import {
+  syncInvalidIndices,
+  syncMovedIndices,
+  validateFractionalIndices,
+} from "../fractionalIndex";
+import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
+import { ENV } from "../constants";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -32,7 +41,10 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   for (const element of allElements) {
     if (!element.isDeleted) {
       elements.push(element as NonDeleted<T>);
-      elementsMap.set(element.id, element as NonDeletedExcalidrawElement);
+      elementsMap.set(
+        element.id,
+        element as Ordered<NonDeletedExcalidrawElement>,
+      );
     }
   }
   return { elementsMap, elements };
@@ -106,11 +118,13 @@ class Scene {
 
   private callbacks: Set<SceneStateCallback> = new Set();
 
-  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
+  private nonDeletedElements: readonly Ordered<NonDeletedExcalidrawElement>[] =
+    [];
   private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
     new Map(),
   );
-  private elements: readonly ExcalidrawElement[] = [];
+  // ideally all elements within the scene should be wrapped around with `Ordered` type, but right now there is no real benefit doing so
+  private elements: readonly OrderedExcalidrawElement[] = [];
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
@@ -138,7 +152,7 @@ class Scene {
     return this.elements;
   }
 
-  getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
+  getNonDeletedElements() {
     return this.nonDeletedElements;
   }
 
@@ -244,12 +258,19 @@ class Scene {
   }
 
   replaceAllElements(nextElements: ElementsMapOrArray) {
-    this.elements =
+    const _nextElements =
       // ts doesn't like `Array.isArray` of `instanceof Map`
       nextElements instanceof Array
         ? nextElements
         : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
+
+    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      // throw on invalid indices in test / dev to potentially detect cases were we forgot to sync moved elements
+      validateFractionalIndices(_nextElements.map((x) => x.index));
+    }
+
+    this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
@@ -292,8 +313,8 @@ class Scene {
   }
 
   destroy() {
-    this.nonDeletedElements = [];
     this.elements = [];
+    this.nonDeletedElements = [];
     this.nonDeletedFramesLikes = [];
     this.frames = [];
     this.elementsMap.clear();
@@ -318,11 +339,15 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
+
     const nextElements = [
       ...this.elements.slice(0, index),
       element,
       ...this.elements.slice(index),
     ];
+
+    syncMovedIndices(nextElements, arrayToMap([element]));
+
     this.replaceAllElements(nextElements);
   }
 
@@ -332,21 +357,32 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
+
     const nextElements = [
       ...this.elements.slice(0, index),
       ...elements,
       ...this.elements.slice(index),
     ];
 
+    syncMovedIndices(nextElements, arrayToMap(elements));
+
     this.replaceAllElements(nextElements);
   }
 
-  addNewElement = (element: ExcalidrawElement) => {
-    if (element.frameId) {
-      this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
-    } else {
-      this.replaceAllElements([...this.elements, element]);
-    }
+  insertElement = (element: ExcalidrawElement) => {
+    const index = element.frameId
+      ? this.getElementIndex(element.frameId)
+      : this.elements.length;
+
+    this.insertElementAtIndex(element, index);
+  };
+
+  insertElements = (elements: ExcalidrawElement[]) => {
+    const index = elements[0].frameId
+      ? this.getElementIndex(elements[0].frameId)
+      : this.elements.length;
+
+    this.insertElementsAtIndex(elements, index);
   };
 
   getElementIndex(elementId: string) {

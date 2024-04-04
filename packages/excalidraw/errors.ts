@@ -32,3 +32,7 @@ export class ImageSceneDataError extends Error {
     this.code = code;
   }
 }
+
+export class InvalidFractionalIndexError extends Error {
+  public code = "ELEMENT_HAS_INVALID_INDEX" as const;
+}

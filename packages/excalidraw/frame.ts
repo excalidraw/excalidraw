@@ -29,7 +29,7 @@ import { ReadonlySetLike } from "./utility-types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
-  nextElements: ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
   oldElements: readonly ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {

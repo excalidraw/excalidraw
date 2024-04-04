@@ -24,6 +24,7 @@ export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
+export type FractionalIndex = string & { _brand: "franctionalIndex" };
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -50,6 +51,11 @@ type _ExcalidrawElementBase = Readonly<{
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */
   versionNonce: number;
+  /** String in a fractional form defined by https://github.com/rocicorp/fractional-indexing.
+      Used for ordering in multiplayer scenarios, such as during reconciliation or undo / redo.
+      Always kept in sync with the array order by `syncMovedIndices` and `syncInvalidIndices`.
+      Could be null, i.e. for new elements which were not yet assigned to the scene. */
+  index: FractionalIndex | null;
   isDeleted: boolean;
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
@@ -164,6 +170,12 @@ export type ExcalidrawElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
+export type Ordered<TElement extends ExcalidrawElement> = TElement & {
+  index: FractionalIndex;
+};
+
+export type OrderedExcalidrawElement = Ordered<ExcalidrawElement>;
+
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
 };
@@ -275,7 +287,10 @@ export type NonDeletedElementsMap = Map<
  * Map of all excalidraw Scene elements, including deleted.
  * Not a subset. Use this type when you need access to current Scene elements.
  */
-export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
+export type SceneElementsMap = Map<
+  ExcalidrawElement["id"],
+  Ordered<ExcalidrawElement>
+> &
   MakeBrand<"SceneElementsMap">;
 
 /**
@@ -284,7 +299,7 @@ export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
  */
 export type NonDeletedSceneElementsMap = Map<
   ExcalidrawElement["id"],
-  NonDeletedExcalidrawElement
+  Ordered<NonDeletedExcalidrawElement>
 > &
   MakeBrand<"NonDeletedSceneElementsMap">;
 

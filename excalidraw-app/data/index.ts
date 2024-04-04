@@ -16,6 +16,7 @@ import { isInitializedImageElement } from "../../packages/excalidraw/element/typ
 import {
   ExcalidrawElement,
   FileId,
+  OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
 import {
@@ -25,6 +26,7 @@ import {
   SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
+import { MakeBrand } from "../../packages/excalidraw/utility-types";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
@@ -35,12 +37,11 @@ import {
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
 
-export type SyncableExcalidrawElement = ExcalidrawElement & {
-  _brand: "SyncableExcalidrawElement";
-};
+export type SyncableExcalidrawElement = OrderedExcalidrawElement &
+  MakeBrand<"SyncableExcalidrawElement">;
 
 export const isSyncableElement = (
-  element: ExcalidrawElement,
+  element: OrderedExcalidrawElement,
 ): element is SyncableExcalidrawElement => {
   if (element.isDeleted) {
     if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
@@ -51,7 +52,9 @@ export const isSyncableElement = (
   return !isInvisiblySmallElement(element);
 };
 
-export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+export const getSyncableElements = (
+  elements: readonly OrderedExcalidrawElement[],
+) =>
   elements.filter((element) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];

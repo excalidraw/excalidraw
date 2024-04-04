@@ -562,7 +562,7 @@ describe("regression tests", () => {
   });
 
   it("adjusts z order when grouping", () => {
-    const positions = [];
+    const positions: number[][] = [];
 
     UI.clickTool("rectangle");
     mouse.down(10, 10);

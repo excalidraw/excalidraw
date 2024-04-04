@@ -27,6 +27,7 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
+import { syncMovedIndices } from "../fractionalIndex";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -140,11 +141,12 @@ export const actionGroup = register({
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    nextElements = [
+    const reorderedElements = [
       ...elementsBeforeGroup,
       ...elementsInGroup,
       ...elementsAfterGroup,
     ];
+    syncMovedIndices(reorderedElements, arrayToMap(elementsInGroup));
 
     return {
       appState: {
@@ -155,7 +157,7 @@ export const actionGroup = register({
           getNonDeletedElements(nextElements),
         ),
       },
-      elements: nextElements,
+      elements: reorderedElements,
       commitToHistory: true,
     };
   },

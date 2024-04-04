@@ -31,8 +31,9 @@ import {
 } from "../element/types";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
-import { getFontString } from "../utils";
+import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
+import { syncMovedIndices } from "../fractionalIndex";
 
 export const actionUnbindText = register({
   name: "unbindText",
@@ -180,6 +181,8 @@ const pushTextAboveContainer = (
     (ele) => ele.id === container.id,
   );
   updatedElements.splice(containerIndex + 1, 0, textElement);
+  syncMovedIndices(updatedElements, arrayToMap([container, textElement]));
+
   return updatedElements;
 };
 
@@ -198,6 +201,8 @@ const pushContainerBelowText = (
     (ele) => ele.id === textElement.id,
   );
   updatedElements.splice(textElementIndex, 0, container);
+  syncMovedIndices(updatedElements, arrayToMap([container, textElement]));
+
   return updatedElements;
 };
 
@@ -304,6 +309,7 @@ export const actionWrapTextInContainer = register({
           container,
           textElement,
         );
+
         containerIds[container.id] = true;
       }
     }

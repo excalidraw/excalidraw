@@ -4,6 +4,7 @@ import {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  OrderedExcalidrawElement,
   PointBinding,
   StrokeRoundness,
 } from "../element/types";
@@ -26,7 +27,6 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
-  PRECEDING_ELEMENT_KEY,
   FONT_FAMILY,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
@@ -44,6 +44,7 @@ import {
   getDefaultLineHeight,
 } from "../element/textElement";
 import { normalizeLink } from "./url";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 type RestoredAppState = Omit<
   AppState,
@@ -73,7 +74,7 @@ export const AllowedExcalidrawActiveTools: Record<
 };
 
 export type RestoredDataState = {
-  elements: ExcalidrawElement[];
+  elements: OrderedExcalidrawElement[];
   appState: RestoredAppState;
   files: BinaryFiles;
 };
@@ -101,8 +102,6 @@ const restoreElementWithProperties = <
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
     strokeSharpness?: StrokeRoundness;
-    /** metadata that may be present in elements during collaboration */
-    [PRECEDING_ELEMENT_KEY]?: string;
   },
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
@@ -115,14 +114,13 @@ const restoreElementWithProperties = <
   > &
     Partial<Pick<ExcalidrawElement, "type" | "x" | "y" | "customData">>,
 ): T => {
-  const base: Pick<T, keyof ExcalidrawElement> & {
-    [PRECEDING_ELEMENT_KEY]?: string;
-  } = {
+  const base: Pick<T, keyof ExcalidrawElement> = {
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
+    index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
     fillStyle: element.fillStyle || DEFAULT_ELEMENT_PROPS.fillStyle,
@@ -164,10 +162,6 @@ const restoreElementWithProperties = <
   if ("customData" in element || "customData" in extra) {
     base.customData =
       "customData" in extra ? extra.customData : element.customData;
-  }
-
-  if (PRECEDING_ELEMENT_KEY in element) {
-    base[PRECEDING_ELEMENT_KEY] = element[PRECEDING_ELEMENT_KEY];
   }
 
   return {
@@ -407,30 +401,35 @@ export const restoreElements = (
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
   opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
-): ExcalidrawElement[] => {
+): OrderedExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  const restoredElements = (elements || []).reduce((elements, element) => {
-    // filtering out selection, which is legacy, no longer kept in elements,
-    // and causing issues if retained
-    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-      let migratedElement: ExcalidrawElement | null = restoreElement(element);
-      if (migratedElement) {
-        const localElement = localElementsMap?.get(element.id);
-        if (localElement && localElement.version > migratedElement.version) {
-          migratedElement = bumpVersion(migratedElement, localElement.version);
-        }
-        if (existingIds.has(migratedElement.id)) {
-          migratedElement = { ...migratedElement, id: randomId() };
-        }
-        existingIds.add(migratedElement.id);
+  const restoredElements = syncInvalidIndices(
+    (elements || []).reduce((elements, element) => {
+      // filtering out selection, which is legacy, no longer kept in elements,
+      // and causing issues if retained
+      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
+        let migratedElement: ExcalidrawElement | null = restoreElement(element);
+        if (migratedElement) {
+          const localElement = localElementsMap?.get(element.id);
+          if (localElement && localElement.version > migratedElement.version) {
+            migratedElement = bumpVersion(
+              migratedElement,
+              localElement.version,
+            );
+          }
+          if (existingIds.has(migratedElement.id)) {
+            migratedElement = { ...migratedElement, id: randomId() };
+          }
+          existingIds.add(migratedElement.id);
 
-        elements.push(migratedElement);
+          elements.push(migratedElement);
+        }
       }
-    }
-    return elements;
-  }, [] as ExcalidrawElement[]);
+      return elements;
+    }, [] as ExcalidrawElement[]),
+  );
 
   if (!opts?.repairBindings) {
     return restoredElements;

@@ -211,10 +211,11 @@ describe("library menu", () => {
       const latestLibrary = await h.app.library.getLatestLibrary();
       expect(latestLibrary.length).toBeGreaterThan(0);
       expect(latestLibrary.length).toBe(libraryItems.length);
-      expect(latestLibrary[0].elements).toEqual(libraryItems[0].elements);
+      const { versionNonce, ...strippedElement } = libraryItems[0]?.elements[0]; // stripped due to mutations
+      expect(latestLibrary[0].elements).toEqual([
+        expect.objectContaining(strippedElement),
+      ]);
     });
-
-    expect(true).toBe(true);
   });
 });
 

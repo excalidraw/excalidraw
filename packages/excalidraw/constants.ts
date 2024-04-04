@@ -316,10 +316,6 @@ export const ROUNDNESS = {
   ADAPTIVE_RADIUS: 3,
 } as const;
 
-/** key containt id of precedeing elemnt id we use in reconciliation during
- * collaboration */
-export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
-
 export const ROUGHNESS = {
   architect: 0,
   artist: 1,

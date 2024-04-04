@@ -44,9 +44,16 @@ import {
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, cloneJSON, getFontString, toBrandedType } from "../utils";
+import {
+  arrayToMap,
+  assertNever,
+  cloneJSON,
+  getFontString,
+  toBrandedType,
+} from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -457,12 +464,15 @@ class ElementStore {
 
     this.excalidrawElements.set(ele.id, ele);
   };
+
   getElements = () => {
-    return Array.from(this.excalidrawElements.values());
+    return syncInvalidIndices(Array.from(this.excalidrawElements.values()));
   };
 
   getElementsMap = () => {
-    return toBrandedType<NonDeletedSceneElementsMap>(this.excalidrawElements);
+    return toBrandedType<NonDeletedSceneElementsMap>(
+      arrayToMap(this.getElements()),
+    );
   };
 
   getElement = (id: string) => {
