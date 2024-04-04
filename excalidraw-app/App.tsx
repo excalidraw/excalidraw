@@ -1,6 +1,6 @@
 import polyfill from "../packages/excalidraw/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
@@ -295,6 +295,58 @@ export const appLangCodeAtom = atom(
   Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode,
 );
 
+type ThemeAction =
+  | { type: "SET_THEME"; theme: Theme }
+  | {
+      type: "SET_APP_THEME";
+      appTheme: Theme | "system";
+      isUserChange?: boolean;
+    };
+
+type ThemeState = {
+  theme: Theme;
+  appTheme: Theme | "system";
+  isUserChange: boolean;
+};
+
+const themeRedurer = (state: ThemeState, action: ThemeAction) => {
+  switch (action.type) {
+    case "SET_APP_THEME":
+      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, action.appTheme);
+
+      const theme =
+        action.appTheme === "system"
+          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
+          : action.appTheme;
+      console.log(action.appTheme, theme);
+      return { ...state, appTheme: action.appTheme, theme };
+    case "SET_THEME":
+      document.documentElement.classList.toggle(
+        "dark",
+        action.theme === "dark",
+      );
+
+      const appTheme =
+        state.appTheme !== "system" ? action.theme : state.appTheme;
+      return { ...state, theme: action.theme, appTheme };
+    default:
+      return state;
+  }
+};
+
+const createInitialThemeState = ({ appTheme }: ThemeState) => {
+  const theme =
+    appTheme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : appTheme;
+
+  return { theme, appTheme, isUserChange: false };
+};
+
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
@@ -563,22 +615,40 @@ const ExcalidrawWrapper = () => {
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
-  const [theme, setTheme] = useState<Theme>(
-    () =>
-      (localStorage.getItem(
-        STORAGE_KEYS.LOCAL_STORAGE_THEME,
-      ) as Theme | null) ||
-      // FIXME migration from old LS scheme. Can be removed later. #5660
-      importFromLocalStorage().appState?.theme ||
-      THEME.LIGHT,
+  const [themeState, dispatchTheme] = useReducer(
+    themeRedurer,
+    {
+      theme: THEME.LIGHT,
+      appTheme:
+        (localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) as
+          | "light"
+          | "dark"
+          | "system"
+          | null) ||
+        // FIXME migration from old LS scheme. Can be removed later. #5660
+        importFromLocalStorage().appState?.theme ||
+        THEME.LIGHT,
+      isUserChange: false,
+    },
+    createInitialThemeState,
   );
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, theme);
-    // currently only used for body styling during init (see public/index.html),
-    // but may change in the future
-    document.documentElement.classList.toggle("dark", theme === THEME.DARK);
-  }, [theme]);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      dispatchTheme({
+        type: "SET_THEME",
+        theme: e.matches ? "dark" : "light",
+      });
+    };
+
+    if (themeState.appTheme === "system") {
+      mediaQuery.addEventListener("change", handleChange);
+    }
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [themeState.appTheme]);
 
   const onChange = (
     elements: readonly ExcalidrawElement[],
@@ -589,7 +659,13 @@ const ExcalidrawWrapper = () => {
       collabAPI.syncElements(elements);
     }
 
-    setTheme(appState.theme);
+    if (themeState.isUserChange) {
+      dispatchTheme({
+        type: "SET_APP_THEME",
+        appTheme: appState.theme,
+        isUserChange: false,
+      });
+    }
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
@@ -795,7 +871,7 @@ const ExcalidrawWrapper = () => {
         detectScroll={false}
         handleKeyboardGlobally={true}
         autoFocus={true}
-        theme={theme}
+        theme={themeState.theme}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
@@ -817,6 +893,14 @@ const ExcalidrawWrapper = () => {
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
+          theme={themeState.appTheme}
+          setTheme={(theme) =>
+            dispatchTheme({
+              type: "SET_APP_THEME",
+              appTheme: theme,
+              isUserChange: true,
+            })
+          }
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}

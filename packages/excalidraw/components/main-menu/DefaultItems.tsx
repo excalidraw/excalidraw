@@ -8,6 +8,7 @@ import {
 } from "../App";
 import {
   boltIcon,
+  DeviceDesktopIcon,
   ExportIcon,
   ExportImageIcon,
   HelpIcon,
@@ -37,6 +38,7 @@ import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 
 import "./DefaultItems.scss";
+import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -181,13 +183,56 @@ export const ClearCanvas = () => {
 };
 ClearCanvas.displayName = "ClearCanvas";
 
-export const ToggleTheme = () => {
+export const ToggleTheme = (
+  props:
+    | {
+        allowSystemTheme: true;
+        theme: "light" | "dark" | "system";
+        onSelect: (theme: "light" | "dark" | "system") => void;
+      }
+    | {
+        allowSystemTheme?: false;
+        theme?: "light" | "dark";
+        onSelect?: (theme: "light" | "dark") => void;
+      },
+) => {
   const { t } = useI18n();
   const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
+  const shortcut = getShortcutFromShortcutName("toggleTheme");
 
   if (!actionManager.isActionEnabled(actionToggleTheme)) {
     return null;
+  }
+
+  if (props?.allowSystemTheme) {
+    return (
+      <DropdownMenuItemContentRadio
+        name="theme"
+        value={props.theme}
+        onChange={(value: "light" | "dark" | "system") => props.onSelect(value)}
+        choices={[
+          {
+            value: "light",
+            label: SunIcon,
+            ariaLabel: t("buttons.lightMode"),
+          },
+          {
+            value: "dark",
+            label: MoonIcon,
+            ariaLabel: t("buttons.darkMode"),
+          },
+          {
+            value: "system",
+            label: DeviceDesktopIcon,
+            ariaLabel: t("buttons.systemMode"),
+          },
+        ]}
+        shortcut={shortcut}
+      >
+        {t("labels.theme")}
+      </DropdownMenuItemContentRadio>
+    );
   }
 
   return (
@@ -195,11 +240,16 @@ export const ToggleTheme = () => {
       onSelect={(event) => {
         // do not close the menu when changing theme
         event.preventDefault();
-        return actionManager.executeAction(actionToggleTheme);
+
+        if (props?.onSelect) {
+          props.onSelect(appState.theme === "dark" ? "light" : "dark");
+        } else {
+          return actionManager.executeAction(actionToggleTheme);
+        }
       }}
       icon={appState.theme === "dark" ? SunIcon : MoonIcon}
       data-testid="toggle-dark-mode"
-      shortcut={getShortcutFromShortcutName("toggleTheme")}
+      shortcut={shortcut}
       aria-label={
         appState.theme === "dark"
           ? t("buttons.lightMode")

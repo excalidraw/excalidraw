@@ -7,6 +7,8 @@ export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
+  theme: "light" | "dark" | "system";
+  setTheme: (theme: "light" | "dark" | "system") => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -35,7 +37,11 @@ export const AppMainMenu: React.FC<{
       </MainMenu.ItemLink>
       <MainMenu.DefaultItems.Socials />
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme />
+      <MainMenu.DefaultItems.ToggleTheme
+        allowSystemTheme
+        theme={props.theme}
+        onSelect={props.setTheme}
+      />
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>
