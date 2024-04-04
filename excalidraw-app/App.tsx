@@ -300,13 +300,11 @@ type ThemeAction =
   | {
       type: "SET_APP_THEME";
       appTheme: Theme | "system";
-      isUserChange?: boolean;
     };
 
 type ThemeState = {
   theme: Theme;
   appTheme: Theme | "system";
-  isUserChange: boolean;
 };
 
 const themeRedurer = (state: ThemeState, action: ThemeAction) => {
@@ -344,7 +342,7 @@ const createInitialThemeState = ({ appTheme }: ThemeState) => {
         : "light"
       : appTheme;
 
-  return { theme, appTheme, isUserChange: false };
+  return { theme, appTheme };
 };
 
 const ExcalidrawWrapper = () => {
@@ -628,7 +626,6 @@ const ExcalidrawWrapper = () => {
         // FIXME migration from old LS scheme. Can be removed later. #5660
         importFromLocalStorage().appState?.theme ||
         THEME.LIGHT,
-      isUserChange: false,
     },
     createInitialThemeState,
   );
@@ -659,13 +656,10 @@ const ExcalidrawWrapper = () => {
       collabAPI.syncElements(elements);
     }
 
-    if (themeState.isUserChange) {
-      dispatchTheme({
-        type: "SET_APP_THEME",
-        appTheme: appState.theme,
-        isUserChange: false,
-      });
-    }
+    // dispatchTheme({
+    //   type: "SET_APP_THEME",
+    //   appTheme: appState.theme,
+    // });
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
@@ -898,7 +892,6 @@ const ExcalidrawWrapper = () => {
             dispatchTheme({
               type: "SET_APP_THEME",
               appTheme: theme,
-              isUserChange: true,
             })
           }
         />
