@@ -1,6 +1,6 @@
 import { MIME_TYPES } from "../../constants";
 import { Bounds, getElementAbsoluteCoords } from "../../element/bounds";
-import { isPointHittingElementBoundingBox } from "../../element/collision";
+import { hitElementBoundingBox } from "../../element/collision";
 import { ElementsMap, NonDeletedExcalidrawElement } from "../../element/types";
 import { rotate } from "../../math";
 import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
@@ -75,17 +75,10 @@ export const isPointHittingLink = (
   if (!element.link || appState.selectedElementIds[element.id]) {
     return false;
   }
-  const threshold = 4 / appState.zoom.value;
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    isPointHittingElementBoundingBox(
-      element,
-      elementsMap,
-      [x, y],
-      threshold,
-      null,
-    )
+    hitElementBoundingBox(x, y, element, elementsMap)
   ) {
     return true;
   }
