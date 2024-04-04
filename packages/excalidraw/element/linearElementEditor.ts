@@ -6,7 +6,6 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
-  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
 import {
@@ -34,6 +33,7 @@ import {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
+  AppClassProperties,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 import History from "../history";
@@ -334,9 +334,10 @@ export class LinearElementEditor {
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
     appState: AppState,
-    elements: readonly NonDeletedExcalidrawElement[],
-    elementsMap: NonDeletedSceneElementsMap,
+    app: AppClassProperties,
   ): LinearElementEditor {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -380,8 +381,7 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                elements,
-                elementsMap,
+                app,
               )
             : null;
 
@@ -645,13 +645,14 @@ export class LinearElementEditor {
     history: History,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
-    elements: readonly NonDeletedExcalidrawElement[],
-    elementsMap: NonDeletedSceneElementsMap,
+    app: AppClassProperties,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
@@ -714,11 +715,7 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(
-          scenePointer,
-          elements,
-          elementsMap,
-        ),
+        endBindingElement: getHoveredElementForBinding(scenePointer, app),
       };
 
       ret.didAddPoint = true;
