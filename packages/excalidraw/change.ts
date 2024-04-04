@@ -39,7 +39,7 @@ import {
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import { SubtypeOf } from "./utility-types";
+import { SubtypeOf, ValueOf } from "./utility-types";
 import {
   arrayToMap,
   arrayToObject,
@@ -177,11 +177,11 @@ class Delta<T> {
   /**
    * Diff object partials as part of the `postProcess`.
    */
-  public static diffObjects<T>(
+  public static diffObjects<T, K extends keyof T, V extends ValueOf<T[K]>>(
     deleted: Partial<T>,
     inserted: Partial<T>,
-    property: keyof T,
-    setValue: (previousValue: any) => any,
+    property: K,
+    setValue: (prevValue: V | undefined) => V,
   ) {
     if (!deleted[property] && !inserted[property]) {
       return;
@@ -191,14 +191,10 @@ class Delta<T> {
       typeof deleted[property] === "object" ||
       typeof inserted[property] === "object"
     ) {
-      const deletedObject = (deleted[property] ?? {}) as Record<
-        string,
-        unknown
-      >;
-      const insertedObject = (inserted[property] ?? {}) as Record<
-        string,
-        unknown
-      >;
+      type RecordLike = Record<string, V | undefined>;
+
+      const deletedObject: RecordLike = deleted[property] ?? {};
+      const insertedObject: RecordLike = inserted[property] ?? {};
 
       const deletedDifferences = Delta.getLeftDifferences(
         deletedObject,
@@ -206,7 +202,7 @@ class Delta<T> {
       ).reduce((acc, curr) => {
         acc[curr] = setValue(deletedObject[curr]);
         return acc;
-      }, {} as Record<string, unknown>);
+      }, {} as RecordLike);
 
       const insertedDifferences = Delta.getRightDifferences(
         deletedObject,
@@ -214,7 +210,7 @@ class Delta<T> {
       ).reduce((acc, curr) => {
         acc[curr] = setValue(insertedObject[curr]);
         return acc;
-      }, {} as Record<string, unknown>);
+      }, {} as RecordLike);
 
       if (
         Object.keys(deletedDifferences).length ||
@@ -232,11 +228,11 @@ class Delta<T> {
   /**
    * Diff array partials as part of the `postProcess`.
    */
-  public static diffArrays<T>(
+  public static diffArrays<T, K extends keyof T, V extends T[K]>(
     deleted: Partial<T>,
     inserted: Partial<T>,
-    property: keyof T,
-    groupBy?: (value: any) => string,
+    property: K,
+    groupBy: (value: V extends ArrayLike<infer T> ? T : never) => string,
   ) {
     if (!deleted[property] && !inserted[property]) {
       return;
@@ -545,12 +541,18 @@ export class AppStateChange implements Change<AppState> {
     inserted: Partial<T>,
   ): [Partial<T>, Partial<T>] {
     try {
-      Delta.diffObjects(deleted, inserted, "selectedElementIds", (_) => true);
+      Delta.diffObjects(
+        deleted,
+        inserted,
+        "selectedElementIds",
+        // ts language server has a bit trouble resolving this, so we are giving it a little push
+        (_) => true as ValueOf<T["selectedElementIds"]>,
+      );
       Delta.diffObjects(
         deleted,
         inserted,
         "selectedGroupIds",
-        (previousValue) => previousValue ?? false,
+        (prevValue) => (prevValue ?? false) as ValueOf<T["selectedGroupIds"]>,
       );
     } catch (e) {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
@@ -1468,7 +1470,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     inserted: ElementPartial,
   ): [ElementPartial, ElementPartial] {
     try {
-      Delta.diffArrays(deleted, inserted, "groupIds");
+      Delta.diffArrays(deleted, inserted, "groupIds", (groupId) => groupId);
       Delta.diffArrays(deleted, inserted, "boundElements", (x) => x.id);
     } catch (e) {
       // if postprocessing fails, it does not make sense to bubble up, but let's make sure we know about it
