@@ -228,7 +228,6 @@ export const ToggleTheme = (
             ariaLabel: t("buttons.systemMode"),
           },
         ]}
-        shortcut={shortcut}
       >
         {t("labels.theme")}
       </DropdownMenuItemContentRadio>
