@@ -4523,9 +4523,9 @@ camelcase@^6.2.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001335, caniuse-lite@^1.0.30001579, caniuse-lite@^1.0.30001587:
-  version "1.0.30001605"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001605.tgz#ca12d7330dd8bcb784557eb9aa64f0037870d9d6"
-  integrity sha512-nXwGlFWo34uliI9z3n6Qc0wZaf7zaZWA1CPZ169La5mV3I/gem7bst0vr5XQH5TJXZIMfDeZyOrZnSlVzKxxHQ==
+  version "1.0.30001606"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001606.tgz#b4d5f67ab0746a3b8b5b6d1f06e39c51beb39a9e"
+  integrity sha512-LPbwnW4vfpJId225pwjZJOgX1m9sGfbw/RKJvw/t0QhYOOaTXHvkjVGFGPpvwEzufrjvTlsULnVTxdy4/6cqkg==
 
 canvas-roundrect-polyfill@0.0.1:
   version "0.0.1"
@@ -6443,6 +6443,11 @@ fraction.js@^4.2.0:
   version "4.3.7"
   resolved "https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz#06ca0085157e42fda7f9e726e79fefc4068840f7"
   integrity sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==
+
+fractional-indexing@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/fractional-indexing/-/fractional-indexing-3.2.0.tgz#1193e63d54ff4e0cbe0c79a9ed6cfbab25d91628"
+  integrity sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==
 
 fs-constants@^1.0.0:
   version "1.0.0"
