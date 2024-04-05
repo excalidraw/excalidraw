@@ -44,12 +44,13 @@ export class History {
     const entry = HistoryEntry.create(appStateChange, elementsChange);
 
     if (!entry.isEmpty()) {
+      // we have the latest changes, no need to `applyLatest`, which is done within `History.push`
       this.undoStack.push(entry.inverse());
 
-      // don't reset redo stack on local appState changes,
-      // as a simple click (unselect) could lead to losing all the redo entries
-      if (!entry.isElementsChangeEmpty()) {
-        // as a new entry was pushed, we invalidate the redo stack
+      if (!entry.elementsChange.isEmpty()) {
+        // don't reset redo stack on local appState changes,
+        // as a simple click (unselect) could lead to losing all the redo entries
+        // only reset on non empty elements changes!
         this.redoStack.length = 0;
       }
 
@@ -124,6 +125,7 @@ export class History {
       return [nextElements, nextAppState];
     } finally {
       // trigger the history change event before returning completely
+      // also trigger it just once, no need doing so on each entry
       this.onHistoryChangedEmitter.trigger(
         new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
       );
@@ -156,8 +158,8 @@ export class History {
 
 export class HistoryEntry {
   private constructor(
-    private readonly appStateChange: AppStateChange,
-    private readonly elementsChange: ElementsChange,
+    public readonly appStateChange: AppStateChange,
+    public readonly elementsChange: ElementsChange,
   ) {}
 
   public static create(
@@ -203,9 +205,5 @@ export class HistoryEntry {
 
   public isEmpty(): boolean {
     return this.appStateChange.isEmpty() && this.elementsChange.isEmpty();
-  }
-
-  public isElementsChangeEmpty(): boolean {
-    return this.elementsChange.isEmpty();
   }
 }

@@ -32,6 +32,7 @@ import {
   SceneElementsMap,
 } from "./element/types";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
+import { getNonDeletedGroupIds } from "./groups";
 import { getObservedAppState } from "./store";
 import {
   AppState,
@@ -52,15 +53,8 @@ import {
  * Represents the difference between two objects of the same type.
  *
  * Both `deleted` and `inserted` partials represent the same set of added, removed or updated properties, where:
- * - `deleted` is a set of all the previous (removed) values
- * - `inserted` is a set of all the next (added, updated) values
- *
- * In addition, we have two forms of representing reference values:
- * - by default, `deleted` & `inserted` contains all the properties, even if only one property has changed
- *  - i.e. check text element `points` prop,  when applied, it will override all the existing points
- * - to granularly resolve conflicts on the level of individual properties, `postProcess` could be used to extract only changed properties
- *  - i.e. check element's `groupIds` prop, when applied, it will be merged with existing `groupIds
- * - related reasoning https://github.com/excalidraw/excalidraw/pull/7348#discussion_r1521718445
+ * - `deleted` is a set of all the deleted values
+ * - `inserted` is a set of all the inserted (added, updated) values
  *
  * Keeping it as pure object (without transient state, side-effects, etc.), so we won't have to instantiate it on load.
  */
@@ -579,16 +573,10 @@ export class AppStateChange implements Change<AppState> {
     const prevObservedAppState = getObservedAppState(prevAppState);
     const nextObservedAppState = getObservedAppState(nextAppState);
 
-    const visibleDifferenceFlag = { value: false };
     const containsStandaloneDifference = Delta.isRightDifferent(
       AppStateChange.stripElementsProps(prevObservedAppState),
       AppStateChange.stripElementsProps(nextObservedAppState),
     );
-
-    if (containsStandaloneDifference) {
-      // we detected a a difference which is unrelated to the elements
-      visibleDifferenceFlag.value = true;
-    }
 
     const containsElementsDifference = Delta.isRightDifferent(
       AppStateChange.stripStandaloneProps(prevObservedAppState),
@@ -596,58 +584,93 @@ export class AppStateChange implements Change<AppState> {
     );
 
     if (!containsStandaloneDifference && !containsElementsDifference) {
-      // there is no difference detected at all
-      visibleDifferenceFlag.value = false;
+      // no change in appstate was detected
+      return false;
     }
 
-    // we need to handle elements differences separately,
-    // as they could be related to deleted elements and/or they could on their own result in no visible action
-    const changedDeltaKeys = Delta.getRightDifferences(
-      AppStateChange.stripStandaloneProps(prevObservedAppState),
-      AppStateChange.stripStandaloneProps(nextObservedAppState),
-    ) as Array<keyof ObservedElementsAppState>;
+    const visibleDifferenceFlag = {
+      value: containsStandaloneDifference ?? false,
+    };
 
-    // check whether delta properties are related to the existing non-deleted elements
-    for (const key of changedDeltaKeys) {
-      switch (key) {
-        case "selectedElementIds":
-          nextAppState.selectedElementIds =
-            AppStateChange.filterSelectedElements(
+    if (containsElementsDifference) {
+      // filter invisible changes on each iteration
+      const changedElementsProps = Delta.getRightDifferences(
+        AppStateChange.stripStandaloneProps(prevObservedAppState),
+        AppStateChange.stripStandaloneProps(nextObservedAppState),
+      ) as Array<keyof ObservedElementsAppState>;
+
+      let nonDeletedGroupIds = new Set<string>();
+
+      if (
+        changedElementsProps.includes("editingGroupId") ||
+        changedElementsProps.includes("selectedGroupIds")
+      ) {
+        // this one iterates through all the non deleted elements, so make sure it's not done twice
+        nonDeletedGroupIds = getNonDeletedGroupIds(nextElements);
+      }
+
+      // check whether delta properties are related to the existing non-deleted elements
+      for (const key of changedElementsProps) {
+        switch (key) {
+          case "selectedElementIds":
+            nextAppState[key] = AppStateChange.filterSelectedElements(
               nextAppState[key],
               nextElements,
               visibleDifferenceFlag,
             );
-          break;
-        case "selectedLinearElementId":
-        case "editingLinearElementId":
-          // map the increment key back into the appState key
-          const appStateKey =
-            key === "selectedLinearElementId"
-              ? "selectedLinearElement"
-              : "editingLinearElement";
 
-          nextAppState[appStateKey] = AppStateChange.filterLinearElement(
-            nextAppState[appStateKey],
-            nextElements,
-            visibleDifferenceFlag,
-          );
-          break;
-        case "editingGroupId":
-        case "selectedGroupIds":
-          // TODO: #7348 currently we don't have an index of elements by groupIds, which means that
-          // the calculation for getting the visible elements based on the groupIds stored in delta
-          // is not worth performing - due to perf. and dev. complexity.
-          //
-          // Therefore we are accepting in these cases empty undos / redos, which should be pretty rare:
-          // - only when one of these (or both) are in delta and there are no non deleted elements containing these group ids
-          visibleDifferenceFlag.value = true;
-          break;
-        default: {
-          assertNever(
-            key,
-            `Unknown ObservedElementsAppState's key "${key}"`,
-            true,
-          );
+            break;
+          case "selectedGroupIds":
+            nextAppState[key] = AppStateChange.filterSelectedGroups(
+              nextAppState[key],
+              nonDeletedGroupIds,
+              visibleDifferenceFlag,
+            );
+
+            break;
+          case "editingGroupId":
+            const editingGroupId = nextAppState[key];
+
+            if (!editingGroupId) {
+              // previously there was an editingGroup related to a visible element, now it's not
+              visibleDifferenceFlag.value = true;
+            } else if (nonDeletedGroupIds.has(editingGroupId)) {
+              // previously there wasn't an editingGroup, now there is one which is visible
+              visibleDifferenceFlag.value = true;
+            } else {
+              // there was assigned an editingGroup now, but it's related to deleted element
+              nextAppState[key] = null;
+            }
+
+            break;
+          case "selectedLinearElementId":
+          case "editingLinearElementId":
+            const appStateKey = AppStateChange.convertToAppStateKey(key);
+            const linearElement = nextAppState[appStateKey];
+
+            if (!linearElement) {
+              // previously there was a linear element related to a visible element, now it's not
+              visibleDifferenceFlag.value = true;
+            } else {
+              const element = nextElements.get(linearElement.elementId);
+
+              if (element && !element.isDeleted) {
+                // previously there wasn't a linear element, now there is one which is visible
+                visibleDifferenceFlag.value = true;
+              } else {
+                // there was assigned a linear element now, but it's deleted
+                nextAppState[appStateKey] = null;
+              }
+            }
+
+            break;
+          default: {
+            assertNever(
+              key,
+              `Unknown ObservedElementsAppState's key "${key}"`,
+              true,
+            );
+          }
         }
       }
     }
@@ -655,18 +678,40 @@ export class AppStateChange implements Change<AppState> {
     return visibleDifferenceFlag.value;
   }
 
+  private static convertToAppStateKey(
+    key: keyof Pick<
+      ObservedElementsAppState,
+      "selectedLinearElementId" | "editingLinearElementId"
+    >,
+  ): keyof Pick<AppState, "selectedLinearElement" | "editingLinearElement"> {
+    switch (key) {
+      case "selectedLinearElementId":
+        return "selectedLinearElement";
+      case "editingLinearElementId":
+        return "editingLinearElement";
+    }
+  }
+
   private static filterSelectedElements(
     selectedElementIds: AppState["selectedElementIds"],
     elements: SceneElementsMap,
     visibleDifferenceFlag: { value: boolean },
   ) {
+    const ids = Object.keys(selectedElementIds);
+
+    if (!ids.length) {
+      // previously there were ids related to visible elements, now there are none
+      visibleDifferenceFlag.value = true;
+      return selectedElementIds;
+    }
+
     const nextSelectedElementIds = { ...selectedElementIds };
 
-    for (const id of Object.keys(selectedElementIds)) {
+    for (const id of ids) {
       const element = elements.get(id);
 
       if (element && !element.isDeleted) {
-        // found related visible element!
+        // there is a selected element id related to a visible element
         visibleDifferenceFlag.value = true;
       } else {
         delete nextSelectedElementIds[id];
@@ -676,29 +721,31 @@ export class AppStateChange implements Change<AppState> {
     return nextSelectedElementIds;
   }
 
-  private static filterLinearElement(
-    linearElement:
-      | AppState["editingLinearElement"]
-      | AppState["selectedLinearElement"],
-    elements: SceneElementsMap,
+  private static filterSelectedGroups(
+    selectedGroupIds: AppState["selectedGroupIds"],
+    nonDeletedGroupIds: Set<string>,
     visibleDifferenceFlag: { value: boolean },
   ) {
-    if (!linearElement) {
-      return null;
-    }
+    const ids = Object.keys(selectedGroupIds);
 
-    let result: typeof linearElement | null = linearElement;
-
-    const element = elements.get(linearElement.elementId);
-
-    if (element && !element.isDeleted) {
-      // found related visible element!
+    if (!ids.length) {
+      // previously there were ids related to visible groups, now there are none
       visibleDifferenceFlag.value = true;
-    } else {
-      result = null;
+      return selectedGroupIds;
     }
 
-    return result;
+    const nextSelectedGroupIds = { ...selectedGroupIds };
+
+    for (const id of Object.keys(nextSelectedGroupIds)) {
+      if (nonDeletedGroupIds.has(id)) {
+        // there is a selected group id related to a visible group
+        visibleDifferenceFlag.value = true;
+      } else {
+        delete nextSelectedGroupIds[id];
+      }
+    }
+
+    return nextSelectedGroupIds;
   }
 
   private static stripElementsProps(
@@ -1034,7 +1081,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
 
       const affectedElements = this.resolveConflicts(elements, nextElements);
 
-      // TODO: #7348 validate semantically and syntactically the changed elements, in case they would result data integrity issues
+      // TODO: #7348 validate elements semantically and syntactically the changed elements, in case they would result data integrity issues
       changedElements = new Map([
         ...addedElements,
         ...removedElements,
