@@ -23,6 +23,7 @@ import {
   selectGroupsFromGivenElements,
 } from "../groups";
 import {
+  DEFAULT_OMIT_SIDES,
   OMIT_SIDES_FOR_FRAME,
   shouldShowBoundingBox,
   TransformHandles,

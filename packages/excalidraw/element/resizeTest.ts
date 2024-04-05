@@ -14,7 +14,14 @@ import {
   MaybeTransformHandleType,
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
-import { Bounds } from "./bounds";
+import { Bounds, getElementAbsoluteCoords } from "./bounds";
+import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../constants";
+import {
+  angleToDegrees,
+  pointOnLine,
+  pointRotate,
+} from "../../utils/geometry/geometry";
+import { Line, Point } from "../../utils/geometry/shape";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -60,6 +67,25 @@ export const resizeTest = (
 
   if (filter.length > 0) {
     return filter[0] as TransformHandleType;
+  }
+
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+  );
+  const SPACING = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / zoom.value;
+  const sides = getSelectionBorders(
+    [x1 - SPACING, y1 - SPACING],
+    [x2 + SPACING, y2 + SPACING],
+    [cx, cy],
+    angleToDegrees(element.angle),
+  );
+
+  for (const [dir, side] of Object.entries(sides)) {
+    // test to see if x, y are on the line segment
+    if (pointOnLine([x, y], side as Line, SPACING)) {
+      return dir as TransformHandleType;
+    }
   }
 
   return false;
@@ -173,4 +199,23 @@ export const getCursorForResizingElement = (resizingElement: {
   }
 
   return cursor ? `${cursor}-resize` : "";
+};
+
+const getSelectionBorders = (
+  [x1, y1]: Point,
+  [x2, y2]: Point,
+  center: Point,
+  angleInDegrees: number,
+) => {
+  const topLeft = pointRotate([x1, y1], angleInDegrees, center);
+  const topRight = pointRotate([x2, y1], angleInDegrees, center);
+  const bottomLeft = pointRotate([x1, y2], angleInDegrees, center);
+  const bottomRight = pointRotate([x2, y2], angleInDegrees, center);
+
+  return {
+    n: [topLeft, topRight],
+    e: [topRight, bottomRight],
+    s: [bottomRight, bottomLeft],
+    w: [bottomLeft, topLeft],
+  };
 };

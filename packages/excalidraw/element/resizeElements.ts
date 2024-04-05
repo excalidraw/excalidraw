@@ -1,12 +1,7 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import {
-  rotate,
-  adjustXYWithRotation,
-  centerPoint,
-  rotatePoint,
-} from "../math";
+import { rotate, centerPoint, rotatePoint } from "../math";
 import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -38,7 +33,6 @@ import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
 import {
-  TransformHandleType,
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
@@ -90,13 +84,7 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
       );
       updateBoundElements(element, elementsMap);
-    } else if (
-      isTextElement(element) &&
-      (transformHandleType === "nw" ||
-        transformHandleType === "ne" ||
-        transformHandleType === "sw" ||
-        transformHandleType === "se")
-    ) {
+    } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         element,
         elementsMap,
@@ -232,37 +220,18 @@ const measureFontSizeFromWidth = (
   };
 };
 
-const getSidesForTransformHandle = (
-  transformHandleType: TransformHandleType,
-  shouldResizeFromCenter: boolean,
-) => {
-  return {
-    n:
-      /^(n|ne|nw)$/.test(transformHandleType) ||
-      (shouldResizeFromCenter && /^(s|se|sw)$/.test(transformHandleType)),
-    s:
-      /^(s|se|sw)$/.test(transformHandleType) ||
-      (shouldResizeFromCenter && /^(n|ne|nw)$/.test(transformHandleType)),
-    w:
-      /^(w|nw|sw)$/.test(transformHandleType) ||
-      (shouldResizeFromCenter && /^(e|ne|se)$/.test(transformHandleType)),
-    e:
-      /^(e|ne|se)$/.test(transformHandleType) ||
-      (shouldResizeFromCenter && /^(w|nw|sw)$/.test(transformHandleType)),
-  };
-};
-
 const resizeSingleTextElement = (
   element: NonDeleted<ExcalidrawTextElement>,
   elementsMap: ElementsMap,
-  transformHandleType: "nw" | "ne" | "sw" | "se",
+  transformHandleType: "nw" | "ne" | "sw" | "se" | "n" | "e" | "s" | "w",
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+  );
   // rotation pointer with reverse angle
   const [rotatedX, rotatedY] = rotate(
     pointerX,
@@ -271,33 +240,24 @@ const resizeSingleTextElement = (
     cy,
     -element.angle,
   );
-  let scale: number;
-  switch (transformHandleType) {
-    case "se":
-      scale = Math.max(
-        (rotatedX - x1) / (x2 - x1),
-        (rotatedY - y1) / (y2 - y1),
-      );
-      break;
-    case "nw":
-      scale = Math.max(
-        (x2 - rotatedX) / (x2 - x1),
-        (y2 - rotatedY) / (y2 - y1),
-      );
-      break;
-    case "ne":
-      scale = Math.max(
-        (rotatedX - x1) / (x2 - x1),
-        (y2 - rotatedY) / (y2 - y1),
-      );
-      break;
-    case "sw":
-      scale = Math.max(
-        (x2 - rotatedX) / (x2 - x1),
-        (rotatedY - y1) / (y2 - y1),
-      );
-      break;
+  let scaleX = 0;
+  let scaleY = 0;
+
+  if (transformHandleType.includes("e")) {
+    scaleX = (rotatedX - x1) / (x2 - x1);
   }
+  if (transformHandleType.includes("w")) {
+    scaleX = (x2 - rotatedX) / (x2 - x1);
+  }
+  if (transformHandleType.includes("n")) {
+    scaleY = (y2 - rotatedY) / (y2 - y1);
+  }
+  if (transformHandleType.includes("s")) {
+    scaleY = (rotatedY - y1) / (y2 - y1);
+  }
+
+  const scale = Math.max(scaleX, scaleY);
+
   if (scale > 0) {
     const nextWidth = element.width * scale;
     const nextHeight = element.height * scale;
@@ -305,32 +265,55 @@ const resizeSingleTextElement = (
     if (metrics === null) {
       return;
     }
-    const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
-      element,
-      nextWidth,
-      nextHeight,
-      false,
-    );
-    const deltaX1 = (x1 - nextX1) / 2;
-    const deltaY1 = (y1 - nextY1) / 2;
-    const deltaX2 = (x2 - nextX2) / 2;
-    const deltaY2 = (y2 - nextY2) / 2;
-    const [nextElementX, nextElementY] = adjustXYWithRotation(
-      getSidesForTransformHandle(transformHandleType, shouldResizeFromCenter),
-      element.x,
-      element.y,
-      element.angle,
-      deltaX1,
-      deltaY1,
-      deltaX2,
-      deltaY2,
-    );
+
+    const startTopLeft = [x1, y1];
+    const startBottomRight = [x2, y2];
+    const startCenter = [cx, cy];
+
+    let newTopLeft = [x1, y1] as [number, number];
+    if (["n", "w", "nw"].includes(transformHandleType)) {
+      newTopLeft = [
+        startBottomRight[0] - Math.abs(nextWidth),
+        startBottomRight[1] - Math.abs(nextHeight),
+      ];
+    }
+    if (transformHandleType === "ne") {
+      const bottomLeft = [startTopLeft[0], startBottomRight[1]];
+      newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(nextHeight)];
+    }
+    if (transformHandleType === "sw") {
+      const topRight = [startBottomRight[0], startTopLeft[1]];
+      newTopLeft = [topRight[0] - Math.abs(nextWidth), topRight[1]];
+    }
+
+    if (["s", "n"].includes(transformHandleType)) {
+      newTopLeft[0] = startCenter[0] - nextWidth / 2;
+    }
+    if (["e", "w"].includes(transformHandleType)) {
+      newTopLeft[1] = startCenter[1] - nextHeight / 2;
+    }
+
+    if (shouldResizeFromCenter) {
+      newTopLeft[0] = startCenter[0] - Math.abs(nextWidth) / 2;
+      newTopLeft[1] = startCenter[1] - Math.abs(nextHeight) / 2;
+    }
+
+    const angle = element.angle;
+    const rotatedTopLeft = rotatePoint(newTopLeft, [cx, cy], angle);
+    const newCenter: Point = [
+      newTopLeft[0] + Math.abs(nextWidth) / 2,
+      newTopLeft[1] + Math.abs(nextHeight) / 2,
+    ];
+    const rotatedNewCenter = rotatePoint(newCenter, [cx, cy], angle);
+    newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
+    const [nextX, nextY] = newTopLeft;
+
     mutateElement(element, {
       fontSize: metrics.size,
       width: nextWidth,
       height: nextHeight,
-      x: nextElementX,
-      y: nextElementY,
+      x: nextX,
+      y: nextY,
     });
   }
 };

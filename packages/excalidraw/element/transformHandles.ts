@@ -38,6 +38,13 @@ const transformHandleSizes: { [k in PointerType]: number } = {
 
 const ROTATION_RESIZE_HANDLE_GAP = 16;
 
+export const DEFAULT_OMIT_SIDES = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+};
+
 export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   e: true,
   s: true,
@@ -232,8 +239,8 @@ export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   elementsMap: ElementsMap,
-
   pointerType: PointerType = "mouse",
+  omitSides: { [T in TransformHandleType]?: boolean } = DEFAULT_OMIT_SIDES,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -242,7 +249,6 @@ export const getTransformHandles = (
     return {};
   }
 
-  let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (element.type === "freedraw" || isLinearElement(element)) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
