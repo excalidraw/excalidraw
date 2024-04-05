@@ -192,7 +192,6 @@ export const ToggleTheme = (
       }
     | {
         allowSystemTheme?: false;
-        theme?: "light" | "dark";
         onSelect?: (theme: "light" | "dark") => void;
       },
 ) => {
