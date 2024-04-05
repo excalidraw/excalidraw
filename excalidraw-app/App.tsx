@@ -307,7 +307,7 @@ type ThemeState = {
   appTheme: Theme | "system";
 };
 
-const themeRedurer = (state: ThemeState, action: ThemeAction) => {
+const themeReducer = (state: ThemeState, action: ThemeAction) => {
   switch (action.type) {
     case "SET_APP_THEME":
       localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, action.appTheme);
@@ -615,7 +615,7 @@ const ExcalidrawWrapper = () => {
   }, [langCode]);
 
   const [themeState, dispatchTheme] = useReducer(
-    themeRedurer,
+    themeReducer,
     {
       theme: THEME.LIGHT,
       appTheme:
