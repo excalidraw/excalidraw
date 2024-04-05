@@ -645,8 +645,26 @@ const ExcalidrawWrapper = () => {
       mediaQuery.addEventListener("change", handleChange);
     }
 
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [themeState.appTheme]);
+    const handleKeydown = (event: KeyboardEvent) => {
+      // NOTE undocumented ATM coz I'm not sure of the combination (plus it
+      // doesn't work universailly due where this hook is used)
+      if (event.altKey && event.shiftKey && event.code === "KeyD") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        dispatchTheme({
+          type: "SET_APP_THEME",
+          appTheme: themeState.theme === "dark" ? "light" : "dark",
+        });
+      }
+    };
+
+    document.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+      document.removeEventListener("keydown", handleKeydown);
+    };
+  }, [themeState.appTheme, themeState.theme]);
 
   const onChange = (
     elements: readonly ExcalidrawElement[],
