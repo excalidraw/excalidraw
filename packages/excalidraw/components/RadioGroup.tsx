@@ -28,6 +28,7 @@ export const RadioGroup = function <T>({
             active: choice.value === value,
           })}
           key={String(choice.value)}
+          title={choice.ariaLabel}
         >
           <input
             name={name}
