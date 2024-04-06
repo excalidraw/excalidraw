@@ -5182,8 +5182,8 @@ class App extends React.Component<AppProps, AppState> {
 
         this.translateCanvas({
           zoom: zoomState.zoom,
-          scrollX: zoomState.scrollX + deltaX / nextZoom,
-          scrollY: zoomState.scrollY + deltaY / nextZoom,
+          scrollX: zoomState.scrollX + 2*(deltaX / nextZoom), //zsviczian
+          scrollY: zoomState.scrollY + 2*(deltaY / nextZoom), //zsviczian
           shouldCacheIgnoreZoom: true,
         });
       });

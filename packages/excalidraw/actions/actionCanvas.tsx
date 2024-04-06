@@ -1,6 +1,7 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import {
   handIcon,
+  laserPointerToolIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -555,7 +556,7 @@ export const actionToggleHandTool = register({
     !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });
 
-export const actionToggleLaserPointer = register({
+export const actionToggleLaserPointer = register({ //zsviczian - did I really add this? Delta compared to excalidraw.com
   name: "toggleLaserPointerTool",
   viewMode: true,
   trackEvent: { category: "menu" },
@@ -593,7 +594,8 @@ export const actionToggleLaserPointer = register({
     };
   },
   checked: (appState) => appState.activeTool.type === "laser",
-  contextItemLabel: "labels.laser",
+  label: "labels.laser",
+  icon: laserPointerToolIcon,
 });
 
 //zsviczian

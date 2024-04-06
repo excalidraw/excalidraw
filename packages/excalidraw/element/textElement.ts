@@ -281,44 +281,11 @@ export const computeBoundTextPosition = (
   return { x, y };
 };
 
-//zsviczian
-type MeasureValue = {
-  fontSize: number;
-  baseline: number;
-  height: number;
-  width: number;
-};
-//zsviczian
-const createMeasureKey = (text: string, fontFamily: string): string => fontFamily + text;
-//zsviczian
-const measures: Map<string, MeasureValue> = new Map();
-
-let measureTextCacheTimeout: NodeJS.Timeout | null;
-
-const clearMeasureTextCache = () => {
-  measures.clear();
-  measureTextCacheTimeout = null;
-}
-
-// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
 export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
-  if(measureTextCacheTimeout) {
-    clearTimeout(measureTextCacheTimeout);
-    measureTextCacheTimeout = null;
-  }
-  measureTextCacheTimeout = setTimeout(clearMeasureTextCache, 300); //zsviczian
-  const fontFamily = font.split("px ")?.[2] //zsviczian
-  const key = createMeasureKey(text, fontFamily); //zsviczian
-  if (measures.has(key)) { //zsviczian
-    const newFontSize = parseFloat(font); //zsviczian
-    const {fontSize, baseline, height, width} = measures.get(key)!; //zsviczian
-    const ratio = newFontSize / fontSize; //zsviczian
-    return {baseline: Math.round(baseline * ratio), height: height * ratio, width: width * ratio}; //zsviczian
-  } //zsviczian
   text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
