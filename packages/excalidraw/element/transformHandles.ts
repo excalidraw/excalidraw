@@ -269,6 +269,7 @@ export const getTransformHandles = (
     omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   } else if (isFrameLikeElement(element)) {
     omitSides = {
+      ...omitSides,
       rotation: true,
     };
   }
