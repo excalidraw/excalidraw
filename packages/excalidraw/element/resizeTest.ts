@@ -69,22 +69,27 @@ export const resizeTest = (
     return filter[0] as TransformHandleType;
   }
 
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    elementsMap,
-  );
-  const SPACING = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / zoom.value;
-  const sides = getSelectionBorders(
-    [x1 - SPACING, y1 - SPACING],
-    [x2 + SPACING, y2 + SPACING],
-    [cx, cy],
-    angleToDegrees(element.angle),
-  );
+  // Resize an element from the sides.
+  // Note that for a text element, when "resized" from the side
+  // we souldmake it wrap/unwrap
+  if (element.type !== "text") {
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+      element,
+      elementsMap,
+    );
+    const SPACING = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / zoom.value;
+    const sides = getSelectionBorders(
+      [x1 - SPACING, y1 - SPACING],
+      [x2 + SPACING, y2 + SPACING],
+      [cx, cy],
+      angleToDegrees(element.angle),
+    );
 
-  for (const [dir, side] of Object.entries(sides)) {
-    // test to see if x, y are on the line segment
-    if (pointOnLine([x, y], side as Line, SPACING)) {
-      return dir as TransformHandleType;
+    for (const [dir, side] of Object.entries(sides)) {
+      // test to see if x, y are on the line segment
+      if (pointOnLine([x, y], side as Line, SPACING)) {
+        return dir as TransformHandleType;
+      }
     }
   }
 

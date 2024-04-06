@@ -84,7 +84,13 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
       );
       updateBoundElements(element, elementsMap);
-    } else if (isTextElement(element) && transformHandleType) {
+    } else if (
+      isTextElement(element) &&
+      (transformHandleType === "nw" ||
+        transformHandleType === "ne" ||
+        transformHandleType === "sw" ||
+        transformHandleType === "se")
+    ) {
       resizeSingleTextElement(
         element,
         elementsMap,
@@ -223,7 +229,7 @@ const measureFontSizeFromWidth = (
 const resizeSingleTextElement = (
   element: NonDeleted<ExcalidrawTextElement>,
   elementsMap: ElementsMap,
-  transformHandleType: "nw" | "ne" | "sw" | "se" | "n" | "e" | "s" | "w",
+  transformHandleType: "nw" | "ne" | "sw" | "se",
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
