@@ -160,23 +160,19 @@ export class Store implements IStore {
       const nextElement = nextElements.get(id);
 
       if (!nextElement) {
-        // Nothing to care about here, elements were forcefully updated
+        // Nothing to care about here, elements were forcefully deleted
         continue;
       }
 
       const elementSnapshot = this._snapshot.elements.get(id);
 
-      // Uncomitted element's snapshot doesn't exist, or its snapshot has lower version than the local element
-      if (
-        !elementSnapshot ||
-        (elementSnapshot && elementSnapshot.version < prevElement.version)
-      ) {
-        // Detected yet uncomitted local element ~ async user action is in progress
-        if (elementSnapshot) {
-          nextElements.set(id, elementSnapshot);
-        } else {
-          nextElements.delete(id);
-        }
+      // Checks for in progress async user action
+      if (!elementSnapshot) {
+        // Detected yet uncomitted local element
+        nextElements.delete(id);
+      } else if (elementSnapshot.version < prevElement.version) {
+        // Element was already commited, but the snapshot version is lower than current current local version
+        nextElements.set(id, elementSnapshot);
       }
     }
 

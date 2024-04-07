@@ -49,9 +49,9 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
+            selectedLinearElement: null,
           },
-          // update the store snapshot, so that invisible elements are not captured by the store
-          storeAction: StoreAction.UPDATE,
+          storeAction: StoreAction.CAPTURE,
         };
       }
     }
@@ -94,9 +94,7 @@ export const actionFinalize = register({
       }
 
       if (isInvisiblySmallElement(multiPointElement)) {
-        // TODO: not a great idea here as it could be recorded by the store,
-        // so the invisible element could be restored by the undo/redo, which is not what we want
-        // however for cases like dragCreate we are not recording, so it serves the purpose
+        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
         newElements = newElements.filter(
           (el) => el.id !== multiPointElement.id,
         );
@@ -192,6 +190,7 @@ export const actionFinalize = register({
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
+      // TODO: #7348 we should not capture everything, but otherwise it leads to incosistencies -> revisit
       storeAction: StoreAction.CAPTURE,
     };
   },

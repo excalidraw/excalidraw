@@ -50,6 +50,12 @@ const checkpoint = (name: string) => {
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
+const transparent = COLOR_PALETTE.transparent;
+const red = COLOR_PALETTE.red[1];
+const blue = COLOR_PALETTE.blue[1];
+const yellow = COLOR_PALETTE.yellow[1];
+const violet = COLOR_PALETTE.violet[1];
+
 describe("history", () => {
   beforeEach(() => {
     renderStaticScene.mockClear();
@@ -60,6 +66,279 @@ describe("history", () => {
   });
 
   describe("singleplayer undo/redo", () => {
+    it("should not end up with history entry when there are no appstate changes", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const rect1 = API.createElement({ type: "rectangle", groupIds: ["A"] });
+      const rect2 = API.createElement({ type: "rectangle", groupIds: ["A"] });
+
+      h.elements = [rect1, rect2];
+      mouse.select(rect1);
+      assertSelectedElements([rect1, rect2]);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+
+      mouse.select(rect2);
+      assertSelectedElements([rect1, rect2]);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+      expect(API.getUndoStack().length).toBe(1); // no new entry was created
+      expect(API.getRedoStack().length).toBe(0);
+    });
+
+    it("should not end up with history entry when there are no elements changes", async () => {
+      const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
+      await render(
+        <Excalidraw
+          excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+          handleKeyboardGlobally={true}
+        />,
+      );
+      const excalidrawAPI = await excalidrawAPIPromise;
+
+      const rect1 = API.createElement({ type: "rectangle" });
+      const rect2 = API.createElement({ type: "rectangle" });
+
+      excalidrawAPI.updateScene({
+        elements: [rect1, rect2],
+        commitToStore: true,
+      });
+
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+
+      excalidrawAPI.updateScene({
+        elements: [rect1, rect2],
+        commitToStore: true, // even though the flag is on, same elements are passed, nothing to commit
+      });
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+    });
+
+    it("should clear the redo stack on elements change", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect1 = UI.createElement("rectangle", { x: 10 });
+
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements(rect1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements()).toEqual([]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+      ]);
+
+      const rect2 = UI.createElement("rectangle", { x: 20 });
+
+      assertSelectedElements(rect2);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0); // redo stack got cleared
+      expect(API.getSnapshot()).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+    });
+
+    it("should not clear the redo stack on standalone appstate change", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect1 = UI.createElement("rectangle", { x: 10 });
+      const rect2 = UI.createElement("rectangle", { x: 20 });
+
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements(rect2);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      assertSelectedElements(rect1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: true }),
+      ]);
+
+      mouse.clickAt(-10, -10);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1); // we still have a possibility to redo!
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: true }),
+      ]);
+
+      mouse.downAt(0, 0);
+      mouse.moveTo(50, 50);
+      mouse.upAt(50, 50);
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(1); // even after re-select!
+      assertSelectedElements(rect1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: true }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements(rect2);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+    });
+
+    it("should not override appstate changes when redo stack is not cleared", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect = UI.createElement("rectangle", { x: 10 });
+      togglePopover("Background");
+      UI.clickOnTestId("color-red");
+      UI.clickOnTestId("color-blue");
+
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements(rect);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: blue }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      assertSelectedElements(rect);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: red }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(2);
+      assertSelectedElements(rect);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: transparent }),
+      ]);
+
+      mouse.clickAt(-10, -10);
+      expect(API.getUndoStack().length).toBe(2); // pushed appstate change,
+      expect(API.getRedoStack().length).toBe(2); // redo stack is not cleared
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: transparent }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements().length).toBe(0); // previously the item was selected, not it is not
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: red }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(API.getSelectedElements().length).toBe(0); // previously the item was selected, not it is not
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: blue }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements().length).toBe(0); // previously the item was selected, not it is not
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: red }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: transparent }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(3);
+      assertSelectedElements(rect); // get's reselected with out pushed entry!
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, backgroundColor: transparent }),
+      ]);
+    });
+
+    it("should iterate through the history when selection changes do not produce visible change", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect = UI.createElement("rectangle", { x: 10 });
+
+      mouse.clickAt(-10, -10);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(API.getSelectedElements().length).toBe(0);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      assertSelectedElements(rect);
+
+      mouse.clickAt(-10, -10);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements().length).toBe(0);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(2); // now we have two same redos
+      assertSelectedElements(rect);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1); // didn't iterate through completely, as first redo already results in a visible change
+      expect(API.getSelectedElements().length).toBe(0);
+
+      Keyboard.redo(); // acceptable empty redo
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(API.getSelectedElements().length).toBe(0);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      assertSelectedElements(rect);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0); // now we iterated through the same undos!
+      expect(API.getRedoStack().length).toBe(3);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, isDeleted: true }),
+      ]);
+    });
+
     it("should end up with no history entry after initializing scene", async () => {
       await render(
         <Excalidraw
@@ -181,81 +460,83 @@ describe("history", () => {
       ]);
     });
 
-    it("should support appstate groups", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-      const rect1 = API.createElement({ type: "rectangle", groupIds: ["A"] });
-      const rect2 = API.createElement({ type: "rectangle", groupIds: ["A"] });
-
-      h.elements = [rect1, rect2];
-      mouse.select(rect1);
-      assertSelectedElements([rect1, rect2]);
-      expect(h.state.selectedGroupIds).toEqual({ A: true });
-
-      Keyboard.withModifierKeys({ ctrl: true }, () => {
-        Keyboard.keyPress("d");
-      });
-      expect(h.elements.length).toBe(4);
-      assertSelectedElements([h.elements[2], h.elements[3]]);
-      expect(h.state.selectedGroupIds).not.toEqual(
-        expect.objectContaining({ A: true }),
+    it("should support appstate name or viewBackgroundColor change", async () => {
+      const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
+      await render(
+        <Excalidraw
+          excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+          handleKeyboardGlobally={true}
+          initialData={{
+            appState: {
+              name: "Old name",
+              viewBackgroundColor: "#FFF",
+            },
+          }}
+        />,
       );
+      const excalidrawAPI = await excalidrawAPIPromise;
 
-      Keyboard.withModifierKeys({ ctrl: true }, () => {
-        Keyboard.keyPress("z");
+      excalidrawAPI.updateScene({
+        appState: {
+          name: "New name",
+        },
+        commitToStore: true,
       });
-      expect(h.elements.length).toBe(4);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-        expect.objectContaining({ id: `${rect1.id}_copy`, isDeleted: true }),
-        expect.objectContaining({ id: `${rect2.id}_copy`, isDeleted: true }),
-      ]);
-      expect(h.state.selectedGroupIds).toEqual({ A: true });
 
-      Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
-        Keyboard.keyPress("z");
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.name).toBe("New name");
+
+      excalidrawAPI.updateScene({
+        appState: {
+          viewBackgroundColor: "#000",
+        },
+        commitToStore: true,
       });
-      expect(h.elements.length).toBe(4);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-        expect.objectContaining({ id: `${rect1.id}_copy`, isDeleted: false }),
-        expect.objectContaining({ id: `${rect2.id}_copy`, isDeleted: false }),
-      ]);
-      expect(h.state.selectedGroupIds).not.toEqual(
-        expect.objectContaining({ A: true }),
-      );
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.name).toBe("New name");
+      expect(h.state.viewBackgroundColor).toBe("#000");
 
-      // undo again, and duplicate once more
-      // -------------------------------------------------------------------------
-
-      Keyboard.withModifierKeys({ ctrl: true }, () => {
-        Keyboard.keyPress("z");
-        Keyboard.keyPress("d");
+      // just to double check that same change is not recorded
+      excalidrawAPI.updateScene({
+        appState: {
+          name: "New name",
+          viewBackgroundColor: "#000",
+        },
+        commitToStore: true,
       });
-      expect(h.elements.length).toBe(6);
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ id: rect1.id, isDeleted: false }),
-          expect.objectContaining({ id: rect2.id, isDeleted: false }),
-          expect.objectContaining({ id: `${rect1.id}_copy`, isDeleted: true }),
-          expect.objectContaining({ id: `${rect2.id}_copy`, isDeleted: true }),
-          expect.objectContaining({
-            id: `${rect1.id}_copy_copy`,
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: `${rect2.id}_copy_copy`,
-            isDeleted: false,
-          }),
-        ]),
-      );
-      expect(h.state.selectedGroupIds).not.toEqual(
-        expect.objectContaining({ A: true }),
-      );
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.name).toBe("New name");
+      expect(h.state.viewBackgroundColor).toBe("#000");
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.name).toBe("New name");
+      expect(h.state.viewBackgroundColor).toBe("#FFF");
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(h.state.name).toBe("Old name");
+      expect(h.state.viewBackgroundColor).toBe("#FFF");
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.name).toBe("New name");
+      expect(h.state.viewBackgroundColor).toBe("#FFF");
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.name).toBe("New name");
+      expect(h.state.viewBackgroundColor).toBe("#000");
     });
 
-    it("should support element creation, deletion and appstate selection", async () => {
+    it("should support element creation, deletion and appstate element selection change", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       const rect1 = UI.createElement("rectangle", { x: 10 });
@@ -366,7 +647,406 @@ describe("history", () => {
       ]);
     });
 
-    it("should support z-index actions", async () => {
+    it("should support linear element creation and points manipulation through the editor", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      // create three point arrow
+      UI.clickTool("arrow");
+      mouse.click(0, 0);
+      mouse.click(10, 10);
+      mouse.click(10, -10);
+
+      // actionFinalize
+      Keyboard.keyPress(KEYS.ENTER);
+
+      // open editor
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      // move point
+      mouse.downAt(20, 0);
+      mouse.moveTo(20, 20);
+      mouse.up();
+
+      // leave editor
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(API.getUndoStack().length).toBe(6);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 20],
+          ],
+        }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(5);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 20],
+          ],
+        }),
+      ]);
+
+      // making sure clicking on points in the editor does not generate new history entries!
+      mouse.clickAt(0, 0);
+      mouse.clickAt(10, 10);
+      mouse.clickAt(20, 20);
+      expect(API.getUndoStack().length).toBe(5);
+      expect(API.getRedoStack().length).toBe(1);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 0],
+          ],
+        }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(3);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull(); // undo `open editor`
+      expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 0],
+          ],
+        }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(4);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull(); // undo `actionFinalize`
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 0],
+          ],
+        }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(5);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+          ],
+        }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(6);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: true,
+          points: [
+            [0, 0],
+            [10, 10],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(5);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(4);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull(); // undo `actionFinalize`
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 0],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(3);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull(); // undo `open editor`
+      expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 0],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 0],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(5);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.state.selectedLinearElement?.elementId).toBe(h.elements[0].id);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 20],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(6);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(assertSelectedElements(h.elements[0]));
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+            [20, 20],
+          ],
+        }),
+      ]);
+    });
+
+    it("should support duplication of groups, appstate group selection and editing group", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const rect1 = API.createElement({
+        type: "rectangle",
+        groupIds: ["A"],
+        x: 0,
+      });
+      const rect2 = API.createElement({
+        type: "rectangle",
+        groupIds: ["A"],
+        x: 100,
+      });
+
+      h.elements = [rect1, rect2];
+      mouse.select(rect1);
+      assertSelectedElements([rect1, rect2]);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+      // inside the editing group
+      mouse.doubleClickOn(rect2);
+      assertSelectedElements([rect2]);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBe("A");
+      expect(h.state.selectedGroupIds).not.toEqual({ A: true });
+
+      mouse.clickOn(rect1);
+      assertSelectedElements([rect1]);
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBe("A");
+      expect(h.state.selectedGroupIds).not.toEqual({ A: true });
+
+      Keyboard.undo();
+      assertSelectedElements([rect2]);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.editingGroupId).toBe("A");
+      expect(h.state.selectedGroupIds).not.toEqual({ A: true });
+
+      Keyboard.undo();
+      assertSelectedElements([rect1, rect2]);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+      Keyboard.redo();
+      assertSelectedElements([rect2]);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.editingGroupId).toBe("A");
+      expect(h.state.selectedGroupIds).not.toEqual({ A: true });
+
+      Keyboard.redo();
+      assertSelectedElements([rect1]);
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBe("A");
+      expect(h.state.selectedGroupIds).not.toEqual({ A: true });
+
+      Keyboard.undo();
+      assertSelectedElements([rect2]);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.editingGroupId).toBe("A");
+      expect(h.state.selectedGroupIds).not.toEqual({ A: true });
+
+      Keyboard.undo();
+      assertSelectedElements([rect1, rect2]);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+      // outside the editing group, testing duplication
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress("d");
+      });
+      assertSelectedElements([h.elements[2], h.elements[3]]);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements.length).toBe(4);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).not.toEqual(
+        expect.objectContaining({ A: true }),
+      );
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements.length).toBe(4);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+        expect.objectContaining({ id: `${rect1.id}_copy`, isDeleted: true }),
+        expect.objectContaining({ id: `${rect2.id}_copy`, isDeleted: true }),
+      ]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements.length).toBe(4);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+        expect.objectContaining({ id: `${rect1.id}_copy`, isDeleted: false }),
+        expect.objectContaining({ id: `${rect2.id}_copy`, isDeleted: false }),
+      ]);
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).not.toEqual(
+        expect.objectContaining({ A: true }),
+      );
+
+      // undo again, and duplicate once more
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress("z");
+        Keyboard.keyPress("d");
+      });
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements.length).toBe(6);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: rect1.id, isDeleted: false }),
+          expect.objectContaining({ id: rect2.id, isDeleted: false }),
+          expect.objectContaining({ id: `${rect1.id}_copy`, isDeleted: true }),
+          expect.objectContaining({ id: `${rect2.id}_copy`, isDeleted: true }),
+          expect.objectContaining({
+            id: `${rect1.id}_copy_copy`,
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: `${rect2.id}_copy_copy`,
+            isDeleted: false,
+          }),
+        ]),
+      );
+      expect(h.state.editingGroupId).toBeNull();
+      expect(h.state.selectedGroupIds).not.toEqual(
+        expect.objectContaining({ A: true }),
+      );
+    });
+
+    it("should support changes in elements' order", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       const rect1 = UI.createElement("rectangle", { x: 10 });
@@ -430,103 +1110,9 @@ describe("history", () => {
         expect.objectContaining({ id: rect3.id }),
       ]);
     });
-
-    it("should clear the redo stack on a new history entry containing element change/s", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      const rect1 = UI.createElement("rectangle", { x: 10 });
-
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      assertSelectedElements(rect1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-      ]);
-
-      Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(API.getSelectedElements()).toEqual([]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: true }),
-      ]);
-
-      const rect2 = UI.createElement("rectangle", { x: 20 });
-
-      assertSelectedElements(rect2);
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: true }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-      ]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: true }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-      ]);
-    });
-
-    it("should not clear the redo stack on a history entry containing only appstate change", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      const rect1 = UI.createElement("rectangle", { x: 10 });
-      const rect2 = UI.createElement("rectangle", { x: 20 });
-
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(0);
-      assertSelectedElements(rect2);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-      ]);
-
-      Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(1);
-      assertSelectedElements(rect1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: true }),
-      ]);
-
-      mouse.clickAt(-10, -10);
-      expect(API.getSelectedElements().length).toBe(0);
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(1); // we still have a possibility to redo!
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: true }),
-      ]);
-
-      mouse.downAt(0, 0);
-      mouse.moveTo(50, 50);
-      mouse.upAt(50, 50);
-      expect(API.getUndoStack().length).toBe(3);
-      expect(API.getRedoStack().length).toBe(1); // even after re-select!
-      assertSelectedElements(rect1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: true }),
-      ]);
-
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(4);
-      expect(API.getRedoStack().length).toBe(0);
-      assertSelectedElements(rect2);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-      ]);
-    });
   });
 
   describe("multiplayer undo/redo", () => {
-    const transparent = COLOR_PALETTE.transparent;
-    const red = COLOR_PALETTE.red[1];
-    const blue = COLOR_PALETTE.blue[1];
-    const yellow = COLOR_PALETTE.yellow[1];
-    const violet = COLOR_PALETTE.violet[1];
-
     let excalidrawAPI: ExcalidrawImperativeAPI;
 
     beforeEach(async () => {
@@ -755,7 +1341,7 @@ describe("history", () => {
       ]);
     });
 
-    it("should iterate through the undo/redo stack when changes related to remotely deleted elements", async () => {
+    it("should iterate through the history when when element change relates to remotely deleted element", async () => {
       UI.createElement("rectangle", { x: 10 });
       togglePopover("Background");
       UI.clickOnTestId("color-red");
@@ -797,6 +1383,7 @@ describe("history", () => {
 
       // We reached the bottom, again we iterate through invisible changes and reach the top
       Keyboard.redo();
+      assertSelectedElements();
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.elements).toEqual([

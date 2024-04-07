@@ -102,11 +102,11 @@ class Delta<T> {
     const deleted = {} as Partial<T>;
     const inserted = {} as Partial<T>;
 
-    // O(n^3) here, but it's not as bad as it looks:
+    // O(n^3) here for elements, but it's not as bad as it looks:
     // - we do this only on store recordings, not on every frame (not for ephemerals)
     // - we do this only on previously detected changed elements
     // - we do shallow compare only on the first level of properties (not going any deeper)
-    // - # of element's properties is reasonably small
+    // - # of properties is reasonably small
     for (const key of this.distinctKeysIterator(
       "full",
       prevObject,
@@ -632,7 +632,7 @@ export class AppStateChange implements Change<AppState> {
             const editingGroupId = nextAppState[key];
 
             if (!editingGroupId) {
-              // previously there was an editingGroup related to a visible element, now it's not
+              // previously there was an editingGroup related to a visible element, now there is none
               visibleDifferenceFlag.value = true;
             } else if (nonDeletedGroupIds.has(editingGroupId)) {
               // previously there wasn't an editingGroup, now there is one which is visible
@@ -649,7 +649,7 @@ export class AppStateChange implements Change<AppState> {
             const linearElement = nextAppState[appStateKey];
 
             if (!linearElement) {
-              // previously there was a linear element related to a visible element, now it's not
+              // previously there was a linear element related to a visible element, now there is none
               visibleDifferenceFlag.value = true;
             } else {
               const element = nextElements.get(linearElement.elementId);

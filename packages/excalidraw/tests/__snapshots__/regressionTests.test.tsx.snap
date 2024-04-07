@@ -4125,10 +4125,31 @@ History {
           "inserted": {
             "editingGroupId": null,
             "selectedElementIds": {
-              "id0": true,
+              "id1": true,
             },
             "selectedGroupIds": {
               "id4": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id1": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id0": true,
             },
           },
         },
@@ -5526,6 +5547,32 @@ History {
             },
           },
         },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "editingGroupId": "id3",
+            "selectedElementIds": {},
+            "selectedGroupIds": {},
+          },
+          "inserted": {
+            "editingGroupId": null,
+            "selectedElementIds": {
+              "id0": true,
+              "id1": true,
+            },
+            "selectedGroupIds": {
+              "id3": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
       },
     },
   ],
@@ -12675,11 +12722,31 @@ History {
           "inserted": {
             "editingGroupId": null,
             "selectedElementIds": {
+              "id0": true,
               "id1": true,
             },
             "selectedGroupIds": {
               "id3": true,
             },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {
+              "id0": true,
+            },
+          },
+          "inserted": {
+            "selectedElementIds": {},
           },
         },
       },
@@ -12748,6 +12815,110 @@ History {
             "selectedElementIds": {},
             "selectedGroupIds": {
               "id5": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "editingGroupId": "id3",
+            "selectedElementIds": {},
+            "selectedGroupIds": {
+              "id5": true,
+            },
+          },
+          "inserted": {
+            "editingGroupId": null,
+            "selectedElementIds": {
+              "id1": true,
+            },
+            "selectedGroupIds": {
+              "id3": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "editingGroupId": "id5",
+            "selectedElementIds": {},
+            "selectedGroupIds": {},
+          },
+          "inserted": {
+            "editingGroupId": "id3",
+            "selectedElementIds": {
+              "id2": true,
+            },
+            "selectedGroupIds": {
+              "id5": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "editingGroupId": null,
+            "selectedElementIds": {
+              "id1": true,
+              "id2": true,
+            },
+            "selectedGroupIds": {
+              "id3": true,
+            },
+          },
+          "inserted": {
+            "editingGroupId": "id5",
+            "selectedElementIds": {},
+            "selectedGroupIds": {},
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "editingGroupId": "id3",
+            "selectedElementIds": {},
+            "selectedGroupIds": {},
+          },
+          "inserted": {
+            "editingGroupId": null,
+            "selectedElementIds": {
+              "id0": true,
+              "id2": true,
+            },
+            "selectedGroupIds": {
+              "id3": true,
             },
           },
         },
@@ -13887,7 +14058,7 @@ History {
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `23`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `24`;
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] appState 1`] = `
 {
