@@ -41,6 +41,7 @@ import {
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MIME_TYPES,
+  THEME,
 } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 import {
@@ -79,7 +80,7 @@ const shouldResetImageFilter = (
   appState: StaticCanvasAppState,
 ) => {
   return (
-    appState.theme === "dark" &&
+    appState.theme === THEME.DARK &&
     isInitializedImageElement(element) &&
     !isPendingImageElement(element, renderConfig) &&
     renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
@@ -668,7 +669,7 @@ export const renderElement = (
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
           context.strokeStyle =
-            appState.theme === "light" ? "#7affd7" : "#1d8264";
+            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
         }
 
         if (FRAME_STYLE.radius && context.roundRect) {

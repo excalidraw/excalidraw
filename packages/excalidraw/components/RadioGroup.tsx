@@ -3,7 +3,8 @@ import "./RadioGroup.scss";
 
 export type RadioGroupChoice<T> = {
   value: T;
-  label: string;
+  label: React.ReactNode;
+  ariaLabel?: string;
 };
 
 export type RadioGroupProps<T> = {
@@ -26,13 +27,15 @@ export const RadioGroup = function <T>({
           className={clsx("RadioGroup__choice", {
             active: choice.value === value,
           })}
-          key={choice.label}
+          key={String(choice.value)}
+          title={choice.ariaLabel}
         >
           <input
             name={name}
             type="radio"
             checked={choice.value === value}
             onChange={() => onChange(choice.value)}
+            aria-label={choice.ariaLabel}
           />
           {choice.label}
         </div>

@@ -433,15 +433,10 @@ export const MoonIcon = createIcon(
 );
 
 export const SunIcon = createIcon(
-  <g
-    stroke="currentColor"
-    strokeWidth="1.25"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <g stroke="currentColor" strokeLinejoin="round">
     <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM10 4.167V2.5M14.167 5.833l1.166-1.166M15.833 10H17.5M14.167 14.167l1.166 1.166M10 15.833V17.5M5.833 14.167l-1.166 1.166M5 10H3.333M5.833 5.833 4.667 4.667" />
   </g>,
-  modifiedTablerIconProps,
+  { ...modifiedTablerIconProps, strokeWidth: 1.5 },
 );
 
 export const HamburgerMenuIcon = createIcon(
@@ -2091,4 +2086,12 @@ export const coffeeIcon = createIcon(
     <path d="M16.746 16.726a3 3 0 1 0 .252 -5.555" />
   </g>,
   tablerIconProps,
+);
+
+export const DeviceDesktopIcon = createIcon(
+  <g stroke="currentColor">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1v-10zM7 20h10M9 16v4M15 16v4" />
+  </g>,
+  { ...tablerIconProps, strokeWidth: 1.5 },
 );
