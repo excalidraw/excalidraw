@@ -1,6 +1,6 @@
 import polyfill from "../packages/excalidraw/polyfill";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
@@ -17,7 +17,6 @@ import {
   ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
-  Theme,
 } from "../packages/excalidraw/element/types";
 import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
 import { t } from "../packages/excalidraw/i18n";
@@ -121,6 +120,7 @@ import {
   exportToPlus,
   share,
 } from "../packages/excalidraw/components/icons";
+import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 
 polyfill();
 
@@ -295,61 +295,13 @@ export const appLangCodeAtom = atom(
   Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode,
 );
 
-type ThemeAction =
-  | { type: "SET_THEME"; theme: Theme }
-  | {
-      type: "SET_APP_THEME";
-      appTheme: Theme | "system";
-    };
-
-type ThemeState = {
-  theme: Theme;
-  appTheme: Theme | "system";
-};
-
-const themeReducer = (state: ThemeState, action: ThemeAction) => {
-  switch (action.type) {
-    case "SET_APP_THEME":
-      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, action.appTheme);
-
-      const theme =
-        action.appTheme === "system"
-          ? window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? THEME.DARK
-            : THEME.LIGHT
-          : action.appTheme;
-      return { ...state, appTheme: action.appTheme, theme };
-
-    case "SET_THEME":
-      document.documentElement.classList.toggle(
-        THEME.DARK,
-        action.theme === THEME.DARK,
-      );
-
-      const appTheme =
-        state.appTheme !== "system" ? action.theme : state.appTheme;
-      return { ...state, theme: action.theme, appTheme };
-
-    default:
-      return state;
-  }
-};
-
-const createInitialThemeState = ({ appTheme }: ThemeState) => {
-  const theme =
-    appTheme === "system"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? THEME.DARK
-        : THEME.LIGHT
-      : appTheme;
-
-  return { theme, appTheme };
-};
-
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
   const isCollabDisabled = isRunningInIframe();
+
+  const [appTheme, setAppTheme] = useAtom(appThemeAtom);
+  const { editorTheme } = useHandleAppTheme();
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -614,54 +566,6 @@ const ExcalidrawWrapper = () => {
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
-  const [themeState, dispatchTheme] = useReducer(
-    themeReducer,
-    {
-      theme: THEME.LIGHT,
-      appTheme:
-        (localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) as
-          | Theme
-          | "system"
-          | null) || THEME.LIGHT,
-    },
-    createInitialThemeState,
-  );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      dispatchTheme({
-        type: "SET_THEME",
-        theme: e.matches ? THEME.DARK : THEME.LIGHT,
-      });
-    };
-
-    if (themeState.appTheme === "system") {
-      mediaQuery.addEventListener("change", handleChange);
-    }
-
-    const handleKeydown = (event: KeyboardEvent) => {
-      // NOTE undocumented ATM coz I'm not sure of the combination (plus it
-      // doesn't work universailly due where this hook is used)
-      if (event.altKey && event.shiftKey && event.code === "KeyD") {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        dispatchTheme({
-          type: "SET_APP_THEME",
-          appTheme: themeState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
-        });
-      }
-    };
-
-    document.addEventListener("keydown", handleKeydown);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-      document.removeEventListener("keydown", handleKeydown);
-    };
-  }, [themeState.appTheme, themeState.theme]);
-
   const onChange = (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -670,11 +574,6 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
-
-    // dispatchTheme({
-    //   type: "SET_APP_THEME",
-    //   appTheme: appState.theme,
-    // });
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
@@ -880,7 +779,7 @@ const ExcalidrawWrapper = () => {
         detectScroll={false}
         handleKeyboardGlobally={true}
         autoFocus={true}
-        theme={themeState.theme}
+        theme={editorTheme}
         renderTopRightUI={(isMobile) => {
           if (isMobile || !collabAPI || isCollabDisabled) {
             return null;
@@ -902,13 +801,8 @@ const ExcalidrawWrapper = () => {
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
-          theme={themeState.appTheme}
-          setTheme={(theme) =>
-            dispatchTheme({
-              type: "SET_APP_THEME",
-              appTheme: theme,
-            })
-          }
+          theme={appTheme}
+          setTheme={(theme) => setAppTheme(theme)}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
@@ -1185,11 +1079,9 @@ const ExcalidrawWrapper = () => {
             {
               ...CommandPalette.defaultItems.toggleTheme,
               perform: () => {
-                dispatchTheme({
-                  type: "SET_APP_THEME",
-                  appTheme:
-                    themeState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
-                });
+                setAppTheme(
+                  editorTheme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
+                );
               },
             },
           ]}
