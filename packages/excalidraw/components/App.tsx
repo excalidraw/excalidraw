@@ -1014,7 +1014,7 @@ class App extends React.Component<AppProps, AppState> {
                         width: 100%;
                         height: 100%;
                         color: ${
-                          this.state.theme === "dark" ? "white" : "black"
+                          this.state.theme === THEME.DARK ? "white" : "black"
                         };
                       }
                       body {
@@ -1281,7 +1281,7 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    const isDarkTheme = this.state.theme === "dark";
+    const isDarkTheme = this.state.theme === THEME.DARK;
 
     let frameIndex = 0;
     let magicFrameIndex = 0;
@@ -2730,7 +2730,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.excalidrawContainerRef.current?.classList.toggle(
       "theme--dark",
-      this.state.theme === "dark",
+      this.state.theme === THEME.DARK,
     );
 
     if (
