@@ -433,12 +433,7 @@ export const MoonIcon = createIcon(
 );
 
 export const SunIcon = createIcon(
-  <g
-    stroke="currentColor"
-    strokeWidth="1.25"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <g stroke="currentColor" strokeLinejoin="round">
     <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM10 4.167V2.5M14.167 5.833l1.166-1.166M15.833 10H17.5M14.167 14.167l1.166 1.166M10 15.833V17.5M5.833 14.167l-1.166 1.166M5 10H3.333M5.833 5.833 4.667 4.667" />
   </g>,
   { ...modifiedTablerIconProps, strokeWidth: 1.5 },
