@@ -54,7 +54,9 @@ const MermaidToExcalidraw = ({
       mermaidToExcalidrawLib,
       setError,
       mermaidDefinition: deferredText,
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("Failed to parse mermaid definition", err);
+    });
 
     debouncedSaveMermaidDefinition(deferredText);
   }, [deferredText, mermaidToExcalidrawLib]);
