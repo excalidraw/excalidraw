@@ -75,12 +75,12 @@
         function getTheme() {
           const theme = window.localStorage.getItem("excalidraw-theme");
 
-          if (theme && theme !== "system") {
-            return theme;
-          } else {
+          if (theme && theme === "system") {
             return window.matchMedia("(prefers-color-scheme: dark)").matches
               ? "dark"
               : "light";
+          } else {
+            return theme || "light";
           }
         }
 
