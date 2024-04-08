@@ -216,12 +216,12 @@ export const ToggleTheme = (
           {
             value: THEME.LIGHT,
             label: SunIcon,
-            ariaLabel: t("buttons.lightMode"),
+            ariaLabel: `${t("buttons.lightMode")} - ${shortcut}`,
           },
           {
             value: THEME.DARK,
             label: MoonIcon,
-            ariaLabel: t("buttons.darkMode"),
+            ariaLabel: `${t("buttons.darkMode")} - ${shortcut}`,
           },
           {
             value: "system",
