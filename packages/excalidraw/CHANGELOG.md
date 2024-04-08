@@ -15,6 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- `MainMenu.DefaultItems.ToggleTheme` now supports `onSelect(theme: string)` callback, and optionally `allowSystemTheme: boolean` alongside `theme: string` to indicate you want to allow users to set to system theme (you need to handle this yourself). [#7853](https://github.com/excalidraw/excalidraw/pull/7853)
 - Add `useHandleLibrary`'s `opts.adapter` as the new recommended pattern to handle library initialization and persistence on library updates. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
 - Add `useHandleLibrary`'s `opts.migrationAdapter` adapter to handle library migration during init, when migrating from one data store to another (e.g. from LocalStorage to IndexedDB). [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
 - Soft-deprecate `useHandleLibrary`'s `opts.getInitialLibraryItems` in favor of `opts.adapter`. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
