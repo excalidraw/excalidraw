@@ -1182,7 +1182,16 @@ const ExcalidrawWrapper = () => {
                 }
               },
             },
-            CommandPalette.defaultItems.toggleTheme,
+            {
+              ...CommandPalette.defaultItems.toggleTheme,
+              perform: () => {
+                dispatchTheme({
+                  type: "SET_APP_THEME",
+                  appTheme:
+                    themeState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
+                });
+              },
+            },
           ]}
         />
       </Excalidraw>
