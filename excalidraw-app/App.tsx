@@ -315,15 +315,15 @@ const themeReducer = (state: ThemeState, action: ThemeAction) => {
       const theme =
         action.appTheme === "system"
           ? window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light"
+            ? THEME.DARK
+            : THEME.LIGHT
           : action.appTheme;
       return { ...state, appTheme: action.appTheme, theme };
 
     case "SET_THEME":
       document.documentElement.classList.toggle(
-        "dark",
-        action.theme === "dark",
+        THEME.DARK,
+        action.theme === THEME.DARK,
       );
 
       const appTheme =
@@ -339,8 +339,8 @@ const createInitialThemeState = ({ appTheme }: ThemeState) => {
   const theme =
     appTheme === "system"
       ? window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light"
+        ? THEME.DARK
+        : THEME.LIGHT
       : appTheme;
 
   return { theme, appTheme };
@@ -620,8 +620,7 @@ const ExcalidrawWrapper = () => {
       theme: THEME.LIGHT,
       appTheme:
         (localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) as
-          | "light"
-          | "dark"
+          | Theme
           | "system"
           | null) ||
         // FIXME migration from old LS scheme. Can be removed later. #5660
@@ -637,7 +636,7 @@ const ExcalidrawWrapper = () => {
     const handleChange = (e: MediaQueryListEvent) => {
       dispatchTheme({
         type: "SET_THEME",
-        theme: e.matches ? "dark" : "light",
+        theme: e.matches ? THEME.DARK : THEME.LIGHT,
       });
     };
 
@@ -653,7 +652,7 @@ const ExcalidrawWrapper = () => {
         event.stopImmediatePropagation();
         dispatchTheme({
           type: "SET_APP_THEME",
-          appTheme: themeState.theme === "dark" ? "light" : "dark",
+          appTheme: themeState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
         });
       }
     };

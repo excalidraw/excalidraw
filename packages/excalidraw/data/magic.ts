@@ -1,3 +1,4 @@
+import { THEME } from "../constants";
 import { Theme } from "../element/types";
 import { DataURL } from "../types";
 import { OpenAIInput, OpenAIOutput } from "./ai/types";
@@ -39,7 +40,7 @@ export async function diagramToHTML({
   image,
   apiKey,
   text,
-  theme = "light",
+  theme = THEME.LIGHT,
 }: {
   image: DataURL;
   apiKey: string;

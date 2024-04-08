@@ -36,9 +36,11 @@ import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
+import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
+import { THEME } from "../../constants";
+import type { Theme } from "../../element/types";
 
 import "./DefaultItems.scss";
-import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -187,12 +189,12 @@ export const ToggleTheme = (
   props:
     | {
         allowSystemTheme: true;
-        theme: "light" | "dark" | "system";
-        onSelect: (theme: "light" | "dark" | "system") => void;
+        theme: Theme | "system";
+        onSelect: (theme: Theme | "system") => void;
       }
     | {
         allowSystemTheme?: false;
-        onSelect?: (theme: "light" | "dark") => void;
+        onSelect?: (theme: Theme) => void;
       },
 ) => {
   const { t } = useI18n();
@@ -209,15 +211,15 @@ export const ToggleTheme = (
       <DropdownMenuItemContentRadio
         name="theme"
         value={props.theme}
-        onChange={(value: "light" | "dark" | "system") => props.onSelect(value)}
+        onChange={(value: Theme | "system") => props.onSelect(value)}
         choices={[
           {
-            value: "light",
+            value: THEME.LIGHT,
             label: SunIcon,
             ariaLabel: t("buttons.lightMode"),
           },
           {
-            value: "dark",
+            value: THEME.DARK,
             label: MoonIcon,
             ariaLabel: t("buttons.darkMode"),
           },
@@ -240,21 +242,23 @@ export const ToggleTheme = (
         event.preventDefault();
 
         if (props?.onSelect) {
-          props.onSelect(appState.theme === "dark" ? "light" : "dark");
+          props.onSelect(
+            appState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
+          );
         } else {
           return actionManager.executeAction(actionToggleTheme);
         }
       }}
-      icon={appState.theme === "dark" ? SunIcon : MoonIcon}
+      icon={appState.theme === THEME.DARK ? SunIcon : MoonIcon}
       data-testid="toggle-dark-mode"
       shortcut={shortcut}
       aria-label={
-        appState.theme === "dark"
+        appState.theme === THEME.DARK
           ? t("buttons.lightMode")
           : t("buttons.darkMode")
       }
     >
-      {appState.theme === "dark"
+      {appState.theme === THEME.DARK
         ? t("buttons.lightMode")
         : t("buttons.darkMode")}
     </DropdownMenuItem>
