@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { THEME } from "../packages/excalidraw";
 import { EVENT } from "../packages/excalidraw/constants";
 import { Theme } from "../packages/excalidraw/element/types";
-import { KEYS } from "../packages/excalidraw/keys";
+import { CODES, KEYS } from "../packages/excalidraw/keys";
 import { STORAGE_KEYS } from "./app_constants";
 
 export const appThemeAtom = atom<Theme | "system">(
