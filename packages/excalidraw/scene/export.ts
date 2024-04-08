@@ -39,6 +39,7 @@ import { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
 import { RenderableElementsMap } from "./types";
+import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
@@ -225,7 +226,7 @@ export const exportToCanvas = async (
       arrayToMap(elementsForRender),
     ),
     allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(elements),
+      arrayToMap(syncInvalidIndices(elements)),
     ),
     visibleElements: elementsForRender,
     scale,

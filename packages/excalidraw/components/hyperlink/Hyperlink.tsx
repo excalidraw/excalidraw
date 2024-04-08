@@ -26,9 +26,9 @@ import clsx from "clsx";
 import { KEYS } from "../../keys";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
 import { getElementAbsoluteCoords } from "../../element/bounds";
-import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
+import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 import { getSelectedElements } from "../../scene";
-import { isPointHittingElementBoundingBox } from "../../element/collision";
+import { hitElementBoundingBox } from "../../element/collision";
 import { isLocalLink, normalizeLink } from "../../data/url";
 
 import "./Hyperlink.scss";
@@ -425,15 +425,7 @@ const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (
-    isPointHittingElementBoundingBox(
-      element,
-      elementsMap,
-      [sceneX, sceneY],
-      threshold,
-      null,
-    )
-  ) {
+  if (hitElementBoundingBox(sceneX, sceneY, element, elementsMap)) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element, elementsMap);

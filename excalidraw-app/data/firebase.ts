@@ -1,6 +1,7 @@
 import {
   ExcalidrawElement,
   FileId,
+  OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import { getSceneVersion } from "../../packages/excalidraw/element";
 import Portal from "../collab/Portal";
@@ -18,10 +19,13 @@ import {
   decryptData,
 } from "../../packages/excalidraw/data/encryption";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import { reconcileElements } from "../collab/reconciliation";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
+import {
+  RemoteExcalidrawElement,
+  reconcileElements,
+} from "../../packages/excalidraw/data/reconcile";
 
 // private
 // -----------------------------------------------------------------------------
@@ -230,7 +234,7 @@ export const saveToFirebase = async (
     !socket ||
     isSavedToFirebase(portal, elements)
   ) {
-    return false;
+    return null;
   }
 
   const firebase = await loadFirestore();
@@ -238,56 +242,59 @@ export const saveToFirebase = async (
 
   const docRef = firestore.collection("scenes").doc(roomId);
 
-  const savedData = await firestore.runTransaction(async (transaction) => {
+  const storedScene = await firestore.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(docRef);
 
     if (!snapshot.exists) {
-      const sceneDocument = await createFirebaseSceneDocument(
+      const storedScene = await createFirebaseSceneDocument(
         firebase,
         elements,
         roomKey,
       );
 
-      transaction.set(docRef, sceneDocument);
+      transaction.set(docRef, storedScene);
 
-      return {
-        elements,
-        reconciledElements: null,
-      };
+      return storedScene;
     }
 
-    const prevDocData = snapshot.data() as FirebaseStoredScene;
-    const prevElements = getSyncableElements(
-      await decryptElements(prevDocData, roomKey),
+    const prevStoredScene = snapshot.data() as FirebaseStoredScene;
+    const prevStoredElements = getSyncableElements(
+      restoreElements(await decryptElements(prevStoredScene, roomKey), null),
     );
-
     const reconciledElements = getSyncableElements(
-      reconcileElements(elements, prevElements, appState),
+      reconcileElements(
+        elements,
+        prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
+        appState,
+      ),
     );
 
-    const sceneDocument = await createFirebaseSceneDocument(
+    const storedScene = await createFirebaseSceneDocument(
       firebase,
       reconciledElements,
       roomKey,
     );
 
-    transaction.update(docRef, sceneDocument);
-    return {
-      elements,
-      reconciledElements,
-    };
+    transaction.update(docRef, storedScene);
+
+    // Return the stored elements as the in memory `reconciledElements` could have mutated in the meantime
+    return storedScene;
   });
 
-  FirebaseSceneVersionCache.set(socket, savedData.elements);
+  const storedElements = getSyncableElements(
+    restoreElements(await decryptElements(storedScene, roomKey), null),
+  );
 
-  return { reconciledElements: savedData.reconciledElements };
+  FirebaseSceneVersionCache.set(socket, storedElements);
+
+  return storedElements;
 };
 
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
   socket: Socket | null,
-): Promise<readonly ExcalidrawElement[] | null> => {
+): Promise<readonly SyncableExcalidrawElement[] | null> => {
   const firebase = await loadFirestore();
   const db = firebase.firestore();
 
@@ -298,14 +305,14 @@ export const loadFromFirebase = async (
   }
   const storedScene = doc.data() as FirebaseStoredScene;
   const elements = getSyncableElements(
-    await decryptElements(storedScene, roomKey),
+    restoreElements(await decryptElements(storedScene, roomKey), null),
   );
 
   if (socket) {
     FirebaseSceneVersionCache.set(socket, elements);
   }
 
-  return restoreElements(elements, null);
+  return elements;
 };
 
 export const loadFilesFromFirebase = async (

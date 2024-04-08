@@ -20,6 +20,7 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
+  OrderedExcalidrawElement,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -415,7 +416,7 @@ export type OnUserFollowedPayload = {
 
 export interface ExcalidrawProps {
   onChange?: (
-    elements: readonly ExcalidrawElement[],
+    elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
@@ -586,6 +587,7 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  getElementShape: App["getElementShape"];
   getName: App["getName"];
 };
 
@@ -722,7 +724,7 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
 }>;
 
-type FrameNameBounds = {
+export type FrameNameBounds = {
   x: number;
   y: number;
   width: number;
