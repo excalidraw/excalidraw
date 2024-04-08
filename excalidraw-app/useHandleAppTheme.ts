@@ -36,7 +36,7 @@ export const useHandleAppTheme = () => {
         !event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
         event.shiftKey &&
-        event.code === KEYS.D
+        event.code === CODES.D
       ) {
         event.preventDefault();
         event.stopImmediatePropagation();
