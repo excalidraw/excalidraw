@@ -442,7 +442,7 @@ export class AppStateChange implements Change<AppState> {
 
   public applyTo(
     appState: AppState,
-    elements: SceneElementsMap,
+    nextElements: SceneElementsMap,
   ): [AppState, boolean] {
     try {
       const {
@@ -471,18 +471,18 @@ export class AppStateChange implements Change<AppState> {
       );
 
       const selectedLinearElement =
-        selectedLinearElementId && elements.has(selectedLinearElementId)
+        selectedLinearElementId && nextElements.has(selectedLinearElementId)
           ? new LinearElementEditor(
-              elements.get(
+              nextElements.get(
                 selectedLinearElementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
             )
           : null;
 
       const editingLinearElement =
-        editingLinearElementId && elements.has(editingLinearElementId)
+        editingLinearElementId && nextElements.has(editingLinearElementId)
           ? new LinearElementEditor(
-              elements.get(
+              nextElements.get(
                 editingLinearElementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
             )
@@ -506,7 +506,7 @@ export class AppStateChange implements Change<AppState> {
       const constainsVisibleChanges = this.filterInvisibleChanges(
         appState,
         nextAppState,
-        elements,
+        nextElements,
       );
 
       return [nextAppState, constainsVisibleChanges];
@@ -570,6 +570,8 @@ export class AppStateChange implements Change<AppState> {
     nextAppState: AppState,
     nextElements: SceneElementsMap,
   ): boolean {
+    // TODO: #7348 we could still get an empty undo/redo, as we assume that previous appstate does not contain references to deleted elements
+    // which is not always true - i.e. now we do cleanup appstate during history, but we do not do it during remote updates
     const prevObservedAppState = getObservedAppState(prevAppState);
     const nextObservedAppState = getObservedAppState(nextAppState);
 
@@ -589,7 +591,7 @@ export class AppStateChange implements Change<AppState> {
     }
 
     const visibleDifferenceFlag = {
-      value: containsStandaloneDifference ?? false,
+      value: containsStandaloneDifference,
     };
 
     if (containsElementsDifference) {
@@ -632,7 +634,7 @@ export class AppStateChange implements Change<AppState> {
             const editingGroupId = nextAppState[key];
 
             if (!editingGroupId) {
-              // previously there was an editingGroup related to a visible element, now there is none
+              // previously there was an editingGroup (assuming visible), now there is none
               visibleDifferenceFlag.value = true;
             } else if (nonDeletedGroupIds.has(editingGroupId)) {
               // previously there wasn't an editingGroup, now there is one which is visible
@@ -649,7 +651,7 @@ export class AppStateChange implements Change<AppState> {
             const linearElement = nextAppState[appStateKey];
 
             if (!linearElement) {
-              // previously there was a linear element related to a visible element, now there is none
+              // previously there was a linear element (assuming visible), now there is none
               visibleDifferenceFlag.value = true;
             } else {
               const element = nextElements.get(linearElement.elementId);
@@ -700,7 +702,7 @@ export class AppStateChange implements Change<AppState> {
     const ids = Object.keys(selectedElementIds);
 
     if (!ids.length) {
-      // previously there were ids related to visible elements, now there are none
+      // previously there were ids (assuming related to visible elements), now there are none
       visibleDifferenceFlag.value = true;
       return selectedElementIds;
     }
@@ -729,7 +731,7 @@ export class AppStateChange implements Change<AppState> {
     const ids = Object.keys(selectedGroupIds);
 
     if (!ids.length) {
-      // previously there were ids related to visible groups, now there are none
+      // previously there were ids (assuming related to visible groups), now there are none
       visibleDifferenceFlag.value = true;
       return selectedGroupIds;
     }

@@ -190,7 +190,7 @@ export const actionFinalize = register({
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
-      // TODO: #7348 we should not capture everything, but otherwise it leads to incosistencies -> revisit
+      // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       storeAction: StoreAction.CAPTURE,
     };
   },

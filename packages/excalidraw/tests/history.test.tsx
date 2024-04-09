@@ -21,6 +21,7 @@ import {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FractionalIndex,
 } from "../element/types";
 import {
   actionSendBackward,
@@ -38,7 +39,8 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
 
-  const { name: _, ...strippedAppState } = h.state;
+  // `scrolledOutside` does not appear to be stable between test runs
+  const { name: _, scrolledOutside, ...strippedAppState } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
   expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
@@ -119,41 +121,6 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect1.id, isDeleted: false }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-      ]);
-    });
-
-    it("should clear the redo stack on elements change", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      const rect1 = UI.createElement("rectangle", { x: 10 });
-
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0);
-      assertSelectedElements(rect1);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: false }),
-      ]);
-
-      Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(API.getSelectedElements()).toEqual([]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: true }),
-      ]);
-
-      const rect2 = UI.createElement("rectangle", { x: 20 });
-
-      assertSelectedElements(rect2);
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(0); // redo stack got cleared
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: true }),
-        expect.objectContaining({ id: rect2.id, isDeleted: false }),
-      ]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect1.id, isDeleted: true }),
         expect.objectContaining({ id: rect2.id, isDeleted: false }),
       ]);
     });
@@ -288,6 +255,41 @@ describe("history", () => {
       assertSelectedElements(rect); // get's reselected with out pushed entry!
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect.id, backgroundColor: transparent }),
+      ]);
+    });
+
+    it("should clear the redo stack on elements change", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect1 = UI.createElement("rectangle", { x: 10 });
+
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements(rect1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements()).toEqual([]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+      ]);
+
+      const rect2 = UI.createElement("rectangle", { x: 20 });
+
+      assertSelectedElements(rect2);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0); // redo stack got cleared
+      expect(API.getSnapshot()).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
       ]);
     });
 
@@ -1127,7 +1129,7 @@ describe("history", () => {
       excalidrawAPI = await excalidrawAPIPromise;
     });
 
-    it("should not override remote changes on different elements", () => {
+    it("should not override remote changes on different elements", async () => {
       UI.createElement("rectangle", { x: 10 });
       togglePopover("Background");
       UI.clickOnTestId("color-red");
@@ -1170,7 +1172,7 @@ describe("history", () => {
       ]);
     });
 
-    it("should not override remote changes on different properties", () => {
+    it("should not override remote changes on different properties", async () => {
       UI.createElement("rectangle", { x: 10 });
       togglePopover("Background");
       UI.clickOnTestId("color-red");
@@ -1265,7 +1267,7 @@ describe("history", () => {
       ]);
     });
 
-    // TODO: #7348 ideally we should not override, but since the order of groupIds matters, right now we cannot ensure that with postprocssed groupIds the order will be consistent after series or undos/ redo, we don't postprocess them at all
+    // TODO: #7348 ideally we should not override, but since the order of groupIds matters, right now we cannot ensure that with postprocssed groupIds the order will be consistent after series or undos/redos, we don't postprocess them at all
     //       in other words, if we would postprocess groupIds, the groupIds order on "redo" below would be ["B", "A"] instead of ["A", "B"]
     it("should override remotely added groups on undo, but restore them on redo", async () => {
       const rect1 = API.createElement({ type: "rectangle" });
@@ -1621,7 +1623,7 @@ describe("history", () => {
       ]);
     });
 
-    it("should iterate through the history when selection changes relate only to remotely deleted elements", async () => {
+    it("should iterate through the history when selected elements relate only to remotely deleted elements", async () => {
       const rect1 = API.createElement({ type: "rectangle", x: 10, y: 10 });
       const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 });
       const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 });
@@ -1709,7 +1711,301 @@ describe("history", () => {
       ]);
     });
 
-    it("should iterate through the history when z-index changes do not produce visible change", async () => {
+    it("should iterate through the history when selected groups contain only remotely deleted elements", async () => {
+      const rect1 = API.createElement({
+        type: "rectangle",
+        groupIds: ["A"],
+      });
+      const rect2 = API.createElement({
+        type: "rectangle",
+        groupIds: ["A"],
+      });
+      const rect3 = API.createElement({
+        type: "rectangle",
+        groupIds: ["B"],
+      });
+      const rect4 = API.createElement({
+        type: "rectangle",
+        groupIds: ["B"],
+      });
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [rect1, rect2],
+      });
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.A);
+      });
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [h.elements[0], h.elements[1], rect3, rect4],
+      });
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.A);
+      });
+
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], {
+            isDeleted: true,
+          }),
+          newElementWith(h.elements[1], {
+            isDeleted: true,
+          }),
+        ],
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(2); // iterated two steps back!
+      expect(h.state.selectedGroupIds).toEqual({});
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2); // iterated two steps forward!
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.selectedGroupIds).toEqual({});
+
+      Keyboard.undo();
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], {
+            isDeleted: false,
+          }),
+          newElementWith(h.elements[1], {
+            isDeleted: false,
+          }),
+        ],
+      });
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.selectedGroupIds).toEqual({ A: true });
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [h.elements[0], h.elements[1], rect3, rect4],
+      });
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
+    });
+
+    it("should iterate through the history when editing group contains only remotely deleted elements", async () => {
+      const rect1 = API.createElement({
+        type: "rectangle",
+        groupIds: ["A"],
+        x: 0,
+      });
+      const rect2 = API.createElement({
+        type: "rectangle",
+        groupIds: ["A"],
+        x: 100,
+      });
+
+      h.elements = [rect1, rect2];
+      mouse.select(rect1);
+
+      // inside the editing group
+      mouse.doubleClickOn(rect2);
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBe("A");
+
+      mouse.clickAt(-10, -10);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBeNull();
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], {
+            isDeleted: true,
+          }),
+          newElementWith(h.elements[1], {
+            isDeleted: true,
+          }),
+        ],
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(3);
+      expect(h.state.editingGroupId).toBeNull();
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBeNull();
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], {
+            isDeleted: false,
+          }),
+          h.elements[1],
+        ],
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.state.editingGroupId).toBe("A");
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingGroupId).toBeNull();
+    });
+
+    it("should iterate through the history when selected or editing linear element was remotely deleted", async () => {
+      // create three point arrow
+      UI.clickTool("arrow");
+      mouse.click(0, 0);
+      mouse.click(10, 10);
+
+      // actionFinalize
+      Keyboard.keyPress(KEYS.ENTER);
+
+      // open editor
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+
+      // leave editor
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], {
+            isDeleted: true,
+          }),
+        ],
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(4);
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(4);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.state.editingLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).toBeNull();
+    });
+
+    it("should iterate through the history when z-index changes do not produce visible change and we synced changed indices", async () => {
+      const rect1 = API.createElement({ type: "rectangle", x: 10, y: 10 }); // a "a0"
+      const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 }); // b "a1"
+      const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 }); // c "a2"
+
+      h.elements = [rect1, rect2, rect3];
+
+      mouse.select(rect2);
+
+      act(() => h.app.actionManager.executeAction(actionSendToBack));
+
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements([rect2]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect2.id }), // b "Zz"
+        expect.objectContaining({ id: rect1.id }), // a "a0"
+        expect.objectContaining({ id: rect3.id }), // c "a2"
+      ]);
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[2], { index: "Zy" as FractionalIndex }),
+          h.elements[0],
+          h.elements[1],
+        ],
+      });
+
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements([rect2]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect3.id }), // c "Zy"
+        expect.objectContaining({ id: rect2.id }), // b "Zz"
+        expect.objectContaining({ id: rect1.id }), // a "a0"
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
+      assertSelectedElements([rect2]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect3.id }), // c "Zy"
+        expect.objectContaining({ id: rect1.id }), // a "a0"
+        expect.objectContaining({ id: rect2.id }), // b "a1"
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements([rect2]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect3.id }), // c "Zy"
+        expect.objectContaining({ id: rect2.id }), // b "Zz"
+        expect.objectContaining({ id: rect1.id }), // a "a0"
+      ]);
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[2], { index: "Zx" as FractionalIndex }),
+          h.elements[0],
+          h.elements[1],
+        ],
+      });
+
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(0);
+      assertSelectedElements([rect2]);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id }), // a "Zx"
+        expect.objectContaining({ id: rect3.id }), // c "Zy"
+        expect.objectContaining({ id: rect2.id }), // b "Zz"
+      ]);
+
+      Keyboard.undo();
+      // We iterated two steps as there was no change in order!
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id }), // a "Zx"
+        expect.objectContaining({ id: rect3.id }), // c "Zy"
+        expect.objectContaining({ id: rect2.id }), // b "a1"
+      ]);
+    });
+
+    it("should iterate through the history when z-index changes do not produce visible change and we synced all indices", async () => {
       const rect1 = API.createElement({ type: "rectangle", x: 10, y: 10 });
       const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 });
       const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 });
@@ -1729,7 +2025,7 @@ describe("history", () => {
         expect.objectContaining({ id: rect3.id }),
       ]);
 
-      // Simulate remote update
+      // Simulate remote update (fixes all invalid z-indices)
       excalidrawAPI.updateScene({
         elements: [
           h.elements[2], // rect3
@@ -1771,27 +2067,6 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(0);
       expect(API.getRedoStack().length).toBe(2); // now we iterated two steps back!
       assertSelectedElements([]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect2.id }),
-        expect.objectContaining({ id: rect3.id }),
-        expect.objectContaining({ id: rect1.id }),
-      ]);
-
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(1);
-      assertSelectedElements([rect2]);
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: rect2.id }),
-        expect.objectContaining({ id: rect3.id }),
-        expect.objectContaining({ id: rect1.id }),
-      ]);
-
-      // no-op
-      Keyboard.redo();
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(0);
-      assertSelectedElements([rect2]);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: rect2.id }),
         expect.objectContaining({ id: rect3.id }),
