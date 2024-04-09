@@ -1004,13 +1004,10 @@ export class ElementsChange implements Change<SceneElementsMap> {
         const latestPartial: { [key: string]: unknown } = {};
 
         for (const key of Object.keys(partial) as Array<keyof typeof partial>) {
-          // it doesn't make sense to update the above props since:
-          // - `boundElements` and `groupIds` are reference values which are represented as removed/added changes in the delta
-          // - `customData` can be anything
+          // do not update following props:
+          // - `boundElements`, as it is a reference value which is postprocessed to contain only deleted/inserted keys
           switch (key) {
             case "boundElements":
-            case "groupIds":
-            case "customData":
               latestPartial[key] = partial[key];
               break;
             default:
@@ -1201,8 +1198,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       containsZindexDifference: true,
     },
   ) {
-    const { boundElements, groupIds, ...directlyApplicablePartial } =
-      delta.inserted;
+    const { boundElements, ...directlyApplicablePartial } = delta.inserted;
 
     if (
       delta.deleted.boundElements?.length ||
@@ -1218,16 +1214,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
       Object.assign(directlyApplicablePartial, {
         boundElements: mergedBoundElements,
       });
-    }
-
-    if (delta.deleted.groupIds?.length || delta.inserted.groupIds?.length) {
-      const mergedGroupIds = Delta.mergeArrays(
-        element.groupIds,
-        delta.inserted.groupIds,
-        delta.deleted.groupIds,
-      );
-
-      Object.assign(directlyApplicablePartial, { groupIds: mergedGroupIds });
     }
 
     if (!flags.containsVisibleDifference) {
@@ -1517,7 +1503,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
     inserted: ElementPartial,
   ): [ElementPartial, ElementPartial] {
     try {
-      Delta.diffArrays(deleted, inserted, "groupIds", (groupId) => groupId);
       Delta.diffArrays(deleted, inserted, "boundElements", (x) => x.id);
     } catch (e) {
       // if postprocessing fails, it does not make sense to bubble up, but let's make sure we know about it

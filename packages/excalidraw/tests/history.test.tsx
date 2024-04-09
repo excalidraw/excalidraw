@@ -19,6 +19,7 @@ import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import {
   ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../element/types";
 import {
@@ -1264,7 +1265,157 @@ describe("history", () => {
       ]);
     });
 
-    it("should redistribute deltas when the removed locally but restored remotely", async () => {
+    // TODO: #7348 ideally we should not override, but since the order of groupIds matters, right now we cannot ensure that with postprocssed groupIds the order will be consistent after series or undos/ redo, we don't postprocess them at all
+    //       in other words, if we would postprocess groupIds, the groupIds order on "redo" below would be ["B", "A"] instead of ["A", "B"]
+    it("should override remotely added groups on undo, but restore them on redo", async () => {
+      const rect1 = API.createElement({ type: "rectangle" });
+      const rect2 = API.createElement({ type: "rectangle" });
+
+      // Initialize scene
+      excalidrawAPI.updateScene({
+        elements: [rect1, rect2],
+      });
+
+      // Simulate local update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], { groupIds: ["A"] }),
+          newElementWith(h.elements[1], { groupIds: ["A"] }),
+        ],
+        commitToStore: true,
+      });
+
+      const rect3 = API.createElement({ type: "rectangle", groupIds: ["B"] });
+      const rect4 = API.createElement({ type: "rectangle", groupIds: ["B"] });
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0], { groupIds: ["A", "B"] }),
+          newElementWith(h.elements[1], { groupIds: ["A", "B"] }),
+          rect3,
+          rect4,
+        ],
+      });
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, groupIds: [] }),
+        expect.objectContaining({ id: rect2.id, groupIds: [] }),
+        expect.objectContaining({ id: rect3.id, groupIds: ["B"] }),
+        expect.objectContaining({ id: rect4.id, groupIds: ["B"] }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, groupIds: ["A", "B"] }),
+        expect.objectContaining({ id: rect2.id, groupIds: ["A", "B"] }),
+        expect.objectContaining({ id: rect3.id, groupIds: ["B"] }),
+        expect.objectContaining({ id: rect4.id, groupIds: ["B"] }),
+      ]);
+    });
+
+    it("should override remotely added points on undo, but restore them on redo", async () => {
+      UI.clickTool("arrow");
+      mouse.click(0, 0);
+      mouse.click(10, 10);
+      mouse.click(20, 20);
+
+      // actionFinalize
+      Keyboard.keyPress(KEYS.ENTER);
+
+      // Simulate remote update
+      excalidrawAPI.updateScene({
+        elements: [
+          newElementWith(h.elements[0] as ExcalidrawLinearElement, {
+            points: [
+              [0, 0],
+              [5, 5],
+              [10, 10],
+              [15, 15],
+              [20, 20],
+            ],
+          }),
+        ],
+      });
+
+      Keyboard.undo(); // undo `actionFinalize`
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          points: [
+            [0, 0],
+            // overriding all the remote points as they are not being postprocessed (as we cannot ensure the order consistency similar to groupIds)
+            // but in this case it might not make even sense to combine the points, as in some cases the linear element might lead unexpected results
+            [10, 10],
+          ],
+        }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(3);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: true,
+          points: [
+            [0, 0],
+            [10, 10],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(2);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          isDeleted: false,
+          points: [
+            [0, 0],
+            [10, 10],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          points: [
+            [0, 0],
+            [5, 5],
+            [10, 10],
+            [15, 15],
+            [20, 20],
+          ],
+        }),
+      ]);
+
+      Keyboard.redo(); // redo `actionFinalize`
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          points: [
+            [0, 0],
+            [5, 5],
+            [10, 10],
+            [15, 15],
+            [20, 20],
+          ],
+        }),
+      ]);
+    });
+
+    it("should redistribute deltas when element gets removed locally but is restored remotely", async () => {
       UI.createElement("rectangle", { x: 10 });
       Keyboard.keyDown(KEYS.DELETE);
 

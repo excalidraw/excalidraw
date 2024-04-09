@@ -1236,21 +1236,27 @@ History {
           "id0" => Delta {
             "deleted": {
               "groupIds": [
+                "id4",
                 "id10",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id4",
+              ],
             },
           },
           "id1" => Delta {
             "deleted": {
               "groupIds": [
+                "id4",
                 "id10",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id4",
+              ],
             },
           },
           "id7" => Delta {
@@ -12206,41 +12212,53 @@ History {
           "id0" => Delta {
             "deleted": {
               "groupIds": [
+                "id4",
                 "id10",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id4",
+              ],
             },
           },
           "id1" => Delta {
             "deleted": {
               "groupIds": [
+                "id4",
                 "id10",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id4",
+              ],
             },
           },
           "id5" => Delta {
             "deleted": {
               "groupIds": [
+                "id9",
                 "id10",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id9",
+              ],
             },
           },
           "id6" => Delta {
             "deleted": {
               "groupIds": [
+                "id9",
                 "id10",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id9",
+              ],
             },
           },
         },
@@ -12777,11 +12795,14 @@ History {
             "deleted": {
               "groupIds": [
                 "id5",
+                "id3",
               ],
               "index": "a1V",
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id3",
+              ],
               "index": "a0",
             },
           },
@@ -12789,10 +12810,13 @@ History {
             "deleted": {
               "groupIds": [
                 "id5",
+                "id3",
               ],
             },
             "inserted": {
-              "groupIds": [],
+              "groupIds": [
+                "id3",
+              ],
             },
           },
         },
