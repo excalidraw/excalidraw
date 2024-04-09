@@ -405,11 +405,21 @@ const bindLinearElementToElement = (
     }
   }
 
+  // Safe check to early return for single point
+  if (linearElement.points.length < 2) {
+    return {
+      linearElement,
+      startBoundElement,
+      endBoundElement,
+    };
+  }
+
   // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
   const endPointIndex = linearElement.points.length - 1;
   const delta = 0.5;
 
   const newPoints = cloneJSON(linearElement.points) as [number, number][];
+
   // left to right so shift the arrow towards right
   if (
     linearElement.points[endPointIndex][0] >
