@@ -673,6 +673,8 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
 
 export const isTestEnv = () => import.meta.env.MODE === "test";
 
+export const isDevEnv = () => import.meta.env.MODE === "development";
+
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
     detail: {
