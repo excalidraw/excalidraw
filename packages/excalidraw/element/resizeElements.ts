@@ -48,7 +48,6 @@ import {
   getApproxMinLineHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { shouldMaintainAspectRatio } from "../keys";
 import { hasGroupAmongElements } from "../groups";
 
 export const normalizeAngle = (angle: number): number => {
