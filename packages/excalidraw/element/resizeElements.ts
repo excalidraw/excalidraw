@@ -48,6 +48,8 @@ import {
   getApproxMinLineHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { shouldMaintainAspectRatio } from "../keys";
+import { hasGroupAmongElements } from "../groups";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -127,18 +129,14 @@ export const transformElements = (
         centerY,
       );
       return true;
-    } else if (
-      transformHandleType === "nw" ||
-      transformHandleType === "ne" ||
-      transformHandleType === "sw" ||
-      transformHandleType === "se"
-    ) {
+    } else if (transformHandleType) {
       resizeMultipleElements(
         originalElements,
         selectedElements,
         elementsMap,
         transformHandleType,
         shouldResizeFromCenter,
+        shouldMaintainAspectRatio,
         pointerX,
         pointerY,
       );
@@ -625,8 +623,9 @@ export const resizeMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   selectedElements: readonly NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
-  transformHandleType: "nw" | "ne" | "sw" | "se",
+  transformHandleType: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
+  shouldMaintainAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
@@ -680,43 +679,79 @@ export const resizeMultipleElements = (
   const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
+  const width = maxX - minX;
+  const height = maxY - minY;
 
   // const originalHeight = maxY - minY;
   // const originalWidth = maxX - minX;
 
   const direction = transformHandleType;
 
-  const mapDirectionsToAnchors: Record<typeof direction, Point> = {
+  const anchorsMap: Record<TransformHandleDirection, Point> = {
     ne: [minX, maxY],
     se: [minX, minY],
     sw: [maxX, minY],
     nw: [maxX, maxY],
+    e: [minX, minY + height / 2],
+    w: [maxX, minY + height / 2],
+    n: [minX + width / 2, maxY],
+    s: [minX + width / 2, minY],
   };
 
   // anchor point must be on the opposite side of the dragged selection handle
   // or be the center of the selection if shouldResizeFromCenter
   const [anchorX, anchorY]: Point = shouldResizeFromCenter
     ? [midX, midY]
-    : mapDirectionsToAnchors[direction];
+    : anchorsMap[direction];
+
+  const resizeFromCenterScale = shouldResizeFromCenter ? 2 : 1;
 
   const scale =
     Math.max(
-      Math.abs(pointerX - anchorX) / (maxX - minX) || 0,
-      Math.abs(pointerY - anchorY) / (maxY - minY) || 0,
-    ) * (shouldResizeFromCenter ? 2 : 1);
+      Math.abs(pointerX - anchorX) / width || 0,
+      Math.abs(pointerY - anchorY) / height || 0,
+    ) * resizeFromCenterScale;
 
   if (scale === 0) {
     return;
   }
 
-  const mapDirectionsToPointerPositions: Record<
-    typeof direction,
+  let scaleX =
+    direction.includes("e") || direction.includes("w")
+      ? (Math.abs(pointerX - anchorX) / width) * resizeFromCenterScale
+      : 1;
+  let scaleY =
+    direction.includes("n") || direction.includes("s")
+      ? (Math.abs(pointerY - anchorY) / height) * resizeFromCenterScale
+      : 1;
+
+  // if there's a group inside target elements, or `shouldMaintainAspectRatio` has been set
+  // we need to align scaleX and scaleY to keep the original aspect ratio
+  if (
+    shouldMaintainAspectRatio ||
+    hasGroupAmongElements(targetElements.map((target) => target.orig))
+  ) {
+    scaleX = scale;
+    scaleY = scale;
+  }
+
+  const flipConditionsMap: Record<
+    TransformHandleDirection,
+    // Condition for which we should flip or not flip the selected elements
+    // - when evaluated to `true`, we flip
+    // - therefore, setting it to always `false` means we do not flip (in that direction) at all
     [x: boolean, y: boolean]
   > = {
-    ne: [pointerX >= anchorX, pointerY <= anchorY],
-    se: [pointerX >= anchorX, pointerY >= anchorY],
-    sw: [pointerX <= anchorX, pointerY >= anchorY],
-    nw: [pointerX <= anchorX, pointerY <= anchorY],
+    ne: [pointerX < anchorX, pointerY > anchorY],
+    se: [pointerX < anchorX, pointerY < anchorY],
+    sw: [pointerX > anchorX, pointerY < anchorY],
+    nw: [pointerX > anchorX, pointerY > anchorY],
+    // e.g. when resizing from the "e" side, we do not need to consider changes in the `y` direction
+    //      and therefore, we do not need to flip in the `y` direction at all
+    e: [pointerX < anchorX, false],
+    w: [pointerX > anchorX, false],
+    n: [false, pointerY > anchorY],
+    s: [false, pointerY < anchorY],
   };
 
   /**
@@ -727,9 +762,9 @@ export const resizeMultipleElements = (
    *    mirror points in the case of linear & freedraw elemenets
    * 3. adjust element angle
    */
-  const [flipFactorX, flipFactorY] = mapDirectionsToPointerPositions[
-    direction
-  ].map((condition) => (condition ? 1 : -1));
+  const [flipFactorX, flipFactorY] = flipConditionsMap[direction].map(
+    (condition) => (condition ? -1 : 1),
+  );
   const isFlippedByX = flipFactorX < 0;
   const isFlippedByY = flipFactorY < 0;
 
@@ -751,8 +786,8 @@ export const resizeMultipleElements = (
       continue;
     }
 
-    const width = orig.width * scale;
-    const height = orig.height * scale;
+    const width = orig.width * scaleX;
+    const height = orig.height * scaleY;
     const angle = normalizeAngle(orig.angle * flipFactorX * flipFactorY);
 
     const isLinearOrFreeDraw = isLinearElement(orig) || isFreeDrawElement(orig);
@@ -760,8 +795,8 @@ export const resizeMultipleElements = (
     const offsetY = orig.y - anchorY;
     const shiftX = isFlippedByX && !isLinearOrFreeDraw ? width : 0;
     const shiftY = isFlippedByY && !isLinearOrFreeDraw ? height : 0;
-    const x = anchorX + flipFactorX * (offsetX * scale + shiftX);
-    const y = anchorY + flipFactorY * (offsetY * scale + shiftY);
+    const x = anchorX + flipFactorX * (offsetX * scaleX + shiftX);
+    const y = anchorY + flipFactorY * (offsetY * scaleY + shiftY);
 
     const rescaledPoints = rescalePointsInElement(
       orig,

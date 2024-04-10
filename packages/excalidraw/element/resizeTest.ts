@@ -145,7 +145,31 @@ export const getTransformHandleTypeFromCoords = (
       isInsideTransformHandle(transformHandle, scenePointerX, scenePointerY)
     );
   });
-  return (found || false) as MaybeTransformHandleType;
+
+  if (found) {
+    return found as MaybeTransformHandleType;
+  }
+
+  // check sides
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+
+  const SPACING = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / zoom.value;
+  const sides = getSelectionBorders(
+    [x1 - SPACING, y1 - SPACING],
+    [x2 + SPACING, y2 + SPACING],
+    [cx, cy],
+    angleToDegrees(0),
+  );
+
+  for (const [dir, side] of Object.entries(sides)) {
+    // test to see if x, y are on the line segment
+    if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
+      return dir as TransformHandleType;
+    }
+  }
+
+  return false;
 };
 
 const RESIZE_CURSORS = ["ns", "nesw", "ew", "nwse"];
