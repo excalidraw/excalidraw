@@ -1,5 +1,6 @@
 import React from "react";
 import { PlusPromoIcon } from "../../packages/excalidraw/components/icons";
+import { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
 
@@ -7,6 +8,8 @@ export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
+  theme: Theme | "system";
+  setTheme: (theme: Theme | "system") => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -35,7 +38,11 @@ export const AppMainMenu: React.FC<{
       </MainMenu.ItemLink>
       <MainMenu.DefaultItems.Socials />
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme />
+      <MainMenu.DefaultItems.ToggleTheme
+        allowSystemTheme
+        theme={props.theme}
+        onSelect={props.setTheme}
+      />
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>

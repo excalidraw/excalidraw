@@ -19,6 +19,7 @@ import {
   FONT_FAMILY,
   FRAME_STYLE,
   SVG_NS,
+  THEME,
   THEME_FILTER,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
@@ -237,7 +238,7 @@ export const exportToCanvas = async (
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
-      theme: appState.exportWithDarkMode ? "dark" : "light",
+      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
     renderConfig: {
       canvasBackgroundColor: viewBackgroundColor,
