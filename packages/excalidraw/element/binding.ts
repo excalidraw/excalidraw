@@ -379,24 +379,27 @@ export const updateBoundElements = (
     simultaneouslyUpdated,
   );
 
+  if (!isBindableElement(changedElement)) {
+    return;
+  }
+
   boundElementsVisitor(elementsMap, changedElement, (element) => {
     if (!isLinearElement(element) || element.isDeleted) {
       return;
     }
 
-    const bindableElement = changedElement as ExcalidrawBindableElement;
     // In case the boundElements are stale
-    if (!doesNeedUpdate(element, bindableElement)) {
+    if (!doesNeedUpdate(element, changedElement)) {
       return;
     }
     const bindings = {
       startBinding: maybeCalculateNewGapWhenScaling(
-        bindableElement,
+        changedElement,
         element.startBinding,
         newSize,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
-        bindableElement,
+        changedElement,
         element.endBinding,
         newSize,
       ),
@@ -411,9 +414,10 @@ export const updateBoundElements = (
     bindableElementsVisitor(
       elementsMap,
       element,
-      (_, bindingProp, bindingId) => {
+      (bindableElement, bindingProp) => {
         if (
-          bindingId === changedElement.id &&
+          bindableElement &&
+          isBindableElement(bindableElement) &&
           (bindingProp === "startBinding" || bindingProp === "endBinding")
         ) {
           updateBoundPoint(
