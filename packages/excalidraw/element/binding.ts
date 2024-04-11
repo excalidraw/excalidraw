@@ -283,13 +283,20 @@ export const isLinearElementSimpleAndAlreadyBound = (
   );
 };
 
-export const unbindLinearElements = (
+export const filterBindingElementsAndPossiblyUnbind = (
   elements: readonly NonDeleted<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
 ): void => {
   elements.forEach((element) => {
     if (isBindingElement(element)) {
-      bindOrUnbindLinearElement(element, null, null, elementsMap);
+      const startBindingElement = element.startBinding ? "keep" : null;
+      const endBindingElement = element.endBinding ? "keep" : null;
+      bindOrUnbindLinearElement(
+        element,
+        startBindingElement,
+        endBindingElement,
+        elementsMap,
+      );
     }
   });
 };

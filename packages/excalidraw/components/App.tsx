@@ -130,7 +130,7 @@ import {
   isLinearElementSimpleAndAlreadyBound,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
-  unbindLinearElements,
+  filterBindingElementsAndPossiblyUnbind,
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -4051,7 +4051,7 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
         ? bindOrUnbindSelectedElements(selectedElements, this)
-        : unbindLinearElements(selectedElements, elementsMap);
+        : filterBindingElementsAndPossiblyUnbind(selectedElements, elementsMap);
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -8395,7 +8395,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getSelectedElements(this.state),
               this,
             )
-          : unbindLinearElements(
+          : filterBindingElementsAndPossiblyUnbind(
               this.scene.getSelectedElements(this.state),
               elementsMap,
             );
