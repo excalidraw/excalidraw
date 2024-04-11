@@ -1,7 +1,7 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import { rotate, centerPoint, rotatePoint } from "../math";
+import { rotate, centerPoint, rotatePoint, elementsAreParallel } from "../math";
 import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -681,9 +681,6 @@ export const resizeMultipleElements = (
   const width = maxX - minX;
   const height = maxY - minY;
 
-  // const originalHeight = maxY - minY;
-  // const originalWidth = maxX - minX;
-
   const direction = transformHandleType;
 
   const anchorsMap: Record<TransformHandleDirection, Point> = {
@@ -724,10 +721,13 @@ export const resizeMultipleElements = (
       ? (Math.abs(pointerY - anchorY) / height) * resizeFromCenterScale
       : 1;
 
+  const sameAngle = elementsAreParallel(selectedElements);
+
   // if there's a group inside target elements, or `shouldMaintainAspectRatio` has been set
   // we need to align scaleX and scaleY to keep the original aspect ratio
   if (
     shouldMaintainAspectRatio ||
+    !sameAngle ||
     hasGroupAmongElements(targetElements.map((target) => target.orig))
   ) {
     scaleX = scale;
