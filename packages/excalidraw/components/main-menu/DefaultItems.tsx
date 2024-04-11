@@ -39,6 +39,7 @@ import Trans from "../Trans";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 import { THEME } from "../../constants";
 import type { Theme } from "../../element/types";
+import { trackEvent } from "../../analytics";
 
 import "./DefaultItems.scss";
 
@@ -122,7 +123,7 @@ export const SaveAsImage = () => {
 };
 SaveAsImage.displayName = "SaveAsImage";
 
-export const CommandPalette = () => {
+export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();
   const { t } = useI18n();
 
@@ -130,9 +131,13 @@ export const CommandPalette = () => {
     <DropdownMenuItem
       icon={boltIcon}
       data-testid="command-palette-button"
-      onSelect={() => setAppState({ openDialog: { name: "commandPalette" } })}
+      onSelect={() => {
+        trackEvent("command_palette", "open", "menu");
+        setAppState({ openDialog: { name: "commandPalette" } });
+      }}
       shortcut={getShortcutFromShortcutName("commandPalette")}
       aria-label={t("commandPalette.title")}
+      className={opts?.className}
     >
       {t("commandPalette.title")}
     </DropdownMenuItem>
