@@ -45,7 +45,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { jotaiScope } from "../jotai";
 import { Provider, useAtom, useAtomValue } from "jotai";
 import MainMenu from "./main-menu/MainMenu";
-import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { ActiveConfirmDialog, ShowDeleteAlert } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
@@ -436,8 +436,8 @@ const LayerUI = ({
                         ? "strokeColor"
                         : "backgroundColor"
                       : colorPickerType === "elementBackground"
-                      ? "backgroundColor"
-                      : "strokeColor"]: color,
+                        ? "backgroundColor"
+                        : "strokeColor"]: color,
                   },
                   false,
                 );
@@ -487,6 +487,7 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
+      <ShowDeleteAlert />
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}
@@ -527,8 +528,8 @@ const LayerUI = ({
             className="layer-ui__wrapper"
             style={
               appState.openSidebar &&
-              isSidebarDocked &&
-              device.editor.canFitSidebar
+                isSidebarDocked &&
+                device.editor.canFitSidebar
                 ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
                 : {}
             }

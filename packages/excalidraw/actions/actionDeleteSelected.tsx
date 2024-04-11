@@ -170,9 +170,6 @@ export const actionDeleteSelected = register({
       ),
     };
   },
-  keyTest: (event, appState, elements) =>
-    (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
-    !event[KEYS.CTRL_OR_CMD],
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
       type="button"
