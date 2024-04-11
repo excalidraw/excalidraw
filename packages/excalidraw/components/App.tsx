@@ -8396,7 +8396,7 @@ class App extends React.Component<AppProps, AppState> {
               this,
             )
           : unbindLinearElements(
-              this.scene.getNonDeletedElements(),
+              this.scene.getSelectedElements(this.state),
               elementsMap,
             );
       }
