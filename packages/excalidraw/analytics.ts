@@ -1,6 +1,6 @@
 // place here categories that you want to track. We want to track just a
 // small subset of categories at a given time.
-const ALLOWED_CATEGORIES_TO_TRACK = ["ai"] as string[];
+const ALLOWED_CATEGORIES_TO_TRACK = ["ai", "command_palette"] as string[];
 
 export const trackEvent = (
   category: string,
