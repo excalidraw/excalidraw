@@ -122,6 +122,7 @@ import {
   usersIcon,
   exportToPlus,
   share,
+  youtubeIcon,
 } from "../packages/excalidraw/components/icons";
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 
@@ -1048,6 +1049,20 @@ const ExcalidrawWrapper = () => {
               perform: () => {
                 window.open(
                   "https://discord.gg/UexuTaE",
+                  "_blank",
+                  "noopener noreferrer",
+                );
+              },
+            },
+            {
+              label: "YouTube",
+              icon: youtubeIcon,
+              category: DEFAULT_CATEGORIES.links,
+              predicate: true,
+              keywords: ["features", "tutorials", "howto", "help", "community"],
+              perform: () => {
+                window.open(
+                  "https://youtube.com/@excalidraw",
                   "_blank",
                   "noopener noreferrer",
                 );
