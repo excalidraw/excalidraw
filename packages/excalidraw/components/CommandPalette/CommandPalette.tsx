@@ -49,6 +49,7 @@ import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { CommandPaletteItem } from "./types";
 import * as defaultItems from "./defaultCommandPaletteItems";
+import { useStable } from "../../hooks/useStable";
 
 import "./CommandPalette.scss";
 
@@ -174,10 +175,20 @@ function CommandPaletteInner({
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const stableDeps = useStable({
+    uiAppState,
+    customCommandPaletteItems,
+    appProps,
+  });
+
   useEffect(() => {
-    if (!uiAppState || !app.scene || !actionManager) {
-      return;
-    }
+    // these props change often and we don't want them to re-run the effect
+    // which would renew `allCommands`, cascading down and resetting state.
+    //
+    // This means that the commands won't update on appState/appProps changes
+    // while the command palette is open
+    const { uiAppState, customCommandPaletteItems, appProps } = stableDeps;
+
     const getActionLabel = (action: Action) => {
       let label = "";
       if (action.label) {
@@ -533,15 +544,13 @@ function CommandPaletteInner({
       );
     }
   }, [
+    stableDeps,
     app,
-    appProps,
-    uiAppState,
     actionManager,
     setAllCommands,
     lastUsed?.label,
     setLastUsed,
     setAppState,
-    customCommandPaletteItems,
   ]);
 
   const [commandSearch, setCommandSearch] = useState("");
