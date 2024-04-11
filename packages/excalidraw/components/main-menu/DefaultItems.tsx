@@ -123,7 +123,7 @@ export const SaveAsImage = () => {
 };
 SaveAsImage.displayName = "SaveAsImage";
 
-export const CommandPalette = () => {
+export const CommandPalette = (opts?: { className?: string }) => {
   const setAppState = useExcalidrawSetAppState();
   const { t } = useI18n();
 
@@ -137,6 +137,7 @@ export const CommandPalette = () => {
       }}
       shortcut={getShortcutFromShortcutName("commandPalette")}
       aria-label={t("commandPalette.title")}
+      className={opts?.className}
     >
       {t("commandPalette.title")}
     </DropdownMenuItem>
