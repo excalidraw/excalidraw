@@ -515,7 +515,9 @@ export const isValueInRange = (value: number, min: number, max: number) => {
 export const elementsAreParallel = (
   elements: readonly NonDeleted<ExcalidrawElement>[],
 ) => {
-  if (elements.length === 0 || elements.length === 1) return true;
+  if (elements.length === 0 || elements.length === 1) {
+    return true;
+  }
 
   return (
     elements.reduce((prev, curr) =>
