@@ -8,7 +8,6 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import Scene from "../scene/Scene";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
@@ -21,12 +20,9 @@ export const actionFinalize = register({
   name: "finalize",
   label: "",
   trackEvent: false,
-  perform: (
-    elements,
-    appState,
-    _,
-    { interactiveCanvas, focusContainer, scene },
-  ) => {
+  perform: (elements, appState, _, app) => {
+    const { interactiveCanvas, focusContainer, scene } = app;
+
     const elementsMap = scene.getNonDeletedElementsMap();
 
     if (appState.editingLinearElement) {
@@ -131,13 +127,7 @@ export const actionFinalize = register({
           -1,
           arrayToMap(elements),
         );
-        maybeBindLinearElement(
-          multiPointElement,
-          appState,
-          Scene.getScene(multiPointElement)!,
-          { x, y },
-          elementsMap,
-        );
+        maybeBindLinearElement(multiPointElement, appState, { x, y }, app);
       }
     }
 

@@ -432,7 +432,9 @@ export const actionZoomToFit = register({
 export const actionToggleTheme = register({
   name: "toggleTheme",
   label: (_, appState) => {
-    return appState.theme === "dark" ? "buttons.lightMode" : "buttons.darkMode";
+    return appState.theme === THEME.DARK
+      ? "buttons.lightMode"
+      : "buttons.darkMode";
   },
   keywords: ["toggle", "dark", "light", "mode", "theme"],
   icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),

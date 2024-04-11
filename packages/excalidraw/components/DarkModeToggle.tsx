@@ -14,7 +14,9 @@ export const DarkModeToggle = (props: {
 }) => {
   const title =
     props.title ||
-    (props.value === "dark" ? t("buttons.lightMode") : t("buttons.darkMode"));
+    (props.value === THEME.DARK
+      ? t("buttons.lightMode")
+      : t("buttons.darkMode"));
 
   return (
     <ToolButton
