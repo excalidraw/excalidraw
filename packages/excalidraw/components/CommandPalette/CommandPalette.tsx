@@ -49,6 +49,7 @@ import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { CommandPaletteItem } from "./types";
 import * as defaultItems from "./defaultCommandPaletteItems";
+import { trackEvent } from "../../analytics";
 import { useStable } from "../../hooks/useStable";
 
 import "./CommandPalette.scss";
@@ -131,12 +132,20 @@ export const CommandPalette = Object.assign(
         if (isCommandPaletteToggleShortcut(event)) {
           event.preventDefault();
           event.stopPropagation();
-          setAppState((appState) => ({
-            openDialog:
+          setAppState((appState) => {
+            const nextState =
               appState.openDialog?.name === "commandPalette"
                 ? null
-                : { name: "commandPalette" },
-          }));
+                : ({ name: "commandPalette" } as const);
+
+            if (nextState) {
+              trackEvent("command_palette", "open", "shortcut");
+            }
+
+            return {
+              openDialog: nextState,
+            };
+          });
         }
       };
       window.addEventListener(EVENT.KEYDOWN, commandPaletteShortcut, {
