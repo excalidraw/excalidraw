@@ -4383,6 +4383,7 @@ class App extends React.Component<AppProps, AppState> {
 
         return shouldTestInside(element)
           ? getClosedCurveShape(
+              element,
               roughShape,
               [element.x, element.y],
               element.angle,
