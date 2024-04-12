@@ -12,6 +12,7 @@ import {
   NonDeletedExcalidrawElement,
   Theme,
 } from "./types";
+import { sanitizeHTMLAttribute } from "../data/url";
 
 type EmbeddedLink =
   | ({
@@ -32,12 +33,13 @@ const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
 
-const RE_GH_GIST = /^https:\/\/gist\.github\.com/;
+const RE_GH_GIST = /^https:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)/;
 const RE_GH_GIST_EMBED =
-  /https?:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)\.js["']/i;
+  /^<script[\s\S]*?\ssrc=["'](https:\/\/gist\.github\.com\/.*?)\.js["']/i;
 
 // not anchored to start to allow <blockquote> twitter embeds
-const RE_TWITTER = /(?:https?:\/\/)?(?:(?:w){3}\.)?(?:twitter|x)\.com/;
+const RE_TWITTER =
+  /(?:https?:\/\/)?(?:(?:w){3}\.)?(?:twitter|x)\.com\/[^/]+\/status\/(\d+)/;
 const RE_TWITTER_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:twitter|x)\.com\/[^"']*)/i;
 
@@ -137,14 +139,20 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   }
 
   if (RE_TWITTER.test(link)) {
-    // the embed srcdoc still supports twitter.com domain only
-    link = link.replace(/\bx.com\b/, "twitter.com");
+    const postId = link.match(RE_TWITTER)![1];
+    // the embed srcdoc still supports twitter.com domain only.
+    // Note that we don't attempt to parse the username as it can consist of
+    // non-latin1 characters, and the username in the url can be set to anything
+    // without affecting the embed.
+    const safeURL = sanitizeHTMLAttribute(
+      `https://twitter.com/x/status/${postId}`,
+    );
 
     const ret: EmbeddedLink = {
       type: "document",
       srcdoc: (theme: string) =>
         createSrcDoc(
-          `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+          `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${safeURL}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
         ),
       aspectRatio: { w: 480, h: 480 },
       sandbox: { allowSameOrigin: true },
@@ -154,11 +162,15 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   }
 
   if (RE_GH_GIST.test(link)) {
+    const [, user, gistId] = link.match(RE_GH_GIST)!;
+    const safeURL = sanitizeHTMLAttribute(
+      `https://gist.github.com/${user}/${gistId}`,
+    );
     const ret: EmbeddedLink = {
       type: "document",
       srcdoc: () =>
         createSrcDoc(`
-          <script src="${link}.js"></script>
+          <script src="${safeURL}.js"></script>
           <style type="text/css">
             * { margin: 0px; }
             table, .gist { height: 100%; }
@@ -284,8 +296,8 @@ export const extractSrc = (htmlString: string): string => {
   }
 
   const gistMatch = htmlString.match(RE_GH_GIST_EMBED);
-  if (gistMatch && gistMatch.length === 3) {
-    return `https://gist.github.com/${gistMatch[1]}/${gistMatch[2]}`;
+  if (gistMatch && gistMatch.length === 2) {
+    return gistMatch[1];
   }
 
   const match = htmlString.match(RE_GENERIC_EMBED);
