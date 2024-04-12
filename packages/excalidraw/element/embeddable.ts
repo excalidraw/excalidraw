@@ -18,20 +18,20 @@ const RE_YOUTUBE =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 
 const RE_VIMEO =
-  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
+  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
 
 const RE_GH_GIST = /^https:\/\/gist\.github\.com/;
 const RE_GH_GIST_EMBED =
-  /^<script[\s\S]*?\ssrc=["'](https:\/\/gist.github.com\/.*?)\.js["']/i;
+  /https?:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)\.js["']/i;
 
 // not anchored to start to allow <blockquote> twitter embeds
-const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:twitter|x).com/;
+const RE_TWITTER = /(?:https?:\/\/)?(?:(?:w){3}\.)?(?:twitter|x)\.com/;
 const RE_TWITTER_EMBED =
-  /^<blockquote[\s\S]*?\shref=["'](https:\/\/(?:twitter|x).com\/[^"']*)/i;
+  /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:twitter|x)\.com\/[^"']*)/i;
 
 const RE_VALTOWN =
-  /^https:\/\/(?:www\.)?val.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
+  /^https:\/\/(?:www\.)?val\.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
 
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
@@ -153,46 +153,24 @@ export const getEmbedLink = (
     // the embed srcdoc still supports twitter.com domain only
     link = link.replace(/\bx.com\b/, "twitter.com");
 
-    let ret: IframeData;
-    // assume embed code
-    if (/<blockquote/.test(link)) {
-      const srcDoc = createSrcDoc(link);
-      ret = {
-        type: "document",
-        srcdoc: () => srcDoc,
-        intrinsicSize: { w: 480, h: 480 },
-      };
-      // assume regular tweet url
-    } else {
-      ret = {
-        type: "document",
-        srcdoc: (theme: string) =>
-          createSrcDoc(
-            `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
-          ),
-        intrinsicSize: { w: 480, h: 480 },
-      };
-    }
+    const ret: IframeData = {
+      type: "document",
+      srcdoc: (theme: string) =>
+        createSrcDoc(
+          `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+        ),
+      intrinsicSize: { w: 480, h: 480 },
+      sandbox: { allowSameOrigin: true },
+    };
     embeddedLinkCache.set(originalLink, ret);
     return ret;
   }
 
   if (RE_GH_GIST.test(link)) {
-    let ret: IframeData;
-    // assume embed code
-    if (/<script>/.test(link)) {
-      const srcDoc = createSrcDoc(link);
-      ret = {
-        type: "document",
-        srcdoc: () => srcDoc,
-        intrinsicSize: { w: 550, h: 720 },
-      };
-      // assume regular url
-    } else {
-      ret = {
-        type: "document",
-        srcdoc: () =>
-          createSrcDoc(`
+    const ret: IframeData = {
+      type: "document",
+      srcdoc: () =>
+        createSrcDoc(`
           <script src="${link}.js"></script>
           <style type="text/css">
             * { margin: 0px; }
@@ -200,9 +178,8 @@ export const getEmbedLink = (
             .gist .gist-file { height: calc(100vh - 2px); padding: 0px; display: grid; grid-template-rows: 1fr auto; }
           </style>
         `),
-        intrinsicSize: { w: 550, h: 720 },
-      };
-    }
+      intrinsicSize: { w: 550, h: 720 },
+    };
     embeddedLinkCache.set(link, ret);
     return ret;
   }
@@ -313,8 +290,8 @@ export const maybeParseEmbedSrc = (str: string): string => {
   }
 
   const gistMatch = str.match(RE_GH_GIST_EMBED);
-  if (gistMatch && gistMatch.length === 2) {
-    return gistMatch[1];
+  if (gistMatch && gistMatch.length === 3) {
+    return `https://gist.github.com/${gistMatch[1]}/${gistMatch[2]}`;
   }
 
   if (RE_GIPHY.test(str)) {
@@ -325,6 +302,7 @@ export const maybeParseEmbedSrc = (str: string): string => {
   if (match && match.length === 2) {
     return match[1];
   }
+
   return str;
 };
 
