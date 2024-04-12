@@ -618,6 +618,15 @@ export const renderSceneToSvg = (
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
+        if (
+          isTextElement(element) &&
+          element.containerId &&
+          elementsMap.has(element.containerId)
+        ) {
+          // will be rendered with the container
+          return;
+        }
+
         try {
           renderElementToSvg(
             element,
@@ -629,6 +638,20 @@ export const renderSceneToSvg = (
             element.y + renderConfig.offsetY,
             renderConfig,
           );
+
+          const boundTextElement = getBoundTextElement(element, elementsMap);
+          if (boundTextElement) {
+            renderElementToSvg(
+              boundTextElement,
+              elementsMap,
+              rsvg,
+              svgRoot,
+              files,
+              boundTextElement.x + renderConfig.offsetX,
+              boundTextElement.y + renderConfig.offsetY,
+              renderConfig,
+            );
+          }
         } catch (error: any) {
           console.error(error);
         }
