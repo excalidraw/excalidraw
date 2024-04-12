@@ -1,5 +1,6 @@
 import * as StaticScene from "../renderer/staticScene";
 import {
+  GlobalTestState,
   act,
   assertSelectedElements,
   render,
@@ -9,7 +10,7 @@ import { Excalidraw } from "../index";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import { waitFor } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { ExcalidrawImperativeAPI } from "../types";
@@ -18,6 +19,7 @@ import { COLOR_PALETTE } from "../colors";
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import {
+  ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -29,6 +31,7 @@ import {
   actionSendToBack,
 } from "../actions";
 import { vi } from "vitest";
+import { queryByText } from "@testing-library/react";
 
 const { h } = window;
 
@@ -40,7 +43,13 @@ const checkpoint = (name: string) => {
   );
 
   // `scrolledOutside` does not appear to be stable between test runs
-  const { name: _, scrolledOutside, ...strippedAppState } = h.state;
+  // `selectedLinearElemnt` includes `startBindingElement` containing seed and versionNonce
+  const {
+    name: _,
+    scrolledOutside,
+    selectedLinearElement,
+    ...strippedAppState
+  } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
   expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
@@ -1113,10 +1122,451 @@ describe("history", () => {
         expect.objectContaining({ id: rect3.id }),
       ]);
     });
+
+    describe("should support bidirectional bindings", async () => {
+      let excalidrawAPI: ExcalidrawImperativeAPI;
+
+      let rect1: ExcalidrawGenericElement;
+      let rect2: ExcalidrawGenericElement;
+      let text: ExcalidrawTextElement;
+      let arrow: ExcalidrawLinearElement;
+
+      const rect1Props = {
+        type: "rectangle",
+        height: 100,
+        width: 100,
+        x: -100,
+        y: -50,
+      } as const;
+
+      const rect2Props = {
+        type: "rectangle",
+        height: 100,
+        width: 100,
+        x: 100,
+        y: -50,
+      } as const;
+
+      const textProps = {
+        type: "text",
+        x: -200,
+        text: "ola",
+      } as const;
+
+      beforeEach(async () => {
+        const excalidrawAPIPromise =
+          resolvablePromise<ExcalidrawImperativeAPI>();
+
+        await render(
+          <Excalidraw
+            excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
+            handleKeyboardGlobally={true}
+          />,
+        );
+        excalidrawAPI = await excalidrawAPIPromise;
+
+        rect1 = API.createElement({ ...rect1Props });
+        text = API.createElement({ ...textProps });
+        rect2 = API.createElement({ ...rect2Props });
+
+        excalidrawAPI.updateScene({
+          elements: [rect1, text, rect2],
+          commitToStore: true,
+        });
+
+        // bind text1 to rect1
+        mouse.select([rect1, text]);
+        fireEvent.contextMenu(GlobalTestState.interactiveCanvas);
+        fireEvent.click(
+          queryByText(
+            document.querySelector(".context-menu") as HTMLElement,
+            "Bind text to the container",
+          )!,
+        );
+
+        expect(API.getUndoStack().length).toBe(4);
+        expect(text.containerId).toBe(rect1.id);
+        expect(rect1.boundElements).toStrictEqual([
+          { id: text.id, type: "text" },
+        ]);
+
+        // bind arrow to rect1 and rect2
+        UI.clickTool("arrow");
+        mouse.down(0, 0);
+        mouse.up(100, 0);
+
+        arrow = h.elements[3] as ExcalidrawLinearElement;
+
+        expect(API.getUndoStack().length).toBe(5);
+        expect(arrow.startBinding).toEqual({
+          elementId: rect1.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(arrow.endBinding).toEqual({
+          elementId: rect2.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(rect1.boundElements).toStrictEqual([
+          { id: text.id, type: "text" },
+          { id: arrow.id, type: "arrow" },
+        ]);
+        expect(rect2.boundElements).toStrictEqual([
+          { id: arrow.id, type: "arrow" },
+        ]);
+      });
+
+      it("should unbind arrow from non deleted bindable elements on undo and rebind on redo", async () => {
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(4);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(arrow.startBinding).toEqual({
+          elementId: rect1.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(arrow.endBinding).toEqual({
+          elementId: rect2.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [{ id: text.id, type: "text" }],
+          }),
+          expect.objectContaining({ id: text.id }),
+          expect.objectContaining({ id: rect2.id, boundElements: [] }),
+          expect.objectContaining({ id: arrow.id, isDeleted: true }),
+        ]);
+
+        Keyboard.redo();
+        expect(API.getUndoStack().length).toBe(5);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(arrow.startBinding).toEqual({
+          elementId: rect1.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(arrow.endBinding).toEqual({
+          elementId: rect2.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: text.id, type: "text" },
+              { id: arrow.id, type: "arrow" },
+            ],
+          }),
+          expect.objectContaining({ id: text.id }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+          }),
+          expect.objectContaining({ id: arrow.id, isDeleted: false }),
+        ]);
+      });
+
+      it("should unbind arrow from non deleted bindable elements on deletion and rebind on undo", async () => {
+        Keyboard.keyDown(KEYS.DELETE);
+        expect(API.getUndoStack().length).toBe(6);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(arrow.startBinding).toEqual({
+          elementId: rect1.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(arrow.endBinding).toEqual({
+          elementId: rect2.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [{ id: text.id, type: "text" }],
+          }),
+          expect.objectContaining({ id: text.id }),
+          expect.objectContaining({ id: rect2.id, boundElements: [] }),
+          expect.objectContaining({ id: arrow.id, isDeleted: true }),
+        ]);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(5);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(arrow.startBinding).toEqual({
+          elementId: rect1.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(arrow.endBinding).toEqual({
+          elementId: rect2.id,
+          focus: expect.toBeNonNaNNumber(),
+          gap: expect.toBeNonNaNNumber(),
+        });
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: text.id, type: "text" },
+              { id: arrow.id, type: "arrow" },
+            ],
+          }),
+          expect.objectContaining({ id: text.id }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+          }),
+          expect.objectContaining({ id: arrow.id, isDeleted: false }),
+        ]);
+      });
+
+      it("should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo", async () => {
+        Keyboard.undo();
+        Keyboard.undo();
+        Keyboard.undo();
+        Keyboard.undo();
+        Keyboard.undo();
+
+        expect(API.getUndoStack().length).toBe(0);
+        expect(API.getRedoStack().length).toBe(5);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [],
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: text.id,
+            containerId: null,
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [],
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: arrow.id,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: true,
+          }),
+        ]);
+
+        Keyboard.redo();
+        Keyboard.redo();
+        Keyboard.redo();
+        Keyboard.redo();
+        Keyboard.redo();
+
+        expect(API.getUndoStack().length).toBe(5);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: text.id, type: "text" },
+              { id: arrow.id, type: "arrow" },
+            ],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: text.id,
+            containerId: rect1.id,
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: arrow.id,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: false,
+          }),
+        ]);
+      });
+
+      it("should unbind rectangle from arrow on deletion and rebind on undo", async () => {
+        mouse.select(rect1);
+        Keyboard.keyPress(KEYS.DELETE);
+        expect(API.getUndoStack().length).toBe(7);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: text.id, type: "text" },
+              { id: arrow.id, type: "arrow" },
+            ],
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: text.id,
+            containerId: rect1.id,
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: arrow.id,
+            startBinding: null,
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: false,
+          }),
+        ]);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(6);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: arrow.id, type: "arrow" },
+              { id: text.id, type: "text" }, // order has now changed!
+            ],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: text.id,
+            containerId: rect1.id,
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: arrow.id,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: false,
+          }),
+        ]);
+      });
+
+      it("should unbind rectangles from arrow on deletion and rebind on undo", async () => {
+        mouse.select([rect1, rect2]);
+        Keyboard.keyPress(KEYS.DELETE);
+        expect(API.getUndoStack().length).toBe(8);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: text.id, type: "text" },
+              { id: arrow.id, type: "arrow" },
+            ],
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: text.id,
+            containerId: rect1.id,
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+            isDeleted: true,
+          }),
+          expect.objectContaining({
+            id: arrow.id,
+            startBinding: null,
+            endBinding: null,
+            isDeleted: false,
+          }),
+        ]);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(7);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [
+              { id: arrow.id, type: "arrow" },
+              { id: text.id, type: "text" }, // order has now changed!
+            ],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: text.id,
+            containerId: rect1.id,
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrow.id, type: "arrow" }],
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: arrow.id,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: false,
+          }),
+        ]);
+      });
+    });
   });
 
   describe("multiplayer undo/redo", () => {
     let excalidrawAPI: ExcalidrawImperativeAPI;
+
+    // Util to check that we end up in the same state after series of undo / redo
+    function runTwice(callback: () => void) {
+      for (let i = 0; i < 2; i++) {
+        callback();
+      }
+    }
 
     beforeEach(async () => {
       const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
@@ -2377,7 +2827,7 @@ describe("history", () => {
       ]);
     });
 
-    describe("conflicts in bound text elements and containers", () => {
+    describe("conflicts in bound text elements and their containers", () => {
       let container: ExcalidrawGenericElement;
       let text: ExcalidrawTextElement;
 
@@ -2397,19 +2847,12 @@ describe("history", () => {
         angle: 0,
       } as const;
 
-      // Util to check that we end up in the same state after series of undo / redo
-      function runTwice(callback: () => void) {
-        for (let i = 0; i < 2; i++) {
-          callback();
-        }
-      }
-
       beforeEach(() => {
         container = API.createElement({ ...containerProps });
         text = API.createElement({ ...textProps });
       });
 
-      it("should rebind bindings when both are updated through the history and there are other non-conflicting changes in the meantime", async () => {
+      it("should rebind bindings when both are updated through the history and there no conflicting updates in the meantime", async () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [container, text],
@@ -2493,6 +2936,7 @@ describe("history", () => {
         });
       });
 
+      // TODO: #7348 we do rebind now, when we have bi-directional binding in history, to eliminate potential data-integrity issues, but we should consider not rebinding in the future
       it("should rebind bindings when both are updated through the history and the container got bound to a different text in the meantime", async () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
@@ -2593,6 +3037,7 @@ describe("history", () => {
         });
       });
 
+      // TODO: #7348 we do rebind now, when we have bi-directional binding in history, to eliminate potential data-integrity issues, but we should consider not rebinding in the future
       it("should rebind bindings when both are updated through the history and the text got bound to a different container in the meantime", async () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
@@ -2699,7 +3144,7 @@ describe("history", () => {
         });
       });
 
-      it("should unbind/rebind remotely added bound text when it's container is removed/added through the history", async () => {
+      it("should rebind remotely added bound text when it's container is added through the history", async () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [container],
@@ -2759,7 +3204,7 @@ describe("history", () => {
         });
       });
 
-      it("should unbind/rebind remotely added container when it's bound text is removed/added through the history", async () => {
+      it("should rebind remotely added container when it's bound text is added through the history", async () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [text],
@@ -3339,6 +3784,657 @@ describe("history", () => {
             id: text.id,
             containerId: container.id,
             isDeleted: false,
+          }),
+        ]);
+      });
+    });
+
+    describe("conflicts in arrows and their bindable elements", () => {
+      let rect1: ExcalidrawGenericElement;
+      let rect2: ExcalidrawGenericElement;
+
+      const rect1Props = {
+        type: "rectangle",
+        height: 100,
+        width: 100,
+        x: -100,
+        y: -50,
+      } as const;
+
+      const rect2Props = {
+        type: "rectangle",
+        height: 100,
+        width: 100,
+        x: 100,
+        y: -50,
+      } as const;
+
+      function roundToNearestHundred(number: number) {
+        return Math.round(number / 100) * 100;
+      }
+
+      beforeEach(() => {
+        rect1 = API.createElement({ ...rect1Props });
+        rect2 = API.createElement({ ...rect2Props });
+
+        // Simulate local update
+        excalidrawAPI.updateScene({
+          elements: [rect1, rect2],
+          commitToStore: true,
+        });
+
+        mouse.reset();
+      });
+
+      it("should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime", async () => {
+        // create arrow without bindings
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          UI.clickTool("arrow");
+          mouse.down(0, 0);
+          mouse.up(100, 0);
+        });
+
+        const arrowId = h.elements[2].id;
+
+        // create binding
+        mouse.downAt(0, 0);
+        mouse.moveTo(0, 1);
+        mouse.moveTo(0, 0);
+        mouse.up();
+
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [{ id: arrowId, type: "arrow" }],
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrowId, type: "arrow" }],
+          }),
+          expect.objectContaining({
+            id: arrowId,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+          }),
+        ]);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(2);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [],
+          }),
+          expect.objectContaining({ id: rect2.id, boundElements: [] }),
+          expect.objectContaining({
+            id: arrowId,
+            startBinding: null,
+            endBinding: null,
+          }),
+        ]);
+
+        // Simulate remote update
+        excalidrawAPI.updateScene({
+          elements: [
+            newElementWith(h.elements[0], {
+              // no conflicting updates
+              x: h.elements[1].x + 50,
+            }),
+            newElementWith(h.elements[1], {
+              // no conflicting updates
+              x: h.elements[1].x + 50,
+            }),
+            newElementWith(h.elements[2], {
+              // no conflicting updates
+              x: h.elements[1].x + 50,
+            }),
+          ],
+        });
+
+        runTwice(() => {
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(3);
+          expect(API.getRedoStack().length).toBe(0);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: {
+                elementId: rect1.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              endBinding: {
+                elementId: rect2.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+            }),
+          ]);
+
+          Keyboard.undo();
+          expect(API.getUndoStack().length).toBe(2);
+          expect(API.getRedoStack().length).toBe(1);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [],
+            }),
+            expect.objectContaining({ id: rect2.id, boundElements: [] }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: null,
+              endBinding: null,
+            }),
+          ]);
+        });
+      });
+
+      it("should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime", async () => {
+        // create arrow without bindings
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          UI.clickTool("arrow");
+          mouse.down(0, 0);
+          mouse.up(100, 0);
+        });
+
+        const arrowId = h.elements[2].id;
+
+        // create binding
+        mouse.downAt(0, 0);
+        mouse.moveTo(0, 1);
+        mouse.upAt(0, 0);
+
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [{ id: arrowId, type: "arrow" }],
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrowId, type: "arrow" }],
+          }),
+          expect.objectContaining({
+            id: arrowId,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+          }),
+        ]);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(2);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [],
+          }),
+          expect.objectContaining({ id: rect2.id, boundElements: [] }),
+          expect.objectContaining({
+            id: arrowId,
+            startBinding: null,
+            endBinding: null,
+          }),
+        ]);
+
+        const remoteContainer = API.createElement({
+          type: "rectangle",
+          width: 50,
+          x: 100,
+          boundElements: [{ id: arrowId, type: "arrow" }],
+        });
+
+        // Simulate remote update
+        excalidrawAPI.updateScene({
+          elements: [
+            h.elements[0],
+            newElementWith(h.elements[1], { boundElements: [] }),
+            newElementWith(h.elements[2] as ExcalidrawLinearElement, {
+              endBinding: { elementId: remoteContainer.id, gap: 1, focus: 0 },
+            }),
+            remoteContainer,
+          ],
+        });
+
+        runTwice(() => {
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(3);
+          expect(API.getRedoStack().length).toBe(0);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: {
+                elementId: rect1.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              // rebound with previous rectangle
+              endBinding: {
+                elementId: rect2.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+            }),
+            expect.objectContaining({
+              id: remoteContainer.id,
+              boundElements: [],
+            }),
+          ]);
+
+          Keyboard.undo();
+          expect(API.getUndoStack().length).toBe(2);
+          expect(API.getRedoStack().length).toBe(1);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [],
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [],
+            }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: null,
+              endBinding: {
+                // now we are back in the previous state!
+                elementId: remoteContainer.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+            }),
+            expect.objectContaining({
+              id: remoteContainer.id,
+              // leaving as bound until we can rebind arrows!
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+          ]);
+        });
+      });
+
+      it("should rebind remotely added arrow when it's bindable elements are added through the history", async () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          startBinding: { elementId: rect1.id, gap: 1, focus: 0 },
+          endBinding: { elementId: rect2.id, gap: 1, focus: 0 },
+        });
+
+        // Simulate remote update
+        excalidrawAPI.updateScene({
+          elements: [
+            arrow,
+            newElementWith(h.elements[0], {
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+            }),
+            newElementWith(h.elements[1], {
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+            }),
+          ],
+        });
+
+        runTwice(() => {
+          Keyboard.undo();
+          expect(API.getUndoStack().length).toBe(0);
+          expect(API.getRedoStack().length).toBe(1);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: null,
+              endBinding: null,
+            }),
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: true,
+            }),
+          ]);
+
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(0);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: {
+                // now we are back in the previous state!
+                elementId: rect1.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              endBinding: {
+                // now we are back in the previous state!
+                elementId: rect2.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+            }),
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+          ]);
+        });
+      });
+
+      it("should rebind remotely added bindable elements when it's arrow is added through the history", async () => {
+        Keyboard.undo();
+        const arrow = API.createElement({
+          type: "arrow",
+        });
+
+        // Simulate local update
+        excalidrawAPI.updateScene({ elements: [arrow], commitToStore: true });
+
+        // Simulate remote update
+        excalidrawAPI.updateScene({
+          elements: [
+            newElementWith(h.elements[0] as ExcalidrawLinearElement, {
+              startBinding: { elementId: rect1.id, gap: 1, focus: 0 },
+              endBinding: { elementId: rect2.id, gap: 1, focus: 0 },
+            }),
+            newElementWith(rect1, {
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+            }),
+            newElementWith(rect2, {
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+            }),
+          ],
+        });
+
+        runTwice(() => {
+          Keyboard.undo();
+          expect(API.getUndoStack().length).toBe(0);
+          expect(API.getRedoStack().length).toBe(1);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: {
+                elementId: rect1.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              endBinding: {
+                elementId: rect2.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [],
+              isDeleted: false,
+            }),
+          ]);
+
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(0);
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: {
+                elementId: rect1.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              endBinding: {
+                elementId: rect2.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              },
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+          ]);
+        });
+      });
+
+      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => {});
+
+      it("should update bound element points when rectangle was remotely moved and arrow is added back through the history", async () => {
+        // bind arrow to rect1 and rect2
+        UI.clickTool("arrow");
+        mouse.down(0, 0);
+        mouse.up(100, 0);
+
+        const arrowId = h.elements[2].id;
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [],
+          }),
+          expect.objectContaining({ id: rect2.id, boundElements: [] }),
+          expect.objectContaining({
+            id: arrowId,
+            points: [
+              [0, 0],
+              [100, 0],
+            ],
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: true,
+          }),
+        ]);
+
+        // Simulate remote update
+        excalidrawAPI.updateScene({
+          elements: [
+            h.elements[0],
+            newElementWith(h.elements[1], { x: 500, y: -500 }),
+            h.elements[2],
+          ],
+        });
+
+        Keyboard.redo();
+        expect(API.getUndoStack().length).toBe(2);
+        expect(API.getRedoStack().length).toBe(0);
+        {
+          // no need to be strict about points, hence the rounding
+          const points = (h.elements[2] as ExcalidrawLinearElement).points[1];
+          expect([
+            roundToNearestHundred(points[0]),
+            roundToNearestHundred(points[1]),
+          ]).toEqual([500, -400]);
+        }
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect1.id,
+            boundElements: [{ id: arrowId, type: "arrow" }],
+          }),
+          expect.objectContaining({
+            id: rect2.id,
+            boundElements: [{ id: arrowId, type: "arrow" }],
+          }),
+          expect.objectContaining({
+            id: arrowId,
+            startBinding: {
+              elementId: rect1.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            endBinding: {
+              elementId: rect2.id,
+              focus: expect.toBeNonNaNNumber(),
+              gap: expect.toBeNonNaNNumber(),
+            },
+            isDeleted: false,
+          }),
+        ]);
+      });
+    });
+
+    describe("conflicts in frames and their children", () => {
+      let frame: ExcalidrawFrameElement;
+      let rect: ExcalidrawGenericElement;
+
+      const frameProps = {
+        type: "frame",
+        x: 0,
+        width: 500,
+      } as const;
+
+      const rectProps = {
+        type: "rectangle",
+        width: 100,
+        x: 10,
+        y: 10,
+        angle: 0,
+      } as const;
+
+      beforeEach(() => {
+        frame = API.createElement({ ...frameProps });
+        rect = API.createElement({ ...rectProps });
+      });
+
+      it("should not rebind frame child with frame when frame was remotely deleted and frame child is added back through the history ", async () => {
+        // Initialize the scene
+        excalidrawAPI.updateScene({
+          elements: [frame],
+        });
+
+        // Simulate local update
+        excalidrawAPI.updateScene({
+          elements: [rect, h.elements[0]],
+          commitToStore: true,
+        });
+
+        // Simulate local update
+        excalidrawAPI.updateScene({
+          elements: [
+            newElementWith(h.elements[0], {
+              frameId: frame.id,
+            }),
+            h.elements[1],
+          ],
+          commitToStore: true,
+        });
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            frameId: null,
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: frame.id,
+            isDeleted: false,
+          }),
+        ]);
+
+        Keyboard.redo();
+        expect(API.getUndoStack().length).toBe(2);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            frameId: frame.id, // double check that the element is rebound
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: frame.id,
+            isDeleted: false,
+          }),
+        ]);
+
+        Keyboard.undo();
+        Keyboard.undo();
+
+        // Simulate remote update
+        excalidrawAPI.updateScene({
+          elements: [
+            h.elements[0],
+            newElementWith(h.elements[1], {
+              isDeleted: true,
+            }),
+          ],
+        });
+
+        Keyboard.redo();
+        Keyboard.redo();
+        expect(API.getUndoStack().length).toBe(2);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            frameId: null, // element is not unbound from
+            isDeleted: false,
+          }),
+          expect.objectContaining({
+            id: frame.id,
+            isDeleted: true,
           }),
         ]);
       });
