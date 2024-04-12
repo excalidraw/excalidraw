@@ -13,8 +13,8 @@ import { getDefaultAppState } from "../appState";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
-import { ExcalidrawImperativeAPI } from "../types";
-import { resolvablePromise } from "../utils";
+import { AppState, ExcalidrawImperativeAPI } from "../types";
+import { arrayToMap, resolvablePromise } from "../utils";
 import { COLOR_PALETTE } from "../colors";
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
@@ -24,6 +24,7 @@ import {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FractionalIndex,
+  SceneElementsMap,
 } from "../element/types";
 import {
   actionSendBackward,
@@ -32,6 +33,9 @@ import {
 } from "../actions";
 import { vi } from "vitest";
 import { queryByText } from "@testing-library/react";
+import { HistoryEntry } from "../history";
+import { AppStateChange, ElementsChange } from "../change";
+import { Snapshot } from "../store";
 
 const { h } = window;
 
@@ -78,6 +82,66 @@ describe("history", () => {
   });
 
   describe("singleplayer undo/redo", () => {
+    it("should not collapse when applying corrupted history entry", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const rect = API.createElement({ type: "rectangle" });
+
+      h.elements = [rect];
+
+      const corrupedEntry = HistoryEntry.create(
+        AppStateChange.empty(),
+        ElementsChange.empty(),
+      );
+
+      vi.spyOn(corrupedEntry, "applyTo").mockImplementation(() => {
+        throw new Error("Oh no, I am corrupted!");
+      });
+
+      (h.history as any).undoStack.push(corrupedEntry);
+
+      const appState = getDefaultAppState() as AppState;
+
+      try {
+        // due to this we unfortunately we couldn't do simple .toThrow()
+        act(
+          () =>
+            h.history.undo(
+              arrayToMap(h.elements) as SceneElementsMap,
+              appState,
+              Snapshot.empty(),
+            ) as any,
+        );
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+      }
+      // we popped the entry, even though it is corrupted, so the user could perform subsequent undo/redo and would not be stuck on this entry forever
+      expect(API.getUndoStack().length).toBe(0);
+      // we pushed the entr, as we don't want just lose it and throw it away - it might be perfectly valid on subsequent redo
+      expect(API.getRedoStack().length).toBe(1);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, isDeleted: false }), // no changes detected
+      ]);
+
+      try {
+        // due to this we unfortunately we couldn't do simple .toThrow()
+        act(
+          () =>
+            h.history.redo(
+              arrayToMap(h.elements) as SceneElementsMap,
+              appState,
+              Snapshot.empty(),
+            ) as any,
+        );
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+      }
+      expect(API.getUndoStack().length).toBe(1); // vice versa for redo
+      expect(API.getRedoStack().length).toBe(0); // vice versa for undo
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect.id, isDeleted: false }),
+      ]);
+    });
+
     it("should not end up with history entry when there are no appstate changes", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       const rect1 = API.createElement({ type: "rectangle", groupIds: ["A"] });

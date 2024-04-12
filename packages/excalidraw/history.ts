@@ -112,6 +112,7 @@ export class History {
           [nextElements, nextAppState, containsVisibleChange] =
             historyEntry.applyTo(nextElements, nextAppState, snapshot);
         } finally {
+          // make sure to always push / pop, even if the increment is corrupted
           push(historyEntry);
         }
 
