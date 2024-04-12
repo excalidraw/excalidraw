@@ -20,6 +20,7 @@ import {
   ExcalidrawFreeDrawElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
@@ -233,18 +234,27 @@ export const getFreedrawShape = (
 };
 
 export const getClosedCurveShape = (
+  element: ExcalidrawLinearElement,
   roughShape: Drawable,
   startingPoint: Point = [0, 0],
   angleInRadian: number,
   center: Point,
 ): GeometricShape => {
-  const ops = getCurvePathOps(roughShape);
   const transform = (p: Point) =>
     pointRotate(
       [p[0] + startingPoint[0], p[1] + startingPoint[1]],
       angleToDegrees(angleInRadian),
       center,
     );
+
+  if (element.roundness === null) {
+    return {
+      type: "polygon",
+      data: close(element.points.map((p) => transform(p as Point))),
+    };
+  }
+
+  const ops = getCurvePathOps(roughShape);
 
   const points: Point[] = [];
   let odd = false;
