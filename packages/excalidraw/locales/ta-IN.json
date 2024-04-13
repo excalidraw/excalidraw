@@ -87,7 +87,7 @@
     "group": "தேர்ந்ததை ஒன்றிணை",
     "ungroup": "தேர்ந்ததைப் பிரி",
     "collaborators": "கூட்டுப்பணியினர்",
-    "showGrid": "கட்டதைக் காட்டு",
+    "toggleGrid": "",
     "addToLibrary": "நூலகத்தில் சேர்",
     "removeFromLibrary": "நூலகத்திலிருந்து நீக்கு",
     "libraryLoadingMessage": "நூலகத்தை ஏற்றுகிறது…",
