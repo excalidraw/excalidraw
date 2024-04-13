@@ -87,7 +87,7 @@
     "group": "Grupuoti pasirinkimą",
     "ungroup": "Išgrupuoti pasirinkimą",
     "collaborators": "Bendradarbiautojai",
-    "showGrid": "Rodyti tinklelį",
+    "toggleGrid": "",
     "addToLibrary": "Pridėti į biblioteką",
     "removeFromLibrary": "Pašalinti iš bibliotekos",
     "libraryLoadingMessage": "",
