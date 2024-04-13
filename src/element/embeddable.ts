@@ -18,7 +18,7 @@ type EmbeddedLink =
   | ({
       aspectRatio: { w: number; h: number };
       warning?: string;
-      sandbox?: { allowSameOrigin?: boolean };
+      sandbox: { allowSameOrigin?: boolean };
     } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
@@ -63,6 +63,18 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
 ]);
 
+const ALLOW_SAME_ORIGIN = new Set([
+  "youtube.com",
+  "youtu.be",
+  "vimeo.com",
+  "player.vimeo.com",
+  "figma.com",
+  "twitter.com",
+  "x.com",
+  "*.simplepdf.eu",
+  "stackblitz.com",
+]);
+
 const createSrcDoc = (body: string) => {
   return `<html><body>${body}</body></html>`;
 };
@@ -77,6 +89,10 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
   }
 
   const originalLink = link;
+
+  const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
+    matchHostname(link, ALLOW_SAME_ORIGIN) || "",
+  );
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
@@ -100,8 +116,13 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return { link, aspectRatio, type, sandbox: { allowSameOrigin } };
   }
 
   const vimeoLink = link.match(RE_VIMEO);
@@ -115,8 +136,13 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
     aspectRatio = { w: 560, h: 315 };
     //warning deliberately ommited so it is displayed only once per link
     //same link next time will be served from cache
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type, warning };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return { link, aspectRatio, type, warning, sandbox: { allowSameOrigin } };
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -126,16 +152,26 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
       link,
     )}`;
     aspectRatio = { w: 550, h: 550 };
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return { link, aspectRatio, type, sandbox: { allowSameOrigin } };
   }
 
   const valLink = link.match(RE_VALTOWN);
   if (valLink) {
     link =
       valLink[1] === "embed" ? valLink[0] : valLink[0].replace("/v", "/embed");
-    embeddedLinkCache.set(originalLink, { link, aspectRatio, type });
-    return { link, aspectRatio, type };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return { link, aspectRatio, type, sandbox: { allowSameOrigin } };
   }
 
   if (RE_TWITTER.test(link)) {
@@ -155,7 +191,7 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
           `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${safeURL}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
         ),
       aspectRatio: { w: 480, h: 480 },
-      sandbox: { allowSameOrigin: true },
+      sandbox: { allowSameOrigin },
     };
     embeddedLinkCache.set(originalLink, ret);
     return ret;
@@ -178,13 +214,19 @@ export const getEmbedLink = (link: string | null | undefined): EmbeddedLink => {
           </style>
         `),
       aspectRatio: { w: 550, h: 720 },
+      sandbox: { allowSameOrigin },
     };
     embeddedLinkCache.set(link, ret);
     return ret;
   }
 
-  embeddedLinkCache.set(link, { link, aspectRatio, type });
-  return { link, aspectRatio, type };
+  embeddedLinkCache.set(link, {
+    link,
+    aspectRatio,
+    type,
+    sandbox: { allowSameOrigin },
+  });
+  return { link, aspectRatio, type, sandbox: { allowSameOrigin } };
 };
 
 export const isEmbeddableOrFrameLabel = (
@@ -259,34 +301,39 @@ export const actionSetEmbeddableAsActiveTool = register({
   },
 });
 
-const validateHostname = (
+const matchHostname = (
   url: string,
   /** using a Set assumes it already contains normalized bare domains */
   allowedHostnames: Set<string> | string,
-): boolean => {
+): string | null => {
   try {
     const { hostname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
-    const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
-      /^([^.]+)/,
-      "*",
-    );
 
     if (allowedHostnames instanceof Set) {
-      return (
-        ALLOWED_DOMAINS.has(bareDomain) ||
-        ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)
+      if (ALLOWED_DOMAINS.has(bareDomain)) {
+        return bareDomain;
+      }
+
+      const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
+        /^([^.]+)/,
+        "*",
       );
+      if (ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)) {
+        return bareDomainWithFirstSubdomainWildcarded;
+      }
+      return null;
     }
 
-    if (bareDomain === allowedHostnames.replace(/^www\./, "")) {
-      return true;
+    const bareAllowedHostname = allowedHostnames.replace(/^www\./, "");
+    if (bareDomain === bareAllowedHostname) {
+      return bareAllowedHostname;
     }
   } catch (error) {
     // ignore
   }
-  return false;
+  return null;
 };
 
 export const extractSrc = (htmlString: string): string => {
@@ -331,7 +378,7 @@ export const embeddableURLValidator = (
           if (url.match(domain)) {
             return true;
           }
-        } else if (validateHostname(url, domain)) {
+        } else if (matchHostname(url, domain)) {
           return true;
         }
       }
@@ -339,5 +386,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return validateHostname(url, ALLOWED_DOMAINS);
+  return !!matchHostname(url, ALLOWED_DOMAINS);
 };
