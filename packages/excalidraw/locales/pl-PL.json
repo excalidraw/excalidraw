@@ -87,7 +87,7 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
-    "showGrid": "Pokaż siatkę",
+    "toggleGrid": "",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
     "libraryLoadingMessage": "Wczytywanie biblioteki…",
