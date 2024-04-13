@@ -12,7 +12,7 @@ import {
   togglePopover,
 } from "./test-utils";
 import { Excalidraw } from "../index";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
@@ -39,7 +39,7 @@ const mouse = new Pointer("mouse");
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 beforeEach(() => {
   localStorage.clear();
   renderStaticScene.mockClear();
@@ -423,8 +423,26 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Duplicate")!);
     expect(h.elements).toHaveLength(2);
-    const { id: _id0, seed: _seed0, x: _x0, y: _y0, ...rect1 } = h.elements[0];
-    const { id: _id1, seed: _seed1, x: _x1, y: _y1, ...rect2 } = h.elements[1];
+    const {
+      id: _id0,
+      seed: _seed0,
+      x: _x0,
+      y: _y0,
+      index: _fractionalIndex0,
+      version: _version0,
+      versionNonce: _versionNonce0,
+      ...rect1
+    } = h.elements[0];
+    const {
+      id: _id1,
+      seed: _seed1,
+      x: _x1,
+      y: _y1,
+      index: _fractionalIndex1,
+      version: _version1,
+      versionNonce: _versionNonce1,
+      ...rect2
+    } = h.elements[1];
     expect(rect1).toEqual(rect2);
   });
 

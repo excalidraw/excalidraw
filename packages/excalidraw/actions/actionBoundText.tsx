@@ -17,7 +17,7 @@ import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "../element/textWysiwyg";
+} from "../element/containerCache";
 import {
   hasBoundTextElement,
   isTextBindableContainer,
@@ -31,12 +31,13 @@ import {
 } from "../element/types";
 import { AppState } from "../types";
 import { Mutable } from "../utility-types";
-import { getFontString } from "../utils";
+import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
+import { syncMovedIndices } from "../fractionalIndex";
 
 export const actionUnbindText = register({
   name: "unbindText",
-  contextItemLabel: "labels.unbindText",
+  label: "labels.unbindText",
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -45,10 +46,11 @@ export const actionUnbindText = register({
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     selectedElements.forEach((element) => {
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        const { width, height, baseline } = measureText(
+        const { width, height } = measureText(
           boundTextElement.originalText,
           getFontString(boundTextElement),
           boundTextElement.lineHeight,
@@ -57,12 +59,15 @@ export const actionUnbindText = register({
           element.id,
         );
         resetOriginalContainerCache(element.id);
-        const { x, y } = computeBoundTextPosition(element, boundTextElement);
+        const { x, y } = computeBoundTextPosition(
+          element,
+          boundTextElement,
+          elementsMap,
+        );
         mutateElement(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
-          baseline,
           text: boundTextElement.originalText,
           x,
           y,
@@ -87,7 +92,7 @@ export const actionUnbindText = register({
 
 export const actionBindText = register({
   name: "bindText",
-  contextItemLabel: "labels.bindText",
+  label: "labels.bindText",
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -106,7 +111,10 @@ export const actionBindText = register({
       if (
         textElement &&
         bindingContainer &&
-        getBoundTextElement(bindingContainer) === null
+        getBoundTextElement(
+          bindingContainer,
+          app.scene.getNonDeletedElementsMap(),
+        ) === null
       ) {
         return true;
       }
@@ -141,7 +149,11 @@ export const actionBindText = register({
       }),
     });
     const originalContainerHeight = container.height;
-    redrawTextBoundingBox(textElement, container);
+    redrawTextBoundingBox(
+      textElement,
+      container,
+      app.scene.getNonDeletedElementsMap(),
+    );
     // overwritting the cache with original container height so
     // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
@@ -169,6 +181,8 @@ const pushTextAboveContainer = (
     (ele) => ele.id === container.id,
   );
   updatedElements.splice(containerIndex + 1, 0, textElement);
+  syncMovedIndices(updatedElements, arrayToMap([container, textElement]));
+
   return updatedElements;
 };
 
@@ -187,12 +201,14 @@ const pushContainerBelowText = (
     (ele) => ele.id === textElement.id,
   );
   updatedElements.splice(textElementIndex, 0, container);
+  syncMovedIndices(updatedElements, arrayToMap([container, textElement]));
+
   return updatedElements;
 };
 
 export const actionWrapTextInContainer = register({
   name: "wrapTextInContainer",
-  contextItemLabel: "labels.createContainerFromText",
+  label: "labels.createContainerFromText",
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -282,13 +298,18 @@ export const actionWrapTextInContainer = register({
           },
           false,
         );
-        redrawTextBoundingBox(textElement, container);
+        redrawTextBoundingBox(
+          textElement,
+          container,
+          app.scene.getNonDeletedElementsMap(),
+        );
 
         updatedElements = pushContainerBelowText(
           [...updatedElements, container],
           container,
           textElement,
         );
+
         containerIds[container.id] = true;
       }
     }

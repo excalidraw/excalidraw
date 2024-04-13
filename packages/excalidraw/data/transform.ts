@@ -24,6 +24,7 @@ import {
   normalizeText,
 } from "../element/textElement";
 import {
+  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -38,13 +39,21 @@ import {
   ExcalidrawTextElement,
   FileId,
   FontFamilyValues,
+  NonDeletedSceneElementsMap,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
 import { MarkOptional } from "../utility-types";
-import { assertNever, cloneJSON, getFontString } from "../utils";
+import {
+  arrayToMap,
+  assertNever,
+  cloneJSON,
+  getFontString,
+  toBrandedType,
+} from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -202,6 +211,7 @@ const DEFAULT_DIMENSION = 100;
 const bindTextToContainer = (
   container: ExcalidrawElement,
   textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  elementsMap: ElementsMap,
 ) => {
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
@@ -220,7 +230,7 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container);
+  redrawTextBoundingBox(textElement, container, elementsMap);
   return [container, textElement] as const;
 };
 
@@ -229,6 +239,7 @@ const bindLinearElementToElement = (
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
+  elementsMap: NonDeletedSceneElementsMap,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -314,6 +325,7 @@ const bindLinearElementToElement = (
         linearElement,
         startBoundElement as ExcalidrawBindableElement,
         "start",
+        elementsMap,
       );
     }
   }
@@ -388,8 +400,18 @@ const bindLinearElementToElement = (
         linearElement,
         endBoundElement as ExcalidrawBindableElement,
         "end",
+        elementsMap,
       );
     }
+  }
+
+  // Safe check to early return for single point
+  if (linearElement.points.length < 2) {
+    return {
+      linearElement,
+      startBoundElement,
+      endBoundElement,
+    };
   }
 
   // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
@@ -397,6 +419,7 @@ const bindLinearElementToElement = (
   const delta = 0.5;
 
   const newPoints = cloneJSON(linearElement.points) as [number, number][];
+
   // left to right so shift the arrow towards right
   if (
     linearElement.points[endPointIndex][0] >
@@ -451,8 +474,15 @@ class ElementStore {
 
     this.excalidrawElements.set(ele.id, ele);
   };
+
   getElements = () => {
-    return Array.from(this.excalidrawElements.values());
+    return syncInvalidIndices(Array.from(this.excalidrawElements.values()));
+  };
+
+  getElementsMap = () => {
+    return toBrandedType<NonDeletedSceneElementsMap>(
+      arrayToMap(this.getElements()),
+    );
   };
 
   getElement = (id: string) => {
@@ -610,6 +640,7 @@ export const convertToExcalidrawElements = (
     }
   }
 
+  const elementsMap = elementStore.getElementsMap();
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
     const excalidrawElement = elementStore.getElement(id)!;
@@ -623,6 +654,7 @@ export const convertToExcalidrawElements = (
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
+            elementsMap,
           );
           elementStore.add(container);
           elementStore.add(text);
@@ -650,6 +682,7 @@ export const convertToExcalidrawElements = (
                 originalStart,
                 originalEnd,
                 elementStore,
+                elementsMap,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -674,6 +707,7 @@ export const convertToExcalidrawElements = (
                   start,
                   end,
                   elementStore,
+                  elementsMap,
                 );
 
               elementStore.add(linearElement);

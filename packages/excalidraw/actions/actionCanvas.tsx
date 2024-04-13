@@ -1,5 +1,14 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import {
+  handIcon,
+  MoonIcon,
+  SunIcon,
+  TrashIcon,
+  zoomAreaIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  ZoomResetIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
@@ -20,11 +29,13 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { Bounds } from "../element/bounds";
+import { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  label: "labels.canvasBackground",
+  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -59,6 +70,9 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  label: "labels.clearCanvas",
+  paletteName: "Clear canvas",
+  icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -95,7 +109,9 @@ export const actionClearCanvas = register({
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  label: "buttons.zoomIn",
   viewMode: true,
+  icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
@@ -109,6 +125,7 @@ export const actionZoomIn = register({
           },
           appState,
         ),
+        userToFollow: null,
       },
       commitToHistory: false,
     };
@@ -132,6 +149,8 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  label: "buttons.zoomOut",
+  icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -146,6 +165,7 @@ export const actionZoomOut = register({
           },
           appState,
         ),
+        userToFollow: null,
       },
       commitToHistory: false,
     };
@@ -169,6 +189,8 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  label: "buttons.resetZoom",
+  icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -183,6 +205,7 @@ export const actionResetZoom = register({
           },
           appState,
         ),
+        userToFollow: null,
       },
       commitToHistory: false,
     };
@@ -208,7 +231,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: Bounds,
+  bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
 ) => {
   const [x1, y1, x2, y2] = bounds;
@@ -226,22 +249,20 @@ const zoomValueToFitBoundsOnViewport = (
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-export const zoomToFit = ({
-  targetElements,
+export const zoomToFitBounds = ({
+  bounds,
   appState,
   fitToViewport = false,
   viewportZoomFactor = 0.7,
 }: {
-  targetElements: readonly ExcalidrawElement[];
+  bounds: SceneBounds;
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
 }) => {
-  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
-
-  const [x1, y1, x2, y2] = commonBounds;
+  const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
@@ -282,7 +303,7 @@ export const zoomToFit = ({
     scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(commonBounds, {
+    newZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
       width: appState.width,
       height: appState.height,
     });
@@ -311,17 +332,45 @@ export const zoomToFit = ({
   };
 };
 
+export const zoomToFit = ({
+  targetElements,
+  appState,
+  fitToViewport,
+  viewportZoomFactor,
+}: {
+  targetElements: readonly ExcalidrawElement[];
+  appState: Readonly<AppState>;
+  /** whether to fit content to viewport (beyond >100%) */
+  fitToViewport: boolean;
+  /** zoom content to cover X of the viewport, when fitToViewport=true */
+  viewportZoomFactor?: number;
+}) => {
+  const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
+
+  return zoomToFitBounds({
+    bounds: commonBounds,
+    appState,
+    fitToViewport,
+    viewportZoomFactor,
+  });
+};
+
 // Note, this action differs from actionZoomToFitSelection in that it doesn't
 // zoom beyond 100%. In other words, if the content is smaller than viewport
 // size, it won't be zoomed in.
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
+  label: "labels.zoomToFitViewport",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
-      appState,
+      appState: {
+        ...appState,
+        userToFollow: null,
+      },
       fitToViewport: false,
     });
   },
@@ -336,12 +385,17 @@ export const actionZoomToFitSelectionInViewport = register({
 
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
+  label: "helpDialog.zoomToSelection",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     return zoomToFit({
       targetElements: selectedElements.length ? selectedElements : elements,
-      appState,
+      appState: {
+        ...appState,
+        userToFollow: null,
+      },
       fitToViewport: true,
     });
   },
@@ -355,10 +409,19 @@ export const actionZoomToFitSelection = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  label: "helpDialog.zoomToFit",
+  icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) =>
-    zoomToFit({ targetElements: elements, appState, fitToViewport: false }),
+    zoomToFit({
+      targetElements: elements,
+      appState: {
+        ...appState,
+        userToFollow: null,
+      },
+      fitToViewport: false,
+    }),
   keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
@@ -368,6 +431,13 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  label: (_, appState) => {
+    return appState.theme === THEME.DARK
+      ? "buttons.lightMode"
+      : "buttons.darkMode";
+  },
+  keywords: ["toggle", "dark", "light", "mode", "theme"],
+  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
@@ -388,6 +458,7 @@ export const actionToggleTheme = register({
 
 export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
+  label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
@@ -422,7 +493,11 @@ export const actionToggleEraserTool = register({
 
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
+  label: "toolBar.hand",
+  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
+  icon: handIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 

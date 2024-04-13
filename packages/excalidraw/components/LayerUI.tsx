@@ -60,7 +60,7 @@ import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
-import { LaserPointerButton } from "./LaserTool/LaserPointerButton";
+import { LaserPointerButton } from "./LaserPointerButton";
 import { MagicSettings } from "./MagicSettings";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 
@@ -195,6 +195,7 @@ const LayerUI = ({
         actionManager={actionManager}
         onExportImage={onExportImage}
         onCloseRequest={() => setAppState({ openDialog: null })}
+        name={app.getName()}
       />
     );
   };
@@ -226,7 +227,7 @@ const LayerUI = ({
       >
         <SelectedShapeActions
           appState={appState}
-          elements={elements}
+          elementsMap={app.scene.getNonDeletedElementsMap()}
           renderAction={actionManager.renderAction}
         />
       </Island>
@@ -338,7 +339,12 @@ const LayerUI = ({
               },
             )}
           >
-            <UserList collaborators={appState.collaborators} />
+            {appState.collaborators.size > 0 && (
+              <UserList
+                collaborators={appState.collaborators}
+                userToFollow={appState.userToFollow?.socketId || null}
+              />
+            )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked

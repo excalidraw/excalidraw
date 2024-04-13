@@ -32,7 +32,11 @@ const distributeSelectedElements = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
-  const updatedElements = distributeElements(selectedElements, distribution);
+  const updatedElements = distributeElements(
+    selectedElements,
+    app.scene.getNonDeletedElementsMap(),
+    distribution,
+  );
 
   const updatedElementsMap = arrayToMap(updatedElements);
 
@@ -45,6 +49,7 @@ const distributeSelectedElements = (
 
 export const distributeHorizontally = register({
   name: "distributeHorizontally",
+  label: "labels.distributeHorizontally",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -75,6 +80,7 @@ export const distributeHorizontally = register({
 
 export const distributeVertically = register({
   name: "distributeVertically",
+  label: "labels.distributeVertically",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {

@@ -12,6 +12,7 @@ import { getElementBounds } from "../element";
 import { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+import { arrayToMap } from "../utils";
 
 const { h } = window;
 
@@ -138,6 +139,8 @@ describe("paste text as single lines", () => {
   });
 
   it("should space items correctly", async () => {
+    const elementsMap = arrayToMap(h.elements);
+
     const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
     const lineHeightPx =
       getLineHeightInPx(
@@ -149,16 +152,17 @@ describe("paste text as single lines", () => {
     pasteWithCtrlCmdV(text);
     await waitFor(async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0]);
+      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
       for (let i = 1; i < h.elements.length; i++) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [fx, elY] = getElementBounds(h.elements[i]);
+        const [fx, elY] = getElementBounds(h.elements[i], elementsMap);
         expect(elY).toEqual(firstElY + lineHeightPx * i);
       }
     });
   });
 
   it("should leave a space for blank new lines", async () => {
+    const elementsMap = arrayToMap(h.elements);
     const text = "hkhkjhki\n\njgkjhffjh";
     const lineHeightPx =
       getLineHeightInPx(
@@ -168,11 +172,12 @@ describe("paste text as single lines", () => {
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
     pasteWithCtrlCmdV(text);
+
     await waitFor(async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0]);
+      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [lx, lastElY] = getElementBounds(h.elements[1]);
+      const [lx, lastElY] = getElementBounds(h.elements[1], elementsMap);
       expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
     });
   });
@@ -260,6 +265,173 @@ describe("Paste bound text container", () => {
       const container = h.elements[0];
       expect(container.height).toBe(770);
       expect(container.width).toBe(166);
+    });
+  });
+});
+
+describe("pasting & frames", () => {
+  it("should add pasted elements to frame under cursor", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({ type: "rectangle" });
+
+    h.elements = [frame];
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect],
+      files: null,
+    });
+
+    mouse.moveTo(50, 50);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(frame.id);
+    });
+  });
+
+  it("should filter out elements not overlapping frame", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      width: 50,
+      height: 50,
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      width: 50,
+      height: 50,
+      x: 100,
+      y: 100,
+    });
+
+    h.elements = [frame];
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect, rect2],
+      files: null,
+    });
+
+    mouse.moveTo(90, 90);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(3);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(frame.id);
+      expect(h.elements[2].type).toBe(rect2.type);
+      expect(h.elements[2].frameId).toBe(null);
+    });
+  });
+
+  it("should not filter out elements not overlapping frame if part of group", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      width: 50,
+      height: 50,
+      groupIds: ["g1"],
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      width: 50,
+      height: 50,
+      x: 100,
+      y: 100,
+      groupIds: ["g1"],
+    });
+
+    h.elements = [frame];
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect, rect2],
+      files: null,
+    });
+
+    mouse.moveTo(90, 90);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(3);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(frame.id);
+      expect(h.elements[2].type).toBe(rect2.type);
+      expect(h.elements[2].frameId).toBe(frame.id);
+    });
+  });
+
+  it("should not filter out other frames and their children", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      width: 50,
+      height: 50,
+      groupIds: ["g1"],
+    });
+
+    const frame2 = API.createElement({
+      type: "frame",
+      width: 75,
+      height: 75,
+      x: 0,
+      y: 0,
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      width: 50,
+      height: 50,
+      x: 55,
+      y: 55,
+      frameId: frame2.id,
+    });
+
+    h.elements = [frame];
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect, rect2, frame2],
+      files: null,
+    });
+
+    mouse.moveTo(90, 90);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(4);
+      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[1].frameId).toBe(frame.id);
+      expect(h.elements[2].type).toBe(rect2.type);
+      expect(h.elements[2].frameId).toBe(h.elements[3].id);
+      expect(h.elements[3].type).toBe(frame2.type);
+      expect(h.elements[3].frameId).toBe(null);
     });
   });
 });

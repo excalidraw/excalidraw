@@ -2,7 +2,12 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FILENAME,
+  isFirefox,
+  MIME_TYPES,
+} from "../constants";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import {
@@ -11,7 +16,6 @@ import {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { t } from "../i18n";
-import { elementsOverlappingBBox } from "../../withinBounds";
 import { isSomeElementSelected, getSelectedElements } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import { ExportType } from "../scene/types";
@@ -20,6 +24,7 @@ import { cloneJSON } from "../utils";
 import { canvasToBlob } from "./blob";
 import { fileSave, FileSystemHandle } from "./filesystem";
 import { serializeAsJSON } from "./json";
+import { getElementsOverlappingFrame } from "../frame";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
@@ -56,11 +61,7 @@ export const prepareElementsForExport = (
       isFrameLikeElement(exportedElements[0])
     ) {
       exportingFrame = exportedElements[0];
-      exportedElements = elementsOverlappingBBox({
-        elements,
-        bounds: exportingFrame,
-        type: "overlap",
-      });
+      exportedElements = getElementsOverlappingFrame(elements, exportingFrame);
     } else if (exportedElements.length > 1) {
       exportedElements = getSelectedElements(
         elements,
@@ -88,14 +89,15 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
-    name,
+    name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    name: string;
+    /** filename, if applicable */
+    name?: string;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },
@@ -104,7 +106,7 @@ export const exportCanvas = async (
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
   if (type === "svg" || type === "clipboard-svg") {
-    const tempSvg = await exportToSvg(
+    const svgPromise = exportToSvg(
       elements,
       {
         exportBackground,
@@ -117,9 +119,12 @@ export const exportCanvas = async (
       files,
       { exportingFrame },
     );
+
     if (type === "svg") {
-      return await fileSave(
-        new Blob([tempSvg.outerHTML], { type: MIME_TYPES.svg }),
+      return fileSave(
+        svgPromise.then((svg) => {
+          return new Blob([svg.outerHTML], { type: MIME_TYPES.svg });
+        }),
         {
           description: "Export to SVG",
           name,
@@ -128,7 +133,12 @@ export const exportCanvas = async (
         },
       );
     } else if (type === "clipboard-svg") {
-      await copyTextToSystemClipboard(tempSvg.outerHTML);
+      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      try {
+        await copyTextToSystemClipboard(svg);
+      } catch (e) {
+        throw new Error(t("errors.copyToSystemClipboardFailed"));
+      }
       return;
     }
   }
@@ -141,17 +151,20 @@ export const exportCanvas = async (
   });
 
   if (type === "png") {
-    let blob = await canvasToBlob(tempCanvas);
+    let blob = canvasToBlob(tempCanvas);
+
     if (appState.exportEmbedScene) {
-      blob = await (
-        await import(/* webpackChunkName: "image" */ "./image")
-      ).encodePngMetadata({
-        blob,
-        metadata: serializeAsJSON(elements, appState, files, "local"),
-      });
+      blob = blob.then((blob) =>
+        import("./image").then(({ encodePngMetadata }) =>
+          encodePngMetadata({
+            blob,
+            metadata: serializeAsJSON(elements, appState, files, "local"),
+          }),
+        ),
+      );
     }
 
-    return await fileSave(blob, {
+    return fileSave(blob, {
       description: "Export to PNG",
       name,
       // FIXME reintroduce `excalidraw.png` when most people upgrade away
@@ -166,7 +179,7 @@ export const exportCanvas = async (
     } catch (error: any) {
       console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
-        throw error;
+        throw new Error(t("canvasError.canvasTooBig"));
       }
       // TypeError *probably* suggests ClipboardItem not defined, which
       // people on Firefox can enable through a flag, so let's tell them.

@@ -1,10 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`multi point mode in linear elements > arrow 1`] = `
+exports[`multi point mode in linear elements > arrow 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
@@ -12,6 +13,7 @@ exports[`multi point mode in linear elements > arrow 1`] = `
   "groupIds": [],
   "height": 110,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
     70,
@@ -46,19 +48,20 @@ exports[`multi point mode in linear elements > arrow 1`] = `
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 7,
-  "versionNonce": 1505387817,
+  "version": 8,
+  "versionNonce": 23633383,
   "width": 70,
   "x": 30,
   "y": 30,
 }
 `;
 
-exports[`multi point mode in linear elements > line 1`] = `
+exports[`multi point mode in linear elements > line 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
@@ -66,6 +69,7 @@ exports[`multi point mode in linear elements > line 1`] = `
   "groupIds": [],
   "height": 110,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
     70,
@@ -100,8 +104,8 @@ exports[`multi point mode in linear elements > line 1`] = `
   "strokeWidth": 2,
   "type": "line",
   "updated": 1,
-  "version": 7,
-  "versionNonce": 1505387817,
+  "version": 8,
+  "versionNonce": 23633383,
   "width": 70,
   "x": 30,
   "y": 30,

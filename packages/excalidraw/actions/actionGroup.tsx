@@ -27,6 +27,7 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
+import { syncMovedIndices } from "../fractionalIndex";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -61,6 +62,8 @@ const enableActionGroup = (
 
 export const actionGroup = register({
   name: "group",
+  label: "labels.group",
+  icon: (appState) => <GroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements({
@@ -105,10 +108,9 @@ export const actionGroup = register({
       const frameElementsMap = groupByFrameLikes(selectedElements);
 
       frameElementsMap.forEach((elementsInFrame, frameId) => {
-        nextElements = removeElementsFromFrame(
-          nextElements,
+        removeElementsFromFrame(
           elementsInFrame,
-          appState,
+          app.scene.getNonDeletedElementsMap(),
         );
       });
     }
@@ -139,11 +141,12 @@ export const actionGroup = register({
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    nextElements = [
+    const reorderedElements = [
       ...elementsBeforeGroup,
       ...elementsInGroup,
       ...elementsAfterGroup,
     ];
+    syncMovedIndices(reorderedElements, arrayToMap(elementsInGroup));
 
     return {
       appState: {
@@ -154,11 +157,10 @@ export const actionGroup = register({
           getNonDeletedElements(nextElements),
         ),
       },
-      elements: nextElements,
+      elements: reorderedElements,
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.group",
   predicate: (elements, appState, _, app) =>
     enableActionGroup(elements, appState, app),
   keyTest: (event) =>
@@ -178,9 +180,13 @@ export const actionGroup = register({
 
 export const actionUngroup = register({
   name: "ungroup",
+  label: "labels.ungroup",
+  icon: (appState) => <UngroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
+    const elementsMap = arrayToMap(elements);
+
     if (groupIds.length === 0) {
       return { appState, elements, commitToHistory: false };
     }
@@ -227,9 +233,14 @@ export const actionUngroup = register({
       if (frame) {
         nextElements = replaceAllElementsInFrame(
           nextElements,
-          getElementsInResizingFrame(nextElements, frame, appState),
+          getElementsInResizingFrame(
+            nextElements,
+            frame,
+            appState,
+            elementsMap,
+          ),
           frame,
-          appState,
+          app,
         );
       }
     });
@@ -257,7 +268,6 @@ export const actionUngroup = register({
     event.shiftKey &&
     event[KEYS.CTRL_OR_CMD] &&
     event.key === KEYS.G.toUpperCase(),
-  contextItemLabel: "labels.ungroup",
   predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (

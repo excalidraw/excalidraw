@@ -32,15 +32,9 @@ function App() {
 
 ### Next.js
 
-Since _Excalidraw_ doesn't support server side rendering, you should render the component once the host is `mounted`.
+Since Excalidraw doesn't support `server side rendering` so it should be rendered only on `client`. The way to achieve this in next.js is using `next.js dynamic import`.
 
-Here are two ways on how you can render **Excalidraw** on **Next.js**.
-
-
-
-1. Using **Next.js Dynamic** import [Recommended].
-
-Since Excalidraw doesn't support server side rendering so you can also use `dynamic import` to render by setting `ssr` to `false`.
+If you want to only import `Excalidraw` component you can do :point_down:
 
 ```jsx showLineNumbers
 import dynamic from "next/dynamic";
@@ -55,25 +49,88 @@ export default function App() {
 }
 ```
 
-Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-dynamic-k8yjq2).
+However the above component only works for named component exports. If you want to import some util / constant or something else apart from Excalidraw, then this approach will not work. Instead you can write a wrapper over Excalidraw and import the wrapper dynamically.
 
+If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper as shown :point_down:
 
-2. Importing Excalidraw once **client** is rendered.
+<Tabs>
+  <TabItem value="Excalidraw Wrapper" label="Excalidraw Wrapper" >
 
-```jsx showLineNumbers
-import { useState, useEffect } from "react";
-export default function App() {
-  const [Excalidraw, setExcalidraw] = useState(null);
-  useEffect(() => {
-    import("@excalidraw/excalidraw").then((comp) =>
-      setExcalidraw(comp.Excalidraw),
+  ```jsx showLineNumbers
+  "use client";
+  import { Excalidraw, convertToExcalidrawElements } from "@excalidraw/excalidraw";
+
+  import "@excalidraw/excalidraw/index.css";
+
+  const ExcalidrawWrapper: React.FC = () => {
+    console.info(convertToExcalidrawElements([{
+      type: "rectangle",
+      id: "rect-1",
+      width: 186.47265625,
+      height: 141.9765625,
+    },]));
+    return (
+      <div style={{height:"500px", width:"500px"}}>  
+        <Excalidraw />
+      </div> 
     );
-  }, []);
-  return <>{Excalidraw && <Excalidraw />}</>;
-}
-```
+  };
+  export default ExcalidrawWrapper;
+  ```
 
-Here is a working [demo](https://codesandbox.io/p/sandbox/excalidraw-with-next-5xb3d)
+  </TabItem>
+
+  <TabItem value="pages" label="Pages router">
+
+  ```jsx showLineNumbers
+  import dynamic from "next/dynamic";
+  
+  // Since client components get prerenderd on server as well hence importing 
+  // the excalidraw stuff dynamically with ssr false
+
+  const ExcalidrawWrapper = dynamic(
+    async () => (await import("../excalidrawWrapper")).default,
+    {
+      ssr: false,
+    },
+  );
+
+  export default function Page() {
+    return (
+      <ExcalidrawWrapper />      
+    );
+  }
+  ```
+  </TabItem>
+
+  <TabItem value="app" label="App router">
+
+  ```jsx showLineNumbers
+  import dynamic from "next/dynamic";
+
+  // Since client components get prerenderd on server as well hence importing 
+  // the excalidraw stuff dynamically with ssr false
+
+  const ExcalidrawWrapper = dynamic(
+    async () => (await import("../excalidrawWrapper")).default,
+    {
+      ssr: false,
+    },
+  );
+
+  export default function Page() {
+    return (
+      <ExcalidrawWrapper />
+    );
+  }
+  ```
+
+  </TabItem>
+</Tabs>
+
+
+Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/excalidraw/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs-gh6smrdnq-excalidraw.vercel.app/).
+
 
 The `types` are available at `@excalidraw/excalidraw/types`, you can view [example for typescript](https://codesandbox.io/s/excalidraw-types-9h2dm)
 

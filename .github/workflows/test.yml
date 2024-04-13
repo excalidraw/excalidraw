@@ -13,5 +13,5 @@ jobs:
           node-version: 18.x
       - name: Install and test
         run: |
-          yarn install:deps
+          yarn install
           yarn test:app

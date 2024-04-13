@@ -27,7 +27,7 @@ import * as blob from "../data/blob";
 import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
-import { cloneJSON } from "../utils";
+import { arrayToMap, cloneJSON } from "../utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -194,11 +194,11 @@ const checkElementsBoundingBox = async (
   element2: ExcalidrawElement,
   toleranceInPx: number = 0,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1);
+  const elementsMap = arrayToMap([element1, element2]);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1, elementsMap);
 
-  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2);
+  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2, elementsMap);
 
-  debugger;
   await waitFor(() => {
     // Check if width and height did not change
     expect(x2 - x1).toBeCloseTo(x22 - x12, -1);
@@ -412,7 +412,7 @@ describe("ellipse", () => {
 describe("arrow", () => {
   it("flips an unrotated arrow horizontally with line inside min/max points bounds", async () => {
     const arrow = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
+    h.elements = [arrow];
     h.app.setState({ selectedElementIds: { [arrow.id]: true } });
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
@@ -421,7 +421,7 @@ describe("arrow", () => {
 
   it("flips an unrotated arrow vertically with line inside min/max points bounds", async () => {
     const arrow = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
+    h.elements = [arrow];
     h.app.setState({ selectedElementIds: { [arrow.id]: true } });
 
     await checkVerticalFlip(50);
@@ -431,7 +431,7 @@ describe("arrow", () => {
     const originalAngle = Math.PI / 4;
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.state.selectedElementIds = {
       ...h.state.selectedElementIds,
       [line.id]: true,
@@ -450,7 +450,7 @@ describe("arrow", () => {
     const originalAngle = Math.PI / 4;
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.state.selectedElementIds = {
       ...h.state.selectedElementIds,
       [line.id]: true,
@@ -468,7 +468,7 @@ describe("arrow", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips an unrotated arrow horizontally with line outside min/max points bounds", async () => {
     const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
+    h.elements = [arrow];
     h.app.setState({ selectedElementIds: { [arrow.id]: true } });
 
     await checkHorizontalFlip(
@@ -482,7 +482,7 @@ describe("arrow", () => {
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedVerticalFlip(
@@ -494,7 +494,7 @@ describe("arrow", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips an unrotated arrow vertically with line outside min/max points bounds", async () => {
     const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
+    h.elements = [arrow];
     h.app.setState({ selectedElementIds: { [arrow.id]: true } });
 
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
@@ -506,7 +506,7 @@ describe("arrow", () => {
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedVerticalFlip(
@@ -542,7 +542,7 @@ describe("arrow", () => {
 describe("line", () => {
   it("flips an unrotated line horizontally with line inside min/max points bounds", async () => {
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkHorizontalFlip(
@@ -552,7 +552,7 @@ describe("line", () => {
 
   it("flips an unrotated line vertically with line inside min/max points bounds", async () => {
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
@@ -567,7 +567,7 @@ describe("line", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips an unrotated line horizontally with line outside min/max points bounds", async () => {
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkHorizontalFlip(
@@ -578,7 +578,7 @@ describe("line", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips an unrotated line vertically with line outside min/max points bounds", async () => {
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
@@ -590,7 +590,7 @@ describe("line", () => {
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
     mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedHorizontalFlip(
@@ -605,7 +605,7 @@ describe("line", () => {
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
     mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.app.setState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedVerticalFlip(
@@ -623,7 +623,7 @@ describe("line", () => {
     const originalAngle = Math.PI / 4;
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.state.selectedElementIds = {
       ...h.state.selectedElementIds,
       [line.id]: true,
@@ -642,7 +642,7 @@ describe("line", () => {
     const originalAngle = Math.PI / 4;
     const expectedAngle = (7 * Math.PI) / 4;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
+    h.elements = [line];
     h.state.selectedElementIds = {
       ...h.state.selectedElementIds,
       [line.id]: true,
@@ -854,7 +854,11 @@ describe("mutliple elements", () => {
     h.app.actionManager.executeAction(actionFlipVertical);
 
     const arrowText = h.elements[1] as ExcalidrawTextElementWithContainer;
-    const arrowTextPos = getBoundTextElementPosition(arrow.get(), arrowText)!;
+    const arrowTextPos = getBoundTextElementPosition(
+      arrow.get(),
+      arrowText,
+      arrayToMap(h.elements),
+    )!;
     const rectText = h.elements[3] as ExcalidrawTextElementWithContainer;
 
     expect(arrow.x).toBeCloseTo(180);

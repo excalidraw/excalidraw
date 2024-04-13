@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ActionManager } from "../actions/manager";
-import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement, ExcalidrawElementType } from "../element/types";
+import {
+  ExcalidrawElement,
+  ExcalidrawElementType,
+  NonDeletedElementsMap,
+  NonDeletedSceneElementsMap,
+} from "../element/types";
 import { t } from "../i18n";
 import { useDevice } from "./App";
 import {
@@ -42,19 +46,50 @@ import {
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
 
+export const canChangeStrokeColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  let commonSelectedType: ExcalidrawElementType | null =
+    targetElements[0]?.type || null;
+
+  for (const element of targetElements) {
+    if (element.type !== commonSelectedType) {
+      commonSelectedType = null;
+      break;
+    }
+  }
+
+  return (
+    (hasStrokeColor(appState.activeTool.type) &&
+      appState.activeTool.type !== "image" &&
+      commonSelectedType !== "image" &&
+      commonSelectedType !== "frame" &&
+      commonSelectedType !== "magicframe") ||
+    targetElements.some((element) => hasStrokeColor(element.type))
+  );
+};
+
+export const canChangeBackgroundColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  return (
+    hasBackground(appState.activeTool.type) ||
+    targetElements.some((element) => hasBackground(element.type))
+  );
+};
+
 export const SelectedShapeActions = ({
   appState,
-  elements,
+  elementsMap,
   renderAction,
 }: {
   appState: UIAppState;
-  elements: readonly ExcalidrawElement[];
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
 }) => {
-  const targetElements = getTargetElements(
-    getNonDeletedElements(elements),
-    appState,
-  );
+  const targetElements = getTargetElements(elementsMap, appState);
 
   let isSingleElementBoundContainer = false;
   if (
@@ -75,35 +110,17 @@ export const SelectedShapeActions = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
-  const showChangeBackgroundIcons =
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
 
-  let commonSelectedType: ExcalidrawElementType | null =
-    targetElements[0]?.type || null;
-
-  for (const element of targetElements) {
-    if (element.type !== commonSelectedType) {
-      commonSelectedType = null;
-      break;
-    }
-  }
-
   return (
     <div className="panelColumn">
       <div>
-        {((hasStrokeColor(appState.activeTool.type) &&
-          appState.activeTool.type !== "image" &&
-          commonSelectedType !== "image" &&
-          commonSelectedType !== "frame" &&
-          commonSelectedType !== "magicframe") ||
-          targetElements.some((element) => hasStrokeColor(element.type))) &&
+        {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
       </div>
-      {showChangeBackgroundIcons && (
+      {canChangeBackgroundColor(appState, targetElements) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {showFillIcons && renderAction("changeFillStyle")}
@@ -137,12 +154,12 @@ export const SelectedShapeActions = ({
           {renderAction("changeFontFamily")}
 
           {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements)) &&
+            suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
         </>
       )}
 
-      {shouldAllowVerticalAlign(targetElements) &&
+      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
         renderAction("changeVerticalAlign")}
       {(canHaveArrowheads(appState.activeTool.type) ||
         targetElements.some((element) => canHaveArrowheads(element.type))) && (
@@ -306,6 +323,25 @@ export const ShapesSwitcher = ({
           title={t("toolBar.extraTools")}
         >
           {extraToolsIcon}
+          {app.props.aiEnabled !== false && (
+            <div
+              style={{
+                display: "inline-flex",
+                marginLeft: "auto",
+                padding: "2px 4px",
+                borderRadius: 6,
+                fontSize: 8,
+                fontFamily: "Cascadia, monospace",
+                position: "absolute",
+                background: "pink",
+                color: "black",
+                bottom: 3,
+                right: 4,
+              }}
+            >
+              AI
+            </div>
+          )}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}

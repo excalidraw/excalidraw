@@ -10,6 +10,7 @@ import { newElementWith } from "../element/mutateElement";
 import { fixBindingsAfterDeletion } from "../element/binding";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 const writeData = (
   prevElements: readonly ExcalidrawElement[],
@@ -48,6 +49,8 @@ const writeData = (
         ),
       );
     fixBindingsAfterDeletion(elements, deletedElements);
+    // TODO: will be replaced in #7348
+    syncInvalidIndices(elements);
 
     return {
       elements,
@@ -63,7 +66,10 @@ type ActionCreator = (history: History) => Action;
 
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
+  label: "buttons.undo",
+  icon: UndoIcon,
   trackEvent: { category: "history" },
+  viewMode: false,
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.undoOnce()),
   keyTest: (event) =>
@@ -84,7 +90,10 @@ export const createUndoAction: ActionCreator = (history) => ({
 
 export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
+  label: "buttons.redo",
+  icon: RedoIcon,
   trackEvent: { category: "history" },
+  viewMode: false,
   perform: (elements, appState) =>
     writeData(elements, appState, () => history.redoOnce()),
   keyTest: (event) =>

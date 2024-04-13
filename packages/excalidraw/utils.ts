@@ -7,10 +7,14 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import { FontFamilyValues, FontString } from "./element/types";
-import { ActiveTool, AppState, ToolType, Zoom } from "./types";
-import { unstable_batchedUpdates } from "react-dom";
-import { ResolutionType } from "./utility-types";
-import React from "react";
+import {
+  ActiveTool,
+  AppState,
+  ToolType,
+  UnsubscribeCallback,
+  Zoom,
+} from "./types";
+import { MaybePromise, ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -534,7 +538,9 @@ export const isTransparent = (color: string) => {
 };
 
 export type ResolvablePromise<T> = Promise<T> & {
-  resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
+  resolve: [T] extends [undefined]
+    ? (value?: MaybePromise<Awaited<T>>) => void
+    : (value: MaybePromise<Awaited<T>>) => void;
   reject: (error: Error) => void;
 };
 export const resolvablePromise = <T>() => {
@@ -547,33 +553,6 @@ export const resolvablePromise = <T>() => {
   (promise as any).resolve = resolve;
   (promise as any).reject = reject;
   return promise as ResolvablePromise<T>;
-};
-
-/**
- * @param func handler taking at most single parameter (event).
- */
-export const withBatchedUpdates = <
-  TFunction extends ((event: any) => void) | (() => void),
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) =>
-  ((event) => {
-    unstable_batchedUpdates(func as TFunction, event);
-  }) as TFunction;
-
-/**
- * barches React state updates and throttles the calls to a single call per
- * animation frame
- */
-export const withBatchedUpdatesThrottled = <
-  TFunction extends ((event: any) => void) | (() => void),
->(
-  func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-) => {
-  // @ts-ignore
-  return throttleRAF<Parameters<TFunction>>(((event) => {
-    unstable_batchedUpdates(func, event);
-  }) as TFunction);
 };
 
 //https://stackoverflow.com/a/9462382/8418
@@ -673,8 +652,11 @@ export const getUpdatedTimestamp = () => (isTestEnv() ? 1 : Date.now());
  * or array of ids (strings), into a Map, keyd by `id`.
  */
 export const arrayToMap = <T extends { id: string } | string>(
-  items: readonly T[],
+  items: readonly T[] | Map<string, T>,
 ) => {
+  if (items instanceof Map) {
+    return items;
+  }
   return items.reduce((acc: Map<string, T>, element) => {
     acc.set(typeof element === "string" ? element : element.id, element);
     return acc;
@@ -690,6 +672,8 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
   }, new Map<string, [element: T, index: number]>());
 
 export const isTestEnv = () => import.meta.env.MODE === "test";
+
+export const isDevEnv = () => import.meta.env.MODE === "development";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
@@ -769,27 +753,88 @@ export const queryFocusableElements = (container: HTMLElement | null) => {
     : [];
 };
 
+/** use as a fallback after identity check (for perf reasons) */
+const _defaultIsShallowComparatorFallback = (a: any, b: any): boolean => {
+  // consider two empty arrays equal
+  if (
+    Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === 0 &&
+    b.length === 0
+  ) {
+    return true;
+  }
+  return a === b;
+};
+
+/**
+ * Returns whether object/array is shallow equal.
+ * Considers empty object/arrays as equal (whether top-level or second-level).
+ */
 export const isShallowEqual = <
   T extends Record<string, any>,
-  I extends keyof T,
+  K extends readonly unknown[],
 >(
   objA: T,
   objB: T,
-  comparators?: Record<I, (a: T[I], b: T[I]) => boolean>,
+  comparators?:
+    | { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
+    | (keyof T extends K[number]
+        ? K extends readonly (keyof T)[]
+          ? K
+          : {
+              _error: "keys are either missing or include keys not in compared obj";
+            }
+        : {
+            _error: "keys are either missing or include keys not in compared obj";
+          }),
   debug = false,
 ) => {
   const aKeys = Object.keys(objA);
   const bKeys = Object.keys(objB);
   if (aKeys.length !== bKeys.length) {
+    if (debug) {
+      console.warn(
+        `%cisShallowEqual: objects don't have same properties ->`,
+        "color: #8B4000",
+        objA,
+        objB,
+      );
+    }
     return false;
   }
+
+  if (comparators && Array.isArray(comparators)) {
+    for (const key of comparators) {
+      const ret =
+        objA[key] === objB[key] ||
+        _defaultIsShallowComparatorFallback(objA[key], objB[key]);
+      if (!ret) {
+        if (debug) {
+          console.warn(
+            `%cisShallowEqual: ${key} not equal ->`,
+            "color: #8B4000",
+            objA[key],
+            objB[key],
+          );
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
   return aKeys.every((key) => {
-    const comparator = comparators?.[key as I];
+    const comparator = (
+      comparators as { [key in keyof T]?: (a: T[key], b: T[key]) => boolean }
+    )?.[key as keyof T];
     const ret = comparator
       ? comparator(objA[key], objB[key])
-      : objA[key] === objB[key];
+      : objA[key] === objB[key] ||
+        _defaultIsShallowComparatorFallback(objA[key], objB[key]);
+
     if (!ret && debug) {
-      console.info(
+      console.warn(
         `%cisShallowEqual: ${key} not equal ->`,
         "color: #8B4000",
         objA[key],
@@ -812,7 +857,7 @@ export const composeEventHandlers = <E>(
 
     if (
       !checkForDefaultPrevented ||
-      !(event as unknown as Event).defaultPrevented
+      !(event as unknown as Event)?.defaultPrevented
     ) {
       return ourEventHandler?.(event);
     }
@@ -880,36 +925,6 @@ export const memoize = <T extends Record<string, any>, R extends any>(
   return ret as typeof func & { clear: () => void };
 };
 
-export const isRenderThrottlingEnabled = (() => {
-  // we don't want to throttle in react < 18 because of #5439 and it was
-  // getting more complex to maintain the fix
-  let IS_REACT_18_AND_UP: boolean;
-  try {
-    const version = React.version.split(".");
-    IS_REACT_18_AND_UP = Number(version[0]) > 17;
-  } catch {
-    IS_REACT_18_AND_UP = false;
-  }
-
-  let hasWarned = false;
-
-  return () => {
-    if (window.EXCALIDRAW_THROTTLE_RENDER === true) {
-      if (!IS_REACT_18_AND_UP) {
-        if (!hasWarned) {
-          hasWarned = true;
-          console.warn(
-            "Excalidraw: render throttling is disabled on React versions < 18.",
-          );
-        }
-        return false;
-      }
-      return true;
-    }
-    return false;
-  };
-})();
-
 /** Checks if value is inside given collection. Useful for type-safety. */
 export const isMemberOf = <T extends string>(
   /** Set/Map/Array/Object */
@@ -928,4 +943,172 @@ export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
 export const isFiniteNumber = (value: any): value is number => {
   return typeof value === "number" && Number.isFinite(value);
+};
+
+export const updateStable = <T extends any[] | Record<string, any>>(
+  prevValue: T,
+  nextValue: T,
+) => {
+  if (isShallowEqual(prevValue, nextValue)) {
+    return prevValue;
+  }
+  return nextValue;
+};
+
+// Window
+export function addEventListener<K extends keyof WindowEventMap>(
+  target: Window & typeof globalThis,
+  type: K,
+  listener: (this: Window, ev: WindowEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+export function addEventListener(
+  target: Window & typeof globalThis,
+  type: string,
+  listener: (this: Window, ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// Document
+export function addEventListener<K extends keyof DocumentEventMap>(
+  target: Document,
+  type: K,
+  listener: (this: Document, ev: DocumentEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+export function addEventListener(
+  target: Document,
+  type: string,
+  listener: (this: Document, ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// FontFaceSet (document.fonts)
+export function addEventListener<K extends keyof FontFaceSetEventMap>(
+  target: FontFaceSet,
+  type: K,
+  listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// HTMLElement / mix
+export function addEventListener<K extends keyof HTMLElementEventMap>(
+  target:
+    | Document
+    | (Window & typeof globalThis)
+    | HTMLElement
+    | undefined
+    | null
+    | false,
+  type: K,
+  listener: (this: HTMLDivElement, ev: HTMLElementEventMap[K]) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback;
+// implem
+export function addEventListener(
+  /**
+   * allows for falsy values so you don't have to type check when adding
+   * event listeners to optional elements
+   */
+  target:
+    | Document
+    | (Window & typeof globalThis)
+    | FontFaceSet
+    | HTMLElement
+    | undefined
+    | null
+    | false,
+  type: keyof WindowEventMap | keyof DocumentEventMap | string,
+  listener: (ev: Event) => any,
+  options?: boolean | AddEventListenerOptions,
+): UnsubscribeCallback {
+  if (!target) {
+    return () => {};
+  }
+  target?.addEventListener?.(type, listener, options);
+  return () => {
+    target?.removeEventListener?.(type, listener, options);
+  };
+}
+
+const average = (a: number, b: number) => (a + b) / 2;
+export function getSvgPathFromStroke(points: number[][], closed = true) {
+  const len = points.length;
+
+  if (len < 4) {
+    return ``;
+  }
+
+  let a = points[0];
+  let b = points[1];
+  const c = points[2];
+
+  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
+    2,
+  )},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
+    b[1],
+    c[1],
+  ).toFixed(2)} T`;
+
+  for (let i = 2, max = len - 1; i < max; i++) {
+    a = points[i];
+    b = points[i + 1];
+    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(
+      2,
+    )} `;
+  }
+
+  if (closed) {
+    result += "Z";
+  }
+
+  return result;
+}
+
+export const normalizeEOL = (str: string) => {
+  return str.replace(/\r?\n|\r/g, "\n");
+};
+
+// -----------------------------------------------------------------------------
+type HasBrand<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  [K in keyof T]: K extends `~brand${infer _}` ? true : never;
+}[keyof T];
+
+type RemoveAllBrands<T> = HasBrand<T> extends true
+  ? {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+    }
+  : never;
+
+// adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
+// currently does not cover all types (e.g. tuples, promises...)
+type Unbrand<T> = T extends Map<infer E, infer F>
+  ? Map<E, F>
+  : T extends Set<infer E>
+  ? Set<E>
+  : T extends Array<infer E>
+  ? Array<E>
+  : RemoveAllBrands<T>;
+
+/**
+ * Makes type into a branded type, ensuring that value is assignable to
+ * the base ubranded type. Optionally you can explicitly supply current value
+ * type to combine both (useful for composite branded types. Make sure you
+ * compose branded types which are not composite themselves.)
+ */
+export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
+  value: Unbrand<BrandedType>,
+) => {
+  return value as CurrentType & BrandedType;
+};
+
+// -----------------------------------------------------------------------------
+
+// Promise.try, adapted from https://github.com/sindresorhus/p-try
+export const promiseTry = async <TValue, TArgs extends unknown[]>(
+  fn: (...args: TArgs) => PromiseLike<TValue> | TValue,
+  ...args: TArgs
+): Promise<TValue> => {
+  return new Promise((resolve) => {
+    resolve(fn(...args));
+  });
 };

@@ -1,4 +1,6 @@
 import {
+  ElementsMap,
+  ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
@@ -43,18 +45,24 @@ export const excludeElementsInFramesFromSelection = <
 export const getElementsWithinSelection = (
   elements: readonly NonDeletedExcalidrawElement[],
   selection: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   excludeElementsInFrames: boolean = true,
 ) => {
   const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(selection);
+    getElementAbsoluteCoords(selection, elementsMap);
 
   let elementsInSelection = elements.filter((element) => {
-    let [elementX1, elementY1, elementX2, elementY2] =
-      getElementBounds(element);
+    let [elementX1, elementY1, elementX2, elementY2] = getElementBounds(
+      element,
+      elementsMap,
+    );
 
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
     if (containingFrame) {
-      const [fx1, fy1, fx2, fy2] = getElementBounds(containingFrame);
+      const [fx1, fy1, fx2, fy2] = getElementBounds(
+        containingFrame,
+        elementsMap,
+      );
 
       elementX1 = Math.max(fx1, elementX1);
       elementY1 = Math.max(fy1, elementY1);
@@ -78,10 +86,10 @@ export const getElementsWithinSelection = (
     : elementsInSelection;
 
   elementsInSelection = elementsInSelection.filter((element) => {
-    const containingFrame = getContainingFrame(element);
+    const containingFrame = getContainingFrame(element, elementsMap);
 
     if (containingFrame) {
-      return elementOverlapsWithFrame(element, containingFrame);
+      return elementOverlapsWithFrame(element, containingFrame, elementsMap);
     }
 
     return true;
@@ -94,6 +102,7 @@ export const getVisibleAndNonSelectedElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   selectedElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
   const selectedElementsSet = new Set(
     selectedElements.map((element) => element.id),
@@ -104,6 +113,7 @@ export const getVisibleAndNonSelectedElements = (
       appState.width,
       appState.height,
       appState,
+      elementsMap,
     );
 
     return !selectedElementsSet.has(element.id) && isVisible;
@@ -166,26 +176,28 @@ export const getCommonAttributeOfSelectedElements = <T>(
 };
 
 export const getSelectedElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: ElementsMapOrArray,
   appState: Pick<InteractiveCanvasAppState, "selectedElementIds">,
   opts?: {
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;
   },
 ) => {
-  const selectedElements = elements.filter((element) => {
+  const selectedElements: ExcalidrawElement[] = [];
+  for (const element of elements.values()) {
     if (appState.selectedElementIds[element.id]) {
-      return element;
+      selectedElements.push(element);
+      continue;
     }
     if (
       opts?.includeBoundTextElement &&
       isBoundToContainer(element) &&
       appState.selectedElementIds[element?.containerId]
     ) {
-      return element;
+      selectedElements.push(element);
+      continue;
     }
-    return null;
-  });
+  }
 
   if (opts?.includeElementsInFrames) {
     const elementsToInclude: ExcalidrawElement[] = [];
@@ -205,7 +217,7 @@ export const getSelectedElements = (
 };
 
 export const getTargetElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
+  elements: ElementsMapOrArray,
   appState: Pick<AppState, "selectedElementIds" | "editingElement">,
 ) =>
   appState.editingElement

@@ -1,48 +1,132 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import { centerScrollOn } from "../scene/scroll";
+import { GoToCollaboratorComponentProps } from "../components/UserList";
+import {
+  eyeIcon,
+  microphoneIcon,
+  microphoneMutedIcon,
+} from "../components/icons";
+import { t } from "../i18n";
 import { Collaborator } from "../types";
 import { register } from "./register";
+import clsx from "clsx";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",
+  label: "Go to a collaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
-  perform: (_elements, appState, value) => {
-    const point = value as Collaborator["pointer"];
-    if (!point) {
-      return { appState, commitToHistory: false };
+  perform: (_elements, appState, collaborator: Collaborator) => {
+    if (
+      !collaborator.socketId ||
+      appState.userToFollow?.socketId === collaborator.socketId ||
+      collaborator.isCurrentUser
+    ) {
+      return {
+        appState: {
+          ...appState,
+          userToFollow: null,
+        },
+        commitToHistory: false,
+      };
     }
 
     return {
       appState: {
         ...appState,
-        ...centerScrollOn({
-          scenePoint: point,
-          viewportDimensions: {
-            width: appState.width,
-            height: appState.height,
-          },
-          zoom: appState.zoom,
-        }),
+        userToFollow: {
+          socketId: collaborator.socketId,
+          username: collaborator.username || "",
+        },
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, data }) => {
-    const [clientId, collaborator] = data as [string, Collaborator];
+  PanelComponent: ({ updateData, data, appState }) => {
+    const { socketId, collaborator, withName, isBeingFollowed } =
+      data as GoToCollaboratorComponentProps;
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(socketId, collaborator);
 
-    return (
-      <Avatar
-        color={background}
-        onClick={() => updateData(collaborator.pointer)}
-        name={collaborator.username || ""}
-        src={collaborator.avatarUrl}
-      />
+    const statusClassNames = clsx({
+      "is-followed": isBeingFollowed,
+      "is-current-user": collaborator.isCurrentUser === true,
+      "is-speaking": collaborator.isSpeaking,
+      "is-in-call": collaborator.isInCall,
+      "is-muted": collaborator.isMuted,
+    });
+
+    const statusIconJSX = collaborator.isInCall ? (
+      collaborator.isSpeaking ? (
+        <div
+          className="UserList__collaborator-status-icon-speaking-indicator"
+          title={t("userList.hint.isSpeaking")}
+        >
+          <div />
+          <div />
+          <div />
+        </div>
+      ) : collaborator.isMuted ? (
+        <div
+          className="UserList__collaborator-status-icon-microphone-muted"
+          title={t("userList.hint.micMuted")}
+        >
+          {microphoneMutedIcon}
+        </div>
+      ) : (
+        <div title={t("userList.hint.inCall")}>{microphoneIcon}</div>
+      )
+    ) : null;
+
+    return withName ? (
+      <div
+        className={`dropdown-menu-item dropdown-menu-item-base UserList__collaborator ${statusClassNames}`}
+        style={{ [`--avatar-size` as any]: "1.5rem" }}
+        onClick={() => updateData<Collaborator>(collaborator)}
+      >
+        <Avatar
+          color={background}
+          onClick={() => {}}
+          name={collaborator.username || ""}
+          src={collaborator.avatarUrl}
+          className={statusClassNames}
+        />
+        <div className="UserList__collaborator-name">
+          {collaborator.username}
+        </div>
+        <div className="UserList__collaborator-status-icons" aria-hidden>
+          {isBeingFollowed && (
+            <div
+              className="UserList__collaborator-status-icon-is-followed"
+              title={t("userList.hint.followStatus")}
+            >
+              {eyeIcon}
+            </div>
+          )}
+          {statusIconJSX}
+        </div>
+      </div>
+    ) : (
+      <div
+        className={`UserList__collaborator UserList__collaborator--avatar-only ${statusClassNames}`}
+      >
+        <Avatar
+          color={background}
+          onClick={() => {
+            updateData(collaborator);
+          }}
+          name={collaborator.username || ""}
+          src={collaborator.avatarUrl}
+          className={statusClassNames}
+        />
+        {statusIconJSX && (
+          <div className="UserList__collaborator-status-icon">
+            {statusIconJSX}
+          </div>
+        )}
+      </div>
     );
   },
 });

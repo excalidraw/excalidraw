@@ -72,8 +72,10 @@ const handleGroupEditingState = (
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
+  label: "labels.delete",
+  icon: TrashIcon,
   trackEvent: { category: "element", action: "delete" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     if (appState.editingLinearElement) {
       const {
         elementId,
@@ -81,7 +83,8 @@ export const actionDeleteSelected = register({
         startBindingElement,
         endBindingElement,
       } = appState.editingLinearElement;
-      const element = LinearElementEditor.getElement(elementId);
+      const elementsMap = app.scene.getNonDeletedElementsMap();
+      const element = LinearElementEditor.getElement(elementId, elementsMap);
       if (!element) {
         return false;
       }
@@ -167,7 +170,6 @@ export const actionDeleteSelected = register({
       ),
     };
   },
-  contextItemLabel: "labels.delete",
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],

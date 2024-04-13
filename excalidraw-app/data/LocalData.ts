@@ -10,8 +10,18 @@
  *   (localStorage, indexedDB).
  */
 
-import { createStore, entries, del, getMany, set, setMany } from "idb-keyval";
+import {
+  createStore,
+  entries,
+  del,
+  getMany,
+  set,
+  setMany,
+  get,
+} from "idb-keyval";
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
+import { LibraryPersistedData } from "../../packages/excalidraw/data/library";
+import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
 import {
   ExcalidrawElement,
@@ -22,6 +32,7 @@ import {
   BinaryFileData,
   BinaryFiles,
 } from "../../packages/excalidraw/types";
+import { MaybePromise } from "../../packages/excalidraw/utility-types";
 import { debounce } from "../../packages/excalidraw/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
@@ -182,4 +193,53 @@ export class LocalData {
       return { savedFiles, erroredFiles };
     },
   });
+}
+export class LibraryIndexedDBAdapter {
+  /** IndexedDB database and store name */
+  private static idb_name = STORAGE_KEYS.IDB_LIBRARY;
+  /** library data store key */
+  private static key = "libraryData";
+
+  private static store = createStore(
+    `${LibraryIndexedDBAdapter.idb_name}-db`,
+    `${LibraryIndexedDBAdapter.idb_name}-store`,
+  );
+
+  static async load() {
+    const IDBData = await get<LibraryPersistedData>(
+      LibraryIndexedDBAdapter.key,
+      LibraryIndexedDBAdapter.store,
+    );
+
+    return IDBData || null;
+  }
+
+  static save(data: LibraryPersistedData): MaybePromise<void> {
+    return set(
+      LibraryIndexedDBAdapter.key,
+      data,
+      LibraryIndexedDBAdapter.store,
+    );
+  }
+}
+
+/** LS Adapter used only for migrating LS library data
+ * to indexedDB */
+export class LibraryLocalStorageMigrationAdapter {
+  static load() {
+    const LSData = localStorage.getItem(
+      STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
+    );
+    if (LSData != null) {
+      const libraryItems: ImportedDataState["libraryItems"] =
+        JSON.parse(LSData);
+      if (libraryItems) {
+        return { libraryItems };
+      }
+    }
+    return null;
+  }
+  static clear() {
+    localStorage.removeItem(STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY);
+  }
 }

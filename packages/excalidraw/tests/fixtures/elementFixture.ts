@@ -17,6 +17,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   groupIds: [],
   frameId: null,
   roundness: null,
+  index: null,
   seed: 1041657908,
   version: 120,
   versionNonce: 1188004276,
@@ -34,7 +35,6 @@ export const rectangleFixture: ExcalidrawElement = {
 export const embeddableFixture: ExcalidrawElement = {
   ...elementBase,
   type: "embeddable",
-  validated: null,
 };
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,

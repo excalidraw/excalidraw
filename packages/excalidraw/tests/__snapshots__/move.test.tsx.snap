@@ -1,15 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
+exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 50,
   "id": "id0_copy",
+  "index": "a0",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -18,30 +20,66 @@ exports[`duplicate element on move when ALT is clicked > rectangle 1`] = `
   "roundness": {
     "type": 3,
   },
-  "seed": 1014066025,
+  "seed": 238820263,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 4,
-  "versionNonce": 238820263,
+  "version": 5,
+  "versionNonce": 400692809,
   "width": 30,
   "x": 30,
   "y": 20,
 }
 `;
 
-exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
+exports[`duplicate element on move when ALT is clicked > rectangle 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 50,
   "id": "id0",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "seed": 1278240551,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "versionNonce": 23633383,
+  "width": 30,
+  "x": -10,
+  "y": 60,
+}
+`;
+
+exports[`move element > rectangle 5`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -57,46 +95,14 @@ exports[`duplicate element on move when ALT is clicked > rectangle 2`] = `
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 1604849351,
-  "width": 30,
-  "x": -10,
-  "y": 60,
-}
-`;
-
-exports[`move element > rectangle 1`] = `
-{
-  "angle": 0,
-  "backgroundColor": "transparent",
-  "boundElements": null,
-  "fillStyle": "solid",
-  "frameId": null,
-  "groupIds": [],
-  "height": 50,
-  "id": "id0",
-  "isDeleted": false,
-  "link": null,
-  "locked": false,
-  "opacity": 100,
-  "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1278240551,
-  "strokeColor": "#1e1e1e",
-  "strokeStyle": "solid",
-  "strokeWidth": 2,
-  "type": "rectangle",
-  "updated": 1,
-  "version": 3,
-  "versionNonce": 1150084233,
+  "versionNonce": 1116226695,
   "width": 30,
   "x": 0,
   "y": 40,
 }
 `;
 
-exports[`move element > rectangles with binding arrow 1`] = `
+exports[`move element > rectangles with binding arrow 5`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -106,11 +112,13 @@ exports[`move element > rectangles with binding arrow 1`] = `
       "type": "arrow",
     },
   ],
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 100,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -125,15 +133,15 @@ exports[`move element > rectangles with binding arrow 1`] = `
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 3,
-  "versionNonce": 81784553,
+  "version": 4,
+  "versionNonce": 760410951,
   "width": 100,
   "x": 0,
   "y": 0,
 }
 `;
 
-exports[`move element > rectangles with binding arrow 2`] = `
+exports[`move element > rectangles with binding arrow 6`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
@@ -143,11 +151,13 @@ exports[`move element > rectangles with binding arrow 2`] = `
       "type": "arrow",
     },
   ],
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 300,
   "id": "id1",
+  "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -156,25 +166,26 @@ exports[`move element > rectangles with binding arrow 2`] = `
   "roundness": {
     "type": 3,
   },
-  "seed": 2019559783,
+  "seed": 1150084233,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
-  "versionNonce": 927333447,
+  "version": 7,
+  "versionNonce": 745419401,
   "width": 300,
   "x": 201,
   "y": 2,
 }
 `;
 
-exports[`move element > rectangles with binding arrow 3`] = `
+exports[`move element > rectangles with binding arrow 7`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "endArrowhead": null,
   "endBinding": {
     "elementId": "id1",
@@ -186,6 +197,7 @@ exports[`move element > rectangles with binding arrow 3`] = `
   "groupIds": [],
   "height": 81.48231043525051,
   "id": "id2",
+  "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
@@ -205,7 +217,7 @@ exports[`move element > rectangles with binding arrow 3`] = `
   "roundness": {
     "type": 2,
   },
-  "seed": 238820263,
+  "seed": 1604849351,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -217,8 +229,8 @@ exports[`move element > rectangles with binding arrow 3`] = `
   "strokeWidth": 2,
   "type": "line",
   "updated": 1,
-  "version": 11,
-  "versionNonce": 1051383431,
+  "version": 12,
+  "versionNonce": 1984422985,
   "width": 81,
   "x": 110,
   "y": 49.981789081137734,

@@ -4,6 +4,8 @@ import {
   isTextElement,
 } from "./element";
 import {
+  ElementsMap,
+  ElementsMapOrArray,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -19,14 +21,15 @@ import { mutateElement } from "./element/mutateElement";
 import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
-import Scene, { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
+import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
-import { doLineSegmentsIntersect } from "../utils";
+import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
+import { ReadonlySetLike } from "./utility-types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
-  nextElements: ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
   oldElements: readonly ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {
@@ -59,10 +62,11 @@ export const bindElementsToFramesAfterDuplication = (
 export function isElementIntersectingFrame(
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) {
-  const frameLineSegments = getElementLineSegments(frame);
+  const frameLineSegments = getElementLineSegments(frame, elementsMap);
 
-  const elementLineSegments = getElementLineSegments(element);
+  const elementLineSegments = getElementLineSegments(element, elementsMap);
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>
@@ -76,9 +80,10 @@ export function isElementIntersectingFrame(
 export const getElementsCompletelyInFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) =>
   omitGroupsContainingFrameLikes(
-    getElementsWithinSelection(elements, frame, false),
+    getElementsWithinSelection(elements, frame, elementsMap, false),
   ).filter(
     (element) =>
       (!isFrameLikeElement(element) && !element.frameId) ||
@@ -89,8 +94,9 @@ export const isElementContainingFrame = (
   elements: readonly ExcalidrawElement[],
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
-  return getElementsWithinSelection(elements, element).some(
+  return getElementsWithinSelection(elements, element, elementsMap).some(
     (e) => e.id === frame.id,
   );
 };
@@ -98,34 +104,43 @@ export const isElementContainingFrame = (
 export const getElementsIntersectingFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
-) => elements.filter((element) => isElementIntersectingFrame(element, frame));
+) => {
+  const elementsMap = arrayToMap(elements);
+  return elements.filter((element) =>
+    isElementIntersectingFrame(element, frame, elementsMap),
+  );
+};
 
 export const elementsAreInFrameBounds = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
-  const [selectionX1, selectionY1, selectionX2, selectionY2] =
-    getElementAbsoluteCoords(frame);
+  const [frameX1, frameY1, frameX2, frameY2] = getElementAbsoluteCoords(
+    frame,
+    elementsMap,
+  );
 
   const [elementX1, elementY1, elementX2, elementY2] =
     getCommonBounds(elements);
 
   return (
-    selectionX1 <= elementX1 &&
-    selectionY1 <= elementY1 &&
-    selectionX2 >= elementX2 &&
-    selectionY2 >= elementY2
+    frameX1 <= elementX1 &&
+    frameY1 <= elementY1 &&
+    frameX2 >= elementX2 &&
+    frameY2 >= elementY2
   );
 };
 
 export const elementOverlapsWithFrame = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
   return (
-    elementsAreInFrameBounds([element], frame) ||
-    isElementIntersectingFrame(element, frame) ||
-    isElementContainingFrame([frame], element, frame)
+    elementsAreInFrameBounds([element], frame, elementsMap) ||
+    isElementIntersectingFrame(element, frame, elementsMap) ||
+    isElementContainingFrame([frame], element, frame, elementsMap)
   );
 };
 
@@ -135,8 +150,9 @@ export const isCursorInFrame = (
     y: number;
   },
   frame: NonDeleted<ExcalidrawFrameLikeElement>,
+  elementsMap: ElementsMap,
 ) => {
-  const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame);
+  const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
 
   return isPointWithinBounds(
     [fx1, fy1],
@@ -150,6 +166,7 @@ export const groupsAreAtLeastIntersectingTheFrame = (
   groupIds: readonly string[],
   frame: ExcalidrawFrameLikeElement,
 ) => {
+  const elementsMap = arrayToMap(elements);
   const elementsInGroup = groupIds.flatMap((groupId) =>
     getElementsInGroup(elements, groupId),
   );
@@ -160,8 +177,8 @@ export const groupsAreAtLeastIntersectingTheFrame = (
 
   return !!elementsInGroup.find(
     (element) =>
-      elementsAreInFrameBounds([element], frame) ||
-      isElementIntersectingFrame(element, frame),
+      elementsAreInFrameBounds([element], frame, elementsMap) ||
+      isElementIntersectingFrame(element, frame, elementsMap),
   );
 };
 
@@ -170,6 +187,7 @@ export const groupsAreCompletelyOutOfFrame = (
   groupIds: readonly string[],
   frame: ExcalidrawFrameLikeElement,
 ) => {
+  const elementsMap = arrayToMap(elements);
   const elementsInGroup = groupIds.flatMap((groupId) =>
     getElementsInGroup(elements, groupId),
   );
@@ -181,8 +199,8 @@ export const groupsAreCompletelyOutOfFrame = (
   return (
     elementsInGroup.find(
       (element) =>
-        elementsAreInFrameBounds([element], frame) ||
-        isElementIntersectingFrame(element, frame),
+        elementsAreInFrameBounds([element], frame, elementsMap) ||
+        isElementIntersectingFrame(element, frame, elementsMap),
     ) === undefined
   );
 };
@@ -209,9 +227,17 @@ export const groupByFrameLikes = (elements: readonly ExcalidrawElement[]) => {
 };
 
 export const getFrameChildren = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+  allElements: ElementsMapOrArray,
   frameId: string,
-) => allElements.filter((element) => element.frameId === frameId);
+) => {
+  const frameChildren: ExcalidrawElement[] = [];
+  for (const element of allElements.values()) {
+    if (element.frameId === frameId) {
+      frameChildren.push(element);
+    }
+  }
+  return frameChildren;
+};
 
 export const getFrameLikeElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
@@ -245,14 +271,15 @@ export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
   appState: AppState,
+  elementsMap: ElementsMap,
 ): ExcalidrawElement[] => {
   const prevElementsInFrame = getFrameChildren(allElements, frame.id);
   const nextElementsInFrame = new Set<ExcalidrawElement>(prevElementsInFrame);
 
   const elementsCompletelyInFrame = new Set([
-    ...getElementsCompletelyInFrame(allElements, frame),
+    ...getElementsCompletelyInFrame(allElements, frame, elementsMap),
     ...prevElementsInFrame.filter((element) =>
-      isElementContainingFrame(allElements, element, frame),
+      isElementContainingFrame(allElements, element, frame, elementsMap),
     ),
   ]);
 
@@ -270,7 +297,7 @@ export const getElementsInResizingFrame = (
   );
 
   for (const element of elementsNotCompletelyInFrame) {
-    if (!isElementIntersectingFrame(element, frame)) {
+    if (!isElementIntersectingFrame(element, frame, elementsMap)) {
       if (element.groupIds.length === 0) {
         nextElementsInFrame.delete(element);
       }
@@ -321,7 +348,7 @@ export const getElementsInResizingFrame = (
     if (isSelected) {
       const elementsInGroup = getElementsInGroup(allElements, id);
 
-      if (elementsAreInFrameBounds(elementsInGroup, frame)) {
+      if (elementsAreInFrameBounds(elementsInGroup, frame, elementsMap)) {
         for (const element of elementsInGroup) {
           nextElementsInFrame.add(element);
         }
@@ -335,65 +362,114 @@ export const getElementsInResizingFrame = (
 };
 
 export const getElementsInNewFrame = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+  elements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
 ) => {
   return omitGroupsContainingFrameLikes(
-    allElements,
-    getElementsCompletelyInFrame(allElements, frame),
+    elements,
+    getElementsCompletelyInFrame(elements, frame, elementsMap),
   );
 };
 
 export const getContainingFrame = (
   element: ExcalidrawElement,
-  /**
-   * Optionally an elements map, in case the elements aren't in the Scene yet.
-   * Takes precedence over Scene elements, even if the element exists
-   * in Scene elements and not the supplied elements map.
-   */
-  elementsMap?: Map<string, ExcalidrawElement>,
+  elementsMap: ElementsMap,
 ) => {
-  if (element.frameId) {
-    if (elementsMap) {
-      return (elementsMap.get(element.frameId) ||
-        null) as null | ExcalidrawFrameLikeElement;
-    }
-    return (
-      (Scene.getScene(element)?.getElement(
-        element.frameId,
-      ) as ExcalidrawFrameLikeElement) || null
-    );
+  if (!element.frameId) {
+    return null;
   }
-  return null;
+  return (elementsMap.get(element.frameId) ||
+    null) as null | ExcalidrawFrameLikeElement;
 };
 
 // --------------------------- Frame Operations -------------------------------
+
+/** */
+export const filterElementsEligibleAsFrameChildren = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameLikeElement,
+) => {
+  const otherFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
+  const elementsMap = arrayToMap(elements);
+  elements = omitGroupsContainingFrameLikes(elements);
+
+  for (const element of elements) {
+    if (isFrameLikeElement(element) && element.id !== frame.id) {
+      otherFrames.add(element.id);
+    }
+  }
+
+  const processedGroups = new Set<ExcalidrawElement["id"]>();
+
+  const eligibleElements: ExcalidrawElement[] = [];
+
+  for (const element of elements) {
+    // don't add frames or their children
+    if (
+      isFrameLikeElement(element) ||
+      (element.frameId && otherFrames.has(element.frameId))
+    ) {
+      continue;
+    }
+
+    if (element.groupIds.length) {
+      const shallowestGroupId = element.groupIds.at(-1)!;
+      if (!processedGroups.has(shallowestGroupId)) {
+        processedGroups.add(shallowestGroupId);
+        const groupElements = getElementsInGroup(elements, shallowestGroupId);
+        if (
+          groupElements.some((el) =>
+            elementOverlapsWithFrame(el, frame, elementsMap),
+          )
+        ) {
+          for (const child of groupElements) {
+            eligibleElements.push(child);
+          }
+        }
+      }
+    } else {
+      const overlaps = elementOverlapsWithFrame(element, frame, elementsMap);
+      if (overlaps) {
+        eligibleElements.push(element);
+      }
+    }
+  }
+
+  return eligibleElements;
+};
 
 /**
  * Retains (or repairs for target frame) the ordering invriant where children
  * elements come right before the parent frame:
  * [el, el, child, child, frame, el]
+ *
+ * @returns mutated allElements (same data structure)
  */
-export const addElementsToFrame = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+export const addElementsToFrame = <T extends ElementsMapOrArray>(
+  allElements: T,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
-) => {
-  const { currTargetFrameChildrenMap } = allElements.reduce(
-    (acc, element, index) => {
-      if (element.frameId === frame.id) {
-        acc.currTargetFrameChildrenMap.set(element.id, true);
-      }
-      return acc;
-    },
-    {
-      currTargetFrameChildrenMap: new Map<ExcalidrawElement["id"], true>(),
-    },
-  );
+): T => {
+  const elementsMap = arrayToMap(allElements);
+  const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
+  for (const element of allElements.values()) {
+    if (element.frameId === frame.id) {
+      currTargetFrameChildrenMap.set(element.id, true);
+    }
+  }
 
   const suppliedElementsToAddSet = new Set(elementsToAdd.map((el) => el.id));
 
   const finalElementsToAdd: ExcalidrawElement[] = [];
+
+  const otherFrames = new Set<ExcalidrawFrameLikeElement["id"]>();
+
+  for (const element of elementsToAdd) {
+    if (isFrameLikeElement(element) && element.id !== frame.id) {
+      otherFrames.add(element.id);
+    }
+  }
 
   // - add bound text elements if not already in the array
   // - filter out elements that are already in the frame
@@ -401,11 +477,19 @@ export const addElementsToFrame = (
     allElements,
     elementsToAdd,
   )) {
+    // don't add frames or their children
+    if (
+      isFrameLikeElement(element) ||
+      (element.frameId && otherFrames.has(element.frameId))
+    ) {
+      continue;
+    }
+
     if (!currTargetFrameChildrenMap.has(element.id)) {
       finalElementsToAdd.push(element);
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (
       boundTextElement &&
       !suppliedElementsToAddSet.has(boundTextElement.id) &&
@@ -424,13 +508,13 @@ export const addElementsToFrame = (
       false,
     );
   }
-  return allElements.slice();
+
+  return allElements;
 };
 
 export const removeElementsFromFrame = (
-  allElements: ExcalidrawElementsIncludingDeleted,
-  elementsToRemove: NonDeletedExcalidrawElement[],
-  appState: AppState,
+  elementsToRemove: ReadonlySetLike<NonDeletedExcalidrawElement>,
+  elementsMap: ElementsMap,
 ) => {
   const _elementsToRemove = new Map<
     ExcalidrawElement["id"],
@@ -449,7 +533,7 @@ export const removeElementsFromFrame = (
       const arr = toRemoveElementsByFrame.get(element.frameId) || [];
       arr.push(element);
 
-      const boundTextElement = getBoundTextElement(element);
+      const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
         _elementsToRemove.set(boundTextElement.id, boundTextElement);
         arr.push(boundTextElement);
@@ -468,35 +552,35 @@ export const removeElementsFromFrame = (
       false,
     );
   }
-
-  return allElements.slice();
 };
 
-export const removeAllElementsFromFrame = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+export const removeAllElementsFromFrame = <T extends ExcalidrawElement>(
+  allElements: readonly T[],
   frame: ExcalidrawFrameLikeElement,
-  appState: AppState,
 ) => {
   const elementsInFrame = getFrameChildren(allElements, frame.id);
-  return removeElementsFromFrame(allElements, elementsInFrame, appState);
+  removeElementsFromFrame(elementsInFrame, arrayToMap(allElements));
+  return allElements;
 };
 
-export const replaceAllElementsInFrame = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
+  allElements: readonly T[],
   nextElementsInFrame: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
-  appState: AppState,
-) => {
+  app: AppClassProperties,
+): T[] => {
   return addElementsToFrame(
-    removeAllElementsFromFrame(allElements, frame, appState),
+    removeAllElementsFromFrame(allElements, frame),
     nextElementsInFrame,
     frame,
-  );
+  ).slice();
 };
 
 /** does not mutate elements, but returns new ones */
-export const updateFrameMembershipOfSelectedElements = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+export const updateFrameMembershipOfSelectedElements = <
+  T extends ElementsMapOrArray,
+>(
+  allElements: T,
   appState: AppState,
   app: AppClassProperties,
 ) => {
@@ -521,19 +605,22 @@ export const updateFrameMembershipOfSelectedElements = (
 
   const elementsToRemove = new Set<ExcalidrawElement>();
 
+  const elementsMap = arrayToMap(allElements);
+
   elementsToFilter.forEach((element) => {
     if (
       element.frameId &&
       !isFrameLikeElement(element) &&
-      !isElementInFrame(element, allElements, appState)
+      !isElementInFrame(element, elementsMap, appState)
     ) {
       elementsToRemove.add(element);
     }
   });
 
-  return elementsToRemove.size > 0
-    ? removeElementsFromFrame(allElements, [...elementsToRemove], appState)
-    : allElements;
+  if (elementsToRemove.size > 0) {
+    removeElementsFromFrame(elementsToRemove, elementsMap);
+  }
+  return allElements;
 };
 
 /**
@@ -541,14 +628,16 @@ export const updateFrameMembershipOfSelectedElements = (
  * anywhere in the group tree
  */
 export const omitGroupsContainingFrameLikes = (
-  allElements: ExcalidrawElementsIncludingDeleted,
+  allElements: ElementsMapOrArray,
   /** subset of elements you want to filter. Optional perf optimization so we
    * don't have to filter all elements unnecessarily
    */
   selectedElements?: readonly ExcalidrawElement[],
 ) => {
   const uniqueGroupIds = new Set<string>();
-  for (const el of selectedElements || allElements) {
+  const elements = selectedElements || allElements;
+
+  for (const el of elements.values()) {
     const topMostGroupId = el.groupIds[el.groupIds.length - 1];
     if (topMostGroupId) {
       uniqueGroupIds.add(topMostGroupId);
@@ -566,9 +655,15 @@ export const omitGroupsContainingFrameLikes = (
     }
   }
 
-  return (selectedElements || allElements).filter(
-    (el) => !rejectedGroupIds.has(el.groupIds[el.groupIds.length - 1]),
-  );
+  const ret: ExcalidrawElement[] = [];
+
+  for (const element of elements.values()) {
+    if (!rejectedGroupIds.has(element.groupIds[element.groupIds.length - 1])) {
+      ret.push(element);
+    }
+  }
+
+  return ret;
 };
 
 /**
@@ -577,28 +672,29 @@ export const omitGroupsContainingFrameLikes = (
  */
 export const getTargetFrame = (
   element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   appState: StaticCanvasAppState,
 ) => {
   const _element = isTextElement(element)
-    ? getContainerElement(element) || element
+    ? getContainerElement(element, elementsMap) || element
     : element;
 
   return appState.selectedElementIds[_element.id] &&
     appState.selectedElementsAreBeingDragged
     ? appState.frameToHighlight
-    : getContainingFrame(_element);
+    : getContainingFrame(_element, elementsMap);
 };
 
 // TODO: this a huge bottleneck for large scenes, optimise
 // given an element, return if the element is in some frame
 export const isElementInFrame = (
   element: ExcalidrawElement,
-  allElements: ExcalidrawElementsIncludingDeleted,
+  allElementsMap: ElementsMap,
   appState: StaticCanvasAppState,
 ) => {
-  const frame = getTargetFrame(element, appState);
+  const frame = getTargetFrame(element, allElementsMap, appState);
   const _element = isTextElement(element)
-    ? getContainerElement(element) || element
+    ? getContainerElement(element, allElementsMap) || element
     : element;
 
   if (frame) {
@@ -614,16 +710,18 @@ export const isElementInFrame = (
     }
 
     if (_element.groupIds.length === 0) {
-      return elementOverlapsWithFrame(_element, frame);
+      return elementOverlapsWithFrame(_element, frame, allElementsMap);
     }
 
     const allElementsInGroup = new Set(
-      _element.groupIds.flatMap((gid) => getElementsInGroup(allElements, gid)),
+      _element.groupIds.flatMap((gid) =>
+        getElementsInGroup(allElementsMap, gid),
+      ),
     );
 
     if (appState.editingGroupId && appState.selectedElementsAreBeingDragged) {
       const selectedElements = new Set(
-        getSelectedElements(allElements, appState),
+        getSelectedElements(allElementsMap, appState),
       );
 
       const editingGroupOverlapsFrame = appState.frameToHighlight !== null;
@@ -644,7 +742,7 @@ export const isElementInFrame = (
     }
 
     for (const elementInGroup of allElementsInGroup) {
-      if (elementOverlapsWithFrame(elementInGroup, frame)) {
+      if (elementOverlapsWithFrame(elementInGroup, frame, allElementsMap)) {
         return true;
       }
     }
@@ -657,10 +755,26 @@ export const getFrameLikeTitle = (
   element: ExcalidrawFrameLikeElement,
   frameIdx: number,
 ) => {
-  const existingName = element.name?.trim();
-  if (existingName) {
-    return existingName;
-  }
-  // TODO name frames AI only is specific to AI frames
-  return isFrameElement(element) ? `Frame ${frameIdx}` : `AI Frame ${frameIdx}`;
+  // TODO name frames "AI" only if specific to AI frames
+  return element.name === null
+    ? isFrameElement(element)
+      ? `Frame ${frameIdx}`
+      : `AI Frame $${frameIdx}`
+    : element.name;
+};
+
+export const getElementsOverlappingFrame = (
+  elements: readonly ExcalidrawElement[],
+  frame: ExcalidrawFrameLikeElement,
+) => {
+  return (
+    elementsOverlappingBBox({
+      elements,
+      bounds: frame,
+      type: "overlap",
+    })
+      // removes elements who are overlapping, but are in a different frame,
+      // and thus invisible in target frame
+      .filter((el) => !el.frameId || el.frameId === frame.id)
+  );
 };

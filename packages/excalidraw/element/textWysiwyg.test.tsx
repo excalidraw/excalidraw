@@ -17,7 +17,7 @@ import {
 } from "./types";
 import { API } from "../tests/helpers/api";
 import { mutateElement } from "./mutateElement";
-import { getOriginalContainerHeightFromCache } from "./textWysiwyg";
+import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
 
 // Unmount ReactDOM from root
@@ -1454,7 +1454,7 @@ describe("textWysiwyg", () => {
           strokeWidth: 2,
           type: "rectangle",
           updated: 1,
-          version: 1,
+          version: 2,
           width: 610,
           x: 15,
           y: 25,

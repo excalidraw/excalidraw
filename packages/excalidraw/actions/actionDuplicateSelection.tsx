@@ -31,14 +31,21 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
+import { syncMovedIndices } from "../fractionalIndex";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
+  label: "labels.duplicateSelection",
+  icon: DuplicateIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
-      const ret = LinearElementEditor.duplicateSelectedPoints(appState);
+      const ret = LinearElementEditor.duplicateSelectedPoints(
+        appState,
+        elementsMap,
+      );
 
       if (!ret) {
         return false;
@@ -56,7 +63,6 @@ export const actionDuplicateSelection = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.duplicateSelection",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -85,6 +91,7 @@ const duplicateElements = (
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
+  const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
   const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
@@ -96,6 +103,7 @@ const duplicateElements = (
         y: element.y + GRID_SIZE / 2,
       },
     );
+    duplicatedElementsMap.set(newElement.id, newElement);
     oldIdToDuplicatedId.set(element.id, newElement.id);
     oldElements.push(element);
     newElements.push(newElement);
@@ -139,7 +147,7 @@ const duplicateElements = (
       continue;
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, arrayToMap(elements));
     const isElementAFrameLike = isFrameLikeElement(element);
 
     if (idsOfElementsToDuplicate.get(element.id)) {
@@ -233,8 +241,9 @@ const duplicateElements = (
   }
 
   // step (3)
-
   const finalElements = finalElementsReversed.reverse();
+
+  syncMovedIndices(finalElements, arrayToMap([...oldElements, ...newElements]));
 
   // ---------------------------------------------------------------------------
 

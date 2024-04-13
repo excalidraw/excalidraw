@@ -68,6 +68,7 @@
   cursor: pointer;
   background-color: var(--button-bg, var(--island-bg-color));
   color: var(--button-color, var(--color-on-surface));
+  font-family: var(--ui-font);
 
   svg {
     width: var(--button-width, var(--lg-icon-size));
@@ -111,6 +112,51 @@
     svg {
       color: var(--button-color, var(--color-on-primary-container));
     }
+  }
+}
+
+@mixin avatarStyles {
+  width: var(--avatar-size, 1.5rem);
+  height: var(--avatar-size, 1.5rem);
+  position: relative;
+  border-radius: 100%;
+  outline-offset: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-gray-90);
+  flex: 0 0 auto;
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    left: -3px;
+    border-radius: 100%;
+  }
+
+  &.is-followed::before {
+    border-color: var(--color-primary-hover);
+    box-shadow: 0 0 0 1px var(--color-primary-hover);
+  }
+  &.is-current-user {
+    cursor: auto;
   }
 }
 

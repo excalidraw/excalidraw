@@ -1,4 +1,3 @@
-import React from "react";
 import {
   moveOneLeft,
   moveOneRight,
@@ -19,6 +18,8 @@ import { isDarwin } from "../constants";
 
 export const actionSendBackward = register({
   name: "sendBackward",
+  label: "labels.sendBackward",
+  icon: SendBackwardIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
@@ -27,7 +28,6 @@ export const actionSendBackward = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.sendBackward",
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
@@ -47,6 +47,8 @@ export const actionSendBackward = register({
 
 export const actionBringForward = register({
   name: "bringForward",
+  label: "labels.bringForward",
+  icon: BringForwardIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
@@ -55,7 +57,6 @@ export const actionBringForward = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.bringForward",
   keyPriority: 40,
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
@@ -75,6 +76,8 @@ export const actionBringForward = register({
 
 export const actionSendToBack = register({
   name: "sendToBack",
+  label: "labels.sendToBack",
+  icon: SendToBackIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
@@ -83,7 +86,6 @@ export const actionSendToBack = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.sendToBack",
   keyTest: (event) =>
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
@@ -110,6 +112,8 @@ export const actionSendToBack = register({
 
 export const actionBringToFront = register({
   name: "bringToFront",
+  label: "labels.bringToFront",
+  icon: BringToFrontIcon,
   trackEvent: { category: "element" },
 
   perform: (elements, appState) => {
@@ -119,7 +123,6 @@ export const actionBringToFront = register({
       commitToHistory: true,
     };
   },
-  contextItemLabel: "labels.bringToFront",
   keyTest: (event) =>
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&

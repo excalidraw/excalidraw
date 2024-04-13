@@ -31,19 +31,18 @@ export const ShareableLinkDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(link);
-
-      setJustCopied(true);
-
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-      }
-
-      timerRef.current = window.setTimeout(() => {
-        setJustCopied(false);
-      }, 3000);
-    } catch (error: any) {
-      setErrorMessage(error.message);
+    } catch (e) {
+      setErrorMessage(t("errors.copyToSystemClipboardFailed"));
     }
+    setJustCopied(true);
+
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = window.setTimeout(() => {
+      setJustCopied(false);
+    }, 3000);
 
     ref.current?.select();
   };
@@ -66,7 +65,7 @@ export const ShareableLinkDialog = ({
               <FilledButton
                 size="large"
                 label="Copy link"
-                startIcon={copyIcon}
+                icon={copyIcon}
                 onClick={copyRoomLink}
               />
             </Popover.Trigger>

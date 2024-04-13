@@ -3,19 +3,22 @@
   "name": "excalidraw-monorepo",
   "workspaces": [
     "excalidraw-app",
-    "packages/excalidraw"
+    "packages/excalidraw",
+    "packages/utils",
+    "examples/excalidraw",
+    "examples/excalidraw/*"
   ],
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
-    "jotai": "1.13.1",
     "firebase": "8.3.3",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
-    "socket.io-client": "2.3.1",
+    "jotai": "1.13.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "socket.io-client": "4.7.2"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.3",
@@ -25,7 +28,7 @@
     "@types/lodash.throttle": "4.1.7",
     "@types/react": "18.0.15",
     "@types/react-dom": "18.0.6",
-    "@types/socket.io-client": "1.4.36",
+    "@types/socket.io-client": "3.0.0",
     "@vitejs/plugin-react": "3.1.0",
     "@vitest/coverage-v8": "0.33.0",
     "@vitest/ui": "0.32.2",
@@ -42,7 +45,7 @@
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "5.0.6",
+    "vite": "5.0.12",
     "vite-plugin-checker": "0.6.1",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",
@@ -64,7 +67,6 @@
     "fix:code": "yarn test:code --fix",
     "fix:other": "yarn prettier --write",
     "fix": "yarn fix:other && yarn fix:code",
-    "install:deps": "yarn install --frozen-lockfile && yarn --frozen-lockfile --cwd ./excalidraw-app",
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",

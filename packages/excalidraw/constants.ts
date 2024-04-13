@@ -2,7 +2,6 @@ import cssVariables from "./css/variables.module.scss";
 import { AppProps } from "./types";
 import { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
-
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
@@ -13,9 +12,16 @@ export const isFirefox =
 export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
 export const isSafari =
   !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
+export const isIOS =
+  /iPad|iPhone/.test(navigator.platform) ||
+  // iPadOS 13+
+  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
 // keeping function so it can be mocked in test
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
+
+export const supportsResizeObserver =
+  typeof window !== "undefined" && "ResizeObserver" in window;
 
 export const APP_NAME = "Excalidraw";
 
@@ -25,6 +31,7 @@ export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
 export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 export const SHIFT_LOCKING_ANGLE = Math.PI / 12;
+export const DEFAULT_LASER_COLOR = "red";
 export const CURSOR_TYPE = {
   TEXT: "text",
   CROSSHAIR: "crosshair",
@@ -39,6 +46,7 @@ export const POINTER_BUTTON = {
   WHEEL: 1,
   SECONDARY: 2,
   TOUCH: -1,
+  ERASER: 5,
 } as const;
 
 export const POINTER_EVENTS = {
@@ -138,6 +146,12 @@ export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
+export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
+
+export const COLOR_WHITE = "#ffffff";
+export const COLOR_CHARCOAL_BLACK = "#1e1e1e";
+// keep this in sync with CSS
+export const COLOR_VOICE_CALL = "#a2f1a6";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
@@ -302,10 +316,6 @@ export const ROUNDNESS = {
   ADAPTIVE_RADIUS: 3,
 } as const;
 
-/** key containt id of precedeing elemnt id we use in reconciliation during
- * collaboration */
-export const PRECEDING_ELEMENT_KEY = "__precedingElement__";
-
 export const ROUGHNESS = {
   architect: 0,
   artist: 1,
@@ -376,3 +386,9 @@ export const EDITOR_LS_KEYS = {
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
 } as const;
+
+/**
+ * not translated as this is used only in public, stateless API as default value
+ * where filename is optional and we can't retrieve name from app state
+ */
+export const DEFAULT_FILENAME = "Untitled";

@@ -5,14 +5,9 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import { NonDeletedExcalidrawElement } from "./types";
 import { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
-import { isSelectedViaGroup } from "../groups";
 import { getGridPoint } from "../math";
 import Scene from "../scene/Scene";
-import {
-  isArrowElement,
-  isBoundToContainer,
-  isFrameLikeElement,
-} from "./typeChecks";
+import { isArrowElement, isFrameLikeElement } from "./typeChecks";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -37,13 +32,11 @@ export const dragSelectedElements = (
     .map((f) => f.id);
 
   if (frames.length > 0) {
-    const elementsInFrames = scene
-      .getNonDeletedElements()
-      .filter((e) => !isBoundToContainer(e))
-      .filter((e) => e.frameId !== null)
-      .filter((e) => frames.includes(e.frameId!));
-
-    elementsInFrames.forEach((element) => elementsToUpdate.add(element));
+    for (const element of scene.getNonDeletedElements()) {
+      if (element.frameId !== null && frames.includes(element.frameId)) {
+        elementsToUpdate.add(element);
+      }
+    }
   }
 
   const commonBounds = getCommonBounds(
@@ -60,23 +53,19 @@ export const dragSelectedElements = (
 
   elementsToUpdate.forEach((element) => {
     updateElementCoords(pointerDownState, element, adjustedOffset);
-    // update coords of bound text only if we're dragging the container directly
-    // (we don't drag the group that it's part of)
     if (
-      // Don't update coords of arrow label since we calculate its position during render
-      !isArrowElement(element) &&
-      // container isn't part of any group
-      // (perf optim so we don't check `isSelectedViaGroup()` in every case)
-      (!element.groupIds.length ||
-        // container is part of a group, but we're dragging the container directly
-        (appState.editingGroupId && !isSelectedViaGroup(appState, element)))
+      // skip arrow labels since we calculate its position during render
+      !isArrowElement(element)
     ) {
-      const textElement = getBoundTextElement(element);
+      const textElement = getBoundTextElement(
+        element,
+        scene.getNonDeletedElementsMap(),
+      );
       if (textElement) {
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
-    updateBoundElements(element, {
+    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
       simultaneouslyUpdated: Array.from(elementsToUpdate),
     });
   });
