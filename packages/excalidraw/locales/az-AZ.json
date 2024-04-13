@@ -87,7 +87,7 @@
     "group": "Qrup şəklində seçim",
     "ungroup": "Qrupsuz seçim",
     "collaborators": "",
-    "showGrid": "",
+    "toggleGrid": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
