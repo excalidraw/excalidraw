@@ -87,7 +87,7 @@
     "group": "دیاریکردنی گروپ",
     "ungroup": "گروپی دیاریکراوەکان لابەرە",
     "collaborators": "هاوکارەکان",
-    "showGrid": "گرید نیشانبدە",
+    "toggleGrid": "",
     "addToLibrary": "زیادکردن بۆ کتێبخانە",
     "removeFromLibrary": "لابردن لە کتێبخانە",
     "libraryLoadingMessage": "...بارکردنی کتێبخانە",
