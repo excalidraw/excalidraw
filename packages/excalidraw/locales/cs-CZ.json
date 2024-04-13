@@ -87,7 +87,7 @@
     "group": "Sloučit výběr do skupiny",
     "ungroup": "Zrušit sloučení skupiny",
     "collaborators": "Spolupracovníci",
-    "showGrid": "Zobrazit mřížku",
+    "toggleGrid": "",
     "addToLibrary": "Přidat do knihovny",
     "removeFromLibrary": "Odebrat z knihovny",
     "libraryLoadingMessage": "Načítání knihovny…",
