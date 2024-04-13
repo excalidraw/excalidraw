@@ -87,7 +87,7 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "showGrid": "Mostrar grade",
+    "toggleGrid": "",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "Carregando biblioteca…",
