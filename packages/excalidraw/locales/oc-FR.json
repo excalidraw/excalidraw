@@ -87,7 +87,7 @@
     "group": "Gropar la seleccion",
     "ungroup": "Desunir la seleccion",
     "collaborators": "Collaborators",
-    "showGrid": "Afichar la gresilha",
+    "toggleGrid": "",
     "addToLibrary": "Apondre a la bibliotèca",
     "removeFromLibrary": "Suprimir de la bibliotèca",
     "libraryLoadingMessage": "Cargament de la bibliotèca…",
