@@ -87,7 +87,7 @@
     "group": "দল গঠন করুন",
     "ungroup": "দল বিভেদ করুন",
     "collaborators": "সহযোগী",
-    "showGrid": "গ্রিড দেখান",
+    "toggleGrid": "",
     "addToLibrary": "সংগ্রহে যোগ করুন",
     "removeFromLibrary": "সংগ্রহ থেকে বের করুন",
     "libraryLoadingMessage": "সংগ্রহ তৈরি হচ্ছে",
