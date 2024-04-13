@@ -87,7 +87,7 @@
     "group": "Združi izbor",
     "ungroup": "Razdruži izbor",
     "collaborators": "Sodelavci",
-    "showGrid": "Prikaži mrežo",
+    "toggleGrid": "Preklopi mrežo",
     "addToLibrary": "Dodaj v knjižnico",
     "removeFromLibrary": "Odstrani iz knjižnice",
     "libraryLoadingMessage": "Nalaganje knjižnice ...",
