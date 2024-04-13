@@ -87,7 +87,7 @@
     "group": "Gộp nhóm lại lựa chọn",
     "ungroup": "Tách nhóm lựa chọn",
     "collaborators": "Cộng tác viên",
-    "showGrid": "Hiển thị lưới",
+    "toggleGrid": "",
     "addToLibrary": "Thêm vào thư viện",
     "removeFromLibrary": "Xóa khỏi thư viện",
     "libraryLoadingMessage": "Đang tải thư viện…",
