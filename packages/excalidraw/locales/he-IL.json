@@ -87,7 +87,7 @@
     "group": "קבץ",
     "ungroup": "פרק קבוצה",
     "collaborators": "שותפים",
-    "showGrid": "הצג רשת",
+    "toggleGrid": "",
     "addToLibrary": "הוסף לספריה",
     "removeFromLibrary": "הסר מספריה",
     "libraryLoadingMessage": "טוען ספריה…",
