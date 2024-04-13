@@ -87,7 +87,7 @@
     "group": "Grupēt atlasīto",
     "ungroup": "Atgrupēt atlasīto",
     "collaborators": "Dalībnieki",
-    "showGrid": "Rādīt režģi",
+    "toggleGrid": "",
     "addToLibrary": "Pievienot bibliotēkai",
     "removeFromLibrary": "Izņemt no bibliotēkas",
     "libraryLoadingMessage": "Ielādē bibliotēku…",
