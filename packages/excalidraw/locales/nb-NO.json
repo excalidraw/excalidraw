@@ -87,7 +87,7 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "showGrid": "Vis rutenett",
+    "toggleGrid": "",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek…",
