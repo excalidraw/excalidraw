@@ -87,7 +87,7 @@
     "group": "Hautapena taldea bihurtu",
     "ungroup": "Desegin hautapenaren taldea",
     "collaborators": "Kolaboratzaileak",
-    "showGrid": "Erakutsi sareta",
+    "toggleGrid": "",
     "addToLibrary": "Gehitu liburutegira",
     "removeFromLibrary": "Kendu liburutegitik",
     "libraryLoadingMessage": "Liburutegia kargatzen…",
