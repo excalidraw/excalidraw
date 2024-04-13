@@ -87,7 +87,7 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "showGrid": "Visualizza griglia",
+    "toggleGrid": "",
     "addToLibrary": "Aggiungi alla libreria",
     "removeFromLibrary": "Rimuovi dalla libreria",
     "libraryLoadingMessage": "Caricamento libreria…",
