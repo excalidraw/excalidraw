@@ -87,7 +87,7 @@
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
-    "showGrid": "Raster weergeven",
+    "toggleGrid": "",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
     "libraryLoadingMessage": "Bibliotheek laden…",
