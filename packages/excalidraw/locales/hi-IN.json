@@ -87,7 +87,7 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "showGrid": "जाल दिखाएं",
+    "toggleGrid": "",
     "addToLibrary": "लाइब्रेरी में सम्मिलित करें",
     "removeFromLibrary": "समूहकोष से अलग करें",
     "libraryLoadingMessage": "समूहकोष खुल रहा है",
