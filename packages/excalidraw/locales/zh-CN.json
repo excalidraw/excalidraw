@@ -87,7 +87,7 @@
     "group": "编组",
     "ungroup": "解除编组",
     "collaborators": "协作者",
-    "showGrid": "显示网格",
+    "toggleGrid": "",
     "addToLibrary": "添加到素材库中",
     "removeFromLibrary": "从素材库中移除",
     "libraryLoadingMessage": "正在加载素材库…",
