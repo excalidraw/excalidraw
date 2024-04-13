@@ -7870,8 +7870,51 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
       "separator",
       {
         "checked": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={1.5}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 6h18"
+            />
+            <path
+              d="M3 12h18"
+            />
+            <path
+              d="M3 18h18"
+            />
+            <path
+              d="M6 3v18"
+            />
+            <path
+              d="M12 3v18"
+            />
+            <path
+              d="M18 3v18"
+            />
+          </g>
+        </svg>,
         "keyTest": [Function],
-        "label": "labels.showGrid",
+        "keywords": [
+          "snap",
+        ],
+        "label": "labels.toggleGrid",
         "name": "gridMode",
         "perform": [Function],
         "predicate": [Function],

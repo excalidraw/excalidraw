@@ -2,10 +2,13 @@ import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import { GRID_SIZE } from "../constants";
 import { AppState } from "../types";
+import { gridIcon } from "../components/icons";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
-  label: "labels.showGrid",
+  icon: gridIcon,
+  keywords: ["snap"],
+  label: "labels.toggleGrid",
   viewMode: true,
   trackEvent: {
     category: "canvas",
