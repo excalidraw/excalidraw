@@ -87,7 +87,7 @@
     "group": "Agrupa la selecció",
     "ungroup": "Desagrupa la selecció",
     "collaborators": "Col·laboradors",
-    "showGrid": "Mostra la graella",
+    "toggleGrid": "",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "S'està carregant la biblioteca…",
