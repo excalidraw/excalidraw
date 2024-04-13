@@ -87,7 +87,7 @@
     "group": "จัดกลุ่ม",
     "ungroup": "ยกเลิกการจัดกลุ่ม",
     "collaborators": "",
-    "showGrid": "แสดงเส้นตาราง",
+    "toggleGrid": "",
     "addToLibrary": "เพิ่มไปในคลัง",
     "removeFromLibrary": "นำออกจากคลัง",
     "libraryLoadingMessage": "กำลังโหลดคลัง...",
