@@ -87,7 +87,7 @@
     "group": "Групирай селекцията",
     "ungroup": "Спри групирането на селекцията",
     "collaborators": "Сътрудници",
-    "showGrid": "Показване на мрежа",
+    "toggleGrid": "",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
     "libraryLoadingMessage": "Зареждане на библиотеката…",
