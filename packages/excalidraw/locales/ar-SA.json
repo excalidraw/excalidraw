@@ -87,7 +87,7 @@
     "group": "تحديد مجموعة",
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
-    "showGrid": "إظهار الشبكة",
+    "toggleGrid": "",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة…",
