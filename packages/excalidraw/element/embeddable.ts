@@ -12,8 +12,11 @@ import {
   IframeData,
 } from "./types";
 import { sanitizeHTMLAttribute } from "../data/url";
+import { MarkRequired } from "../utility-types";
 
-const embeddedLinkCache = new Map<string, IframeData>();
+type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
+
+const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
@@ -55,7 +58,18 @@ const ALLOWED_DOMAINS = new Set([
   "stackblitz.com",
   "val.town",
   "giphy.com",
-  "dddice.com",
+]);
+
+const ALLOW_SAME_ORIGIN = new Set([
+  "youtube.com",
+  "youtu.be",
+  "vimeo.com",
+  "player.vimeo.com",
+  "figma.com",
+  "twitter.com",
+  "x.com",
+  "*.simplepdf.eu",
+  "stackblitz.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -64,7 +78,7 @@ export const createSrcDoc = (body: string) => {
 
 export const getEmbedLink = (
   link: string | null | undefined,
-): IframeData | null => {
+): IframeDataWithSandbox | null => {
   if (!link) {
     return null;
   }
@@ -74,6 +88,10 @@ export const getEmbedLink = (
   }
 
   const originalLink = link;
+
+  const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
+    matchHostname(link, ALLOW_SAME_ORIGIN) || "",
+  );
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
@@ -101,8 +119,14 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   const vimeoLink = link.match(RE_VIMEO);
@@ -120,8 +144,15 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type, error };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      error,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -135,8 +166,14 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   const valLink = link.match(RE_VALTOWN);
@@ -147,8 +184,14 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   if (RE_TWITTER.test(link)) {
@@ -161,14 +204,14 @@ export const getEmbedLink = (
       `https://twitter.com/x/status/${postId}`,
     );
 
-    const ret: IframeData = {
+    const ret: IframeDataWithSandbox = {
       type: "document",
       srcdoc: (theme: string) =>
         createSrcDoc(
           `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${safeURL}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
         ),
       intrinsicSize: { w: 480, h: 480 },
-      sandbox: { allowSameOrigin: true },
+      sandbox: { allowSameOrigin },
     };
     embeddedLinkCache.set(originalLink, ret);
     return ret;
@@ -179,7 +222,7 @@ export const getEmbedLink = (
     const safeURL = sanitizeHTMLAttribute(
       `https://gist.github.com/${user}/${gistId}`,
     );
-    const ret: IframeData = {
+    const ret: IframeDataWithSandbox = {
       type: "document",
       srcdoc: () =>
         createSrcDoc(`
@@ -191,13 +234,24 @@ export const getEmbedLink = (
           </style>
         `),
       intrinsicSize: { w: 550, h: 720 },
+      sandbox: { allowSameOrigin },
     };
     embeddedLinkCache.set(link, ret);
     return ret;
   }
 
-  embeddedLinkCache.set(link, { link, intrinsicSize: aspectRatio, type });
-  return { link, intrinsicSize: aspectRatio, type };
+  embeddedLinkCache.set(link, {
+    link,
+    intrinsicSize: aspectRatio,
+    type,
+    sandbox: { allowSameOrigin },
+  });
+  return {
+    link,
+    intrinsicSize: aspectRatio,
+    type,
+    sandbox: { allowSameOrigin },
+  };
 };
 
 export const createPlaceholderEmbeddableLabel = (
@@ -265,34 +319,39 @@ export const actionSetEmbeddableAsActiveTool = register({
   },
 });
 
-const validateHostname = (
+const matchHostname = (
   url: string,
   /** using a Set assumes it already contains normalized bare domains */
   allowedHostnames: Set<string> | string,
-): boolean => {
+): string | null => {
   try {
     const { hostname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
-    const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
-      /^([^.]+)/,
-      "*",
-    );
 
     if (allowedHostnames instanceof Set) {
-      return (
-        ALLOWED_DOMAINS.has(bareDomain) ||
-        ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)
+      if (ALLOWED_DOMAINS.has(bareDomain)) {
+        return bareDomain;
+      }
+
+      const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
+        /^([^.]+)/,
+        "*",
       );
+      if (ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)) {
+        return bareDomainWithFirstSubdomainWildcarded;
+      }
+      return null;
     }
 
-    if (bareDomain === allowedHostnames.replace(/^www\./, "")) {
-      return true;
+    const bareAllowedHostname = allowedHostnames.replace(/^www\./, "");
+    if (bareDomain === bareAllowedHostname) {
+      return bareAllowedHostname;
     }
   } catch (error) {
     // ignore
   }
-  return false;
+  return null;
 };
 
 export const maybeParseEmbedSrc = (str: string): string => {
@@ -342,7 +401,7 @@ export const embeddableURLValidator = (
           if (url.match(domain)) {
             return true;
           }
-        } else if (validateHostname(url, domain)) {
+        } else if (matchHostname(url, domain)) {
           return true;
         }
       }
@@ -350,5 +409,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return validateHostname(url, ALLOWED_DOMAINS);
+  return !!matchHostname(url, ALLOWED_DOMAINS);
 };
