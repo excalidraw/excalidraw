@@ -87,7 +87,7 @@
     "group": "ការជ្រើសរើសជាក្រុម",
     "ungroup": "បំបែកក្រុមការជ្រើសរើសជាក្រុម",
     "collaborators": "អ្នកសហការ",
-    "showGrid": "បង្ហាញក្រឡាចត្រង្គ",
+    "toggleGrid": "",
     "addToLibrary": "បន្ថែមទៅបណ្ណាល័យ",
     "removeFromLibrary": "លុបចេញពីបណ្ណាល័យ",
     "libraryLoadingMessage": "កំពុងផ្ទុកបណ្ណាល័យ...",
