@@ -11,7 +11,7 @@
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
     "copyText": "نسخ إلى الحافظة كنص",
-    "copySource": "",
+    "copySource": "نسخ المصدر إلى الحافظة",
     "convertToCode": "تحويل إلى كود",
     "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
@@ -21,7 +21,7 @@
     "copyStyles": "نسخ الأنماط",
     "pasteStyles": "لصق الأنماط",
     "stroke": "الخط",
-    "changeStroke": "",
+    "changeStroke": "تغيير لون القلم",
     "background": "الخلفية",
     "changeBackground": "تغيير لون الخلفية",
     "fill": "التعبئة",
@@ -109,7 +109,7 @@
     "share": "مشاركة",
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
-    "toggleTheme": "",
+    "toggleTheme": "تبديل السمة الفاتحة/الغامقة",
     "theme": "السمة",
     "personalLib": "المكتبة الشخصية",
     "excalidrawLib": "مكتبتنا",
@@ -240,7 +240,7 @@
       "iframe": "",
       "image": "سوف يتم دعم إضافة صور إلى المكتبة قريباً!"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "تعذر لصق (تعذر القراءة من حافظة النظام).",
     "asyncPasteFailedOnParse": "تعذر اللصق.",
     "copyToSystemClipboardFailed": "تعذر النسخ إلى الحافظة."
   },
@@ -257,7 +257,7 @@
     "library": "مكتبة",
     "lock": "الحفاظ على أداة التحديد نشطة بعد الرسم",
     "penMode": "وضع القلم - امنع اللمس",
-    "link": "",
+    "link": "إضافة/تحديث الرابط للشكل المحدد",
     "eraser": "ممحاة",
     "frame": "أداة الإطار",
     "magicframe": "",
@@ -265,7 +265,7 @@
     "laser": "مؤشر ليزر",
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من أﻷدوات",
-    "mermaidToExcalidraw": "",
+    "mermaidToExcalidraw": "من Mermaid إلى Excalidraw",
     "magicSettings": "إعدادات الذكاء الاصطناعي"
   },
   "headings": {
@@ -314,8 +314,8 @@
     "or": "أو"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "دعوة الناس للتعاون في الرسم الخاص بك.",
+    "desc_privacy": "لا تقلق، الجلسة مشفرة من النهاية إلى النهاية وخصوصية تماماً. حتى خادمنا لا يستطيع أن يرى ما ترسمه.",
     "button_startSession": "بدء الجلسة",
     "button_stopSession": "إيقاف الجلسة",
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
