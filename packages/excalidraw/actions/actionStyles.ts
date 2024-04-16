@@ -26,7 +26,7 @@ import {
 import { getSelectedElements } from "../scene";
 import { ExcalidrawTextElement } from "../element/types";
 import { paintIcon } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";

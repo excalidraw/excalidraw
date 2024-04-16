@@ -15,7 +15,7 @@ import {
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import { AppState } from "../types";
 import { resetCursor } from "../cursor";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionFinalize = register({
   name: "finalize",

@@ -18,7 +18,7 @@ import {
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",

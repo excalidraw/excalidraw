@@ -3,7 +3,7 @@ import { deepCopyElement } from "../element/newElement";
 import { randomId } from "../random";
 import { t } from "../i18n";
 import { LIBRARY_DISABLED_TYPES } from "../constants";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",

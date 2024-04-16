@@ -9,7 +9,7 @@ import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 const isSingleFrameSelected = (
   appState: UIAppState,

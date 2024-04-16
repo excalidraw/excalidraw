@@ -34,7 +34,7 @@ import { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionUnbindText = register({
   name: "unbindText",

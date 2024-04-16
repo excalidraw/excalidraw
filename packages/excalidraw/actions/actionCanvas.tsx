@@ -37,7 +37,7 @@ import {
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

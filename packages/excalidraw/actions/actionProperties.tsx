@@ -96,7 +96,7 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

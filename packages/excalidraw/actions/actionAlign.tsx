@@ -15,10 +15,10 @@ import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
+import { StoreAction } from "../store";
 import { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
-import { StoreAction } from "./types";
 
 const alignActionsPredicate = (
   elements: readonly ExcalidrawElement[],

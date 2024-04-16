@@ -8,6 +8,7 @@ import {
   UIAppState,
 } from "../types";
 import { MarkOptional } from "../utility-types";
+import { StoreAction } from "../store";
 
 export type ActionSource =
   | "ui"
@@ -15,12 +16,6 @@ export type ActionSource =
   | "contextMenu"
   | "api"
   | "commandPalette";
-
-export enum StoreAction {
-  NONE = "none",
-  UPDATE = "update",
-  CAPTURE = "capture",
-}
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -31,7 +26,7 @@ export type ActionResult =
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
       files?: BinaryFiles | null;
-      storeAction: StoreAction;
+      storeAction: keyof typeof StoreAction;
       replaceFiles?: boolean;
     }
   | false;

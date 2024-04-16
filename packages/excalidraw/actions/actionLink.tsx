@@ -5,9 +5,9 @@ import { isEmbeddableElement } from "../element/typeChecks";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
+import { StoreAction } from "../store";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
-import { StoreAction } from "./types";
 
 export const actionLink = register({
   name: "hyperlink",

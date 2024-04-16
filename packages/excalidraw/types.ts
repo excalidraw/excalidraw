@@ -217,7 +217,7 @@ export type ObservedElementsAppState = {
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
 };
 
-export type AppState = {
+export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
     top: number;
@@ -359,7 +359,7 @@ export type AppState = {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
-};
+}
 
 export type UIAppState = Omit<
   AppState,

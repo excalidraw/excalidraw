@@ -13,7 +13,7 @@ import {
 } from "./types";
 import { sanitizeHTMLAttribute } from "../data/url";
 import { MarkRequired } from "../utility-types";
-import { StoreAction } from "../actions/types";
+import { StoreAction } from "../store";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 

@@ -7,10 +7,10 @@ import {
   microphoneMutedIcon,
 } from "../components/icons";
 import { t } from "../i18n";
+import { StoreAction } from "../store";
 import { Collaborator } from "../types";
 import { register } from "./register";
 import clsx from "clsx";
-import { StoreAction } from "./types";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",

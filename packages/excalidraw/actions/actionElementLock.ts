@@ -4,9 +4,9 @@ import { isFrameLikeElement } from "../element/typeChecks";
 import { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
+import { StoreAction } from "../store";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
-import { StoreAction } from "./types";
 
 const shouldLock = (elements: readonly ExcalidrawElement[]) =>
   elements.every((el) => !el.locked);

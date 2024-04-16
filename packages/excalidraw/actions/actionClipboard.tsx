@@ -14,7 +14,7 @@ import { isTextElement } from "../element";
 import { t } from "../i18n";
 import { isFirefox } from "../constants";
 import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionCopy = register({
   name: "copy",

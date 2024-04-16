@@ -32,7 +32,7 @@ import {
   replaceAllElementsInFrame,
 } from "../frame";
 import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {

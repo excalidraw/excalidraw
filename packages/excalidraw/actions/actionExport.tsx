@@ -19,7 +19,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",

@@ -15,7 +15,7 @@ import {
   SendToBackIcon,
 } from "../components/icons";
 import { isDarwin } from "../constants";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionSendBackward = register({
   name: "sendBackward",

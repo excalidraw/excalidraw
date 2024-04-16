@@ -14,7 +14,7 @@ import {
 } from "../groups";
 import { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
-import { ActionResult, StoreAction } from "./types";
+import { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
@@ -32,6 +32,7 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 import { syncMovedIndices } from "../fractionalIndex";
+import { StoreAction } from "../store";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",

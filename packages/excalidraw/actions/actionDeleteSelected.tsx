@@ -13,7 +13,7 @@ import { fixBindingsAfterDeletion } from "../element/binding";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],

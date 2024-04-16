@@ -1,4 +1,4 @@
-import { Action, ActionResult, StoreAction } from "./types";
+import { Action, ActionResult } from "./types";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
@@ -8,7 +8,7 @@ import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import { SceneElementsMap } from "../element/types";
-import { IStore } from "../store";
+import { IStore, StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
 const writeData = (

@@ -3,7 +3,7 @@ import { register } from "./register";
 import { GRID_SIZE } from "../constants";
 import { AppState } from "../types";
 import { gridIcon } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionToggleGridMode = register({
   name: "gridMode",

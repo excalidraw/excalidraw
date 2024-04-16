@@ -19,6 +19,12 @@ export const getObservedAppState = (appState: AppState): ObservedAppState => {
   };
 };
 
+export const StoreAction = {
+  NONE: "NONE",
+  UPDATE: "UPDATE",
+  CAPTURE: "CAPTURE",
+} as const;
+
 /**
  * Store which captures the observed changes and emits them as `StoreIncrementEvent` events.
  *

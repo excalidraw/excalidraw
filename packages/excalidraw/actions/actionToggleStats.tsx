@@ -1,7 +1,7 @@
 import { register } from "./register";
 import { CODES, KEYS } from "../keys";
 import { abacusIcon } from "../components/icons";
-import { StoreAction } from "./types";
+import { StoreAction } from "../store";
 
 export const actionToggleStats = register({
   name: "stats",
