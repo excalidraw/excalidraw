@@ -131,16 +131,16 @@ export const actionZoomIn = register({
     };
   },
   PanelComponent: ({ updateData }) => (
-    <ToolButton
+    <Tooltip label={t("buttons.zoomIn") + " — " + getShortcutKey("CtrlOrCmd++")} style={{ height: "100%", width: "100%" }} children={<ToolButton
       type="button"
       className="zoom-in-button zoom-button"
       icon={ZoomInIcon}
-      title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
       onClick={() => {
         updateData(null);
       }}
-    />
+    />} />
+
   ),
   keyTest: (event) =>
     (event.code === CODES.EQUAL || event.code === CODES.NUM_ADD) &&
@@ -171,16 +171,16 @@ export const actionZoomOut = register({
     };
   },
   PanelComponent: ({ updateData }) => (
-    <ToolButton
-      type="button"
-      className="zoom-out-button zoom-button"
-      icon={ZoomOutIcon}
-      title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
-      aria-label={t("buttons.zoomOut")}
-      onClick={() => {
-        updateData(null);
-      }}
-    />
+    <Tooltip label={t("buttons.zoomOut") + " — " + getShortcutKey("CtrlOrCmd+-")} style={{ height: "100%", width: "100%" }} children={
+      <ToolButton
+        type="button"
+        className="zoom-out-button zoom-button"
+        icon={ZoomOutIcon}
+        aria-label={t("buttons.zoomOut")}
+        onClick={() => {
+          updateData(null);
+        }}
+      />} />
   ),
   keyTest: (event) =>
     (event.code === CODES.MINUS || event.code === CODES.NUM_SUBTRACT) &&
@@ -211,11 +211,10 @@ export const actionResetZoom = register({
     };
   },
   PanelComponent: ({ updateData, appState }) => (
-    <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+    <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }} children={
       <ToolButton
         type="button"
         className="reset-zoom-button zoom-button"
-        title={t("buttons.resetZoom")}
         aria-label={t("buttons.resetZoom")}
         onClick={() => {
           updateData(null);
@@ -223,7 +222,7 @@ export const actionResetZoom = register({
       >
         {(appState.zoom.value * 100).toFixed(0)}%
       </ToolButton>
-    </Tooltip>
+    } />
   ),
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
