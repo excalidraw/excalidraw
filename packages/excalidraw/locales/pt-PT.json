@@ -21,9 +21,9 @@
     "copyStyles": "Copiar estilos",
     "pasteStyles": "Colar estilos",
     "stroke": "Contorno",
-    "changeStroke": "",
+    "changeStroke": "Alterar cor do traço",
     "background": "Fundo",
-    "changeBackground": "",
+    "changeBackground": "Alterar cor do fundo",
     "fill": "Preenchimento",
     "strokeWidth": "Espessura do traço",
     "strokeStyle": "Estilo do traço",
@@ -74,7 +74,7 @@
     "canvasColors": "Usado na área de desenho",
     "canvasBackground": "Fundo da área de desenho",
     "drawingCanvas": "Área de desenho",
-    "clearCanvas": "",
+    "clearCanvas": "Apagar área de desenho",
     "layers": "Camadas",
     "actions": "Ações",
     "language": "Idioma",
@@ -87,13 +87,13 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "toggleGrid": "",
+    "toggleGrid": "Ativar/desativar grelha",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
     "libraryLoadingMessage": "A carregar a biblioteca…",
     "libraries": "Procurar bibliotecas",
     "loadingScene": "A carregar a cena…",
-    "loadScene": "",
+    "loadScene": "Carregar cena de um ficheiro",
     "align": "Alinhamento",
     "alignTop": "Alinhar ao topo",
     "alignBottom": "Alinhar ao fundo",
@@ -109,8 +109,8 @@
     "share": "Partilhar",
     "showStroke": "Mostrar seletor de cores do traço",
     "showBackground": "Mostrar seletor de cores do fundo",
-    "toggleTheme": "",
-    "theme": "",
+    "toggleTheme": "Alternar tema claro/escuro",
+    "theme": "Tema",
     "personalLib": "Biblioteca pessoal",
     "excalidrawLib": "Biblioteca do Excalidraw",
     "decreaseFontSize": "Reduzir o tamanho do tipo de letra",
@@ -146,9 +146,9 @@
     "prompt": "Entrada de código",
     "followUs": "Siga-nos",
     "discordChat": "Conversação no Discord",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFitViewport": "Aproximar para enquadrar no cisualizador",
+    "zoomToFitSelection": "Aproximar para enquadrar a seleção",
+    "zoomToFit": "Aproximar para enquadrar todos os elementos"
   },
   "library": {
     "noItems": "Ainda não foram adicionados itens...",
@@ -181,7 +181,7 @@
     "fullScreen": "Ecrã inteiro",
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
-    "systemMode": "",
+    "systemMode": "Modo do sistema",
     "zenMode": "Modo zen",
     "objectsSnapMode": "Atrair aos objetos",
     "exitZenMode": "Sair do modo zen",
@@ -225,7 +225,7 @@
     "failedToFetchImage": "Falha ao processar a imagem.",
     "cannotResolveCollabServer": "Não foi possível fazer a ligação ao servidor colaborativo. Por favor volte a carregar a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
-    "saveLibraryError": "",
+    "saveLibraryError": "Não foi possível guardar a biblioteca no armazenamento. Guarde a sua biblioteca num ficheiro local para garantir que não perde as alterações.",
     "collabSaveFailed": "Não foi possível guardar na base de dados de backend. Se os problemas persistirem, guarde o ficheiro localmente para garantir que não perde o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível guardar na base de dados de backend, parece que a a área de desenho é muito grande. Deve guardar o ficheiro localmente para garantir que não perde o seu trabalho.",
     "imageToolNotSupported": "As imagens estão desativadas.",
@@ -257,7 +257,7 @@
     "library": "Biblioteca",
     "lock": "Manter a ferramenta selecionada ativa após desenhar",
     "penMode": "Modo caneta - impedir toque",
-    "link": "",
+    "link": "Adicionar / atualizar hiperligação para uma forma selecionada",
     "eraser": "Borracha",
     "frame": "Ferramenta de moldura",
     "magicframe": "Esquema para código",
@@ -544,24 +544,24 @@
     "hint": {
       "text": "Clique no utilizador para o seguir",
       "followStatus": "Está a seguir este utilizador",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Utilizador está numa chamada de voz",
+      "micMuted": "O microfone do utilizador está desligado",
+      "isSpeaking": "O utilizador está a falar"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paleta de comandos",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Selecionar",
+      "confirm": "Confirmar",
+      "close": "Fechar"
     },
-    "recents": "",
+    "recents": "Usado recentemente",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Procure menus, comandos e descubra pedras preciosas ocultas",
+      "noMatch": "Nenhum comando correspondente..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Comando não está disponível...",
+    "shortcutHint": "Para a paleta de comandos, use {{shortcut}}"
   }
 }
