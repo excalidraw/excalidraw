@@ -50,6 +50,15 @@
         color: var(--color-on-primary-container);
       }
     }
+
+    &[aria-disabled="true"] {
+      background: initial;
+      border: none;
+
+      svg {
+        color: var(--color-disabled);
+      }
+    }
   }
 }
 

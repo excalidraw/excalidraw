@@ -269,7 +269,7 @@ export const loadScene = async (
     // in the scene database/localStorage, and instead fetch them async
     // from a different database
     files: data.files,
-    commitToHistory: false,
+    commitToStore: false,
   };
 };
 

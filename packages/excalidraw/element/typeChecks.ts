@@ -20,6 +20,7 @@ import {
   ExcalidrawIframeElement,
   ExcalidrawIframeLikeElement,
   ExcalidrawMagicFrameElement,
+  ExcalidrawArrowElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -101,7 +102,7 @@ export const isLinearElement = (
 
 export const isArrowElement = (
   element?: ExcalidrawElement | null,
-): element is ExcalidrawLinearElement => {
+): element is ExcalidrawArrowElement => {
   return element != null && element.type === "arrow";
 };
 
