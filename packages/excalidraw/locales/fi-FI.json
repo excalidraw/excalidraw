@@ -11,8 +11,8 @@
     "copyAsPng": "Kopioi leikepöydälle PNG-tiedostona",
     "copyAsSvg": "Kopioi leikepöydälle SVG-tiedostona",
     "copyText": "Kopioi tekstinä",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Kopioi lähde leikepöydälle",
+    "convertToCode": "Muunna koodiksi",
     "bringForward": "Tuo eteenpäin",
     "sendToBack": "Vie taakse",
     "bringToFront": "Tuo eteen",
@@ -40,10 +40,10 @@
     "arrowhead_none": "Ei mitään",
     "arrowhead_arrow": "Nuoli",
     "arrowhead_bar": "Tasapää",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Ympyrä",
+    "arrowhead_circle_outline": "Ympyrä (ääriviiva)",
     "arrowhead_triangle": "Kolmio",
-    "arrowhead_triangle_outline": "",
+    "arrowhead_triangle_outline": "Kolmio (ääriviiva)",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
     "fontSize": "Kirjasinkoko",
@@ -74,7 +74,7 @@
     "canvasColors": "Käytössä piirtoalueella",
     "canvasBackground": "Piirtoalueen tausta",
     "drawingCanvas": "Piirtoalue",
-    "clearCanvas": "",
+    "clearCanvas": "Tyhjennä piirtoalue",
     "layers": "Tasot",
     "actions": "Toiminnot",
     "language": "Kieli",
@@ -87,7 +87,7 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
-    "toggleGrid": "",
+    "toggleGrid": "Näytä tai piilota ruudukko",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa…",
@@ -110,7 +110,7 @@
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
     "toggleTheme": "",
-    "theme": "",
+    "theme": "Teema",
     "personalLib": "Oma kirjasto",
     "excalidrawLib": "Excalidraw kirjasto",
     "decreaseFontSize": "Pienennä kirjasinkokoa",
@@ -125,7 +125,7 @@
       "createEmbed": "",
       "label": "Linkki",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "Linkkiä ei ole asetettu"
     },
     "lineEditor": {
       "edit": "Muokkaa riviä",
@@ -142,10 +142,10 @@
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
-    "textToDiagram": "",
+    "textToDiagram": "Teksti kaavioksi",
     "prompt": "",
-    "followUs": "",
-    "discordChat": "",
+    "followUs": "Seuraa meitä",
+    "discordChat": "Discord-keskustelu",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": ""
@@ -181,7 +181,7 @@
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
     "lightMode": "Vaalea tila",
-    "systemMode": "",
+    "systemMode": "Järjestelmätila",
     "zenMode": "Zen-tila",
     "objectsSnapMode": "",
     "exitZenMode": "Poistu zen-tilasta",
@@ -241,8 +241,8 @@
       "image": ""
     },
     "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnParse": "Ei voitu liittää.",
+    "copyToSystemClipboardFailed": "Kopiointi leikepöydälle epäonnistui."
   },
   "toolBar": {
     "selection": "Valinta",
@@ -261,12 +261,12 @@
     "eraser": "Poistotyökalu",
     "frame": "",
     "magicframe": "",
-    "embeddable": "",
-    "laser": "",
+    "embeddable": "Verkkoupote",
+    "laser": "Laserosoitin",
     "hand": "Käsi (panning-työkalu)",
-    "extraTools": "",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "extraTools": "Lisää työkaluja",
+    "mermaidToExcalidraw": "Mermaid Excalidrawiksi",
+    "magicSettings": "AI asetukset"
   },
   "headings": {
     "canvasActions": "Piirtoalueen toiminnot",
@@ -311,7 +311,7 @@
     "sceneContent": "Piirroksen tiedot:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Tai"
   },
   "roomDialog": {
     "desc_intro": "",
@@ -410,7 +410,7 @@
     "label": {
       "withBackground": "",
       "onlySelected": "",
-      "darkMode": "",
+      "darkMode": "Tumma tila",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -421,12 +421,12 @@
     "title": {
       "exportToPng": "",
       "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "copyPngToClipboard": "Kopioi PNG leikepöydälle"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Kopioi leikepöydälle"
     }
   },
   "encrypted": {
@@ -463,20 +463,20 @@
   },
   "colors": {
     "transparent": "Läpinäkyvä",
-    "black": "",
-    "white": "",
-    "red": "",
-    "pink": "",
-    "grape": "",
-    "violet": "",
-    "gray": "",
-    "blue": "",
-    "cyan": "",
-    "teal": "",
-    "green": "",
-    "yellow": "",
-    "orange": "",
-    "bronze": ""
+    "black": "Musta",
+    "white": "Valkoinen",
+    "red": "Punainen",
+    "pink": "Pinkki",
+    "grape": "Rypäle",
+    "violet": "Violetti",
+    "gray": "Harmaa",
+    "blue": "Sininen",
+    "cyan": "Syaani",
+    "teal": "Sinivihreä",
+    "green": "Vihreä",
+    "yellow": "Keltainen",
+    "orange": "Oranssi",
+    "bronze": "Pronssi"
   },
   "welcomeScreen": {
     "app": {
@@ -492,34 +492,34 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
-    "colors": "",
-    "shades": "",
-    "hexCode": "",
+    "mostUsedCustomColors": "Eniten käytetyt omat värit",
+    "colors": "Värit",
+    "shades": "Varjot",
+    "hexCode": "Hex koodi",
     "noShades": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Vie kuva",
+        "button": "Vie kuva",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Tallenna levylle",
+        "button": "Tallenna levylle",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+",
+        "button": "Vie Excalidraw+:aan",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Lataa tiedostosta",
+        "button": "Lataa tiedostosta",
         "description": ""
       },
       "shareableLink": {
@@ -534,12 +534,12 @@
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "Esikatsele"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Pikahaku",
+      "empty": "Käyttäjiä ei löytynyt"
     },
     "hint": {
       "text": "",
@@ -552,16 +552,16 @@
   "commandPalette": {
     "title": "",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Valitse",
+      "confirm": "Vahvista",
+      "close": "Sulje"
     },
-    "recents": "",
+    "recents": "Viimeksi käytetty",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Hae valikoita, komentoja ja löydä piilotettuja helmiä",
+      "noMatch": "Ei vastaavia komentoja..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Komento ei ole käytettävissä...",
     "shortcutHint": ""
   }
 }
