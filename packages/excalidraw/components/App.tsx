@@ -5535,7 +5535,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        } else {
+        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {

@@ -23,6 +23,8 @@ import {
 } from "../../utils/geometry/geometry";
 import { Line, Point } from "../../utils/geometry/shape";
 
+const SIDE_RESIZING_SPACING = DEFAULT_TRANSFORM_HANDLE_SPACING * 3;
+
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
   x: number,
@@ -77,7 +79,7 @@ export const resizeTest = (
       element,
       elementsMap,
     );
-    const SPACING = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / zoom.value;
+    const SPACING = SIDE_RESIZING_SPACING / zoom.value;
     const sides = getSelectionBorders(
       [x1 - SPACING, y1 - SPACING],
       [x2 + SPACING, y2 + SPACING],
@@ -154,7 +156,7 @@ export const getTransformHandleTypeFromCoords = (
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
 
-  const SPACING = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / zoom.value;
+  const SPACING = SIDE_RESIZING_SPACING / zoom.value;
   const sides = getSelectionBorders(
     [x1 - SPACING, y1 - SPACING],
     [x2 + SPACING, y2 + SPACING],

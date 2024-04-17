@@ -120,7 +120,7 @@ describe("regression tests", () => {
     const firstRectPos = mouse.getPosition();
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -12);
     mouse.up(10, 10);
 
     const prevSelectedId = API.getSelectedElement().id;
@@ -242,21 +242,25 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -10);
     mouse.up(10, 10);
 
     const prevRectsXY = h.elements
       .filter((element) => element.type === "rectangle")
       .map((element) => ({ x: element.x, y: element.y }));
 
+    console.log("prevRectsXY", prevRectsXY);
+
     mouse.reset();
     mouse.click(10, 10);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.click(20, 0);
+      mouse.click(22, 0);
     });
 
     mouse.down();
     mouse.up(10, 10);
+
+    console.log("h.elements", h.elements);
 
     h.elements
       .filter((element) => element.type === "rectangle")
@@ -381,7 +385,7 @@ describe("regression tests", () => {
     const firstElementEndPoint = mouse.getPosition();
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -10);
     mouse.up(10, 10);
 
     const secondElementEndPoint = mouse.getPosition();

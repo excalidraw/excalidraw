@@ -106,6 +106,8 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
+    console.log(h.elements);
+
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
@@ -188,13 +190,13 @@ describe("contextMenu element", () => {
     mouse.up(10, 10);
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -10);
     mouse.up(10, 10);
 
     mouse.reset();
     mouse.click(10, 10);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.click(20, 0);
+      mouse.click(22, 0);
     });
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
@@ -240,13 +242,13 @@ describe("contextMenu element", () => {
     mouse.up(10, 10);
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -10);
     mouse.up(10, 10);
 
     mouse.reset();
     mouse.click(10, 10);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.click(20, 0);
+      mouse.click(22, 0);
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
