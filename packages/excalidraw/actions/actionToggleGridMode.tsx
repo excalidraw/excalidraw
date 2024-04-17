@@ -3,6 +3,7 @@ import { register } from "./register";
 import { GRID_SIZE } from "../constants";
 import { AppState } from "../types";
 import { gridIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
@@ -21,7 +22,7 @@ export const actionToggleGridMode = register({
         gridSize: this.checked!(appState) ? null : GRID_SIZE,
         objectsSnapModeEnabled: false,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState: AppState) => appState.gridSize !== null,

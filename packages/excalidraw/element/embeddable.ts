@@ -13,6 +13,7 @@ import {
 } from "./types";
 import { sanitizeHTMLAttribute } from "../data/url";
 import { MarkRequired } from "../utility-types";
+import { StoreAction } from "../store";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 
@@ -314,7 +315,7 @@ export const actionSetEmbeddableAsActiveTool = register({
           type: "embeddable",
         }),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
 });
