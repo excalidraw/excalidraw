@@ -230,6 +230,7 @@ import {
   getEllipseShape,
   getFreedrawShape,
   getPolygonShape,
+  getSelectionBoxShape,
 } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import {
@@ -4540,13 +4541,13 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      return hitElementBoundingBox(
-        x,
-        y,
+      const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
         this.getHitThreshold(),
       );
+
+      return isPointInShape([x, y], selectionShape);
     }
 
     // take bound text element into consideration for hit collision as well
