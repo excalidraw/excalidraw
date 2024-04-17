@@ -1,5 +1,6 @@
 import { coffeeIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
+import { StoreAction } from "../store";
 import { register } from "./register";
 
 export const actionToggleZenMode = register({
@@ -18,7 +19,7 @@ export const actionToggleZenMode = register({
         ...appState,
         zenModeEnabled: !this.checked!(appState),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.zenModeEnabled,

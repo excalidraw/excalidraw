@@ -15,6 +15,7 @@ import {
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import { AppState } from "../types";
 import { resetCursor } from "../cursor";
+import { StoreAction } from "../store";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -48,8 +49,9 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
+            selectedLinearElement: null,
           },
-          commitToHistory: true,
+          storeAction: StoreAction.CAPTURE,
         };
       }
     }
@@ -90,7 +92,9 @@ export const actionFinalize = register({
           });
         }
       }
+
       if (isInvisiblySmallElement(multiPointElement)) {
+        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
         newElements = newElements.filter(
           (el) => el.id !== multiPointElement.id,
         );
@@ -186,7 +190,8 @@ export const actionFinalize = register({
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
-      commitToHistory: appState.activeTool.type === "freedraw",
+      // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event, appState) =>

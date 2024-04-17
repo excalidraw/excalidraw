@@ -3,6 +3,7 @@ import { deepCopyElement } from "../element/newElement";
 import { randomId } from "../random";
 import { t } from "../i18n";
 import { LIBRARY_DISABLED_TYPES } from "../constants";
+import { StoreAction } from "../store";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
@@ -17,7 +18,7 @@ export const actionAddToLibrary = register({
     for (const type of LIBRARY_DISABLED_TYPES) {
       if (selectedElements.some((element) => element.type === type)) {
         return {
-          commitToHistory: false,
+          storeAction: StoreAction.NONE,
           appState: {
             ...appState,
             errorMessage: t(`errors.libraryElementTypeError.${type}`),
@@ -41,7 +42,7 @@ export const actionAddToLibrary = register({
       })
       .then(() => {
         return {
-          commitToHistory: false,
+          storeAction: StoreAction.NONE,
           appState: {
             ...appState,
             toast: { message: t("toast.addedToLibrary") },
@@ -50,7 +51,7 @@ export const actionAddToLibrary = register({
       })
       .catch((error) => {
         return {
-          commitToHistory: false,
+          storeAction: StoreAction.NONE,
           appState: {
             ...appState,
             errorMessage: error.message,

@@ -15,6 +15,7 @@ import {
   SendToBackIcon,
 } from "../components/icons";
 import { isDarwin } from "../constants";
+import { StoreAction } from "../store";
 
 export const actionSendBackward = register({
   name: "sendBackward",
@@ -25,7 +26,7 @@ export const actionSendBackward = register({
     return {
       elements: moveOneLeft(elements, appState),
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyPriority: 40,
@@ -54,7 +55,7 @@ export const actionBringForward = register({
     return {
       elements: moveOneRight(elements, appState),
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyPriority: 40,
@@ -83,7 +84,7 @@ export const actionSendToBack = register({
     return {
       elements: moveAllLeft(elements, appState),
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -120,7 +121,7 @@ export const actionBringToFront = register({
     return {
       elements: moveAllRight(elements, appState),
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

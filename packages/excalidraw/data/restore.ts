@@ -294,7 +294,7 @@ const restoreElement = (
 };
 
 /**
- * Repairs contaienr element's boundElements array by removing duplicates and
+ * Repairs container element's boundElements array by removing duplicates and
  * fixing containerId of bound elements if not present. Also removes any
  * bound elements that do not exist in the elements array.
  *

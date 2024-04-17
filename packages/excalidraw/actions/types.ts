@@ -1,5 +1,5 @@
 import React from "react";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, OrderedExcalidrawElement } from "../element/types";
 import {
   AppClassProperties,
   AppState,
@@ -8,6 +8,7 @@ import {
   UIAppState,
 } from "../types";
 import { MarkOptional } from "../utility-types";
+import { StoreAction } from "../store";
 
 export type ActionSource =
   | "ui"
@@ -25,14 +26,13 @@ export type ActionResult =
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
       files?: BinaryFiles | null;
-      commitToHistory: boolean;
-      syncHistory?: boolean;
+      storeAction: keyof typeof StoreAction;
       replaceFiles?: boolean;
     }
   | false;
 
 type ActionFn = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly OrderedExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
   app: AppClassProperties,

@@ -48,6 +48,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
+  informMutation: boolean = true,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -56,6 +57,7 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
+    angle: container?.angle ?? textElement.angle,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -89,7 +91,7 @@ export const redrawTextBoundingBox = (
         metrics.height,
         container.type,
       );
-      mutateElement(container, { height: nextHeight });
+      mutateElement(container, { height: nextHeight }, informMutation);
       updateOriginalContainerCache(container.id, nextHeight);
     }
     if (metrics.width > maxContainerWidth) {
@@ -97,7 +99,7 @@ export const redrawTextBoundingBox = (
         metrics.width,
         container.type,
       );
-      mutateElement(container, { width: nextWidth });
+      mutateElement(container, { width: nextWidth }, informMutation);
     }
     const updatedTextElement = {
       ...textElement,
@@ -112,7 +114,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.y = y;
   }
 
-  mutateElement(textElement, boundTextUpdates);
+  mutateElement(textElement, boundTextUpdates, informMutation);
 };
 
 export const bindTextToShapeAfterDuplication = (

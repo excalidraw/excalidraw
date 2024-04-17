@@ -26,6 +26,11 @@ type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
 export type FractionalIndex = string & { _brand: "franctionalIndex" };
 
+export type BoundElement = Readonly<{
+  id: ExcalidrawLinearElement["id"];
+  type: "arrow" | "text";
+}>;
+
 type _ExcalidrawElementBase = Readonly<{
   id: string;
   x: number;
@@ -62,12 +67,7 @@ type _ExcalidrawElementBase = Readonly<{
   groupIds: readonly GroupId[];
   frameId: string | null;
   /** other elements that are bound to this element */
-  boundElements:
-    | readonly Readonly<{
-        id: ExcalidrawLinearElement["id"];
-        type: "arrow" | "text";
-      }>[]
-    | null;
+  boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
   link: string | null;

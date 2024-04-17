@@ -2,6 +2,7 @@ import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette"
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isLinearElement } from "../element/typeChecks";
 import { ExcalidrawLinearElement } from "../element/types";
+import { StoreAction } from "../store";
 import { register } from "./register";
 
 export const actionToggleLinearEditor = register({
@@ -41,7 +42,7 @@ export const actionToggleLinearEditor = register({
         ...appState,
         editingLinearElement,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });
