@@ -2607,8 +2607,8 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "version": 4,
   "versionNonce": 400692809,
   "width": 20,
-  "x": -5,
-  "y": 5,
+  "x": 0,
+  "y": 10,
 }
 `;
 
@@ -2744,8 +2744,8 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
           "version": 4,
           "versionNonce": 400692809,
           "width": 20,
-          "x": -5,
-          "y": 5,
+          "x": 0,
+          "y": 10,
         },
       ],
     },

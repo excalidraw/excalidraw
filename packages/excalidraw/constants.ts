@@ -155,7 +155,7 @@ export const COLOR_VOICE_CALL = "#a2f1a6";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
-export const GRID_SIZE = 10; // TODO make it configurable?
+export const GRID_SIZE = 20; // TODO make it configurable?
 
 export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",

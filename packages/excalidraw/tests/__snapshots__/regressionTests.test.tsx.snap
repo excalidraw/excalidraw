@@ -4466,7 +4466,7 @@ exports[`regression tests > click to select a shape > [end of test] history 1`] 
           "versionNonce": 238820263,
           "width": 10,
           "x": 32,
-          "y": 8,
+          "y": 10,
         },
       ],
     },

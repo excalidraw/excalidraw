@@ -106,8 +106,6 @@ describe("contextMenu element", () => {
     mouse.down(10, 10);
     mouse.up(20, 20);
 
-    console.log(h.elements);
-
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: 1,
