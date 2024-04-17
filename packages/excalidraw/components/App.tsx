@@ -230,6 +230,7 @@ import {
   getEllipseShape,
   getFreedrawShape,
   getPolygonShape,
+  getSelectionBoxShape,
 } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import {
@@ -416,7 +417,6 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import {
   hitElementBoundText,
-  hitElementBoundingBox,
   hitElementBoundingBoxOnly,
   hitElementItself,
   shouldTestInside,
@@ -4462,10 +4462,18 @@ class App extends React.Component<AppProps, AppState> {
 
       // If we're hitting element with highest z-index only on its bounding box
       // while also hitting other element figure, the latter should be considered.
-      return isPointInShape(
-        [x, y],
-        this.getElementShape(elementWithHighestZIndex),
-      )
+      return hitElementItself({
+        x,
+        y,
+        element: elementWithHighestZIndex,
+        shape: this.getElementShape(elementWithHighestZIndex),
+        // when overlapping, we would like to be more precise
+        // this also avoids the need to update past tests
+        threshold: this.getHitThreshold() / 2,
+        frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
+          ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
+          : null,
+      })
         ? elementWithHighestZIndex
         : allHitElements[allHitElements.length - 2];
     }
@@ -4540,13 +4548,13 @@ class App extends React.Component<AppProps, AppState> {
       this.state.selectedElementIds[element.id] &&
       shouldShowBoundingBox([element], this.state)
     ) {
-      return hitElementBoundingBox(
-        x,
-        y,
+      const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
         this.getHitThreshold(),
       );
+
+      return isPointInShape([x, y], selectionShape);
     }
 
     // take bound text element into consideration for hit collision as well
