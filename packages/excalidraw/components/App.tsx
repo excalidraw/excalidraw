@@ -417,7 +417,6 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import {
   hitElementBoundText,
-  hitElementBoundingBox,
   hitElementBoundingBoxOnly,
   hitElementItself,
   shouldTestInside,

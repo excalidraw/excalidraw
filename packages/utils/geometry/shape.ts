@@ -12,7 +12,6 @@
  * to pure shapes
  */
 
-import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../../excalidraw/constants";
 import { getElementAbsoluteCoords } from "../../excalidraw/element";
 import {
   ElementsMap,
