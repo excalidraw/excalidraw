@@ -47,7 +47,7 @@
     "rewire": "6.0.0",
     "typescript": "4.9.4",
     "vite": "5.2.8",
-    "vite-plugin-checker": "0.6.1",
+    "vite-plugin-checker": "0.6.4",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",
     "vite-plugin-svgr": "2.4.0",
