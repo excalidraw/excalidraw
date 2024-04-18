@@ -23,6 +23,7 @@ import {
   pointRotate,
 } from "../../utils/geometry/geometry";
 import { Line, Point } from "../../utils/geometry/shape";
+import { isLinearElement } from "./typeChecks";
 
 const SIDE_RESIZING_SPACING = DEFAULT_TRANSFORM_HANDLE_SPACING * 4.5;
 
@@ -83,6 +84,7 @@ export const resizeTest = (
 
   if (
     element.type !== "text" &&
+    !(isLinearElement(element) && element.points.length <= 2) &&
     showAllTransformHandles(Math.abs(x2 - x1), Math.abs(y2 - y1), zoom)
   ) {
     const SPACING = SIDE_RESIZING_SPACING / zoom.value;
