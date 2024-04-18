@@ -12,6 +12,7 @@ import {
   TransformHandleType,
   TransformHandle,
   MaybeTransformHandleType,
+  showAllTransformHandles,
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
 import { Bounds, getElementAbsoluteCoords } from "./bounds";
@@ -23,7 +24,7 @@ import {
 } from "../../utils/geometry/geometry";
 import { Line, Point } from "../../utils/geometry/shape";
 
-const SIDE_RESIZING_SPACING = DEFAULT_TRANSFORM_HANDLE_SPACING * 3;
+const SIDE_RESIZING_SPACING = DEFAULT_TRANSFORM_HANDLE_SPACING * 4.5;
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -73,16 +74,22 @@ export const resizeTest = (
 
   // Resize an element from the sides.
   // Note that for a text element, when "resized" from the side
-  // we souldmake it wrap/unwrap
-  if (element.type !== "text") {
-    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-      element,
-      elementsMap,
-    );
+  // we should make it wrap/unwrap
+
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+  );
+
+  if (
+    element.type !== "text" &&
+    showAllTransformHandles(Math.abs(x2 - x1), Math.abs(y2 - y1), zoom)
+  ) {
     const SPACING = SIDE_RESIZING_SPACING / zoom.value;
+    const HALF = DEFAULT_TRANSFORM_HANDLE_SPACING / zoom.value / 2;
     const sides = getSelectionBorders(
-      [x1 - SPACING, y1 - SPACING],
-      [x2 + SPACING, y2 + SPACING],
+      [x1 - HALF, y1 - HALF],
+      [x2 + HALF, y2 + HALF],
       [cx, cy],
       angleToDegrees(element.angle),
     );
@@ -153,21 +160,23 @@ export const getTransformHandleTypeFromCoords = (
   }
 
   // check sides
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
+  if (showAllTransformHandles(Math.abs(x2 - x1), Math.abs(y2 - y1), zoom)) {
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
 
-  const SPACING = SIDE_RESIZING_SPACING / zoom.value;
-  const sides = getSelectionBorders(
-    [x1 - SPACING, y1 - SPACING],
-    [x2 + SPACING, y2 + SPACING],
-    [cx, cy],
-    angleToDegrees(0),
-  );
+    const SPACING = SIDE_RESIZING_SPACING / zoom.value;
+    const sides = getSelectionBorders(
+      [x1 - SPACING, y1 - SPACING],
+      [x2 + SPACING, y2 + SPACING],
+      [cx, cy],
+      angleToDegrees(0),
+    );
 
-  for (const [dir, side] of Object.entries(sides)) {
-    // test to see if x, y are on the line segment
-    if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
-      return dir as TransformHandleType;
+    for (const [dir, side] of Object.entries(sides)) {
+      // test to see if x, y are on the line segment
+      if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
+        return dir as TransformHandleType;
+      }
     }
   }
 

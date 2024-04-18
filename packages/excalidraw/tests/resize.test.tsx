@@ -6,7 +6,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
-import type { Point } from "../types";
+import type { Point, Zoom } from "../types";
 import { Bounds, getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
