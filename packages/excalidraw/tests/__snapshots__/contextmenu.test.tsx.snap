@@ -5493,7 +5493,7 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
+              "x": 12,
               "y": 0,
             },
             "inserted": {
@@ -5536,20 +5536,6 @@ History {
           "inserted": {
             "selectedElementIds": {},
           },
-<<<<<<< HEAD
-          "seed": 1014066025,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 1604849351,
-          "width": 10,
-          "x": 12,
-          "y": 0,
-=======
->>>>>>> master
         },
       },
       "elementsChange": ElementsChange {
@@ -6638,7 +6624,7 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
+              "x": 12,
               "y": 0,
             },
             "inserted": {
@@ -6664,78 +6650,11 @@ History {
           },
         },
       },
-<<<<<<< HEAD
-      "elements": [
-        {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "customData": undefined,
-          "fillStyle": "solid",
-          "frameId": null,
-          "groupIds": [],
-          "height": 10,
-          "id": "id0",
-          "index": "a0",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "roundness": {
-            "type": 3,
-          },
-          "seed": 449462985,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 1150084233,
-          "width": 10,
-          "x": -10,
-          "y": 0,
-        },
-        {
-          "angle": 0,
-          "backgroundColor": "transparent",
-          "boundElements": null,
-          "customData": undefined,
-          "fillStyle": "solid",
-          "frameId": null,
-          "groupIds": [],
-          "height": 10,
-          "id": "id1",
-          "index": "a1",
-          "isDeleted": false,
-          "link": null,
-          "locked": false,
-          "opacity": 100,
-          "roughness": 1,
-          "roundness": {
-            "type": 3,
-          },
-          "seed": 238820263,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 3,
-          "versionNonce": 1505387817,
-          "width": 10,
-          "x": 12,
-          "y": 0,
-        },
-      ],
-=======
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {},
         "updated": Map {},
       },
->>>>>>> master
     },
     HistoryEntry {
       "appStateChange": AppStateChange {
@@ -6767,20 +6686,6 @@ History {
           "inserted": {
             "selectedGroupIds": {},
           },
-<<<<<<< HEAD
-          "seed": 238820263,
-          "strokeColor": "#1e1e1e",
-          "strokeStyle": "solid",
-          "strokeWidth": 2,
-          "type": "rectangle",
-          "updated": 1,
-          "version": 4,
-          "versionNonce": 747212839,
-          "width": 10,
-          "x": 12,
-          "y": 0,
-=======
->>>>>>> master
         },
       },
       "elementsChange": ElementsChange {
