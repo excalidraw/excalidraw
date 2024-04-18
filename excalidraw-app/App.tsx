@@ -26,7 +26,8 @@ import {
   LiveCollaborationTrigger,
   TTDDialog,
   TTDDialogTrigger,
-} from "../packages/excalidraw/index";
+  StoreAction,
+} from "../packages/excalidraw";
 import {
   AppState,
   ExcalidrawImperativeAPI,
@@ -438,7 +439,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               ...restore(data.scene, null, null, { repairBindings: true }),
-              commitToStore: true,
+              storeAction: StoreAction.CAPTURE,
             });
           }
         });
@@ -469,6 +470,7 @@ const ExcalidrawWrapper = () => {
           setLangCode(langCode);
           excalidrawAPI.updateScene({
             ...localDataState,
+            storeAction: StoreAction.UPDATE,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
@@ -604,6 +606,7 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
+              storeAction: StoreAction.UPDATE,
             });
           }
         }
