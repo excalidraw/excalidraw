@@ -65,7 +65,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
 | `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
-| `commitToStore` | `boolean` | Implies if the change should be captured and commited to the `store`. Commited changes are emmitted and listened to by other components, such as `History` for undo / redo purposes. Defaults to `false`. |
+| `storeAction` | [`StoreActionType`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/store.ts#L38) | Parameter to control which updates should be captured by the `Store`. Captured updates are emmitted as increments and listened to by other components, such as `History` for undo / redo purposes. |
 
 ```jsx live
 function App() {
@@ -105,6 +105,7 @@ function App() {
       appState: {
         viewBackgroundColor: "#edf2ff",
       },
+      storeAction: StoreAction.CAPTURE,
     };
     excalidrawAPI.updateScene(sceneData);
   };
@@ -120,6 +121,17 @@ function App() {
   );
 }
 ```
+
+#### storeAction
+
+You can use the `storeAction` to influence undo / redo behaviour.
+
+|  | `storeAction` value | Notes |
+| --- | --- | --- |
+| _Immediately undoable_ | `"capture"` | Use for all updates which should be recorded. Should be used for the most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `"none"` | Use for all updates which should not be recorded immediately (likely exceptions which are part of some async multi-step process) or those not meant to be recorded at all (i.e. updates to `collaborators` object, parts of `AppState` which are not observed by the store & history - not `ObservedAppState`). Otherwise, all such updates would end up being recorded with the next `"capture"` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | `"update"` | Use for all updates which should never be recorded, such as remote updates or scene initialization. These updates will _never_ make it to the local undo / redo stacks. |
+
 
 ### updateLibrary
 
@@ -440,3 +452,4 @@ Returns an unsubscribe function.
 Subscribes to canvas `pointerup` events.
 
 Returns an unsubscribe function.
+
