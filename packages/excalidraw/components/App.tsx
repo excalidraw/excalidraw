@@ -3702,7 +3702,7 @@ class App extends React.Component<AppProps, AppState> {
           : prevCommittedElements;
 
         // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
-        // NOT scheduling actions after re-render, as it might cause unexpected concurrency issues
+        // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
         if (sceneData.storeAction === StoreAction.CAPTURE) {
           this.store.captureIncrement(
             nextCommittedElements,
