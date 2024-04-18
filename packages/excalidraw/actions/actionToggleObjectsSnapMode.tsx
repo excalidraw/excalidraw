@@ -1,5 +1,6 @@
 import { magnetIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
+import { StoreAction } from "../store";
 import { register } from "./register";
 
 export const actionToggleObjectsSnapMode = register({
@@ -18,7 +19,7 @@ export const actionToggleObjectsSnapMode = register({
         objectsSnapModeEnabled: !this.checked!(appState),
         gridSize: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.objectsSnapModeEnabled,

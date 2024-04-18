@@ -101,7 +101,7 @@ describe("<Excalidraw/>", () => {
         clientY: 1,
       });
       const contextMenu = document.querySelector(".context-menu");
-      fireEvent.click(queryByText(contextMenu as HTMLElement, "Show grid")!);
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Toggle grid")!);
       expect(h.state.gridSize).toBe(GRID_SIZE);
     });
 

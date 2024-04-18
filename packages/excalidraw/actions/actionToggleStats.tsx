@@ -1,6 +1,7 @@
 import { register } from "./register";
 import { CODES, KEYS } from "../keys";
 import { abacusIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 export const actionToggleStats = register({
   name: "stats",
@@ -15,7 +16,7 @@ export const actionToggleStats = register({
         ...appState,
         showStats: !this.checked!(appState),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.showStats,

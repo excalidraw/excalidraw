@@ -671,6 +671,18 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
+/**
+ * Transform array into an object, use only when array order is irrelevant.
+ */
+export const arrayToObject = <T>(
+  array: readonly T[],
+  groupBy?: (value: T) => string,
+) =>
+  array.reduce((acc, value) => {
+    acc[groupBy ? groupBy(value) : String(value)] = value;
+    return acc;
+  }, {} as { [key: string]: T });
+
 export const isTestEnv = () => import.meta.env.MODE === "test";
 
 export const isDevEnv = () => import.meta.env.MODE === "development";
