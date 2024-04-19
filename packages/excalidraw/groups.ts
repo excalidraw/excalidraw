@@ -387,3 +387,9 @@ export const elementsAreInSameGroup = (elements: ExcalidrawElement[]) => {
 
   return maxGroup === elements.length;
 };
+
+export const hasGroupAmongElements = (
+  elements: readonly NonDeletedExcalidrawElement[],
+) => {
+  return elements.some((e) => e.groupIds.length > 0);
+};

@@ -48,6 +48,8 @@ import {
   getApproxMinLineHeight,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { hasGroupAmongElements } from "../groups";
+import { shouldMaintainAspectRatio } from "../keys";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -134,6 +136,7 @@ export const transformElements = (
         elementsMap,
         transformHandleType,
         shouldResizeFromCenter,
+        shouldMaintainAspectRatio,
         pointerX,
         pointerY,
       );
@@ -622,6 +625,7 @@ export const resizeMultipleElements = (
   elementsMap: ElementsMap,
   transformHandleType: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
+  shouldMaintainAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
 ) => {
@@ -709,6 +713,26 @@ export const resizeMultipleElements = (
     return;
   }
 
+  let scaleX =
+    direction.includes("e") || direction.includes("w")
+      ? (Math.abs(pointerX - anchorX) / width) * resizeFromCenterScale
+      : 1;
+  let scaleY =
+    direction.includes("n") || direction.includes("s")
+      ? (Math.abs(pointerY - anchorY) / height) * resizeFromCenterScale
+      : 1;
+
+  if (
+    shouldMaintainAspectRatio ||
+    hasGroupAmongElements(selectedElements) ||
+    targetElements
+      .map((item) => item.latest)
+      .some((element) => element.angle !== 0)
+  ) {
+    scaleX = scale;
+    scaleY = scale;
+  }
+
   const flipConditionsMap: Record<
     TransformHandleDirection,
     // Condition for which we should flip or not flip the selected elements
@@ -760,8 +784,8 @@ export const resizeMultipleElements = (
       continue;
     }
 
-    const width = orig.width * scale;
-    const height = orig.height * scale;
+    const width = orig.width * scaleX;
+    const height = orig.height * scaleY;
     const angle = normalizeAngle(orig.angle * flipFactorX * flipFactorY);
 
     const isLinearOrFreeDraw = isLinearElement(orig) || isFreeDrawElement(orig);
@@ -769,8 +793,8 @@ export const resizeMultipleElements = (
     const offsetY = orig.y - anchorY;
     const shiftX = isFlippedByX && !isLinearOrFreeDraw ? width : 0;
     const shiftY = isFlippedByY && !isLinearOrFreeDraw ? height : 0;
-    const x = anchorX + flipFactorX * (offsetX * scale + shiftX);
-    const y = anchorY + flipFactorY * (offsetY * scale + shiftY);
+    const x = anchorX + flipFactorX * (offsetX * scaleX + shiftX);
+    const y = anchorY + flipFactorY * (offsetY * scaleY + shiftY);
 
     const rescaledPoints = rescalePointsInElement(
       orig,
