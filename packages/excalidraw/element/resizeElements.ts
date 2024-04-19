@@ -49,7 +49,6 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { hasGroupAmongElements } from "../groups";
-import { shouldMaintainAspectRatio } from "../keys";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {

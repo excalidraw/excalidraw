@@ -174,10 +174,12 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const { x: prevX, y: prevY } = API.getSelectedElement();
+    API.clearSelection();
     mouse.down(-8, -8);
     mouse.up(10, 10);
 
     const { x: nextX, y: nextY } = API.getSelectedElement();
+    API.clearSelection();
     expect(nextX).toBeGreaterThan(prevX);
     expect(nextY).toBeGreaterThan(prevY);
 
@@ -199,7 +201,7 @@ describe("regression tests", () => {
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
     ).toBe(1);
-
+    API.clearSelection();
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(-8, -8);
       mouse.up(10, 10);
@@ -725,7 +727,7 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const { x: prevX, y: prevY } = API.getSelectedElement();
-
+    API.clearSelection();
     // drag element from point on bounding box that doesn't hit element
     mouse.reset();
     mouse.down(8, 8);
@@ -999,12 +1001,12 @@ describe("regression tests", () => {
   it("shift click on selected element should deselect it on pointer up", () => {
     UI.clickTool("rectangle");
     mouse.down();
-    mouse.up(10, 10);
+    mouse.up(100, 100);
 
     // Rectangle is already selected since creating
     // it was our last action
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.down(-8, -8);
+      mouse.down(-50, -50);
     });
     expect(API.getSelectedElements().length).toBe(1);
 

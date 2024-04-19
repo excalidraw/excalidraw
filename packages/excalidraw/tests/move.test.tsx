@@ -13,6 +13,7 @@ import {
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
+import { API } from "./helpers/api";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -58,12 +59,16 @@ describe("move element", () => {
       renderStaticScene.mockClear();
     }
 
+    h.setState({
+      selectedElementIds: {},
+    });
+
     fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`3`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`2`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`4`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
@@ -153,6 +158,8 @@ describe("duplicate element on move when ALT is clicked", () => {
       renderStaticScene.mockClear();
     }
 
+    API.clearSelection();
+
     fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40, altKey: true });
 
@@ -164,8 +171,8 @@ describe("duplicate element on move when ALT is clicked", () => {
 
     // TODO: This used to be 4, but binding made it go up to 5. Do we need
     // that additional render?
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`5`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
 

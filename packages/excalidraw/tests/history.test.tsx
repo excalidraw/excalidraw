@@ -2070,6 +2070,8 @@ describe("history", () => {
 
       const rect3 = UI.createElement("rectangle", { x: 30, y: 30 });
 
+      API.clearSelection();
+
       // move rect3
       mouse.downAt(35, 35);
       mouse.moveTo(55, 55);

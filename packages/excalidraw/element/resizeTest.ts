@@ -12,7 +12,6 @@ import {
   TransformHandleType,
   TransformHandle,
   MaybeTransformHandleType,
-  showAllTransformHandles,
 } from "./transformHandles";
 import { AppState, Zoom } from "../types";
 import { Bounds, getElementAbsoluteCoords } from "./bounds";
@@ -84,8 +83,7 @@ export const resizeTest = (
 
   if (
     element.type !== "text" &&
-    !(isLinearElement(element) && element.points.length <= 2) &&
-    showAllTransformHandles(Math.abs(x2 - x1), Math.abs(y2 - y1), zoom)
+    !(isLinearElement(element) && element.points.length <= 2)
   ) {
     const SPACING = SIDE_RESIZING_SPACING / zoom.value;
     const HALF = DEFAULT_TRANSFORM_HANDLE_SPACING / zoom.value / 2;
@@ -161,24 +159,21 @@ export const getTransformHandleTypeFromCoords = (
     return found as MaybeTransformHandleType;
   }
 
-  // check sides
-  if (showAllTransformHandles(Math.abs(x2 - x1), Math.abs(y2 - y1), zoom)) {
-    const cx = (x1 + x2) / 2;
-    const cy = (y1 + y2) / 2;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
 
-    const SPACING = SIDE_RESIZING_SPACING / zoom.value;
-    const sides = getSelectionBorders(
-      [x1 - SPACING, y1 - SPACING],
-      [x2 + SPACING, y2 + SPACING],
-      [cx, cy],
-      angleToDegrees(0),
-    );
+  const SPACING = SIDE_RESIZING_SPACING / zoom.value;
+  const sides = getSelectionBorders(
+    [x1 - SPACING, y1 - SPACING],
+    [x2 + SPACING, y2 + SPACING],
+    [cx, cy],
+    angleToDegrees(0),
+  );
 
-    for (const [dir, side] of Object.entries(sides)) {
-      // test to see if x, y are on the line segment
-      if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
-        return dir as TransformHandleType;
-      }
+  for (const [dir, side] of Object.entries(sides)) {
+    // test to see if x, y are on the line segment
+    if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
+      return dir as TransformHandleType;
     }
   }
 

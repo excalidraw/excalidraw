@@ -96,16 +96,6 @@ const generateTransformHandle = (
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-export const showAllTransformHandles = (
-  width: number,
-  height: number,
-  zoom: Zoom,
-) => {
-  // Note: we render using "mouse" size so we should also use "mouse" size for this check
-  const minSizeForAllHandles = (4 * transformHandleSizes.mouse) / zoom.value;
-  return width > minSizeForAllHandles && height > minSizeForAllHandles;
-};
-
 export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
   angle: number,
@@ -243,10 +233,10 @@ export const getTransformHandlesFromCoords = (
   }
 
   // We only want to show complete handles above a certain size
-  if (!showAllTransformHandles(width, height, zoom)) {
-    transformHandles.ne = undefined;
-    transformHandles.sw = undefined;
-  }
+  // if (!showAllTransformHandles(width, height, zoom)) {
+  //   transformHandles.ne = undefined;
+  //   transformHandles.sw = undefined;
+  // }
 
   return transformHandles;
 };
