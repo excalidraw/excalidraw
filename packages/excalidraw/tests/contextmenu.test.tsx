@@ -108,8 +108,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
@@ -199,8 +199,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
 
     const contextMenu = UI.queryContextMenu();
@@ -255,8 +255,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
 
     const contextMenu = UI.queryContextMenu();
@@ -297,8 +297,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     expect(copiedStyles).toBe("{}");
@@ -382,8 +382,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryAllByText(contextMenu!, "Delete")[0]);
@@ -398,8 +398,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Add to library")!);
@@ -417,8 +417,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Duplicate")!);
@@ -548,8 +548,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Group selection")!);
@@ -578,8 +578,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
 
     const contextMenu = UI.queryContextMenu();

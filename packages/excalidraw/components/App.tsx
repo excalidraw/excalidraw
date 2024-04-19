@@ -4600,7 +4600,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getHitThreshold() {
-    return 10 / this.state.zoom.value;
+    return 8 / this.state.zoom.value;
   }
 
   private hitElement(
