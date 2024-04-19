@@ -177,7 +177,6 @@ export const getTransformHandleTypeFromCoords = (
         ];
 
   const SPACING = SIDE_RESIZING_SPACING / zoom.value;
-  const PADDING = DEFAULT_TRANSFORM_HANDLE_SPACING / zoom.value;
 
   if (
     (width < SPACING * 2 || height < SPACING * 2) &&
