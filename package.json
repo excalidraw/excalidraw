@@ -88,5 +88,8 @@
     "prerelease:excalidraw": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
     "release:excalidraw": "node scripts/release.js"
+  },
+  "resolutions": {
+    "@babel/traverse": "7.23.2"
   }
 }
