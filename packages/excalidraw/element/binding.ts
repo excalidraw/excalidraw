@@ -289,14 +289,16 @@ export const filterBindingElementsAndPossiblyUnbind = (
 ): void => {
   elements.forEach((element) => {
     if (isBindingElement(element)) {
-      const startBindingElement = element.startBinding ? "keep" : null;
-      const endBindingElement = element.endBinding ? "keep" : null;
-      bindOrUnbindLinearElement(
-        element,
-        startBindingElement,
-        endBindingElement,
-        elementsMap,
-      );
+      if (element.startBinding !== null && element.endBinding !== null) {
+        bindOrUnbindLinearElement(element, null, null, elementsMap);
+      } else {
+        bindOrUnbindLinearElement(
+          element,
+          element.startBinding ? "keep" : null,
+          element.endBinding ? "keep" : null,
+          elementsMap,
+        );
+      }
     }
   });
 };
