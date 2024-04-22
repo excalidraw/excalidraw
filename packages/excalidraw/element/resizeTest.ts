@@ -6,14 +6,14 @@ import {
 } from "./types";
 
 import {
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   getTransformHandlesFromCoords,
   getTransformHandles,
   TransformHandleType,
   TransformHandle,
   MaybeTransformHandleType,
+  getOmitSidesForDevice,
 } from "./transformHandles";
-import { AppState, Zoom } from "../types";
+import { AppState, Device, Zoom } from "../types";
 import { Bounds, getElementAbsoluteCoords } from "./bounds";
 import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../constants";
 import {
@@ -44,13 +44,20 @@ export const resizeTest = (
   y: number,
   zoom: Zoom,
   pointerType: PointerType,
+  device: Device,
 ): MaybeTransformHandleType => {
   if (!appState.selectedElementIds[element.id]) {
     return false;
   }
 
   const { rotation: rotationTransformHandle, ...transformHandles } =
-    getTransformHandles(element, zoom, elementsMap, pointerType);
+    getTransformHandles(
+      element,
+      zoom,
+      elementsMap,
+      pointerType,
+      getOmitSidesForDevice(device),
+    );
 
   if (
     rotationTransformHandle &&
@@ -70,6 +77,10 @@ export const resizeTest = (
 
   if (filter.length > 0) {
     return filter[0] as TransformHandleType;
+  }
+
+  if (device.isTouchScreen || device.viewport.isMobile) {
+    return false;
   }
 
   // Resize an element from the sides.
@@ -113,6 +124,7 @@ export const getElementWithTransformHandleType = (
   zoom: Zoom,
   pointerType: PointerType,
   elementsMap: ElementsMap,
+  device: Device,
 ) => {
   return elements.reduce((result, element) => {
     if (result) {
@@ -126,6 +138,7 @@ export const getElementWithTransformHandleType = (
       scenePointerY,
       zoom,
       pointerType,
+      device,
     );
     return transformHandleType ? { element, transformHandleType } : null;
   }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
@@ -137,13 +150,14 @@ export const getTransformHandleTypeFromCoords = (
   scenePointerY: number,
   zoom: Zoom,
   pointerType: PointerType,
+  device: Device,
 ): MaybeTransformHandleType => {
   const transformHandles = getTransformHandlesFromCoords(
     [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
     0,
     zoom,
     pointerType,
-    OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+    getOmitSidesForDevice(device),
   );
 
   const found = Object.keys(transformHandles).find((key) => {
@@ -157,6 +171,14 @@ export const getTransformHandleTypeFromCoords = (
 
   if (found) {
     return found as MaybeTransformHandleType;
+  }
+
+  if (pointerType !== "mouse") {
+    return false;
+  }
+
+  if (device.isTouchScreen || device.viewport.isMobile) {
+    return false;
   }
 
   const cx = (x1 + x2) / 2;

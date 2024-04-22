@@ -1704,6 +1704,7 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           scale={window.devicePixelRatio}
                           appState={this.state}
+                          device={this.device}
                           renderInteractiveSceneCallback={
                             this.renderInteractiveSceneCallback
                           }
@@ -5362,6 +5363,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
+            this.device,
           );
         if (
           elementWithTransformHandleType &&
@@ -5381,6 +5383,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
+        this.device,
       );
       if (transformHandleType) {
         setCursor(
@@ -6346,6 +6349,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
+            this.device,
           );
         if (elementWithTransformHandleType != null) {
           this.setState({
@@ -6361,6 +6365,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
+          this.device,
         );
       }
       if (pointerDownState.resize.handleType) {

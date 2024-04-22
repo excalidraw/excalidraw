@@ -7,7 +7,7 @@ import {
 
 import { Bounds, getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
-import { InteractiveCanvasAppState, Zoom } from "../types";
+import { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
 import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../constants";
@@ -94,6 +94,13 @@ const generateTransformHandle = (
 ): TransformHandle => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
   return [xx - width / 2, yy - height / 2, width, height];
+};
+
+export const getOmitSidesForDevice = (device: Device) => {
+  if (device.isTouchScreen || device.viewport.isMobile) {
+    return {};
+  }
+  return DEFAULT_OMIT_SIDES;
 };
 
 export const getTransformHandlesFromCoords = (
