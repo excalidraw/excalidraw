@@ -17,6 +17,7 @@ import {
   getSceneVersion,
   restoreElements,
   zoomToFitBounds,
+  reconcileElements,
 } from "../../packages/excalidraw";
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
@@ -80,10 +81,9 @@ import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 import { collabErrorIndicatorAtom } from "./CollabError";
-import {
+import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
-  reconcileElements,
 } from "../../packages/excalidraw/data/reconcile";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);

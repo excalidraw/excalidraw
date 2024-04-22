@@ -1,3 +1,4 @@
+import { reconcileElements } from "../../packages/excalidraw";
 import {
   ExcalidrawElement,
   FileId,
@@ -22,10 +23,7 @@ import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
 import { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
-import {
-  RemoteExcalidrawElement,
-  reconcileElements,
-} from "../../packages/excalidraw/data/reconcile";
+import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
 
 // private
 // -----------------------------------------------------------------------------
