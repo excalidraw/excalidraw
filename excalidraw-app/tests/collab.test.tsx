@@ -12,7 +12,7 @@ import {
   createRedoAction,
   createUndoAction,
 } from "../../packages/excalidraw/actions/actionHistory";
-import { newElementWith } from "../../packages/excalidraw";
+import { StoreAction, newElementWith } from "../../packages/excalidraw";
 
 const { h } = window;
 
@@ -90,7 +90,7 @@ describe("collaboration", () => {
 
     updateSceneData({
       elements: syncInvalidIndices([rect1, rect2]),
-      commitToStore: true,
+      storeAction: StoreAction.CAPTURE,
     });
 
     updateSceneData({
@@ -98,7 +98,7 @@ describe("collaboration", () => {
         rect1,
         newElementWith(h.elements[1], { isDeleted: true }),
       ]),
-      commitToStore: true,
+      storeAction: StoreAction.CAPTURE,
     });
 
     await waitFor(() => {
@@ -145,6 +145,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     updateSceneData({
       elements: syncInvalidIndices([rect1]),
+      storeAction: StoreAction.UPDATE,
     });
 
     await waitFor(() => {
@@ -182,7 +183,7 @@ describe("collaboration", () => {
         h.elements[0],
         newElementWith(h.elements[1], { x: 100 }),
       ]),
-      commitToStore: true,
+      storeAction: StoreAction.CAPTURE,
     });
 
     await waitFor(() => {
@@ -217,6 +218,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     updateSceneData({
       elements: syncInvalidIndices([rect1]),
+      storeAction: StoreAction.UPDATE,
     });
 
     // snapshot was correctly updated and marked the element as deleted

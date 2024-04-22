@@ -8,7 +8,7 @@ import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import { SceneElementsMap } from "../element/types";
-import { IStore, StoreAction } from "../store";
+import { Store, StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
 const writeData = (
@@ -40,7 +40,7 @@ const writeData = (
   return { storeAction: StoreAction.NONE };
 };
 
-type ActionCreator = (history: History, store: IStore) => Action;
+type ActionCreator = (history: History, store: Store) => Action;
 
 export const createUndoAction: ActionCreator = (history, store) => ({
   name: "undo",

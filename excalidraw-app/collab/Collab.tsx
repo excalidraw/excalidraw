@@ -13,10 +13,11 @@ import {
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import {
+  StoreAction,
   getSceneVersion,
   restoreElements,
   zoomToFitBounds,
-} from "../../packages/excalidraw/index";
+} from "../../packages/excalidraw";
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   assertNever,
@@ -356,6 +357,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       this.excalidrawAPI.updateScene({
         elements,
+        storeAction: StoreAction.UPDATE,
       });
     }
   };
@@ -506,6 +508,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       // to database even if deleted before creating the room.
       this.excalidrawAPI.updateScene({
         elements,
+        storeAction: StoreAction.UPDATE,
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
@@ -743,6 +746,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
+      storeAction: StoreAction.UPDATE,
     });
 
     this.loadImageFiles();

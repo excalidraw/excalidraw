@@ -40,6 +40,7 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
 import { Merge, MaybePromise, ValueOf } from "./utility-types";
+import { StoreActionType } from "./store";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -507,7 +508,7 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  commitToStore?: boolean;
+  storeAction?: StoreActionType;
 };
 
 export enum UserIdleState {

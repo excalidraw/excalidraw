@@ -8,7 +8,7 @@ import {
   UIAppState,
 } from "../types";
 import { MarkOptional } from "../utility-types";
-import { StoreAction } from "../store";
+import { StoreActionType } from "../store";
 
 export type ActionSource =
   | "ui"
@@ -26,7 +26,7 @@ export type ActionResult =
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
       files?: BinaryFiles | null;
-      storeAction: keyof typeof StoreAction;
+      storeAction: StoreActionType;
       replaceFiles?: boolean;
     }
   | false;

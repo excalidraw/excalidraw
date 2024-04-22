@@ -19,6 +19,7 @@ import throttle from "lodash.throttle";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import { encryptData } from "../../packages/excalidraw/data/encryption";
 import type { Socket } from "socket.io-client";
+import { StoreAction } from "../../packages/excalidraw";
 
 class Portal {
   collab: TCollabClass;
@@ -127,6 +128,7 @@ class Portal {
           }
           return element;
         }),
+      storeAction: StoreAction.UPDATE,
     });
   }, FILE_UPLOAD_TIMEOUT);
 

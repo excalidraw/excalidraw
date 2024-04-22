@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import { Excalidraw } from "../../index";
+import { Excalidraw, StoreAction } from "../../index";
 import { ExcalidrawImperativeAPI } from "../../types";
 import { resolvablePromise } from "../../utils";
 import { render } from "../test-utils";
@@ -27,7 +27,10 @@ describe("event callbacks", () => {
 
     const origBackgroundColor = h.state.viewBackgroundColor;
     excalidrawAPI.onChange(onChange);
-    excalidrawAPI.updateScene({ appState: { viewBackgroundColor: "red" } });
+    excalidrawAPI.updateScene({
+      appState: { viewBackgroundColor: "red" },
+      storeAction: StoreAction.CAPTURE,
+    });
     expect(onChange).toHaveBeenCalledWith(
       // elements
       [],
