@@ -220,6 +220,8 @@ export {
   restoreLibraryItems,
 } from "./data/restore";
 
+export { reconcileElements } from "./data/reconcile";
+
 export {
   exportToCanvas,
   exportToBlob,
