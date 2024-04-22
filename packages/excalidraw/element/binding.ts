@@ -293,7 +293,16 @@ export const unbindLinearElements = (
 ): void => {
   elements.forEach((element) => {
     if (isBindingElement(element)) {
-      bindOrUnbindLinearElement(element, null, null, elementsMap);
+      if (element.startBinding !== null && element.endBinding !== null) {
+        bindOrUnbindLinearElement(element, null, null, elementsMap);
+      } else {
+        bindOrUnbindLinearElement(
+          element,
+          element.startBinding ? "keep" : null,
+          element.endBinding ? "keep" : null,
+          elementsMap,
+        );
+      }
     }
   });
 };
