@@ -10,7 +10,11 @@ import { rotate } from "../math";
 import { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
-import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  isAndroid,
+  isIOS,
+} from "../constants";
 
 export type TransformHandleDirection =
   | "n"
@@ -96,11 +100,24 @@ const generateTransformHandle = (
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
-export const getOmitSidesForDevice = (device: Device) => {
-  if (device.isTouchScreen || device.viewport.isMobile) {
-    return {};
+export const canResizeFromSides = (device: Device) => {
+  if (device.viewport.isMobile) {
+    return false;
   }
-  return DEFAULT_OMIT_SIDES;
+
+  if (device.isTouchScreen && (isAndroid || isIOS)) {
+    return false;
+  }
+
+  return true;
+};
+
+export const getOmitSidesForDevice = (device: Device) => {
+  if (canResizeFromSides(device)) {
+    return DEFAULT_OMIT_SIDES;
+  }
+
+  return {};
 };
 
 export const getTransformHandlesFromCoords = (

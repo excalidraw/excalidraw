@@ -12,6 +12,7 @@ import {
   TransformHandle,
   MaybeTransformHandleType,
   getOmitSidesForDevice,
+  canResizeFromSides,
 } from "./transformHandles";
 import { AppState, Device, Zoom } from "../types";
 import { Bounds, getElementAbsoluteCoords } from "./bounds";
@@ -79,36 +80,32 @@ export const resizeTest = (
     return filter[0] as TransformHandleType;
   }
 
-  if (device.isTouchScreen || device.viewport.isMobile) {
-    return false;
-  }
-
-  // Resize an element from the sides.
-  // Note that for a text element, when "resized" from the side
-  // we should make it wrap/unwrap
-
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    elementsMap,
-  );
-
-  if (
-    element.type !== "text" &&
-    !(isLinearElement(element) && element.points.length <= 2)
-  ) {
-    const SPACING = SIDE_RESIZING_SPACING / zoom.value;
-    const PADDING = DEFAULT_TRANSFORM_HANDLE_SPACING / zoom.value;
-    const sides = getSelectionBorders(
-      [x1 - PADDING, y1 - PADDING],
-      [x2 + PADDING, y2 + PADDING],
-      [cx, cy],
-      angleToDegrees(element.angle),
+  if (canResizeFromSides(device)) {
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+      element,
+      elementsMap,
     );
 
-    for (const [dir, side] of Object.entries(sides)) {
-      // test to see if x, y are on the line segment
-      if (pointOnLine([x, y], side as Line, SPACING)) {
-        return dir as TransformHandleType;
+    // Note that for a text element, when "resized" from the side
+    // we should make it wrap/unwrap
+    if (
+      element.type !== "text" &&
+      !(isLinearElement(element) && element.points.length <= 2)
+    ) {
+      const SPACING = SIDE_RESIZING_SPACING / zoom.value;
+      const PADDING = DEFAULT_TRANSFORM_HANDLE_SPACING / zoom.value;
+      const sides = getSelectionBorders(
+        [x1 - PADDING, y1 - PADDING],
+        [x2 + PADDING, y2 + PADDING],
+        [cx, cy],
+        angleToDegrees(element.angle),
+      );
+
+      for (const [dir, side] of Object.entries(sides)) {
+        // test to see if x, y are on the line segment
+        if (pointOnLine([x, y], side as Line, SPACING)) {
+          return dir as TransformHandleType;
+        }
       }
     }
   }
@@ -173,51 +170,45 @@ export const getTransformHandleTypeFromCoords = (
     return found as MaybeTransformHandleType;
   }
 
-  if (pointerType !== "mouse") {
-    return false;
-  }
+  if (canResizeFromSides(device)) {
+    const cx = (x1 + x2) / 2;
+    const cy = (y1 + y2) / 2;
 
-  if (device.isTouchScreen || device.viewport.isMobile) {
-    return false;
-  }
+    const width = x2 - x1;
+    const height = y2 - y1;
 
-  const cx = (x1 + x2) / 2;
-  const cy = (y1 + y2) / 2;
+    const centerLine: Line =
+      height > width
+        ? [
+            [cx, y1],
+            [cx, y2],
+          ]
+        : [
+            [x1, cy],
+            [x2, cy],
+          ];
 
-  const width = x2 - x1;
-  const height = y2 - y1;
+    const SPACING = SIDE_RESIZING_SPACING / zoom.value;
 
-  const centerLine: Line =
-    height > width
-      ? [
-          [cx, y1],
-          [cx, y2],
-        ]
-      : [
-          [x1, cy],
-          [x2, cy],
-        ];
+    if (
+      (width < SPACING * 2 || height < SPACING * 2) &&
+      pointOnLine([scenePointerX, scenePointerY], centerLine, SPACING / 2)
+    ) {
+      return false;
+    }
 
-  const SPACING = SIDE_RESIZING_SPACING / zoom.value;
+    const sides = getSelectionBorders(
+      [x1, y1],
+      [x2, y2],
+      [cx, cy],
+      angleToDegrees(0),
+    );
 
-  if (
-    (width < SPACING * 2 || height < SPACING * 2) &&
-    pointOnLine([scenePointerX, scenePointerY], centerLine, SPACING / 2)
-  ) {
-    return false;
-  }
-
-  const sides = getSelectionBorders(
-    [x1, y1],
-    [x2, y2],
-    [cx, cy],
-    angleToDegrees(0),
-  );
-
-  for (const [dir, side] of Object.entries(sides)) {
-    // test to see if x, y are on the line segment
-    if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
-      return dir as TransformHandleType;
+    for (const [dir, side] of Object.entries(sides)) {
+      // test to see if x, y are on the line segment
+      if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
+        return dir as TransformHandleType;
+      }
     }
   }
 
