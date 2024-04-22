@@ -251,6 +251,8 @@ export {
   bumpVersion,
 } from "./element/mutateElement";
 
+export { StoreAction } from "./store";
+
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
 export {
