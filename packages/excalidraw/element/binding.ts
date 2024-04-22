@@ -283,7 +283,7 @@ export const isLinearElementSimpleAndAlreadyBound = (
   );
 };
 
-export const filterBindingElementsAndPossiblyUnbind = (
+export const unbindLinearElements = (
   elements: readonly NonDeleted<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
 ): void => {

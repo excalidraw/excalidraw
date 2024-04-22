@@ -14,7 +14,7 @@ import { getCommonBoundingBox } from "../element/bounds";
 import {
   bindOrUnbindSelectedElements,
   isBindingEnabled,
-  filterBindingElementsAndPossiblyUnbind,
+  unbindLinearElements,
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
@@ -124,7 +124,7 @@ const flipElements = (
 
   isBindingEnabled(appState)
     ? bindOrUnbindSelectedElements(selectedElements, app)
-    : filterBindingElementsAndPossiblyUnbind(selectedElements, elementsMap);
+    : unbindLinearElements(selectedElements, elementsMap);
 
   return selectedElements;
 };
