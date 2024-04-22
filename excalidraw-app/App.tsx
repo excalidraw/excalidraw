@@ -27,6 +27,7 @@ import {
   TTDDialog,
   TTDDialogTrigger,
   StoreAction,
+  reconcileElements,
 } from "../packages/excalidraw";
 import {
   AppState,
@@ -107,10 +108,7 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
-import {
-  RemoteExcalidrawElement,
-  reconcileElements,
-} from "../packages/excalidraw/data/reconcile";
+import type { RemoteExcalidrawElement } from "../packages/excalidraw/data/reconcile";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
