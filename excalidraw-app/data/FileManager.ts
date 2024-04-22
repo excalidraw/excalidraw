@@ -1,3 +1,4 @@
+import { StoreAction } from "../../packages/excalidraw";
 import { compressData } from "../../packages/excalidraw/data/encode";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
@@ -238,5 +239,6 @@ export const updateStaleImageStatuses = (params: {
         }
         return element;
       }),
+    storeAction: StoreAction.UPDATE,
   });
 };

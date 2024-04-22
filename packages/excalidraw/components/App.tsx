@@ -183,7 +183,6 @@ import {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   Ordered,
-  OrderedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -412,7 +411,7 @@ import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
-import { IStore, Store, StoreAction } from "../store";
+import { Store, StoreAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -543,7 +542,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: IStore;
+  private store: Store;
   private history: History;
   private excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -2123,7 +2122,7 @@ class App extends React.Component<AppProps, AppState> {
               }
               return el;
             }),
-            commitToStore: true,
+            storeAction: StoreAction.CAPTURE,
           });
         }
       },
@@ -2810,7 +2809,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    this.store.capture(elementsMap, this.state);
+    this.store.commit(elementsMap, this.state);
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -3683,51 +3682,39 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      commitToStore?: SceneData["commitToStore"];
+      /** @default StoreAction.CAPTURE */
+      storeAction?: SceneData["storeAction"];
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
-      if (sceneData.commitToStore) {
-        this.store.shouldCaptureIncrement();
-      }
+      if (sceneData.storeAction && sceneData.storeAction !== StoreAction.NONE) {
+        const prevCommittedAppState = this.store.snapshot.appState;
+        const prevCommittedElements = this.store.snapshot.elements;
 
-      if (sceneData.elements || sceneData.appState) {
-        let nextCommittedAppState = this.state;
-        let nextCommittedElements: Map<string, OrderedExcalidrawElement>;
+        const nextCommittedAppState = sceneData.appState
+          ? Object.assign({}, prevCommittedAppState, sceneData.appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
+          : prevCommittedAppState;
 
-        if (sceneData.appState) {
-          nextCommittedAppState = {
-            ...this.state,
-            ...sceneData.appState, // Here we expect just partial appState
-          };
-        }
+        const nextCommittedElements = sceneData.elements
+          ? this.store.filterUncomittedElements(
+              this.scene.getElementsMapIncludingDeleted(), // Only used to detect uncomitted local elements
+              arrayToMap(nextElements), // We expect all (already reconciled) elements
+            )
+          : prevCommittedElements;
 
-        const prevElements = this.scene.getElementsIncludingDeleted();
-
-        if (sceneData.elements) {
-          /**
-           * We need to schedule a snapshot update, as in case `commitToStore` is false  (i.e. remote update),
-           * as it's essential for computing local changes after the async action is completed (i.e. not to include remote changes in the diff).
-           *
-           * This is also a breaking change for all local `updateScene` calls without set `commitToStore` to true,
-           * as it makes such updates impossible to undo (previously they were undone coincidentally with the switch to the whole snapshot captured by the history).
-           *
-           * WARN: be careful here as moving it elsewhere could break the history for remote client without noticing
-           * - we need to find a way to test two concurrent client updates simultaneously, while having access to both stores & histories.
-           */
-          this.store.shouldUpdateSnapshot();
-
-          // TODO#7348: deprecate once exchanging just store increments between clients
-          nextCommittedElements = this.store.ignoreUncomittedElements(
-            arrayToMap(prevElements),
-            arrayToMap(nextElements),
+        // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
+        // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
+        if (sceneData.storeAction === StoreAction.CAPTURE) {
+          this.store.captureIncrement(
+            nextCommittedElements,
+            nextCommittedAppState,
           );
-        } else {
-          nextCommittedElements = arrayToMap(prevElements);
+        } else if (sceneData.storeAction === StoreAction.UPDATE) {
+          this.store.updateSnapshot(
+            nextCommittedElements,
+            nextCommittedAppState,
+          );
         }
-
-        // WARN: Performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
-        this.store.capture(nextCommittedElements, nextCommittedAppState);
       }
 
       if (sceneData.appState) {
@@ -5704,6 +5691,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
+        storeAction: StoreAction.UPDATE,
       });
       return;
     }
@@ -7993,6 +7981,7 @@ class App extends React.Component<AppProps, AppState> {
           appState: {
             draggingElement: null,
           },
+          storeAction: StoreAction.UPDATE,
         });
 
         return;
@@ -8165,6 +8154,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
+          storeAction: StoreAction.UPDATE,
         });
       }
 
@@ -9228,13 +9218,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (ret.type === MIME_TYPES.excalidraw) {
-        // Restore the fractional indices by mutating elements and update the
-        // store snapshot, otherwise we would end up with duplicate indices
+        // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
-        this.store.snapshot = this.store.snapshot.clone(
-          arrayToMap(elements),
-          this.state,
-        );
+
+        // update the store snapshot for old elements, otherwise we would end up with duplicated fractional indices on undo
+        this.store.updateSnapshot(arrayToMap(elements), this.state);
+
         this.setState({ isLoading: true });
         this.syncActionResult({
           ...ret.data,
