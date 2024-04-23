@@ -1,5 +1,9 @@
 import { sanitizeUrl } from "@braintree/sanitize-url";
 
+export const sanitizeHTMLAttribute = (html: string) => {
+  return html.replace(/"/g, "&quot;");
+};
+
 export const normalizeLink = (link: string) => {
   if (!link) {
     return link;
@@ -8,7 +12,7 @@ export const normalizeLink = (link: string) => {
   if(link?.startsWith("data:text/html")) { //zsviczian
     return link;
   }
-  return sanitizeUrl(link);
+  return sanitizeUrl(sanitizeHTMLAttribute(link));
 };
 
 export const isLocalLink = (link: string | null) => {

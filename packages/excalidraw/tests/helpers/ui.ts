@@ -113,6 +113,18 @@ export class Keyboard {
     Keyboard.codeDown(code);
     Keyboard.codeUp(code);
   };
+
+  static undo = () => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
+
+  static redo = () => {
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
 }
 
 const getElementPointForSelection = (element: ExcalidrawElement): Point => {
@@ -287,9 +299,16 @@ const transform = (
   keyboardModifiers: KeyboardModifiers = {},
 ) => {
   const elements = Array.isArray(element) ? element : [element];
-  mouse.select(elements);
+  h.setState({
+    selectedElementIds: elements.reduce(
+      (acc, e) => ({
+        ...acc,
+        [e.id]: true,
+      }),
+      {},
+    ),
+  });
   let handleCoords: TransformHandle | undefined;
-
   if (elements.length === 1) {
     handleCoords = getTransformHandles(
       elements[0],

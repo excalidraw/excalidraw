@@ -1,5 +1,6 @@
 import { useState, useLayoutEffect } from "react";
 import { useDevice, useExcalidrawContainer } from "../components/App";
+import { THEME } from "../constants";
 import { useUIAppState } from "../context/ui-appState";
 
 export const useCreatePortalContainer = (opts?: {
@@ -19,7 +20,7 @@ export const useCreatePortalContainer = (opts?: {
       div.className = "";
       div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
       div.classList.toggle("excalidraw--mobile", device.editor.isMobile);
-      div.classList.toggle("theme--dark", theme === "dark");
+      div.classList.toggle("theme--dark", theme === THEME.DARK);
       if (opts?.style) {
         //zsviczian
         const style = opts.style;
