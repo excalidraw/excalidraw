@@ -110,7 +110,7 @@
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
     "toggleTheme": "החלפת מצב מואר/חשוך",
-    "theme": "",
+    "theme": "ערכת עיצוב",
     "personalLib": "ספריה פרטית",
     "excalidrawLib": "הספריה של Excalidraw",
     "decreaseFontSize": "הקטן את גודל הגופן",
@@ -145,7 +145,7 @@
     "textToDiagram": "טקסט לתרשים",
     "prompt": "בקשה",
     "followUs": "",
-    "discordChat": "",
+    "discordChat": "צ׳אט ב־Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": ""
@@ -236,8 +236,8 @@
       "line4": ""
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
+      "embeddable": "אי אפשר להוסיף רכיבי הטמעה לספרייה.",
+      "iframe": "אי אפשר להוסיף רכיבי מסגרות שיבוץ (IFrame) לספרייה.",
       "image": "תמיכה בהוספת תמונות לספרייה תושק בקרוב!"
     },
     "asyncPasteFailedOnRead": "לא ניתן להדביק (אי אפשר לקרוא מלוח המערכת).",
@@ -303,10 +303,10 @@
     "canvasTooBigTip": "טיפ: נסה להזיז את הרכיבים הרחוקים ביותר מעט קרוב יותר האחד לשני."
   },
   "errorSplash": {
-    "headingMain": "",
+    "headingMain": "התעוררה איזו שגיאה. נא לנסות <button>לרענן את העמוד</button>.",
     "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
     "clearCanvasCaveat": " זה יגרום לאובדן העבודה ",
-    "trackedToSentry": "",
+    "trackedToSentry": "השגיאה עם המזהה {{eventId}} במעקב במערכת שלך.",
     "openIssueMessage": "",
     "sceneContent": "תוכן הקנבאס:"
   },
@@ -542,15 +542,15 @@
       "empty": "לא נמצאו משתמשים"
     },
     "hint": {
-      "text": "",
-      "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "text": "יש ללחוץ על משתמש כדי לעקוב",
+      "followStatus": "המשתמש ברשימת המעקב שלך",
+      "inCall": "המשתמש בשיחה קולית",
+      "micMuted": "המיקרופון של המשתמש מושתק",
+      "isSpeaking": "המשתמש מדבר"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "לוח פקודות",
     "shortcuts": {
       "select": "בחירה",
       "confirm": "אישור",
@@ -562,6 +562,6 @@
       "noMatch": "אין פקודות תואמות…"
     },
     "itemNotAvailable": "הפקודה לא זמינה…",
-    "shortcutHint": ""
+    "shortcutHint": "ללוח פקודות, יש להשתמש ב־{{shortcut}}"
   }
 }
