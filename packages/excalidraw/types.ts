@@ -21,6 +21,7 @@ import {
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
+  OrderedExcalidrawElement,
 } from "./element/types";
 import { Action } from "./actions/types";
 import { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -41,6 +42,7 @@ import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
 import { Merge, MaybePromise, ValueOf } from "./utility-types";
 import { ColorPaletteCustom } from "./colors"; //zsviczian
+import { StoreActionType } from "./store";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -203,6 +205,24 @@ export type InteractiveCanvasAppState = Readonly<
     zenModeEnabled: AppState["zenModeEnabled"];
   }
 >;
+
+export type ObservedAppState = ObservedStandaloneAppState &
+  ObservedElementsAppState;
+
+export type ObservedStandaloneAppState = {
+  name: AppState["name"];
+  viewBackgroundColor: AppState["viewBackgroundColor"];
+};
+
+export type ObservedElementsAppState = {
+  editingGroupId: AppState["editingGroupId"];
+  selectedElementIds: AppState["selectedElementIds"];
+  selectedGroupIds: AppState["selectedGroupIds"];
+  // Avoiding storing whole instance, as it could lead into state incosistencies, empty undos/redos and etc.
+  editingLinearElementId: LinearElementEditor["elementId"] | null;
+  // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
+  selectedLinearElementId: LinearElementEditor["elementId"] | null;
+};
 
 export interface AppState {
   contextMenu: {
@@ -444,7 +464,7 @@ export type OnUserFollowedPayload = {
 
 export interface ExcalidrawProps {
   onChange?: (
-    elements: readonly ExcalidrawElement[],
+    elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
@@ -547,7 +567,7 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  commitToHistory?: boolean;
+  storeAction?: StoreActionType;
 };
 
 export enum UserIdleState {
@@ -646,6 +666,7 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  getElementShape: App["getElementShape"];
   getName: App["getName"];
 };
 
@@ -793,7 +814,7 @@ export type Device = Readonly<{
   isTouchScreen: boolean;
 }>;
 
-type FrameNameBounds = {
+export type FrameNameBounds = {
   x: number;
   y: number;
   width: number;

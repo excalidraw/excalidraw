@@ -355,6 +355,24 @@ export const getMaximumGroups = (
   return Array.from(groups.values());
 };
 
+export const getNonDeletedGroupIds = (elements: ElementsMap) => {
+  const nonDeletedGroupIds = new Set<string>();
+
+  for (const [, element] of elements) {
+    // defensive check
+    if (element.isDeleted) {
+      continue;
+    }
+
+    // defensive fallback
+    for (const groupId of element.groupIds ?? []) {
+      nonDeletedGroupIds.add(groupId);
+    }
+  }
+
+  return nonDeletedGroupIds;
+};
+
 export const elementsAreInSameGroup = (elements: ExcalidrawElement[]) => {
   const allGroups = elements.flatMap((element) => element.groupIds);
   const groupCount = new Map<string, number>();

@@ -8,7 +8,6 @@ import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import Scene from "../scene/Scene";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
@@ -16,17 +15,15 @@ import {
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import { AppState } from "../types";
 import { resetCursor } from "../cursor";
+import { StoreAction } from "../store";
 
 export const actionFinalize = register({
   name: "finalize",
   label: "",
   trackEvent: false,
-  perform: (
-    elements,
-    appState,
-    _,
-    { interactiveCanvas, focusContainer, scene },
-  ) => {
+  perform: (elements, appState, _, app) => {
+    const { interactiveCanvas, focusContainer, scene } = app;
+
     const elementsMap = scene.getNonDeletedElementsMap();
 
     if (appState.editingLinearElement) {
@@ -52,8 +49,9 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
+            selectedLinearElement: null,
           },
-          commitToHistory: true,
+          storeAction: StoreAction.CAPTURE,
         };
       }
     }
@@ -94,7 +92,9 @@ export const actionFinalize = register({
           });
         }
       }
+
       if (isInvisiblySmallElement(multiPointElement)) {
+        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
         newElements = newElements.filter(
           (el) => el.id !== multiPointElement.id,
         );
@@ -128,13 +128,7 @@ export const actionFinalize = register({
           -1,
           arrayToMap(elements),
         );
-        maybeBindLinearElement(
-          multiPointElement,
-          appState,
-          Scene.getScene(multiPointElement)!,
-          { x, y },
-          elementsMap,
-        );
+        maybeBindLinearElement(multiPointElement, appState, { x, y }, app);
       }
     }
 
@@ -193,7 +187,8 @@ export const actionFinalize = register({
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
-      commitToHistory: appState.activeTool.type === "freedraw",
+      // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event, appState) =>

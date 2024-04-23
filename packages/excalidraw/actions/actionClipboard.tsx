@@ -14,6 +14,7 @@ import { isTextElement } from "../element";
 import { t } from "../i18n";
 import { isFirefox } from "../constants";
 import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 export const actionCopy = register({
   name: "copy",
@@ -31,7 +32,7 @@ export const actionCopy = register({
       await copyToClipboard(elementsToCopy, app.files, event);
     } catch (error: any) {
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
         appState: {
           ...appState,
           errorMessage: error.message,
@@ -40,7 +41,7 @@ export const actionCopy = register({
     }
 
     return {
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   // don't supply a shortcut since we handle this conditionally via onCopy event
@@ -66,7 +67,7 @@ export const actionPaste = register({
 
       if (isFirefox) {
         return {
-          commitToHistory: false,
+          storeAction: StoreAction.NONE,
           appState: {
             ...appState,
             errorMessage: t("hints.firefox_clipboard_write"),
@@ -75,7 +76,7 @@ export const actionPaste = register({
       }
 
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
         appState: {
           ...appState,
           errorMessage: t("errors.asyncPasteFailedOnRead"),
@@ -88,7 +89,7 @@ export const actionPaste = register({
     } catch (error: any) {
       console.error(error);
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
         appState: {
           ...appState,
           errorMessage: t("errors.asyncPasteFailedOnParse"),
@@ -97,7 +98,7 @@ export const actionPaste = register({
     }
 
     return {
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   // don't supply a shortcut since we handle this conditionally via onCopy event
@@ -124,7 +125,7 @@ export const actionCopyAsSvg = register({
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
 
@@ -147,7 +148,7 @@ export const actionCopyAsSvg = register({
         },
       );
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     } catch (error: any) {
       console.error(error);
@@ -156,7 +157,7 @@ export const actionCopyAsSvg = register({
           ...appState,
           errorMessage: error.message,
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
   },
@@ -174,7 +175,7 @@ export const actionCopyAsPng = register({
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
     const selectedElements = app.scene.getSelectedElements({
@@ -208,7 +209,7 @@ export const actionCopyAsPng = register({
             }),
           },
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     } catch (error: any) {
       console.error(error);
@@ -217,7 +218,7 @@ export const actionCopyAsPng = register({
           ...appState,
           errorMessage: error.message,
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
   },
@@ -252,7 +253,7 @@ export const copyText = register({
       throw new Error(t("errors.copyToSystemClipboardFailed"));
     }
     return {
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   predicate: (elements, appState, _, app) => {
