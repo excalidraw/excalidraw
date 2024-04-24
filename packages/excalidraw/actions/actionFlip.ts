@@ -19,6 +19,7 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
+import { isLinearElement } from "../element/typeChecks";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -125,7 +126,10 @@ const flipElements = (
 
   isBindingEnabled(appState)
     ? bindOrUnbindSelectedElements(selectedElements, app)
-    : unbindLinearElements(selectedElements, elementsMap);
+    : unbindLinearElements(
+        selectedElements.filter(isLinearElement),
+        elementsMap,
+      );
 
   return selectedElements;
 };

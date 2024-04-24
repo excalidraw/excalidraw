@@ -169,10 +169,16 @@ export const bindOrUnbindSelectedElements = (
 ): void => {
   selectedElements.forEach((selectedElement) => {
     if (isBindingElement(selectedElement)) {
+      const start = selectedElement.startBinding
+        ? getElligibleElementForBindingElement(selectedElement, "start", app)
+        : null;
+      const end = selectedElement.endBinding
+        ? getElligibleElementForBindingElement(selectedElement, "end", app)
+        : null;
       bindOrUnbindLinearElement(
         selectedElement,
-        getElligibleElementForBindingElement(selectedElement, "start", app),
-        getElligibleElementForBindingElement(selectedElement, "end", app),
+        start,
+        end,
         app.scene.getNonDeletedElementsMap(),
       );
     } else if (isBindableElement(selectedElement)) {
@@ -288,7 +294,7 @@ export const isLinearElementSimpleAndAlreadyBound = (
 };
 
 export const unbindLinearElements = (
-  elements: readonly NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeleted<ExcalidrawLinearElement>[],
   elementsMap: NonDeletedSceneElementsMap,
 ): void => {
   elements.forEach((element) => {

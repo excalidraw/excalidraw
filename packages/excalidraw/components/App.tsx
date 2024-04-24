@@ -4107,7 +4107,10 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
       isBindingEnabled(this.state)
         ? bindOrUnbindSelectedElements(selectedElements, this)
-        : unbindLinearElements(selectedElements, elementsMap);
+        : unbindLinearElements(
+            selectedElements.filter(isLinearElement),
+            elementsMap,
+          );
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -7419,8 +7422,6 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          this.maybeSuggestBindingForAll(selectedElements);
-
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
             // Move the currently selected elements to the top of the z index stack, and
@@ -8466,15 +8467,28 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        isBindingEnabled(this.state)
-          ? bindOrUnbindSelectedElements(
-              this.scene.getSelectedElements(this.state),
-              this,
-            )
-          : unbindLinearElements(
-              this.scene.getSelectedElements(this.state),
-              elementsMap,
+        if (this.state.selectedLinearElement?.isDragging) {
+          // The arrow endpoints are dragged (i.e. start, joints..., end)
+          isBindingEnabled(this.state)
+            ? bindOrUnbindSelectedElements(
+                this.scene.getSelectedElements(this.state),
+                this,
+              )
+            : unbindLinearElements(
+                this.scene
+                  .getSelectedElements(this.state)
+                  .filter(isLinearElement),
+                elementsMap,
+              );
+        } else {
+          // The arrow itself (the shaft) is dragged
+          this.scene
+            .getSelectedElements(this.state)
+            .filter(isLinearElement)
+            .forEach((element) =>
+              bindOrUnbindLinearElement(element, null, null, elementsMap),
             );
+        }
       }
 
       if (activeTool.type === "laser") {
