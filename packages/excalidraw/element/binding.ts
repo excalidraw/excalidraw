@@ -164,47 +164,34 @@ const bindOrUnbindLinearElementEdge = (
 };
 
 export const bindOrUnbindSelectedElements = (
-  selectedElements: NonDeleted<ExcalidrawElement>[],
+  selectedElements: NonDeleted<ExcalidrawLinearElement>[],
   app: AppClassProperties,
+  isBindingEnabled: boolean,
+  draggingPoints: readonly number[],
 ): void => {
   selectedElements.forEach((selectedElement) => {
-    if (isBindingElement(selectedElement)) {
-      const start = selectedElement.startBinding
+    const startDragged = draggingPoints.findIndex((i) => i === 0) > -1;
+    const endDragged =
+      draggingPoints.findIndex((i) => i === selectedElement.points.length - 1) >
+      -1;
+    const start = startDragged
+      ? isBindingEnabled
         ? getElligibleElementForBindingElement(selectedElement, "start", app)
-        : null;
-      const end = selectedElement.endBinding
+        : null // If binding is disabled and start is dragged, break all binds
+      : "keep"; // We don't care, start is not dragged, leave it be
+    const end = endDragged
+      ? isBindingEnabled
         ? getElligibleElementForBindingElement(selectedElement, "end", app)
-        : null;
-      bindOrUnbindLinearElement(
-        selectedElement,
-        start,
-        end,
-        app.scene.getNonDeletedElementsMap(),
-      );
-    } else if (isBindableElement(selectedElement)) {
-      maybeBindBindableElement(
-        selectedElement,
-        app.scene.getNonDeletedElementsMap(),
-        app,
-      );
-    }
-  });
-};
+        : null // If binding is disabled and end is dragged, break all binds
+      : "keep"; // We don't care, end is not dragged, leave it be
 
-const maybeBindBindableElement = (
-  bindableElement: NonDeleted<ExcalidrawBindableElement>,
-  elementsMap: NonDeletedSceneElementsMap,
-  app: AppClassProperties,
-): void => {
-  getElligibleElementsForBindableElementAndWhere(bindableElement, app).forEach(
-    ([linearElement, where]) =>
-      bindOrUnbindLinearElement(
-        linearElement,
-        where === "end" ? "keep" : bindableElement,
-        where === "start" ? "keep" : bindableElement,
-        elementsMap,
-      ),
-  );
+    bindOrUnbindLinearElement(
+      selectedElement,
+      start,
+      end,
+      app.scene.getNonDeletedElementsMap(),
+    );
+  });
 };
 
 export const maybeBindLinearElement = (
@@ -291,26 +278,6 @@ export const isLinearElementSimpleAndAlreadyBound = (
   return (
     alreadyBoundToId === bindableElement.id && linearElement.points.length < 3
   );
-};
-
-export const unbindLinearElements = (
-  elements: readonly NonDeleted<ExcalidrawLinearElement>[],
-  elementsMap: NonDeletedSceneElementsMap,
-): void => {
-  elements.forEach((element) => {
-    if (isBindingElement(element)) {
-      if (element.startBinding !== null && element.endBinding !== null) {
-        bindOrUnbindLinearElement(element, null, null, elementsMap);
-      } else {
-        bindOrUnbindLinearElement(
-          element,
-          element.startBinding ? "keep" : null,
-          element.endBinding ? "keep" : null,
-          elementsMap,
-        );
-      }
-    }
-  });
 };
 
 const unbindLinearElement = (

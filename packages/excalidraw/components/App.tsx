@@ -130,7 +130,6 @@ import {
   isLinearElementSimpleAndAlreadyBound,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
-  unbindLinearElements,
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -4103,14 +4102,12 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
-      const selectedElements = this.scene.getSelectedElements(this.state);
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements, this)
-        : unbindLinearElements(
-            selectedElements.filter(isLinearElement),
-            elementsMap,
-          );
+      bindOrUnbindSelectedElements(
+        this.scene.getSelectedElements(this.state).filter(isLinearElement),
+        this,
+        isBindingEnabled(this.state),
+        this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+      );
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -8469,17 +8466,12 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
         if (this.state.selectedLinearElement?.isDragging) {
           // The arrow endpoints are dragged (i.e. start, joints..., end)
-          isBindingEnabled(this.state)
-            ? bindOrUnbindSelectedElements(
-                this.scene.getSelectedElements(this.state),
-                this,
-              )
-            : unbindLinearElements(
-                this.scene
-                  .getSelectedElements(this.state)
-                  .filter(isLinearElement),
-                elementsMap,
-              );
+          bindOrUnbindSelectedElements(
+            this.scene.getSelectedElements(this.state).filter(isLinearElement),
+            this,
+            isBindingEnabled(this.state),
+            this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+          );
         } else {
           // The arrow itself (the shaft) is dragged
           this.scene
