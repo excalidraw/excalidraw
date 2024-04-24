@@ -124,7 +124,6 @@ import {
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
-  getEligibleElementsForBinding,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
@@ -3935,8 +3934,6 @@ class App extends React.Component<AppProps, AppState> {
             simultaneouslyUpdated: selectedElements,
           });
         });
-
-        this.maybeSuggestBindingForAll(selectedElements);
 
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
@@ -9021,19 +9018,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   };
 
-  private maybeSuggestBindingForAll(
-    selectedElements: NonDeleted<ExcalidrawElement>[],
-  ): void {
-    if (selectedElements.length > 50) {
-      return;
-    }
-    const suggestedBindings = getEligibleElementsForBinding(
-      selectedElements,
-      this,
-    );
-    this.setState({ suggestedBindings });
-  }
-
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -9420,8 +9404,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.originSnapOffset,
       );
 
-      this.maybeSuggestBindingForAll([draggingElement]);
-
       // highlight elements that are to be added to frames on frames creation
       if (
         this.state.activeTool.type === TOOL_TYPE.frame ||
@@ -9544,8 +9526,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.y,
       )
     ) {
-      this.maybeSuggestBindingForAll(selectedElements);
-
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
         getElementsInResizingFrame(

@@ -613,42 +613,6 @@ const maybeCalculateNewGapWhenScaling = (
   return { elementId, gap: newGap, focus };
 };
 
-// TODO: this is a bottleneck, optimise
-export const getEligibleElementsForBinding = (
-  selectedElements: NonDeleted<ExcalidrawElement>[],
-  app: AppClassProperties,
-): SuggestedBinding[] => {
-  const includedElementIds = new Set(selectedElements.map(({ id }) => id));
-  return selectedElements.flatMap((selectedElement) =>
-    isBindingElement(selectedElement, false)
-      ? (getElligibleElementsForBindingElement(
-          selectedElement as NonDeleted<ExcalidrawLinearElement>,
-          app,
-        ).filter(
-          (element) => !includedElementIds.has(element.id),
-        ) as SuggestedBinding[])
-      : isBindableElement(selectedElement, false)
-      ? getElligibleElementsForBindableElementAndWhere(
-          selectedElement,
-          app,
-        ).filter((binding) => !includedElementIds.has(binding[0].id))
-      : [],
-  );
-};
-
-const getElligibleElementsForBindingElement = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  app: AppClassProperties,
-): NonDeleted<ExcalidrawBindableElement>[] => {
-  return [
-    getElligibleElementForBindingElement(linearElement, "start", app),
-    getElligibleElementForBindingElement(linearElement, "end", app),
-  ].filter(
-    (element): element is NonDeleted<ExcalidrawBindableElement> =>
-      element != null,
-  );
-};
-
 const getElligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
@@ -676,67 +640,6 @@ export const getLinearElementEdgeCoors = (
       index,
       elementsMap,
     ),
-  );
-};
-
-const getElligibleElementsForBindableElementAndWhere = (
-  bindableElement: NonDeleted<ExcalidrawBindableElement>,
-  app: AppClassProperties,
-): SuggestedPointBinding[] => {
-  const scene = Scene.getScene(bindableElement)!;
-  return scene
-    .getNonDeletedElements()
-    .map((element) => {
-      if (!isBindingElement(element, false)) {
-        return null;
-      }
-      const canBindStart = isLinearElementEligibleForNewBindingByBindable(
-        element,
-        "start",
-        bindableElement,
-        scene.getNonDeletedElementsMap(),
-        app,
-      );
-      const canBindEnd = isLinearElementEligibleForNewBindingByBindable(
-        element,
-        "end",
-        bindableElement,
-        scene.getNonDeletedElementsMap(),
-        app,
-      );
-      if (!canBindStart && !canBindEnd) {
-        return null;
-      }
-      return [
-        element,
-        canBindStart && canBindEnd ? "both" : canBindStart ? "start" : "end",
-        bindableElement,
-      ];
-    })
-    .filter((maybeElement) => maybeElement != null) as SuggestedPointBinding[];
-};
-
-const isLinearElementEligibleForNewBindingByBindable = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  startOrEnd: "start" | "end",
-  bindableElement: NonDeleted<ExcalidrawBindableElement>,
-  elementsMap: NonDeletedSceneElementsMap,
-  app: AppClassProperties,
-): boolean => {
-  const existingBinding =
-    linearElement[startOrEnd === "start" ? "startBinding" : "endBinding"];
-  return (
-    existingBinding == null &&
-    !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-      linearElement,
-      bindableElement,
-      startOrEnd,
-    ) &&
-    bindingBorderTest(
-      bindableElement,
-      getLinearElementEdgeCoors(linearElement, startOrEnd, elementsMap),
-      app,
-    )
   );
 };
 
