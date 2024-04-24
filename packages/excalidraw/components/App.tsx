@@ -4167,6 +4167,7 @@ class App extends React.Component<AppProps, AppState> {
         activeEmbeddable: null,
       } as const;
       if (nextActiveTool.type !== "selection") {
+        this.store.shouldCaptureIncrement();
         return {
           ...prevState,
           activeTool: nextActiveTool,
