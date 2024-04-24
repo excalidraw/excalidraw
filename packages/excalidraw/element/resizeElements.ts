@@ -726,7 +726,7 @@ export const resizeMultipleElements = (
     hasGroupAmongElements(selectedElements) ||
     targetElements
       .map((item) => item.latest)
-      .some((element) => element.angle !== 0)
+      .some((element) => element.angle !== 0 || isTextElement(element))
   ) {
     scaleX = scale;
     scaleY = scale;

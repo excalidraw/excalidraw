@@ -324,10 +324,10 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id154",
-                "focus": 0.009900990099009901,
+                "focus": 0.0099009900990099,
                 "gap": 1,
               },
-              "height": 0.9800000000000002,
+              "height": 0.9800000000000001,
               "points": [
                 [
                   0,
@@ -335,15 +335,15 @@ History {
                 ],
                 [
                   98,
-                  -0.9800000000000002,
+                  -0.9800000000000001,
                 ],
               ],
               "startBinding": {
                 "elementId": "id153",
-                "focus": 0.0297029702970297,
+                "focus": 0.029702970297029698,
                 "gap": 1,
               },
-              "y": 0.9900000000000004,
+              "y": 0.9900000000000002,
             },
           },
           "id157" => Delta {
@@ -789,11 +789,12 @@ History {
                 ],
               ],
               "startBinding": null,
+              "y": 0,
             },
             "inserted": {
               "endBinding": {
                 "elementId": "id150",
-                "focus": 0,
+                "focus": 2.220446049250313e-18,
                 "gap": 1,
               },
               "points": [
@@ -808,9 +809,10 @@ History {
               ],
               "startBinding": {
                 "elementId": "id149",
-                "focus": 0,
+                "focus": -2.220446049250313e-18,
                 "gap": 1,
               },
+              "y": -1.1102230246251565e-16,
             },
           },
         },
