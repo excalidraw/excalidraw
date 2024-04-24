@@ -163,6 +163,47 @@ const bindOrUnbindLinearElementEdge = (
   }
 };
 
+const linearElementStillNear = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  startOrEnd: "start" | "end",
+  elementsMap: NonDeletedSceneElementsMap,
+  app: AppClassProperties,
+): NonDeleted<ExcalidrawElement> | null => {
+  const coors = getLinearElementEdgeCoors(
+    linearElement,
+    startOrEnd,
+    elementsMap,
+  );
+  const elementId =
+    startOrEnd === "start"
+      ? linearElement.startBinding?.elementId
+      : linearElement.endBinding?.elementId;
+  if (elementId) {
+    const element = elementsMap.get(
+      elementId,
+    ) as NonDeleted<ExcalidrawBindableElement>;
+    if (bindingBorderTest(element, coors, app)) {
+      return element;
+    }
+  }
+
+  return null;
+};
+
+export const linearElementsStillNear = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  elementsMap: NonDeletedSceneElementsMap,
+  app: AppClassProperties,
+): (NonDeleted<ExcalidrawElement> | null)[] =>
+  ["start", "end"].map((startOrEnd) =>
+    linearElementStillNear(
+      linearElement,
+      startOrEnd as "start" | "end",
+      elementsMap,
+      app,
+    ),
+  );
+
 export const bindOrUnbindSelectedElements = (
   selectedElements: NonDeleted<ExcalidrawLinearElement>[],
   app: AppClassProperties,
@@ -576,7 +617,7 @@ const getElligibleElementForBindingElement = (
   );
 };
 
-const getLinearElementEdgeCoors = (
+export const getLinearElementEdgeCoors = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,

@@ -128,6 +128,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
+  linearElementsStillNear,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
@@ -7419,6 +7420,18 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
+          selectedElements.filter(isLinearElement).forEach((element) => {
+            const candidateBindables = linearElementsStillNear(
+              element,
+              elementsMap,
+              this,
+            ).filter((element) => element);
+            this.setState({
+              suggestedBindings:
+                candidateBindables as NonDeleted<ExcalidrawBindableElement>[],
+            });
+          });
+
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
             // Move the currently selected elements to the top of the z index stack, and
@@ -8464,22 +8477,32 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
+        const linearElements = this.scene
+          .getSelectedElements(this.state)
+          .filter(isLinearElement);
         if (this.state.selectedLinearElement?.isDragging) {
           // The arrow endpoints are dragged (i.e. start, joints..., end)
           bindOrUnbindSelectedElements(
-            this.scene.getSelectedElements(this.state).filter(isLinearElement),
+            linearElements,
             this,
             isBindingEnabled(this.state),
             this.state.selectedLinearElement?.selectedPointsIndices ?? [],
           );
-        } else {
+        } else if (linearElements.length > 0) {
           // The arrow itself (the shaft) is dragged
-          this.scene
-            .getSelectedElements(this.state)
-            .filter(isLinearElement)
-            .forEach((element) =>
-              bindOrUnbindLinearElement(element, null, null, elementsMap),
+          linearElements.forEach((element) => {
+            const [start, end] = linearElementsStillNear(
+              element,
+              elementsMap,
+              this,
             );
+            bindOrUnbindLinearElement(
+              element,
+              start ? (isBindingEnabled(this.state) ? "keep" : null) : null,
+              end ? (isBindingEnabled(this.state) ? "keep" : null) : null,
+              elementsMap,
+            );
+          });
         }
       }
 
