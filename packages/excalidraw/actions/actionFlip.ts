@@ -128,7 +128,6 @@ const flipElements = (
     app,
     isBindingEnabled(appState),
     [],
-    elementsMap,
   );
 
   return selectedElements;

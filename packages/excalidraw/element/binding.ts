@@ -237,8 +237,16 @@ const getBindingStrategyForDraggingLinear = (
   );
 
   return [
-    start ? (isBindingEnabled ? "keep" : null) : null,
-    end ? (isBindingEnabled ? "keep" : null) : null,
+    start
+      ? isBindingEnabled
+        ? getElligibleElementForBindingElement(selectedElement, "start", app)
+        : null
+      : null,
+    end
+      ? isBindingEnabled
+        ? getElligibleElementForBindingElement(selectedElement, "end", app)
+        : null
+      : null,
   ];
 };
 
@@ -247,7 +255,6 @@ export const bindOrUnbindLinearElements = (
   app: AppClassProperties,
   isBindingEnabled: boolean,
   draggingPoints: readonly number[] | null,
-  elementsMap: NonDeletedSceneElementsMap,
 ): void => {
   selectedElements.forEach((selectedElement) => {
     const [start, end] = draggingPoints?.length
@@ -261,7 +268,7 @@ export const bindOrUnbindLinearElements = (
       : // The arrow itself (the shaft) or the inner joins are dragged
         getBindingStrategyForDraggingLinear(
           selectedElement,
-          elementsMap,
+          app.scene.getNonDeletedElementsMap(),
           app,
           isBindingEnabled,
         );

@@ -4108,7 +4108,6 @@ class App extends React.Component<AppProps, AppState> {
         this,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
-        this.scene.getNonDeletedElementsMap(),
       );
       this.setState({ suggestedBindings: [] });
     }
@@ -8490,7 +8489,6 @@ class App extends React.Component<AppProps, AppState> {
           this,
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
-          elementsMap,
         );
       }
 
