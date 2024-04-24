@@ -12,7 +12,7 @@ import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
 import { getCommonBoundingBox } from "../element/bounds";
 import {
-  bindOrUnbindSelectedElements,
+  bindOrUnbindLinearElements,
   isBindingEnabled,
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
@@ -123,11 +123,12 @@ const flipElements = (
     flipDirection === "horizontal" ? minY : maxY,
   );
 
-  bindOrUnbindSelectedElements(
+  bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
     app,
     isBindingEnabled(appState),
     [],
+    elementsMap,
   );
 
   return selectedElements;

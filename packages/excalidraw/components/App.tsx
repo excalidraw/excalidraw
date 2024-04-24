@@ -121,14 +121,14 @@ import {
 } from "../element";
 import {
   bindOrUnbindLinearElement,
-  bindOrUnbindSelectedElements,
+  bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
   getEligibleElementsForBinding,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
-  linearElementsStillNear,
+  getOriginalBindingsIfStillCloseOfLinearElement,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
@@ -4103,11 +4103,12 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
-      bindOrUnbindSelectedElements(
+      bindOrUnbindLinearElements(
         this.scene.getSelectedElements(this.state).filter(isLinearElement),
         this,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+        this.scene.getNonDeletedElementsMap(),
       );
       this.setState({ suggestedBindings: [] });
     }
@@ -7421,11 +7422,12 @@ class App extends React.Component<AppProps, AppState> {
             );
 
           selectedElements.filter(isLinearElement).forEach((element) => {
-            const candidateBindables = linearElementsStillNear(
-              element,
-              elementsMap,
-              this,
-            ).filter((element) => element);
+            const candidateBindables =
+              getOriginalBindingsIfStillCloseOfLinearElement(
+                element,
+                elementsMap,
+                this,
+              ).filter((element) => element);
             this.setState({
               suggestedBindings:
                 candidateBindables as NonDeleted<ExcalidrawBindableElement>[],
@@ -8477,33 +8479,19 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
+        // We only allow binding via linear elements, specifically via dragging
+        // the endpoints ("start" or "end").
         const linearElements = this.scene
           .getSelectedElements(this.state)
           .filter(isLinearElement);
-        if (this.state.selectedLinearElement?.isDragging) {
-          // The arrow endpoints are dragged (i.e. start, joints..., end)
-          bindOrUnbindSelectedElements(
-            linearElements,
-            this,
-            isBindingEnabled(this.state),
-            this.state.selectedLinearElement?.selectedPointsIndices ?? [],
-          );
-        } else if (linearElements.length > 0) {
-          // The arrow itself (the shaft) is dragged
-          linearElements.forEach((element) => {
-            const [start, end] = linearElementsStillNear(
-              element,
-              elementsMap,
-              this,
-            );
-            bindOrUnbindLinearElement(
-              element,
-              start ? (isBindingEnabled(this.state) ? "keep" : null) : null,
-              end ? (isBindingEnabled(this.state) ? "keep" : null) : null,
-              elementsMap,
-            );
-          });
-        }
+
+        bindOrUnbindLinearElements(
+          linearElements,
+          this,
+          isBindingEnabled(this.state),
+          this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+          elementsMap,
+        );
       }
 
       if (activeTool.type === "laser") {
