@@ -18,7 +18,6 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
   getCommonBoundingBox,
-  getElementPointsCoords,
 } from "./bounds";
 import {
   isArrowElement,
