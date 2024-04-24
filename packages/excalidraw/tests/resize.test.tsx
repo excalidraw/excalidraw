@@ -991,7 +991,7 @@ describe("multiple selection", () => {
     expect(image.width).toBeCloseTo(100 * -scaleX);
     expect(image.height).toBeCloseTo(100 * scaleY);
     expect(image.angle).toBeCloseTo((Math.PI * 5) / 6);
-    expect(image.scale).toEqual([1, 1]);
+    expect(image.scale).toEqual([-1, 1]);
 
     expect(rectangle.x).toBeCloseTo((180 + 160) * scaleX);
     expect(rectangle.y).toBeCloseTo(60 * scaleY);

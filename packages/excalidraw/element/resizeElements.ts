@@ -811,38 +811,8 @@ export const resizeMultipleElements = (
       ...rescaledPoints,
     };
 
-    if (isImageElement(orig) && targetElements.length === 1) {
+    if (isImageElement(orig)) {
       update.scale = [orig.scale[0] * flipFactorX, orig.scale[1] * flipFactorY];
-    }
-
-    if (isLinearElement(orig) && (isFlippedByX || isFlippedByY)) {
-      const origBounds = getElementPointsCoords(orig, orig.points);
-      const newBounds = getElementPointsCoords(
-        { ...orig, x, y },
-        rescaledPoints.points!,
-      );
-      const origXY = [orig.x, orig.y];
-      const newXY = [x, y];
-
-      const linearShift = (axis: "x" | "y") => {
-        const i = axis === "x" ? 0 : 1;
-        return (
-          (newBounds[i + 2] -
-            newXY[i] -
-            (origXY[i] - origBounds[i]) * scale +
-            (origBounds[i + 2] - origXY[i]) * scale -
-            (newXY[i] - newBounds[i])) /
-          2
-        );
-      };
-
-      if (isFlippedByX) {
-        update.x -= linearShift("x");
-      }
-
-      if (isFlippedByY) {
-        update.y -= linearShift("y");
-      }
     }
 
     if (isTextElement(orig)) {
