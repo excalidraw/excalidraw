@@ -90,6 +90,7 @@
     "release:excalidraw": "node scripts/release.js"
   },
   "resolutions": {
-    "@babel/traverse": ">=7.23.2"
+    "@babel/traverse": ">=7.23.2",
+    "node-fetch": "2.6.7"
   }
 }
