@@ -54,6 +54,7 @@ const elements = [
   },
 ];
 
+registerFont("./public/fonts/Muyao.ttf", { family: "Muyao" });
 registerFont("./public/Virgil.woff2", { family: "Virgil" });
 registerFont("./public/Cascadia.woff2", { family: "Cascadia" });
 

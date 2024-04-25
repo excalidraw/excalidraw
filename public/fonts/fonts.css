@@ -36,3 +36,8 @@
   font-display: swap;
   font-weight: 700;
 }
+@font-face {
+  font-family: "Muyao";
+  src: url("Muyao.ttf");
+  font-display: swap;
+}
