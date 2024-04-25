@@ -281,16 +281,33 @@ export const bindOrUnbindLinearElements = (
 export const getSuggestedBindingsForArrows = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
   app: AppClassProperties,
-): SuggestedBinding[] =>
-  selectedElements
-    .filter(isLinearElement)
-    .flatMap((element) =>
-      getOriginalBindingsIfStillCloseToArrowEnds(element, app),
-    )
-    .filter(
-      (element): element is NonDeleted<ExcalidrawBindableElement> =>
-        element !== null,
-    );
+): SuggestedBinding[] => {
+  // HOT PATH: Bail out if selected elements list is too large
+  if (selectedElements.length > 50) {
+    return [];
+  }
+
+  return (
+    selectedElements
+      .filter(isLinearElement)
+      .flatMap((element) =>
+        getOriginalBindingsIfStillCloseToArrowEnds(element, app),
+      )
+      .filter(
+        (element): element is NonDeleted<ExcalidrawBindableElement> =>
+          element !== null,
+      )
+      // Filter out bind candidates which are in the
+      // same selection / group with the arrow
+      //
+      // TODO: Is it worth turning the list into a set to avoid dupes?
+      .filter(
+        (element) =>
+          selectedElements.filter((selected) => selected.id === element?.id)
+            .length === 0,
+      )
+  );
+};
 
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,

@@ -89,7 +89,6 @@ const flipSelectedElements = (
 
   const updatedElements = flipElements(
     selectedElements,
-    elements,
     elementsMap,
     appState,
     flipDirection,
@@ -105,7 +104,6 @@ const flipSelectedElements = (
 
 const flipElements = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
-  elements: readonly ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   appState: AppState,
   flipDirection: "horizontal" | "vertical",

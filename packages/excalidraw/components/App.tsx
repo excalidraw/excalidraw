@@ -3935,6 +3935,13 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
+        this.setState({
+          suggestedBindings: getSuggestedBindingsForArrows(
+            selectedElements,
+            this,
+          ),
+        });
+
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = this.scene.getSelectedElements(this.state);
@@ -7417,14 +7424,12 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          if (selectedElements.length <= 50) {
-            this.setState({
-              suggestedBindings: getSuggestedBindingsForArrows(
-                selectedElements,
-                this,
-              ),
-            });
-          }
+          this.setState({
+            suggestedBindings: getSuggestedBindingsForArrows(
+              selectedElements,
+              this,
+            ),
+          });
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -9341,6 +9346,13 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter(event),
       );
     } else {
+      this.setState({
+        suggestedBindings: getSuggestedBindingsForArrows(
+          [draggingElement],
+          this,
+        ),
+      });
+
       let [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -9522,6 +9534,11 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.y,
       )
     ) {
+      const suggestedBindings = getSuggestedBindingsForArrows(
+        selectedElements,
+        this,
+      );
+
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
         getElementsInResizingFrame(
@@ -9534,6 +9551,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         elementsToHighlight: [...elementsToHighlight],
+        suggestedBindings,
       });
 
       return true;
