@@ -15,7 +15,11 @@ import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { AppState, ExcalidrawImperativeAPI } from "../types";
 import { arrayToMap, resolvablePromise } from "../utils";
-import { COLOR_PALETTE } from "../colors";
+import {
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+} from "../colors";
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import {
@@ -67,10 +71,11 @@ const checkpoint = (name: string) => {
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const transparent = COLOR_PALETTE.transparent;
-const red = COLOR_PALETTE.red[1];
-const blue = COLOR_PALETTE.blue[1];
-const yellow = COLOR_PALETTE.yellow[1];
-const violet = COLOR_PALETTE.violet[1];
+const black = COLOR_PALETTE.black;
+const red = COLOR_PALETTE.red[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+const blue = COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+const yellow = COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+const violet = COLOR_PALETTE.violet[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 
 describe("history", () => {
   beforeEach(() => {
@@ -971,6 +976,69 @@ describe("history", () => {
           ],
         }),
       ]);
+    });
+
+    it("should create entry when selecting freedraw", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      UI.clickTool("rectangle");
+      mouse.down(-10, -10);
+      mouse.up(10, 10);
+
+      UI.clickTool("freedraw");
+      mouse.down(40, -20);
+      mouse.up(50, 10);
+
+      const rectangle = h.elements[0];
+      const freedraw1 = h.elements[1];
+
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+        expect.objectContaining({ id: freedraw1.id, strokeColor: black }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+        expect.objectContaining({
+          id: freedraw1.id,
+          strokeColor: black,
+          isDeleted: true,
+        }),
+      ]);
+
+      togglePopover("Stroke");
+      UI.clickOnTestId("color-red");
+      mouse.down(40, -20);
+      mouse.up(50, 10);
+
+      const freedraw2 = h.elements[2];
+
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+        expect.objectContaining({
+          id: freedraw1.id,
+          strokeColor: black,
+          isDeleted: true,
+        }),
+        expect.objectContaining({
+          id: freedraw2.id,
+          strokeColor: COLOR_PALETTE.red[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+        }),
+      ]);
+
+      // ensure we don't end up with duplicated entries
+      UI.clickTool("freedraw");
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
     });
 
     it("should support duplication of groups, appstate group selection and editing group", async () => {

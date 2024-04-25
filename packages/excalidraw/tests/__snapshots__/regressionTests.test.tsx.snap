@@ -6570,12 +6570,27 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {},
-            "selectedLinearElementId": null,
           },
           "inserted": {
             "selectedElementIds": {
               "id6": true,
             },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedLinearElementId": null,
+          },
+          "inserted": {
             "selectedLinearElementId": "id6",
           },
         },
