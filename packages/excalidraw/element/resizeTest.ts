@@ -25,7 +25,7 @@ import {
 import { Line, Point } from "../../utils/geometry/shape";
 import { isLinearElement } from "./typeChecks";
 
-const SIDE_RESIZING_SPACING = DEFAULT_TRANSFORM_HANDLE_SPACING * 4;
+const SIDE_RESIZING_SPACING = DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -93,10 +93,9 @@ export const resizeTest = (
       !(isLinearElement(element) && element.points.length <= 2)
     ) {
       const SPACING = SIDE_RESIZING_SPACING / zoom.value;
-      const PADDING = DEFAULT_TRANSFORM_HANDLE_SPACING / zoom.value;
       const sides = getSelectionBorders(
-        [x1 - PADDING, y1 - PADDING],
-        [x2 + PADDING, y2 + PADDING],
+        [x1 - SPACING, y1 - SPACING],
+        [x2 + SPACING, y2 + SPACING],
         [cx, cy],
         angleToDegrees(element.angle),
       );
@@ -174,32 +173,11 @@ export const getTransformHandleTypeFromCoords = (
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
 
-    const width = x2 - x1;
-    const height = y2 - y1;
-
-    const centerLine: Line =
-      height > width
-        ? [
-            [cx, y1],
-            [cx, y2],
-          ]
-        : [
-            [x1, cy],
-            [x2, cy],
-          ];
-
     const SPACING = SIDE_RESIZING_SPACING / zoom.value;
 
-    if (
-      (width < SPACING * 2 || height < SPACING * 2) &&
-      pointOnLine([scenePointerX, scenePointerY], centerLine, SPACING / 2)
-    ) {
-      return false;
-    }
-
     const sides = getSelectionBorders(
-      [x1, y1],
-      [x2, y2],
+      [x1 - SPACING, y1 - SPACING],
+      [x2 + SPACING, y2 + SPACING],
       [cx, cy],
       angleToDegrees(0),
     );

@@ -314,7 +314,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -346,7 +346,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -378,7 +378,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();

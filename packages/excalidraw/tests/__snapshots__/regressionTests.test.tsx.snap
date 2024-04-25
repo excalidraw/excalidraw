@@ -1955,7 +1955,9 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": {},
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -2109,7 +2111,7 @@ History {
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `11`;
+exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > arrow keys > [end of test] appState 1`] = `
 {
@@ -2895,12 +2897,16 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": {},
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "selectedElementIds": {},
+  "selectedElementIds": {
+    "id0": true,
+  },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": null,
@@ -3050,7 +3056,7 @@ History {
 
 exports[`regression tests > click on an element and drag it > [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `12`;
+exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `9`;
 
 exports[`regression tests > click on an element and drag it > [end of test] appState 1`] = `
 {
@@ -3123,7 +3129,9 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": {},
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -3267,7 +3275,7 @@ History {
 
 exports[`regression tests > click on an element and drag it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `15`;
+exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests > click to select a shape > [end of test] appState 1`] = `
 {
@@ -3474,7 +3482,7 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 32,
+              "x": 30,
               "y": 10,
             },
             "inserted": {
@@ -10595,7 +10603,7 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 32,
+              "x": 30,
               "y": 10,
             },
             "inserted": {
@@ -10798,37 +10806,7 @@ exports[`regression tests > shift click on selected element should deselect it o
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": {
-    "angle": 0,
-    "backgroundColor": "transparent",
-    "boundElements": null,
-    "customData": undefined,
-    "fillStyle": "solid",
-    "frameId": null,
-    "groupIds": [],
-    "height": 0,
-    "id": "id1",
-    "index": null,
-    "isDeleted": false,
-    "link": null,
-    "locked": false,
-    "opacity": 100,
-    "roughness": 1,
-    "roundness": {
-      "type": 2,
-    },
-    "seed": 1150084233,
-    "strokeColor": "#1e1e1e",
-    "strokeStyle": "solid",
-    "strokeWidth": 2,
-    "type": "selection",
-    "updated": 1,
-    "version": 1,
-    "versionNonce": 0,
-    "width": 0,
-    "x": 50,
-    "y": 50,
-  },
+  "draggingElement": null,
   "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
@@ -10936,7 +10914,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 100,
+              "height": 10,
               "index": "a0",
               "isDeleted": false,
               "link": null,
@@ -10950,7 +10928,7 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "rectangle",
-              "width": 100,
+              "width": 10,
               "x": 0,
               "y": 0,
             },
@@ -10959,6 +10937,25 @@ History {
             },
           },
         },
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedElementIds": {},
+          },
+          "inserted": {
+            "selectedElementIds": {
+              "id0": true,
+            },
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
         "updated": Map {},
       },
     },
@@ -11816,7 +11813,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 20,
+              "height": 10,
               "index": "a0",
               "isDeleted": false,
               "link": null,
@@ -11830,7 +11827,7 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "rectangle",
-              "width": 20,
+              "width": 10,
               "x": 10,
               "y": 0,
             },
@@ -11869,7 +11866,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 20,
+              "height": 10,
               "index": "a1",
               "isDeleted": false,
               "link": null,
@@ -11883,7 +11880,7 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "rectangle",
-              "width": 20,
+              "width": 10,
               "x": 50,
               "y": 0,
             },
@@ -12007,7 +12004,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 20,
+              "height": 10,
               "index": "a2",
               "isDeleted": false,
               "link": null,
@@ -12021,7 +12018,7 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "rectangle",
-              "width": 20,
+              "width": 10,
               "x": 10,
               "y": 50,
             },
@@ -12060,7 +12057,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 20,
+              "height": 10,
               "index": "a3",
               "isDeleted": false,
               "link": null,
@@ -12074,7 +12071,7 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "rectangle",
-              "width": 20,
+              "width": 10,
               "x": 50,
               "y": 50,
             },

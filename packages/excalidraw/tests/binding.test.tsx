@@ -39,6 +39,9 @@ describe("element binding", () => {
     h.elements = [rect, arrow];
     expect(arrow.startBinding).toBe(null);
 
+    API.setSelectedElements([arrow]);
+
+    expect(API.getSelectedElements()).toEqual([arrow]);
     mouse.downAt(100, 0);
     mouse.moveTo(55, 0);
     mouse.up(0, 0);
@@ -49,8 +52,6 @@ describe("element binding", () => {
       gap: expect.toBeNonNaNNumber(),
     });
 
-    API.clearSelection();
-
     mouse.downAt(100, 0);
     mouse.move(-45, 0);
     mouse.up();
@@ -59,8 +60,6 @@ describe("element binding", () => {
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
-
-    API.clearSelection();
 
     mouse.down();
     mouse.move(-50, 0);

@@ -5732,7 +5732,9 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": {},
+  "previousSelectedElementIds": {
+    "id87": true,
+  },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -6075,7 +6077,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `22`;
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `20`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when selected elements relate only to remotely deleted elements > [end of test] appState 1`] = `
 {
