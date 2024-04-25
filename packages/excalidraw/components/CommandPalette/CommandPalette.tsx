@@ -16,7 +16,7 @@ import {
   ShortcutName,
   getShortcutFromShortcutName,
 } from "../../actions/shortcuts";
-import { DEFAULT_SIDEBAR, EVENT } from "../../constants";
+import { DEFAULT_SIDEBAR, EVENT, THEME } from "../../constants";
 import {
   LockedIcon,
   UnlockedIcon,
@@ -356,7 +356,10 @@ function CommandPaletteInner({
             "picture",
           ],
           perform: () => {
-            setAppState({ openDialog: { name: "imageExport" } });
+            setAppState({
+              exportWithDarkMode: uiAppState.theme === THEME.DARK,
+              openDialog: { name: "imageExport" },
+            });
           },
         },
         ...exportCommands,

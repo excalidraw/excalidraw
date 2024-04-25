@@ -107,7 +107,7 @@ export const SaveToActiveFile = () => {
 SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
-  const appState = useUIAppState();
+  const uiAppState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const { t } = useI18n();
   return (
@@ -116,7 +116,7 @@ export const SaveAsImage = () => {
       data-testid="image-export-button"
       onSelect={() =>
         setAppState({
-          exportWithDarkMode: appState.theme === THEME.DARK,
+          exportWithDarkMode: uiAppState.theme === THEME.DARK,
           openDialog: { name: "imageExport" },
         })
       }
