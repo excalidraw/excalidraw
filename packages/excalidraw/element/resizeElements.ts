@@ -720,13 +720,14 @@ export const resizeMultipleElements = (
       ? (Math.abs(pointerY - anchorY) / height) * resizeFromCenterScale
       : 1;
 
-  if (
+  const keepAspectRatio =
     shouldMaintainAspectRatio ||
     hasGroupAmongElements(selectedElements) ||
     targetElements
       .map((item) => item.latest)
-      .some((element) => element.angle !== 0 || isTextElement(element))
-  ) {
+      .some((element) => element.angle !== 0 || isTextElement(element));
+
+  if (keepAspectRatio) {
     scaleX = scale;
     scaleY = scale;
   }
@@ -827,11 +828,15 @@ export const resizeMultipleElements = (
     ) as ExcalidrawTextElementWithContainer | undefined;
 
     if (boundTextElement) {
-      const newFontSize = boundTextElement.fontSize * scale;
-      if (newFontSize < MIN_FONT_SIZE) {
-        return;
+      if (keepAspectRatio) {
+        const newFontSize = boundTextElement.fontSize * scale;
+        if (newFontSize < MIN_FONT_SIZE) {
+          return;
+        }
+        update.boundTextFontSize = newFontSize;
+      } else {
+        update.boundTextFontSize = boundTextElement.fontSize;
       }
-      update.boundTextFontSize = newFontSize;
     }
 
     elementsAndUpdates.push({
