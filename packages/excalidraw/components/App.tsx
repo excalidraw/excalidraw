@@ -127,10 +127,10 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
-  getOriginalBindingsIfStillCloseOfLinearElement,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
+  getOriginalBindingsIfStillCloseToArrowEnds,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -7417,18 +7417,19 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          selectedElements.filter(isLinearElement).forEach((element) => {
-            const candidateBindables =
-              getOriginalBindingsIfStillCloseOfLinearElement(
-                element,
-                elementsMap,
-                this,
-              ).filter((element) => element);
+          if (selectedElements.length <= 50) {
             this.setState({
-              suggestedBindings:
-                candidateBindables as NonDeleted<ExcalidrawBindableElement>[],
+              suggestedBindings: selectedElements
+                .filter(isLinearElement)
+                .flatMap((element) =>
+                  getOriginalBindingsIfStillCloseToArrowEnds(element, this),
+                )
+                .filter(
+                  (element): element is NonDeleted<ExcalidrawBindableElement> =>
+                    element !== null,
+                ),
             });
-          });
+          }
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
