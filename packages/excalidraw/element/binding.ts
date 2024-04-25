@@ -278,6 +278,20 @@ export const bindOrUnbindLinearElements = (
   });
 };
 
+export const getSuggestedBindingsForArrows = (
+  selectedElements: NonDeleted<ExcalidrawElement>[],
+  app: AppClassProperties,
+): SuggestedBinding[] =>
+  selectedElements
+    .filter(isLinearElement)
+    .flatMap((element) =>
+      getOriginalBindingsIfStillCloseToArrowEnds(element, app),
+    )
+    .filter(
+      (element): element is NonDeleted<ExcalidrawBindableElement> =>
+        element !== null,
+    );
+
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,

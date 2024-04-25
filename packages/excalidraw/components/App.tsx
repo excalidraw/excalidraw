@@ -130,7 +130,7 @@ import {
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
-  getOriginalBindingsIfStillCloseToArrowEnds,
+  getSuggestedBindingsForArrows,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -7419,15 +7419,10 @@ class App extends React.Component<AppProps, AppState> {
 
           if (selectedElements.length <= 50) {
             this.setState({
-              suggestedBindings: selectedElements
-                .filter(isLinearElement)
-                .flatMap((element) =>
-                  getOriginalBindingsIfStillCloseToArrowEnds(element, this),
-                )
-                .filter(
-                  (element): element is NonDeleted<ExcalidrawBindableElement> =>
-                    element !== null,
-                ),
+              suggestedBindings: getSuggestedBindingsForArrows(
+                selectedElements,
+                this,
+              ),
             });
           }
 
