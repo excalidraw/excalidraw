@@ -107,13 +107,19 @@ export const SaveToActiveFile = () => {
 SaveToActiveFile.displayName = "SaveToActiveFile";
 
 export const SaveAsImage = () => {
+  const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const { t } = useI18n();
   return (
     <DropdownMenuItem
       icon={ExportImageIcon}
       data-testid="image-export-button"
-      onSelect={() => setAppState({ openDialog: { name: "imageExport" } })}
+      onSelect={() =>
+        setAppState({
+          exportWithDarkMode: appState.theme === THEME.DARK,
+          openDialog: { name: "imageExport" },
+        })
+      }
       shortcut={getShortcutFromShortcutName("imageExport")}
       aria-label={t("buttons.exportImage")}
     >
