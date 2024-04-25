@@ -13,7 +13,6 @@ import {
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
-import { API } from "./helpers/api";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
