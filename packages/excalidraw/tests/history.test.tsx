@@ -3946,10 +3946,16 @@ describe("history", () => {
 
         const arrowId = h.elements[2].id;
 
-        // create binding
+        // create start binding
         mouse.downAt(0, 0);
         mouse.moveTo(0, 1);
         mouse.moveTo(0, 0);
+        mouse.up();
+
+        // create end binding
+        mouse.downAt(100, 0);
+        mouse.moveTo(100, 1);
+        mouse.moveTo(100, 0);
         mouse.up();
 
         expect(h.elements).toEqual([
@@ -3976,9 +3982,10 @@ describe("history", () => {
           }),
         ]);
 
-        Keyboard.undo();
+        Keyboard.undo(); // undo start binding
+        Keyboard.undo(); // undo end binding
         expect(API.getUndoStack().length).toBe(2);
-        expect(API.getRedoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(2);
         expect(h.elements).toEqual([
           expect.objectContaining({
             id: rect1.id,
@@ -4013,7 +4020,8 @@ describe("history", () => {
 
         runTwice(() => {
           Keyboard.redo();
-          expect(API.getUndoStack().length).toBe(3);
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(4);
           expect(API.getRedoStack().length).toBe(0);
           expect(h.elements).toEqual([
             expect.objectContaining({
@@ -4040,8 +4048,9 @@ describe("history", () => {
           ]);
 
           Keyboard.undo();
+          Keyboard.undo();
           expect(API.getUndoStack().length).toBe(2);
-          expect(API.getRedoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(2);
           expect(h.elements).toEqual([
             expect.objectContaining({
               id: rect1.id,
@@ -4067,10 +4076,15 @@ describe("history", () => {
 
         const arrowId = h.elements[2].id;
 
-        // create binding
+        // create start binding
         mouse.downAt(0, 0);
         mouse.moveTo(0, 1);
         mouse.upAt(0, 0);
+
+        // create end binding
+        mouse.downAt(100, 0);
+        mouse.moveTo(100, 1);
+        mouse.upAt(100, 0);
 
         expect(h.elements).toEqual([
           expect.objectContaining({
@@ -4097,8 +4111,9 @@ describe("history", () => {
         ]);
 
         Keyboard.undo();
+        Keyboard.undo();
         expect(API.getUndoStack().length).toBe(2);
-        expect(API.getRedoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(2);
         expect(h.elements).toEqual([
           expect.objectContaining({
             id: rect1.id,
@@ -4134,7 +4149,8 @@ describe("history", () => {
 
         runTwice(() => {
           Keyboard.redo();
-          expect(API.getUndoStack().length).toBe(3);
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(4);
           expect(API.getRedoStack().length).toBe(0);
           expect(h.elements).toEqual([
             expect.objectContaining({
@@ -4166,8 +4182,9 @@ describe("history", () => {
           ]);
 
           Keyboard.undo();
+          Keyboard.undo();
           expect(API.getUndoStack().length).toBe(2);
-          expect(API.getRedoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(2);
           expect(h.elements).toEqual([
             expect.objectContaining({
               id: rect1.id,
@@ -4364,7 +4381,7 @@ describe("history", () => {
         });
       });
 
-      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => {});
+      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => { });
 
       it("should update bound element points when rectangle was remotely moved and arrow is added back through the history", async () => {
         // bind arrow to rect1 and rect2
