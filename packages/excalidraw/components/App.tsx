@@ -3862,7 +3862,10 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD]
       ) {
         event.preventDefault();
-        this.setState({ openDialog: { name: "imageExport" } });
+        this.setState({
+          exportWithDarkMode: this.state.theme === THEME.DARK,
+          openDialog: { name: "imageExport" },
+        });
         return;
       }
 
