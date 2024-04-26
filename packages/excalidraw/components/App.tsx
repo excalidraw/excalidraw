@@ -4171,6 +4171,11 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
         activeEmbeddable: null,
       } as const;
+
+      if (nextActiveTool.type === "freedraw") {
+        this.store.shouldCaptureIncrement();
+      }
+
       if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
