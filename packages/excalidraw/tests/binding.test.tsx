@@ -20,6 +20,7 @@ describe("element binding", () => {
     const rect = API.createElement({
       type: "rectangle",
       x: 0,
+      y: 0,
       width: 50,
       height: 50,
     });
@@ -39,31 +40,41 @@ describe("element binding", () => {
     h.elements = [rect, arrow];
     expect(arrow.startBinding).toBe(null);
 
-    API.setSelectedElements([arrow]);
+    // select arrow
+    mouse.clickAt(150, 0);
 
-    expect(API.getSelectedElements()).toEqual([arrow]);
+    // move arrow start to potential binding position
     mouse.downAt(100, 0);
     mouse.moveTo(55, 0);
     mouse.up(0, 0);
-    expect(arrow.startBinding).toEqual({
-      elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
-    });
 
-    mouse.downAt(100, 0);
-    mouse.move(-45, 0);
-    mouse.up();
-    expect(arrow.startBinding).toEqual({
-      elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
-    });
-
-    mouse.down();
-    mouse.move(-50, 0);
-    mouse.up();
+    // Point selection is evaluated like the points are rendered,
+    // from right to left. So clicking on the first point should move the joint,
+    // not the start point.
     expect(arrow.startBinding).toBe(null);
+
+    // Now that the start point is free, move it into overlapping position
+    mouse.downAt(100, 0);
+    mouse.moveTo(55, 0);
+    mouse.up(0, 0);
+
+    expect(arrow.startBinding).toEqual({
+      elementId: rect.id,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
+
+    // Move the end point to the overlapping binding position
+    mouse.downAt(200, 0);
+    mouse.moveTo(55, 0);
+    mouse.up(0, 0);
+
+    // Both the start and the end points should be bound
+    expect(arrow.startBinding).toEqual({
+      elementId: rect.id,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
     expect(arrow.endBinding).toEqual({
       elementId: rect.id,
       focus: expect.toBeNonNaNNumber(),
@@ -112,7 +123,7 @@ describe("element binding", () => {
   // TODO fix & reenable once we rewrite tests to work with concurrency
   it.skip(
     "editing arrow and moving its head to bind it to element A, finalizing the" +
-      "editing by clicking on element A should end up selecting A",
+    "editing by clicking on element A should end up selecting A",
     async () => {
       UI.createElement("rectangle", {
         y: 0,
@@ -143,7 +154,7 @@ describe("element binding", () => {
     },
   );
 
-  it("should bind/unbind arrow when moving it with keyboard", () => {
+  it("should unbind arrow when moving it with keyboard", () => {
     const rectangle = UI.createElement("rectangle", {
       x: 75,
       y: 0,
@@ -159,11 +170,22 @@ describe("element binding", () => {
 
     expect(arrow.endBinding).toBe(null);
 
+    mouse.downAt(50, 50);
+    mouse.moveTo(51, 0);
+    mouse.up(0, 0);
+
+    // Test sticky connection
     expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
-
     Keyboard.keyPress(KEYS.ARROW_LEFT);
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+
+    // Sever connection
+    expect(API.getSelectedElement().type).toBe("arrow");
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    expect(arrow.endBinding).toBe(null);
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
     expect(arrow.endBinding).toBe(null);
   });
 
