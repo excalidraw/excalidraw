@@ -4449,7 +4449,7 @@ describe("history", () => {
         });
       });
 
-      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => { });
+      it("should unbind remotely deleted bindable elements from arrow when the arrow is added through the history", async () => {});
 
       it("should update bound element points when rectangle was remotely moved and arrow is added back through the history", async () => {
         // bind arrow to rect1 and rect2
