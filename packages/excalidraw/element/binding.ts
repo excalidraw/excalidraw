@@ -212,19 +212,20 @@ const getBindingStrategyForDraggingArrowEndpoints = (
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(selectedElement, "start", app)
       : null // If binding is disabled and start is dragged, break all binds
-    : "keep"; // We don't care, start is not dragged, leave it be
+    : // We have to update the focus and gap of the binding, so let's rebind
+      getElligibleElementForBindingElement(selectedElement, "start", app);
   const end = endDragged
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(selectedElement, "end", app)
       : null // If binding is disabled and end is dragged, break all binds
-    : "keep"; // We don't care, end is not dragged, leave it be
+    : // We have to update the focus and gap of the binding, so let's rebind
+      getElligibleElementForBindingElement(selectedElement, "end", app);
 
   return [start, end];
 };
 
 const getBindingStrategyForDraggingArrowOrJoints = (
   selectedElement: NonDeleted<ExcalidrawLinearElement>,
-  elementsMap: NonDeletedSceneElementsMap,
   app: AppClassProperties,
   isBindingEnabled: boolean,
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
@@ -264,7 +265,6 @@ export const bindOrUnbindLinearElements = (
       : // The arrow itself (the shaft) or the inner joins are dragged
         getBindingStrategyForDraggingArrowOrJoints(
           selectedElement,
-          app.scene.getNonDeletedElementsMap(),
           app,
           isBindingEnabled,
         );
