@@ -147,6 +147,7 @@ export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
+export const DEFAULT_HIT_THRESHOLD = 8;
 
 export const COLOR_WHITE = "#ffffff";
 export const COLOR_CHARCOAL_BLACK = "#1e1e1e";

@@ -90,6 +90,7 @@ import {
   EDITOR_LS_KEYS,
   isIOS,
   supportsResizeObserver,
+  DEFAULT_HIT_THRESHOLD,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -4601,7 +4602,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getHitThreshold() {
-    return 8 / this.state.zoom.value;
+    // to make edge resizing always take precedence
+    // (avoids an increase in renders and changes to tests)
+    const EPSILON = 0.00001;
+    return (DEFAULT_HIT_THRESHOLD - EPSILON) / this.state.zoom.value;
   }
 
   private hitElement(
