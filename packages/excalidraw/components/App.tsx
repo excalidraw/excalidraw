@@ -90,7 +90,7 @@ import {
   EDITOR_LS_KEYS,
   isIOS,
   supportsResizeObserver,
-  DEFAULT_HIT_THRESHOLD,
+  DEFAULT_COLLISION_THRESHOLD,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -4538,7 +4538,7 @@ class App extends React.Component<AppProps, AppState> {
         shape: this.getElementShape(elementWithHighestZIndex),
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
-        threshold: this.getHitThreshold() / 2,
+        threshold: this.getElementHitThreshold() / 2,
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
@@ -4601,11 +4601,8 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  private getHitThreshold() {
-    // to make edge resizing always take precedence
-    // (avoids an increase in renders and changes to tests)
-    const EPSILON = 0.00001;
-    return (DEFAULT_HIT_THRESHOLD - EPSILON) / this.state.zoom.value;
+  private getElementHitThreshold() {
+    return DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value;
   }
 
   private hitElement(
@@ -4623,7 +4620,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
-        this.getHitThreshold(),
+        this.getElementHitThreshold(),
       );
 
       return isPointInShape([x, y], selectionShape);
@@ -4644,7 +4641,7 @@ class App extends React.Component<AppProps, AppState> {
       y,
       element,
       shape: this.getElementShape(element),
-      threshold: this.getHitThreshold(),
+      threshold: this.getElementHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
@@ -4676,7 +4673,7 @@ class App extends React.Component<AppProps, AppState> {
           y,
           element: elements[index],
           shape: this.getElementShape(elements[index]),
-          threshold: this.getHitThreshold(),
+          threshold: this.getElementHitThreshold(),
         })
       ) {
         hitElement = elements[index];
@@ -4929,7 +4926,7 @@ class App extends React.Component<AppProps, AppState> {
             y: sceneY,
             element: container,
             shape: this.getElementShape(container),
-            threshold: this.getHitThreshold(),
+            threshold: this.getElementHitThreshold(),
           })
         ) {
           const midPoint = getContainerCenter(
@@ -5540,7 +5537,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
-    const threshold = this.getHitThreshold();
+    const threshold = this.getElementHitThreshold();
     const point = { ...pointerDownState.lastCoords };
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
@@ -6626,7 +6623,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = this.getHitThreshold();
+    const threshold = this.getElementHitThreshold();
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -8449,7 +8446,7 @@ class App extends React.Component<AppProps, AppState> {
               y: pointerDownState.origin.y,
               element: hitElement,
               shape: this.getElementShape(hitElement),
-              threshold: this.getHitThreshold(),
+              threshold: this.getElementHitThreshold(),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
                 : null,
