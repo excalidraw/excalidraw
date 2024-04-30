@@ -16,6 +16,7 @@ import {
   StaticCanvasAppState,
   SocketId,
   UserIdleState,
+  Device,
 } from "../types";
 import { MakeBrand } from "../utility-types";
 
@@ -85,6 +86,7 @@ export type InteractiveSceneRenderConfig = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderConfig: InteractiveCanvasRenderConfig;
+  device: Device;
   callback: (data: RenderInteractiveSceneCallback) => void;
 };
 

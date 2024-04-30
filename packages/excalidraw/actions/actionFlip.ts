@@ -119,6 +119,7 @@ const flipElements = (
     elementsMap,
     "nw",
     true,
+    true,
     flipDirection === "horizontal" ? maxX : minX,
     flipDirection === "horizontal" ? minY : maxY,
   );
