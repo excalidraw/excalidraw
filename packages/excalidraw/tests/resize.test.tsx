@@ -838,7 +838,7 @@ describe("multiple selection", () => {
     expect(bottomText.angle).toEqual(0);
   });
 
-  it("resizes with images", () => {
+  it("resizes with images (proportional)", () => {
     const topImage = API.createElement({
       type: "image",
       x: 0,
@@ -863,7 +863,7 @@ describe("multiple selection", () => {
       1 + move[1] / selectionHeight,
     );
 
-    UI.resize([topImage, bottomImage], "se", move, { shift: true });
+    UI.resize([topImage, bottomImage], "se", move);
 
     expect(topImage.x).toBeCloseTo(0);
     expect(topImage.y).toBeCloseTo(0);
