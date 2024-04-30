@@ -115,7 +115,7 @@ function App() {
       <button className="custom-button" onClick={updateScene}>
         Update Scene
       </button>
-      <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
+      <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
     </div>
   );
 }
@@ -188,7 +188,7 @@ function App() {
         Update Library
       </button>
       <Excalidraw
-        ref={(api) => setExcalidrawAPI(api)}
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
         // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
         initialData={{
           libraryItems: initialData.libraryItems,
