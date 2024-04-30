@@ -1,6 +1,7 @@
 // vitest.setup.ts
 import "vitest-canvas-mock";
 import "@testing-library/jest-dom";
+import fs from "fs";
 import { vi } from "vitest";
 import polyfill from "./packages/excalidraw/polyfill";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
@@ -24,6 +25,60 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
+
+Object.defineProperty(window, "FontFace", {
+  enumerable: true,
+  value: class {
+    private family: string;
+    private source: string;
+    private descriptors: any;
+    private status: string;
+
+    constructor(family, source, descriptors) {
+      this.family = family;
+      this.source = source;
+      this.descriptors = descriptors;
+      this.status = "unloaded";
+    }
+
+    load() {
+      this.status = "loaded";
+    }
+  },
+});
+
+Object.defineProperty(document, "fonts", {
+  value: new Set(),
+});
+
+Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {
+  value: `file://${__dirname}/`,
+});
+
+vi.mock(
+  "./packages/excalidraw/fonts/ExcalidrawFont",
+  async (importOriginal) => {
+    const mod = await importOriginal<
+      typeof import("./packages/excalidraw/fonts/ExcalidrawFont")
+    >();
+    const ExcalidrawFontImpl = mod.ExcalidrawFont;
+
+    return {
+      ...mod,
+      ExcalidrawFont: class extends ExcalidrawFontImpl {
+        public async getContent(): Promise<string> {
+          if (this.url.protocol !== "file:") {
+            return super.getContent();
+          }
+
+          // read local assets directly, without running a server
+          const content = await fs.promises.readFile(this.url);
+          return `data:font/woff2;base64,${content.toString("base64")}`;
+        }
+      },
+    };
+  },
+);
 
 vi.mock("nanoid", () => {
   return {

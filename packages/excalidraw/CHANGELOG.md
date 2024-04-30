@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 - Added support for multiplayer undo/redo, by calculating invertible increments and storing them inside the local-only undo/redo stacks. [#7348](https://github.com/excalidraw/excalidraw/pull/7348)
 
+- Added font picker component to have the ability to choose from a range of different fonts. Also, changed the default fonts to `Excalifont`, `Nunito` and `Comic Shanns` and deprecated `Virgil`, `Helvetica` and `Cascadia`.
+
 - `MainMenu.DefaultItems.ToggleTheme` now supports `onSelect(theme: string)` callback, and optionally `allowSystemTheme: boolean` alongside `theme: string` to indicate you want to allow users to set to system theme (you need to handle this yourself). [#7853](https://github.com/excalidraw/excalidraw/pull/7853)
 
 - Add `useHandleLibrary`'s `opts.adapter` as the new recommended pattern to handle library initialization and persistence on library updates. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
@@ -46,6 +48,8 @@ Please add the latest change on the top under the correct section.
 | _Never undoable_ | n/a | `"update"` | **NEW**: previously there was no equivalent for this value. Now, it's recommended to use `"update"` for all remote updates (from the other clients), scene initialization, or those updates, which should not be locally "undoable". These updates will _never_ make it to the local undo / redo stacks. |
 
 - `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
+
+- `window.EXCALIDRAW_ASSET_PATH` now needs to be defined before any `@excalidraw/excalidraw` import. It also expects a valid url as defined by the [`URL.base` parameter](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL#base) (e.g. `"/"` isn't valid, but `"https://domain.com/"` or `window.origin` are valid). [#8012](https://github.com/excalidraw/excalidraw/pull/8012)
 
 - `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties.
 

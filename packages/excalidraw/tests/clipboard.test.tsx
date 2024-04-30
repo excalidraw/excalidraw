@@ -4,16 +4,14 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
-import {
-  getDefaultLineHeight,
-  getLineHeightInPx,
-} from "../element/textElement";
+import { getLineHeightInPx } from "../element/textElement";
 import { getElementBounds } from "../element";
 import type { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 import { arrayToMap } from "../utils";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
+import { getLineHeight } from "../fonts";
 
 const { h } = window;
 
@@ -146,7 +144,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getDefaultLineHeight(h.state.currentItemFontFamily),
+        getLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -168,7 +166,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getDefaultLineHeight(h.state.currentItemFontFamily),
+        getLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);

@@ -124,22 +124,61 @@
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
 
+    <!-- Preload Excalifont & Virgil, but leave the registration on scene init -->
     <link
       rel="preload"
-      href="/Virgil.woff2"
+      href="../packages/excalidraw/fonts/assets/Excalifont-Regular.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
     />
     <link
       rel="preload"
-      href="/Cascadia.woff2"
+      href="../packages/excalidraw/fonts/assets/Virgil-Regular.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
     />
 
-    <link rel="stylesheet" href="/fonts/fonts.css" type="text/css" />
+    <!-- Register Assistant as the UI font, before the scene inits -->
+    <style>
+      @font-face {
+        font-family: "Assistant";
+        src: url(/Assistant-Regular.woff2) format("woff2");
+        font-weight: 400;
+        style: normal;
+        display: swap;
+      }
+
+      @font-face {
+        font-family: "Assistant";
+        src: url(/Assistant-Medium.woff2) format("woff2");
+        font-weight: 500;
+        style: normal;
+        display: swap;
+      }
+
+      @font-face {
+        font-family: "Assistant";
+        src: url(/Assistant-SemiBold.woff2) format("woff2");
+        font-weight: 600;
+        style: normal;
+        display: swap;
+      }
+
+      @font-face {
+        font-family: "Assistant";
+        src: url(/Assistant-Bold.woff2) format("woff2");
+        font-weight: 700;
+        style: normal;
+        display: swap;
+      }
+    </style>
+
+    <!-- Warmup the connection for Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
     VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
     <script>
@@ -158,9 +197,10 @@
     </script>
     <% } %>
     <script>
-      window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
+      // set assets env variable
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
