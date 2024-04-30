@@ -23,7 +23,6 @@ import {
 } from "../groups";
 import {
   getOmitSidesForDevice,
-  OMIT_SIDES_FOR_FRAME,
   shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
@@ -845,7 +844,9 @@ const _renderInteractiveScene = ({
         0,
         appState.zoom,
         "mouse",
-        isFrameSelected ? OMIT_SIDES_FOR_FRAME : getOmitSidesForDevice(device),
+        isFrameSelected
+          ? { ...getOmitSidesForDevice(device), rotation: true }
+          : getOmitSidesForDevice(device),
       );
       if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(
