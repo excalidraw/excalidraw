@@ -58,6 +58,8 @@ describe("element binding", () => {
     mouse.moveTo(55, 0);
     mouse.up(0, 0);
 
+    expect(API.getSelectedElements()).toEqual([arrow]);
+
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
       focus: expect.toBeNonNaNNumber(),
