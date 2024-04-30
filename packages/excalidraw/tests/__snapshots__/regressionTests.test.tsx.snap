@@ -1400,9 +1400,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "penDetected": false,
   "penMode": false,
   "pendingImageElementId": null,
-  "previousSelectedElementIds": {
-    "id0": true,
-  },
+  "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
@@ -1522,7 +1520,7 @@ History {
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `9`;
+exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests > adjusts z order when grouping > [end of test] appState 1`] = `
 {
