@@ -131,35 +131,47 @@ const bindOrUnbindLinearElementEdge = (
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   elementsMap: NonDeletedSceneElementsMap,
 ): void => {
-  if (bindableElement !== "keep") {
-    if (bindableElement != null) {
-      // Don't bind if we're trying to bind or are already bound to the same
-      // element on the other edge already ("start" edge takes precedence).
-      if (
-        otherEdgeBindableElement == null ||
-        (otherEdgeBindableElement === "keep"
-          ? !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-              linearElement,
-              bindableElement,
-              startOrEnd,
-            )
-          : startOrEnd === "start" ||
-            otherEdgeBindableElement.id !== bindableElement.id)
-      ) {
-        bindLinearElement(
-          linearElement,
-          bindableElement,
-          startOrEnd,
-          elementsMap,
-        );
-        boundToElementIds.add(bindableElement.id);
-      }
-    } else {
-      const unbound = unbindLinearElement(linearElement, startOrEnd);
-      if (unbound != null) {
-        unboundFromElementIds.add(unbound);
-      }
+  // "keep" is for method chaining convenience, a "no-op", so just bail out
+  if (bindableElement === "keep") {
+    return;
+  }
+
+  // null means break the bind, so nothing to consider here
+  if (bindableElement === null) {
+    const unbound = unbindLinearElement(linearElement, startOrEnd);
+    if (unbound != null) {
+      unboundFromElementIds.add(unbound);
     }
+    return;
+  }
+
+  // While complext arrows can do anything, simple arrow with both ends trying
+  // to bind to the same bindable should not be allowed, start binding takes
+  // precedence
+  if (isLinearElementSimple(linearElement)) {
+    if (
+      otherEdgeBindableElement == null ||
+      (otherEdgeBindableElement === "keep"
+        ? // TODO: Refactor - Needlessly complex
+          !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
+            linearElement,
+            bindableElement,
+            startOrEnd,
+          )
+        : startOrEnd === "start" ||
+          otherEdgeBindableElement.id !== bindableElement.id)
+    ) {
+      bindLinearElement(
+        linearElement,
+        bindableElement,
+        startOrEnd,
+        elementsMap,
+      );
+      boundToElementIds.add(bindableElement.id);
+    }
+  } else {
+    bindLinearElement(linearElement, bindableElement, startOrEnd, elementsMap);
+    boundToElementIds.add(bindableElement.id);
   }
 };
 
@@ -391,9 +403,14 @@ export const isLinearElementSimpleAndAlreadyBound = (
   bindableElement: ExcalidrawBindableElement,
 ): boolean => {
   return (
-    alreadyBoundToId === bindableElement.id && linearElement.points.length < 3
+    alreadyBoundToId === bindableElement.id &&
+    isLinearElementSimple(linearElement)
   );
 };
+
+export const isLinearElementSimple = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+): boolean => linearElement.points.length < 3;
 
 const unbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
