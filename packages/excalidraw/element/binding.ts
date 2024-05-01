@@ -198,7 +198,7 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
   return null;
 };
 
-export const getOriginalBindingsIfStillCloseToArrowEnds = (
+const getOriginalBindingsIfStillCloseToArrowEnds = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   app: AppClassProperties,
 ): (NonDeleted<ExcalidrawElement> | null)[] =>
@@ -408,7 +408,7 @@ export const isLinearElementSimpleAndAlreadyBound = (
   );
 };
 
-export const isLinearElementSimple = (
+const isLinearElementSimple = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): boolean => linearElement.points.length < 3;
 
@@ -672,7 +672,7 @@ const getElligibleElementForBindingElement = (
   );
 };
 
-export const getLinearElementEdgeCoors = (
+const getLinearElementEdgeCoors = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
@@ -822,7 +822,7 @@ const newBoundElements = (
   return nextBoundElements;
 };
 
-export const bindingBorderTest = (
+const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
   app: AppClassProperties,
@@ -844,7 +844,7 @@ export const maxBindingGap = (
   return Math.max(16, Math.min(0.25 * smallerDimension, 32));
 };
 
-export const distanceToBindableElement = (
+const distanceToBindableElement = (
   element: ExcalidrawBindableElement,
   point: Point,
   elementsMap: ElementsMap,
@@ -901,7 +901,7 @@ const distanceToDiamond = (
   return GAPoint.distanceToLine(pointRel, side);
 };
 
-export const distanceToEllipse = (
+const distanceToEllipse = (
   element: ExcalidrawEllipseElement,
   point: Point,
   elementsMap: ElementsMap,
@@ -1020,7 +1020,7 @@ const coordsCenter = (
 // all focus points lie, so it's a number between -1 and 1.
 // The line going through `a` and `b` is a tangent to the "focus image"
 // of the element.
-export const determineFocusDistance = (
+const determineFocusDistance = (
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,
@@ -1061,7 +1061,7 @@ export const determineFocusDistance = (
   return ret || 0;
 };
 
-export const determineFocusPoint = (
+const determineFocusPoint = (
   element: ExcalidrawBindableElement,
   // The oriented, relative distance from the center of `element` of the
   // returned focusPoint
@@ -1101,7 +1101,7 @@ export const determineFocusPoint = (
 
 // Returns 2 or 0 intersection points between line going through `a` and `b`
 // and the `element`, in ascending order of distance from `a`.
-export const intersectElementWithLine = (
+const intersectElementWithLine = (
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,
@@ -1268,7 +1268,7 @@ const getEllipseIntersections = (
   ];
 };
 
-export const getCircleIntersections = (
+const getCircleIntersections = (
   center: GA.Point,
   radius: number,
   line: GA.Line,
@@ -1298,7 +1298,7 @@ export const getCircleIntersections = (
 
 // The focus point is the tangent point of the "focus image" of the
 // `element`, where the tangent goes through `point`.
-export const findFocusPointForEllipse = (
+const findFocusPointForEllipse = (
   ellipse: ExcalidrawEllipseElement,
   // Between -1 and 1 (not 0) the relative size of the "focus image" of
   // the element on which the focus point lies
@@ -1335,7 +1335,7 @@ export const findFocusPointForEllipse = (
   return GA.point(x, (-m * x - 1) / n);
 };
 
-export const findFocusPointForRectangulars = (
+const findFocusPointForRectangulars = (
   element:
     | ExcalidrawRectangleElement
     | ExcalidrawImageElement
