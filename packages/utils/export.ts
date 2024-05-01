@@ -208,8 +208,8 @@ export const exportToClipboard = async (
 
 export { getCommonBoundingBox } from "../excalidraw/element/bounds"; //zsviczian
 export { getMaximumGroups } from "../excalidraw/groups"; //zsviczian
-export { intersectElementWithLine } from "../excalidraw/element/collision"; //zsviczian
-export { determineFocusDistance } from "../excalidraw/element/collision"; //zsviczian
+export { intersectElementWithLine } from "../excalidraw/element/binding"; //zsviczian
+export { determineFocusDistance } from "../excalidraw/element/binding"; //zsviczian
 export {
   measureText,
   wrapText,

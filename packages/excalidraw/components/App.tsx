@@ -3860,6 +3860,7 @@ class App extends React.Component<AppProps, AppState> {
           return map;
         }, {} as any),
       },
+      storeAction: StoreAction.NONE,
     });
   };
 
@@ -7033,10 +7034,11 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (strokeOptions?.highlighter) {
       //zsviczian
-      this.scene.replaceAllElements([
+      this.scene.insertElement(element,0);
+/*      this.scene.replaceAllElements([
         element,
         ...this.scene.getElementsIncludingDeleted(),
-      ]);
+      ]);*/
     } else {
       this.scene.insertElement(element);
     }

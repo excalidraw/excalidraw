@@ -603,7 +603,7 @@ export const actionToggleLaserPointer = register({ //zsviczian - did I really ad
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.activeTool.type === "laser",

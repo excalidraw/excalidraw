@@ -84,8 +84,10 @@ export const getEmbedLink = (
     return null;
   }
 
+  const allowSameOrigin = true; //zsviczian I don't worry about same origin in Obsidian
+
   if (link.startsWith("data:text/html")) { //zsviczian
-    return { link, intrinsicSize: { w: 550, h: 720 }, type: "generic" };
+    return { link, intrinsicSize: { w: 550, h: 720 }, type: "generic", sandbox: { allowSameOrigin }, };
   }
 
   if (embeddedLinkCache.has(link)) {
@@ -94,9 +96,10 @@ export const getEmbedLink = (
 
   const originalLink = link;
 
+  /* zsviczian
   const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
     matchHostname(link, ALLOW_SAME_ORIGIN) || "",
-  );
+  );*/
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };

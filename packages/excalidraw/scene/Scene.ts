@@ -369,12 +369,12 @@ class Scene {
     this.replaceAllElements(nextElements);
   }
 
-  insertElement = (element: ExcalidrawElement) => {
+  insertElement = (element: ExcalidrawElement, idx?: number) => { //zsviczian idx
     const index = element.frameId
       ? this.getElementIndex(element.frameId)
       : this.elements.length;
 
-    this.insertElementAtIndex(element, index);
+    this.insertElementAtIndex(element, idx ?? index); //zsviczian support for highlighter pen
   };
 
   insertElements = (elements: ExcalidrawElement[]) => {
