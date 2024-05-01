@@ -9380,13 +9380,6 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter(event),
       );
     } else {
-      this.setState({
-        suggestedBindings: getSuggestedBindingsForArrows(
-          [draggingElement],
-          this,
-        ),
-      });
-
       let [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
