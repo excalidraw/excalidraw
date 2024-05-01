@@ -1,5 +1,3 @@
-export type { ValueOf } from "ts-essentials";
-
 export type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
@@ -18,19 +16,11 @@ export type MarkNonNullable<T, K extends keyof T> = {
   [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
 } & { [P in keyof T]: T[P] };
 
-// -----------------------------------------------------------------------------
-// type getter for interface's callable type
-// src: https://stackoverflow.com/a/58658851/927631
-// -----------------------------------------------------------------------------
-export type SignatureType<T> = T extends (...args: infer R) => any ? R : never;
-export type CallableType<T extends (...args: any[]) => any> = (
-  ...args: SignatureType<T>
-) => ReturnType<T>;
 // --------------------------------------------------------------------------—
 
 // Type for React.forwardRef --- supply only the first generic argument T
 export type ForwardRef<T, P = any> = Parameters<
-  CallableType<React.ForwardRefRenderFunction<T, P>>
+  React.ForwardRefRenderFunction<T, P>
 >[1];
 
 export type ExtractSetType<T extends Set<any>> = T extends Set<infer U>
