@@ -50,7 +50,7 @@
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",
     "vite-plugin-svgr": "2.4.0",
-    "vitest": "1.0.1",
+    "vitest": "1.5.3",
     "vitest-canvas-mock": "0.3.2"
   },
   "engines": {
