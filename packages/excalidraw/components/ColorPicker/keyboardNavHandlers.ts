@@ -6,7 +6,7 @@ import {
   COLORS_PER_ROW,
   COLOR_PALETTE,
 } from "../../colors";
-import { ValueOf } from "../../utility-types";
+import { ValueOf } from "ts-essentials";
 import {
   ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,

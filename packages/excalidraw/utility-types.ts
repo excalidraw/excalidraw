@@ -1,10 +1,8 @@
+export type { ValueOf } from "ts-essentials";
+
 export type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
-
-export type ValueOf<T> = T[keyof T];
-
-export type Merge<M, N> = Omit<M, keyof N> & N;
 
 /** utility type to assert that the second type is a subtype of the first type.
  * Returns the subtype. */
@@ -16,18 +14,9 @@ export type ResolutionType<T extends (...args: any) => any> = T extends (
   ? R
   : any;
 
-// https://github.com/krzkaczor/ts-essentials
-export type MarkOptional<T, K extends keyof T> = Omit<T, K> &
-  Partial<Pick<T, K>>;
-
-export type MarkRequired<T, RK extends keyof T> = Exclude<T, RK> &
-  Required<Pick<T, RK>>;
-
 export type MarkNonNullable<T, K extends keyof T> = {
   [P in K]-?: P extends K ? NonNullable<T[P]> : T[P];
 } & { [P in keyof T]: T[P] };
-
-export type NonOptional<T> = Exclude<T, undefined>;
 
 // -----------------------------------------------------------------------------
 // type getter for interface's callable type

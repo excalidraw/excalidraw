@@ -6,7 +6,7 @@ import { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
 import { AppState, DataURL, LibraryItem } from "../types";
-import { ValueOf } from "../utility-types";
+import { ValueOf } from "ts-essentials";
 import { bytesToHexString, isPromiseLike } from "../utils";
 import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";

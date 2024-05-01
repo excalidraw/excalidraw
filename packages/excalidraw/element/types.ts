@@ -6,7 +6,8 @@ import {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
+import { MakeBrand, MarkNonNullable } from "../utility-types";
+import { ValueOf } from "ts-essentials";
 import { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";

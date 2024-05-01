@@ -13,7 +13,7 @@ import { searchIcon } from "./icons";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
 import { supportsResizeObserver } from "../constants";
-import { MarkRequired } from "../utility-types";
+import { MarkRequired } from "ts-essentials";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

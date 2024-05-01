@@ -1,5 +1,5 @@
 import oc from "open-color";
-import { Merge } from "./utility-types";
+import { Merge } from "ts-essentials";
 
 // FIXME can't put to utils.ts rn because of circular dependency
 const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(

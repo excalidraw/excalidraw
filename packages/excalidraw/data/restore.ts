@@ -37,7 +37,8 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { MarkOptional, Mutable } from "../utility-types";
+import { MarkOptional } from "ts-essentials";
+import { Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getContainerElement,
