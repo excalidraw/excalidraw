@@ -22,7 +22,7 @@ export const getObservedAppState = (appState: AppState): ObservedAppState => {
     selectedLinearElementId: appState.selectedLinearElement?.elementId || null,
   };
 
-  Object.defineProperty(observedAppState, hiddenObservedAppStateProp, {
+  Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {
     value: true,
     enumerable: false,
   });
@@ -33,7 +33,7 @@ export const getObservedAppState = (appState: AppState): ObservedAppState => {
 const isObservedAppState = (
   appState: AppState | ObservedAppState,
 ): appState is ObservedAppState =>
-  Object.hasOwn(appState, hiddenObservedAppStateProp);
+  !!Reflect.get(appState, hiddenObservedAppStateProp);
 
 export type StoreActionType = "capture" | "update" | "none";
 
