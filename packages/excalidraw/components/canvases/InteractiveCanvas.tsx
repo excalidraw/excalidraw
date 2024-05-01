@@ -3,7 +3,7 @@ import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
 import type { DOMAttributes } from "react";
-import type { AppState, InteractiveCanvasAppState } from "../../types";
+import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
 import type {
   InteractiveCanvasRenderConfig,
   RenderableElementsMap,
@@ -23,6 +23,7 @@ type InteractiveCanvasProps = {
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
+  device: Device;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -132,6 +133,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
           selectionColor,
           renderScrollbars: false,
         },
+        device: props.device,
         callback: props.renderInteractiveSceneCallback,
       },
       isRenderThrottlingEnabled(),
