@@ -71,13 +71,13 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id158": true,
+    "id159": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id158": true,
+    "id159": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -112,7 +112,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id156",
+  "id": "id157",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -127,7 +127,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 8,
+  "version": 18,
   "width": 100,
   "x": -100,
   "y": -50,
@@ -144,7 +144,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id157",
+  "id": "id158",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -159,7 +159,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
+  "version": 19,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -174,7 +174,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "customData": undefined,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id160",
+    "elementId": "id162",
     "focus": 0,
     "gap": 1,
   },
@@ -182,7 +182,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 99.19725525211979,
-  "id": "id158",
+  "id": "id159",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -210,9 +210,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 24,
+  "version": 54,
   "width": 98.40367721010284,
-  "x": 1.000000000000007,
+  "x": 1,
   "y": 0,
 }
 `;
@@ -223,7 +223,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id158",
+      "id": "id159",
       "type": "arrow",
     },
   ],
@@ -232,7 +232,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id160",
+  "id": "id162",
   "index": "a3",
   "isDeleted": false,
   "link": null,
@@ -274,19 +274,68 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id156" => Delta {
+          "id159" => Delta {
             "deleted": {
-              "boundElements": [],
+              "endBinding": {
+                "elementId": "id158",
+                "focus": 0.009900990099009901,
+                "gap": 1,
+              },
+              "height": 0.9800031696987099,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  98,
+                  -0.9800031696987099,
+                ],
+              ],
+              "startBinding": {
+                "elementId": "id157",
+                "focus": 0.0297029702970297,
+                "gap": 1,
+              },
             },
             "inserted": {
-              "boundElements": [
-                {
-                  "id": "id158",
-                  "type": "arrow",
-                },
+              "endBinding": {
+                "elementId": "id158",
+                "focus": -0.02,
+                "gap": 1,
+              },
+              "height": 0.0002487679019458344,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  98,
+                  0.0002487679019458344,
+                ],
               ],
+              "startBinding": {
+                "elementId": "id157",
+                "focus": 0.02,
+                "gap": 1,
+              },
             },
           },
+        },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
           "id157" => Delta {
             "deleted": {
               "boundElements": [],
@@ -294,7 +343,7 @@ History {
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id158",
+                  "id": "id159",
                   "type": "arrow",
                 },
               ],
@@ -302,8 +351,21 @@ History {
           },
           "id158" => Delta {
             "deleted": {
+              "boundElements": [],
+            },
+            "inserted": {
+              "boundElements": [
+                {
+                  "id": "id159",
+                  "type": "arrow",
+                },
+              ],
+            },
+          },
+          "id159" => Delta {
+            "deleted": {
               "endBinding": {
-                "elementId": "id160",
+                "elementId": "id162",
                 "focus": 0,
                 "gap": 1,
               },
@@ -323,11 +385,11 @@ History {
             },
             "inserted": {
               "endBinding": {
-                "elementId": "id157",
+                "elementId": "id158",
                 "focus": 0.009900990099009901,
                 "gap": 1,
               },
-              "height": 0.9800000000000002,
+              "height": 0.9802432787444684,
               "points": [
                 [
                   0,
@@ -335,22 +397,22 @@ History {
                 ],
                 [
                   98,
-                  -0.9800000000000002,
+                  -0.9802432787444684,
                 ],
               ],
               "startBinding": {
-                "elementId": "id156",
+                "elementId": "id157",
                 "focus": 0.0297029702970297,
                 "gap": 1,
               },
-              "y": 0.9900000000000004,
+              "y": 0.9903686540602428,
             },
           },
-          "id160" => Delta {
+          "id162" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id158",
+                  "id": "id159",
                   "type": "arrow",
                 },
               ],
@@ -374,7 +436,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id156" => Delta {
+          "id157" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -405,7 +467,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id157" => Delta {
+          "id158" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -445,9 +507,9 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id158": true,
+              "id159": true,
             },
-            "selectedLinearElementId": "id158",
+            "selectedLinearElementId": "id159",
           },
           "inserted": {
             "selectedElementIds": {},
@@ -458,7 +520,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id158" => Delta {
+          "id159" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -514,7 +576,7 @@ History {
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of elements 1`] = `4`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `15`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `22`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] appState 1`] = `
 {
@@ -722,7 +784,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 23,
+  "version": 34,
   "width": 0,
   "x": 251,
   "y": 0,
@@ -738,6 +800,46 @@ History {
     ],
   },
   "redoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id154" => Delta {
+            "deleted": {
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  0,
+                  0,
+                ],
+              ],
+            },
+            "inserted": {
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  100,
+                  0,
+                ],
+              ],
+            },
+          },
+        },
+      },
+    },
     HistoryEntry {
       "appStateChange": AppStateChange {
         "delta": Delta {
@@ -968,7 +1070,7 @@ History {
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `16`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `24`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] appState 1`] = `
 {
@@ -1079,7 +1181,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "customData": undefined,
   "endArrowhead": null,
   "endBinding": {
-    "elementId": "id162",
+    "elementId": "id164",
     "focus": 0,
     "gap": 1,
   },
@@ -1087,7 +1189,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 0.03596020595764898,
-  "id": "id163",
+  "id": "id165",
   "index": "Zz",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -1110,7 +1212,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id161",
+    "elementId": "id163",
     "focus": 0,
     "gap": 1,
   },
@@ -1132,7 +1234,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id163",
+      "id": "id165",
       "type": "arrow",
     },
   ],
@@ -1141,7 +1243,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id161",
+  "id": "id163",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -1169,7 +1271,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id163",
+      "id": "id165",
       "type": "arrow",
     },
   ],
@@ -1178,7 +1280,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id162",
+  "id": "id164",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1220,7 +1322,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id161" => Delta {
+          "id163" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1251,7 +1353,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id162" => Delta {
+          "id164" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1284,15 +1386,15 @@ History {
           },
         },
         "updated": Map {
-          "id163" => Delta {
+          "id165" => Delta {
             "deleted": {
               "endBinding": {
-                "elementId": "id162",
+                "elementId": "id164",
                 "focus": 0,
                 "gap": 1,
               },
               "startBinding": {
-                "elementId": "id161",
+                "elementId": "id163",
                 "focus": 0,
                 "gap": 1,
               },
@@ -1422,7 +1524,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "customData": undefined,
   "endArrowhead": null,
   "endBinding": {
-    "elementId": "id165",
+    "elementId": "id167",
     "focus": 0,
     "gap": 1,
   },
@@ -1430,7 +1532,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 0.03596020595764898,
-  "id": "id166",
+  "id": "id168",
   "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -1453,7 +1555,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id164",
+    "elementId": "id166",
     "focus": 0,
     "gap": 1,
   },
@@ -1475,7 +1577,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id166",
+      "id": "id168",
       "type": "arrow",
     },
   ],
@@ -1484,7 +1586,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id164",
+  "id": "id166",
   "index": "a0V",
   "isDeleted": false,
   "link": null,
@@ -1512,7 +1614,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id166",
+      "id": "id168",
       "type": "arrow",
     },
   ],
@@ -1521,7 +1623,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id165",
+  "id": "id167",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1563,7 +1665,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id166" => Delta {
+          "id168" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1571,7 +1673,7 @@ History {
               "customData": undefined,
               "endArrowhead": null,
               "endBinding": {
-                "elementId": "id165",
+                "elementId": "id167",
                 "focus": 0,
                 "gap": 1,
               },
@@ -1601,7 +1703,7 @@ History {
               },
               "startArrowhead": null,
               "startBinding": {
-                "elementId": "id164",
+                "elementId": "id166",
                 "focus": 0,
                 "gap": 1,
               },
@@ -1619,11 +1721,11 @@ History {
           },
         },
         "updated": Map {
-          "id164" => Delta {
+          "id166" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id166",
+                  "id": "id168",
                   "type": "arrow",
                 },
               ],
@@ -1632,11 +1734,11 @@ History {
               "boundElements": [],
             },
           },
-          "id165" => Delta {
+          "id167" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id166",
+                  "id": "id168",
                   "type": "arrow",
                 },
               ],
@@ -1767,7 +1869,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id167",
+  "id": "id169",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -1799,7 +1901,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id168",
+  "id": "id170",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1841,7 +1943,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id167" => Delta {
+          "id169" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1872,7 +1974,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id168" => Delta {
+          "id170" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1990,7 +2092,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id171": true,
+    "id173": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2021,7 +2123,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id171",
+      "id": "id173",
       "type": "arrow",
     },
   ],
@@ -2030,7 +2132,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id169",
+  "id": "id171",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -2058,7 +2160,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id171",
+      "id": "id173",
       "type": "arrow",
     },
   ],
@@ -2067,7 +2169,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id170",
+  "id": "id172",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -2097,7 +2199,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "customData": undefined,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id170",
+    "elementId": "id172",
     "focus": 0,
     "gap": 1,
   },
@@ -2105,7 +2207,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 373.7994222717614,
-  "id": "id171",
+  "id": "id173",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -2128,7 +2230,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id169",
+    "elementId": "id171",
     "focus": 0,
     "gap": 1,
   },
@@ -2164,7 +2266,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id169" => Delta {
+          "id171" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2195,7 +2297,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id170" => Delta {
+          "id172" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2235,9 +2337,9 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id171": true,
+              "id173": true,
             },
-            "selectedLinearElementId": "id171",
+            "selectedLinearElementId": "id173",
           },
           "inserted": {
             "selectedElementIds": {},
@@ -2248,7 +2350,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id171" => Delta {
+          "id173" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2256,7 +2358,7 @@ History {
               "customData": undefined,
               "endArrowhead": "arrow",
               "endBinding": {
-                "elementId": "id170",
+                "elementId": "id172",
                 "focus": 0,
                 "gap": 1,
               },
@@ -2286,7 +2388,7 @@ History {
               },
               "startArrowhead": null,
               "startBinding": {
-                "elementId": "id169",
+                "elementId": "id171",
                 "focus": 0,
                 "gap": 1,
               },
@@ -2304,11 +2406,11 @@ History {
           },
         },
         "updated": Map {
-          "id169" => Delta {
+          "id171" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id171",
+                  "id": "id173",
                   "type": "arrow",
                 },
               ],
@@ -2317,11 +2419,11 @@ History {
               "boundElements": [],
             },
           },
-          "id170" => Delta {
+          "id172" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id171",
+                  "id": "id173",
                   "type": "arrow",
                 },
               ],
@@ -5199,7 +5301,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id173",
+  "id": "id175",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -5231,7 +5333,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "frameId": null,
   "groupIds": [],
   "height": 500,
-  "id": "id172",
+  "id": "id174",
   "index": "a0",
   "isDeleted": true,
   "link": null,
@@ -5274,7 +5376,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id173" => Delta {
+          "id175" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -5320,9 +5422,9 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id173" => Delta {
+          "id175" => Delta {
             "deleted": {
-              "frameId": "id172",
+              "frameId": "id174",
             },
             "inserted": {
               "frameId": null,
