@@ -122,17 +122,16 @@ import {
 } from "../element";
 import {
   bindOrUnbindLinearElement,
-  bindOrUnbindSelectedElements,
+  bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
-  getEligibleElementsForBinding,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
-  unbindLinearElements,
   updateBoundElements,
+  getSuggestedBindingsForArrows,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -3938,7 +3937,12 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
-        this.maybeSuggestBindingForAll(selectedElements);
+        this.setState({
+          suggestedBindings: getSuggestedBindingsForArrows(
+            selectedElements,
+            this,
+          ),
+        });
 
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
@@ -4105,11 +4109,12 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
-      const selectedElements = this.scene.getSelectedElements(this.state);
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements, this)
-        : unbindLinearElements(selectedElements, elementsMap);
+      bindOrUnbindLinearElements(
+        this.scene.getSelectedElements(this.state).filter(isLinearElement),
+        this,
+        isBindingEnabled(this.state),
+        this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+      );
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -7453,7 +7458,12 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          this.maybeSuggestBindingForAll(selectedElements);
+          this.setState({
+            suggestedBindings: getSuggestedBindingsForArrows(
+              selectedElements,
+              this,
+            ),
+          });
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -8500,15 +8510,18 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        isBindingEnabled(this.state)
-          ? bindOrUnbindSelectedElements(
-              this.scene.getSelectedElements(this.state),
-              this,
-            )
-          : unbindLinearElements(
-              this.scene.getSelectedElements(this.state),
-              elementsMap,
-            );
+        // We only allow binding via linear elements, specifically via dragging
+        // the endpoints ("start" or "end").
+        const linearElements = this.scene
+          .getSelectedElements(this.state)
+          .filter(isLinearElement);
+
+        bindOrUnbindLinearElements(
+          linearElements,
+          this,
+          isBindingEnabled(this.state),
+          this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+        );
       }
 
       if (activeTool.type === "laser") {
@@ -9040,19 +9053,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   };
 
-  private maybeSuggestBindingForAll(
-    selectedElements: NonDeleted<ExcalidrawElement>[],
-  ): void {
-    if (selectedElements.length > 50) {
-      return;
-    }
-    const suggestedBindings = getEligibleElementsForBinding(
-      selectedElements,
-      this,
-    );
-    this.setState({ suggestedBindings });
-  }
-
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -9439,8 +9439,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.originSnapOffset,
       );
 
-      this.maybeSuggestBindingForAll([draggingElement]);
-
       // highlight elements that are to be added to frames on frames creation
       if (
         this.state.activeTool.type === TOOL_TYPE.frame ||
@@ -9563,7 +9561,10 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.y,
       )
     ) {
-      this.maybeSuggestBindingForAll(selectedElements);
+      const suggestedBindings = getSuggestedBindingsForArrows(
+        selectedElements,
+        this,
+      );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
@@ -9577,6 +9578,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         elementsToHighlight: [...elementsToHighlight],
+        suggestedBindings,
       });
 
       return true;
