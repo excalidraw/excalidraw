@@ -223,7 +223,7 @@ export const getSelectedGroupIds = (
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);
 
-// given a list of elements, return the the actual group ids that should be selected
+// given a list of elements, return the actual group ids that should be selected
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
   elements: readonly NonDeleted<ExcalidrawElement>[],

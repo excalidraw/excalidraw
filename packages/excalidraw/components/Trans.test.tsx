@@ -6,7 +6,7 @@ import Trans from "./Trans";
 import { TranslationKeys } from "../i18n";
 
 describe("Test <Trans/>", () => {
-  it("should translate the the strings correctly", () => {
+  it("should translate the strings correctly", () => {
     //@ts-ignore
     fallbackLangData.transTest = {
       key1: "Hello {{audience}}",
