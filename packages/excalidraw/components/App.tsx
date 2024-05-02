@@ -90,6 +90,7 @@ import {
   EDITOR_LS_KEYS,
   isIOS,
   supportsResizeObserver,
+  DEFAULT_COLLISION_THRESHOLD,
 } from "../constants";
 import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
@@ -183,7 +184,6 @@ import {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   Ordered,
-  OrderedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -412,7 +412,7 @@ import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
-import { IStore, Store, StoreAction } from "../store";
+import { Store, StoreAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -543,7 +543,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: IStore;
+  private store: Store;
   private history: History;
   private excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -1704,6 +1704,7 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           scale={window.devicePixelRatio}
                           appState={this.state}
+                          device={this.device}
                           renderInteractiveSceneCallback={
                             this.renderInteractiveSceneCallback
                           }
@@ -2123,7 +2124,7 @@ class App extends React.Component<AppProps, AppState> {
               }
               return el;
             }),
-            commitToStore: true,
+            storeAction: StoreAction.CAPTURE,
           });
         }
       },
@@ -2810,7 +2811,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    this.store.capture(elementsMap, this.state);
+    this.store.commit(elementsMap, this.state);
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -3683,51 +3684,39 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      commitToStore?: SceneData["commitToStore"];
+      /** @default StoreAction.CAPTURE */
+      storeAction?: SceneData["storeAction"];
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
-      if (sceneData.commitToStore) {
-        this.store.shouldCaptureIncrement();
-      }
+      if (sceneData.storeAction && sceneData.storeAction !== StoreAction.NONE) {
+        const prevCommittedAppState = this.store.snapshot.appState;
+        const prevCommittedElements = this.store.snapshot.elements;
 
-      if (sceneData.elements || sceneData.appState) {
-        let nextCommittedAppState = this.state;
-        let nextCommittedElements: Map<string, OrderedExcalidrawElement>;
+        const nextCommittedAppState = sceneData.appState
+          ? Object.assign({}, prevCommittedAppState, sceneData.appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
+          : prevCommittedAppState;
 
-        if (sceneData.appState) {
-          nextCommittedAppState = {
-            ...this.state,
-            ...sceneData.appState, // Here we expect just partial appState
-          };
-        }
+        const nextCommittedElements = sceneData.elements
+          ? this.store.filterUncomittedElements(
+              this.scene.getElementsMapIncludingDeleted(), // Only used to detect uncomitted local elements
+              arrayToMap(nextElements), // We expect all (already reconciled) elements
+            )
+          : prevCommittedElements;
 
-        const prevElements = this.scene.getElementsIncludingDeleted();
-
-        if (sceneData.elements) {
-          /**
-           * We need to schedule a snapshot update, as in case `commitToStore` is false  (i.e. remote update),
-           * as it's essential for computing local changes after the async action is completed (i.e. not to include remote changes in the diff).
-           *
-           * This is also a breaking change for all local `updateScene` calls without set `commitToStore` to true,
-           * as it makes such updates impossible to undo (previously they were undone coincidentally with the switch to the whole snapshot captured by the history).
-           *
-           * WARN: be careful here as moving it elsewhere could break the history for remote client without noticing
-           * - we need to find a way to test two concurrent client updates simultaneously, while having access to both stores & histories.
-           */
-          this.store.shouldUpdateSnapshot();
-
-          // TODO#7348: deprecate once exchanging just store increments between clients
-          nextCommittedElements = this.store.ignoreUncomittedElements(
-            arrayToMap(prevElements),
-            arrayToMap(nextElements),
+        // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
+        // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
+        if (sceneData.storeAction === StoreAction.CAPTURE) {
+          this.store.captureIncrement(
+            nextCommittedElements,
+            nextCommittedAppState,
           );
-        } else {
-          nextCommittedElements = arrayToMap(prevElements);
+        } else if (sceneData.storeAction === StoreAction.UPDATE) {
+          this.store.updateSnapshot(
+            nextCommittedElements,
+            nextCommittedAppState,
+          );
         }
-
-        // WARN: Performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
-        this.store.capture(nextCommittedElements, nextCommittedAppState);
       }
 
       if (sceneData.appState) {
@@ -4179,6 +4168,11 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
         activeEmbeddable: null,
       } as const;
+
+      if (nextActiveTool.type === "freedraw") {
+        this.store.shouldCaptureIncrement();
+      }
+
       if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
@@ -4536,7 +4530,7 @@ class App extends React.Component<AppProps, AppState> {
         shape: this.getElementShape(elementWithHighestZIndex),
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
-        threshold: this.getHitThreshold() / 2,
+        threshold: this.getElementHitThreshold() / 2,
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
@@ -4599,8 +4593,8 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  private getHitThreshold() {
-    return 10 / this.state.zoom.value;
+  private getElementHitThreshold() {
+    return DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value;
   }
 
   private hitElement(
@@ -4618,7 +4612,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
-        this.getHitThreshold(),
+        this.getElementHitThreshold(),
       );
 
       return isPointInShape([x, y], selectionShape);
@@ -4639,7 +4633,7 @@ class App extends React.Component<AppProps, AppState> {
       y,
       element,
       shape: this.getElementShape(element),
-      threshold: this.getHitThreshold(),
+      threshold: this.getElementHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
@@ -4671,7 +4665,7 @@ class App extends React.Component<AppProps, AppState> {
           y,
           element: elements[index],
           shape: this.getElementShape(elements[index]),
-          threshold: this.getHitThreshold(),
+          threshold: this.getElementHitThreshold(),
         })
       ) {
         hitElement = elements[index];
@@ -4924,7 +4918,7 @@ class App extends React.Component<AppProps, AppState> {
             y: sceneY,
             element: container,
             shape: this.getElementShape(container),
-            threshold: this.getHitThreshold(),
+            threshold: this.getElementHitThreshold(),
           })
         ) {
           const midPoint = getContainerCenter(
@@ -5339,24 +5333,41 @@ class App extends React.Component<AppProps, AppState> {
       !isOverScrollBar &&
       !this.state.editingLinearElement
     ) {
-      const elementWithTransformHandleType = getElementWithTransformHandleType(
-        elements,
-        this.state,
-        scenePointerX,
-        scenePointerY,
-        this.state.zoom,
-        event.pointerType,
-        this.scene.getNonDeletedElementsMap(),
-      );
-      if (
-        elementWithTransformHandleType &&
-        elementWithTransformHandleType.transformHandleType
-      ) {
-        setCursor(
-          this.interactiveCanvas,
-          getCursorForResizingElement(elementWithTransformHandleType),
+      // for linear elements, we'd like to prioritize point dragging over edge resizing
+      // therefore, we update and check hovered point index first
+      if (this.state.selectedLinearElement) {
+        this.handleHoverSelectedLinearElement(
+          this.state.selectedLinearElement,
+          scenePointerX,
+          scenePointerY,
         );
-        return;
+      }
+
+      if (
+        !this.state.selectedLinearElement ||
+        this.state.selectedLinearElement.hoverPointIndex === -1
+      ) {
+        const elementWithTransformHandleType =
+          getElementWithTransformHandleType(
+            elements,
+            this.state,
+            scenePointerX,
+            scenePointerY,
+            this.state.zoom,
+            event.pointerType,
+            this.scene.getNonDeletedElementsMap(),
+            this.device,
+          );
+        if (
+          elementWithTransformHandleType &&
+          elementWithTransformHandleType.transformHandleType
+        ) {
+          setCursor(
+            this.interactiveCanvas,
+            getCursorForResizingElement(elementWithTransformHandleType),
+          );
+          return;
+        }
       }
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
       const transformHandleType = getTransformHandleTypeFromCoords(
@@ -5365,6 +5376,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerY,
         this.state.zoom,
         event.pointerType,
+        this.device,
       );
       if (transformHandleType) {
         setCursor(
@@ -5517,7 +5529,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
-    const threshold = this.getHitThreshold();
+    const threshold = this.getElementHitThreshold();
     const point = { ...pointerDownState.lastCoords };
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
@@ -5614,7 +5626,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        } else {
+        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
@@ -5704,6 +5716,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
+        storeAction: StoreAction.UPDATE,
       });
       return;
     }
@@ -6313,7 +6326,14 @@ class App extends React.Component<AppProps, AppState> {
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
 
-      if (selectedElements.length === 1 && !this.state.editingLinearElement) {
+      if (
+        selectedElements.length === 1 &&
+        !this.state.editingLinearElement &&
+        !(
+          this.state.selectedLinearElement &&
+          this.state.selectedLinearElement.hoverPointIndex !== -1
+        )
+      ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
             elements,
@@ -6323,6 +6343,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
+            this.device,
           );
         if (elementWithTransformHandleType != null) {
           this.setState({
@@ -6338,6 +6359,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.origin.y,
           this.state.zoom,
           event.pointerType,
+          this.device,
         );
       }
       if (pointerDownState.resize.handleType) {
@@ -6594,7 +6616,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = this.getHitThreshold();
+    const threshold = this.getElementHitThreshold();
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -7993,6 +8015,7 @@ class App extends React.Component<AppProps, AppState> {
           appState: {
             draggingElement: null,
           },
+          storeAction: StoreAction.UPDATE,
         });
 
         return;
@@ -8165,6 +8188,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
+          storeAction: StoreAction.UPDATE,
         });
       }
 
@@ -8417,7 +8441,7 @@ class App extends React.Component<AppProps, AppState> {
               y: pointerDownState.origin.y,
               element: hitElement,
               shape: this.getElementShape(hitElement),
-              threshold: this.getHitThreshold(),
+              threshold: this.getElementHitThreshold(),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
                 : null,
@@ -8482,7 +8506,7 @@ class App extends React.Component<AppProps, AppState> {
               this,
             )
           : unbindLinearElements(
-              this.scene.getNonDeletedElements(),
+              this.scene.getSelectedElements(this.state),
               elementsMap,
             );
       }
@@ -9228,13 +9252,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (ret.type === MIME_TYPES.excalidraw) {
-        // Restore the fractional indices by mutating elements and update the
-        // store snapshot, otherwise we would end up with duplicate indices
+        // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
-        this.store.snapshot = this.store.snapshot.clone(
-          arrayToMap(elements),
-          this.state,
-        );
+
+        // update the store snapshot for old elements, otherwise we would end up with duplicated fractional indices on undo
+        this.store.updateSnapshot(arrayToMap(elements), this.state);
+
         this.setState({ isLoading: true });
         this.syncActionResult({
           ...ret.data,
@@ -9531,7 +9554,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getElementsMapIncludingDeleted(),
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        selectedElements.length === 1 && isImageElement(selectedElements[0])
+        selectedElements.some((element) => isImageElement(element))
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         resizeX,

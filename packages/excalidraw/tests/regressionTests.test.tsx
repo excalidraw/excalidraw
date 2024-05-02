@@ -199,7 +199,6 @@ describe("regression tests", () => {
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
     ).toBe(1);
-
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(-8, -8);
       mouse.up(10, 10);
@@ -725,7 +724,7 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const { x: prevX, y: prevY } = API.getSelectedElement();
-
+    API.clearSelection();
     // drag element from point on bounding box that doesn't hit element
     mouse.reset();
     mouse.down(8, 8);
@@ -1015,12 +1014,22 @@ describe("regression tests", () => {
   });
 
   it("single-clicking on a subgroup of a selected group should not alter selection", () => {
-    const rect1 = UI.createElement("rectangle", { x: 10 });
-    const rect2 = UI.createElement("rectangle", { x: 50 });
+    const rect1 = UI.createElement("rectangle", {
+      x: 10,
+    });
+    const rect2 = UI.createElement("rectangle", {
+      x: 50,
+    });
     UI.group([rect1, rect2]);
 
-    const rect3 = UI.createElement("rectangle", { x: 10, y: 50 });
-    const rect4 = UI.createElement("rectangle", { x: 50, y: 50 });
+    const rect3 = UI.createElement("rectangle", {
+      x: 10,
+      y: 50,
+    });
+    const rect4 = UI.createElement("rectangle", {
+      x: 50,
+      y: 50,
+    });
     UI.group([rect3, rect4]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -1079,8 +1088,9 @@ describe("regression tests", () => {
     UI.group([rect1, rect3]);
     assertSelectedElements(rect1, rect2, rect3);
 
+    mouse.reset();
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      mouse.clickOn(rect1);
+      mouse.click(10, 5);
     });
     assertSelectedElements(rect1);
 

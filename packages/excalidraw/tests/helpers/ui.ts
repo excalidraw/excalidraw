@@ -315,6 +315,7 @@ const transform = (
       h.state.zoom,
       arrayToMap(h.elements),
       "mouse",
+      {},
     )[handle];
   } else {
     const [x1, y1, x2, y2] = getCommonBounds(elements);

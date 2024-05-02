@@ -26,7 +26,9 @@ import {
   LiveCollaborationTrigger,
   TTDDialog,
   TTDDialogTrigger,
-} from "../packages/excalidraw/index";
+  StoreAction,
+  reconcileElements,
+} from "../packages/excalidraw";
 import {
   AppState,
   ExcalidrawImperativeAPI,
@@ -106,10 +108,7 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
-import {
-  RemoteExcalidrawElement,
-  reconcileElements,
-} from "../packages/excalidraw/data/reconcile";
+import type { RemoteExcalidrawElement } from "../packages/excalidraw/data/reconcile";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
@@ -438,7 +437,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               ...restore(data.scene, null, null, { repairBindings: true }),
-              commitToStore: true,
+              storeAction: StoreAction.CAPTURE,
             });
           }
         });
@@ -469,6 +468,7 @@ const ExcalidrawWrapper = () => {
           setLangCode(langCode);
           excalidrawAPI.updateScene({
             ...localDataState,
+            storeAction: StoreAction.UPDATE,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
@@ -604,6 +604,7 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
+              storeAction: StoreAction.UPDATE,
             });
           }
         }

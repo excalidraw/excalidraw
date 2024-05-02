@@ -1,6 +1,5 @@
 import {
   getElementAbsoluteCoords,
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   getTransformHandlesFromCoords,
   getTransformHandles,
   getCommonBounds,
@@ -23,7 +22,7 @@ import {
   selectGroupsFromGivenElements,
 } from "../groups";
 import {
-  OMIT_SIDES_FOR_FRAME,
+  getOmitSidesForDevice,
   shouldShowBoundingBox,
   TransformHandles,
   TransformHandleType,
@@ -577,6 +576,7 @@ const _renderInteractiveScene = ({
   scale,
   appState,
   renderConfig,
+  device,
 }: InteractiveSceneRenderConfig) => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false, elementsMap };
@@ -806,6 +806,7 @@ const _renderInteractiveScene = ({
         appState.zoom,
         elementsMap,
         "mouse", // when we render we don't know which pointer type so use mouse,
+        getOmitSidesForDevice(device),
       );
       if (!appState.viewModeEnabled && showBoundingBox) {
         renderTransformHandles(
@@ -844,8 +845,8 @@ const _renderInteractiveScene = ({
         appState.zoom,
         "mouse",
         isFrameSelected
-          ? OMIT_SIDES_FOR_FRAME
-          : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+          ? { ...getOmitSidesForDevice(device), rotation: true }
+          : getOmitSidesForDevice(device),
       );
       if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(

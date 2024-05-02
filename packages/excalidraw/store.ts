@@ -1,5 +1,6 @@
 import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
+import { ENV } from "./constants";
 import { newElementWith } from "./element/mutateElement";
 import { deepCopyElement } from "./element/newElement";
 import { OrderedExcalidrawElement } from "./element/types";
@@ -7,8 +8,11 @@ import { Emitter } from "./emitter";
 import { AppState, ObservedAppState } from "./types";
 import { isShallowEqual } from "./utils";
 
+// hidden non-enumerable property for runtime checks
+const hiddenObservedAppStateProp = "__observedAppState";
+
 export const getObservedAppState = (appState: AppState): ObservedAppState => {
-  return {
+  const observedAppState = {
     name: appState.name,
     editingGroupId: appState.editingGroupId,
     viewBackgroundColor: appState.viewBackgroundColor,
@@ -17,13 +21,39 @@ export const getObservedAppState = (appState: AppState): ObservedAppState => {
     editingLinearElementId: appState.editingLinearElement?.elementId || null,
     selectedLinearElementId: appState.selectedLinearElement?.elementId || null,
   };
+
+  Reflect.defineProperty(observedAppState, hiddenObservedAppStateProp, {
+    value: true,
+    enumerable: false,
+  });
+
+  return observedAppState;
 };
 
-export const StoreAction = {
-  NONE: "NONE",
-  UPDATE: "UPDATE",
-  CAPTURE: "CAPTURE",
+const isObservedAppState = (
+  appState: AppState | ObservedAppState,
+): appState is ObservedAppState =>
+  !!Reflect.get(appState, hiddenObservedAppStateProp);
+
+export type StoreActionType = "capture" | "update" | "none";
+
+export const StoreAction: {
+  [K in Uppercase<StoreActionType>]: StoreActionType;
+} = {
+  CAPTURE: "capture",
+  UPDATE: "update",
+  NONE: "none",
 } as const;
+
+/**
+ * Represent an increment to the Store.
+ */
+class StoreIncrementEvent {
+  constructor(
+    public readonly elementsChange: ElementsChange,
+    public readonly appStateChange: AppStateChange,
+  ) {}
+}
 
 /**
  * Store which captures the observed changes and emits them as `StoreIncrementEvent` events.
@@ -41,18 +71,18 @@ export interface IStore {
   shouldUpdateSnapshot(): void;
 
   /**
-   * Use to schedule calculation of a store increment on a next component update.
+   * Use to schedule calculation of a store increment.
    */
   shouldCaptureIncrement(): void;
 
   /**
-   * Capture changes to the `elements` and `appState` by calculating changes (based on a snapshot) and emitting resulting changes as a store increment.
+   * Based on the scheduled operation, either only updates store snapshot or also calculates increment and emits the result as a `StoreIncrementEvent`.
    *
-   * @emits StoreIncrementEvent
+   * @emits StoreIncrementEvent when increment is calculated.
    */
-  capture(
-    elements: Map<string, OrderedExcalidrawElement>,
-    appState: AppState,
+  commit(
+    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    appState: AppState | ObservedAppState | undefined,
   ): void;
 
   /**
@@ -64,23 +94,11 @@ export interface IStore {
    * Filters out yet uncomitted elements from `nextElements`, which are part of in-progress local async actions (ephemerals) and thus were not yet commited to the snapshot.
    *
    * This is necessary in updates in which we receive reconciled elements, already containing elements which were not yet captured by the local store (i.e. collab).
-   *
-   * Once we will be exchanging just store increments for all ephemerals, this could be deprecated.
    */
-  ignoreUncomittedElements(
+  filterUncomittedElements(
     prevElements: Map<string, OrderedExcalidrawElement>,
     nextElements: Map<string, OrderedExcalidrawElement>,
   ): Map<string, OrderedExcalidrawElement>;
-}
-
-/**
- * Represent an increment to the Store.
- */
-class StoreIncrementEvent {
-  constructor(
-    public readonly elementsChange: ElementsChange,
-    public readonly appStateChange: AppStateChange,
-  ) {}
 }
 
 export class Store implements IStore {
@@ -88,9 +106,7 @@ export class Store implements IStore {
     [StoreIncrementEvent]
   >();
 
-  private calculatingIncrement: boolean = false;
-  private updatingSnapshot: boolean = false;
-
+  private scheduledActions: Set<StoreActionType> = new Set();
   private _snapshot = Snapshot.empty();
 
   public get snapshot() {
@@ -101,64 +117,81 @@ export class Store implements IStore {
     this._snapshot = snapshot;
   }
 
-  public shouldUpdateSnapshot = () => {
-    this.updatingSnapshot = true;
-  };
-
-  // Suspicious that this is called so many places. Seems error-prone.
+  // TODO: Suspicious that this is called so many places. Seems error-prone.
   public shouldCaptureIncrement = () => {
-    this.calculatingIncrement = true;
+    this.scheduleAction(StoreAction.CAPTURE);
   };
 
-  public capture = (
-    elements: Map<string, OrderedExcalidrawElement>,
-    appState: AppState,
+  public shouldUpdateSnapshot = () => {
+    this.scheduleAction(StoreAction.UPDATE);
+  };
+
+  private scheduleAction = (action: StoreActionType) => {
+    this.scheduledActions.add(action);
+    this.satisfiesScheduledActionsInvariant();
+  };
+
+  public commit = (
+    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    appState: AppState | ObservedAppState | undefined,
   ): void => {
-    // Quick exit for irrelevant changes
-    if (!this.calculatingIncrement && !this.updatingSnapshot) {
-      return;
-    }
-
     try {
-      const nextSnapshot = this._snapshot.clone(elements, appState);
-
-      // Optimisation, don't continue if nothing has changed
-      if (this._snapshot !== nextSnapshot) {
-        // Calculate and record the changes based on the previous and next snapshot
-        if (this.calculatingIncrement) {
-          const elementsChange = nextSnapshot.meta.didElementsChange
-            ? ElementsChange.calculate(
-                this._snapshot.elements,
-                nextSnapshot.elements,
-              )
-            : ElementsChange.empty();
-
-          const appStateChange = nextSnapshot.meta.didAppStateChange
-            ? AppStateChange.calculate(
-                this._snapshot.appState,
-                nextSnapshot.appState,
-              )
-            : AppStateChange.empty();
-
-          if (!elementsChange.isEmpty() || !appStateChange.isEmpty()) {
-            // Notify listeners with the increment
-            this.onStoreIncrementEmitter.trigger(
-              new StoreIncrementEvent(elementsChange, appStateChange),
-            );
-          }
-        }
-
-        // Update the snapshot
-        this._snapshot = nextSnapshot;
+      // Capture has precedence since it also performs update
+      if (this.scheduledActions.has(StoreAction.CAPTURE)) {
+        this.captureIncrement(elements, appState);
+      } else if (this.scheduledActions.has(StoreAction.UPDATE)) {
+        this.updateSnapshot(elements, appState);
       }
     } finally {
-      // Reset props
-      this.updatingSnapshot = false;
-      this.calculatingIncrement = false;
+      this.satisfiesScheduledActionsInvariant();
+      // Defensively reset all scheduled actions, potentially cleans up other runtime garbage
+      this.scheduledActions = new Set();
     }
   };
 
-  public ignoreUncomittedElements = (
+  public captureIncrement = (
+    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    appState: AppState | ObservedAppState | undefined,
+  ) => {
+    const prevSnapshot = this.snapshot;
+    const nextSnapshot = this.snapshot.maybeClone(elements, appState);
+
+    // Optimisation, don't continue if nothing has changed
+    if (prevSnapshot !== nextSnapshot) {
+      // Calculate and record the changes based on the previous and next snapshot
+      const elementsChange = nextSnapshot.meta.didElementsChange
+        ? ElementsChange.calculate(prevSnapshot.elements, nextSnapshot.elements)
+        : ElementsChange.empty();
+
+      const appStateChange = nextSnapshot.meta.didAppStateChange
+        ? AppStateChange.calculate(prevSnapshot.appState, nextSnapshot.appState)
+        : AppStateChange.empty();
+
+      if (!elementsChange.isEmpty() || !appStateChange.isEmpty()) {
+        // Notify listeners with the increment
+        this.onStoreIncrementEmitter.trigger(
+          new StoreIncrementEvent(elementsChange, appStateChange),
+        );
+      }
+
+      // Update snapshot
+      this.snapshot = nextSnapshot;
+    }
+  };
+
+  public updateSnapshot = (
+    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    appState: AppState | ObservedAppState | undefined,
+  ) => {
+    const nextSnapshot = this.snapshot.maybeClone(elements, appState);
+
+    if (this.snapshot !== nextSnapshot) {
+      // Update snapshot
+      this.snapshot = nextSnapshot;
+    }
+  };
+
+  public filterUncomittedElements = (
     prevElements: Map<string, OrderedExcalidrawElement>,
     nextElements: Map<string, OrderedExcalidrawElement>,
   ) => {
@@ -170,7 +203,7 @@ export class Store implements IStore {
         continue;
       }
 
-      const elementSnapshot = this._snapshot.elements.get(id);
+      const elementSnapshot = this.snapshot.elements.get(id);
 
       // Checks for in progress async user action
       if (!elementSnapshot) {
@@ -186,7 +219,19 @@ export class Store implements IStore {
   };
 
   public clear = (): void => {
-    this._snapshot = Snapshot.empty();
+    this.snapshot = Snapshot.empty();
+    this.scheduledActions = new Set();
+  };
+
+  private satisfiesScheduledActionsInvariant = () => {
+    if (!(this.scheduledActions.size >= 0 && this.scheduledActions.size <= 3)) {
+      const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledActions.size}".`;
+      console.error(message, this.scheduledActions.values());
+
+      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+        throw new Error(message);
+      }
+    }
   };
 }
 
@@ -218,29 +263,30 @@ export class Snapshot {
   }
 
   /**
-   * Efficiently clone the existing snapshot.
+   * Efficiently clone the existing snapshot, only if we detected changes.
    *
    * @returns same instance if there are no changes detected, new instance otherwise.
    */
-  public clone(
-    elements: Map<string, OrderedExcalidrawElement>,
-    appState: AppState,
+  public maybeClone(
+    elements: Map<string, OrderedExcalidrawElement> | undefined,
+    appState: AppState | ObservedAppState | undefined,
   ) {
-    const didElementsChange = this.detectChangedElements(elements);
+    const nextElementsSnapshot = this.maybeCreateElementsSnapshot(elements);
+    const nextAppStateSnapshot = this.maybeCreateAppStateSnapshot(appState);
 
-    // Not watching over everything from app state, just the relevant props
-    const nextAppStateSnapshot = getObservedAppState(appState);
-    const didAppStateChange = this.detectChangedAppState(nextAppStateSnapshot);
+    let didElementsChange = false;
+    let didAppStateChange = false;
 
-    // Nothing has changed, so there is no point of continuing further
-    if (!didElementsChange && !didAppStateChange) {
-      return this;
+    if (this.elements !== nextElementsSnapshot) {
+      didElementsChange = true;
     }
 
-    // Clone only if there was really a change
-    let nextElementsSnapshot = this.elements;
-    if (didElementsChange) {
-      nextElementsSnapshot = this.createElementsSnapshot(elements);
+    if (this.appState !== nextAppStateSnapshot) {
+      didAppStateChange = true;
+    }
+
+    if (!didElementsChange && !didAppStateChange) {
+      return this;
     }
 
     const snapshot = new Snapshot(nextElementsSnapshot, nextAppStateSnapshot, {
@@ -251,10 +297,55 @@ export class Snapshot {
     return snapshot;
   }
 
+  private maybeCreateAppStateSnapshot(
+    appState: AppState | ObservedAppState | undefined,
+  ) {
+    if (!appState) {
+      return this.appState;
+    }
+
+    // Not watching over everything from the app state, just the relevant props
+    const nextAppStateSnapshot = !isObservedAppState(appState)
+      ? getObservedAppState(appState)
+      : appState;
+
+    const didAppStateChange = this.detectChangedAppState(nextAppStateSnapshot);
+
+    if (!didAppStateChange) {
+      return this.appState;
+    }
+
+    return nextAppStateSnapshot;
+  }
+
+  private detectChangedAppState(nextObservedAppState: ObservedAppState) {
+    return !isShallowEqual(this.appState, nextObservedAppState, {
+      selectedElementIds: isShallowEqual,
+      selectedGroupIds: isShallowEqual,
+    });
+  }
+
+  private maybeCreateElementsSnapshot(
+    elements: Map<string, OrderedExcalidrawElement> | undefined,
+  ) {
+    if (!elements) {
+      return this.elements;
+    }
+
+    const didElementsChange = this.detectChangedElements(elements);
+
+    if (!didElementsChange) {
+      return this.elements;
+    }
+
+    const elementsSnapshot = this.createElementsSnapshot(elements);
+    return elementsSnapshot;
+  }
+
   /**
    * Detect if there any changed elements.
    *
-   * NOTE: we shouldn't use `sceneVersionNonce` instead, as we need to call this before the scene updates.
+   * NOTE: we shouldn't just use `sceneVersionNonce` instead, as we need to call this before the scene updates.
    */
   private detectChangedElements(
     nextElements: Map<string, OrderedExcalidrawElement>,
@@ -284,13 +375,6 @@ export class Snapshot {
     }
 
     return false;
-  }
-
-  private detectChangedAppState(observedAppState: ObservedAppState) {
-    return !isShallowEqual(this.appState, observedAppState, {
-      selectedElementIds: isShallowEqual,
-      selectedGroupIds: isShallowEqual,
-    });
   }
 
   /**

@@ -13,10 +13,12 @@ import {
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import {
+  StoreAction,
   getSceneVersion,
   restoreElements,
   zoomToFitBounds,
-} from "../../packages/excalidraw/index";
+  reconcileElements,
+} from "../../packages/excalidraw";
 import { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   assertNever,
@@ -79,10 +81,9 @@ import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 import { collabErrorIndicatorAtom } from "./CollabError";
-import {
+import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
-  reconcileElements,
 } from "../../packages/excalidraw/data/reconcile";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -356,6 +357,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       this.excalidrawAPI.updateScene({
         elements,
+        storeAction: StoreAction.UPDATE,
       });
     }
   };
@@ -506,6 +508,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       // to database even if deleted before creating the room.
       this.excalidrawAPI.updateScene({
         elements,
+        storeAction: StoreAction.UPDATE,
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
@@ -743,6 +746,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
+      storeAction: StoreAction.UPDATE,
     });
 
     this.loadImageFiles();

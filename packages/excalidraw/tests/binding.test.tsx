@@ -45,6 +45,7 @@ describe("element binding", () => {
     mouse.downAt(100, 0);
     mouse.moveTo(55, 0);
     mouse.up(0, 0);
+    expect(API.getSelectedElements()).toEqual([arrow]);
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
       focus: expect.toBeNonNaNNumber(),
@@ -368,5 +369,45 @@ describe("element binding", () => {
     expect(arrow1.endBinding?.elementId).toBe(container.id);
     expect(arrow2.startBinding?.elementId).toBe(container.id);
     expect(arrow2.endBinding?.elementId).toBe(rectangle1.id);
+  });
+
+  // #6459
+  it("should unbind arrow only from the latest element", () => {
+    const rectLeft = UI.createElement("rectangle", {
+      x: 0,
+      width: 200,
+      height: 500,
+    });
+    const rectRight = UI.createElement("rectangle", {
+      x: 400,
+      width: 200,
+      height: 500,
+    });
+    const arrow = UI.createElement("arrow", {
+      x: 210,
+      y: 250,
+      width: 180,
+      height: 1,
+    });
+    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+
+    // Drag arrow off of bound rectangle range
+    const handles = getTransformHandles(
+      arrow,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+    ).se!;
+
+    Keyboard.keyDown(KEYS.CTRL_OR_CMD);
+    const elX = handles[0] + handles[2] / 2;
+    const elY = handles[1] + handles[3] / 2;
+    mouse.downAt(elX, elY);
+    mouse.moveTo(300, 400);
+    mouse.up();
+
+    expect(arrow.startBinding).not.toBe(null);
+    expect(arrow.endBinding).toBe(null);
   });
 });
