@@ -2022,11 +2022,6 @@
   resolved "https://registry.npmjs.org/@excalidraw/random-username/-/random-username-1.1.0.tgz#6f388d6a9708cf655b8c9c6aa3fa569ee71ecf0f"
   integrity sha512-nULYsQxkWHnbmHvcs+efMkJ4/9TtvNyFeLyHdeGxW0zHs6P+jYVqcRff9A6Vq9w9JXeDRnRh2VKvTtS19GW2qA==
 
-"@excalidraw/utils@workspace:^":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@excalidraw/utils/-/utils-0.1.2.tgz#69b931772b5d06ea655743a85557f001b585c352"
-  integrity sha512-hypi3np+Do3e8Eb0Y1ug52EyJP4JAP3RPQRfAgiMN0ftag7M49vahiWVXd9yX4wsviCKYacTbBDs2mRqt3nyUQ==
-
 "@firebase/analytics-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.npmjs.org/@firebase/analytics-types/-/analytics-types-0.4.0.tgz#d6716f9fa36a6e340bc0ecfe68af325aa6f60508"

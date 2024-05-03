@@ -13,7 +13,7 @@ import {
   GeometricShape,
   getPolygonShape,
 } from "../../utils/geometry/shape";
-import { isPointInShape, isPointOnShape } from "../../utils/collision";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils";
 import { isTransparent } from "../utils";
 import {
   hasBoundTextElement,

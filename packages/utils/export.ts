@@ -171,6 +171,8 @@ export const exportToSvg = async ({
   exportPadding?: number;
   renderEmbeddables?: boolean;
 }): Promise<SVGSVGElement> => {
+  console.log("HIIII TGEREE122");
+
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
     null,

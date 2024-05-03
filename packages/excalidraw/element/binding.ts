@@ -26,7 +26,7 @@ import {
 
 import { getElementAbsoluteCoords } from "./bounds";
 import { AppClassProperties, AppState, Point } from "../types";
-import { isPointOnShape } from "../../utils/collision";
+import { isPointOnShape } from "@excalidraw/utils";
 import { getElementAtPosition } from "../scene";
 import {
   isArrowElement,

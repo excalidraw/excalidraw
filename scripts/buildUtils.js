@@ -8,6 +8,7 @@ const browserConfig = {
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
+  external: ["@excalidraw/utils"],
 };
 
 // Will be used later for treeshaking
@@ -80,6 +81,7 @@ const rawConfig = {
   format: "esm",
   packages: "external",
   plugins: [sassPlugin()],
+  external: ["@excalidraw/utils"],
 };
 
 // const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;
