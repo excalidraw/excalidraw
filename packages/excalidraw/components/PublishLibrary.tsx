@@ -6,7 +6,7 @@ import { t } from "../i18n";
 import Trans from "./Trans";
 
 import { LibraryItems, LibraryItem, UIAppState } from "../types";
-import { exportToCanvas, exportToSvg } from "../../utils/export";
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,

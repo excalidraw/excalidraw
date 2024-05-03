@@ -23,7 +23,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../../utils/export";
+import { exportToCanvas } from "@excalidraw/utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
