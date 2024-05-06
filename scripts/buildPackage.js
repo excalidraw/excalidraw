@@ -53,6 +53,7 @@ const browserConfig = {
     ".woff2": "copy",
     ".ttf": "copy",
   },
+  external: ["@excalidraw/utils"],
 };
 const createESMBrowserBuild = async () => {
   // Development unminified build with source maps
@@ -107,6 +108,7 @@ const rawConfig = {
     ".json": "copy",
   },
   packages: "external",
+  external: ["@excalidraw/utils"],
 };
 
 const createESMRawBuild = async () => {

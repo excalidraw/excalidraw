@@ -4,7 +4,7 @@ import { execSync } from "child_process";
 
 const createDevBuild = async () => {
   return await esbuild.build({
-    entryPoints: ["../../examples/excalidraw/with-script-in-browser/index.tsx"],
+  entryPoints: ["../../examples/excalidraw/with-script-in-browser/index.tsx"],
     outfile:
       "../../examples/excalidraw/with-script-in-browser/public/bundle.js",
     define: {
