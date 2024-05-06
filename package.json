@@ -81,7 +81,7 @@
     "test:typecheck": "tsc",
     "test:update": "yarn test:app --update --watch=false",
     "test": "yarn clear:workspaces && yarn workspace @excalidraw/utils build:esm && yarn test:app",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "yarn clear:workspaces && yarn workspace @excalidraw/utils build:esm && yarn test:app --coverage",
     "test:coverage:watch": "vitest --coverage --watch",
     "test:ui": "yarn test --ui --coverage.enabled=true",
     "autorelease": "node scripts/autorelease.js",
