@@ -12,7 +12,7 @@
     "typescript": "^5"
   },
   "scripts": {
-    "build:workspaces": "yarn workspace @excalidraw/excalidraw run build:esm && yarn workspace @excalidraw/utils run build:esm",
+    "build:workspaces": "yarn workspace @excalidraw/utils run build:esm && yarn workspace @excalidraw/excalidraw run build:esm",
     "start": "yarn build:workspaces && vite",
     "build": "yarn build:workspaces && vite build",
     "build:preview": "yarn build && vite preview --port 5002"

@@ -1,5 +1,6 @@
 {
   "extends": "../../tsconfig",
+  "exclude": ["**/*.test.*", "**/tests/*", "types", "examples", "packages/**/dist/**", "dist"],
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,
@@ -11,6 +12,5 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "jsx": "react-jsx"
-  },
-  "exclude": ["**/*.test.*", "**/tests/*", "types", "dist"]
+  }
 }
