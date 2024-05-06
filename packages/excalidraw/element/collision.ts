@@ -8,11 +8,7 @@ import {
 
 import { getElementBounds } from "./bounds";
 import { FrameNameBounds } from "../types";
-import {
-  Polygon,
-  GeometricShape,
-  getPolygonShape,
-} from "@excalidraw/utils";
+import { Polygon, GeometricShape, getPolygonShape } from "@excalidraw/utils";
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils";
 import { isTransparent } from "../utils";
 import {

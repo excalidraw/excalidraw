@@ -250,7 +250,6 @@ describe("exporting frames", () => {
         exportPadding: 0,
         exportingFrame: frame,
       });
-      console.log("SVG IS", svg.innerHTML);
       // frame itself isn't exported
       expect(svg.querySelector(`[data-id="${frame.id}"]`)).toBeNull();
       // frame child is exported
