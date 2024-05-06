@@ -171,7 +171,7 @@ export const exportToSvg = async ({
   exportPadding?: number;
   renderEmbeddables?: boolean;
 }): Promise<SVGSVGElement> => {
-  console.log("HIIII FROM UTILS WORKSPACE");
+  console.info("HIIII FROM UTILS WORKSPACE");
 
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
