@@ -14,4 +14,4 @@ jobs:
       - name: Install and test
         run: |
           yarn install
-          yarn test:app
+          yarn test
