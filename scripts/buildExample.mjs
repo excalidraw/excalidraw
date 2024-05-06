@@ -13,6 +13,7 @@ const createDevBuild = async () => {
     bundle: true,
     format: "esm",
     plugins: [sassPlugin()],
+    external: ["@excalidraw/utils"],
     loader: {
       ".woff2": "dataurl",
       ".html": "copy",
