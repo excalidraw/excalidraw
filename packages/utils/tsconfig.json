@@ -1,11 +1,11 @@
 {
+  "extends": "../../tsconfig",
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,
     "outDir": "dist",
     "skipLibCheck": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "allowSyntheticDefaultImports": true,
     "module": "ESNext",
     "moduleResolution": "Node",

@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig",
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"],
   "compilerOptions": {
     "target": "ESNext",
