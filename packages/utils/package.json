@@ -81,6 +81,7 @@
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
     "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
+    "clear":"rm -rf dist",
     "pack": "yarn build:umd && yarn pack"
   }
 }
