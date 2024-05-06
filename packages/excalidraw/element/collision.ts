@@ -12,7 +12,7 @@ import {
   Polygon,
   GeometricShape,
   getPolygonShape,
-} from "../../utils/geometry/shape";
+} from "@excalidraw/utils";
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils";
 import { isTransparent } from "../utils";
 import {

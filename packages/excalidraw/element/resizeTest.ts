@@ -17,12 +17,8 @@ import {
 import { AppState, Device, Zoom } from "../types";
 import { Bounds, getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
-import {
-  angleToDegrees,
-  pointOnLine,
-  pointRotate,
-} from "../../utils/geometry/geometry";
-import { Line, Point } from "../../utils/geometry/shape";
+import { angleToDegrees, pointOnLine, pointRotate } from "@excalidraw/utils";
+import { Line, Point } from "@excalidraw/utils";
 import { isLinearElement } from "./typeChecks";
 
 const isInsideTransformHandle = (

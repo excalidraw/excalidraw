@@ -231,8 +231,8 @@ import {
   getFreedrawShape,
   getPolygonShape,
   getSelectionBoxShape,
-} from "../../utils/geometry/shape";
-import { isPointInShape } from "../../utils/collision";
+} from "@excalidraw/utils";
+import { isPointInShape } from "@excalidraw/utils";
 import {
   AppClassProperties,
   AppProps,
