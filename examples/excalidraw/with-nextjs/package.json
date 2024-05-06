@@ -5,7 +5,7 @@
   "scripts": {
     "build:workspaces": "yarn workspace @excalidraw/utils run build:esm && yarn workspace @excalidraw/excalidraw run build:esm",
     "dev": "yarn build:workspaces && next dev -p 3005",
-    "build": "yarn build:workspace && next build",
+    "build": "yarn build:workspaces && next build",
     "start": "next start -p 3006",
     "lint": "next lint"
   },
