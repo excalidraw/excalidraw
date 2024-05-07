@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "ویرایش لینک",
-      "exit": "خروج از ویرایشگر"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "قفل",
