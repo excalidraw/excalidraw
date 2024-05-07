@@ -23,7 +23,11 @@ import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
@@ -113,6 +117,11 @@ export const SelectedShapeActions = ({
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
+
+  const showLineEditorAction =
+    !appState.editingLinearElement &&
+    targetElements.length === 1 &&
+    isLinearElement(targetElements[0]);
 
   return (
     <div className="panelColumn">
@@ -229,6 +238,7 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
+            {showLineEditorAction && renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
       )}
