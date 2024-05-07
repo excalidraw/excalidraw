@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Upravit čáru",
-      "exit": "Ukončit editor řádků"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Uzamknout",
