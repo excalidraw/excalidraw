@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "行を編集",
-      "exit": "行エディタを終了"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "ロック",
