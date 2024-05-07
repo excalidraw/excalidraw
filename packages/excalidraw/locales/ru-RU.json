@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Редактирование строки",
-      "editArrow": ""
+      "editArrow": "Изменить стрелку"
     },
     "elementLock": {
       "lock": "Блокировать",
