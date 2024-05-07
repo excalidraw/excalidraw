@@ -12,7 +12,7 @@ import {
   IframeData,
 } from "./types";
 import { sanitizeHTMLAttribute } from "../data/url";
-import { MarkRequired } from "../utility-types";
+import { MarkRequired } from "ts-essentials";
 import { StoreAction } from "../store";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;

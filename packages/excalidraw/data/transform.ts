@@ -43,7 +43,7 @@ import {
   TextAlign,
   VerticalAlign,
 } from "../element/types";
-import { MarkOptional } from "../utility-types";
+import { MarkOptional } from "ts-essentials";
 import {
   arrayToMap,
   assertNever,

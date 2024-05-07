@@ -390,7 +390,7 @@ import {
   ExcalidrawElementSkeleton,
   convertToExcalidrawElements,
 } from "../data/transform";
-import { ValueOf } from "../utility-types";
+import { ValueOf } from "ts-essentials";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";

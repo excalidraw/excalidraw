@@ -46,7 +46,8 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkOptional, Merge, Mutable } from "../utility-types";
+import { MarkOptional, Merge } from "ts-essentials";
+import { Mutable } from "../utility-types";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,

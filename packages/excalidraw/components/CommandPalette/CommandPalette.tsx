@@ -39,7 +39,7 @@ import {
 } from "../../utils";
 import { atom, useAtom } from "jotai";
 import { deburr } from "../../deburr";
-import { MarkRequired } from "../../utility-types";
+import { MarkRequired } from "ts-essentials";
 import { InlineIcon } from "../InlineIcon";
 import { SHAPES } from "../../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";

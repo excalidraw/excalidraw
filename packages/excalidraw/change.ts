@@ -40,7 +40,8 @@ import {
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import { SubtypeOf, ValueOf } from "./utility-types";
+import { SubtypeOf } from "./utility-types";
+import { ValueOf } from "ts-essentials";
 import {
   arrayToMap,
   arrayToObject,

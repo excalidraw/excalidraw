@@ -7,7 +7,7 @@ import {
   BinaryFiles,
   UIAppState,
 } from "../types";
-import { MarkOptional } from "../utility-types";
+import { MarkOptional } from "ts-essentials";
 import { StoreActionType } from "../store";
 
 export type ActionSource =
