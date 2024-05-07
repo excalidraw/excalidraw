@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Bewerk regel",
-      "exit": "Verlaat regel-editor"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Vergrendel",
