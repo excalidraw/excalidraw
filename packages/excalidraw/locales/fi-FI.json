@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Muokkaa riviä",
-      "exit": "Poistu rivieditorista"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Lukitse",
