@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Edit tautan",
-      "exit": "Keluar editor garis"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Kunci",
