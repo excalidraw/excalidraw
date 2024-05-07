@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "ערוך קו",
-      "exit": "צא מעורך הקו"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "נעילה",
