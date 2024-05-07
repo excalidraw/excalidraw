@@ -8,15 +8,6 @@
     "examples/excalidraw",
     "examples/excalidraw/*"
   ],
-  "dependencies": {
-    "@excalidraw/random-username": "1.0.0",
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
-    "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.4",
-    "idb-keyval": "6.0.3",
-    "socket.io-client": "4.7.2"
-  },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@excalidraw/eslint-config": "1.0.3",
