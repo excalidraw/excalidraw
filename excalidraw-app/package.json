@@ -26,6 +26,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "jotai": "1.13.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "vite-plugin-html": "3.2.2"
   },
   "prettier": "@excalidraw/prettier-config",
