@@ -173,8 +173,8 @@ export const SelectedShapeActions = ({
         <div className="buttonList">
           {renderAction("sendToBack")}
           {renderAction("sendBackward")}
-          {renderAction("bringToFront")}
           {renderAction("bringForward")}
+          {renderAction("bringToFront")}
         </div>
       </fieldset>
 
