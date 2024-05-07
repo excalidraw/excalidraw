@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Rediģēt līniju",
-      "exit": "Aizvērt līnijas redaktoru"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Fiksēt",
