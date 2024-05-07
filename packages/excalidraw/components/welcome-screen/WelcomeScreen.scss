@@ -206,10 +206,8 @@
     text-decoration: none;
     background: var(--button-hover-bg);
 
-    .welcome-screen-menu-item__shortcut {
-      color: var(--color-gray-50);
-    }
-
+    .welcome-screen-menu-item__shortcut,
+    .welcome-screen-menu-item__icon,
     .welcome-screen-menu-item__text {
       color: var(--color-gray-100);
     }
@@ -219,10 +217,8 @@
     background: var(--button-hover-bg);
     border-color: var(--color-brand-active);
 
-    .welcome-screen-menu-item__shortcut {
-      color: var(--color-gray-50);
-    }
-
+    .welcome-screen-menu-item__shortcut,
+    .welcome-screen-menu-item__icon,
     .welcome-screen-menu-item__text {
       color: var(--color-gray-100);
     }
@@ -249,16 +245,17 @@
 
     .welcome-screen-menu-item:hover {
       background-color: var(--color-surface-low);
-      .welcome-screen-menu-item__shortcut {
-        color: var(--color-gray-50);
-      }
 
+      .welcome-screen-menu-item__icon,
+      .welcome-screen-menu-item__shortcut,
       .welcome-screen-menu-item__text {
         color: var(--color-gray-10);
       }
     }
 
     .welcome-screen-menu-item:active {
+      .welcome-screen-menu-item__icon,
+      .welcome-screen-menu-item__shortcut,
       .welcome-screen-menu-item__text {
         color: var(--color-gray-10);
       }

@@ -20,6 +20,7 @@ import { StoreAction } from "../store";
 export const actionSendBackward = register({
   name: "sendBackward",
   label: "labels.sendBackward",
+  keywords: ["move down", "zindex", "layer"],
   icon: SendBackwardIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
@@ -49,6 +50,7 @@ export const actionSendBackward = register({
 export const actionBringForward = register({
   name: "bringForward",
   label: "labels.bringForward",
+  keywords: ["move up", "zindex", "layer"],
   icon: BringForwardIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
@@ -78,6 +80,7 @@ export const actionBringForward = register({
 export const actionSendToBack = register({
   name: "sendToBack",
   label: "labels.sendToBack",
+  keywords: ["move down", "zindex", "layer"],
   icon: SendToBackIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
@@ -114,6 +117,7 @@ export const actionSendToBack = register({
 export const actionBringToFront = register({
   name: "bringToFront",
   label: "labels.bringToFront",
+  keywords: ["move up", "zindex", "layer"],
   icon: BringToFrontIcon,
   trackEvent: { category: "element" },
 

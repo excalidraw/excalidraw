@@ -40,6 +40,10 @@
       }
       &.highlighted {
         color: var(--color-promo);
+        font-weight: 700;
+        .dropdown-menu-item__icon g {
+          stroke-width: 2;
+        }
       }
     }
   }

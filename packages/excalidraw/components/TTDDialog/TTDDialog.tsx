@@ -253,8 +253,8 @@ export const TTDDialogBase = withInternalFallback(
                       marginLeft: "10px",
                       fontSize: 10,
                       borderRadius: "12px",
-                      background: "pink",
-                      color: "#000",
+                      background: "var(--color-promo)",
+                      color: "var(--color-surface-lowest)",
                     }}
                   >
                     AI Beta
