@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Modificar la linha",
-      "exit": "Sortir de l’editor de linha"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Verrolhar",
