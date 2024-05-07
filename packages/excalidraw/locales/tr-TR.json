@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Çizgiyi düzenle",
-      "exit": "Çizgi düzenlemeden çık"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Kilitle",
