@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "रेघ संपादन",
-      "exit": "रेघ संपादकाबाहेर"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "कुलूपात ठेवा",
