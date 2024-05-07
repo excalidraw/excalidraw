@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "تحرير السطر",
-      "exit": "الخروج من المُحرر"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "قفل",
