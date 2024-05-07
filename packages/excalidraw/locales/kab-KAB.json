@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Ẓreg izirig",
-      "exit": "Ffeɣ seg umaẓrag n yizirig"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Sekkeṛ",
