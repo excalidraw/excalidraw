@@ -3,6 +3,6 @@
   "rules": {
     "import/no-anonymous-default-export": "off",
     "no-restricted-globals": "off",
-    "@typescript-eslint/consistent-type-imports": "error"
+    "@typescript-eslint/consistent-type-imports": "warn"
   }
 }
