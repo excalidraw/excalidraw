@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "แก้ไขเส้น",
-      "exit": ""
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "ล็อก",
