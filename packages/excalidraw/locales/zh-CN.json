@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "编辑线条",
-      "editArrow": ""
+      "editArrow": "编辑箭头"
     },
     "elementLock": {
       "lock": "锁定",
