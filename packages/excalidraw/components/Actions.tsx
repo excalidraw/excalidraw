@@ -333,8 +333,8 @@ export const ShapesSwitcher = ({
                 fontSize: 8,
                 fontFamily: "Cascadia, monospace",
                 position: "absolute",
-                background: "pink",
-                color: "black",
+                background: "var(--color-promo)",
+                color: "var(--color-surface-lowest)",
                 bottom: 3,
                 right: 4,
               }}

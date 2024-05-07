@@ -128,7 +128,7 @@
   --color-muted-background: var(--color-gray-80);
   --color-muted-background-darker: var(--color-gray-100);
 
-  --color-promo: #e70078;
+  --color-promo: var(--color-primary);
   --color-success: #268029;
   --color-success-lighter: #cafccc;
 
@@ -235,8 +235,6 @@
     --color-muted-darkest: var(--color-gray-20);
     --color-muted-background: var(--color-gray-40);
     --color-muted-background-darker: var(--color-gray-20);
-
-    --color-promo: #d297ff;
 
     --color-logo-text: #e2dfff;
 
