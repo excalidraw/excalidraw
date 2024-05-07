@@ -68,7 +68,7 @@
     "build:app:noclean": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
     "build:version": "node ./scripts/build-version.js",
     "build": "yarn --cwd ./excalidraw-app build",
-    "clean": "rimraf node_modules dev-docs/node_modules examples/excalidraw/node_modules examples/excalidraw/with-nextjs/node_modules examples/excalidraw/with-script-in-browser/node_modules excalidraw-app/node_modules packages/excalidraw/node_modules packages/utils/node_modules excalidraw-app/build",
+    "clean": "yarn workspaces run clean",
     "fix:code": "yarn test:code --fix",
     "fix:other": "yarn prettier --write",
     "fix": "run-s fix:other fix:code",

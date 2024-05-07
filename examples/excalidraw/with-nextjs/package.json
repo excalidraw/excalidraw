@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules .next",
     "dev": "run-s build:workspace next:dev",
     "next:dev": "next dev -p 3005",
     "next:build": "next build",

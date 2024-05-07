@@ -8,6 +8,10 @@
     "@excalidraw/excalidraw": "*"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^5",
+    "rimraf": "5.0.5"
+  },
+  "scripts": {
+    "clean": "rimraf node_modules"
   }
 }
