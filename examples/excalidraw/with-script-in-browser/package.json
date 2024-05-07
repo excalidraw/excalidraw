@@ -9,11 +9,16 @@
   },
   "devDependencies": {
     "vite": "5.0.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "rimraf": "5.0.5",
+    "npm-run-all": "4.1.5"
   },
   "scripts": {
-    "start": "yarn workspace @excalidraw/excalidraw run build:esm && vite",
-    "build": "yarn workspace @excalidraw/excalidraw run build:esm && vite build",
-    "build:preview": "yarn build && vite preview --port 5002"
+    "build:esm": "yarn workspace @excalidraw/excalidraw run build:esm",
+    "start": "run-s build:esm vite",
+    "vite": "vite",
+    "vite:preview": "vite preview --port 5002",
+    "build": "run-s build:esm vite build",
+    "build:preview": "run-s build vite:preview"
   }
 }

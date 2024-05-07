@@ -77,10 +77,16 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
+    "clean": "rimraf types dist node_modules",
+    "clean:dist": "rimraf dist",
+    "clean:types": "rimraf types",
+    "gen:types": "run-s clean:types build:compile",
+    "build:utils": "node ../../scripts/buildUtils.js",
+    "build:compile": "tsc",
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
-    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
+    "build:esm": "run-s clean:dist build:utils gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "yarn build:umd && yarn pack"
+    "yarn:pack": "yarn pack",
+    "pack": "run-s build:umd yarn:pack"
   }
 }

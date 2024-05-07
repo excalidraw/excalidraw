@@ -121,16 +121,24 @@
     "size-limit": "9.0.0",
     "style-loader": "3.3.3",
     "ts-loader": "9.3.1",
-    "typescript": "4.9.4"
+    "typescript": "4.9.4",
+    "rimraf": "5.0.5",
+    "npm-run-all": "4.1.5"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types",
-    "pack": "yarn build:umd && yarn pack",
-    "start": "node ../../scripts/buildExample.mjs && vite",
+    "clean": "rimraf types dist node_modules",
+    "clean:types": "rimraf types",
+    "gen:types": "run-s clean:types build:compile",
+    "build:compile": "tsc",
+    "build:package": "node ../../scripts/buildPackage.js",
+    "build:esm": "run-s clean build:package gen:types",
+    "pack": "run-s build:umd pack",
+    "start": "run-s build:example run",
     "build:example": "node ../../scripts/buildExample.mjs",
-    "size": "yarn build:umd && size-limit"
+    "size": "run-s build:umd size:limit",
+    "size:limit": "size-limit",
+    "run": "vite"
   }
 }

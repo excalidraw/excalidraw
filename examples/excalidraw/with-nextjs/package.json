@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm",
-    "dev": "yarn build:workspace && next dev -p 3005",
-    "build": "yarn build:workspace && next build",
+    "clean": "rimraf node_modules",
+    "dev": "run-s build:workspace next:dev",
+    "next:dev": "next dev -p 3005",
+    "next:build": "next build",
+    "build": "run-s build:workspace next:build",
     "start": "next start -p 3006",
     "lint": "next lint"
   },
@@ -19,7 +22,9 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "npm-run-all": "4.1.5",
     "path2d-polyfill": "2.0.1",
+    "rimraf": "5.0.5",
     "typescript": "^5"
   }
 }
