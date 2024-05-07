@@ -1,14 +1,16 @@
-import { Action, ActionResult } from "./types";
+import type { Action, ActionResult } from "./types";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { History, HistoryChangedEvent } from "../history";
-import { AppState } from "../types";
+import type { History } from "../history";
+import { HistoryChangedEvent } from "../history";
+import type { AppState } from "../types";
 import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
-import { SceneElementsMap } from "../element/types";
-import { Store, StoreAction } from "../store";
+import type { SceneElementsMap } from "../element/types";
+import type { Store } from "../store";
+import { StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
 const writeData = (

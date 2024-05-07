@@ -1,14 +1,13 @@
 import { KEYS } from "../../keys";
-import {
+import type {
   ColorPickerColor,
   ColorPalette,
   ColorPaletteCustom,
-  COLORS_PER_ROW,
-  COLOR_PALETTE,
 } from "../../colors";
-import { ValueOf } from "../../utility-types";
+import { COLORS_PER_ROW, COLOR_PALETTE } from "../../colors";
+import type { ValueOf } from "../../utility-types";
+import type { ActiveColorPickerSectionAtomType } from "./colorPickerUtils";
 import {
-  ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";

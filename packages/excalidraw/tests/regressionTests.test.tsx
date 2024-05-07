@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";

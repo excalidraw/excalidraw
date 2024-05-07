@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { RoughCanvas } from "roughjs/bin/canvas";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 import { renderStaticScene } from "../../renderer/staticScene";
 import { isShallowEqual } from "../../utils";
 import type { AppState, StaticCanvasAppState } from "../../types";

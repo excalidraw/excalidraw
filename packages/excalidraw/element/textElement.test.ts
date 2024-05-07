@@ -11,7 +11,7 @@ import {
   getDefaultLineHeight,
   parseTokens,
 } from "./textElement";
-import { ExcalidrawTextElementWithContainer, FontString } from "./types";
+import type { ExcalidrawTextElementWithContainer, FontString } from "./types";
 
 describe("Test wrapText", () => {
   const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;

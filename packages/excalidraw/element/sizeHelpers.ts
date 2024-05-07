@@ -1,8 +1,8 @@
-import { ElementsMap, ExcalidrawElement } from "./types";
+import type { ElementsMap, ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import { AppState, Zoom } from "../types";
+import type { AppState, Zoom } from "../types";
 import { getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
 
