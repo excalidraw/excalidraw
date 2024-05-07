@@ -32,6 +32,11 @@ import {
 import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { rotatePoint } from "../../math";
 import { getTextEditor } from "../queries/dom";
+import { arrayToMap } from "../../utils";
+import { createTestHook } from "../../components/App";
+
+// so that window.h is available when App.tsx is not imported as well.
+createTestHook();
 
 const { h } = window;
 
@@ -107,6 +112,18 @@ export class Keyboard {
   static codePress = (code: string) => {
     Keyboard.codeDown(code);
     Keyboard.codeUp(code);
+  };
+
+  static undo = () => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
+
+  static redo = () => {
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("z");
+    });
   };
 }
 
@@ -282,13 +299,24 @@ const transform = (
   keyboardModifiers: KeyboardModifiers = {},
 ) => {
   const elements = Array.isArray(element) ? element : [element];
-  mouse.select(elements);
+  h.setState({
+    selectedElementIds: elements.reduce(
+      (acc, e) => ({
+        ...acc,
+        [e.id]: true,
+      }),
+      {},
+    ),
+  });
   let handleCoords: TransformHandle | undefined;
-
   if (elements.length === 1) {
-    handleCoords = getTransformHandles(elements[0], h.state.zoom, "mouse")[
-      handle
-    ];
+    handleCoords = getTransformHandles(
+      elements[0],
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+      {},
+    )[handle];
   } else {
     const [x1, y1, x2, y2] = getCommonBounds(elements);
     const isFrameSelected = elements.some(isFrameLikeElement);
@@ -456,7 +484,6 @@ export class UI {
       mouse.reset();
       mouse.up(x + width, y + height);
     }
-
     const origElement = h.elements[h.elements.length - 1] as any;
 
     if (angle !== 0) {

@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
+import { CLASSES } from "../constants";
 import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -31,7 +31,6 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
-  detectLineHeight,
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
@@ -121,13 +120,13 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
       const container = getContainerElement(
         updatedTextElement,
-        app.scene.getElementsMapIncludingDeleted(),
+        app.scene.getNonDeletedElementsMap(),
       );
       let maxWidth = updatedTextElement.width;
 
@@ -143,6 +142,7 @@ export const textWysiwyg = ({
             LinearElementEditor.getBoundTextElementPosition(
               container,
               updatedTextElement as ExcalidrawTextElementWithContainer,
+              elementsMap,
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
@@ -200,6 +200,7 @@ export const textWysiwyg = ({
           const { y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
+            elementsMap,
           );
           coordY = y;
         }
@@ -225,18 +226,6 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
-      } else {
-        textElementWidth += 0.5;
-      }
-
-      let lineHeight = updatedTextElement.lineHeight;
-
-      // In Safari the font size gets rounded off when rendering hence calculating the line height by rounding off font size
-      if (isSafari) {
-        lineHeight = detectLineHeight({
-          ...updatedTextElement,
-          fontSize: Math.round(updatedTextElement.fontSize),
-        });
       }
 
       // Make sure text editor height doesn't go beyond viewport
@@ -245,7 +234,7 @@ export const textWysiwyg = ({
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight,
+        lineHeight: updatedTextElement.lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
@@ -326,7 +315,7 @@ export const textWysiwyg = ({
       }
       const container = getContainerElement(
         element,
-        app.scene.getElementsMapIncludingDeleted(),
+        app.scene.getNonDeletedElementsMap(),
       );
 
       const font = getFontString({
@@ -513,7 +502,7 @@ export const textWysiwyg = ({
     let text = editable.value;
     const container = getContainerElement(
       updateElement,
-      app.scene.getElementsMapIncludingDeleted(),
+      app.scene.getNonDeletedElementsMap(),
     );
 
     if (container) {
@@ -541,7 +530,11 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(updateElement, container);
+      redrawTextBoundingBox(
+        updateElement,
+        container,
+        app.scene.getNonDeletedElementsMap(),
+      );
     }
 
     onSubmit({

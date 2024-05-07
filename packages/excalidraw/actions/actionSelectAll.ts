@@ -6,10 +6,15 @@ import { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { excludeElementsInFramesFromSelection } from "../scene/selection";
+import { selectAllIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 export const actionSelectAll = register({
   name: "selectAll",
+  label: "labels.selectAll",
+  icon: selectAllIcon,
   trackEvent: { category: "canvas" },
+  viewMode: false,
   perform: (elements, appState, value, app) => {
     if (appState.editingLinearElement) {
       return false;
@@ -43,12 +48,11 @@ export const actionSelectAll = register({
           // single linear element selected
           Object.keys(selectedElementIds).length === 1 &&
           isLinearElement(elements[0])
-            ? new LinearElementEditor(elements[0], app.scene)
+            ? new LinearElementEditor(elements[0])
             : null,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
-  contextItemLabel: "labels.selectAll",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.A,
 });

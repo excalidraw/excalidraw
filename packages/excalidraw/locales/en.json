@@ -21,7 +21,9 @@
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
+    "changeStroke": "Change stroke color",
     "background": "Background",
+    "changeBackground": "Change background color",
     "fill": "Fill",
     "strokeWidth": "Stroke width",
     "strokeStyle": "Stroke style",
@@ -72,6 +74,7 @@
     "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
+    "clearCanvas": "Clear canvas",
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
@@ -84,12 +87,13 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "showGrid": "Show grid",
+    "toggleGrid": "Toggle grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
     "libraries": "Browse libraries",
     "loadingScene": "Loading scene…",
+    "loadScene": "Load scene from file",
     "align": "Align",
     "alignTop": "Align top",
     "alignBottom": "Align bottom",
@@ -105,7 +109,8 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
-    "toggleTheme": "Toggle theme",
+    "toggleTheme": "Toggle light/dark theme",
+    "theme": "Theme",
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Edit line",
-      "exit": "Exit line editor"
+      "editArrow": "Edit arrow"
     },
     "elementLock": {
       "lock": "Lock",
@@ -140,7 +145,10 @@
     "textToDiagram": "Text to diagram",
     "prompt": "Prompt",
     "followUs": "Follow us",
-    "discordChat": "Discord chat"
+    "discordChat": "Discord chat",
+    "zoomToFitViewport": "Zoom to fit in viewport",
+    "zoomToFitSelection": "Zoom to fit selection",
+    "zoomToFit": "Zoom to fit all elements"
   },
   "library": {
     "noItems": "No items added yet...",
@@ -173,6 +181,7 @@
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
+    "systemMode": "System mode",
     "zenMode": "Zen mode",
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
@@ -214,9 +223,9 @@
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "failedToFetchImage": "Failed to fetch image.",
-    "invalidSVGString": "Invalid SVG.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
     "importLibraryError": "Couldn't load library",
+    "saveLibraryError": "Couldn't save library to storage. Please save your library to a file locally to make sure you don't lose changes.",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
     "collabSaveFailed_sizeExceeded": "Couldn't save to the backend database, the canvas seems to be too big. You should save the file locally to ensure you don't lose your work.",
     "imageToolNotSupported": "Images are disabled.",
@@ -248,7 +257,7 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Pen mode - prevent touch",
-    "link": "Add/ Update link for a selected shape",
+    "link": "Add / Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
@@ -534,7 +543,25 @@
     },
     "hint": {
       "text": "Click on user to follow",
-      "followStatus": "You're currently following this user"
+      "followStatus": "You're currently following this user",
+      "inCall": "User is in a voice call",
+      "micMuted": "User's microphone is muted",
+      "isSpeaking": "User is speaking"
     }
+  },
+  "commandPalette": {
+    "title": "Command palette",
+    "shortcuts": {
+      "select": "Select",
+      "confirm": "Confirm",
+      "close": "Close"
+    },
+    "recents": "Recently used",
+    "search": {
+      "placeholder": "Search menus, commands, and discover hidden gems",
+      "noMatch": "No matching commands..."
+    },
+    "itemNotAvailable": "Command is not available...",
+    "shortcutHint": "For Command palette, use {{shortcut}}"
   }
 }

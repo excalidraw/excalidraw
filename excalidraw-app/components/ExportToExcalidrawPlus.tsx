@@ -30,6 +30,7 @@ export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
+  name: string,
 ) => {
   const firebase = await loadFirebaseStorage();
 
@@ -53,7 +54,7 @@ export const exportToExcalidrawPlus = async (
     .ref(`/migrations/scenes/${id}`)
     .put(blob, {
       customMetadata: {
-        data: JSON.stringify({ version: 2, name: appState.name }),
+        data: JSON.stringify({ version: 2, name }),
         created: Date.now().toString(),
       },
     });
@@ -89,9 +90,10 @@ export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
   appState: Partial<AppState>;
   files: BinaryFiles;
+  name: string;
   onError: (error: Error) => void;
   onSuccess: () => void;
-}> = ({ elements, appState, files, onError, onSuccess }) => {
+}> = ({ elements, appState, files, name, onError, onSuccess }) => {
   const { t } = useI18n();
   return (
     <Card color="primary">
@@ -117,7 +119,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         onClick={async () => {
           try {
             trackEvent("export", "eplus", `ui (${getFrame()})`);
-            await exportToExcalidrawPlus(elements, appState, files);
+            await exportToExcalidrawPlus(elements, appState, files, name);
             onSuccess();
           } catch (error: any) {
             console.error(error);

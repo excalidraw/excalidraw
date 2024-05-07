@@ -18,7 +18,7 @@ import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { EDITOR_LS_KEYS } from "../../constants";
-import { debounce } from "../../utils";
+import { debounce, isDevEnv } from "../../utils";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MERMAID_EXAMPLE =
@@ -54,7 +54,11 @@ const MermaidToExcalidraw = ({
       mermaidToExcalidrawLib,
       setError,
       mermaidDefinition: deferredText,
-    }).catch(() => {});
+    }).catch((err) => {
+      if (isDevEnv()) {
+        console.error("Failed to parse mermaid definition", err);
+      }
+    });
 
     debouncedSaveMermaidDefinition(deferredText);
   }, [deferredText, mermaidToExcalidrawLib]);

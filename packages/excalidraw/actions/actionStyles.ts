@@ -25,12 +25,16 @@ import {
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
 import { ExcalidrawTextElement } from "../element/types";
+import { paintIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
+  label: "labels.copyStyles",
+  icon: paintIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = [];
@@ -51,23 +55,24 @@ export const actionCopyStyles = register({
         ...appState,
         toast: { message: t("toast.copyStyles") },
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.C,
 });
 
 export const actionPasteStyles = register({
   name: "pasteStyles",
+  label: "labels.pasteStyles",
+  icon: paintIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = JSON.parse(copiedStyles);
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];
     if (!isExcalidrawElement(pastedElement)) {
-      return { elements, commitToHistory: false };
+      return { elements, storeAction: StoreAction.NONE };
     }
 
     const selectedElements = getSelectedElements(elements, appState, {
@@ -128,7 +133,11 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
-            redrawTextBoundingBox(newElement, container);
+            redrawTextBoundingBox(
+              newElement,
+              container,
+              app.scene.getNonDeletedElementsMap(),
+            );
           }
 
           if (
@@ -152,10 +161,9 @@ export const actionPasteStyles = register({
         }
         return element;
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
-  contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
 });

@@ -7,7 +7,7 @@ import {
   PanelComponentProps,
   ActionSource,
 } from "./types";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, OrderedExcalidrawElement } from "../element/types";
 import { AppClassProperties, AppState } from "../types";
 import { trackEvent } from "../analytics";
 import { isPromiseLike } from "../utils";
@@ -46,13 +46,13 @@ export class ActionManager {
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
   getAppState: () => Readonly<AppState>;
-  getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
+  getElementsIncludingDeleted: () => readonly OrderedExcalidrawElement[];
   app: AppClassProperties;
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
-    getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
+    getElementsIncludingDeleted: () => readonly OrderedExcalidrawElement[],
     app: AppClassProperties,
   ) {
     this.updater = (actionResult) => {

@@ -15,13 +15,14 @@ import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
-import { AppClassProperties, AppState } from "../types";
+import { StoreAction } from "../store";
+import { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
 const alignActionsPredicate = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: UIAppState,
   _: unknown,
   app: AppClassProperties,
 ) => {
@@ -59,6 +60,8 @@ const alignSelectedElements = (
 
 export const actionAlignTop = register({
   name: "alignTop",
+  label: "labels.alignTop",
+  icon: AlignTopIcon,
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
@@ -68,7 +71,7 @@ export const actionAlignTop = register({
         position: "start",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -90,6 +93,8 @@ export const actionAlignTop = register({
 
 export const actionAlignBottom = register({
   name: "alignBottom",
+  label: "labels.alignBottom",
+  icon: AlignBottomIcon,
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
@@ -99,7 +104,7 @@ export const actionAlignBottom = register({
         position: "end",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -121,6 +126,8 @@ export const actionAlignBottom = register({
 
 export const actionAlignLeft = register({
   name: "alignLeft",
+  label: "labels.alignLeft",
+  icon: AlignLeftIcon,
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
@@ -130,7 +137,7 @@ export const actionAlignLeft = register({
         position: "start",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -152,6 +159,8 @@ export const actionAlignLeft = register({
 
 export const actionAlignRight = register({
   name: "alignRight",
+  label: "labels.alignRight",
+  icon: AlignRightIcon,
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
@@ -161,7 +170,7 @@ export const actionAlignRight = register({
         position: "end",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -183,6 +192,8 @@ export const actionAlignRight = register({
 
 export const actionAlignVerticallyCentered = register({
   name: "alignVerticallyCentered",
+  label: "labels.centerVertically",
+  icon: CenterVerticallyIcon,
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
@@ -192,7 +203,7 @@ export const actionAlignVerticallyCentered = register({
         position: "center",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (
@@ -210,6 +221,8 @@ export const actionAlignVerticallyCentered = register({
 
 export const actionAlignHorizontallyCentered = register({
   name: "alignHorizontallyCentered",
+  label: "labels.centerHorizontally",
+  icon: CenterHorizontallyIcon,
   trackEvent: { category: "element" },
   predicate: alignActionsPredicate,
   perform: (elements, appState, _, app) => {
@@ -219,7 +232,7 @@ export const actionAlignHorizontallyCentered = register({
         position: "center",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (

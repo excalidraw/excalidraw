@@ -64,12 +64,30 @@
     <!--   to minimize white flash on load when user has dark mode enabled   -->
     <script>
       try {
-        //
-        const theme = window.localStorage.getItem("excalidraw-theme");
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
+        function setTheme(theme) {
+          if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
         }
-      } catch {}
+
+        function getTheme() {
+          const theme = window.localStorage.getItem("excalidraw-theme");
+
+          if (theme && theme === "system") {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          } else {
+            return theme || "light";
+          }
+        }
+
+        setTheme(getTheme());
+      } catch (e) {
+        console.error("Error setting dark mode", e);
+      }
     </script>
     <style>
       html.dark {
@@ -78,7 +96,7 @@
       }
     </style>
     <!------------------------------------------------------------------------->
-    <% if ("%PROD%" === "true") { %>
+    <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -122,7 +140,8 @@
     />
 
     <link rel="stylesheet" href="/fonts/fonts.css" type="text/css" />
-    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%"==="true" ) { %>
+    <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
+    VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
@@ -196,7 +215,6 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
-    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%" !== 'true') { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking
@@ -229,6 +247,5 @@
       }
     </script>
     <!-- end LEGACY GOOGLE ANALYTICS -->
-    <% } %>
   </body>
 </html>

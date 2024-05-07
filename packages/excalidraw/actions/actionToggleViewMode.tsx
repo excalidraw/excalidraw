@@ -1,8 +1,13 @@
+import { eyeIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
+import { StoreAction } from "../store";
 import { register } from "./register";
 
 export const actionToggleViewMode = register({
   name: "viewMode",
+  label: "labels.viewMode",
+  paletteName: "Toggle view mode",
+  icon: eyeIcon,
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -14,14 +19,13 @@ export const actionToggleViewMode = register({
         ...appState,
         viewModeEnabled: !this.checked!(appState),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.viewModeEnabled,
   predicate: (elements, appState, appProps) => {
     return typeof appProps.viewModeEnabled === "undefined";
   },
-  contextItemLabel: "labels.viewMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,
 });

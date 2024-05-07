@@ -7,6 +7,8 @@ import {
   useAppProps,
 } from "../App";
 import {
+  boltIcon,
+  DeviceDesktopIcon,
   ExportIcon,
   ExportImageIcon,
   HelpIcon,
@@ -27,8 +29,6 @@ import {
   actionShortcuts,
   actionToggleTheme,
 } from "../../actions";
-
-import "./DefaultItems.scss";
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -36,6 +36,12 @@ import { jotaiScope } from "../../jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
+import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
+import { THEME } from "../../constants";
+import type { Theme } from "../../element/types";
+import { trackEvent } from "../../analytics";
+
+import "./DefaultItems.scss";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -117,6 +123,28 @@ export const SaveAsImage = () => {
 };
 SaveAsImage.displayName = "SaveAsImage";
 
+export const CommandPalette = (opts?: { className?: string }) => {
+  const setAppState = useExcalidrawSetAppState();
+  const { t } = useI18n();
+
+  return (
+    <DropdownMenuItem
+      icon={boltIcon}
+      data-testid="command-palette-button"
+      onSelect={() => {
+        trackEvent("command_palette", "open", "menu");
+        setAppState({ openDialog: { name: "commandPalette" } });
+      }}
+      shortcut={getShortcutFromShortcutName("commandPalette")}
+      aria-label={t("commandPalette.title")}
+      className={opts?.className}
+    >
+      {t("commandPalette.title")}
+    </DropdownMenuItem>
+  );
+};
+CommandPalette.displayName = "CommandPalette";
+
 export const Help = () => {
   const { t } = useI18n();
 
@@ -162,13 +190,54 @@ export const ClearCanvas = () => {
 };
 ClearCanvas.displayName = "ClearCanvas";
 
-export const ToggleTheme = () => {
+export const ToggleTheme = (
+  props:
+    | {
+        allowSystemTheme: true;
+        theme: Theme | "system";
+        onSelect: (theme: Theme | "system") => void;
+      }
+    | {
+        allowSystemTheme?: false;
+        onSelect?: (theme: Theme) => void;
+      },
+) => {
   const { t } = useI18n();
   const appState = useUIAppState();
   const actionManager = useExcalidrawActionManager();
+  const shortcut = getShortcutFromShortcutName("toggleTheme");
 
   if (!actionManager.isActionEnabled(actionToggleTheme)) {
     return null;
+  }
+
+  if (props?.allowSystemTheme) {
+    return (
+      <DropdownMenuItemContentRadio
+        name="theme"
+        value={props.theme}
+        onChange={(value: Theme | "system") => props.onSelect(value)}
+        choices={[
+          {
+            value: THEME.LIGHT,
+            label: SunIcon,
+            ariaLabel: `${t("buttons.lightMode")} - ${shortcut}`,
+          },
+          {
+            value: THEME.DARK,
+            label: MoonIcon,
+            ariaLabel: `${t("buttons.darkMode")} - ${shortcut}`,
+          },
+          {
+            value: "system",
+            label: DeviceDesktopIcon,
+            ariaLabel: t("buttons.systemMode"),
+          },
+        ]}
+      >
+        {t("labels.theme")}
+      </DropdownMenuItemContentRadio>
+    );
   }
 
   return (
@@ -176,18 +245,25 @@ export const ToggleTheme = () => {
       onSelect={(event) => {
         // do not close the menu when changing theme
         event.preventDefault();
-        return actionManager.executeAction(actionToggleTheme);
+
+        if (props?.onSelect) {
+          props.onSelect(
+            appState.theme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
+          );
+        } else {
+          return actionManager.executeAction(actionToggleTheme);
+        }
       }}
-      icon={appState.theme === "dark" ? SunIcon : MoonIcon}
+      icon={appState.theme === THEME.DARK ? SunIcon : MoonIcon}
       data-testid="toggle-dark-mode"
-      shortcut={getShortcutFromShortcutName("toggleTheme")}
+      shortcut={shortcut}
       aria-label={
-        appState.theme === "dark"
+        appState.theme === THEME.DARK
           ? t("buttons.lightMode")
           : t("buttons.darkMode")
       }
     >
-      {appState.theme === "dark"
+      {appState.theme === THEME.DARK
         ? t("buttons.lightMode")
         : t("buttons.darkMode")}
     </DropdownMenuItem>
