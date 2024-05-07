@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "선 수정하기",
-      "exit": "선 편집기 종료"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "잠금",
