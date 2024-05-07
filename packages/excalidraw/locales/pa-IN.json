@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "ਪੰਕਤੀ ਸੋਧੋ",
-      "exit": "ਪੰਕਤੀ ਸੋਧਕ 'ਤੋਂ ਬਾਹਰ ਨਿਕਲੋ"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "ਲਾਕ ਕਰੋ",
