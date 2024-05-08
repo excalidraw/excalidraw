@@ -1,18 +1,14 @@
 import { ENV } from "./constants";
+import type { BindableProp, BindingProp } from "./element/binding";
 import {
   BoundElement,
   BindableElement,
-  BindableProp,
-  BindingProp,
   bindingProperties,
   updateBoundElements,
 } from "./element/binding";
 import { LinearElementEditor } from "./element/linearElementEditor";
-import {
-  ElementUpdate,
-  mutateElement,
-  newElementWith,
-} from "./element/mutateElement";
+import type { ElementUpdate } from "./element/mutateElement";
+import { mutateElement, newElementWith } from "./element/mutateElement";
 import {
   getBoundTextElementId,
   redrawTextBoundingBox,
@@ -23,7 +19,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -34,13 +30,13 @@ import {
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
 import { getObservedAppState } from "./store";
-import {
+import type {
   AppState,
   ObservedAppState,
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import { SubtypeOf, ValueOf } from "./utility-types";
+import type { SubtypeOf, ValueOf } from "./utility-types";
 import {
   arrayToMap,
   arrayToObject,

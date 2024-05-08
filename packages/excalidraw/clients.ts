@@ -5,13 +5,13 @@ import {
   THEME,
 } from "./constants";
 import { roundRect } from "./renderer/roundRect";
-import { InteractiveCanvasRenderConfig } from "./scene/types";
-import {
+import type { InteractiveCanvasRenderConfig } from "./scene/types";
+import type {
   Collaborator,
   InteractiveCanvasAppState,
   SocketId,
-  UserIdleState,
 } from "./types";
+import { UserIdleState } from "./types";
 
 function hashToInteger(id: string) {
   let hash = 0;

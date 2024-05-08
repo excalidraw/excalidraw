@@ -1,5 +1,5 @@
 import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawElementType,
@@ -21,16 +21,16 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MaybeTransformHandleType } from "./transformHandles";
+import type { MaybeTransformHandleType } from "./transformHandles";
 import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./containerCache";
-import { ExtractSetType, MakeBrand } from "../utility-types";
+import type { ExtractSetType, MakeBrand } from "../utility-types";
 
 export const normalizeText = (text: string) => {
   return (

@@ -12,8 +12,8 @@ import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
 import { useStable } from "../hooks/useStable";
 
 import "./EyeDropper.scss";
-import { ColorPickerType } from "./ColorPicker/colorPickerUtils";
-import { ExcalidrawElement } from "../element/types";
+import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
+import type { ExcalidrawElement } from "../element/types";
 
 export type EyeDropperProperties = {
   keepOpenOnAlt: boolean;

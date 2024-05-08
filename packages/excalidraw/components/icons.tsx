@@ -10,7 +10,7 @@ import React from "react";
 
 import oc from "open-color";
 import clsx from "clsx";
-import { Theme } from "../element/types";
+import type { Theme } from "../element/types";
 import { THEME } from "../constants";
 
 export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";

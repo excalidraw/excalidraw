@@ -1,16 +1,16 @@
 import { isElementInViewport } from "../element/sizeHelpers";
 import { isImageElement } from "../element/typeChecks";
-import {
+import type {
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { memoize, toBrandedType } from "../utils";
-import Scene from "./Scene";
-import { RenderableElementsMap } from "./types";
+import type Scene from "./Scene";
+import type { RenderableElementsMap } from "./types";
 
 export class Renderer {
   private scene: Scene;
