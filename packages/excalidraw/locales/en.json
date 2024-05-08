@@ -148,7 +148,8 @@
     "discordChat": "Discord chat",
     "zoomToFitViewport": "Zoom to fit in viewport",
     "zoomToFitSelection": "Zoom to fit selection",
-    "zoomToFit": "Zoom to fit all elements"
+    "zoomToFit": "Zoom to fit all elements",
+    "installPWA": "Install Excalidraw locally (PWA)"
   },
   "library": {
     "noItems": "No items added yet...",
