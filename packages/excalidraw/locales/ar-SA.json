@@ -148,7 +148,8 @@
     "discordChat": "دردشة ديسكورد",
     "zoomToFitViewport": "التكبير لتناسب العرض",
     "zoomToFitSelection": "تكبير للعنصر المحدد",
-    "zoomToFit": "تكبير لتلائم جميع العناصر"
+    "zoomToFit": "تكبير لتلائم جميع العناصر",
+    "installPWA": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
