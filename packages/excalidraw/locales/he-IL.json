@@ -148,7 +148,8 @@
     "discordChat": "צ׳אט ב־Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
