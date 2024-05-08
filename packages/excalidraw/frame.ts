@@ -3,7 +3,7 @@ import {
   getElementAbsoluteCoords,
   isTextElement,
 } from "./element";
-import {
+import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
@@ -18,14 +18,18 @@ import {
 } from "./element/textElement";
 import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
+import type {
+  AppClassProperties,
+  AppState,
+  StaticCanvasAppState,
+} from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
 import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
-import { ReadonlySetLike } from "./utility-types";
+import type { ReadonlySetLike } from "./utility-types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Trail } from "../animated-trail";
+import type { Trail } from "../animated-trail";
 
 import "./SVGLayer.scss";
 

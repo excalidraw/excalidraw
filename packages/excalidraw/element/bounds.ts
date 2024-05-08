@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   Arrowhead,
@@ -9,8 +9,8 @@ import {
 } from "./types";
 import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
-import { Drawable, Op } from "roughjs/bin/core";
-import { AppState, Point } from "../types";
+import type { Drawable, Op } from "roughjs/bin/core";
+import type { AppState, Point } from "../types";
 import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
@@ -22,7 +22,7 @@ import {
 import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { Mutable } from "../utility-types";
+import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import { arrayToMap } from "../utils";
 

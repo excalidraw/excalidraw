@@ -2,10 +2,11 @@ import { useCallback, useState } from "react";
 import { t } from "../i18n";
 import Trans from "./Trans";
 import { jotaiScope } from "../jotai";
-import { LibraryItem, LibraryItems, UIAppState } from "../types";
+import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { saveLibraryAsJSON } from "../data/json";
-import Library, { libraryItemsAtom } from "../data/library";
+import type Library from "../data/library";
+import { libraryItemsAtom } from "../data/library";
 import {
   DotsIcon,
   ExportIcon,

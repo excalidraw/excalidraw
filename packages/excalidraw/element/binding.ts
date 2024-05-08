@@ -4,7 +4,7 @@ import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
 import * as GATransform from "../gatransforms";
 
-import {
+import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
@@ -25,7 +25,7 @@ import {
 } from "./types";
 
 import { getElementAbsoluteCoords } from "./bounds";
-import { AppClassProperties, AppState, Point } from "../types";
+import type { AppClassProperties, AppState, Point } from "../types";
 import { isPointOnShape } from "../../utils/collision";
 import { getElementAtPosition } from "../scene";
 import {
@@ -36,7 +36,8 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { ElementUpdate, mutateElement } from "./mutateElement";
+import type { ElementUpdate } from "./mutateElement";
+import { mutateElement } from "./mutateElement";
 import Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";

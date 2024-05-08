@@ -1,6 +1,6 @@
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
-import { ElementsMap, NonDeletedExcalidrawElement } from "./types";
+import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
 import { getElementAbsoluteCoords } from ".";
 import { useExcalidrawAppState } from "../components/App";
 

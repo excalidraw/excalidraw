@@ -1,7 +1,7 @@
-import { OrderedExcalidrawElement } from "../element/types";
+import type { OrderedExcalidrawElement } from "../element/types";
 import { orderByFractionalIndex, syncInvalidIndices } from "../fractionalIndex";
-import { AppState } from "../types";
-import { MakeBrand } from "../utility-types";
+import type { AppState } from "../types";
+import type { MakeBrand } from "../utility-types";
 import { arrayToMap } from "../utils";
 
 export type ReconciledExcalidrawElement = OrderedExcalidrawElement &

@@ -1,9 +1,10 @@
-import {
+import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { BinaryFiles } from "./types";
-import { tryParseSpreadsheet, Spreadsheet, VALID_SPREADSHEET } from "./charts";
+import type { BinaryFiles } from "./types";
+import type { Spreadsheet } from "./charts";
+import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 import {
   ALLOWED_PASTE_MIME_TYPES,
   EXPORT_DATA_TYPES,

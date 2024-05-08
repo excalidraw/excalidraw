@@ -23,14 +23,14 @@ import {
   isTextBindableContainer,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { AppState } from "../types";
-import { Mutable } from "../utility-types";
+import type { AppState } from "../types";
+import type { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";

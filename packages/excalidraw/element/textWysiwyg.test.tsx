@@ -11,7 +11,7 @@ import {
 import { queryByText } from "@testing-library/react";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
-import {
+import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";

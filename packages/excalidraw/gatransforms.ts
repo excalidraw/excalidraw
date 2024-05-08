@@ -1,5 +1,5 @@
 import * as GA from "./ga";
-import { Line, Direction, Point, Transform } from "./ga";
+import type { Line, Direction, Point, Transform } from "./ga";
 import * as GADirection from "./gadirections";
 
 /**

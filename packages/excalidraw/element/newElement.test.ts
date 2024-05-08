@@ -3,7 +3,7 @@ import { mutateElement } from "./mutateElement";
 import { API } from "../tests/helpers/api";
 import { FONT_FAMILY, ROUNDNESS } from "../constants";
 import { isPrimitive } from "../utils";
-import { ExcalidrawLinearElement } from "./types";
+import type { ExcalidrawLinearElement } from "./types";
 
 const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {

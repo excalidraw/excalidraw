@@ -1,5 +1,5 @@
 import React from "react";
-import {
+import type {
   Action,
   UpdaterFn,
   ActionName,
@@ -7,8 +7,11 @@ import {
   PanelComponentProps,
   ActionSource,
 } from "./types";
-import { ExcalidrawElement, OrderedExcalidrawElement } from "../element/types";
-import { AppClassProperties, AppState } from "../types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
+import type { AppClassProperties, AppState } from "../types";
 import { trackEvent } from "../analytics";
 import { isPromiseLike } from "../utils";
 

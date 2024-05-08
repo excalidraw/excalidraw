@@ -1,5 +1,5 @@
 import { arrayToMapWithIndex } from "../utils";
-import { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement } from "./types";
 
 const normalizeGroupElementOrder = (elements: readonly ExcalidrawElement[]) => {
   const origElements: ExcalidrawElement[] = elements.slice();

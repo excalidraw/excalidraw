@@ -16,7 +16,7 @@ import * as StaticScene from "../renderer/staticScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
-import { ShortcutName } from "../actions/shortcuts";
+import type { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";

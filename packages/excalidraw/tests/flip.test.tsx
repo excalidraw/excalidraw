@@ -10,7 +10,7 @@ import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { getElementAbsoluteCoords } from "../element";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
@@ -20,7 +20,7 @@ import {
 import { newLinearElement } from "../element";
 import { Excalidraw } from "../index";
 import { mutateElement } from "../element/mutateElement";
-import { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
 import { vi } from "vitest";
 import * as blob from "../data/blob";

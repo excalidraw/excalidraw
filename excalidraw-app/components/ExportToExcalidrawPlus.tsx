@@ -3,11 +3,11 @@ import { Card } from "../../packages/excalidraw/components/Card";
 import { ToolButton } from "../../packages/excalidraw/components/ToolButton";
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
-import {
+import type {
   FileId,
   NonDeletedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
-import {
+import type {
   AppState,
   BinaryFileData,
   BinaryFiles,

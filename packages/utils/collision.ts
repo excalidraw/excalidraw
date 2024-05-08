@@ -1,4 +1,4 @@
-import { Point, Polygon, GeometricShape } from "./geometry/shape";
+import type { Point, Polygon, GeometricShape } from "./geometry/shape";
 import {
   pointInEllipse,
   pointInPolygon,

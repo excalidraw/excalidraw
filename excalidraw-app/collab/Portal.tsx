@@ -1,15 +1,15 @@
-import {
-  isSyncableElement,
+import type {
   SocketUpdateData,
   SocketUpdateDataSource,
   SyncableExcalidrawElement,
 } from "../data";
+import { isSyncableElement } from "../data";
 
-import { TCollabClass } from "./Collab";
+import type { TCollabClass } from "./Collab";
 
-import { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
+import type { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
 import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
-import {
+import type {
   OnUserFollowedPayload,
   SocketId,
   UserIdleState,

@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
@@ -21,14 +21,14 @@ import {
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
-import {
+import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
 import { getCornerRadius, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
-import {
+import type {
   AppState,
   StaticCanvasAppState,
   Zoom,
@@ -43,7 +43,8 @@ import {
   MIME_TYPES,
   THEME,
 } from "../constants";
-import { getStroke, StrokeOptions } from "perfect-freehand";
+import type { StrokeOptions } from "perfect-freehand";
+import { getStroke } from "perfect-freehand";
 import {
   getBoundTextElement,
   getContainerCoords,

@@ -1,6 +1,6 @@
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import { GoToCollaboratorComponentProps } from "../components/UserList";
+import type { GoToCollaboratorComponentProps } from "../components/UserList";
 import {
   eyeIcon,
   microphoneIcon,
@@ -8,7 +8,7 @@ import {
 } from "../components/icons";
 import { t } from "../i18n";
 import { StoreAction } from "../store";
-import { Collaborator } from "../types";
+import type { Collaborator } from "../types";
 import { register } from "./register";
 import clsx from "clsx";
 

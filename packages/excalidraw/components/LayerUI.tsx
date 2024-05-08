@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../actions/manager";
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
@@ -8,10 +8,11 @@ import {
   TOOL_TYPE,
 } from "../constants";
 import { showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { Language, t } from "../i18n";
+import type { NonDeletedExcalidrawElement } from "../element/types";
+import type { Language } from "../i18n";
+import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import {
+import type {
   AppProps,
   AppState,
   ExcalidrawProps,

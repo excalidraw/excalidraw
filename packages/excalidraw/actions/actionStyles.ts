@@ -24,7 +24,7 @@ import {
   isArrowElement,
 } from "../element/typeChecks";
 import { getSelectedElements } from "../scene";
-import { ExcalidrawTextElement } from "../element/types";
+import type { ExcalidrawTextElement } from "../element/types";
 import { paintIcon } from "../components/icons";
 import { StoreAction } from "../store";
 

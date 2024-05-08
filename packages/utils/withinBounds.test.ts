@@ -1,4 +1,4 @@
-import { Bounds } from "../excalidraw/element/bounds";
+import type { Bounds } from "../excalidraw/element/bounds";
 import { API } from "../excalidraw/tests/helpers/api";
 import {
   elementPartiallyOverlapsWithOrContainsBBox,

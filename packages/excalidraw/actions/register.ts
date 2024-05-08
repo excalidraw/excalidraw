@@ -1,4 +1,4 @@
-import { Action } from "./types";
+import type { Action } from "./types";
 
 export let actions: readonly Action[] = [];
 

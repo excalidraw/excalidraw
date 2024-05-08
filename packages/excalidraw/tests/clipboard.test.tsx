@@ -9,7 +9,7 @@ import {
   getLineHeightInPx,
 } from "../element/textElement";
 import { getElementBounds } from "../element";
-import { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 import { arrayToMap } from "../utils";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { t } from "../../i18n";
 
-import { ExcalidrawElement } from "../../element/types";
+import type { ExcalidrawElement } from "../../element/types";
 import { ShadeList } from "./ShadeList";
 
 import PickerColorList from "./PickerColorList";
@@ -9,15 +9,15 @@ import { useAtom } from "jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
+import type { ColorPickerType } from "./colorPickerUtils";
 import {
-  ColorPickerType,
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromColor,
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
+import type { ColorPaletteCustom } from "../../colors";
 import {
-  ColorPaletteCustom,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "../../colors";

@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawElementType,
   ExcalidrawSelectionElement,
@@ -8,13 +8,13 @@ import {
   PointBinding,
   StrokeRoundness,
 } from "../element/types";
-import {
+import type {
   AppState,
   BinaryFiles,
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
-import { ImportedDataState, LegacyAppState } from "./types";
+import type { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
@@ -37,7 +37,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { MarkOptional, Mutable } from "../utility-types";
+import type { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getContainerElement,

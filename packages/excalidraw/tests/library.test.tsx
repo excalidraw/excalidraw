@@ -5,11 +5,11 @@ import { queryByTestId } from "@testing-library/react";
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
-import { LibraryItem, LibraryItems } from "../types";
+import type { LibraryItem, LibraryItems } from "../types";
 import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { ExcalidrawGenericElement } from "../element/types";
+import type { ExcalidrawGenericElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { parseLibraryJSON } from "../data/blob";
 

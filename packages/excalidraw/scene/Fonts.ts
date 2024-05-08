@@ -2,7 +2,10 @@ import { isTextElement, refreshTextDimensions } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { getContainerElement } from "../element/textElement";
 import { isBoundToContainer } from "../element/typeChecks";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "../element/types";
 import { getFontString } from "../utils";
 import type Scene from "./Scene";
 import { ShapeCache } from "./ShapeCache";

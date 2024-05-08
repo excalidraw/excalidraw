@@ -1,4 +1,4 @@
-import { ExcalidrawProps, UIAppState } from "../types";
+import type { ExcalidrawProps, UIAppState } from "../types";
 import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 import clsx from "clsx";
 

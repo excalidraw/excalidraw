@@ -13,13 +13,13 @@ import {
 } from "../element/typeChecks";
 import { renderElement } from "../renderer/renderElement";
 import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import { StaticCanvasAppState, Zoom } from "../types";
-import {
+import type { StaticCanvasAppState, Zoom } from "../types";
+import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import {
+import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";

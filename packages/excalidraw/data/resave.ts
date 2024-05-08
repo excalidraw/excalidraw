@@ -1,5 +1,5 @@
-import { ExcalidrawElement } from "../element/types";
-import { AppState, BinaryFiles } from "../types";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppState, BinaryFiles } from "../types";
 import { exportCanvas, prepareElementsForExport } from ".";
 import { getFileHandleType, isImageFileHandleType } from "./blob";
 

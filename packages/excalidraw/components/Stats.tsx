@@ -1,9 +1,9 @@
 import React from "react";
 import { getCommonBounds } from "../element/bounds";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import type { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { getTargetElements } from "../scene";
-import { ExcalidrawProps, UIAppState } from "../types";
+import type { ExcalidrawProps, UIAppState } from "../types";
 import { CloseIcon } from "./icons";
 import { Island } from "./Island";
 import "./Stats.scss";

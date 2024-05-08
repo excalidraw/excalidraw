@@ -1,7 +1,7 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import { GRID_SIZE } from "../constants";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { gridIcon } from "../components/icons";
 import { StoreAction } from "../store";
 

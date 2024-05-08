@@ -1,7 +1,7 @@
 import { LockedIcon, UnlockedIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameLikeElement } from "../element/typeChecks";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { StoreAction } from "../store";

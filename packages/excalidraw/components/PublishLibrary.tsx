@@ -1,11 +1,12 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import OpenColor from "open-color";
 
 import { Dialog } from "./Dialog";
 import { t } from "../i18n";
 import Trans from "./Trans";
 
-import { LibraryItems, LibraryItem, UIAppState } from "../types";
+import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 import { exportToCanvas, exportToSvg } from "../../utils/export";
 import {
   EDITOR_LS_KEYS,
@@ -14,7 +15,7 @@ import {
   MIME_TYPES,
   VERSIONS,
 } from "../constants";
-import { ExportedLibraryData } from "../data/types";
+import type { ExportedLibraryData } from "../data/types";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { chunk } from "../utils";
 import DialogActionButton from "./DialogActionButton";

@@ -1,5 +1,5 @@
 import { queries, buildQueries } from "@testing-library/react";
-import { ToolType } from "../../types";
+import type { ToolType } from "../../types";
 import { TOOL_TYPE } from "../../constants";
 
 const _getAllByToolName = (container: HTMLElement, tool: ToolType | "lock") => {

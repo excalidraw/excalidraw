@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
@@ -12,9 +12,9 @@ import {
   getSelectedGroupForElement,
   getElementsInGroup,
 } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
-import { ActionResult } from "./types";
+import type { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,

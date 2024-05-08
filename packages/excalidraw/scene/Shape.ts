@@ -21,7 +21,7 @@ import {
   isLinearElement,
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
-import { EmbedsValidationStatus } from "../types";
+import type { EmbedsValidationStatus } from "../types";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 

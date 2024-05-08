@@ -2,10 +2,10 @@ import "./UserList.scss";
 
 import React, { useLayoutEffect } from "react";
 import clsx from "clsx";
-import { Collaborator, SocketId } from "../types";
+import type { Collaborator, SocketId } from "../types";
 import { Tooltip } from "./Tooltip";
 import { useExcalidrawActionManager } from "./App";
-import { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../actions/manager";
 
 import * as Popover from "@radix-ui/react-popover";
 import { Island } from "./Island";
@@ -13,7 +13,7 @@ import { searchIcon } from "./icons";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
 import { supportsResizeObserver } from "../constants";
-import { MarkRequired } from "../utility-types";
+import type { MarkRequired } from "../utility-types";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

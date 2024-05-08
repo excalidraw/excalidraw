@@ -1,5 +1,6 @@
 import { t } from "../i18n";
-import { Dialog, DialogProps } from "./Dialog";
+import type { DialogProps } from "./Dialog";
+import { Dialog } from "./Dialog";
 
 import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";

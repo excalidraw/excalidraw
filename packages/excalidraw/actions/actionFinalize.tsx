@@ -13,7 +13,7 @@ import {
   bindOrUnbindLinearElement,
 } from "../element/binding";
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
 

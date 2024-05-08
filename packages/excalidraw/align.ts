@@ -1,6 +1,7 @@
-import { ElementsMap, ExcalidrawElement } from "./element/types";
+import type { ElementsMap, ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
-import { BoundingBox, getCommonBoundingBox } from "./element/bounds";
+import type { BoundingBox } from "./element/bounds";
+import { getCommonBoundingBox } from "./element/bounds";
 import { getMaximumGroups } from "./groups";
 
 export interface Alignment {

@@ -11,8 +11,8 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { bindLinearElement } from "../element/binding";
+import type { ElementConstructorOpts } from "../element/newElement";
 import {
-  ElementConstructorOpts,
   newFrameElement,
   newImageElement,
   newMagicFrameElement,
@@ -23,7 +23,7 @@ import {
   measureText,
   normalizeText,
 } from "../element/textElement";
-import {
+import type {
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
@@ -43,7 +43,7 @@ import {
   TextAlign,
   VerticalAlign,
 } from "../element/types";
-import { MarkOptional } from "../utility-types";
+import type { MarkOptional } from "../utility-types";
 import {
   arrayToMap,
   assertNever,

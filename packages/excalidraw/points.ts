@@ -1,4 +1,4 @@
-import { Point } from "./types";
+import type { Point } from "./types";
 
 export const getSizeFromPoints = (points: readonly Point[]) => {
   const xs = points.map((point) => point[0]);

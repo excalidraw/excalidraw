@@ -1,16 +1,15 @@
 import { isInteractive, isTransparent, isWritableElement } from "../../utils";
-import { ExcalidrawElement } from "../../element/types";
-import { AppState } from "../../types";
+import type { ExcalidrawElement } from "../../element/types";
+import type { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";
 import { Picker } from "./Picker";
 import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
-import {
-  activeColorPickerSectionAtom,
-  ColorPickerType,
-} from "./colorPickerUtils";
+import type { ColorPickerType } from "./colorPickerUtils";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { useDevice, useExcalidrawContainer } from "../App";
-import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
+import type { ColorTuple, ColorPaletteCustom } from "../../colors";
+import { COLOR_PALETTE } from "../../colors";
 import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
 import clsx from "clsx";

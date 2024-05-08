@@ -3,9 +3,9 @@ import { AppStateChange, ElementsChange } from "./change";
 import { ENV } from "./constants";
 import { newElementWith } from "./element/mutateElement";
 import { deepCopyElement } from "./element/newElement";
-import { OrderedExcalidrawElement } from "./element/types";
+import type { OrderedExcalidrawElement } from "./element/types";
 import { Emitter } from "./emitter";
-import { AppState, ObservedAppState } from "./types";
+import type { AppState, ObservedAppState } from "./types";
 import { isShallowEqual } from "./utils";
 
 // hidden non-enumerable property for runtime checks

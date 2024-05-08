@@ -1,5 +1,5 @@
-import { AppState, PointerCoords, Zoom } from "../types";
-import { ExcalidrawElement } from "../element/types";
+import type { AppState, PointerCoords, Zoom } from "../types";
+import type { ExcalidrawElement } from "../element/types";
 import {
   getCommonBounds,
   getClosestElementBounds,

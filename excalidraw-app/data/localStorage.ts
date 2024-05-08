@@ -1,5 +1,5 @@
-import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
-import { AppState } from "../../packages/excalidraw/types";
+import type { ExcalidrawElement } from "../../packages/excalidraw/element/types";
+import type { AppState } from "../../packages/excalidraw/types";
 import {
   clearAppStateForLocalStorage,
   getDefaultAppState,

@@ -1,6 +1,6 @@
-import { ActionManager } from "../../actions/manager";
-import { Action } from "../../actions/types";
-import { UIAppState } from "../../types";
+import type { ActionManager } from "../../actions/manager";
+import type { Action } from "../../actions/types";
+import type { UIAppState } from "../../types";
 
 export type CommandPaletteItem = {
   label: string;

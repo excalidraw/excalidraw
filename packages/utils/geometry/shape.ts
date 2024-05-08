@@ -13,7 +13,7 @@
  */
 
 import { getElementAbsoluteCoords } from "../../excalidraw/element";
-import {
+import type {
   ElementsMap,
   ExcalidrawDiamondElement,
   ExcalidrawElement,

@@ -5,7 +5,7 @@ import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { Pointer, UI } from "./helpers/ui";
-import { ExcalidrawTextElement } from "../element/types";
+import type { ExcalidrawTextElement } from "../element/types";
 
 const { h } = window;
 

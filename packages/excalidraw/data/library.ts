@@ -1,5 +1,5 @@
 import { loadLibraryFromBlob } from "./blob";
-import {
+import type {
   LibraryItems,
   LibraryItem,
   ExcalidrawImperativeAPI,
@@ -10,7 +10,7 @@ import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { AbortError } from "../errors";
 import { t } from "../i18n";
@@ -31,7 +31,7 @@ import {
   promiseTry,
   resolvablePromise,
 } from "../utils";
-import { MaybePromise } from "../utility-types";
+import type { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 import { Queue } from "../queue";
 import { hashElementsVersion, hashString } from "../element";

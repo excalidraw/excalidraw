@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../../element/types";
+import type { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
   id: "vWrqOAfkind2qcm7LDAGZ",

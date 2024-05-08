@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
@@ -10,11 +10,11 @@ import {
   Ordered,
 } from "../element/types";
 import { isNonDeletedElement } from "../element";
-import { LinearElementEditor } from "../element/linearElementEditor";
+import type { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { getSelectedElements } from "./selection";
-import { AppState } from "../types";
-import { Assert, SameType } from "../utility-types";
+import type { AppState } from "../types";
+import type { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
 import {
   syncInvalidIndices,

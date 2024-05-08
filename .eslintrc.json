@@ -2,6 +2,7 @@
   "extends": ["@excalidraw/eslint-config", "react-app"],
   "rules": {
     "import/no-anonymous-default-export": "off",
-    "no-restricted-globals": "off"
+    "no-restricted-globals": "off",
+    "@typescript-eslint/consistent-type-imports": ["error", { "prefer": "type-imports", "disallowTypeAnnotations": false, "fixStyle": "separate-type-imports" }]
   }
 }

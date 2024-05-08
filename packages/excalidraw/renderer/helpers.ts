@@ -1,6 +1,6 @@
-import { StaticCanvasAppState, AppState } from "../types";
+import type { StaticCanvasAppState, AppState } from "../types";
 
-import { StaticCanvasRenderConfig } from "../scene/types";
+import type { StaticCanvasRenderConfig } from "../scene/types";
 
 import { THEME, THEME_FILTER } from "../constants";
 

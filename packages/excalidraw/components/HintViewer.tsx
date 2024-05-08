@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { AppClassProperties, Device, UIAppState } from "../types";
+import type { AppClassProperties, Device, UIAppState } from "../types";
 import {
   isImageElement,
   isLinearElement,

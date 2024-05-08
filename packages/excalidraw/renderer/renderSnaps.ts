@@ -1,6 +1,6 @@
 import { THEME } from "../constants";
-import { PointSnapLine, PointerSnapLine } from "../snapping";
-import { InteractiveCanvasAppState, Point } from "../types";
+import type { PointSnapLine, PointerSnapLine } from "../snapping";
+import type { InteractiveCanvasAppState, Point } from "../types";
 
 const SNAP_COLOR_LIGHT = "#ff6b6b";
 const SNAP_COLOR_DARK = "#ff0000";

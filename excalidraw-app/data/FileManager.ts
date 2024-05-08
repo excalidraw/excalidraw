@@ -2,14 +2,14 @@ import { StoreAction } from "../../packages/excalidraw";
 import { compressData } from "../../packages/excalidraw/data/encode";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   FileId,
   InitializedExcalidrawImageElement,
 } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
-import {
+import type {
   BinaryFileData,
   BinaryFileMetadata,
   ExcalidrawImperativeAPI,

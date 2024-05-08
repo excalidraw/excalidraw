@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ActionManager } from "../actions/manager";
-import {
+import type { ActionManager } from "../actions/manager";
+import type {
   ExcalidrawElement,
   ExcalidrawElementType,
   NonDeletedElementsMap,
@@ -17,7 +17,7 @@ import {
   hasStrokeWidth,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";

@@ -1,9 +1,9 @@
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
-import { AppClassProperties, AppState, UIAppState } from "../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { register } from "./register";

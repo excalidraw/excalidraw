@@ -10,12 +10,12 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
 } from "../../element/types";
+import type { TransformHandleType } from "../../element/transformHandles";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
   OMIT_SIDES_FOR_FRAME,
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  TransformHandleType,
   type TransformHandle,
   type TransformHandleDirection,
 } from "../../element/transformHandles";

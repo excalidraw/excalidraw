@@ -8,11 +8,11 @@ import {
   VERSIONS,
 } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
-import { AppState, BinaryFiles, LibraryItems } from "../types";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
-import {
+import type {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,

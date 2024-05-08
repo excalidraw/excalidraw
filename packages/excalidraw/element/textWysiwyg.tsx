@@ -12,13 +12,13 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { CLASSES } from "../constants";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
 } from "./types";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
@@ -39,7 +39,7 @@ import {
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
-import App from "../components/App";
+import type App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 import {

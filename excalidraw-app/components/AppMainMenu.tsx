@@ -3,7 +3,7 @@ import {
   loginIcon,
   ExcalLogo,
 } from "../../packages/excalidraw/components/icons";
-import { Theme } from "../../packages/excalidraw/element/types";
+import type { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "./LanguageList";

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Button } from "../Button";
 import clsx from "clsx";
 import Spinner from "../Spinner";
