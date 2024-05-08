@@ -148,7 +148,8 @@
     "discordChat": "Chat Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
