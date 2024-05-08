@@ -16,10 +16,11 @@
   "scripts": {
     "clean": "rimraf node_modules",
     "build:esm": "yarn workspace @excalidraw/excalidraw run build:esm",
-    "start": "run-s build:esm vite",
     "vite": "vite",
+    "vite:build": "vite build",
     "vite:preview": "vite preview --port 5002",
-    "build": "run-s build:esm vite build",
+    "start": "run-s build:esm vite",
+    "build": "run-s build:esm vite:build",
     "build:preview": "run-s build vite:preview"
   }
 }
