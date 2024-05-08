@@ -148,7 +148,8 @@
     "discordChat": "",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "추가된 아이템 없음",
