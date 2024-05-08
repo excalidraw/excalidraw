@@ -148,7 +148,8 @@
     "discordChat": "",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
