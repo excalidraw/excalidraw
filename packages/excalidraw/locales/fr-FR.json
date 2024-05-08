@@ -148,7 +148,8 @@
     "discordChat": "Salon Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
