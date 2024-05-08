@@ -148,7 +148,8 @@
     "discordChat": "Chat di Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
