@@ -148,7 +148,8 @@
     "discordChat": "Xat de Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "Zoom per veure la selecció",
-    "zoomToFit": "Zoom per veure tots els elements"
+    "zoomToFit": "Zoom per veure tots els elements",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
