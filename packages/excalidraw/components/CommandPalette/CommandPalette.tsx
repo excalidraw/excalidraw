@@ -540,7 +540,7 @@ function CommandPaletteInner({
           ...command,
           icon: command.icon || boltIcon,
           order: command.order ?? getCategoryOrder(command.category),
-          haystack: `${deburr(command.label)} ${
+          haystack: `${deburr(command.label.toLocaleLowerCase())} ${
             command.keywords?.join(" ") || ""
           }`,
         };
@@ -777,7 +777,9 @@ function CommandPaletteInner({
       return;
     }
 
-    const _query = deburr(commandSearch.replace(/[<>-_| ]/g, ""));
+    const _query = deburr(
+      commandSearch.toLocaleLowerCase().replace(/[<>_| -]/g, ""),
+    );
     matchingCommands = fuzzy
       .filter(_query, matchingCommands, {
         extract: (command) => command.haystack,
