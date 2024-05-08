@@ -148,7 +148,8 @@
     "discordChat": "Discord chat",
     "zoomToFitViewport": "Zooma för att passa in i vyn",
     "zoomToFitSelection": "Zooma för att passa urval",
-    "zoomToFit": "Zooma för att rymma alla element"
+    "zoomToFit": "Zooma för att rymma alla element",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
