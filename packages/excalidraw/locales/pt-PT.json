@@ -148,7 +148,8 @@
     "discordChat": "Conversação no Discord",
     "zoomToFitViewport": "Aproximar para enquadrar no cisualizador",
     "zoomToFitSelection": "Aproximar para enquadrar a seleção",
-    "zoomToFit": "Aproximar para enquadrar todos os elementos"
+    "zoomToFit": "Aproximar para enquadrar todos os elementos",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Ainda não foram adicionados itens...",
