@@ -148,7 +148,8 @@
     "discordChat": "Чат в Discord",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "Увеличить до выделенного",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
