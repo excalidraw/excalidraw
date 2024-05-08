@@ -143,9 +143,9 @@
     "removeAllElementsFromFrame": "சட்டகத்திலுள்ள எல்லா உறுப்புகளையும் நீக்கு",
     "eyeDropper": "கித்தானிலிருந்து நிறம் தேர்ந்தெடு",
     "textToDiagram": "உரையிலிருந்து வரைபடம்",
-    "prompt": "",
-    "followUs": "",
-    "discordChat": "",
+    "prompt": "தூண்டுக்குறி",
+    "followUs": "எங்களைப் பின்தொடர்க",
+    "discordChat": "டிஸ்கார்டு அரட்டை",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": ""
@@ -181,7 +181,7 @@
     "fullScreen": "முழுத் திரை",
     "darkMode": "கருமை பயன்முறை",
     "lightMode": "வெளிர்ந்த பயன்முறை",
-    "systemMode": "",
+    "systemMode": "இயங்குதள பயன்முறை",
     "zenMode": "ஜென் பயன்முறை",
     "objectsSnapMode": "பொருட்களுடன் பற்று",
     "exitZenMode": "ஜென் பயன்முறையை விலகு",
@@ -348,8 +348,8 @@
     "doubleClick": "இரு-சொடுக்கு",
     "drag": "பிடித்திழு",
     "editor": "திருத்தி",
-    "editLineArrowPoints": "",
-    "editText": "",
+    "editLineArrowPoints": "வரி/அம்பு புள்ளிகளைத் திருத்து",
+    "editText": "உரையைத் திருத்து / முத்திரையைச் சேர்",
     "github": "சிக்கலைக் கண்டீரா? சமர்ப்பி",
     "howto": "எங்கள் கையேடுகளைப் பின்பற்றுக",
     "or": "அ",
@@ -421,7 +421,7 @@
     "title": {
       "exportToPng": "PNGக்கு ஏற்றுமதிசெய்",
       "exportToSvg": "SVGக்கு ஏற்றுமதிசெய்",
-      "copyPngToClipboard": ""
+      "copyPngToClipboard": "PNGஐ நகலகத்திற்கு நகலெடு"
     },
     "button": {
       "exportToPng": "PNG",
@@ -482,58 +482,58 @@
     "app": {
       "center_heading": "",
       "center_heading_plus": "",
-      "menuHint": ""
+      "menuHint": "விருப்பத்தேர்வுகள், மொழிகள் போன்றனவை ஏற்றுமதிசெய்..."
     },
     "defaults": {
-      "menuHint": "",
+      "menuHint": "விருப்பத்தேர்வுகள் மற்றும் பலவற்றை ஏற்றுமதிசெய்...",
       "center_heading": "எளிமையாக வரைபடங்கள் உருவாக்க!",
       "toolbarHint": "கருவியைத் தேர்ந்தெடு & வரை!",
       "helpHint": "குறுக்குவழிகள் & உதவி"
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "அதகம் பயன்படுத்தப்பட்ட தனிப்பயன் நிறங்கள்",
     "colors": "நிறங்கள்",
-    "shades": "",
-    "hexCode": "",
-    "noShades": ""
+    "shades": "சாயல்கள்",
+    "hexCode": "ஹெக்ஸ் குறியீடு",
+    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "படமாக ஏற்றுமதிசெய்",
+        "button": "படமாக ஏற்றுமதிசெய்",
+        "description": "காட்சித் தரவை நீங்கள் பின்னர் இறக்குமதி செய்யக்கூடிய ஒரு படமாக ஏற்றுமதிசெய்க."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "வட்டில் சேமி",
+        "button": "வட்டில் சேமி",
+        "description": "காட்சித் தரவை நீங்கள் பின்னர் இறக்குமதி செய்யக்கூடிய ஒரு கோப்பிற்கு ஏற்றுமதிசெய்க."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "எக்ஸ்காலிட்ரா+",
+        "button": "எக்ஸ்காலிட்ரா+-க்கு ஏற்றுமதிசெய்",
+        "description": "காட்சியை உன் எக்ஸ்கேலிட்ரா+ பணியிடத்தில் சேமி."
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "கோப்பிலிருந்து ஏற்று",
+        "button": "கோப்பிலிருந்து ஏற்று",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
+        "title": "தொடுப்பிலிருந்து ஏற்று",
+        "button": "எனது உள்ளடக்கத்தை இடங்கொள்",
         "description": ""
       }
     }
   },
   "mermaid": {
-    "title": "",
+    "title": "மெர்மெய்டிலிருந்து எக்ஸ்காலிட்ரா",
     "button": "புகுத்து",
     "description": "",
-    "syntax": "",
+    "syntax": "மெர்மெய்டு தொடரியல்",
     "preview": "முன்னோட்டம்"
   },
   "userList": {
