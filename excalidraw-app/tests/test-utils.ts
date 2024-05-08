@@ -1,4 +1,4 @@
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
+import type { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { STORAGE_KEYS } from "../app_constants";
 
 export const initLocalStorage = (data: ImportedDataState) => {
