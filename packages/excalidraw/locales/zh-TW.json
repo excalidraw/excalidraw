@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "編輯線條",
-      "editArrow": ""
+      "editArrow": "編輯箭頭"
     },
     "elementLock": {
       "lock": "鎖定",
