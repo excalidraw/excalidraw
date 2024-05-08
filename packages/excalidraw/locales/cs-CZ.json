@@ -148,7 +148,8 @@
     "discordChat": "",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
-    "zoomToFit": ""
+    "zoomToFit": "",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
