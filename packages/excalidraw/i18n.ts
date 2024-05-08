@@ -2,7 +2,7 @@ import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
-import { NestedKeyOf } from "./utility-types";
+import type { NestedKeyOf } from "./utility-types";
 
 const COMPLETION_THRESHOLD = 85;
 

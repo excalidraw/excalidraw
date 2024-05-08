@@ -1,4 +1,4 @@
-import { PointerCoords } from "./types";
+import type { PointerCoords } from "./types";
 
 export const getCenter = (pointers: Map<number, PointerCoords>) => {
   const allCoords = Array.from(pointers.values());

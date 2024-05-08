@@ -69,7 +69,6 @@ describe("mathjax loaded", () => {
     const metrics = {
       width: measureTextElement(elements[0]).width + svgDim,
       height: svgDim,
-      baseline: 0,
     };
     expect(measureTextElement(elements[1])).toStrictEqual(metrics);
     expect(measureTextElement(elements[2])).toStrictEqual(metrics);

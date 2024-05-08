@@ -1,17 +1,18 @@
 import { fileOpen, fileSave } from "./filesystem";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import {
+  DEFAULT_FILENAME,
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
 } from "../constants";
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
-import { AppState, BinaryFiles, LibraryItems } from "../types";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
-import {
+import type {
   ExportedDataState,
   ImportedDataState,
   ExportedLibraryData,
@@ -71,6 +72,8 @@ export const saveAsJSON = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
+  /** filename */
+  name: string = appState.name || DEFAULT_FILENAME,
 ) => {
   const serialized = serializeAsJSON(elements, appState, files, "local");
   const blob = new Blob([serialized], {
@@ -78,7 +81,7 @@ export const saveAsJSON = async (
   });
 
   const fileHandle = await fileSave(blob, {
-    name: appState.name,
+    name,
     extension: "excalidraw",
     description: "Excalidraw file",
     fileHandle: isImageFileHandle(appState.fileHandle)

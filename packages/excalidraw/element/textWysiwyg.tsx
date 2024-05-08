@@ -11,14 +11,14 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
-import {
+import { CLASSES } from "../constants";
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
 } from "./types";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
@@ -32,7 +32,6 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
-  detectLineHeight,
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
@@ -41,10 +40,11 @@ import {
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
-import App from "../components/App";
+import type App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
-import { SubtypeMethods, getSubtypeMethods } from "./subtypes";
+import type { SubtypeMethods } from "./subtypes";
+import { getSubtypeMethods } from "./subtypes";
 import {
   originalContainerCache,
   updateOriginalContainerCache,
@@ -133,13 +133,13 @@ export const textWysiwyg = ({
       return;
     }
     const { textAlign, verticalAlign } = updatedTextElement;
-
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
       const container = getContainerElement(
         updatedTextElement,
-        app.scene.getElementsMapIncludingDeleted(),
+        app.scene.getNonDeletedElementsMap(),
       );
       let maxWidth = updatedTextElement.width;
 
@@ -168,6 +168,7 @@ export const textWysiwyg = ({
             LinearElementEditor.getBoundTextElementPosition(
               container,
               updatedTextElement as ExcalidrawTextElementWithContainer,
+              elementsMap,
             );
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
@@ -225,6 +226,7 @@ export const textWysiwyg = ({
           const { y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
+            elementsMap,
           );
           coordY = y;
         }
@@ -247,13 +249,10 @@ export const textWysiwyg = ({
         editable.selectionEnd = editable.value.length - diff;
       }
 
-      let transformWidth = updatedTextElement.width;
+      const transformWidth = updatedTextElement.width;
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
-      } else {
-        textElementWidth += 0.5;
-        transformWidth += 0.5;
       }
 
       // Horizontal offset in case updatedTextElement has a non-WYSIWYG subtype
@@ -276,15 +275,6 @@ export const textWysiwyg = ({
         updatedTextElement.height !== eMetrics.height
           ? { transformOrigin: `${w / 2}px ${h / 2}px` }
           : {};
-      let lineHeight = updatedTextElement.lineHeight;
-
-      // In Safari the font size gets rounded off when rendering hence calculating the line height by rounding off font size
-      if (isSafari) {
-        lineHeight = detectLineHeight({
-          ...updatedTextElement,
-          fontSize: Math.round(updatedTextElement.fontSize),
-        });
-      }
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
@@ -292,7 +282,7 @@ export const textWysiwyg = ({
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight,
+        lineHeight: updatedTextElement.lineHeight,
         width: `${Math.min(textElementWidth, maxWidth)}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
@@ -376,7 +366,7 @@ export const textWysiwyg = ({
       }
       const container = getContainerElement(
         element,
-        app.scene.getElementsMapIncludingDeleted(),
+        app.scene.getNonDeletedElementsMap(),
       );
 
       const font = getFontString({
@@ -563,7 +553,7 @@ export const textWysiwyg = ({
     let text = editable.value;
     const container = getContainerElement(
       updateElement,
-      app.scene.getElementsMapIncludingDeleted(),
+      app.scene.getNonDeletedElementsMap(),
     );
 
     if (container) {
@@ -591,7 +581,11 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(updateElement, container);
+      redrawTextBoundingBox(
+        updateElement,
+        container,
+        app.scene.getNonDeletedElementsMap(),
+      );
     }
 
     onSubmit({

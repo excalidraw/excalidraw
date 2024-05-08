@@ -1,5 +1,5 @@
 import * as GA from "./ga";
-import { Line, Direction, Point } from "./ga";
+import type { Line, Direction, Point } from "./ga";
 
 /**
  * A direction is stored as an array `[0, 0, 0, 0, y, x, 0, 0]` representing

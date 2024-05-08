@@ -1,11 +1,12 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
-import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
-import { ChartType, ElementsMap } from "../element/types";
+import type { ChartElements, Spreadsheet } from "../charts";
+import { renderSpreadsheet } from "../charts";
+import type { ChartType, ElementsMap } from "../element/types";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
-import { UIAppState } from "../types";
+import type { UIAppState } from "../types";
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
 
@@ -58,7 +59,11 @@ const ChartPreviewBtn = (props: {
             elements.forEach(
               (el) =>
                 isTextElement(el) &&
-                redrawTextBoundingBox(el, getContainerElement(el, elementsMap)),
+                redrawTextBoundingBox(
+                  el,
+                  getContainerElement(el, elementsMap),
+                  elementsMap,
+                ),
             );
             setChartElements(elements);
           },

@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElement,
@@ -16,12 +16,13 @@ import {
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
+  ElementsMap,
 } from "./types";
 import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
@@ -40,7 +41,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkOptional, Merge, Mutable } from "../utility-types";
+import type { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getSubtypeMethods, isValidSubtype } from "./subtypes";
 
 export const maybeGetSubtypeProps = (
@@ -73,6 +74,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "angle"
   | "groupIds"
   | "frameId"
+  | "index"
   | "boundElements"
   | "seed"
   | "version"
@@ -109,6 +111,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     frameId = null,
+    index = null,
     roundness = null,
     boundElements = null,
     link = null,
@@ -136,6 +139,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     frameId,
+    index,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
@@ -276,7 +280,6 @@ export const newTextElement = (
       y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
-      baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
@@ -288,19 +291,15 @@ export const newTextElement = (
 
 const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
+  elementsMap: ElementsMap,
   nextText: string,
 ): {
   x: number;
   y: number;
   width: number;
   height: number;
-  baseline: number;
 } => {
-  const {
-    width: nextWidth,
-    height: nextHeight,
-    baseline: nextBaseline,
-  } = measureTextElement(element, {
+  const { width: nextWidth, height: nextHeight } = measureTextElement(element, {
     text: nextText,
   });
   const { textAlign, verticalAlign } = element;
@@ -320,7 +319,7 @@ const getAdjustedDimensions = (
     x = element.x - offsets.x;
     y = element.y - offsets.y;
   } else {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+    const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
 
     const [nextX1, nextY1, nextX2, nextY2] = getResizedElementAbsoluteCoords(
       element,
@@ -352,7 +351,6 @@ const getAdjustedDimensions = (
   return {
     width: nextWidth,
     height: nextHeight,
-    baseline: nextBaseline,
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
   };
@@ -361,6 +359,7 @@ const getAdjustedDimensions = (
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
+  elementsMap: ElementsMap,
   text = textElement.text,
 ) => {
   if (textElement.isDeleted) {
@@ -375,13 +374,14 @@ export const refreshTextDimensions = (
       },
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, text);
+  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
 };
 
 export const updateTextElement = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
+  elementsMap: ElementsMap,
   {
     text,
     isDeleted,
@@ -395,7 +395,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, originalText),
+    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
   });
 };
 

@@ -1,4 +1,5 @@
-import { PrimitiveAtom, unstable_createStore, useAtom } from "jotai";
+import type { PrimitiveAtom } from "jotai";
+import { unstable_createStore, useAtom } from "jotai";
 import { useLayoutEffect } from "react";
 
 export const jotaiScope = Symbol();

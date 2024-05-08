@@ -1,5 +1,5 @@
 import { getShortcutKey } from "../../../utils";
-import { SubtypeRecord } from "../";
+import type { SubtypeRecord } from "../";
 
 // Exports
 export const getMathSubtypeRecord = () => mathSubtype;

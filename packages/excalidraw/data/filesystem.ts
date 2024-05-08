@@ -1,7 +1,7 @@
+import type { FileSystemHandle } from "browser-fs-access";
 import {
   fileOpen as _fileOpen,
   fileSave as _fileSave,
-  FileSystemHandle,
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
 import { EVENT, MIME_TYPES } from "../constants";

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -7,16 +7,17 @@ import {
 } from "../types";
 import { getNonDeletedElements } from "../";
 import { getSelectedElements } from "../../scene";
-import { AppState, ExcalidrawImperativeAPI, ToolType } from "../../types";
-import { LangLdr, registerCustomLangData } from "../../i18n";
+import type { AppState, ExcalidrawImperativeAPI, ToolType } from "../../types";
+import type { LangLdr } from "../../i18n";
+import { registerCustomLangData } from "../../i18n";
 
-import {
+import type {
   Action,
   ActionName,
   ActionPredicateFn,
   CustomActionName,
-  makeCustomActionName,
 } from "../../actions/types";
+import { makeCustomActionName } from "../../actions/types";
 import { registerCustomShortcuts } from "../../actions/shortcuts";
 import { register } from "../../actions/register";
 import { hasBoundTextElement, isTextElement } from "../typeChecks";
@@ -27,7 +28,7 @@ import {
 } from "../textElement";
 import { ShapeCache } from "../../scene/ShapeCache";
 import Scene from "../../scene/Scene";
-import { RenderableElementsMap } from "../../scene/types";
+import type { RenderableElementsMap } from "../../scene/types";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
 let subtypeNames: readonly Subtype[] = [];
@@ -263,7 +264,7 @@ export type SubtypeMethods = {
       text?: string;
       customData?: ExcalidrawElement["customData"];
     },
-  ) => { width: number; height: number; baseline: number };
+  ) => { width: number; height: number };
   render: (
     element: NonDeleted<ExcalidrawElement>,
     elementsMap: RenderableElementsMap,
@@ -505,6 +506,7 @@ export const checkRefreshOnSubtypeLoad = (
         redrawTextBoundingBox(
           element,
           getContainerElement(element, elementsMap),
+          elementsMap,
         );
       }
       refreshNeeded = true;

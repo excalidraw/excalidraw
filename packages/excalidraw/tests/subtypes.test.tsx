@@ -1,10 +1,12 @@
 import { vi } from "vitest";
 import fallbackLangData from "./helpers/locales/en.json";
-import {
+import type {
   SubtypeLoadedCb,
   SubtypeRecord,
   SubtypeMethods,
   SubtypePrepFn,
+} from "../element/subtypes";
+import {
   addSubtypeMethods,
   ensureSubtypesLoadedForElements,
   getSubtypeMethods,
@@ -19,7 +21,7 @@ import { render } from "./test-utils";
 import { API } from "./helpers/api";
 import { Excalidraw } from "../index";
 
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
   FontString,
@@ -27,13 +29,15 @@ import {
 } from "../element/types";
 import { createIcon, iconFillColor } from "../components/icons";
 import { SubtypeButton } from "../components/Subtypes";
-import { LangLdr, registerCustomLangData } from "../i18n";
+import type { LangLdr } from "../i18n";
+import { registerCustomLangData, t } from "../i18n";
 import { getFontString, getShortcutKey } from "../utils";
 import * as textElementUtils from "../element/textElement";
 import { isTextElement } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { Action, ActionName, makeCustomActionName } from "../actions/types";
-import { AppState } from "../types";
+import type { Action, ActionName } from "../actions/types";
+import { makeCustomActionName } from "../actions/types";
+import type { AppState } from "../types";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionChangeSloppiness } from "../actions";
 import { actionChangeRoundness } from "../actions/actionProperties";
@@ -41,7 +45,6 @@ import { actionChangeRoundness } from "../actions/actionProperties";
 const MW = 200;
 const TWIDTH = 200;
 const THEIGHT = 20;
-const TBASELINE = 0;
 const FONTSIZE = 20;
 const DBFONTSIZE = 40;
 const TRFONTSIZE = 60;
@@ -73,11 +76,12 @@ const test1: SubtypeRecord = {
 
 const testAction: Action = {
   name: makeCustomActionName(TEST_ACTION),
+  label: t("toolBar.test"),
   trackEvent: false,
   perform: (elements, appState) => {
     return {
       elements,
-      commitToHistory: false,
+      storeAction: "none",
     };
   },
 };
@@ -182,7 +186,7 @@ const measureTest2: SubtypeMethods["measureText"] = function (element, next) {
   const height = test2Loaded
     ? metrics.height * 2
     : Math.max(metrics.height - 5, 0);
-  return { width, height, baseline: 1 };
+  return { width, height };
 };
 
 const wrapTest2: SubtypeMethods["wrapText"] = function (
@@ -446,10 +450,9 @@ describe("subtypes", () => {
         }
         const width = multiplier * TWIDTH;
         const height = multiplier * THEIGHT;
-        const baseline = multiplier * TBASELINE;
-        return { width, height, baseline };
+        return { width, height };
       }
-      return { width: 1, height: 0, baseline: 0 };
+      return { width: 1, height: 0 };
     };
 
     vi.spyOn(textElementUtils, "measureText").mockImplementation(
@@ -463,7 +466,6 @@ describe("subtypes", () => {
         expect(metrics).toStrictEqual({
           width: TWIDTH - 10,
           height: THEIGHT - 5,
-          baseline: TBASELINE + 1,
         });
         const wrappedText = textElementUtils.wrapTextElement(el, MW);
         expect(wrappedText).toEqual(
@@ -479,7 +481,7 @@ describe("subtypes", () => {
           text: "Hello world.",
         };
         const nextMetrics = textElementUtils.measureTextElement(el, next);
-        expect(nextMetrics).toStrictEqual({ width: 0, height: 0, baseline: 1 });
+        expect(nextMetrics).toStrictEqual({ width: 0, height: 0 });
         const nextWrappedText = textElementUtils.wrapTextElement(el, MW, next);
         expect(nextWrappedText).toEqual("Hello\nworld.\nHello world.");
 
@@ -489,7 +491,6 @@ describe("subtypes", () => {
         expect(nextFM).toStrictEqual({
           width: 2 * TWIDTH - 10,
           height: 2 * THEIGHT - 5,
-          baseline: 2 * TBASELINE + 1,
         });
         const nextFWrText = textElementUtils.wrapTextElement(el, MW, next);
         expect(nextFWrText).toEqual(
@@ -502,7 +503,6 @@ describe("subtypes", () => {
         expect(nextCD).toStrictEqual({
           width: 3 * TWIDTH - 10,
           height: 3 * THEIGHT - 5,
-          baseline: 3 * TBASELINE + 1,
         });
         const nextCDWrText = textElementUtils.wrapTextElement(el, MW, next);
         expect(nextCDWrText).toEqual(
@@ -677,6 +677,5 @@ describe("subtype loading", () => {
     ensureSubtypesLoadedForElements(elements);
     expect(el.width).toEqual(TWIDTH * 2);
     expect(el.height).toEqual(THEIGHT * 2);
-    expect(el.baseline).toEqual(TBASELINE + 1);
   });
 });

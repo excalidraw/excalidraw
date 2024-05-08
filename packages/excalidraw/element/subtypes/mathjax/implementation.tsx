@@ -15,7 +15,7 @@ import {
   hasBoundTextElement,
   isTextElement,
 } from "../../../element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeleted,
@@ -25,9 +25,11 @@ import { getElementAbsoluteCoords } from "../../../element/bounds";
 import Scene from "../../../scene/Scene";
 
 // Imports for actions
-import { LangLdr, registerCustomLangData, t } from "../../../i18n";
-import { Action, makeCustomActionName } from "../../../actions/types";
-import { AppClassProperties, AppState } from "../../../types";
+import type { LangLdr } from "../../../i18n";
+import { registerCustomLangData, t } from "../../../i18n";
+import type { Action } from "../../../actions/types";
+import { makeCustomActionName } from "../../../actions/types";
+import type { AppClassProperties, AppState } from "../../../types";
 import {
   changeProperty,
   getFormValue,
@@ -37,7 +39,7 @@ import { getNonDeletedElements, redrawTextBoundingBox } from "../../../element";
 import { ButtonIconSelect } from "../../../components/ButtonIconSelect";
 
 // Subtype imports
-import { SubtypeLoadedCb, SubtypeMethods, SubtypePrepFn } from "../";
+import type { SubtypeLoadedCb, SubtypeMethods, SubtypePrepFn } from "../";
 import { mathSubtypeIcon } from "./icon";
 import { getMathSubtypeRecord } from "./types";
 import { SubtypeButton } from "../../../components/Subtypes";
@@ -395,7 +397,7 @@ const metricsCache = {} as {
       height: number;
     }>[];
     lineMetrics: Array<{ width: number; height: number; baseline: number }>;
-    imageMetrics: { width: number; height: number; baseline: number };
+    imageMetrics: { width: number; height: number };
   };
 };
 // Cache the SVGs for renderSvgMathElement()
@@ -734,15 +736,9 @@ const getMetrics = (
     imageWidth = Math.max(imageWidth, width);
     imageHeight += height;
   }
-  const lastLineMetrics = lineMetrics[lineMetrics.length - 1];
-  const imageBaseline = Math.max(
-    0,
-    imageHeight - lastLineMetrics.height + lastLineMetrics.baseline - 1,
-  );
   const imageMetrics = {
     width: imageWidth,
     height: imageHeight,
-    baseline: imageBaseline,
   };
   const metrics = { markupMetrics, lineMetrics, imageMetrics };
   if (isMathJaxLoaded) {
@@ -923,8 +919,8 @@ const measureMathElement = function (element, next) {
   ensureMathElement(element);
   const isMathJaxLoaded = mathJaxLoaded;
   if (!isMathJaxLoaded && isMathElement(element as ExcalidrawElement)) {
-    const { width, height, baseline } = element as ExcalidrawMathElement;
-    return { width, height, baseline };
+    const { width, height } = element as ExcalidrawMathElement;
+    return { width, height };
   }
   const fontSize = next?.fontSize ?? element.fontSize;
   const lineHeight = element.lineHeight;
@@ -1091,7 +1087,7 @@ const renderSvgMathElement = function (
   const strokeColor = _element.strokeColor;
   const textAlign = _element.textAlign;
   const opacity = _element.opacity / 100;
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const cx = (x2 - x1) / 2 - (element.x - x1);
   const cy = (y2 - y1) / 2 - (element.y - y1);
   const degree = (180 * element.angle) / Math.PI;
@@ -1425,10 +1421,10 @@ const createMathActions = () => {
       return {
         elements,
         appState: { ...appState, customData },
-        commitToHistory: true,
+        storeAction: "capture",
       };
     },
-    contextItemLabel: (elements, appState) =>
+    label: (elements, appState) =>
       getMathProps.getUseTex(appState)
         ? "labels.useTexTrueActive"
         : "labels.useTexTrueInactive",
@@ -1444,10 +1440,10 @@ const createMathActions = () => {
       return {
         elements,
         appState: { ...appState, customData },
-        commitToHistory: true,
+        storeAction: "capture",
       };
     },
-    contextItemLabel: (elements, appState) =>
+    label: (elements, appState) =>
       !getMathProps.getUseTex(appState)
         ? "labels.useTexFalseActive"
         : "labels.useTexFalseInactive",
@@ -1482,6 +1478,7 @@ const createMathActions = () => {
                 oldElement,
                 app.scene.getElementsMapIncludingDeleted(),
               ),
+              app.scene.getElementsMapIncludingDeleted(),
             );
             return newElement;
           }
@@ -1493,11 +1490,11 @@ const createMathActions = () => {
 
       return {
         elements: modElements,
-        commitToHistory: true,
+        storeAction: "capture",
       };
     },
     keyTest: (event) => event.shiftKey && event.code === "KeyR",
-    contextItemLabel: "labels.resetUseTex",
+    label: "labels.resetUseTex",
     predicate: (elements, appState, _, app) => {
       const useTex = getMathProps.getUseTex(appState);
       const mathElements = getSelectedMathElements(elements, appState, app);
@@ -1515,6 +1512,7 @@ const createMathActions = () => {
   };
   const actionChangeMathOnly: Action = {
     name: makeCustomActionName("changeMathOnly"),
+    label: t("labels.changeMathOnly"),
     perform: (elements, appState, mathOnly: boolean | null, app) => {
       if (mathOnly === null) {
         mathOnly = getFormValue(
@@ -1555,6 +1553,7 @@ const createMathActions = () => {
                 oldElement,
                 app.scene.getElementsMapIncludingDeleted(),
               ),
+              app.scene.getElementsMapIncludingDeleted(),
             );
             return newElement;
           }
@@ -1570,7 +1569,7 @@ const createMathActions = () => {
       return {
         elements: modElements,
         appState: { ...appState, customData },
-        commitToHistory: true,
+        storeAction: "capture",
       };
     },
     PanelComponent: ({ elements, appState, updateData, app }) => {

@@ -1,12 +1,13 @@
 import { updateBoundElements } from "./binding";
-import { Bounds, getCommonBounds } from "./bounds";
+import type { Bounds } from "./bounds";
+import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { NonDeletedExcalidrawElement } from "./types";
-import { AppState, PointerDownState } from "../types";
+import type { NonDeletedExcalidrawElement } from "./types";
+import type { AppState, PointerDownState } from "../types";
 import { getBoundTextElement } from "./textElement";
 import { getGridPoint } from "../math";
-import Scene from "../scene/Scene";
+import type Scene from "../scene/Scene";
 import { isArrowElement, isFrameLikeElement } from "./typeChecks";
 
 export const dragSelectedElements = (
@@ -65,7 +66,7 @@ export const dragSelectedElements = (
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
-    updateBoundElements(element, {
+    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
       simultaneouslyUpdated: Array.from(elementsToUpdate),
     });
   });

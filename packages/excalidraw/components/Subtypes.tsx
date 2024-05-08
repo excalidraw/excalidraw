@@ -1,23 +1,23 @@
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { t } from "../i18n";
-import { Action, makeCustomActionName } from "../actions/types";
+import type { Action } from "../actions/types";
+import { makeCustomActionName } from "../actions/types";
 import clsx from "clsx";
+import type { Subtype, SubtypeRecord } from "../element/subtypes";
 import {
-  Subtype,
-  SubtypeRecord,
   getSubtypeNames,
   hasAlwaysEnabledActions,
   isSubtypeAction,
   isValidSubtype,
   subtypeCollides,
 } from "../element/subtypes";
-import { ExcalidrawElement, Theme } from "../element/types";
+import type { ExcalidrawElement, Theme } from "../element/types";
 import {
   useExcalidrawActionManager,
   useExcalidrawContainer,
   useExcalidrawSetAppState,
 } from "./App";
-import { ContextMenuItems } from "./ContextMenu";
+import type { ContextMenuItems } from "./ContextMenu";
 import { Island } from "./Island";
 
 export const SubtypeButton = (
@@ -31,6 +31,7 @@ export const SubtypeButton = (
     key !== undefined ? (event) => event.code === `Key${key}` : undefined;
   const subtypeAction: Action = {
     name: makeCustomActionName(subtype),
+    label: t(`toolBar.${subtype}`),
     trackEvent: false,
     predicate: (...rest) => rest[4]?.subtype === subtype,
     perform: (elements, appState) => {
@@ -70,7 +71,7 @@ export const SubtypeButton = (
           selectedGroupIds,
           activeTool,
         },
-        commitToHistory: true,
+        storeAction: "capture",
       };
     },
     keyTest,

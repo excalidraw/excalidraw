@@ -9,9 +9,9 @@ import {
   VERTICAL_ALIGN,
 } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
-import { NonDeletedExcalidrawElement } from "./element/types";
+import type { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
-import { AppState } from "./types";
+import type { AppState } from "./types";
 import { selectSubtype } from "./element/subtypes";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];

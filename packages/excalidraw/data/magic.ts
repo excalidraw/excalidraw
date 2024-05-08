@@ -1,6 +1,7 @@
-import { Theme } from "../element/types";
-import { DataURL } from "../types";
-import { OpenAIInput, OpenAIOutput } from "./ai/types";
+import { THEME } from "../constants";
+import type { Theme } from "../element/types";
+import type { DataURL } from "../types";
+import type { OpenAIInput, OpenAIOutput } from "./ai/types";
 
 export type MagicCacheData =
   | {
@@ -39,7 +40,7 @@ export async function diagramToHTML({
   image,
   apiKey,
   text,
-  theme = "light",
+  theme = THEME.LIGHT,
 }: {
   image: DataURL;
   apiKey: string;

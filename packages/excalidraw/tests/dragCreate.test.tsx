@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveScene from "../renderer/interactiveScene";
 import { KEYS } from "../keys";
 import {
   render,
@@ -8,15 +9,18 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
-import { ExcalidrawLinearElement } from "../element/types";
+import type { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
-const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(
+  InteractiveScene,
+  "renderInteractiveScene",
+);
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 beforeEach(() => {
   localStorage.clear();

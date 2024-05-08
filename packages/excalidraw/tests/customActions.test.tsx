@@ -1,4 +1,4 @@
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { getShortcutKey } from "../utils";
 import { API } from "./helpers/api";
 import { render } from "./test-utils";
@@ -7,13 +7,13 @@ import {
   getShortcutFromShortcutName,
   registerCustomShortcuts,
 } from "../actions/shortcuts";
-import {
+import type {
   Action,
   ActionPredicateFn,
   ActionResult,
   CustomActionName,
-  makeCustomActionName,
 } from "../actions/types";
+import { makeCustomActionName } from "../actions/types";
 import {
   actionChangeFontFamily,
   actionChangeFontSize,
@@ -48,6 +48,7 @@ describe("regression tests", () => {
     const enableName = "custom.enable";
     const enableAction: Action = {
       name: enableName,
+      label: "",
       perform: (): ActionResult => {
         return {} as ActionResult;
       },

@@ -2,10 +2,15 @@ import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
 } from "../clipboard";
-import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
+import {
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FILENAME,
+  isFirefox,
+  MIME_TYPES,
+} from "../constants";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
@@ -13,11 +18,12 @@ import {
 import { t } from "../i18n";
 import { isSomeElementSelected, getSelectedElements } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
-import { ExportType } from "../scene/types";
-import { AppState, BinaryFiles } from "../types";
+import type { ExportType } from "../scene/types";
+import type { AppState, BinaryFiles } from "../types";
 import { cloneJSON } from "../utils";
 import { canvasToBlob } from "./blob";
-import { fileSave, FileSystemHandle } from "./filesystem";
+import type { FileSystemHandle } from "./filesystem";
+import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 import { getElementsOverlappingFrame } from "../frame";
 
@@ -84,14 +90,15 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
-    name,
+    name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    name: string;
+    /** filename, if applicable */
+    name?: string;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },
@@ -127,9 +134,12 @@ export const exportCanvas = async (
         },
       );
     } else if (type === "clipboard-svg") {
-      await copyTextToSystemClipboard(
-        await svgPromise.then((svg) => svg.outerHTML),
-      );
+      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      try {
+        await copyTextToSystemClipboard(svg);
+      } catch (e) {
+        throw new Error(t("errors.copyToSystemClipboardFailed"));
+      }
       return;
     }
   }
@@ -170,7 +180,7 @@ export const exportCanvas = async (
     } catch (error: any) {
       console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
-        throw error;
+        throw new Error(t("canvasError.canvasTooBig"));
       }
       // TypeError *probably* suggests ClipboardItem not defined, which
       // people on Firefox can enable through a flag, so let's tell them.

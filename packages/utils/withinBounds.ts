@@ -13,7 +13,9 @@ import {
 } from "../excalidraw/element/typeChecks";
 import { isValueInRange, rotatePoint } from "../excalidraw/math";
 import type { Point } from "../excalidraw/types";
-import { Bounds, getElementBounds } from "../excalidraw/element/bounds";
+import type { Bounds } from "../excalidraw/element/bounds";
+import { getElementBounds } from "../excalidraw/element/bounds";
+import { arrayToMap } from "../excalidraw/utils";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
@@ -158,7 +160,7 @@ export const elementsOverlappingBBox = ({
   type: "overlap" | "contain" | "inside";
 }) => {
   if (isExcalidrawElement(bounds)) {
-    bounds = getElementBounds(bounds);
+    bounds = getElementBounds(bounds, arrayToMap(elements));
   }
   const adjustedBBox: Bounds = [
     bounds[0] - errorMargin,

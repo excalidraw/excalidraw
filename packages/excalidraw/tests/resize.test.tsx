@@ -7,12 +7,14 @@ import type {
   ExcalidrawLinearElement,
 } from "../element/types";
 import type { Point } from "../types";
-import { Bounds, getElementPointsCoords } from "../element/bounds";
+import type { Bounds } from "../element/bounds";
+import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { arrayToMap } from "../utils";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -301,10 +303,12 @@ describe("arrow element", () => {
       ],
     });
     const label = await UI.editText(arrow, "Hello");
+    const elementsMap = arrayToMap(h.elements);
     UI.resize(arrow, "se", [50, 30]);
     let labelPos = LinearElementEditor.getBoundTextElementPosition(
       arrow,
       label,
+      elementsMap,
     );
 
     expect(labelPos.x + label.width / 2).toBeCloseTo(
@@ -317,7 +321,11 @@ describe("arrow element", () => {
     expect(label.fontSize).toEqual(20);
 
     UI.resize(arrow, "w", [20, 0]);
-    labelPos = LinearElementEditor.getBoundTextElementPosition(arrow, label);
+    labelPos = LinearElementEditor.getBoundTextElementPosition(
+      arrow,
+      label,
+      elementsMap,
+    );
 
     expect(labelPos.x + label.width / 2).toBeCloseTo(
       arrow.x + arrow.points[2][0],
@@ -537,7 +545,9 @@ describe("multiple selection", () => {
       1 + move[1] / selectionHeight,
     );
 
-    UI.resize([rectangle, diamond, ellipse], "se", move);
+    UI.resize([rectangle, diamond, ellipse], "se", move, {
+      shift: true,
+    });
 
     expect(rectangle.x).toBeCloseTo(0);
     expect(rectangle.y).toBeCloseTo(0);
@@ -606,7 +616,9 @@ describe("multiple selection", () => {
       1 + move[1] / selectionHeight,
     );
 
-    UI.resize([line, freedraw], "se", move);
+    UI.resize([line, freedraw], "se", move, {
+      shift: true,
+    });
 
     expect(line.x).toBeCloseTo(60 * scale);
     expect(line.y).toBeCloseTo(40 * scale);
@@ -646,7 +658,9 @@ describe("multiple selection", () => {
       1 - move[1] / selectionHeight,
     );
 
-    UI.resize([horizLine, vertLine, diagLine], "nw", move);
+    UI.resize([horizLine, vertLine, diagLine], "nw", move, {
+      shift: true,
+    });
 
     expect(horizLine.x).toBeCloseTo(selectionWidth * (1 - scale));
     expect(horizLine.y).toBeCloseTo(selectionHeight * (1 - scale));
@@ -696,7 +710,9 @@ describe("multiple selection", () => {
     const rightArrowBinding = { ...rightBoundArrow.endBinding };
     delete rightArrowBinding.gap;
 
-    UI.resize([rectangle, rightBoundArrow], "nw", move);
+    UI.resize([rectangle, rightBoundArrow], "nw", move, {
+      shift: true,
+    });
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
@@ -743,15 +759,19 @@ describe("multiple selection", () => {
     const selectionTop = 20 - topArrowLabel.height / 2;
     const move = [80, 0] as [number, number];
     const scale = move[0] / selectionWidth + 1;
-
-    UI.resize([topArrow.get(), bottomArrow.get()], "se", move);
+    const elementsMap = arrayToMap(h.elements);
+    UI.resize([topArrow.get(), bottomArrow.get()], "se", move, {
+      shift: true,
+    });
     const topArrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
       topArrow,
       topArrowLabel,
+      elementsMap,
     );
     const bottomArrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
       bottomArrow,
       bottomArrowLabel,
+      elementsMap,
     );
 
     expect(topArrow.x).toBeCloseTo(0);
@@ -806,7 +826,7 @@ describe("multiple selection", () => {
       1 - move[1] / selectionHeight,
     );
 
-    UI.resize([topText, bottomText], "ne", move);
+    UI.resize([topText, bottomText], "ne", move, { shift: true });
 
     expect(topText.x).toBeCloseTo(0);
     expect(topText.y).toBeCloseTo(-selectionHeight * (scale - 1));
@@ -819,7 +839,7 @@ describe("multiple selection", () => {
     expect(bottomText.angle).toEqual(0);
   });
 
-  it("resizes with images", () => {
+  it("resizes with images (proportional)", () => {
     const topImage = API.createElement({
       type: "image",
       x: 0,
@@ -882,7 +902,7 @@ describe("multiple selection", () => {
       1 + (2 * move[1]) / selectionHeight,
     );
 
-    UI.resize([rectangle, ellipse], "se", move, { alt: true });
+    UI.resize([rectangle, ellipse], "se", move, { shift: true, alt: true });
 
     expect(rectangle.x).toBeCloseTo(-200 * scale);
     expect(rectangle.y).toBeCloseTo(-140 * scale);
@@ -944,12 +964,15 @@ describe("multiple selection", () => {
     const scaleX = move[0] / selectionWidth + 1;
     const scaleY = -scaleX;
     const lineOrigBounds = getBoundsFromPoints(line);
-
-    UI.resize([line, image, rectangle, boundArrow], "se", move);
+    const elementsMap = arrayToMap(h.elements);
+    UI.resize([line, image, rectangle, boundArrow], "se", move, {
+      shift: true,
+    });
     const lineNewBounds = getBoundsFromPoints(line);
     const arrowLabelPos = LinearElementEditor.getBoundTextElementPosition(
       boundArrow,
       arrowLabel,
+      elementsMap,
     );
 
     expect(line.x).toBeCloseTo(60 * scaleX);
@@ -969,7 +992,7 @@ describe("multiple selection", () => {
     expect(image.width).toBeCloseTo(100 * -scaleX);
     expect(image.height).toBeCloseTo(100 * scaleY);
     expect(image.angle).toBeCloseTo((Math.PI * 5) / 6);
-    expect(image.scale).toEqual([1, 1]);
+    expect(image.scale).toEqual([-1, 1]);
 
     expect(rectangle.x).toBeCloseTo((180 + 160) * scaleX);
     expect(rectangle.y).toBeCloseTo(60 * scaleY);

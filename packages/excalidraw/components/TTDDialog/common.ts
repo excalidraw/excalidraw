@@ -1,15 +1,16 @@
-import { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
-import { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
+import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
+import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 import {
   DEFAULT_EXPORT_PADDING,
   DEFAULT_FONT_SIZE,
   EDITOR_LS_KEYS,
 } from "../../constants";
 import { convertToExcalidrawElements, exportToCanvas } from "../../index";
-import { NonDeletedExcalidrawElement } from "../../element/types";
-import { AppClassProperties, BinaryFiles } from "../../types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type { AppClassProperties, BinaryFiles } from "../../types";
 import { canvasToBlob } from "../../data/blob";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { t } from "../../i18n";
 
 const resetPreview = ({
   canvasRef,
@@ -108,7 +109,14 @@ export const convertMermaidToExcalidraw = async ({
     });
     // if converting to blob fails, there's some problem that will
     // likely prevent preview and export (e.g. canvas too big)
-    await canvasToBlob(canvas);
+    try {
+      await canvasToBlob(canvas);
+    } catch (e: any) {
+      if (e.name === "CANVAS_POSSIBLY_TOO_BIG") {
+        throw new Error(t("canvasError.canvasTooBig"));
+      }
+      throw e;
+    }
     parent.style.background = "var(--default-bg-color)";
     canvasNode.replaceChildren(canvas);
   } catch (err: any) {

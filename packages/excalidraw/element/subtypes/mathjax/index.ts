@@ -1,4 +1,4 @@
-import { ExcalidrawImperativeAPI } from "../../../types";
+import type { ExcalidrawImperativeAPI } from "../../../types";
 import { useSubtype } from "../";
 import { getMathSubtypeRecord } from "./types";
 import { prepareMathSubtype } from "./implementation";

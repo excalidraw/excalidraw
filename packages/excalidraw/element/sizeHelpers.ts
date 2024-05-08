@@ -1,11 +1,14 @@
-import { ExcalidrawElement } from "./types";
+import type { ElementsMap, ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import { AppState, Zoom } from "../types";
+import type { AppState, Zoom } from "../types";
 import { getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
 
+// TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
+//        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
+//        - could also be part of `_clearElements`
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
@@ -26,8 +29,9 @@ export const isElementInViewport = (
     scrollX: number;
     scrollY: number;
   },
+  elementsMap: ElementsMap,
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element); // scene coordinates
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
     {
       clientX: viewTransformations.offsetLeft,
