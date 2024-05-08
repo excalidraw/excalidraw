@@ -1,4 +1,4 @@
-import { AppState, ExcalidrawProps, Point, UIAppState } from "../../types";
+import type { AppState, ExcalidrawProps, Point, UIAppState } from "../../types";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -6,7 +6,7 @@ import {
 } from "../../utils";
 import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
 import { mutateElement } from "../../element/mutateElement";
-import {
+import type {
   ElementsMap,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,

@@ -1,21 +1,15 @@
 import "pepjs";
 
-import {
-  render,
-  queries,
-  RenderResult,
-  RenderOptions,
-  waitFor,
-  fireEvent,
-} from "@testing-library/react";
+import type { RenderResult, RenderOptions } from "@testing-library/react";
+import { render, queries, waitFor, fireEvent } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
-import { ImportedDataState } from "../data/types";
+import type { ImportedDataState } from "../data/types";
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 
-import { SceneData } from "../types";
+import type { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { UI } from "./helpers/ui";
 
 const customQueries = {

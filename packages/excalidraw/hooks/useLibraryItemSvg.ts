@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { COLOR_PALETTE } from "../colors";
 import { jotaiScope } from "../jotai";
 import { exportToSvg } from "../../utils/export";
-import { LibraryItem } from "../types";
+import type { LibraryItem } from "../types";
 
 export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 

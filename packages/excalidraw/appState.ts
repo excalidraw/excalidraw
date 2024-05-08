@@ -7,7 +7,7 @@ import {
   EXPORT_SCALES,
   THEME,
 } from "./constants";
-import { AppState, NormalizedZoomValue } from "./types";
+import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio

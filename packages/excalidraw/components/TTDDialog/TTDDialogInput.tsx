@@ -1,4 +1,5 @@
-import { ChangeEventHandler, useEffect, useRef } from "react";
+import type { ChangeEventHandler } from "react";
+import { useEffect, useRef } from "react";
 import { EVENT } from "../../constants";
 import { KEYS } from "../../keys";
 

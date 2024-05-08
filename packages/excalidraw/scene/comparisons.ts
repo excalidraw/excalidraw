@@ -1,9 +1,9 @@
 import { isIframeElement } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawIframeElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { ElementOrToolType } from "../types";
+import type { ElementOrToolType } from "../types";
 
 export const hasBackground = (type: ElementOrToolType) =>
   type === "rectangle" ||

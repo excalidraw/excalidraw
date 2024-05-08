@@ -3,16 +3,17 @@ import {
   DistributeVerticallyIcon,
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { distributeElements, Distribution } from "../distribute";
+import type { Distribution } from "../distribute";
+import { distributeElements } from "../distribute";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
 import { StoreAction } from "../store";
-import { AppClassProperties, AppState } from "../types";
+import type { AppClassProperties, AppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 

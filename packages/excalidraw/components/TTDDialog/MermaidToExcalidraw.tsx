@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import { BinaryFiles } from "../../types";
+import type { BinaryFiles } from "../../types";
 import { useApp } from "../App";
-import { NonDeletedExcalidrawElement } from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { ArrowRightIcon } from "../icons";
 import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";
 import Trans from "../Trans";
+import type { MermaidToExcalidrawLibProps } from "./common";
 import {
-  MermaidToExcalidrawLibProps,
   convertMermaidToExcalidraw,
   insertToEditor,
   saveMermaidDataToStorage,

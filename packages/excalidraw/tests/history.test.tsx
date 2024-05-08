@@ -13,7 +13,7 @@ import { getDefaultAppState } from "../appState";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
-import { AppState, ExcalidrawImperativeAPI } from "../types";
+import type { AppState, ExcalidrawImperativeAPI } from "../types";
 import { arrayToMap, resolvablePromise } from "../utils";
 import {
   COLOR_PALETTE,
@@ -22,7 +22,7 @@ import {
 } from "../colors";
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
-import {
+import type {
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,

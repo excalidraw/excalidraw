@@ -1,4 +1,4 @@
-import { ExcalidrawTextContainer } from "./types";
+import type { ExcalidrawTextContainer } from "./types";
 
 export const originalContainerCache: {
   [id: ExcalidrawTextContainer["id"]]:

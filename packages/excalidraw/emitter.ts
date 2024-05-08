@@ -1,4 +1,4 @@
-import { UnsubscribeCallback } from "./types";
+import type { UnsubscribeCallback } from "./types";
 
 type Subscriber<T extends any[]> = (...payload: T) => void;
 
