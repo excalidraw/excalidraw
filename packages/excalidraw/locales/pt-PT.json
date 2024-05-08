@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Editar linha",
-      "editArrow": ""
+      "editArrow": "Editar seta"
     },
     "elementLock": {
       "lock": "Bloquear",
