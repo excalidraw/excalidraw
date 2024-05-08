@@ -254,6 +254,7 @@ export const newTextElement = (
       height: metrics.height,
       containerId: opts.containerId || null,
       originalText: text,
+      wrapped: false,
       lineHeight,
     },
     {},
@@ -341,6 +342,9 @@ export const refreshTextDimensions = (
   text = textElement.text,
 ) => {
   if (textElement.isDeleted) {
+    return;
+  }
+  if (textElement.wrapped) {
     return;
   }
   if (container) {
