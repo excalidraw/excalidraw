@@ -148,7 +148,8 @@
     "discordChat": "Klepet v Discordu",
     "zoomToFitViewport": "Približaj na vidno polje",
     "zoomToFitSelection": "Približaj na izbor",
-    "zoomToFit": "Približaj na vse elemente"
+    "zoomToFit": "Približaj na vse elemente",
+    "installPWA": ""
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
