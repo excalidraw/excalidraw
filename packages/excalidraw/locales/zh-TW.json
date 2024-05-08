@@ -148,7 +148,8 @@
     "discordChat": "Discord 聊天室",
     "zoomToFitViewport": "縮放至符合 viewport",
     "zoomToFitSelection": "縮放至符合選取區",
-    "zoomToFit": "縮放至顯示所有元素"
+    "zoomToFit": "縮放至顯示所有元素",
+    "installPWA": ""
   },
   "library": {
     "noItems": "尚未加入任何物件...",
