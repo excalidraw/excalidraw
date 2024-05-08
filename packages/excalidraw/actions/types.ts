@@ -1,14 +1,17 @@
-import React from "react";
-import { ExcalidrawElement, OrderedExcalidrawElement } from "../element/types";
-import {
+import type React from "react";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
+import type {
   AppClassProperties,
   AppState,
   ExcalidrawProps,
   BinaryFiles,
   UIAppState,
 } from "../types";
-import { MarkOptional } from "../utility-types";
-import { StoreActionType } from "../store";
+import type { MarkOptional } from "../utility-types";
+import type { StoreActionType } from "../store";
 
 export type ActionSource =
   | "ui"

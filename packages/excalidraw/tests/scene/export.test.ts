@@ -1,4 +1,4 @@
-import { NonDeletedExcalidrawElement } from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,

@@ -60,9 +60,9 @@
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true VITE_APP_DISABLE_TRACKING=true vite build",
-    "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
-    "build:version": "node ./scripts/build-version.js",
+    "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
+    "build:app": "yarn --cwd ./excalidraw-app build:app",
+    "build:version": "yarn --cwd ./excalidraw-app build:version",
     "build": "yarn workspace @excalidraw/utils build:esm && yarn --cwd ./excalidraw-app build",
     "clear:workspaces": "yarn workspace @excalidraw/utils run clear && yarn workspace @excalidraw/excalidraw run clear",
     "fix:code": "yarn test:code --fix",

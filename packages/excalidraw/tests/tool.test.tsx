@@ -1,5 +1,5 @@
 import { Excalidraw } from "../index";
-import { ExcalidrawImperativeAPI } from "../types";
+import type { ExcalidrawImperativeAPI } from "../types";
 import { resolvablePromise } from "../utils";
 import { render } from "./test-utils";
 import { Pointer } from "./helpers/ui";

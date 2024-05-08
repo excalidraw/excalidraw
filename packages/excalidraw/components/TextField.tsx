@@ -1,8 +1,8 @@
+import type { KeyboardEvent } from "react";
 import {
   forwardRef,
   useRef,
   useImperativeHandle,
-  KeyboardEvent,
   useLayoutEffect,
   useState,
 } from "react";

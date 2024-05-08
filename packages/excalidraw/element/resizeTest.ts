@@ -1,24 +1,27 @@
-import {
+import type {
   ExcalidrawElement,
   PointerType,
   NonDeletedExcalidrawElement,
   ElementsMap,
 } from "./types";
 
-import {
-  getTransformHandlesFromCoords,
-  getTransformHandles,
+import type {
   TransformHandleType,
   TransformHandle,
   MaybeTransformHandleType,
+} from "./transformHandles";
+import {
+  getTransformHandlesFromCoords,
+  getTransformHandles,
   getOmitSidesForDevice,
   canResizeFromSides,
 } from "./transformHandles";
-import { AppState, Device, Zoom } from "../types";
-import { Bounds, getElementAbsoluteCoords } from "./bounds";
+import type { AppState, Device, Zoom } from "../types";
+import type { Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
 import { angleToDegrees, pointOnLine, pointRotate } from "@excalidraw/utils";
-import { Line, Point } from "@excalidraw/utils";
+import type { Line, Point } from "@excalidraw/utils";
 import { isLinearElement } from "./typeChecks";
 
 const isInsideTransformHandle = (

@@ -1,15 +1,19 @@
 import { isPathALoop, isPointWithinBounds } from "../math";
 
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
 } from "./types";
 
 import { getElementBounds } from "./bounds";
-import { FrameNameBounds } from "../types";
-import { Polygon, GeometricShape, getPolygonShape } from "@excalidraw/utils";
-import { isPointInShape, isPointOnShape } from "@excalidraw/utils";
+import type { FrameNameBounds } from "../types";
+import type { Polygon, GeometricShape } from "@excalidraw/utils";
+import {
+  getPolygonShape,
+  isPointInShape,
+  isPointOnShape,
+} from "@excalidraw/utils";
 import { isTransparent } from "../utils";
 import {
   hasBoundTextElement,

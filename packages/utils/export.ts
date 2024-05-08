@@ -3,6 +3,12 @@ import {
   exportToSvg as _exportToSvg,
 } from "../excalidraw/scene/export";
 import { getDefaultAppState } from "../excalidraw/appState";
+import type { AppState, BinaryFiles } from "../excalidraw/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  NonDeleted,
+} from "../excalidraw/element/types";
 import { restore } from "../excalidraw/data/restore";
 import { MIME_TYPES } from "../excalidraw/constants";
 import { encodePngMetadata } from "../excalidraw/data/image";
@@ -12,13 +18,6 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "../excalidraw/clipboard";
-
-import type { AppState, BinaryFiles } from "../excalidraw/types";
-import type {
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  NonDeleted,
-} from "../excalidraw/element/types";
 
 export { MIME_TYPES };
 

@@ -1,8 +1,8 @@
-import { AppStateChange, ElementsChange } from "./change";
-import { SceneElementsMap } from "./element/types";
+import type { AppStateChange, ElementsChange } from "./change";
+import type { SceneElementsMap } from "./element/types";
 import { Emitter } from "./emitter";
-import { Snapshot } from "./store";
-import { AppState } from "./types";
+import type { Snapshot } from "./store";
+import type { AppState } from "./types";
 
 type HistoryStack = HistoryEntry[];
 
