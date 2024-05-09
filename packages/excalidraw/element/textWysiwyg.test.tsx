@@ -786,8 +786,10 @@ describe("textWysiwyg", () => {
       ]);
       expect(text.containerId).toBe(rectangle.id);
       expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
-      expect(text.textAlign).toBe(TEXT_ALIGN.LEFT);
-      expect(text.x).toBe(h.elements[0].x + BOUND_TEXT_PADDING);
+      expect(text.textAlign).toBe(TEXT_ALIGN.CENTER);
+      expect(text.x).toBe(
+        h.elements[0].x + h.elements[0].width / 2 - text.width / 2,
+      );
       expect(text.y).toBe(
         h.elements[0].y + h.elements[0].height / 2 - text.height / 2,
       );
@@ -1456,6 +1458,7 @@ describe("textWysiwyg", () => {
         expect.objectContaining({
           text: "Excalidraw is an opensource virtual collaborative whiteboard",
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          textAlign: TEXT_ALIGN.CENTER,
           boundElements: null,
         }),
       );
