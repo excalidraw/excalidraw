@@ -326,7 +326,6 @@ const resizeSingleTextElement = (
 
   if (transformHandleType === "e" || transformHandleType === "w") {
     const stateAtResizeStart = originalElements.get(element.id)!;
-    // Gets bounds corners
     const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
       stateAtResizeStart,
       stateAtResizeStart.width,
@@ -337,14 +336,12 @@ const resizeSingleTextElement = (
     const startBottomRight: Point = [x2, y2];
     const startCenter: Point = centerPoint(startTopLeft, startBottomRight);
 
-    // Calculate new dimensions based on cursor position
     const rotatedPointer = rotatePoint(
       [pointerX, pointerY],
       startCenter,
       -stateAtResizeStart.angle,
     );
 
-    // Get bounds corners rendered on screen
     const [esx1, , esx2] = getResizedElementAbsoluteCoords(
       element,
       element.width,
@@ -354,11 +351,9 @@ const resizeSingleTextElement = (
 
     const boundsCurrentWidth = esx2 - esx1;
 
-    // It's important we set the initial scale value based on the width and height at resize start,
-    // otherwise previous dimensions affected by modifiers will be taken into account.
     const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
     const minWidth =
-      getMinCharWidth(getFontString(element)) + BOUND_TEXT_PADDING;
+      getMinCharWidth(getFontString(element)) + BOUND_TEXT_PADDING * 2;
 
     let scaleX = atStartBoundsWidth / boundsCurrentWidth;
 
