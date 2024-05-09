@@ -1,4 +1,4 @@
-import {
+import type {
   GroupId,
   ExcalidrawElement,
   NonDeleted,
@@ -6,7 +6,7 @@ import {
   ElementsMapOrArray,
   ElementsMap,
 } from "./element/types";
-import {
+import type {
   AppClassProperties,
   AppState,
   InteractiveCanvasAppState,
@@ -14,7 +14,7 @@ import {
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
-import { Mutable } from "./utility-types";
+import type { Mutable } from "./utility-types";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -388,8 +388,6 @@ export const elementsAreInSameGroup = (elements: ExcalidrawElement[]) => {
   return maxGroup === elements.length;
 };
 
-export const hasGroupAmongElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
-) => {
-  return elements.some((e) => e.groupIds.length > 0);
+export const isInGroup = (element: NonDeletedExcalidrawElement) => {
+  return element.groupIds.length > 0;
 };

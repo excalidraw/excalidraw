@@ -7,7 +7,8 @@ import type {
   ExcalidrawLinearElement,
 } from "../element/types";
 import type { Point } from "../types";
-import { Bounds, getElementPointsCoords } from "../element/bounds";
+import type { Bounds } from "../element/bounds";
+import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
@@ -838,7 +839,7 @@ describe("multiple selection", () => {
     expect(bottomText.angle).toEqual(0);
   });
 
-  it("resizes with images", () => {
+  it("resizes with images (proportional)", () => {
     const topImage = API.createElement({
       type: "image",
       x: 0,
@@ -863,7 +864,7 @@ describe("multiple selection", () => {
       1 + move[1] / selectionHeight,
     );
 
-    UI.resize([topImage, bottomImage], "se", move, { shift: true });
+    UI.resize([topImage, bottomImage], "se", move);
 
     expect(topImage.x).toBeCloseTo(0);
     expect(topImage.y).toBeCloseTo(0);

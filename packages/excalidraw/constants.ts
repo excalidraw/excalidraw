@@ -1,6 +1,6 @@
 import cssVariables from "./css/variables.module.scss";
-import { AppProps } from "./types";
-import { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import type { AppProps } from "./types";
+import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -147,6 +147,13 @@ export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
+
+export const SIDE_RESIZING_THRESHOLD = 2 * DEFAULT_TRANSFORM_HANDLE_SPACING;
+// a small epsilon to make side resizing always take precedence
+// (avoids an increase in renders and changes to tests)
+const EPSILON = 0.00001;
+export const DEFAULT_COLLISION_THRESHOLD =
+  2 * SIDE_RESIZING_THRESHOLD - EPSILON;
 
 export const COLOR_WHITE = "#ffffff";
 export const COLOR_CHARCOAL_BLACK = "#1e1e1e";

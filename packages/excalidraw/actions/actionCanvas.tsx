@@ -18,13 +18,13 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { AppState, NormalizedZoomValue } from "../types";
+import type { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
@@ -35,7 +35,7 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { SceneBounds } from "../element/bounds";
+import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
 

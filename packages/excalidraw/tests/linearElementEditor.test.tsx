@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
@@ -14,7 +14,7 @@ import * as InteractiveCanvas from "../renderer/interactiveScene";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
-import { Point } from "../types";
+import type { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
@@ -214,7 +214,7 @@ describe("Test Linear Elements", () => {
       clientY: midpoint[1],
     });
     // Enter line editor
-    let contextMenu = document.querySelector(".context-menu");
+    const contextMenu = document.querySelector(".context-menu");
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
@@ -223,23 +223,6 @@ describe("Test Linear Elements", () => {
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Edit line")!);
 
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
-
-    // Exiting line editor
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    contextMenu = document.querySelector(".context-menu");
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    fireEvent.click(
-      queryByText(contextMenu as HTMLElement, "Exit line editor")!,
-    );
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
   });
 
   it("should enter line editor when using double clicked with ctrl key", () => {

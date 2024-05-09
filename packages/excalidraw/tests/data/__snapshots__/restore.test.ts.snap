@@ -336,6 +336,7 @@ exports[`restoreElements > should restore text element correctly passing value f
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 100,
+  "wrapped": false,
   "x": -20,
   "y": -8.75,
 }
@@ -378,6 +379,7 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
+  "wrapped": false,
   "x": 0,
   "y": 0,
 }

@@ -1,13 +1,13 @@
-import { Point } from "../types";
-import {
+import type { Point } from "../types";
+import type {
   FONT_FAMILY,
   ROUNDNESS,
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
-import { MagicCacheData } from "../data/magic";
+import type { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
+import type { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";

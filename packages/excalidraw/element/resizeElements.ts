@@ -6,7 +6,7 @@ import {
 import { rescalePoints } from "../points";
 
 import { rotate, centerPoint, rotatePoint } from "../math";
-import {
+import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
@@ -35,11 +35,11 @@ import {
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
 import { updateBoundElements } from "./binding";
-import {
+import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
-import { Point, PointerDownState } from "../types";
+import type { Point, PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
@@ -54,7 +54,7 @@ import {
   getMinCharWidth,
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import { hasGroupAmongElements } from "../groups";
+import { isInGroup } from "../groups";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -223,6 +223,7 @@ const measureFontSizeFromWidth = (
     size: nextFontSize,
   };
 };
+
 const resizeSingleTextElement = (
   originalElements: PointerDownState["originalElements"],
   element: NonDeleted<ExcalidrawTextElement>,
@@ -827,10 +828,12 @@ export const resizeMultipleElements = (
 
   const keepAspectRatio =
     shouldMaintainAspectRatio ||
-    hasGroupAmongElements(selectedElements) ||
-    targetElements
-      .map((item) => item.latest)
-      .some((element) => element.angle !== 0 || isTextElement(element));
+    targetElements.some(
+      (item) =>
+        item.latest.angle !== 0 ||
+        isTextElement(item.latest) ||
+        isInGroup(item.latest),
+    );
 
   if (keepAspectRatio) {
     scaleX = scale;

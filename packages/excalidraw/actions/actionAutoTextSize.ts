@@ -2,7 +2,7 @@ import { isTextElement } from "../element";
 import { measureText } from "../element/textElement";
 import { getSelectedElements } from "../scene";
 import { StoreAction } from "../store";
-import { AppClassProperties } from "../types";
+import type { AppClassProperties } from "../types";
 import { getFontString } from "../utils";
 import { register } from "./register";
 

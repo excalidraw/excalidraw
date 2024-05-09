@@ -1,13 +1,14 @@
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   PointerType,
 } from "./types";
 
-import { Bounds, getElementAbsoluteCoords } from "./bounds";
+import type { Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
-import { Device, InteractiveCanvasAppState, Zoom } from "../types";
+import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import { isTextElement } from ".";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
 import {

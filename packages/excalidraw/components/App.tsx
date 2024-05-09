@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 
-import { RoughCanvas } from "roughjs/bin/canvas";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
@@ -39,18 +39,16 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { Action, ActionResult } from "../actions/types";
+import type { Action, ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import {
-  PastedMixedContent,
-  copyTextToSystemClipboard,
-  parseClipboard,
-} from "../clipboard";
+import type { PastedMixedContent } from "../clipboard";
+import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
+import type { EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -62,7 +60,6 @@ import {
   ENV,
   EVENT,
   FRAME_STYLE,
-  EXPORT_IMAGE_TYPES,
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
@@ -90,8 +87,10 @@ import {
   EDITOR_LS_KEYS,
   isIOS,
   supportsResizeObserver,
+  DEFAULT_COLLISION_THRESHOLD,
 } from "../constants";
-import { ExportedElements, exportCanvas, loadFromBlob } from "../data";
+import type { ExportedElements } from "../data";
+import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import {
@@ -121,17 +120,16 @@ import {
 } from "../element";
 import {
   bindOrUnbindLinearElement,
-  bindOrUnbindSelectedElements,
+  bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
-  getEligibleElementsForBinding,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
-  unbindLinearElements,
   updateBoundElements,
+  getSuggestedBindingsForArrows,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -163,7 +161,7 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
 } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -183,7 +181,6 @@ import {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   Ordered,
-  OrderedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -221,11 +218,14 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import { RenderInteractiveSceneCallback, ScrollBars } from "../scene/types";
+import type {
+  RenderInteractiveSceneCallback,
+  ScrollBars,
+} from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
+import type { GeometricShape } from "../../utils/geometry/shape";
 import {
-  GeometricShape,
   getClosedCurveShape,
   getCurveShape,
   getEllipseShape,
@@ -234,7 +234,7 @@ import {
   getSelectionBoxShape,
 } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
-import {
+import type {
   AppClassProperties,
   AppProps,
   AppState,
@@ -292,11 +292,8 @@ import {
   maybeParseEmbedSrc,
   getEmbedLink,
 } from "../element/embeddable";
-import {
-  ContextMenu,
-  ContextMenuItems,
-  CONTEXT_MENU_SEPARATOR,
-} from "./ContextMenu";
+import type { ContextMenuItems } from "./ContextMenu";
+import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import LayerUI from "./LayerUI";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
@@ -321,7 +318,8 @@ import {
   updateImageCache as _updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
-import { fileOpen, FileSystemHandle } from "../data/filesystem";
+import type { FileSystemHandle } from "../data/filesystem";
+import { fileOpen } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
@@ -387,11 +385,9 @@ import {
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import {
-  ExcalidrawElementSkeleton,
-  convertToExcalidrawElements,
-} from "../data/transform";
-import { ValueOf } from "../utility-types";
+import type { ExcalidrawElementSkeleton } from "../data/transform";
+import { convertToExcalidrawElements } from "../data/transform";
+import type { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
@@ -405,14 +401,15 @@ import {
 } from "../cursor";
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
-import { MagicCacheData, diagramToHTML } from "../data/magic";
+import type { MagicCacheData } from "../data/magic";
+import { diagramToHTML } from "../data/magic";
 import { exportToBlob } from "../../utils/export";
 import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
-import { IStore, Store, StoreAction } from "../store";
+import { Store, StoreAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -544,7 +541,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: IStore;
+  private store: Store;
   private history: History;
   private excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -2125,7 +2122,7 @@ class App extends React.Component<AppProps, AppState> {
               }
               return el;
             }),
-            commitToStore: true,
+            storeAction: StoreAction.CAPTURE,
           });
         }
       },
@@ -2812,7 +2809,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    this.store.capture(elementsMap, this.state);
+    this.store.commit(elementsMap, this.state);
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -3685,51 +3682,39 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      commitToStore?: SceneData["commitToStore"];
+      /** @default StoreAction.CAPTURE */
+      storeAction?: SceneData["storeAction"];
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
-      if (sceneData.commitToStore) {
-        this.store.shouldCaptureIncrement();
-      }
+      if (sceneData.storeAction && sceneData.storeAction !== StoreAction.NONE) {
+        const prevCommittedAppState = this.store.snapshot.appState;
+        const prevCommittedElements = this.store.snapshot.elements;
 
-      if (sceneData.elements || sceneData.appState) {
-        let nextCommittedAppState = this.state;
-        let nextCommittedElements: Map<string, OrderedExcalidrawElement>;
+        const nextCommittedAppState = sceneData.appState
+          ? Object.assign({}, prevCommittedAppState, sceneData.appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
+          : prevCommittedAppState;
 
-        if (sceneData.appState) {
-          nextCommittedAppState = {
-            ...this.state,
-            ...sceneData.appState, // Here we expect just partial appState
-          };
-        }
+        const nextCommittedElements = sceneData.elements
+          ? this.store.filterUncomittedElements(
+              this.scene.getElementsMapIncludingDeleted(), // Only used to detect uncomitted local elements
+              arrayToMap(nextElements), // We expect all (already reconciled) elements
+            )
+          : prevCommittedElements;
 
-        const prevElements = this.scene.getElementsIncludingDeleted();
-
-        if (sceneData.elements) {
-          /**
-           * We need to schedule a snapshot update, as in case `commitToStore` is false  (i.e. remote update),
-           * as it's essential for computing local changes after the async action is completed (i.e. not to include remote changes in the diff).
-           *
-           * This is also a breaking change for all local `updateScene` calls without set `commitToStore` to true,
-           * as it makes such updates impossible to undo (previously they were undone coincidentally with the switch to the whole snapshot captured by the history).
-           *
-           * WARN: be careful here as moving it elsewhere could break the history for remote client without noticing
-           * - we need to find a way to test two concurrent client updates simultaneously, while having access to both stores & histories.
-           */
-          this.store.shouldUpdateSnapshot();
-
-          // TODO#7348: deprecate once exchanging just store increments between clients
-          nextCommittedElements = this.store.ignoreUncomittedElements(
-            arrayToMap(prevElements),
-            arrayToMap(nextElements),
+        // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
+        // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
+        if (sceneData.storeAction === StoreAction.CAPTURE) {
+          this.store.captureIncrement(
+            nextCommittedElements,
+            nextCommittedAppState,
           );
-        } else {
-          nextCommittedElements = arrayToMap(prevElements);
+        } else if (sceneData.storeAction === StoreAction.UPDATE) {
+          this.store.updateSnapshot(
+            nextCommittedElements,
+            nextCommittedAppState,
+          );
         }
-
-        // WARN: Performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
-        this.store.capture(nextCommittedElements, nextCommittedAppState);
       }
 
       if (sceneData.appState) {
@@ -3951,7 +3936,12 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
-        this.maybeSuggestBindingForAll(selectedElements);
+        this.setState({
+          suggestedBindings: getSuggestedBindingsForArrows(
+            selectedElements,
+            this,
+          ),
+        });
 
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
@@ -4118,11 +4108,12 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ isBindingEnabled: true });
     }
     if (isArrowKey(event.key)) {
-      const selectedElements = this.scene.getSelectedElements(this.state);
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      isBindingEnabled(this.state)
-        ? bindOrUnbindSelectedElements(selectedElements, this)
-        : unbindLinearElements(selectedElements, elementsMap);
+      bindOrUnbindLinearElements(
+        this.scene.getSelectedElements(this.state).filter(isLinearElement),
+        this,
+        isBindingEnabled(this.state),
+        this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+      );
       this.setState({ suggestedBindings: [] });
     }
   });
@@ -4181,6 +4172,11 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
         activeEmbeddable: null,
       } as const;
+
+      if (nextActiveTool.type === "freedraw") {
+        this.store.shouldCaptureIncrement();
+      }
+
       if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
@@ -4538,7 +4534,7 @@ class App extends React.Component<AppProps, AppState> {
         shape: this.getElementShape(elementWithHighestZIndex),
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
-        threshold: this.getHitThreshold() / 2,
+        threshold: this.getElementHitThreshold() / 2,
         frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
           ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
           : null,
@@ -4601,8 +4597,8 @@ class App extends React.Component<AppProps, AppState> {
     return elements;
   }
 
-  private getHitThreshold() {
-    return 8 / this.state.zoom.value;
+  private getElementHitThreshold() {
+    return DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value;
   }
 
   private hitElement(
@@ -4620,7 +4616,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
-        this.getHitThreshold(),
+        this.getElementHitThreshold(),
       );
 
       return isPointInShape([x, y], selectionShape);
@@ -4641,7 +4637,7 @@ class App extends React.Component<AppProps, AppState> {
       y,
       element,
       shape: this.getElementShape(element),
-      threshold: this.getHitThreshold(),
+      threshold: this.getElementHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
         : null,
@@ -4673,7 +4669,7 @@ class App extends React.Component<AppProps, AppState> {
           y,
           element: elements[index],
           shape: this.getElementShape(elements[index]),
-          threshold: this.getHitThreshold(),
+          threshold: this.getElementHitThreshold(),
         })
       ) {
         hitElement = elements[index];
@@ -4926,7 +4922,7 @@ class App extends React.Component<AppProps, AppState> {
             y: sceneY,
             element: container,
             shape: this.getElementShape(container),
-            threshold: this.getHitThreshold(),
+            threshold: this.getElementHitThreshold(),
           })
         ) {
           const midPoint = getContainerCenter(
@@ -5537,7 +5533,7 @@ class App extends React.Component<AppProps, AppState> {
       scenePointer.x,
       scenePointer.y,
     );
-    const threshold = this.getHitThreshold();
+    const threshold = this.getElementHitThreshold();
     const point = { ...pointerDownState.lastCoords };
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
@@ -5724,6 +5720,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
+        storeAction: StoreAction.UPDATE,
       });
       return;
     }
@@ -6623,7 +6620,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // How many pixels off the shape boundary we still consider a hit
-    const threshold = this.getHitThreshold();
+    const threshold = this.getElementHitThreshold();
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
       point.x > x1 - threshold &&
@@ -7460,7 +7457,12 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          this.maybeSuggestBindingForAll(selectedElements);
+          this.setState({
+            suggestedBindings: getSuggestedBindingsForArrows(
+              selectedElements,
+              this,
+            ),
+          });
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -8022,6 +8024,7 @@ class App extends React.Component<AppProps, AppState> {
           appState: {
             draggingElement: null,
           },
+          storeAction: StoreAction.UPDATE,
         });
 
         return;
@@ -8194,6 +8197,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
+          storeAction: StoreAction.UPDATE,
         });
       }
 
@@ -8446,7 +8450,7 @@ class App extends React.Component<AppProps, AppState> {
               y: pointerDownState.origin.y,
               element: hitElement,
               shape: this.getElementShape(hitElement),
-              threshold: this.getHitThreshold(),
+              threshold: this.getElementHitThreshold(),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
                 : null,
@@ -8505,15 +8509,18 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
-        isBindingEnabled(this.state)
-          ? bindOrUnbindSelectedElements(
-              this.scene.getSelectedElements(this.state),
-              this,
-            )
-          : unbindLinearElements(
-              this.scene.getNonDeletedElements(),
-              elementsMap,
-            );
+        // We only allow binding via linear elements, specifically via dragging
+        // the endpoints ("start" or "end").
+        const linearElements = this.scene
+          .getSelectedElements(this.state)
+          .filter(isLinearElement);
+
+        bindOrUnbindLinearElements(
+          linearElements,
+          this,
+          isBindingEnabled(this.state),
+          this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+        );
       }
 
       if (activeTool.type === "laser") {
@@ -9045,19 +9052,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   };
 
-  private maybeSuggestBindingForAll(
-    selectedElements: NonDeleted<ExcalidrawElement>[],
-  ): void {
-    if (selectedElements.length > 50) {
-      return;
-    }
-    const suggestedBindings = getEligibleElementsForBinding(
-      selectedElements,
-      this,
-    );
-    this.setState({ suggestedBindings });
-  }
-
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -9257,13 +9251,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (ret.type === MIME_TYPES.excalidraw) {
-        // Restore the fractional indices by mutating elements and update the
-        // store snapshot, otherwise we would end up with duplicate indices
+        // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
-        this.store.snapshot = this.store.snapshot.clone(
-          arrayToMap(elements),
-          this.state,
-        );
+
+        // update the store snapshot for old elements, otherwise we would end up with duplicated fractional indices on undo
+        this.store.updateSnapshot(arrayToMap(elements), this.state);
+
         this.setState({ isLoading: true });
         this.syncActionResult({
           ...ret.data,
@@ -9445,8 +9438,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.originSnapOffset,
       );
 
-      this.maybeSuggestBindingForAll([draggingElement]);
-
       // highlight elements that are to be added to frames on frames creation
       if (
         this.state.activeTool.type === TOOL_TYPE.frame ||
@@ -9560,7 +9551,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getElementsMapIncludingDeleted(),
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        selectedElements.length === 1 && isImageElement(selectedElements[0])
+        selectedElements.some((element) => isImageElement(element))
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         resizeX,
@@ -9569,7 +9560,10 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.y,
       )
     ) {
-      this.maybeSuggestBindingForAll(selectedElements);
+      const suggestedBindings = getSuggestedBindingsForArrows(
+        selectedElements,
+        this,
+      );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
       selectedFrames.forEach((frame) => {
@@ -9583,6 +9577,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         elementsToHighlight: [...elementsToHighlight],
+        suggestedBindings,
       });
 
       return true;

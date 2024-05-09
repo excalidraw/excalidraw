@@ -18,7 +18,8 @@ import {
 } from "../../packages/excalidraw/components/icons";
 import { TextField } from "../../packages/excalidraw/components/TextField";
 import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
-import { activeRoomLinkAtom, CollabAPI } from "../collab/Collab";
+import type { CollabAPI } from "../collab/Collab";
+import { activeRoomLinkAtom } from "../collab/Collab";
 import { atom, useAtom, useAtomValue } from "jotai";
 
 import "./ShareDialog.scss";

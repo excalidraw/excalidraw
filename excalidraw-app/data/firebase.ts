@@ -1,12 +1,13 @@
-import {
+import { reconcileElements } from "../../packages/excalidraw";
+import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import { getSceneVersion } from "../../packages/excalidraw/element";
-import Portal from "../collab/Portal";
+import type Portal from "../collab/Portal";
 import { restoreElements } from "../../packages/excalidraw/data/restore";
-import {
+import type {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
@@ -19,13 +20,11 @@ import {
   decryptData,
 } from "../../packages/excalidraw/data/encryption";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { ResolutionType } from "../../packages/excalidraw/utility-types";
+import type { SyncableExcalidrawElement } from ".";
+import { getSyncableElements } from ".";
+import type { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
-import {
-  RemoteExcalidrawElement,
-  reconcileElements,
-} from "../../packages/excalidraw/data/reconcile";
+import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
 
 // private
 // -----------------------------------------------------------------------------
