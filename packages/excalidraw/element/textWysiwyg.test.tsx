@@ -10,12 +10,7 @@ import {
 } from "../tests/test-utils";
 import { queryByText } from "@testing-library/react";
 
-import {
-  BOUND_TEXT_PADDING,
-  FONT_FAMILY,
-  TEXT_ALIGN,
-  VERTICAL_ALIGN,
-} from "../constants";
+import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
