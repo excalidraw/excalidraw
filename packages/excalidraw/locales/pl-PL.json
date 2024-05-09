@@ -21,9 +21,9 @@
     "copyStyles": "Kopiuj style",
     "pasteStyles": "Wklej style",
     "stroke": "Kolor obramowania",
-    "changeStroke": "",
+    "changeStroke": "Zmień kolor kreski",
     "background": "Kolor wypełnienia",
-    "changeBackground": "",
+    "changeBackground": "Zmień kolor tła",
     "fill": "Wypełnienie",
     "strokeWidth": "Grubość obramowania",
     "strokeStyle": "Styl obrysu",
@@ -74,7 +74,7 @@
     "canvasColors": "Używane na płótnie",
     "canvasBackground": "Kolor dokumentu",
     "drawingCanvas": "Obszar roboczy",
-    "clearCanvas": "",
+    "clearCanvas": "Wyczyść płótno",
     "layers": "Warstwy",
     "actions": "Akcje",
     "language": "Język",
@@ -87,13 +87,13 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
-    "toggleGrid": "",
+    "toggleGrid": "Przełącz widoczność siatki",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
     "libraryLoadingMessage": "Wczytywanie biblioteki…",
     "libraries": "Przeglądaj biblioteki",
     "loadingScene": "Wczytywanie sceny…",
-    "loadScene": "",
+    "loadScene": "Wczytaj scenę z pliku",
     "align": "Wyrównaj",
     "alignTop": "Wyrównaj do góry",
     "alignBottom": "Wyrównaj do dołu",
@@ -109,8 +109,8 @@
     "share": "Udostępnij",
     "showStroke": "Pokaż próbnik kolorów obrysu",
     "showBackground": "Pokaż próbnik koloru tła",
-    "toggleTheme": "",
-    "theme": "",
+    "toggleTheme": "Przełącz motyw jasny / ciemny",
+    "theme": "Motyw",
     "personalLib": "Biblioteka prywatna",
     "excalidrawLib": "Biblioteka Excalidraw",
     "decreaseFontSize": "Zmniejsz rozmiar czcionki",
@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Edytuj linię",
-      "editArrow": ""
+      "editArrow": "Edytuj strzałkę"
     },
     "elementLock": {
       "lock": "Zablokuj",
@@ -146,10 +146,10 @@
     "prompt": "Opis",
     "followUs": "Obserwuj nas",
     "discordChat": "Czat Discorda",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
-    "installPWA": ""
+    "zoomToFitViewport": "Dopasuj widok do ekranu",
+    "zoomToFitSelection": "Dopasuj widok do zaznaczenia",
+    "zoomToFit": "Dopasuj widok do całej zawartości",
+    "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)"
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
@@ -182,7 +182,7 @@
     "fullScreen": "Pełny ekran",
     "darkMode": "Ciemny motyw",
     "lightMode": "Jasny motyw",
-    "systemMode": "",
+    "systemMode": "Motyw systemowy",
     "zenMode": "Tryb Zen",
     "objectsSnapMode": "Przyciąganie do obiektów",
     "exitZenMode": "Wyjdź z trybu Zen",
@@ -545,8 +545,8 @@
     "hint": {
       "text": "Kliknij na użytkownika, aby obserwować",
       "followStatus": "Obserwujesz tego użytkownika",
-      "inCall": "",
-      "micMuted": "",
+      "inCall": "Użytkownik jest w trakcie połączenia głosowego",
+      "micMuted": "Mikrofon użytkownik jest wyciszony",
       "isSpeaking": ""
     }
   },
@@ -563,6 +563,6 @@
       "noMatch": ""
     },
     "itemNotAvailable": "",
-    "shortcutHint": ""
+    "shortcutHint": "Przywołaj paletę poleceń za pomocą {{shortcut}}"
   }
 }
