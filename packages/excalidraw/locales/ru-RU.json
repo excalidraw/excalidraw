@@ -149,7 +149,7 @@
     "zoomToFitViewport": "",
     "zoomToFitSelection": "Увеличить до выделенного",
     "zoomToFit": "",
-    "installPWA": ""
+    "installPWA": "Установить Excalidraw локально (PWA)"
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
