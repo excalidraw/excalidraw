@@ -10,7 +10,12 @@ import {
 } from "../tests/test-utils";
 import { queryByText } from "@testing-library/react";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import {
+  BOUND_TEXT_PADDING,
+  FONT_FAMILY,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -781,10 +786,8 @@ describe("textWysiwyg", () => {
       ]);
       expect(text.containerId).toBe(rectangle.id);
       expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
-      expect(text.textAlign).toBe(TEXT_ALIGN.CENTER);
-      expect(text.x).toBe(
-        h.elements[0].x + h.elements[0].width / 2 - text.width / 2,
-      );
+      expect(text.textAlign).toBe(TEXT_ALIGN.LEFT);
+      expect(text.x).toBe(h.elements[0].x + BOUND_TEXT_PADDING);
       expect(text.y).toBe(
         h.elements[0].y + h.elements[0].height / 2 - text.height / 2,
       );

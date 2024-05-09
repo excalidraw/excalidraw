@@ -141,7 +141,7 @@ export const actionBindText = register({
     mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
-      textAlign: TEXT_ALIGN.CENTER,
+      wrapped: false,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
