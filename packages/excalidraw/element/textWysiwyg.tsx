@@ -644,7 +644,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
+  const unbindUpdate = Scene.getScene(element)!.onUpdate(() => {
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-content",

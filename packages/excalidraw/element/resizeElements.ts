@@ -876,7 +876,7 @@ export const resizeMultipleElements = (
     }
   }
 
-  Scene.getScene(elementsAndUpdates[0].element)?.informMutation();
+  Scene.getScene(elementsAndUpdates[0].element)?.triggerUpdate();
 };
 
 const rotateMultipleElements = (
@@ -938,7 +938,7 @@ const rotateMultipleElements = (
       }
     });
 
-  Scene.getScene(elements[0])?.informMutation();
+  Scene.getScene(elements[0])?.triggerUpdate();
 };
 
 export const getResizeOffsetXY = (
