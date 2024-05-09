@@ -800,7 +800,7 @@ describe("textWysiwyg", () => {
       mouse.down();
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      let editor = await getTextEditor(textEditorSelector, true);
+      const editor = await getTextEditor(textEditorSelector, true);
 
       await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello World!");
