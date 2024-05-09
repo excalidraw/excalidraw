@@ -547,22 +547,22 @@
       "followStatus": "Obserwujesz tego użytkownika",
       "inCall": "Użytkownik jest w trakcie połączenia głosowego",
       "micMuted": "Mikrofon użytkownik jest wyciszony",
-      "isSpeaking": ""
+      "isSpeaking": "Użytkownik przemawia"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paleta poleceń",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Wybierz",
+      "confirm": "Potwierdź",
+      "close": "Zamknij"
     },
-    "recents": "",
+    "recents": "Ostatnio używane",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Szukaj w menu, poleceniach i odkrywaj ukryte funkcje",
+      "noMatch": "Brak pasujących komend..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Polecenie jest niedostępne...",
     "shortcutHint": "Przywołaj paletę poleceń za pomocą {{shortcut}}"
   }
 }
