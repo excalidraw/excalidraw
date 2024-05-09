@@ -149,7 +149,7 @@
     "zoomToFitViewport": "Zoom auf Ansicht anpassen",
     "zoomToFitSelection": "Zoom auf Auswahl anpassen",
     "zoomToFit": "Zoom auf alle Elemente anpassen",
-    "installPWA": ""
+    "installPWA": "Excalidraw lokal installieren (PWA)"
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
