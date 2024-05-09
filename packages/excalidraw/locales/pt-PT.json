@@ -149,7 +149,7 @@
     "zoomToFitViewport": "Aproximar para enquadrar no cisualizador",
     "zoomToFitSelection": "Aproximar para enquadrar a seleção",
     "zoomToFit": "Aproximar para enquadrar todos os elementos",
-    "installPWA": ""
+    "installPWA": "Instalar Excalidraw localmente (PWA)"
   },
   "library": {
     "noItems": "Ainda não foram adicionados itens...",
