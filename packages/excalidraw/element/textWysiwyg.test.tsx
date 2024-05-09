@@ -1313,7 +1313,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            30,
+            15,
             45,
           ]
         `);
@@ -1337,7 +1337,7 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            30,
+            45,
             45,
           ]
         `);
@@ -1453,7 +1453,6 @@ describe("textWysiwyg", () => {
         expect.objectContaining({
           text: "Excalidraw is an opensource virtual collaborative whiteboard",
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
-          textAlign: TEXT_ALIGN.CENTER,
           boundElements: null,
         }),
       );

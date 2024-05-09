@@ -848,6 +848,14 @@ export const actionChangeTextAlign = register({
               oldElement,
               { textAlign: value },
             );
+            redrawTextBoundingBox(
+              newElement,
+              app.scene.getContainerElement(oldElement),
+              app.scene.getNonDeletedElementsMap(),
+              {
+                keepPreviousSize: true,
+              },
+            );
             return newElement;
           }
 

@@ -295,7 +295,7 @@ export const actionWrapTextInContainer = register({
             containerId: container.id,
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
-            textAlign: TEXT_ALIGN.CENTER,
+            wrapped: false,
           },
           false,
         );
