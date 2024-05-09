@@ -3,7 +3,7 @@ import {
   decodeSvgMetadata,
 } from "../../excalidraw/data/image";
 import type { ImportedDataState } from "../../excalidraw/data/types";
-import * as utils from "../dist/prod";
+import * as utils from "../index";
 import { API } from "../../excalidraw/tests/helpers/api";
 
 // NOTE this test file is using the actual API, unmocked. Hence splitting it
