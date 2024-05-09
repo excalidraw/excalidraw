@@ -1,9 +1,4 @@
-import {
-  BOUND_TEXT_PADDING,
-  ROUNDNESS,
-  VERTICAL_ALIGN,
-  TEXT_ALIGN,
-} from "../constants";
+import { BOUND_TEXT_PADDING, ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
 import {
