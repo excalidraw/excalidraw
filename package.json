@@ -72,7 +72,7 @@
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
-    "start": "yarn clear:workspaces && yarn workspace @excalidraw/utils run build:esm && yarn --cwd ./excalidraw-app start",
+    "start": "yarn clear:workspaces && yarn workspace @excalidraw/utils run build:esm && yarn --cwd ./excalidraw-app start & node scripts/watchUtils.js",
     "start:app:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
     "test:app": "vitest",

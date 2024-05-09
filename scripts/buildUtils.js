@@ -121,5 +121,7 @@ const createESMRawBuild = async () => {
   fs.writeFileSync("meta-raw-prod.json", JSON.stringify(rawProd.metafile));
 };
 
+console.info("BUILDING UTILS STARTED");
 createESMRawBuild();
 createESMBrowserBuild();
+console.info("BUILDING UTILS COMPLETE");
