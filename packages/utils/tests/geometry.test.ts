@@ -11,8 +11,15 @@ import {
   pointOnPolyline,
   pointRightofLine,
   pointRotate,
-} from "./geometry";
-import type { Curve, Ellipse, Line, Point, Polygon, Polyline } from "./shape";
+} from "../src/geometry/geometry";
+import type {
+  Curve,
+  Ellipse,
+  Line,
+  Point,
+  Polygon,
+  Polyline,
+} from "../src/geometry/shape";
 
 describe("point and line", () => {
   const line: Line = [

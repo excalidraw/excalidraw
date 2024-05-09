@@ -12,7 +12,7 @@
  * to pure shapes
  */
 
-import { getElementAbsoluteCoords } from "../../excalidraw/element";
+import { getElementAbsoluteCoords } from "../../../excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
@@ -27,7 +27,7 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
-} from "../../excalidraw/element/types";
+} from "../../../excalidraw/element/types";
 import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";

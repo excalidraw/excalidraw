@@ -1,4 +1,4 @@
-import { distance2d } from "../../excalidraw/math";
+import { distance2d } from "../../../excalidraw/math";
 import type {
   Point,
   Line,

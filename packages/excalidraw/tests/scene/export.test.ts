@@ -6,7 +6,7 @@ import {
   rectangleWithLinkFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { exportToCanvas, exportToSvg } from "../../../utils/export";
+import { exportToCanvas, exportToSvg } from "../../../utils/src/export";
 import { FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 

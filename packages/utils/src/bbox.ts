@@ -1,5 +1,5 @@
-import type { Bounds } from "../excalidraw/element/bounds";
-import type { Point } from "../excalidraw/types";
+import type { Bounds } from "../../excalidraw/element/bounds";
+import type { Point } from "../../excalidraw/types";
 
 export type LineSegment = [Point, Point];
 
@@ -17,6 +17,7 @@ export function crossProduct(a: Point, b: Point) {
 }
 
 export function doBBoxesIntersect(a: Bounds, b: Bounds) {
+  console.log("HI");
   return a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
 }
 
