@@ -228,6 +228,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 1`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -265,7 +266,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 70,
-  "wrapped": false,
   "x": 185,
   "y": 226.5,
 }
@@ -274,6 +274,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -311,7 +312,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
-  "wrapped": false,
   "x": 560,
   "y": 226.5,
 }
@@ -380,6 +380,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 4`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id48",
@@ -412,7 +413,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "wrapped": false,
   "x": 240,
   "y": 226.5,
 }
@@ -481,6 +481,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
 exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id37",
@@ -513,7 +514,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "wrapped": false,
   "x": 240,
   "y": 226.5,
 }
@@ -656,6 +656,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id41",
@@ -688,7 +689,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "wrapped": false,
   "x": 240,
   "y": 226.5,
 }
@@ -697,6 +697,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 3`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -734,7 +735,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 70,
-  "wrapped": false,
   "x": 185,
   "y": 226.5,
 }
@@ -743,6 +743,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 4`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -780,7 +781,6 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
-  "wrapped": false,
   "x": 355,
   "y": 226.5,
 }
@@ -1201,6 +1201,7 @@ exports[`Test Transform > should transform regular shapes 6`] = `
 exports[`Test Transform > should transform text element 1`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": null,
@@ -1233,7 +1234,6 @@ exports[`Test Transform > should transform text element 1`] = `
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 120,
-  "wrapped": false,
   "x": 100,
   "y": 100,
 }
@@ -1242,6 +1242,7 @@ exports[`Test Transform > should transform text element 1`] = `
 exports[`Test Transform > should transform text element 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": null,
@@ -1274,7 +1275,6 @@ exports[`Test Transform > should transform text element 2`] = `
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 190,
-  "wrapped": false,
   "x": 100,
   "y": 150,
 }
@@ -1575,6 +1575,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 7`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "B",
@@ -1609,7 +1610,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 10,
-  "wrapped": false,
   "x": 78.015625,
   "y": 5,
 }
@@ -1618,6 +1618,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 8`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "A",
@@ -1652,7 +1653,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 10,
-  "wrapped": false,
   "x": 419.6796875,
   "y": 5,
 }
@@ -1661,6 +1661,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 9`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Alice",
@@ -1695,7 +1696,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 50,
-  "wrapped": false,
   "x": 399.6796875,
   "y": 44.5,
 }
@@ -1704,6 +1704,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 10`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Bob",
@@ -1738,7 +1739,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 30,
-  "wrapped": false,
   "x": 68.015625,
   "y": 44.5,
 }
@@ -1747,6 +1747,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 11`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Bob_Alice",
@@ -1779,7 +1780,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 120,
-  "wrapped": false,
   "x": 187.7545,
   "y": 44.5,
 }
@@ -1788,6 +1788,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 12`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Bob_B",
@@ -1820,7 +1821,6 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 100,
-  "wrapped": false,
   "x": 27.016999999999996,
   "y": 66.5,
 }
@@ -2037,6 +2037,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 5`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id25",
@@ -2069,7 +2070,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "wrapped": false,
   "x": 85,
   "y": 87.5,
 }
@@ -2078,6 +2078,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 6`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id26",
@@ -2110,7 +2111,6 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 200,
-  "wrapped": false,
   "x": 50,
   "y": 187.5,
 }
@@ -2119,6 +2119,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 7`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id27",
@@ -2152,7 +2153,6 @@ LABELLED ARROW",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 150,
-  "wrapped": false,
   "x": 75,
   "y": 275,
 }
@@ -2161,6 +2161,7 @@ LABELLED ARROW",
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 8`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id28",
@@ -2194,7 +2195,6 @@ LABELLED ARROW",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 150,
-  "wrapped": false,
   "x": 75,
   "y": 375,
 }
@@ -2425,6 +2425,7 @@ exports[`Test Transform > should transform to text containers when label provide
 exports[`Test Transform > should transform to text containers when label provided 7`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id13",
@@ -2457,7 +2458,6 @@ exports[`Test Transform > should transform to text containers when label provide
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 240,
-  "wrapped": false,
   "x": 105,
   "y": 105,
 }
@@ -2466,6 +2466,7 @@ exports[`Test Transform > should transform to text containers when label provide
 exports[`Test Transform > should transform to text containers when label provided 8`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id14",
@@ -2499,7 +2500,6 @@ CONTAINER",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "wrapped": false,
   "x": 534.7893218813452,
   "y": 117.44796179957173,
 }
@@ -2508,6 +2508,7 @@ CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 9`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id15",
@@ -2543,7 +2544,6 @@ CONTAINER",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 90,
-  "wrapped": false,
   "x": 195,
   "y": 197.5,
 }
@@ -2552,6 +2552,7 @@ CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 10`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id16",
@@ -2585,7 +2586,6 @@ TEXT CONTAINER",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 140,
-  "wrapped": false,
   "x": 180,
   "y": 435,
 }
@@ -2594,6 +2594,7 @@ TEXT CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 11`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id17",
@@ -2628,7 +2629,6 @@ CONTAINER",
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 170,
-  "wrapped": false,
   "x": 505,
   "y": 305,
 }
@@ -2637,6 +2637,7 @@ CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 12`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id18",
@@ -2671,7 +2672,6 @@ CONTAINER",
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "wrapped": false,
   "x": 534.7893218813452,
   "y": 522.5735931288071,
 }
