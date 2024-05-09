@@ -408,13 +408,13 @@ const resizeSingleTextElement = (
     const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
     newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
 
-    const resizedElement = {
+    const resizedElement: Partial<ExcalidrawTextElement> = {
       width: Math.abs(newWidth),
       height: Math.abs(metrics.height),
       x: newTopLeft[0],
       y: newTopLeft[1],
       text,
-      wrapped: true,
+      autoResize: false,
     };
 
     mutateElement(element, resizedElement);

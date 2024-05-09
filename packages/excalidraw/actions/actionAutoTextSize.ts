@@ -16,7 +16,7 @@ export const actionUnwrapText = register({
     return (
       selectedElements.length === 1 &&
       isTextElement(selectedElements[0]) &&
-      selectedElements[0].wrapped
+      selectedElements[0].autoResize === false
     );
   },
   perform: (elements, appState, _, app) => {
@@ -34,7 +34,7 @@ export const actionUnwrapText = register({
 
           return {
             ...element,
-            wrapped: false,
+            autoResize: true,
             width: metrics.width,
             height: metrics.height,
             text: element.originalText,

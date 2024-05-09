@@ -225,7 +225,7 @@ export const textWysiwyg = ({
       }
 
       if (!container) {
-        if (element.wrapped) {
+        if (element.autoResize === false) {
           text = wrapText(
             text,
             getFontString(element),
@@ -301,7 +301,7 @@ export const textWysiwyg = ({
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
-  if (isBoundToContainer(element) || element.wrapped) {
+  if (isBoundToContainer(element) || element.autoResize === false) {
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }

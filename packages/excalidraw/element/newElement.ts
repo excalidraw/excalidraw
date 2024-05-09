@@ -240,25 +240,28 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElement = newElementWith(
-    {
-      ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text,
-      fontSize,
-      fontFamily,
-      textAlign,
-      verticalAlign,
-      x: opts.x - offsets.x,
-      y: opts.y - offsets.y,
-      width: metrics.width,
-      height: metrics.height,
-      containerId: opts.containerId || null,
-      originalText: text,
-      wrapped: false,
-      lineHeight,
-    },
+  const textElementProps: ExcalidrawTextElement = {
+    ..._newElementBase<ExcalidrawTextElement>("text", opts),
+    text,
+    fontSize,
+    fontFamily,
+    textAlign,
+    verticalAlign,
+    x: opts.x - offsets.x,
+    y: opts.y - offsets.y,
+    width: metrics.width,
+    height: metrics.height,
+    containerId: opts.containerId || null,
+    originalText: text,
+    autoResize: true,
+    lineHeight,
+  };
+
+  const textElement: ExcalidrawTextElement = newElementWith(
+    textElementProps,
     {},
   );
+
   return textElement;
 };
 
@@ -344,7 +347,7 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (textElement.wrapped) {
+  if (textElement.autoResize === false) {
     return;
   }
   if (container) {

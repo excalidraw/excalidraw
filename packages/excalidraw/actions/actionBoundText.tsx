@@ -141,7 +141,7 @@ export const actionBindText = register({
     mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
-      wrapped: false,
+      autoResize: true,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -295,7 +295,7 @@ export const actionWrapTextInContainer = register({
             containerId: container.id,
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
-            wrapped: false,
+            autoResize: true,
           },
           false,
         );
