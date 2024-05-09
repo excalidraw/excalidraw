@@ -33,6 +33,7 @@ import {
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
   getBoundTextElement,
+  measureText,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -130,11 +131,11 @@ export const textWysiwyg = ({
       );
       let maxWidth = updatedTextElement.width;
 
+      let text = editable.value;
+
       let maxHeight = updatedTextElement.height;
       let textElementWidth = updatedTextElement.width;
-      // Set to element height by default since that's
-      // what is going to be used for unbounded text
-      const textElementHeight = updatedTextElement.height;
+      let textElementHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
@@ -224,6 +225,24 @@ export const textWysiwyg = ({
       }
 
       if (!container) {
+        if (element.wrapped) {
+          text = wrapText(
+            text,
+            getFontString(element),
+            Math.abs(updatedTextElement.width),
+          );
+        }
+
+        const metrics = measureText(
+          text,
+          getFontString(updatedTextElement),
+          updatedTextElement.lineHeight,
+        );
+
+        textElementWidth = updatedTextElement.width;
+        textElementHeight = metrics.height;
+
+        maxHeight = metrics.height;
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
       }
@@ -260,7 +279,13 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
-      mutateElement(updatedTextElement, { x: coordX, y: coordY });
+
+      mutateElement(updatedTextElement, {
+        x: coordX,
+        y: coordY,
+        height: textElementHeight,
+        text,
+      });
     }
   };
 
@@ -276,7 +301,7 @@ export const textWysiwyg = ({
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
-  if (isBoundToContainer(element)) {
+  if (isBoundToContainer(element) || element.wrapped) {
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }

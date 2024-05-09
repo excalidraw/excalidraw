@@ -1324,7 +1324,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
+            30,
             45,
           ]
         `);
@@ -1348,7 +1348,7 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
+            30,
             45,
           ]
         `);
