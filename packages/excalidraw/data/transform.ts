@@ -11,8 +11,8 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { bindLinearElement } from "../element/binding";
+import type { ElementConstructorOpts } from "../element/newElement";
 import {
-  ElementConstructorOpts,
   newFrameElement,
   newImageElement,
   newMagicFrameElement,
@@ -23,7 +23,7 @@ import {
   measureText,
   normalizeText,
 } from "../element/textElement";
-import {
+import type {
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
@@ -43,10 +43,17 @@ import {
   TextAlign,
   VerticalAlign,
 } from "../element/types";
-import { MarkOptional } from "../utility-types";
-import { assertNever, cloneJSON, getFontString, toBrandedType } from "../utils";
+import type { MarkOptional } from "../utility-types";
+import {
+  arrayToMap,
+  assertNever,
+  cloneJSON,
+  getFontString,
+  toBrandedType,
+} from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
+import { syncInvalidIndices } from "../fractionalIndex";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -398,11 +405,21 @@ const bindLinearElementToElement = (
     }
   }
 
+  // Safe check to early return for single point
+  if (linearElement.points.length < 2) {
+    return {
+      linearElement,
+      startBoundElement,
+      endBoundElement,
+    };
+  }
+
   // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
   const endPointIndex = linearElement.points.length - 1;
   const delta = 0.5;
 
   const newPoints = cloneJSON(linearElement.points) as [number, number][];
+
   // left to right so shift the arrow towards right
   if (
     linearElement.points[endPointIndex][0] >
@@ -457,12 +474,15 @@ class ElementStore {
 
     this.excalidrawElements.set(ele.id, ele);
   };
+
   getElements = () => {
-    return Array.from(this.excalidrawElements.values());
+    return syncInvalidIndices(Array.from(this.excalidrawElements.values()));
   };
 
   getElementsMap = () => {
-    return toBrandedType<NonDeletedSceneElementsMap>(this.excalidrawElements);
+    return toBrandedType<NonDeletedSceneElementsMap>(
+      arrayToMap(this.getElements()),
+    );
   };
 
   getElement = (id: string) => {

@@ -9,10 +9,10 @@ import {
   actionSendToBack,
   actionDuplicateSelection,
 } from "../actions";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { API } from "./helpers/api";
 import { selectGroupsForSelectedElements } from "../groups";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawSelectionElement,
@@ -46,6 +46,7 @@ const populateElements = (
     height?: number;
     containerId?: string;
     frameId?: ExcalidrawFrameElement["id"];
+    index?: ExcalidrawElement["index"];
   }[],
   appState?: Partial<AppState>,
 ) => {

@@ -1,19 +1,21 @@
-import { HamburgerMenuIcon, palette } from "../components/icons";
+import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { KEYS } from "../keys";
+import { StoreAction } from "../store";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
+  label: "buttons.menu",
   trackEvent: { category: "menu" },
   perform: (_, appState) => ({
     appState: {
       ...appState,
       openMenu: appState.openMenu === "canvas" ? null : "canvas",
     },
-    commitToHistory: false,
+    storeAction: StoreAction.NONE,
   }),
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
@@ -28,13 +30,14 @@ export const actionToggleCanvasMenu = register({
 
 export const actionToggleEditMenu = register({
   name: "toggleEditMenu",
+  label: "buttons.edit",
   trackEvent: { category: "menu" },
   perform: (_elements, appState) => ({
     appState: {
       ...appState,
       openMenu: appState.openMenu === "shape" ? null : "shape",
     },
-    commitToHistory: false,
+    storeAction: StoreAction.NONE,
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -53,6 +56,8 @@ export const actionToggleEditMenu = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
+  label: "welcomeScreen.defaults.helpHint",
+  icon: HelpIconThin,
   viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
@@ -69,7 +74,7 @@ export const actionShortcuts = register({
                 name: "help",
               },
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,

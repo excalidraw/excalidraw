@@ -1,15 +1,15 @@
-import { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { Point } from "../types";
+import type { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
-import { Mutable } from "../utility-types";
+import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 
-type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
+export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
-  "id" | "version" | "versionNonce"
+  "id" | "version" | "versionNonce" | "updated"
 >;
 
 // This function tracks updates of text elements for the purposes for collaboration.
@@ -79,6 +79,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       didChange = true;
     }
   }
+
   if (!didChange) {
     return element;
   }

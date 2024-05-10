@@ -1,8 +1,8 @@
 import React from "react";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import type { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 
-import { ExportOpts, BinaryFiles, UIAppState } from "../types";
+import type { ExportOpts, BinaryFiles, UIAppState } from "../types";
 import { Dialog } from "./Dialog";
 import { exportToFileIcon, LinkIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
@@ -12,7 +12,7 @@ import { Card } from "./Card";
 import "./ExportDialog.scss";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { trackEvent } from "../analytics";
-import { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../actions/manager";
 import { getFrame } from "../utils";
 
 export type ExportCB = (

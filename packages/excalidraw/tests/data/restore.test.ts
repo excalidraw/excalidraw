@@ -1,5 +1,5 @@
 import * as restore from "../../data/restore";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -8,8 +8,8 @@ import {
 import * as sizeHelpers from "../../element/sizeHelpers";
 import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
-import { ImportedDataState } from "../../data/types";
-import { NormalizedZoomValue } from "../../types";
+import type { ImportedDataState } from "../../data/types";
+import type { NormalizedZoomValue } from "../../types";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 import { vi } from "vitest";
@@ -72,6 +72,7 @@ describe("restoreElements", () => {
 
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),
+      versionNonce: expect.any(Number),
     });
   });
 
@@ -109,7 +110,10 @@ describe("restoreElements", () => {
       null,
     )[0] as ExcalidrawFreeDrawElement;
 
-    expect(restoredFreedraw).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredFreedraw).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
   });
 
   it("should restore line and draw elements correctly", () => {
@@ -129,8 +133,14 @@ describe("restoreElements", () => {
     const restoredLine = restoredElements[0] as ExcalidrawLinearElement;
     const restoredDraw = restoredElements[1] as ExcalidrawLinearElement;
 
-    expect(restoredLine).toMatchSnapshot({ seed: expect.any(Number) });
-    expect(restoredDraw).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredLine).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
+    expect(restoredDraw).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
   });
 
   it("should restore arrow element correctly", () => {
@@ -140,7 +150,10 @@ describe("restoreElements", () => {
 
     const restoredArrow = restoredElements[0] as ExcalidrawLinearElement;
 
-    expect(restoredArrow).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredArrow).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
   });
 
   it('should set arrow element endArrowHead as "arrow" when arrow element endArrowHead is null', () => {
@@ -270,9 +283,18 @@ describe("restoreElements", () => {
 
     const restoredElements = restore.restoreElements(elements, null);
 
-    expect(restoredElements[0]).toMatchSnapshot({ seed: expect.any(Number) });
-    expect(restoredElements[1]).toMatchSnapshot({ seed: expect.any(Number) });
-    expect(restoredElements[2]).toMatchSnapshot({ seed: expect.any(Number) });
+    expect(restoredElements[0]).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
+    expect(restoredElements[1]).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
+    expect(restoredElements[2]).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
   });
 
   it("bump versions of local duplicate elements when supplied", () => {
@@ -290,12 +312,11 @@ describe("restoreElements", () => {
     expect(restoredElements).toEqual([
       expect.objectContaining({
         id: rectangle.id,
-        version: rectangle_modified.version + 1,
+        version: rectangle_modified.version + 2,
       }),
       expect.objectContaining({
         id: ellipse.id,
-        version: ellipse.version,
-        versionNonce: ellipse.versionNonce,
+        version: ellipse.version + 1,
       }),
     ]);
   });
@@ -549,11 +570,10 @@ describe("restore", () => {
       rectangle.versionNonce,
     );
     expect(restoredData.elements).toEqual([
-      expect.objectContaining({ version: rectangle_modified.version + 1 }),
+      expect.objectContaining({ version: rectangle_modified.version + 2 }),
       expect.objectContaining({
         id: ellipse.id,
-        version: ellipse.version,
-        versionNonce: ellipse.versionNonce,
+        version: ellipse.version + 1,
       }),
     ]);
   });

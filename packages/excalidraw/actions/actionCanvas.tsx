@@ -1,15 +1,30 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import {
+  handIcon,
+  MoonIcon,
+  SunIcon,
+  TrashIcon,
+  zoomAreaIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  ZoomResetIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
+import {
+  CURSOR_TYPE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  THEME,
+  ZOOM_STEP,
+} from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { AppState, NormalizedZoomValue } from "../types";
+import type { AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
@@ -20,11 +35,14 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { SceneBounds } from "../element/bounds";
+import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
+import { StoreAction } from "../store";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  label: "labels.canvasBackground",
+  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -35,7 +53,9 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      commitToHistory: !!value.viewBackgroundColor,
+      storeAction: !!value.viewBackgroundColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => {
@@ -59,6 +79,9 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  label: "labels.clearCanvas",
+  paletteName: "Clear canvas",
+  icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -88,14 +111,16 @@ export const actionClearCanvas = register({
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  label: "buttons.zoomIn",
   viewMode: true,
+  icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
@@ -111,16 +136,17 @@ export const actionZoomIn = register({
         ),
         userToFollow: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       className="zoom-in-button zoom-button"
       icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
+      disabled={appState.zoom.value >= MAX_ZOOM}
       onClick={() => {
         updateData(null);
       }}
@@ -133,6 +159,8 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  label: "buttons.zoomOut",
+  icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -149,16 +177,17 @@ export const actionZoomOut = register({
         ),
         userToFollow: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       className="zoom-out-button zoom-button"
       icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
+      disabled={appState.zoom.value <= MIN_ZOOM}
       onClick={() => {
         updateData(null);
       }}
@@ -171,6 +200,8 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  label: "buttons.resetZoom",
+  icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -187,7 +218,7 @@ export const actionResetZoom = register({
         ),
         userToFollow: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -262,8 +293,8 @@ export const zoomToFitBounds = ({
 
     // Apply clamping to newZoomValue to be between 10% and 3000%
     newZoomValue = Math.min(
-      Math.max(newZoomValue, 0.1),
-      30.0,
+      Math.max(newZoomValue, MIN_ZOOM),
+      MAX_ZOOM,
     ) as NormalizedZoomValue;
 
     let appStateWidth = appState.width;
@@ -308,7 +339,7 @@ export const zoomToFitBounds = ({
       scrollY,
       zoom: { value: newZoomValue },
     },
-    commitToHistory: false,
+    storeAction: StoreAction.NONE,
   };
 };
 
@@ -340,6 +371,8 @@ export const zoomToFit = ({
 // size, it won't be zoomed in.
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
+  label: "labels.zoomToFitViewport",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -363,6 +396,8 @@ export const actionZoomToFitSelectionInViewport = register({
 
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
+  label: "helpDialog.zoomToSelection",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -385,6 +420,8 @@ export const actionZoomToFitSelection = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  label: "helpDialog.zoomToFit",
+  icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) =>
@@ -405,6 +442,13 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  label: (_, appState) => {
+    return appState.theme === THEME.DARK
+      ? "buttons.lightMode"
+      : "buttons.darkMode";
+  },
+  keywords: ["toggle", "dark", "light", "mode", "theme"],
+  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
@@ -414,7 +458,7 @@ export const actionToggleTheme = register({
         theme:
           value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
@@ -425,6 +469,7 @@ export const actionToggleTheme = register({
 
 export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
+  label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
@@ -451,7 +496,7 @@ export const actionToggleEraserTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) => event.key === KEYS.E,
@@ -459,7 +504,11 @@ export const actionToggleEraserTool = register({
 
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
+  label: "toolBar.hand",
+  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
+  icon: handIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
@@ -486,7 +535,7 @@ export const actionToggleHandTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

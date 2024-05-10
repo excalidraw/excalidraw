@@ -1,5 +1,5 @@
 import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawElementType,
@@ -18,25 +18,19 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
-  isSafari,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MaybeTransformHandleType } from "./transformHandles";
+import type { MaybeTransformHandleType } from "./transformHandles";
 import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import { AppState } from "../types";
-import { isTextBindableContainer } from "./typeChecks";
-import { getElementAbsoluteCoords } from ".";
-import { getSelectedElements } from "../scene";
-import { isHittingElementNotConsideringBoundingBox } from "./collision";
-
-import { ExtractSetType } from "../utility-types";
+import type { AppState } from "../types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./containerCache";
+import type { ExtractSetType, MakeBrand } from "../utility-types";
 
 export const normalizeText = (text: string) => {
   return (
@@ -54,6 +48,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
+  informMutation: boolean = true,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -62,7 +57,7 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    baseline: textElement.baseline,
+    angle: container?.angle ?? textElement.angle,
   };
 
   boundTextUpdates.text = textElement.text;
@@ -83,7 +78,6 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
-  boundTextUpdates.baseline = metrics.baseline;
 
   if (container) {
     const maxContainerHeight = getBoundTextMaxHeight(
@@ -97,7 +91,7 @@ export const redrawTextBoundingBox = (
         metrics.height,
         container.type,
       );
-      mutateElement(container, { height: nextHeight });
+      mutateElement(container, { height: nextHeight }, informMutation);
       updateOriginalContainerCache(container.id, nextHeight);
     }
     if (metrics.width > maxContainerWidth) {
@@ -105,7 +99,7 @@ export const redrawTextBoundingBox = (
         metrics.width,
         container.type,
       );
-      mutateElement(container, { width: nextWidth });
+      mutateElement(container, { width: nextWidth }, informMutation);
     }
     const updatedTextElement = {
       ...textElement,
@@ -120,7 +114,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.y = y;
   }
 
-  mutateElement(textElement, boundTextUpdates);
+  mutateElement(textElement, boundTextUpdates, informMutation);
 };
 
 export const bindTextToShapeAfterDuplication = (
@@ -188,7 +182,6 @@ export const handleBindTextResize = (
     const maxWidth = getBoundTextMaxWidth(container, textElement);
     const maxHeight = getBoundTextMaxHeight(container, textElement);
     let containerHeight = container.height;
-    let nextBaseLine = textElement.baseline;
     if (
       shouldMaintainAspectRatio ||
       (transformHandleType !== "n" && transformHandleType !== "s")
@@ -207,7 +200,6 @@ export const handleBindTextResize = (
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
-      nextBaseLine = metrics.baseline;
     }
     // increase height in case text element height exceeds
     if (nextHeight > maxHeight) {
@@ -235,7 +227,6 @@ export const handleBindTextResize = (
       text,
       width: nextWidth,
       height: nextHeight,
-      baseline: nextBaseLine,
     });
 
     if (!isArrowElement(container)) {
@@ -285,8 +276,6 @@ export const computeBoundTextPosition = (
   return { x, y };
 };
 
-// https://github.com/grassator/canvas-text-editor/blob/master/lib/FontMetrics.js
-
 export const measureText = (
   text: string,
   font: FontString,
@@ -301,59 +290,7 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  const baseline = measureBaseline(text, font, lineHeight);
-  return { width, height, baseline };
-};
-
-export const measureBaseline = (
-  text: string,
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-  wrapInContainer?: boolean,
-) => {
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.whiteSpace = "pre";
-  container.style.font = font;
-  container.style.minHeight = "1em";
-  if (wrapInContainer) {
-    container.style.overflow = "hidden";
-    container.style.wordBreak = "break-word";
-    container.style.whiteSpace = "pre-wrap";
-  }
-
-  container.style.lineHeight = String(lineHeight);
-
-  container.innerText = text;
-
-  // Baseline is important for positioning text on canvas
-  document.body.appendChild(container);
-
-  const span = document.createElement("span");
-  span.style.display = "inline-block";
-  span.style.overflow = "hidden";
-  span.style.width = "1px";
-  span.style.height = "1px";
-  container.appendChild(span);
-  let baseline = span.offsetTop + span.offsetHeight;
-  const height = container.offsetHeight;
-
-  if (isSafari) {
-    const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
-    const fontSize = parseFloat(font);
-    // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
-    // from the actual canvas height
-    const domHeight = getTextHeight(text, Math.round(fontSize), lineHeight);
-    if (canvasHeight > height) {
-      baseline += canvasHeight - domHeight;
-    }
-
-    if (height > canvasHeight) {
-      baseline -= domHeight - canvasHeight;
-    }
-  }
-  document.body.removeChild(container);
-  return baseline;
+  return { width, height };
 };
 
 /**
@@ -376,6 +313,24 @@ export const getLineHeightInPx = (
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
   return fontSize * lineHeight;
+};
+
+/**
+ * Calculates vertical offset for a text with alphabetic baseline.
+ */
+export const getVerticalOffset = (
+  fontFamily: ExcalidrawTextElement["fontFamily"],
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeightPx: number,
+) => {
+  const { unitsPerEm, ascender, descender } =
+    FONT_METRICS[fontFamily] || FONT_METRICS[FONT_FAMILY.Helvetica];
+
+  const fontSizeEm = fontSize / unitsPerEm;
+  const lineGap = lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender;
+
+  const verticalOffset = fontSizeEm * ascender + lineGap;
+  return verticalOffset;
 };
 
 // FIXME rename to getApproxMinContainerHeight
@@ -813,50 +768,6 @@ export const suppportsHorizontalAlign = (
   });
 };
 
-export const getTextBindableContainerAtPosition = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  x: number,
-  y: number,
-  elementsMap: ElementsMap,
-): ExcalidrawTextContainer | null => {
-  const selectedElements = getSelectedElements(elements, appState);
-  if (selectedElements.length === 1) {
-    return isTextBindableContainer(selectedElements[0], false)
-      ? selectedElements[0]
-      : null;
-  }
-  let hitElement = null;
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  for (let index = elements.length - 1; index >= 0; --index) {
-    if (elements[index].isDeleted) {
-      continue;
-    }
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(
-      elements[index],
-      elementsMap,
-    );
-    if (
-      isArrowElement(elements[index]) &&
-      isHittingElementNotConsideringBoundingBox(
-        elements[index],
-        appState,
-        null,
-        [x, y],
-        elementsMap,
-      )
-    ) {
-      hitElement = elements[index];
-      break;
-    } else if (x1 < x && x < x2 && y1 < y && y < y2) {
-      hitElement = elements[index];
-      break;
-    }
-  }
-
-  return isTextBindableContainer(hitElement, false) ? hitElement : null;
-};
-
 const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
   "ellipse",
@@ -964,11 +875,55 @@ const DEFAULT_LINE_HEIGHT = {
   // ~1.25 is the average for Virgil in WebKit and Blink.
   // Gecko (FF) uses ~1.28.
   [FONT_FAMILY.Virgil]: 1.25 as ExcalidrawTextElement["lineHeight"],
-  // ~1.15 is the average for Virgil in WebKit and Blink.
-  // Gecko if all over the place.
+  // ~1.15 is the average for Helvetica in WebKit and Blink.
   [FONT_FAMILY.Helvetica]: 1.15 as ExcalidrawTextElement["lineHeight"],
-  // ~1.2 is the average for Virgil in WebKit and Blink, and kinda Gecko too
+  // ~1.2 is the average for Cascadia in WebKit and Blink, and kinda Gecko too
   [FONT_FAMILY.Cascadia]: 1.2 as ExcalidrawTextElement["lineHeight"],
+};
+
+/** OS/2 sTypoAscender, https://learn.microsoft.com/en-us/typography/opentype/spec/os2#stypoascender */
+type sTypoAscender = number & MakeBrand<"sTypoAscender">;
+
+/** OS/2 sTypoDescender, https://learn.microsoft.com/en-us/typography/opentype/spec/os2#stypodescender */
+type sTypoDescender = number & MakeBrand<"sTypoDescender">;
+
+/** head.unitsPerEm, usually either 1000 or 2048 */
+type unitsPerEm = number & MakeBrand<"unitsPerEm">;
+
+/**
+ * Hardcoded metrics for default fonts, read by https://opentype.js.org/font-inspector.html.
+ * For custom fonts, read these metrics from OS/2 table and extend this object.
+ *
+ * WARN: opentype does NOT open WOFF2 correctly, make sure to convert WOFF2 to TTF first.
+ */
+export const FONT_METRICS: Record<
+  number,
+  {
+    unitsPerEm: number;
+    ascender: sTypoAscender;
+    descender: sTypoDescender;
+  }
+> = {
+  [FONT_FAMILY.Virgil]: {
+    unitsPerEm: 1000 as unitsPerEm,
+    ascender: 886 as sTypoAscender,
+    descender: -374 as sTypoDescender,
+  },
+  [FONT_FAMILY.Helvetica]: {
+    unitsPerEm: 2048 as unitsPerEm,
+    ascender: 1577 as sTypoAscender,
+    descender: -471 as sTypoDescender,
+  },
+  [FONT_FAMILY.Cascadia]: {
+    unitsPerEm: 2048 as unitsPerEm,
+    ascender: 1977 as sTypoAscender,
+    descender: -480 as sTypoDescender,
+  },
+  [FONT_FAMILY.Assistant]: {
+    unitsPerEm: 1000 as unitsPerEm,
+    ascender: 1021 as sTypoAscender,
+    descender: -287 as sTypoDescender,
+  },
 };
 
 export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {

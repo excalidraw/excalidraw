@@ -19,7 +19,14 @@
 
     &__top-right {
       display: flex;
+      width: 100%;
+      justify-content: flex-end;
       gap: 0.75rem;
+      pointer-events: none !important;
+
+      & > * {
+        pointer-events: var(--ui-pointerEvents);
+      }
     }
 
     &__footer {

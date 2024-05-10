@@ -1,5 +1,6 @@
-import { PointSnapLine, PointerSnapLine } from "../snapping";
-import { InteractiveCanvasAppState, Point } from "../types";
+import { THEME } from "../constants";
+import type { PointSnapLine, PointerSnapLine } from "../snapping";
+import type { InteractiveCanvasAppState, Point } from "../types";
 
 const SNAP_COLOR_LIGHT = "#ff6b6b";
 const SNAP_COLOR_DARK = "#ff0000";
@@ -18,7 +19,7 @@ export const renderSnaps = (
   // Don't change if zen mode, because we draw only crosses, we want the
   // colors to be more visible
   const snapColor =
-    appState.theme === "light" || appState.zenModeEnabled
+    appState.theme === THEME.LIGHT || appState.zenModeEnabled
       ? SNAP_COLOR_LIGHT
       : SNAP_COLOR_DARK;
   // in zen mode make the cross more visible since we don't draw the lines

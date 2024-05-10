@@ -1,15 +1,20 @@
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
-import { AppClassProperties, AppState } from "../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
+import { frameToolIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
-const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
+const isSingleFrameSelected = (
+  appState: UIAppState,
+  app: AppClassProperties,
+) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
   return (
@@ -19,6 +24,7 @@ const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
 
 export const actionSelectAllElementsInFrame = register({
   name: "selectAllElementsInFrame",
+  label: "labels.selectAllElementsInFrame",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -39,23 +45,23 @@ export const actionSelectAllElementsInFrame = register({
             return acc;
           }, {} as Record<ExcalidrawElement["id"], true>),
         },
-        commitToHistory: false,
+        storeAction: StoreAction.CAPTURE,
       };
     }
 
     return {
       elements,
       appState,
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.selectAllElementsInFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
   name: "removeAllElementsFromFrame",
+  label: "labels.removeAllElementsFromFrame",
   trackEvent: { category: "history" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -70,23 +76,23 @@ export const actionRemoveAllElementsFromFrame = register({
             [selectedElement.id]: true,
           },
         },
-        commitToHistory: true,
+        storeAction: StoreAction.CAPTURE,
       };
     }
 
     return {
       elements,
       appState,
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.removeAllElementsFromFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionupdateFrameRendering = register({
   name: "updateFrameRendering",
+  label: "labels.updateFrameRendering",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
@@ -99,16 +105,18 @@ export const actionupdateFrameRendering = register({
           enabled: !appState.frameRendering.enabled,
         },
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.updateFrameRendering",
   checked: (appState: AppState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({
   name: "setFrameAsActiveTool",
+  label: "toolBar.frame",
   trackEvent: { category: "toolbar" },
+  icon: frameToolIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "frame",
@@ -127,7 +135,7 @@ export const actionSetFrameAsActiveTool = register({
           type: "frame",
         }),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) =>
