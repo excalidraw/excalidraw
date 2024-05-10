@@ -149,7 +149,7 @@
     "zoomToFitViewport": "Transfocare pentru a se potrivi în poarta de vizualizare",
     "zoomToFitSelection": "Transfocare pentru a cuprinde selecția",
     "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
-    "installPWA": ""
+    "installPWA": "Instalează Excalidraw la nivel local (PWA)"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
