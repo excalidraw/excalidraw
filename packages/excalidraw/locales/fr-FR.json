@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Modifier la ligne",
-      "editArrow": ""
+      "editArrow": "Modifier la flèche"
     },
     "elementLock": {
       "lock": "Verrouiller",
@@ -146,9 +146,9 @@
     "prompt": "Demander",
     "followUs": "Suivez-nous",
     "discordChat": "Salon Discord",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
+    "zoomToFitViewport": "Zoomer pour tenir dans la fenêtre d'affichage",
+    "zoomToFitSelection": "Zoomer pour s'adapter à la sélection",
+    "zoomToFit": "Zoomer pour voir tous les éléments",
     "installPWA": "Installer Excalidraw localement (PWA)"
   },
   "library": {
@@ -182,7 +182,7 @@
     "fullScreen": "Plein écran",
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
-    "systemMode": "",
+    "systemMode": "Mode système",
     "zenMode": "Mode zen",
     "objectsSnapMode": "Aimanter aux objets",
     "exitZenMode": "Quitter le mode zen",
@@ -226,7 +226,7 @@
     "failedToFetchImage": "Échec de récupération de l'image.",
     "cannotResolveCollabServer": "Impossible de se connecter au serveur collaboratif. Veuillez recharger la page et réessayer.",
     "importLibraryError": "Impossible de charger la bibliothèque",
-    "saveLibraryError": "",
+    "saveLibraryError": "Impossible d'enregistrer la bibliothèque sur le stockage. Veuillez enregistrer votre bibliothèque dans un fichier localement pour éviter de perdre vos modifications.",
     "collabSaveFailed": "Impossible d'enregistrer dans la base de données en arrière-plan. Si des problèmes persistent, vous devriez enregistrer votre fichier localement pour vous assurer de ne pas perdre votre travail.",
     "collabSaveFailed_sizeExceeded": "Impossible d'enregistrer dans la base de données en arrière-plan, le tableau semble trop grand. Vous devriez enregistrer le fichier localement pour vous assurer de ne pas perdre votre travail.",
     "imageToolNotSupported": "Les images sont désactivées.",
@@ -258,7 +258,7 @@
     "library": "Bibliothèque",
     "lock": "Garder l'outil sélectionné actif après le dessin",
     "penMode": "Mode stylo - évite le toucher",
-    "link": "",
+    "link": "Ajouter / Mettre à jour un lien pour une forme sélectionnée",
     "eraser": "Gomme",
     "frame": "Outil de cadre",
     "magicframe": "Modèle en fil de fer vers code",
@@ -559,10 +559,10 @@
     },
     "recents": "Récemment utilisé",
     "search": {
-      "placeholder": "",
+      "placeholder": "Recherchez dans les menus, les commandes et découvrez des gemmes cachées",
       "noMatch": "Aucune commande correspondante..."
     },
     "itemNotAvailable": "Commande non disponible...",
-    "shortcutHint": ""
+    "shortcutHint": "Pour la palette de commandes, utilisez {{shortcut}}"
   }
 }
