@@ -21,9 +21,9 @@
     "copyStyles": "Copiar estilos",
     "pasteStyles": "Pegar estilos",
     "stroke": "Trazo",
-    "changeStroke": "",
+    "changeStroke": "Cambiar el color del trazo",
     "background": "Fondo",
-    "changeBackground": "",
+    "changeBackground": "Cambiar el color de fondo",
     "fill": "Rellenar",
     "strokeWidth": "Grosor del trazo",
     "strokeStyle": "Estilo del trazo",
@@ -74,7 +74,7 @@
     "canvasColors": "Usado en lienzo",
     "canvasBackground": "Fondo del lienzo",
     "drawingCanvas": "Lienzo de dibujo",
-    "clearCanvas": "",
+    "clearCanvas": "Lona transparente",
     "layers": "Capas",
     "actions": "Acciones",
     "language": "Idioma",
@@ -87,13 +87,13 @@
     "group": "Agrupar selección",
     "ungroup": "Desagrupar selección",
     "collaborators": "Colaboradores",
-    "toggleGrid": "",
+    "toggleGrid": "Alternar rejilla",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca…",
     "libraries": "Explorar bibliotecas",
     "loadingScene": "Cargando escena…",
-    "loadScene": "",
+    "loadScene": "Cargar escena desde archivo",
     "align": "Alinear",
     "alignTop": "Alineación superior",
     "alignBottom": "Alineación inferior",
@@ -315,8 +315,8 @@
     "or": ""
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Invita a gente a colaborar en tu dibujo.",
+    "desc_privacy": "No te preocupes, la sesión está encriptada de extremo a extremo y es totalmente privada. Ni siquiera nuestro servidor puede ver lo que dibujas.",
     "button_startSession": "Iniciar sesión",
     "button_stopSession": "Detener sesión",
     "desc_inProgressIntro": "La sesión de colaboración en vivo está ahora en progreso.",
@@ -545,9 +545,9 @@
     "hint": {
       "text": "Haga clic en el usuario para seguir",
       "followStatus": "Ya estás siguiendo a este usuario",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "El usuario está en una llamada de voz",
+      "micMuted": "El micrófono del usuario está silenciado",
+      "isSpeaking": "El usuario está hablando"
     }
   },
   "commandPalette": {
