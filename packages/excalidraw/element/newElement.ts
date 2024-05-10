@@ -347,9 +347,6 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (textElement.autoResize === false) {
-    return;
-  }
   if (container) {
     text = wrapText(
       text,
@@ -378,7 +375,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
+    ...refreshTextDimensions(textElement, container, elementsMap, text),
   });
 };
 
