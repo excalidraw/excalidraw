@@ -21,9 +21,9 @@
     "copyStyles": "Copier les styles",
     "pasteStyles": "Coller les styles",
     "stroke": "Trait",
-    "changeStroke": "",
+    "changeStroke": "Changer la couleur du trait",
     "background": "Arrière-plan",
-    "changeBackground": "",
+    "changeBackground": "Changer la couleur d'arrière-plan",
     "fill": "Remplissage",
     "strokeWidth": "Largeur du contour",
     "strokeStyle": "Style du trait",
@@ -74,7 +74,7 @@
     "canvasColors": "Utilisé sur la zone de dessin",
     "canvasBackground": "Arrière-plan du canevas",
     "drawingCanvas": "Zone de dessin",
-    "clearCanvas": "",
+    "clearCanvas": "Effacer la zone de dessin",
     "layers": "Disposition",
     "actions": "Actions",
     "language": "Langue",
@@ -87,13 +87,13 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
-    "toggleGrid": "",
+    "toggleGrid": "Afficher/Cacher la grille",
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
     "libraryLoadingMessage": "Chargement de la bibliothèque…",
     "libraries": "Parcourir les bibliothèques",
     "loadingScene": "Chargement de la scène…",
-    "loadScene": "",
+    "loadScene": "Charger une scène depuis un fichier",
     "align": "Alignement",
     "alignTop": "Aligner en haut",
     "alignBottom": "Aligner en bas",
@@ -109,8 +109,8 @@
     "share": "Partager",
     "showStroke": "Afficher le sélecteur de couleur de trait",
     "showBackground": "Afficher le sélecteur de couleur de fond",
-    "toggleTheme": "",
-    "theme": "",
+    "toggleTheme": "Basculer mode clair/sombre",
+    "theme": "Thème",
     "personalLib": "Bibliothèque personnelle",
     "excalidrawLib": "Bibliothèque Excalidraw",
     "decreaseFontSize": "Diminuer la taille de police",
@@ -149,7 +149,7 @@
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": "",
-    "installPWA": ""
+    "installPWA": "Installer Excalidraw localement (PWA)"
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -545,24 +545,24 @@
     "hint": {
       "text": "Cliquez sur l'utilisateur pour le suivre",
       "followStatus": "Vous suivez actuellement cet utilisateur",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "L'utilisateur est dans un appel vocal",
+      "micMuted": "Le micro de l'utilisateur est muet",
+      "isSpeaking": "L'utilisateur parle"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Palette de commandes",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Sélectionner",
+      "confirm": "Confirmer",
+      "close": "Fermer"
     },
-    "recents": "",
+    "recents": "Récemment utilisé",
     "search": {
       "placeholder": "",
-      "noMatch": ""
+      "noMatch": "Aucune commande correspondante..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Commande non disponible...",
     "shortcutHint": ""
   }
 }
