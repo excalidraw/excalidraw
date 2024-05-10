@@ -217,7 +217,6 @@ const LayerUI = ({
       })}
     >
       <Island
-        draggable
         className={CLASSES.SHAPE_ACTIONS_MENU}
         padding={2}
         style={{

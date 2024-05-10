@@ -16,11 +16,7 @@ export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
   ({ children, padding, className, style, draggable }, ref) =>
     draggable ? (
       <Draggable>
-        <div
-          className={clsx("Island", className)}
-          style={{ "--padding": padding, ...style }}
-          ref={ref}
-        >
+        <div className={clsx("Island", className)} ref={ref}>
           {children}
         </div>
       </Draggable>
