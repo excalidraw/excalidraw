@@ -1,20 +1,20 @@
 import { COLOR_PALETTE } from "./colors";
+import type { EVENT } from "./constants";
 import {
   DEFAULT_VERSION,
-  EVENT,
   FONT_FAMILY,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
-import {
+import type { FontFamilyValues, FontString } from "./element/types";
+import type {
   ActiveTool,
   AppState,
   ToolType,
   UnsubscribeCallback,
   Zoom,
 } from "./types";
-import { ResolutionType } from "./utility-types";
+import type { MaybePromise, ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -538,7 +538,9 @@ export const isTransparent = (color: string) => {
 };
 
 export type ResolvablePromise<T> = Promise<T> & {
-  resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
+  resolve: [T] extends [undefined]
+    ? (value?: MaybePromise<Awaited<T>>) => void
+    : (value: MaybePromise<Awaited<T>>) => void;
   reject: (error: Error) => void;
 };
 export const resolvablePromise = <T>() => {
@@ -669,7 +671,21 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
+/**
+ * Transform array into an object, use only when array order is irrelevant.
+ */
+export const arrayToObject = <T>(
+  array: readonly T[],
+  groupBy?: (value: T) => string,
+) =>
+  array.reduce((acc, value) => {
+    acc[groupBy ? groupBy(value) : String(value)] = value;
+    return acc;
+  }, {} as { [key: string]: T });
+
 export const isTestEnv = () => import.meta.env.MODE === "test";
+
+export const isDevEnv = () => import.meta.env.MODE === "development";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
@@ -789,6 +805,14 @@ export const isShallowEqual = <
   const aKeys = Object.keys(objA);
   const bKeys = Object.keys(objB);
   if (aKeys.length !== bKeys.length) {
+    if (debug) {
+      console.warn(
+        `%cisShallowEqual: objects don't have same properties ->`,
+        "color: #8B4000",
+        objA,
+        objB,
+      );
+    }
     return false;
   }
 
@@ -1090,3 +1114,13 @@ export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
 };
 
 // -----------------------------------------------------------------------------
+
+// Promise.try, adapted from https://github.com/sindresorhus/p-try
+export const promiseTry = async <TValue, TArgs extends unknown[]>(
+  fn: (...args: TArgs) => PromiseLike<TValue> | TValue,
+  ...args: TArgs
+): Promise<TValue> => {
+  return new Promise((resolve) => {
+    resolve(fn(...args));
+  });
+};

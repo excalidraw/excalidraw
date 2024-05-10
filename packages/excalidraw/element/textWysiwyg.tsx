@@ -11,14 +11,14 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
-import {
+import { CLASSES } from "../constants";
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
 } from "./types";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
@@ -31,7 +31,6 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
-  detectLineHeight,
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
@@ -40,7 +39,7 @@ import {
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
-import App from "../components/App";
+import type App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 import {
@@ -227,18 +226,6 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
-      } else {
-        textElementWidth += 0.5;
-      }
-
-      let lineHeight = updatedTextElement.lineHeight;
-
-      // In Safari the font size gets rounded off when rendering hence calculating the line height by rounding off font size
-      if (isSafari) {
-        lineHeight = detectLineHeight({
-          ...updatedTextElement,
-          fontSize: Math.round(updatedTextElement.fontSize),
-        });
       }
 
       // Make sure text editor height doesn't go beyond viewport
@@ -247,7 +234,7 @@ export const textWysiwyg = ({
       Object.assign(editable.style, {
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
-        lineHeight,
+        lineHeight: updatedTextElement.lineHeight,
         width: `${textElementWidth}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,

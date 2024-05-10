@@ -1,265 +1,210 @@
-import { AppState } from "./types";
-import { ExcalidrawElement } from "./element/types";
-import { isLinearElement } from "./element/typeChecks";
-import { deepCopyElement } from "./element/newElement";
-import { Mutable } from "./utility-types";
+import type { AppStateChange, ElementsChange } from "./change";
+import type { SceneElementsMap } from "./element/types";
+import { Emitter } from "./emitter";
+import type { Snapshot } from "./store";
+import type { AppState } from "./types";
 
-export interface HistoryEntry {
-  appState: ReturnType<typeof clearAppStatePropertiesForHistory>;
-  elements: ExcalidrawElement[];
+type HistoryStack = HistoryEntry[];
+
+export class HistoryChangedEvent {
+  constructor(
+    public readonly isUndoStackEmpty: boolean = true,
+    public readonly isRedoStackEmpty: boolean = true,
+  ) {}
 }
 
-interface DehydratedExcalidrawElement {
-  id: string;
-  versionNonce: number;
-}
+export class History {
+  public readonly onHistoryChangedEmitter = new Emitter<
+    [HistoryChangedEvent]
+  >();
 
-interface DehydratedHistoryEntry {
-  appState: string;
-  elements: DehydratedExcalidrawElement[];
-}
+  private readonly undoStack: HistoryStack = [];
+  private readonly redoStack: HistoryStack = [];
 
-const clearAppStatePropertiesForHistory = (appState: AppState) => {
-  return {
-    selectedElementIds: appState.selectedElementIds,
-    selectedGroupIds: appState.selectedGroupIds,
-    viewBackgroundColor: appState.viewBackgroundColor,
-    editingLinearElement: appState.editingLinearElement,
-    editingGroupId: appState.editingGroupId,
-    name: appState.name,
-  };
-};
-
-class History {
-  private elementCache = new Map<string, Map<number, ExcalidrawElement>>();
-  private recording: boolean = true;
-  private stateHistory: DehydratedHistoryEntry[] = [];
-  private redoStack: DehydratedHistoryEntry[] = [];
-  private lastEntry: HistoryEntry | null = null;
-
-  private hydrateHistoryEntry({
-    appState,
-    elements,
-  }: DehydratedHistoryEntry): HistoryEntry {
-    return {
-      appState: JSON.parse(appState),
-      elements: elements.map((dehydratedExcalidrawElement) => {
-        const element = this.elementCache
-          .get(dehydratedExcalidrawElement.id)
-          ?.get(dehydratedExcalidrawElement.versionNonce);
-        if (!element) {
-          throw new Error(
-            `Element not found: ${dehydratedExcalidrawElement.id}:${dehydratedExcalidrawElement.versionNonce}`,
-          );
-        }
-        return element;
-      }),
-    };
+  public get isUndoStackEmpty() {
+    return this.undoStack.length === 0;
   }
 
-  private dehydrateHistoryEntry({
-    appState,
-    elements,
-  }: HistoryEntry): DehydratedHistoryEntry {
-    return {
-      appState: JSON.stringify(appState),
-      elements: elements.map((element: ExcalidrawElement) => {
-        if (!this.elementCache.has(element.id)) {
-          this.elementCache.set(element.id, new Map());
-        }
-        const versions = this.elementCache.get(element.id)!;
-        if (!versions.has(element.versionNonce)) {
-          versions.set(element.versionNonce, deepCopyElement(element));
-        }
-        return {
-          id: element.id,
-          versionNonce: element.versionNonce,
-        };
-      }),
-    };
+  public get isRedoStackEmpty() {
+    return this.redoStack.length === 0;
   }
 
-  getSnapshotForTest() {
-    return {
-      recording: this.recording,
-      stateHistory: this.stateHistory.map((dehydratedHistoryEntry) =>
-        this.hydrateHistoryEntry(dehydratedHistoryEntry),
-      ),
-      redoStack: this.redoStack.map((dehydratedHistoryEntry) =>
-        this.hydrateHistoryEntry(dehydratedHistoryEntry),
-      ),
-    };
-  }
-
-  clear() {
-    this.stateHistory.length = 0;
+  public clear() {
+    this.undoStack.length = 0;
     this.redoStack.length = 0;
-    this.lastEntry = null;
-    this.elementCache.clear();
-  }
-
-  private generateEntry = (
-    appState: AppState,
-    elements: readonly ExcalidrawElement[],
-  ): DehydratedHistoryEntry =>
-    this.dehydrateHistoryEntry({
-      appState: clearAppStatePropertiesForHistory(appState),
-      elements: elements.reduce((elements, element) => {
-        if (
-          isLinearElement(element) &&
-          appState.multiElement &&
-          appState.multiElement.id === element.id
-        ) {
-          // don't store multi-point arrow if still has only one point
-          if (
-            appState.multiElement &&
-            appState.multiElement.id === element.id &&
-            element.points.length < 2
-          ) {
-            return elements;
-          }
-
-          elements.push({
-            ...element,
-            // don't store last point if not committed
-            points:
-              element.lastCommittedPoint !==
-              element.points[element.points.length - 1]
-                ? element.points.slice(0, -1)
-                : element.points,
-          });
-        } else {
-          elements.push(element);
-        }
-        return elements;
-      }, [] as Mutable<typeof elements>),
-    });
-
-  shouldCreateEntry(nextEntry: HistoryEntry): boolean {
-    const { lastEntry } = this;
-
-    if (!lastEntry) {
-      return true;
-    }
-
-    if (nextEntry.elements.length !== lastEntry.elements.length) {
-      return true;
-    }
-
-    // loop from right to left as changes are likelier to happen on new elements
-    for (let i = nextEntry.elements.length - 1; i > -1; i--) {
-      const prev = nextEntry.elements[i];
-      const next = lastEntry.elements[i];
-      if (
-        !prev ||
-        !next ||
-        prev.id !== next.id ||
-        prev.versionNonce !== next.versionNonce
-      ) {
-        return true;
-      }
-    }
-
-    // note: this is safe because entry's appState is guaranteed no excess props
-    let key: keyof typeof nextEntry.appState;
-    for (key in nextEntry.appState) {
-      if (key === "editingLinearElement") {
-        if (
-          nextEntry.appState[key]?.elementId ===
-          lastEntry.appState[key]?.elementId
-        ) {
-          continue;
-        }
-      }
-      if (key === "selectedElementIds" || key === "selectedGroupIds") {
-        continue;
-      }
-      if (nextEntry.appState[key] !== lastEntry.appState[key]) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  pushEntry(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    const newEntryDehydrated = this.generateEntry(appState, elements);
-    const newEntry: HistoryEntry = this.hydrateHistoryEntry(newEntryDehydrated);
-
-    if (newEntry) {
-      if (!this.shouldCreateEntry(newEntry)) {
-        return;
-      }
-
-      this.stateHistory.push(newEntryDehydrated);
-      this.lastEntry = newEntry;
-      // As a new entry was pushed, we invalidate the redo stack
-      this.clearRedoStack();
-    }
-  }
-
-  clearRedoStack() {
-    this.redoStack.splice(0, this.redoStack.length);
-  }
-
-  redoOnce(): HistoryEntry | null {
-    if (this.redoStack.length === 0) {
-      return null;
-    }
-
-    const entryToRestore = this.redoStack.pop();
-
-    if (entryToRestore !== undefined) {
-      this.stateHistory.push(entryToRestore);
-      return this.hydrateHistoryEntry(entryToRestore);
-    }
-
-    return null;
-  }
-
-  undoOnce(): HistoryEntry | null {
-    if (this.stateHistory.length === 1) {
-      return null;
-    }
-
-    const currentEntry = this.stateHistory.pop();
-
-    const entryToRestore = this.stateHistory[this.stateHistory.length - 1];
-
-    if (currentEntry !== undefined) {
-      this.redoStack.push(currentEntry);
-      return this.hydrateHistoryEntry(entryToRestore);
-    }
-
-    return null;
   }
 
   /**
-   * Updates history's `lastEntry` to latest app state. This is necessary
-   *  when doing undo/redo which itself doesn't commit to history, but updates
-   *  app state in a way that would break `shouldCreateEntry` which relies on
-   *  `lastEntry` to reflect last comittable history state.
-   * We can't update `lastEntry` from within history when calling undo/redo
-   *  because the action potentially mutates appState/elements before storing
-   *  it.
+   * Record a local change which will go into the history
    */
-  setCurrentState(appState: AppState, elements: readonly ExcalidrawElement[]) {
-    this.lastEntry = this.hydrateHistoryEntry(
-      this.generateEntry(appState, elements),
+  public record(
+    elementsChange: ElementsChange,
+    appStateChange: AppStateChange,
+  ) {
+    const entry = HistoryEntry.create(appStateChange, elementsChange);
+
+    if (!entry.isEmpty()) {
+      // we have the latest changes, no need to `applyLatest`, which is done within `History.push`
+      this.undoStack.push(entry.inverse());
+
+      if (!entry.elementsChange.isEmpty()) {
+        // don't reset redo stack on local appState changes,
+        // as a simple click (unselect) could lead to losing all the redo entries
+        // only reset on non empty elements changes!
+        this.redoStack.length = 0;
+      }
+
+      this.onHistoryChangedEmitter.trigger(
+        new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
+      );
+    }
+  }
+
+  public undo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: Readonly<Snapshot>,
+  ) {
+    return this.perform(
+      elements,
+      appState,
+      snapshot,
+      () => History.pop(this.undoStack),
+      (entry: HistoryEntry) => History.push(this.redoStack, entry, elements),
     );
   }
 
-  // Suspicious that this is called so many places. Seems error-prone.
-  resumeRecording() {
-    this.recording = true;
+  public redo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: Readonly<Snapshot>,
+  ) {
+    return this.perform(
+      elements,
+      appState,
+      snapshot,
+      () => History.pop(this.redoStack),
+      (entry: HistoryEntry) => History.push(this.undoStack, entry, elements),
+    );
   }
 
-  record(state: AppState, elements: readonly ExcalidrawElement[]) {
-    if (this.recording) {
-      this.pushEntry(state, elements);
-      this.recording = false;
+  private perform(
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: Readonly<Snapshot>,
+    pop: () => HistoryEntry | null,
+    push: (entry: HistoryEntry) => void,
+  ): [SceneElementsMap, AppState] | void {
+    try {
+      let historyEntry = pop();
+
+      if (historyEntry === null) {
+        return;
+      }
+
+      let nextElements = elements;
+      let nextAppState = appState;
+      let containsVisibleChange = false;
+
+      // iterate through the history entries in case they result in no visible changes
+      while (historyEntry) {
+        try {
+          [nextElements, nextAppState, containsVisibleChange] =
+            historyEntry.applyTo(nextElements, nextAppState, snapshot);
+        } finally {
+          // make sure to always push / pop, even if the increment is corrupted
+          push(historyEntry);
+        }
+
+        if (containsVisibleChange) {
+          break;
+        }
+
+        historyEntry = pop();
+      }
+
+      return [nextElements, nextAppState];
+    } finally {
+      // trigger the history change event before returning completely
+      // also trigger it just once, no need doing so on each entry
+      this.onHistoryChangedEmitter.trigger(
+        new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
+      );
     }
+  }
+
+  private static pop(stack: HistoryStack): HistoryEntry | null {
+    if (!stack.length) {
+      return null;
+    }
+
+    const entry = stack.pop();
+
+    if (entry !== undefined) {
+      return entry;
+    }
+
+    return null;
+  }
+
+  private static push(
+    stack: HistoryStack,
+    entry: HistoryEntry,
+    prevElements: SceneElementsMap,
+  ) {
+    const updatedEntry = entry.inverse().applyLatestChanges(prevElements);
+    return stack.push(updatedEntry);
   }
 }
 
-export default History;
+export class HistoryEntry {
+  private constructor(
+    public readonly appStateChange: AppStateChange,
+    public readonly elementsChange: ElementsChange,
+  ) {}
+
+  public static create(
+    appStateChange: AppStateChange,
+    elementsChange: ElementsChange,
+  ) {
+    return new HistoryEntry(appStateChange, elementsChange);
+  }
+
+  public inverse(): HistoryEntry {
+    return new HistoryEntry(
+      this.appStateChange.inverse(),
+      this.elementsChange.inverse(),
+    );
+  }
+
+  public applyTo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    snapshot: Readonly<Snapshot>,
+  ): [SceneElementsMap, AppState, boolean] {
+    const [nextElements, elementsContainVisibleChange] =
+      this.elementsChange.applyTo(elements, snapshot.elements);
+
+    const [nextAppState, appStateContainsVisibleChange] =
+      this.appStateChange.applyTo(appState, nextElements);
+
+    const appliedVisibleChanges =
+      elementsContainVisibleChange || appStateContainsVisibleChange;
+
+    return [nextElements, nextAppState, appliedVisibleChanges];
+  }
+
+  /**
+   * Apply latest (remote) changes to the history entry, creates new instance of `HistoryEntry`.
+   */
+  public applyLatestChanges(elements: SceneElementsMap): HistoryEntry {
+    const updatedElementsChange =
+      this.elementsChange.applyLatestChanges(elements);
+
+    return HistoryEntry.create(this.appStateChange, updatedElementsChange);
+  }
+
+  public isEmpty(): boolean {
+    return this.appStateChange.isEmpty() && this.elementsChange.isEmpty();
+  }
+}

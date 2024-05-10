@@ -1,5 +1,5 @@
 import React from "react";
-import {
+import type {
   AppClassProperties,
   AppProps,
   AppState,
@@ -7,11 +7,11 @@ import {
   ExcalidrawProps,
   UIAppState,
 } from "../types";
-import { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
 import { showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import type { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
@@ -80,7 +80,7 @@ export const MobileMenu = ({
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar App-toolbar--mobile">
+                <Island draggable padding={1} className="App-toolbar App-toolbar--mobile">
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher

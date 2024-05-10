@@ -10,12 +10,12 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
 } from "../../element/types";
+import type { TransformHandleType } from "../../element/transformHandles";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
   OMIT_SIDES_FOR_FRAME,
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  TransformHandleType,
   type TransformHandle,
   type TransformHandleDirection,
 } from "../../element/transformHandles";
@@ -112,6 +112,18 @@ export class Keyboard {
   static codePress = (code: string) => {
     Keyboard.codeDown(code);
     Keyboard.codeUp(code);
+  };
+
+  static undo = () => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress("z");
+    });
+  };
+
+  static redo = () => {
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress("z");
+    });
   };
 }
 
@@ -287,15 +299,23 @@ const transform = (
   keyboardModifiers: KeyboardModifiers = {},
 ) => {
   const elements = Array.isArray(element) ? element : [element];
-  mouse.select(elements);
+  h.setState({
+    selectedElementIds: elements.reduce(
+      (acc, e) => ({
+        ...acc,
+        [e.id]: true,
+      }),
+      {},
+    ),
+  });
   let handleCoords: TransformHandle | undefined;
-
   if (elements.length === 1) {
     handleCoords = getTransformHandles(
       elements[0],
       h.state.zoom,
       arrayToMap(h.elements),
       "mouse",
+      {},
     )[handle];
   } else {
     const [x1, y1, x2, y2] = getCommonBounds(elements);

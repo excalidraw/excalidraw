@@ -1,17 +1,17 @@
-import { NormalizedZoomValue, Point, Zoom } from "./types";
+import type { NormalizedZoomValue, Point, Zoom } from "./types";
 import {
   DEFAULT_ADAPTIVE_RADIUS,
   LINE_CONFIRM_THRESHOLD,
   DEFAULT_PROPORTIONAL_RADIUS,
   ROUNDNESS,
 } from "./constants";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
 } from "./element/types";
 import { getCurvePathOps } from "./element/bounds";
-import { Mutable } from "./utility-types";
+import type { Mutable } from "./utility-types";
 import { ShapeCache } from "./scene/ShapeCache";
 
 export const rotate = (

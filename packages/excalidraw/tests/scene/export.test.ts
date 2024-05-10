@@ -1,4 +1,4 @@
-import { NonDeletedExcalidrawElement } from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
@@ -15,8 +15,18 @@ describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;
   const ELEMENT_WIDTH = 100;
   const ELEMENTS = [
-    { ...diamondFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
-    { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
+    {
+      ...diamondFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a0",
+    },
+    {
+      ...ellipseFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a1",
+    },
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_OPTIONS = {

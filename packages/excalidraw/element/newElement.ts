@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElement,
@@ -27,7 +27,7 @@ import {
 import { randomInteger, randomId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
@@ -46,7 +46,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkOptional, Merge, Mutable } from "../utility-types";
+import type { MarkOptional, Merge, Mutable } from "../utility-types";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -55,6 +55,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "angle"
   | "groupIds"
   | "frameId"
+  | "index"
   | "boundElements"
   | "seed"
   | "version"
@@ -89,6 +90,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     angle = 0,
     groupIds = [],
     frameId = null,
+    index = null,
     roundness = null,
     boundElements = null,
     link = null,
@@ -114,6 +116,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     frameId,
+    index,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
@@ -249,7 +252,6 @@ export const newTextElement = (
       y: opts.y - offsets.y,
       width: metrics.width,
       height: metrics.height,
-      baseline: metrics.baseline,
       containerId: opts.containerId || null,
       originalText: text,
       lineHeight,
@@ -268,13 +270,12 @@ const getAdjustedDimensions = (
   y: number;
   width: number;
   height: number;
-  baseline: number;
 } => {
-  const {
-    width: nextWidth,
-    height: nextHeight,
-    baseline: nextBaseline,
-  } = measureText(nextText, getFontString(element), element.lineHeight);
+  const { width: nextWidth, height: nextHeight } = measureText(
+    nextText,
+    getFontString(element),
+    element.lineHeight,
+  );
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -328,7 +329,6 @@ const getAdjustedDimensions = (
   return {
     width: nextWidth,
     height: nextHeight,
-    baseline: nextBaseline,
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
   };

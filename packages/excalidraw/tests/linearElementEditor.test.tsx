@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
@@ -8,11 +8,13 @@ import {
 import { Excalidraw } from "../index";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
-import { Point } from "../types";
+import type { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
@@ -26,8 +28,11 @@ import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 
-const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(
+  InteractiveCanvas,
+  "renderInteractiveScene",
+);
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const { h } = window;
 const font = "20px Cascadia, width: Segoe UI Emoji" as FontString;
@@ -209,7 +214,7 @@ describe("Test Linear Elements", () => {
       clientY: midpoint[1],
     });
     // Enter line editor
-    let contextMenu = document.querySelector(".context-menu");
+    const contextMenu = document.querySelector(".context-menu");
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
@@ -218,23 +223,6 @@ describe("Test Linear Elements", () => {
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Edit line")!);
 
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
-
-    // Exiting line editor
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    contextMenu = document.querySelector(".context-menu");
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    fireEvent.click(
-      queryByText(contextMenu as HTMLElement, "Exit line editor")!,
-    );
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
   });
 
   it("should enter line editor when using double clicked with ctrl key", () => {
@@ -316,9 +304,9 @@ describe("Test Linear Elements", () => {
       fireEvent.click(screen.getByTitle("Round"));
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `10`,
+        `9`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
       const midPointsWithRoundEdge = LinearElementEditor.getEditorMidPoints(
         h.elements[0] as ExcalidrawLinearElement,
@@ -374,9 +362,9 @@ describe("Test Linear Elements", () => {
       drag(startPoint, endPoint);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `13`,
+        `12`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
 
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
@@ -436,9 +424,9 @@ describe("Test Linear Elements", () => {
         ]);
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `17`,
+          `16`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
 
         expect(line.points.length).toEqual(5);
 
@@ -487,9 +475,9 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, [hitCoords[0] - delta, hitCoords[1] - delta]);
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `13`,
+          `12`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
@@ -528,9 +516,9 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `13`,
+          `12`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
@@ -576,9 +564,9 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `19`,
+          `18`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -626,9 +614,9 @@ describe("Test Linear Elements", () => {
           lastSegmentMidpoint[1] + delta,
         ]);
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `17`,
+          `16`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -724,9 +712,9 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, [hitCoords[0] + delta, hitCoords[1] + delta]);
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `13`,
+          `12`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,

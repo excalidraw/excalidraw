@@ -1,4 +1,4 @@
-import {
+import type {
   NonDeleted,
   ExcalidrawLinearElement,
   ExcalidrawElement,
@@ -6,7 +6,6 @@ import {
   ExcalidrawBindableElement,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
-  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
 import {
@@ -23,20 +22,20 @@ import {
   arePointsEqual,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
+import type { Bounds } from "./bounds";
 import {
-  Bounds,
   getCurvePathOps,
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
-import {
+import type {
   Point,
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
+  AppClassProperties,
 } from "../types";
 import { mutateElement } from "./mutateElement";
-import History from "../history";
 
 import {
   bindOrUnbindLinearElement,
@@ -48,8 +47,9 @@ import { isBindingElement } from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
-import { Mutable } from "../utility-types";
+import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import type { Store } from "../store";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -334,9 +334,10 @@ export class LinearElementEditor {
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
     appState: AppState,
-    elements: readonly NonDeletedExcalidrawElement[],
-    elementsMap: NonDeletedSceneElementsMap,
+    app: AppClassProperties,
   ): LinearElementEditor {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -380,8 +381,7 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                elements,
-                elementsMap,
+                app,
               )
             : null;
 
@@ -642,16 +642,17 @@ export class LinearElementEditor {
   static handlePointerDown(
     event: React.PointerEvent<HTMLElement>,
     appState: AppState,
-    history: History,
+    store: Store,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
-    elements: readonly NonDeletedExcalidrawElement[],
-    elementsMap: NonDeletedSceneElementsMap,
+    app: AppClassProperties,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
@@ -699,7 +700,7 @@ export class LinearElementEditor {
         });
         ret.didAddPoint = true;
       }
-      history.resumeRecording();
+      store.shouldCaptureIncrement();
       ret.linearElementEditor = {
         ...linearElementEditor,
         pointerDownState: {
@@ -714,11 +715,7 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(
-          scenePointer,
-          elements,
-          elementsMap,
-        ),
+        endBindingElement: getHoveredElementForBinding(scenePointer, app),
       };
 
       ret.didAddPoint = true;

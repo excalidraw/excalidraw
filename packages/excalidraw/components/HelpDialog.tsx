@@ -4,9 +4,10 @@ import { KEYS } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
-import { ExternalLinkIcon } from "./icons";
+import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { isDarwin, isFirefox, isWindows } from "../constants";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -16,8 +17,8 @@ const Header = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("helpDialog.documentation")}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+      {t("helpDialog.documentation")}
     </a>
     <a
       className="HelpDialog__btn"
@@ -25,8 +26,8 @@ const Header = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("helpDialog.blog")}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+      {t("helpDialog.blog")}
     </a>
     <a
       className="HelpDialog__btn"
@@ -34,8 +35,17 @@ const Header = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
+      <div className="HelpDialog__link-icon">{GithubIcon}</div>
       {t("helpDialog.github")}
-      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+    </a>
+    <a
+      className="HelpDialog__btn"
+      href="https://youtube.com/@excalidraw"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div className="HelpDialog__link-icon">{youtubeIcon}</div>
+      YouTube
     </a>
   </div>
 );
@@ -263,7 +273,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("Alt+S")]}
             />
             <Shortcut
-              label={t("labels.showGrid")}
+              label={t("labels.toggleGrid")}
               shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
             />
             <Shortcut
@@ -277,6 +287,17 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("stats.title")}
               shortcuts={[getShortcutKey("Alt+/")]}
+            />
+            <Shortcut
+              label={t("commandPalette.title")}
+              shortcuts={
+                isFirefox
+                  ? [getShortcutFromShortcutName("commandPalette")]
+                  : [
+                      getShortcutFromShortcutName("commandPalette"),
+                      getShortcutFromShortcutName("commandPalette", 1),
+                    ]
+              }
             />
           </ShortcutIsland>
           <ShortcutIsland

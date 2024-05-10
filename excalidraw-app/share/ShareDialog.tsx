@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
 import { trackEvent } from "../../packages/excalidraw/analytics";
@@ -18,10 +18,12 @@ import {
 } from "../../packages/excalidraw/components/icons";
 import { TextField } from "../../packages/excalidraw/components/TextField";
 import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
-import { activeRoomLinkAtom, CollabAPI } from "../collab/Collab";
+import type { CollabAPI } from "../collab/Collab";
+import { activeRoomLinkAtom } from "../collab/Collab";
 import { atom, useAtom, useAtomValue } from "jotai";
 
 import "./ShareDialog.scss";
+import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
@@ -70,7 +72,7 @@ const ActiveRoomDialog = ({
     try {
       await copyTextToSystemClipboard(activeRoomLink);
     } catch (e) {
-      collabAPI.setErrorMessage(t("errors.copyToSystemClipboardFailed"));
+      collabAPI.setCollabError(t("errors.copyToSystemClipboardFailed"));
     }
 
     setJustCopied(true);
@@ -275,6 +277,14 @@ export const ShareDialog = (props: {
 }) => {
   const [shareDialogState, setShareDialogState] = useAtom(shareDialogStateAtom);
 
+  const { openDialog } = useUIAppState();
+
+  useEffect(() => {
+    if (openDialog) {
+      setShareDialogState({ isOpen: false });
+    }
+  }, [openDialog, setShareDialogState]);
+
   if (!shareDialogState.isOpen) {
     return null;
   }
@@ -285,6 +295,6 @@ export const ShareDialog = (props: {
       collabAPI={props.collabAPI}
       onExportToBackend={props.onExportToBackend}
       type={shareDialogState.type}
-    ></ShareDialogInner>
+    />
   );
 };

@@ -1,5 +1,5 @@
 import * as GA from "./ga";
-import { Line, Point } from "./ga";
+import type { Line, Point } from "./ga";
 
 /**
  * A line is stored as an array `[0, c, a, b, 0, 0, 0, 0]` representing:
