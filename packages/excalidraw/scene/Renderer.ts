@@ -107,9 +107,8 @@ export class Renderer {
         width,
         editingElement,
         pendingImageElementId,
-        // unused but serves we cache on it to invalidate elements if they
-        // get mutated
-        versionNonce: _versionNonce,
+        // cache-invalidation nonce
+        sceneNonce: _sceneNonce,
       }: {
         zoom: AppState["zoom"];
         offsetLeft: AppState["offsetLeft"];
@@ -120,7 +119,7 @@ export class Renderer {
         width: AppState["width"];
         editingElement: AppState["editingElement"];
         pendingImageElementId: AppState["pendingImageElementId"];
-        versionNonce: ReturnType<InstanceType<typeof Scene>["getVersionNonce"]>;
+        sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
 

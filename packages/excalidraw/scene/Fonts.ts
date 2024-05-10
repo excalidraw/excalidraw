@@ -1,7 +1,5 @@
-import { isTextElement, refreshTextDimensions } from "../element";
+import { isTextElement } from "../element";
 import { newElementWith } from "../element/mutateElement";
-import { getContainerElement } from "../element/textElement";
-import { isBoundToContainer } from "../element/typeChecks";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -12,17 +10,9 @@ import { ShapeCache } from "./ShapeCache";
 
 export class Fonts {
   private scene: Scene;
-  private onSceneUpdated: () => void;
 
-  constructor({
-    scene,
-    onSceneUpdated,
-  }: {
-    scene: Scene;
-    onSceneUpdated: () => void;
-  }) {
+  constructor({ scene }: { scene: Scene }) {
     this.scene = scene;
-    this.onSceneUpdated = onSceneUpdated;
   }
 
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -57,22 +47,16 @@ export class Fonts {
     let didUpdate = false;
 
     this.scene.mapElements((element) => {
-      if (isTextElement(element) && !isBoundToContainer(element)) {
-        ShapeCache.delete(element);
+      if (isTextElement(element)) {
         didUpdate = true;
-        return newElementWith(element, {
-          ...refreshTextDimensions(
-            element,
-            getContainerElement(element, this.scene.getNonDeletedElementsMap()),
-            this.scene.getNonDeletedElementsMap(),
-          ),
-        });
+        ShapeCache.delete(element);
+        return newElementWith(element, {}, true);
       }
       return element;
     });
 
     if (didUpdate) {
-      this.onSceneUpdated();
+      this.scene.triggerUpdate();
     }
   };
 

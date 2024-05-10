@@ -444,7 +444,7 @@ const LayerUI = ({
                 );
                 ShapeCache.delete(element);
               }
-              Scene.getScene(selectedElements[0])?.informMutation();
+              Scene.getScene(selectedElements[0])?.triggerUpdate();
             } else if (colorPickerType === "elementBackground") {
               setAppState({
                 currentItemBackgroundColor: color,
