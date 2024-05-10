@@ -970,8 +970,9 @@ describe("Test Linear Elements", () => {
       expect(arrow.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
-      expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
-        .toMatchInlineSnapshot(`""`);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).text,
+      ).toMatchInlineSnapshot(`""`);
     });
 
     it("should bind text to arrow when clicked on arrow and enter pressed", async () => {
@@ -1000,8 +1001,9 @@ describe("Test Linear Elements", () => {
       expect(arrow.boundElements).toStrictEqual([
         { id: textElement.id, type: "text" },
       ]);
-      expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
-        .toMatchInlineSnapshot(`""`);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).text,
+      ).toMatchInlineSnapshot(`""`);
     });
 
     it("should not bind text to line when double clicked", async () => {
