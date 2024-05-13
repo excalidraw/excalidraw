@@ -275,11 +275,20 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
-  const { width: nextWidth, height: nextHeight } = measureText(
+  let { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
     element.lineHeight,
   );
+
+  // wrapped text
+  if (!element.autoResize && !element.containerId) {
+    const prevWidth = element.width;
+    if (nextWidth < prevWidth) {
+      nextWidth = prevWidth;
+    }
+  }
+
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;

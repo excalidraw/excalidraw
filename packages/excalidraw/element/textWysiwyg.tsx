@@ -255,7 +255,6 @@ export const textWysiwyg = ({
           updatedTextElement.lineHeight,
         );
 
-        textElementWidth = updatedTextElement.width;
         textElementHeight = metrics.height;
 
         maxHeight = metrics.height;
