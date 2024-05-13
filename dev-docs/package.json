@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@docusaurus/core": "2.4.3",
-    "@docusaurus/preset-classic": "2.2.0",
+    "@docusaurus/preset-classic": "2.4.3",
     "@docusaurus/theme-live-codeblock": "2.4.3",
     "@excalidraw/excalidraw": "0.17.6",
     "@mdx-js/react": "^1.6.22",
