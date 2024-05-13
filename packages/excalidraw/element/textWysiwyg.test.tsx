@@ -236,6 +236,117 @@ describe("textWysiwyg", () => {
     });
   });
 
+  describe("Test wrapping", () => {
+    const { h } = window;
+    const dimensions = { height: 400, width: 800 };
+
+    beforeAll(() => {
+      mockBoundingClientRect(dimensions);
+    });
+
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      // @ts-ignore
+      h.app.refreshViewportBreakpoints();
+      // @ts-ignore
+      h.app.refreshEditorBreakpoints();
+
+      h.elements = [];
+    });
+
+    afterAll(() => {
+      restoreOriginalGetBoundingClientRect();
+    });
+
+    it("should keep width when editing a wrapped text", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "Excalidraw\nEditor",
+      });
+
+      h.elements = [text];
+
+      const prevWidth = text.width;
+      const prevHeight = text.height;
+      const prevText = text.text;
+
+      // text is wrapped
+      UI.resize(text, "e", [-20, 0]);
+      expect(text.width).not.toEqual(prevWidth);
+      expect(text.height).not.toEqual(prevHeight);
+      expect(text.text).not.toEqual(prevText);
+      expect(text.autoResize).toBe(false);
+
+      const wrappedWidth = text.width;
+      const wrappedHeight = text.height;
+      const wrappedText = text.text;
+
+      // edit text
+      UI.clickTool("selection");
+      mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+      const editor = await getTextEditor(textEditorSelector);
+      expect(editor).not.toBe(null);
+      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.elements.length).toBe(1);
+
+      const nextText = `${wrappedText} is great!`;
+      updateTextEditor(editor, nextText);
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+
+      expect(h.elements[0].width).toEqual(wrappedWidth);
+      expect(h.elements[0].height).toBeGreaterThan(wrappedHeight);
+
+      // remove all texts and then add it back editing
+      updateTextEditor(editor, "");
+      await new Promise((cb) => setTimeout(cb, 0));
+      updateTextEditor(editor, nextText);
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+
+      expect(h.elements[0].width).toEqual(wrappedWidth);
+    });
+
+    it("should restore after unwrapping a wrapped text", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "Excalidraw\neditor\nis great!",
+      });
+      h.elements = [text];
+      const prevText = text.text;
+
+      // wrap
+      UI.resize(text, "e", [-40, 0]);
+      // enter text editing mode
+      UI.clickTool("selection");
+      mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+      const editor = await getTextEditor(textEditorSelector);
+      editor.blur();
+      // restore after unwrapping
+      UI.resize(text, "e", [40, 0]);
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(prevText);
+
+      // wrap again and add a new line
+      UI.resize(text, "e", [-30, 0]);
+      const wrappedText = text.text;
+      UI.clickTool("selection");
+      mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+      updateTextEditor(editor, `${wrappedText}\nA new line!`);
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      // remove the newly added line
+      UI.clickTool("selection");
+      mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+      updateTextEditor(editor, wrappedText);
+      await new Promise((cb) => setTimeout(cb, 0));
+      editor.blur();
+      // unwrap
+      UI.resize(text, "e", [30, 0]);
+      // expect the text to be restored the same
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(prevText);
+    });
+  });
+
   describe("Test container-unbound text", () => {
     const { h } = window;
     const dimensions = { height: 400, width: 800 };
