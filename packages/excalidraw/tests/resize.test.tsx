@@ -472,21 +472,25 @@ describe("text element", () => {
     expect(text.width).toBe(prevWidth - 50);
     expect(text.height).toBeGreaterThan(prevHeight);
     expect(text.text).not.toEqual(prevText);
+    expect(text.autoResize).toBe(false);
 
     UI.resize(text, "w", [-50, 0]);
     expect(text.width).toBe(prevWidth);
     expect(text.height).toEqual(prevHeight);
     expect(text.text).toEqual(prevText);
+    expect(text.autoResize).toBe(false);
 
     UI.resize(text, "e", [-20, 0]);
     expect(text.width).toBe(prevWidth - 20);
     expect(text.height).toBeGreaterThan(prevHeight);
     expect(text.text).not.toEqual(prevText);
+    expect(text.autoResize).toBe(false);
 
     UI.resize(text, "e", [20, 0]);
     expect(text.width).toBe(prevWidth);
     expect(text.height).toEqual(prevHeight);
     expect(text.text).toEqual(prevText);
+    expect(text.autoResize).toBe(false);
   });
 
   it("keeps properties when wrapped", async () => {
@@ -501,11 +505,13 @@ describe("text element", () => {
     expect(text.textAlign).toBe(alignment);
     expect(text.fontSize).toBe(fontSize);
     expect(text.fontFamily).toBe(fontFamily);
+    expect(text.autoResize).toBe(false);
 
     UI.resize(text, "e", [60, 0]);
     expect(text.textAlign).toBe(alignment);
     expect(text.fontSize).toBe(fontSize);
     expect(text.fontFamily).toBe(fontFamily);
+    expect(text.autoResize).toBe(false);
   });
 
   it("has a minimum width when wrapped", async () => {
@@ -518,11 +524,13 @@ describe("text element", () => {
     expect(text.width).not.toEqual(0);
     UI.resize(text, "e", [width - text.width, 0]);
     expect(text.width).toEqual(width);
+    expect(text.autoResize).toBe(false);
 
     UI.resize(text, "w", [width, 0]);
     expect(text.width).not.toEqual(0);
     UI.resize(text, "w", [text.width - width, 0]);
     expect(text.width).toEqual(width);
+    expect(text.autoResize).toBe(false);
   });
 });
 
