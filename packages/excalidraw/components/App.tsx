@@ -1790,6 +1790,13 @@ class App extends React.Component<AppProps, AppState> {
             : t("toast.fileSaved"),
         },
       });
+    } else if (type === "clipboard") {
+      this.setState({
+        openDialog: null,
+        toast: {
+          message: t("toast.copyToClipboard"),
+        },
+      });
     }
   };
 
