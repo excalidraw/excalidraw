@@ -7,7 +7,7 @@ import { getFontString } from "../utils";
 import { register } from "./register";
 
 export const actionUnwrapText = register({
-  name: "unwrapText",
+  name: "autoTextSize",
   label: "labels.autoTextSize",
   icon: null,
   trackEvent: { category: "element" },
@@ -16,7 +16,7 @@ export const actionUnwrapText = register({
     return (
       selectedElements.length === 1 &&
       isTextElement(selectedElements[0]) &&
-      selectedElements[0].autoResize === false
+      !selectedElements[0].autoResize
     );
   },
   perform: (elements, appState, _, app) => {

@@ -15,7 +15,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       {
         "icon": null,
         "label": "labels.autoTextSize",
-        "name": "unwrapText",
+        "name": "autoTextSize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -4428,7 +4428,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       {
         "icon": null,
         "label": "labels.autoTextSize",
-        "name": "unwrapText",
+        "name": "autoTextSize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -5539,7 +5539,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       {
         "icon": null,
         "label": "labels.autoTextSize",
-        "name": "unwrapText",
+        "name": "autoTextSize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7357,7 +7357,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       {
         "icon": null,
         "label": "labels.autoTextSize",
-        "name": "unwrapText",
+        "name": "autoTextSize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -8235,7 +8235,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       {
         "icon": null,
         "label": "labels.autoTextSize",
-        "name": "unwrapText",
+        "name": "autoTextSize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
