@@ -1,6 +1,7 @@
 {
   "private": true,
   "name": "excalidraw-monorepo",
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "excalidraw-app",
     "packages/excalidraw",
