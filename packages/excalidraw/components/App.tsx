@@ -715,10 +715,7 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = new Fonts({
-      scene: this.scene,
-      onSceneUpdated: this.onSceneUpdated,
-    });
+    this.fonts = new Fonts({ scene: this.scene });
     this.history = new History();
 
     this.actionManager.registerAll(actions);
@@ -941,7 +938,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (updated) {
-      this.scene.informMutation();
+      this.scene.triggerUpdate();
     }
 
     // GC
@@ -1453,10 +1450,10 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
-    const versionNonce = this.scene.getVersionNonce();
+    const sceneNonce = this.scene.getSceneNonce();
     const { elementsMap, visibleElements } =
       this.renderer.getRenderableElements({
-        versionNonce,
+        sceneNonce,
         zoom: this.state.zoom,
         offsetLeft: this.state.offsetLeft,
         offsetTop: this.state.offsetTop,
@@ -1674,7 +1671,7 @@ class App extends React.Component<AppProps, AppState> {
                           elementsMap={elementsMap}
                           allElementsMap={allElementsMap}
                           visibleElements={visibleElements}
-                          versionNonce={versionNonce}
+                          sceneNonce={sceneNonce}
                           selectionNonce={
                             this.state.selectionElement?.versionNonce
                           }
@@ -1696,7 +1693,7 @@ class App extends React.Component<AppProps, AppState> {
                           elementsMap={elementsMap}
                           visibleElements={visibleElements}
                           selectedElements={selectedElements}
-                          versionNonce={versionNonce}
+                          sceneNonce={sceneNonce}
                           selectionNonce={
                             this.state.selectionElement?.versionNonce
                           }
@@ -1820,7 +1817,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     this.magicGenerations.set(frameElement.id, data);
-    this.onSceneUpdated();
+    this.triggerRender();
   };
 
   private getTextFromElements(elements: readonly ExcalidrawElement[]) {
@@ -2445,7 +2442,7 @@ class App extends React.Component<AppProps, AppState> {
       this.history.record(increment.elementsChange, increment.appStateChange);
     });
 
-    this.scene.addCallback(this.onSceneUpdated);
+    this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
 
     if (this.props.autoFocus && this.excalidrawContainerRef.current) {
@@ -2490,6 +2487,7 @@ class App extends React.Component<AppProps, AppState> {
   public componentWillUnmount() {
     this.renderer.destroy();
     this.scene = new Scene();
+    this.fonts = new Fonts({ scene: this.scene });
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
@@ -3671,7 +3669,7 @@ class App extends React.Component<AppProps, AppState> {
           ShapeCache.delete(element);
         }
       });
-      this.scene.informMutation();
+      this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
     },
@@ -3731,7 +3729,7 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private onSceneUpdated = () => {
+  private triggerRender = () => {
     this.setState({});
   };
 
@@ -5578,7 +5576,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.elementsPendingErasure = new Set(this.elementsPendingErasure);
-      this.onSceneUpdated();
+      this.triggerRender();
     }
   };
 
@@ -8070,7 +8068,7 @@ class App extends React.Component<AppProps, AppState> {
                     this.scene.getNonDeletedElementsMap(),
                   );
 
-                  this.scene.informMutation();
+                  this.scene.triggerUpdate();
                 }
               }
             }
@@ -8565,7 +8563,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private restoreReadyToEraseElements = () => {
     this.elementsPendingErasure = new Set();
-    this.onSceneUpdated();
+    this.triggerRender();
   };
 
   private eraseElements = () => {
@@ -8979,7 +8977,7 @@ class App extends React.Component<AppProps, AppState> {
         files,
       );
       if (updatedFiles.size) {
-        this.scene.informMutation();
+        this.scene.triggerUpdate();
       }
     }
   };

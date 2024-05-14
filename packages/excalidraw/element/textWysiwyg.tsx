@@ -260,6 +260,8 @@ export const textWysiwyg = ({
         maxHeight = metrics.height;
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
+      } else {
+        textElementWidth += 0.5;
       }
 
       // Make sure text editor height doesn't go beyond viewport
@@ -684,7 +686,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
+  const unbindUpdate = Scene.getScene(element)!.onUpdate(() => {
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-content",
