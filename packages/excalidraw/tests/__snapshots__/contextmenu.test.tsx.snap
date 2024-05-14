@@ -12,16 +12,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "collaborators": Map {},
   "contextMenu": {
     "items": [
-      {
-        "icon": null,
-        "label": "labels.autoTextSize",
-        "name": "autoTextSize",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
       "separator",
       {
         "icon": <svg
@@ -331,6 +321,16 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -4425,16 +4425,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "collaborators": Map {},
   "contextMenu": {
     "items": [
-      {
-        "icon": null,
-        "label": "labels.autoTextSize",
-        "name": "autoTextSize",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
       "separator",
       {
         "icon": <svg
@@ -4744,6 +4734,16 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -5536,16 +5536,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "collaborators": Map {},
   "contextMenu": {
     "items": [
-      {
-        "icon": null,
-        "label": "labels.autoTextSize",
-        "name": "autoTextSize",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
       "separator",
       {
         "icon": <svg
@@ -5855,6 +5845,16 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7354,16 +7354,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "collaborators": Map {},
   "contextMenu": {
     "items": [
-      {
-        "icon": null,
-        "label": "labels.autoTextSize",
-        "name": "autoTextSize",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
       "separator",
       {
         "icon": <svg
@@ -7673,6 +7663,16 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -8232,16 +8232,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "collaborators": Map {},
   "contextMenu": {
     "items": [
-      {
-        "icon": null,
-        "label": "labels.autoTextSize",
-        "name": "autoTextSize",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
       "separator",
       {
         "icon": <svg
@@ -8551,6 +8541,16 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {

@@ -429,7 +429,7 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { actionUnwrapText } from "../actions/actionAutoTextSize";
+import { actionUnwrapText } from "../actions/actionTextAutoResize";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -9632,7 +9632,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     return [
-      actionUnwrapText,
       CONTEXT_MENU_SEPARATOR,
       actionCut,
       actionCopy,
@@ -9646,6 +9645,7 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionUnwrapText,
       actionUnbindText,
       actionBindText,
       actionWrapTextInContainer,

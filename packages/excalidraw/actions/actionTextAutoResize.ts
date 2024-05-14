@@ -1,4 +1,5 @@
 import { isTextElement } from "../element";
+import { newElementWith } from "../element/mutateElement";
 import { measureText } from "../element/textElement";
 import { getSelectedElements } from "../scene";
 import { StoreAction } from "../store";
@@ -7,8 +8,8 @@ import { getFontString } from "../utils";
 import { register } from "./register";
 
 export const actionUnwrapText = register({
-  name: "autoTextSize",
-  label: "labels.autoTextSize",
+  name: "autoResize",
+  label: "labels.autoResize",
   icon: null,
   trackEvent: { category: "element" },
   predicate: (elements, appState, _: unknown, app: AppClassProperties) => {
