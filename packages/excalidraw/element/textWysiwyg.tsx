@@ -300,8 +300,6 @@ export const textWysiwyg = ({
       mutateElement(updatedTextElement, {
         x: coordX,
         y: coordY,
-        height: textElementHeight,
-        width: textElementWidth,
       });
     }
   };
