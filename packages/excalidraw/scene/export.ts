@@ -339,7 +339,7 @@ export const exportToSvg = async (
     assetPath =
       window.EXCALIDRAW_ASSET_PATH ||
       `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-        import.meta.env.PKG_VERSION
+        import.meta.env.VITE_PKG_VERSION
       }`;
 
     if (assetPath?.startsWith("/")) {
