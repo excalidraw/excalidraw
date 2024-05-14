@@ -46,7 +46,6 @@ import {
   renderElementToSvg,
   renderSelectionElement,
 } from "./renderElement";
-import { getClientColor } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   isSelectedViaGroup,
