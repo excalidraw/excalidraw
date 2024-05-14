@@ -282,11 +282,8 @@ const getAdjustedDimensions = (
   );
 
   // wrapped text
-  if (!element.autoResize && !element.containerId) {
-    const prevWidth = element.width;
-    if (nextWidth < prevWidth) {
-      nextWidth = prevWidth;
-    }
+  if (!element.autoResize) {
+    nextWidth = element.width;
   }
 
   const { textAlign, verticalAlign } = element;
