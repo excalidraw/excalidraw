@@ -48,10 +48,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
-  {
-    informMutation = true,
-    keepPreviousSize = false,
-  }: { informMutation?: boolean; keepPreviousSize?: boolean } = {},
+  { informMutation = true }: { informMutation?: boolean } = {},
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -65,8 +62,10 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.text = textElement.text;
 
-  if (container) {
-    maxWidth = getBoundTextMaxWidth(container, textElement);
+  if (container || !textElement.autoResize) {
+    maxWidth = container
+      ? getBoundTextMaxWidth(container, textElement)
+      : textElement.width;
     boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
@@ -80,10 +79,10 @@ export const redrawTextBoundingBox = (
     textElement.lineHeight,
   );
 
-  if (!keepPreviousSize) {
+  if (textElement.autoResize) {
     boundTextUpdates.width = metrics.width;
-    boundTextUpdates.height = metrics.height;
   }
+  boundTextUpdates.height = metrics.height;
 
   if (container) {
     const maxContainerHeight = getBoundTextMaxHeight(
