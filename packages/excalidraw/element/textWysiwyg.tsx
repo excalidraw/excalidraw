@@ -297,10 +297,7 @@ export const textWysiwyg = ({
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
 
-      mutateElement(updatedTextElement, {
-        x: coordX,
-        y: coordY,
-      });
+      mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
 
