@@ -8,7 +8,6 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
-import { getNormalizedZoom } from "../scene";
 
 const { h } = window;
 

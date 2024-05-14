@@ -1,5 +1,4 @@
 import { ENCRYPTION_KEY_BITS } from "../constants";
-import { blobToArrayBuffer } from "./blob";
 
 export const IV_LENGTH_BYTES = 12;
 
