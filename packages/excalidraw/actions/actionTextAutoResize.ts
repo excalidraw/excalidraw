@@ -33,13 +33,12 @@ export const actionUnwrapText = register({
             element.lineHeight,
           );
 
-          return {
-            ...element,
+          return newElementWith(element, {
             autoResize: true,
             width: metrics.width,
             height: metrics.height,
             text: element.originalText,
-          };
+          });
         }
         return element;
       }),
