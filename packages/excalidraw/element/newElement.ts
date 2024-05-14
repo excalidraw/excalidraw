@@ -292,7 +292,8 @@ const getAdjustedDimensions = (
   if (
     textAlign === "center" &&
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
-    !element.containerId
+    !element.containerId &&
+    element.autoResize
   ) {
     const prevMetrics = measureText(
       element.text,
