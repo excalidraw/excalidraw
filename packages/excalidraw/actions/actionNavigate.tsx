@@ -1,4 +1,3 @@
-import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
 import { GoToCollaboratorComponentProps } from "../components/UserList";
 import { eyeIcon } from "../components/icons";

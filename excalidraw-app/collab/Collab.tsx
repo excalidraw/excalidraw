@@ -142,7 +142,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           throw new AbortError();
         }
 
-        console.log("[draw] Loading files from http storage", fileIds);
+        console.info("[draw] Loading files from http storage", fileIds);
         return loadFilesFromHttpStorage(fileIds, roomId, roomKey);
       },
       saveFiles: async ({ addedFiles }) => {
@@ -279,7 +279,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ) => {
     try {
       // TODO (Jess): Firebase uses app state when saving, consider if we should use this too
-      const savedData = await saveToHttpStorage(
+      await saveToHttpStorage(
         this.portal,
         syncableElements,
         // this.excalidrawAPI.getAppState(),
@@ -418,7 +418,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ): Promise<ImportedDataState | null> => {
-    console.log("[draw] Starting collaboration", existingRoomLinkData);
+    console.info("[draw] Starting collaboration", existingRoomLinkData);
     if (!this.state.username) {
       const username = getUsernameFromSearchParams();
       this.setUsername(username);
@@ -452,7 +452,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     );
 
     const fallbackInitializationHandler = () => {
-      console.log(
+      console.info(
         "[draw] Fallback initialization handler",
         existingRoomLinkData,
       );
@@ -534,7 +534,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
                 init: true,
               });
               if (reconciledElements.length === 0) {
-                console.log("[draw] Received empty scene from socket payload");
+                console.info("[draw] Received empty scene from socket payload");
                 Sentry.captureMessage(
                   "Received empty scene from socket payload",
                   {
@@ -671,7 +671,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         roomLinkData: { roomId: string; roomKey: string } | null;
       }
     | { fetchScene: false; roomLinkData?: null }) => {
-    console.log("[draw] Initializing room", fetchScene, roomLinkData);
+    console.info("[draw] Initializing room", fetchScene, roomLinkData);
     clearTimeout(this.socketInitializationTimer!);
     if (this.portal.socket && this.fallbackInitializationHandler) {
       this.portal.socket.off(
@@ -694,7 +694,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
-        console.log("[draw] Fetching scene to initialize room");
+        console.info("[draw] Fetching scene to initialize room");
         const elements = await loadFromHttpStorage(
           roomLinkData.roomId,
           roomLinkData.roomKey,
