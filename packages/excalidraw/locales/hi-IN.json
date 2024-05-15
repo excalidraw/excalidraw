@@ -149,7 +149,8 @@
     "zoomToFitViewport": "दृश्यचौखट में पूरी तरह से बैठने के लिए झूम करें.",
     "zoomToFitSelection": "चयन पूरा दिखने इतना झूम करे",
     "zoomToFit": "सभी तत्व दिखे इतना झूम करें",
-    "installPWA": ""
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "अभी तक कोई अवयव जोडा नहीं गया.",
