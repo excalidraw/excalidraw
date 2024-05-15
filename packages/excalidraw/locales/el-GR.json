@@ -149,7 +149,8 @@
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": "",
-    "installPWA": ""
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
