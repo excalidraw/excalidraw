@@ -972,10 +972,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
-          collaboration made 
-          easy"
-        `);
+        "Online whiteboard 
+        collaboration made 
+        easy"
+      `);
     });
 
     it("should bind text to arrow when clicked on arrow and enter pressed", async () => {
@@ -1006,10 +1006,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
-          collaboration made 
-          easy"
-        `);
+        "Online whiteboard 
+        collaboration made 
+        easy"
+      `);
     });
 
     it("should not bind text to line when double clicked", async () => {

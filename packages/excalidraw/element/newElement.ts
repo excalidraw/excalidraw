@@ -240,24 +240,28 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElement = newElementWith(
-    {
-      ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text,
-      fontSize,
-      fontFamily,
-      textAlign,
-      verticalAlign,
-      x: opts.x - offsets.x,
-      y: opts.y - offsets.y,
-      width: metrics.width,
-      height: metrics.height,
-      containerId: opts.containerId || null,
-      originalText: text,
-      lineHeight,
-    },
+  const textElementProps: ExcalidrawTextElement = {
+    ..._newElementBase<ExcalidrawTextElement>("text", opts),
+    text,
+    fontSize,
+    fontFamily,
+    textAlign,
+    verticalAlign,
+    x: opts.x - offsets.x,
+    y: opts.y - offsets.y,
+    width: metrics.width,
+    height: metrics.height,
+    containerId: opts.containerId || null,
+    originalText: text,
+    autoResize: true,
+    lineHeight,
+  };
+
+  const textElement: ExcalidrawTextElement = newElementWith(
+    textElementProps,
     {},
   );
+
   return textElement;
 };
 
@@ -271,18 +275,25 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
-  const { width: nextWidth, height: nextHeight } = measureText(
+  let { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
     element.lineHeight,
   );
+
+  // wrapped text
+  if (!element.autoResize) {
+    nextWidth = element.width;
+  }
+
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
   if (
     textAlign === "center" &&
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
-    !element.containerId
+    !element.containerId &&
+    element.autoResize
   ) {
     const prevMetrics = measureText(
       element.text,
@@ -343,36 +354,17 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (container) {
+  if (container || !textElement.autoResize) {
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container, textElement),
+      container
+        ? getBoundTextMaxWidth(container, textElement)
+        : textElement.width,
     );
   }
   const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
-};
-
-export const updateTextElement = (
-  textElement: ExcalidrawTextElement,
-  container: ExcalidrawTextContainer | null,
-  elementsMap: ElementsMap,
-  {
-    text,
-    isDeleted,
-    originalText,
-  }: {
-    text: string;
-    isDeleted?: boolean;
-    originalText: string;
-  },
-): ExcalidrawTextElement => {
-  return newElementWith(textElement, {
-    originalText,
-    isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
-  });
 };
 
 export const newFreeDrawElement = (

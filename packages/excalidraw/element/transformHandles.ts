@@ -9,7 +9,6 @@ import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
-import { isTextElement } from ".";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
@@ -63,13 +62,6 @@ export const OMIT_SIDES_FOR_FRAME = {
   n: true,
   w: true,
   rotation: true,
-};
-
-const OMIT_SIDES_FOR_TEXT_ELEMENT = {
-  e: true,
-  s: true,
-  n: true,
-  w: true,
 };
 
 const OMIT_SIDES_FOR_LINE_SLASH = {
@@ -290,8 +282,6 @@ export const getTransformHandles = (
         omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
       }
     }
-  } else if (isTextElement(element)) {
-    omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   } else if (isFrameLikeElement(element)) {
     omitSides = {
       ...omitSides,

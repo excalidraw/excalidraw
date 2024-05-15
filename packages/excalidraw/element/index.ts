@@ -9,7 +9,6 @@ import { isLinearElementType } from "./typeChecks";
 export {
   newElement,
   newTextElement,
-  updateTextElement,
   refreshTextDimensions,
   newLinearElement,
   newImageElement,
