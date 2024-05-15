@@ -1,6 +1,6 @@
 import { generateNKeysBetween } from "fractional-indexing";
 import { mutateElement } from "./element/mutateElement";
-import {
+import type {
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,

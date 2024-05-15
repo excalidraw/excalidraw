@@ -1,28 +1,31 @@
-import {
+import type {
   ExcalidrawElement,
   PointerType,
   NonDeletedExcalidrawElement,
   ElementsMap,
 } from "./types";
 
-import {
-  getTransformHandlesFromCoords,
-  getTransformHandles,
+import type {
   TransformHandleType,
   TransformHandle,
   MaybeTransformHandleType,
+} from "./transformHandles";
+import {
+  getTransformHandlesFromCoords,
+  getTransformHandles,
   getOmitSidesForDevice,
   canResizeFromSides,
 } from "./transformHandles";
-import { AppState, Device, Zoom } from "../types";
-import { Bounds, getElementAbsoluteCoords } from "./bounds";
+import type { AppState, Device, Zoom } from "../types";
+import type { Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
 import {
   angleToDegrees,
   pointOnLine,
   pointRotate,
 } from "../../utils/geometry/geometry";
-import { Line, Point } from "../../utils/geometry/shape";
+import type { Line, Point } from "../../utils/geometry/shape";
 import { isLinearElement } from "./typeChecks";
 
 const isInsideTransformHandle = (
@@ -84,12 +87,8 @@ export const resizeTest = (
       elementsMap,
     );
 
-    // Note that for a text element, when "resized" from the side
-    // we should make it wrap/unwrap
-    if (
-      element.type !== "text" &&
-      !(isLinearElement(element) && element.points.length <= 2)
-    ) {
+    // do not resize from the sides for linear elements with only two points
+    if (!(isLinearElement(element) && element.points.length <= 2)) {
       const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
         [x1 - SPACING, y1 - SPACING],

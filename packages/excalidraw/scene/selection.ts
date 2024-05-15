@@ -1,11 +1,11 @@
-import {
+import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { AppState, InteractiveCanvasAppState } from "../types";
+import type { AppState, InteractiveCanvasAppState } from "../types";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,

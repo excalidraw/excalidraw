@@ -50,10 +50,10 @@ export const DropDownMenuItemBadge = ({
         display: "inline-flex",
         marginLeft: "auto",
         padding: "2px 4px",
-        background: "pink",
+        background: "var(--color-promo)",
+        color: "var(--color-surface-lowest)",
         borderRadius: 6,
         fontSize: 9,
-        color: "black",
         fontFamily: "Cascadia, monospace",
       }}
     >

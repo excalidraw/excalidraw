@@ -1,13 +1,13 @@
 import { TOOL_TYPE } from "./constants";
+import type { Bounds } from "./element/bounds";
 import {
-  Bounds,
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
 } from "./element/bounds";
-import { MaybeTransformHandleType } from "./element/transformHandles";
+import type { MaybeTransformHandleType } from "./element/transformHandles";
 import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -19,7 +19,7 @@ import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,
 } from "./scene/selection";
-import { AppState, KeyboardModifiersObject, Point } from "./types";
+import type { AppState, KeyboardModifiersObject, Point } from "./types";
 
 const SNAP_DISTANCE = 8;
 

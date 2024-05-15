@@ -1,10 +1,14 @@
 import { MIME_TYPES } from "../../constants";
-import { Bounds, getElementAbsoluteCoords } from "../../element/bounds";
+import type { Bounds } from "../../element/bounds";
+import { getElementAbsoluteCoords } from "../../element/bounds";
 import { hitElementBoundingBox } from "../../element/collision";
-import { ElementsMap, NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  ElementsMap,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
 import { rotate } from "../../math";
 import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
-import { AppState, Point, UIAppState } from "../../types";
+import type { AppState, Point, UIAppState } from "../../types";
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(

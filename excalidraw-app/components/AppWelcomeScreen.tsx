@@ -1,5 +1,5 @@
 import React from "react";
-import { arrowBarToLeftIcon } from "../../packages/excalidraw/components/icons";
+import { loginIcon } from "../../packages/excalidraw/components/icons";
 import { useI18n } from "../../packages/excalidraw/i18n";
 import { WelcomeScreen } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
@@ -61,7 +61,7 @@ export const AppWelcomeScreen: React.FC<{
                 import.meta.env.VITE_APP_PLUS_LP
               }/plus?utm_source=excalidraw&utm_medium=app&utm_content=welcomeScreenGuest`}
               shortcut={null}
-              icon={arrowBarToLeftIcon}
+              icon={loginIcon}
             >
               Sign up
             </WelcomeScreen.Center.MenuItemLink>
