@@ -194,6 +194,13 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
     /**
+     * If `true` the width will fit the text. If `false`, the text will
+     * wrap to fit the width.
+     *
+     * @default true
+     */
+    autoResize: boolean;
+    /**
      * Unitless line height (aligned to W3C). To get line height in px, multiply
      *  with font size (using `getLineHeightInPx` helper).
      */

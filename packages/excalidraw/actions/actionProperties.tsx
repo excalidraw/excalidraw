@@ -167,7 +167,7 @@ const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
   nextElement: ExcalidrawTextElement,
 ) => {
-  if (isBoundToContainer(nextElement)) {
+  if (isBoundToContainer(nextElement) || !nextElement.autoResize) {
     return nextElement;
   }
   return mutateElement(

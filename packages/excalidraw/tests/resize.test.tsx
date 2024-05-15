@@ -426,6 +426,112 @@ describe("text element", () => {
       expect(text.fontSize).toBe(fontSize);
     });
   });
+
+  // text can be resized from sides
+  it("can be resized from e", async () => {
+    const text = UI.createElement("text");
+    await UI.editText(text, "Excalidraw\nEditor");
+
+    const width = text.width;
+    const height = text.height;
+
+    UI.resize(text, "e", [30, 0]);
+    expect(text.width).toBe(width + 30);
+    expect(text.height).toBe(height);
+
+    UI.resize(text, "e", [-30, 0]);
+    expect(text.width).toBe(width);
+    expect(text.height).toBe(height);
+  });
+
+  it("can be resized from w", async () => {
+    const text = UI.createElement("text");
+    await UI.editText(text, "Excalidraw\nEditor");
+
+    const width = text.width;
+    const height = text.height;
+
+    UI.resize(text, "w", [-50, 0]);
+    expect(text.width).toBe(width + 50);
+    expect(text.height).toBe(height);
+
+    UI.resize(text, "w", [50, 0]);
+    expect(text.width).toBe(width);
+    expect(text.height).toBe(height);
+  });
+
+  it("wraps when width is narrower than texts inside", async () => {
+    const text = UI.createElement("text");
+    await UI.editText(text, "Excalidraw\nEditor");
+
+    const prevWidth = text.width;
+    const prevHeight = text.height;
+    const prevText = text.text;
+
+    UI.resize(text, "w", [50, 0]);
+    expect(text.width).toBe(prevWidth - 50);
+    expect(text.height).toBeGreaterThan(prevHeight);
+    expect(text.text).not.toEqual(prevText);
+    expect(text.autoResize).toBe(false);
+
+    UI.resize(text, "w", [-50, 0]);
+    expect(text.width).toBe(prevWidth);
+    expect(text.height).toEqual(prevHeight);
+    expect(text.text).toEqual(prevText);
+    expect(text.autoResize).toBe(false);
+
+    UI.resize(text, "e", [-20, 0]);
+    expect(text.width).toBe(prevWidth - 20);
+    expect(text.height).toBeGreaterThan(prevHeight);
+    expect(text.text).not.toEqual(prevText);
+    expect(text.autoResize).toBe(false);
+
+    UI.resize(text, "e", [20, 0]);
+    expect(text.width).toBe(prevWidth);
+    expect(text.height).toEqual(prevHeight);
+    expect(text.text).toEqual(prevText);
+    expect(text.autoResize).toBe(false);
+  });
+
+  it("keeps properties when wrapped", async () => {
+    const text = UI.createElement("text");
+    await UI.editText(text, "Excalidraw\nEditor");
+
+    const alignment = text.textAlign;
+    const fontSize = text.fontSize;
+    const fontFamily = text.fontFamily;
+
+    UI.resize(text, "e", [-60, 0]);
+    expect(text.textAlign).toBe(alignment);
+    expect(text.fontSize).toBe(fontSize);
+    expect(text.fontFamily).toBe(fontFamily);
+    expect(text.autoResize).toBe(false);
+
+    UI.resize(text, "e", [60, 0]);
+    expect(text.textAlign).toBe(alignment);
+    expect(text.fontSize).toBe(fontSize);
+    expect(text.fontFamily).toBe(fontFamily);
+    expect(text.autoResize).toBe(false);
+  });
+
+  it("has a minimum width when wrapped", async () => {
+    const text = UI.createElement("text");
+    await UI.editText(text, "Excalidraw\nEditor");
+
+    const width = text.width;
+
+    UI.resize(text, "e", [-width, 0]);
+    expect(text.width).not.toEqual(0);
+    UI.resize(text, "e", [width - text.width, 0]);
+    expect(text.width).toEqual(width);
+    expect(text.autoResize).toBe(false);
+
+    UI.resize(text, "w", [width, 0]);
+    expect(text.width).not.toEqual(0);
+    UI.resize(text, "w", [text.width - width, 0]);
+    expect(text.width).toEqual(width);
+    expect(text.autoResize).toBe(false);
+  });
 });
 
 describe("image element", () => {

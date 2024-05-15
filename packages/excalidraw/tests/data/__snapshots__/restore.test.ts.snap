@@ -302,6 +302,7 @@ exports[`restoreElements > should restore line and draw elements correctly 2`] =
 exports[`restoreElements > should restore text element correctly passing value for each attribute 1`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [],
   "containerId": null,
@@ -344,6 +345,7 @@ exports[`restoreElements > should restore text element correctly passing value f
 exports[`restoreElements > should restore text element correctly with unknown font family, null text and undefined alignment 1`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [],
   "containerId": null,
