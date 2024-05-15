@@ -150,7 +150,7 @@
     "zoomToFitSelection": "Približaj na izbor",
     "zoomToFit": "Približaj na vse elemente",
     "installPWA": "Namesti Excalidraw lokalno (PWA)",
-    "autoResize": ""
+    "autoResize": "Omogoči samodejno spreminjanje velikosti besedila"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
