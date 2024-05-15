@@ -48,7 +48,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
-  { informMutation = true }: { informMutation?: boolean } = {},
+  informMutation = true,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {

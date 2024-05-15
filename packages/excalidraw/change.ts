@@ -1450,9 +1450,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
         continue;
       }
 
-      redrawTextBoundingBox(boundText, container, elements, {
-        informMutation: false,
-      });
+      redrawTextBoundingBox(boundText, container, elements, false);
     }
   }
 
