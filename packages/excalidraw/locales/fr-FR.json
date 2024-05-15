@@ -149,7 +149,8 @@
     "zoomToFitViewport": "Zoomer pour tenir dans la fenêtre d'affichage",
     "zoomToFitSelection": "Zoomer pour s'adapter à la sélection",
     "zoomToFit": "Zoomer pour voir tous les éléments",
-    "installPWA": "Installer Excalidraw localement (PWA)"
+    "installPWA": "Installer Excalidraw localement (PWA)",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
