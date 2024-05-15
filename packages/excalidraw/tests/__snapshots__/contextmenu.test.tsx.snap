@@ -387,11 +387,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -439,7 +443,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -483,11 +486,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -537,7 +544,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -4791,11 +4797,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -4843,7 +4853,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -4887,11 +4896,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -4941,7 +4954,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -5893,11 +5905,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -5945,7 +5961,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -5989,11 +6004,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -6043,7 +6062,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -7702,11 +7720,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -7754,7 +7776,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -7798,11 +7819,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -7852,7 +7877,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -8571,11 +8595,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -8623,7 +8651,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -8667,11 +8694,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(180,12,12)"
           >
             <path
               d="M0 0h24v24H0z"
@@ -8721,7 +8752,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         >
           <g
             strokeWidth={1.5}
-            transform="rotate(0,12,12)"
           >
             <path
               d="M0 0h24v24H0z"

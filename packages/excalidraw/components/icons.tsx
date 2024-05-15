@@ -675,13 +675,8 @@ export const resetZoom = createIcon(
   { width: 1024 },
 );
 
-const computeRotate = (
-  rotate: number,
-  origin: { width?: number; height?: number },
-) => `rotate(${rotate},${(origin.width ?? 0) / 2},${(origin.height ?? 0) / 2})`;
-
-const arrowBarToTopJSX = (rotate: number) => (
-  <g strokeWidth={1.5} transform={computeRotate(rotate, tablerIconProps)}>
+const arrowBarToTopJSX = (
+  <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M12 10l0 10" />
     <path d="M12 10l4 4" />
@@ -690,8 +685,8 @@ const arrowBarToTopJSX = (rotate: number) => (
   </g>
 );
 
-const arrownNarrowUpJSX = (rotate: number) => (
-  <g strokeWidth={1.5} transform={computeRotate(rotate, tablerIconProps)}>
+const arrownNarrowUpJSX = (
+  <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M12 5l0 14" />
     <path d="M16 9l-4 -4" />
@@ -699,28 +694,22 @@ const arrownNarrowUpJSX = (rotate: number) => (
   </g>
 );
 
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#example
-// In SVG 1.1, <svg> element can not use transform attribute
-// and safari IE11 maybe use SVG 1.1
-// in order to compatible with SVG 1.1, we need to apply transform attribute in <g> element
-export const BringForwardIcon = createIcon(
-  arrownNarrowUpJSX(0),
-  tablerIconProps,
-);
+export const BringForwardIcon = createIcon(arrownNarrowUpJSX, tablerIconProps);
 
-export const SendBackwardIcon = createIcon(arrownNarrowUpJSX(180), {
+export const SendBackwardIcon = createIcon(arrownNarrowUpJSX, {
   ...tablerIconProps,
-  // transform: "rotate(180)",
+  style: {
+    transform: "rotate(180deg)",
+  },
 });
 
-export const BringToFrontIcon = createIcon(
-  arrowBarToTopJSX(0),
-  tablerIconProps,
-);
+export const BringToFrontIcon = createIcon(arrowBarToTopJSX, tablerIconProps);
 
-export const SendToBackIcon = createIcon(arrowBarToTopJSX(180), {
+export const SendToBackIcon = createIcon(arrowBarToTopJSX, {
   ...tablerIconProps,
-  // transform: "rotate(180)",
+  style: {
+    transform: "rotate(180deg)",
+  },
 });
 
 //
