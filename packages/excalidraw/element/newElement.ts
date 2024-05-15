@@ -354,11 +354,13 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (container) {
+  if (container || !textElement.autoResize) {
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container, textElement),
+      container
+        ? getBoundTextMaxWidth(container, textElement)
+        : textElement.width,
     );
   }
   const dimensions = getAdjustedDimensions(textElement, elementsMap, text);

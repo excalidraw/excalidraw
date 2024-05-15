@@ -112,24 +112,6 @@ export const textWysiwyg = ({
     return false;
   };
 
-  const getNormalizedEditableValue = () => {
-    const updatedTextElement =
-      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
-    const normalizedText = normalizeText(editable.value);
-
-    if (updatedTextElement) {
-      return wrapText(
-        normalizedText,
-        getFontString(element),
-        updatedTextElement.autoResize
-          ? Infinity
-          : Math.abs(updatedTextElement.width),
-      );
-    }
-
-    return normalizedText;
-  };
-
   const updateWysiwygStyle = () => {
     const appState = app.state;
     const updatedTextElement =
@@ -375,7 +357,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
-      onChange(getNormalizedEditableValue());
+      onChange(normalizeText(editable.value));
     };
   }
 
@@ -536,7 +518,7 @@ export const textWysiwyg = ({
     if (!updateElement) {
       return;
     }
-    let text = getNormalizedEditableValue();
+    let text = editable.value;
     const container = getContainerElement(
       updateElement,
       app.scene.getNonDeletedElementsMap(),
