@@ -149,7 +149,8 @@
     "zoomToFitViewport": "縮放至符合 viewport",
     "zoomToFitSelection": "縮放至符合選取區",
     "zoomToFit": "縮放至顯示所有元素",
-    "installPWA": "於本機安裝 Excalidraw (PWA)"
+    "installPWA": "於本機安裝 Excalidraw (PWA)",
+    "autoResize": ""
   },
   "library": {
     "noItems": "尚未加入任何物件...",
