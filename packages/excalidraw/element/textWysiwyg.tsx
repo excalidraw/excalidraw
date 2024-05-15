@@ -33,7 +33,6 @@ import {
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
   getBoundTextElement,
-  measureText,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -130,12 +129,9 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
       let maxWidth = updatedTextElement.width;
-
-      let text = editable.value;
-
       let maxHeight = updatedTextElement.height;
       let textElementWidth = updatedTextElement.width;
-      let textElementHeight = updatedTextElement.height;
+      const textElementHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
@@ -225,21 +221,6 @@ export const textWysiwyg = ({
       }
 
       if (!container) {
-        text = wrapText(
-          text,
-          getFontString(element),
-          Math.abs(textElementWidth),
-        );
-
-        const metrics = measureText(
-          text,
-          getFontString(updatedTextElement),
-          updatedTextElement.lineHeight,
-        );
-
-        textElementHeight = metrics.height;
-
-        maxHeight = metrics.height;
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
       } else {
