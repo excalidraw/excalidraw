@@ -1788,6 +1788,7 @@ class App extends React.Component<AppProps, AppState> {
                 `"${fileHandle.name}"`,
               )
             : t("toast.fileSaved"),
+          duration: 1500,
         },
       });
     } else if (type === "clipboard") {
@@ -1795,6 +1796,7 @@ class App extends React.Component<AppProps, AppState> {
         openDialog: null,
         toast: {
           message: t("toast.copyToClipboard"),
+          duration: 1500,
         },
       });
     }
