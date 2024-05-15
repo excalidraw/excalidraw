@@ -79,12 +79,14 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  onChange?: (text: string) => void;
-  onSubmit: (data: {
-    text: string;
-    viaKeyboard: boolean;
-    originalText: string;
-  }) => void;
+  /**
+   * textWysiwyg only deals with `originalText`
+   *
+   * Note: `text`, which can be wrapped and therefore different from `originalText`,
+   *       is derived from `originalText`
+   */
+  onChange?: (nextOriginalText: string) => void;
+  onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -499,14 +501,12 @@ export const textWysiwyg = ({
     if (!updateElement) {
       return;
     }
-    let text = editable.value;
     const container = getContainerElement(
       updateElement,
       app.scene.getNonDeletedElementsMap(),
     );
 
     if (container) {
-      text = updateElement.text;
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -538,9 +538,8 @@ export const textWysiwyg = ({
     }
 
     onSubmit({
-      text,
       viaKeyboard: submittedViaKeyboard,
-      originalText: editable.value,
+      nextOriginalText: editable.value,
     });
   };
 

@@ -367,27 +367,6 @@ export const refreshTextDimensions = (
   return { text, ...dimensions };
 };
 
-export const updateTextElement = (
-  textElement: ExcalidrawTextElement,
-  container: ExcalidrawTextContainer | null,
-  elementsMap: ElementsMap,
-  {
-    text,
-    isDeleted,
-    originalText,
-  }: {
-    text: string;
-    isDeleted?: boolean;
-    originalText: string;
-  },
-): ExcalidrawTextElement => {
-  return newElementWith(textElement, {
-    originalText,
-    isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, text),
-  });
-};
-
 export const newFreeDrawElement = (
   opts: {
     type: "freedraw";
