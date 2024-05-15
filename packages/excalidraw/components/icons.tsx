@@ -698,14 +698,18 @@ export const BringForwardIcon = createIcon(arrownNarrowUpJSX, tablerIconProps);
 
 export const SendBackwardIcon = createIcon(arrownNarrowUpJSX, {
   ...tablerIconProps,
-  transform: "rotate(180)",
+  style: {
+    transform: "rotate(180deg)",
+  },
 });
 
 export const BringToFrontIcon = createIcon(arrowBarToTopJSX, tablerIconProps);
 
 export const SendToBackIcon = createIcon(arrowBarToTopJSX, {
   ...tablerIconProps,
-  transform: "rotate(180)",
+  style: {
+    transform: "rotate(180deg)",
+  },
 });
 
 //
