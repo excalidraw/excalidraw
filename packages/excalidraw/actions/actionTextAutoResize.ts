@@ -7,7 +7,7 @@ import type { AppClassProperties } from "../types";
 import { getFontString } from "../utils";
 import { register } from "./register";
 
-export const actionUnwrapText = register({
+export const actionTextAutoResize = register({
   name: "autoResize",
   label: "labels.autoResize",
   icon: null,

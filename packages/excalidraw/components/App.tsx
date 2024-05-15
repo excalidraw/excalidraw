@@ -429,7 +429,7 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { actionUnwrapText } from "../actions/actionTextAutoResize";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -9645,7 +9645,7 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
-      actionUnwrapText,
+      actionTextAutoResize,
       actionUnbindText,
       actionBindText,
       actionWrapTextInContainer,
