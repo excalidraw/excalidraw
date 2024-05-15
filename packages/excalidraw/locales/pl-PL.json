@@ -149,7 +149,8 @@
     "zoomToFitViewport": "Dopasuj widok do ekranu",
     "zoomToFitSelection": "Dopasuj widok do zaznaczenia",
     "zoomToFit": "Dopasuj widok do całej zawartości",
-    "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)"
+    "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
