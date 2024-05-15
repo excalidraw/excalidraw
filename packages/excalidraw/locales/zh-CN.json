@@ -149,7 +149,8 @@
     "zoomToFitViewport": "缩放以适应视图",
     "zoomToFitSelection": "缩放以适应选区",
     "zoomToFit": "缩放以适应所有元素",
-    "installPWA": "在本地安装 Excalidraw (PWA)"
+    "installPWA": "在本地安装 Excalidraw (PWA)",
+    "autoResize": ""
   },
   "library": {
     "noItems": "尚未添加任何项目……",
