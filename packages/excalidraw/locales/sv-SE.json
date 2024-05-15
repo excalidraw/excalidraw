@@ -149,7 +149,8 @@
     "zoomToFitViewport": "Zooma för att passa in i vyn",
     "zoomToFitSelection": "Zooma för att passa urval",
     "zoomToFit": "Zooma för att rymma alla element",
-    "installPWA": "Installera Excalidraw lokalt (PWA)"
+    "installPWA": "Installera Excalidraw lokalt (PWA)",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
