@@ -149,7 +149,8 @@
     "zoomToFitViewport": "Priblížiť na veľkosť zobrazenia",
     "zoomToFitSelection": "Priblížiť na výber",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "installPWA": ""
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
