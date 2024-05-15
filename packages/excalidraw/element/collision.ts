@@ -1,18 +1,15 @@
 import { isPathALoop, isPointWithinBounds } from "../math";
 
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
 } from "./types";
 
 import { getElementBounds } from "./bounds";
-import { FrameNameBounds } from "../types";
-import {
-  Polygon,
-  GeometricShape,
-  getPolygonShape,
-} from "../../utils/geometry/shape";
+import type { FrameNameBounds } from "../types";
+import type { Polygon, GeometricShape } from "../../utils/geometry/shape";
+import { getPolygonShape } from "../../utils/geometry/shape";
 import { isPointInShape, isPointOnShape } from "../../utils/collision";
 import { isTransparent } from "../utils";
 import {

@@ -8,7 +8,7 @@ import {
 } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 import { exportToSvg } from "../scene/export";
-import { FileId } from "../element/types";
+import type { FileId } from "../element/types";
 import { getDataURL } from "../data/blob";
 import { getDefaultAppState } from "../appState";
 

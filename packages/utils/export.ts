@@ -3,8 +3,8 @@ import {
   exportToSvg as _exportToSvg,
 } from "../excalidraw/scene/export";
 import { getDefaultAppState } from "../excalidraw/appState";
-import { AppState, BinaryFiles } from "../excalidraw/types";
-import {
+import type { AppState, BinaryFiles } from "../excalidraw/types";
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,

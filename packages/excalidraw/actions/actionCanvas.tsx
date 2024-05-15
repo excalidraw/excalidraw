@@ -19,13 +19,13 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { AppClassProperties, AppState, NormalizedZoomValue } from "../types";
+import type { AppClassProperties, AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
@@ -40,7 +40,7 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE, //zsviczian
 } from "../colors";
 import { excludeElementsInFramesFromSelection } from "../scene/selection"; //zsviczian
-import { SceneBounds } from "../element/bounds";
+import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
 

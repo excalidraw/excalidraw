@@ -1,4 +1,5 @@
-import { alignElements, Alignment } from "../align";
+import type { Alignment } from "../align";
+import { alignElements } from "../align";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -10,13 +11,13 @@ import {
 import { ToolButton } from "../components/ToolButton";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
 import { StoreAction } from "../store";
-import { AppClassProperties, AppState, UIAppState } from "../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 

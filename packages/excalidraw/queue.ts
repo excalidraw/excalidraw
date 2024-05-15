@@ -1,5 +1,6 @@
-import { MaybePromise } from "./utility-types";
-import { promiseTry, ResolvablePromise, resolvablePromise } from "./utils";
+import type { MaybePromise } from "./utility-types";
+import type { ResolvablePromise } from "./utils";
+import { promiseTry, resolvablePromise } from "./utils";
 
 type Job<T, TArgs extends unknown[]> = (...args: TArgs) => MaybePromise<T>;
 

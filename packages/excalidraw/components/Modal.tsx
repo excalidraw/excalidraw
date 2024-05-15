@@ -3,7 +3,7 @@ import "./Modal.scss";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useRef } from "react";
 

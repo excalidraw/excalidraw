@@ -1,5 +1,5 @@
 import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawElementType,
@@ -21,16 +21,16 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MaybeTransformHandleType } from "./transformHandles";
+import type { MaybeTransformHandleType } from "./transformHandles";
 import { isTextElement } from ".";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./containerCache";
-import { ExtractSetType, MakeBrand } from "../utility-types";
+import type { ExtractSetType, MakeBrand } from "../utility-types";
 
 export const normalizeText = (text: string) => {
   return (
@@ -48,7 +48,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
-  informMutation: boolean = true,
+  informMutation = true,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -62,21 +62,27 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.text = textElement.text;
 
-  if (container) {
-    maxWidth = getBoundTextMaxWidth(container, textElement);
+  if (container || !textElement.autoResize) {
+    maxWidth = container
+      ? getBoundTextMaxWidth(container, textElement)
+      : textElement.width;
     boundTextUpdates.text = wrapText(
       textElement.originalText,
       getFontString(textElement),
       maxWidth,
     );
   }
+
   const metrics = measureText(
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
   );
 
-  boundTextUpdates.width = metrics.width;
+  // Note: only update width for unwrapped text and bound texts (which always have autoResize set to true)
+  if (textElement.autoResize) {
+    boundTextUpdates.width = metrics.width;
+  }
   boundTextUpdates.height = metrics.height;
 
   if (container) {

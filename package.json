@@ -1,6 +1,7 @@
 {
   "private": true,
   "name": "excalidraw-monorepo",
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "excalidraw-app",
     "packages/excalidraw",
@@ -60,9 +61,9 @@
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
     "build-node": "node ./scripts/build-node.js",
-    "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true VITE_APP_DISABLE_TRACKING=true vite build",
-    "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA vite build",
-    "build:version": "node ./scripts/build-version.js",
+    "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
+    "build:app": "yarn --cwd ./excalidraw-app build:app",
+    "build:version": "yarn --cwd ./excalidraw-app build:version",
     "build": "yarn --cwd ./excalidraw-app build",
     "fix:code": "yarn test:code --fix",
     "fix:other": "yarn prettier --write",
