@@ -236,7 +236,7 @@ describe("textWysiwyg", () => {
     });
   });
 
-  describe("Test wrapping", () => {
+  describe("Test text wrapping", () => {
     const { h } = window;
     const dimensions = { height: 400, width: 800 };
 
@@ -307,13 +307,13 @@ describe("textWysiwyg", () => {
       expect(h.elements[0].width).toEqual(wrappedWidth);
     });
 
-    it("should restore after unwrapping a wrapped text", async () => {
+    it("should restore original text after unwrapping a wrapped text", async () => {
+      const originalText = "Excalidraw\neditor\nis great!";
       const text = API.createElement({
         type: "text",
-        text: "Excalidraw\neditor\nis great!",
+        text: originalText,
       });
       h.elements = [text];
-      const prevText = text.text;
 
       // wrap
       UI.resize(text, "e", [-40, 0]);
@@ -324,7 +324,7 @@ describe("textWysiwyg", () => {
       editor.blur();
       // restore after unwrapping
       UI.resize(text, "e", [40, 0]);
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(prevText);
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(originalText);
 
       // wrap again and add a new line
       UI.resize(text, "e", [-30, 0]);
@@ -343,7 +343,7 @@ describe("textWysiwyg", () => {
       // unwrap
       UI.resize(text, "e", [30, 0]);
       // expect the text to be restored the same
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(prevText);
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(originalText);
     });
   });
 
