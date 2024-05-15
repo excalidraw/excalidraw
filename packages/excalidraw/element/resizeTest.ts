@@ -87,12 +87,8 @@ export const resizeTest = (
       elementsMap,
     );
 
-    // Note that for a text element, when "resized" from the side
-    // we should make it wrap/unwrap
-    if (
-      element.type !== "text" &&
-      !(isLinearElement(element) && element.points.length <= 2)
-    ) {
+    // do not resize from the sides for linear elements with only two points
+    if (!(isLinearElement(element) && element.points.length <= 2)) {
       const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
         [x1 - SPACING, y1 - SPACING],
