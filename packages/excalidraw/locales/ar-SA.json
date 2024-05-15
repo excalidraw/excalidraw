@@ -149,7 +149,8 @@
     "zoomToFitViewport": "التكبير لتناسب العرض",
     "zoomToFitSelection": "تكبير للعنصر المحدد",
     "zoomToFit": "تكبير لتلائم جميع العناصر",
-    "installPWA": ""
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
