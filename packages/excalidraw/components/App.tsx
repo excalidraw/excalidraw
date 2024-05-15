@@ -1777,10 +1777,14 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ errorMessage: error.message });
       });
 
-    if (type === "clipboard" || (fileHandle && isImageFileHandle(fileHandle))) {
+    if (
+      type === "clipboard" ||
+      (this.state.exportEmbedScene &&
+        fileHandle &&
+        isImageFileHandle(fileHandle))
+    ) {
       this.setState({
-        fileHandle:
-          fileHandle && this.state.exportEmbedScene ? fileHandle : null,
+        fileHandle: fileHandle ?? null,
         openDialog: null,
         toast: {
           message:
