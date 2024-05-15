@@ -149,7 +149,8 @@
     "zoomToFitViewport": "पूर्ण दृश्यरूप आकार",
     "zoomToFitSelection": "निवडी प्रयंत दृश्यरूप आकार करा",
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
-    "installPWA": ""
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
