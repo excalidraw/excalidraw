@@ -149,7 +149,8 @@
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": "",
-    "installPWA": ""
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
