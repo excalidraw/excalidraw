@@ -19,7 +19,7 @@ type InteractiveCanvasProps = {
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
-  versionNonce: number | undefined;
+  sceneNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
@@ -206,10 +206,10 @@ const areEqual = (
   // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
-    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.sceneNonce !== nextProps.sceneNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if versionNonce didn't change (e.g. we filter elements out based
+    // even if sceneNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||

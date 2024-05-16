@@ -13,7 +13,7 @@ import {
   VERSION_TIMEOUT,
 } from "../packages/excalidraw/constants";
 import { loadFromBlob } from "../packages/excalidraw/data/blob";
-import {
+import type {
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
@@ -29,20 +29,20 @@ import {
   StoreAction,
   reconcileElements,
 } from "../packages/excalidraw";
-import {
+import type {
   AppState,
   ExcalidrawImperativeAPI,
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
 } from "../packages/excalidraw/types";
+import type { ResolvablePromise } from "../packages/excalidraw/utils";
 import {
   debounce,
   getVersion,
   getFrame,
   isTestEnv,
   preventUnload,
-  ResolvablePromise,
   resolvablePromise,
   isRunningInIframe,
 } from "../packages/excalidraw/utils";
@@ -52,8 +52,8 @@ import {
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
+import type { CollabAPI } from "./collab/Collab";
 import Collab, {
-  CollabAPI,
   collabAPIAtom,
   isCollaboratingAtom,
   isOfflineAtom,
@@ -69,11 +69,8 @@ import {
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
 import CustomStats from "./CustomStats";
-import {
-  restore,
-  restoreAppState,
-  RestoredDataState,
-} from "../packages/excalidraw/data/restore";
+import type { RestoredDataState } from "../packages/excalidraw/data/restore";
+import { restore, restoreAppState } from "../packages/excalidraw/data/restore";
 import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
@@ -101,7 +98,7 @@ import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { appJotaiStore } from "./app-jotai";
 
 import "./index.scss";
-import { ResolutionType } from "../packages/excalidraw/utility-types";
+import type { ResolutionType } from "../packages/excalidraw/utility-types";
 import { ShareableLinkDialog } from "../packages/excalidraw/components/ShareableLinkDialog";
 import { openConfirmModal } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
@@ -128,6 +125,38 @@ import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
+
+declare global {
+  interface BeforeInstallPromptEventChoiceResult {
+    outcome: "accepted" | "dismissed";
+  }
+
+  interface BeforeInstallPromptEvent extends Event {
+    prompt(): Promise<void>;
+    userChoice: Promise<BeforeInstallPromptEventChoiceResult>;
+  }
+
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}
+
+let pwaEvent: BeforeInstallPromptEvent | null = null;
+
+// Adding a listener outside of the component as it may (?) need to be
+// subscribed early to catch the event.
+//
+// Also note that it will fire only if certain heuristics are met (user has
+// used the app for some time, etc.)
+window.addEventListener(
+  "beforeinstallprompt",
+  (event: BeforeInstallPromptEvent) => {
+    // prevent Chrome <= 67 from automatically showing the prompt
+    event.preventDefault();
+    // cache for later use
+    pwaEvent = event;
+  },
+);
 
 let isSelfEmbedding = false;
 
@@ -1101,6 +1130,21 @@ const ExcalidrawWrapper = () => {
                 setAppTheme(
                   editorTheme === THEME.DARK ? THEME.LIGHT : THEME.DARK,
                 );
+              },
+            },
+            {
+              label: t("labels.installPWA"),
+              category: DEFAULT_CATEGORIES.app,
+              predicate: () => !!pwaEvent,
+              perform: () => {
+                if (pwaEvent) {
+                  pwaEvent.prompt();
+                  pwaEvent.userChoice.then(() => {
+                    // event cannot be reused, but we'll hopefully
+                    // grab new one as the event should be fired again
+                    pwaEvent = null;
+                  });
+                }
               },
             },
           ]}

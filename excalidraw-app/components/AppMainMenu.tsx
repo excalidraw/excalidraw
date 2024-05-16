@@ -1,9 +1,9 @@
 import React from "react";
 import {
-  arrowBarToLeftIcon,
+  loginIcon,
   ExcalLogo,
 } from "../../packages/excalidraw/components/icons";
-import { Theme } from "../../packages/excalidraw/element/types";
+import type { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "./LanguageList";
@@ -42,7 +42,7 @@ export const AppMainMenu: React.FC<{
       </MainMenu.ItemLink>
       <MainMenu.DefaultItems.Socials />
       <MainMenu.ItemLink
-        icon={arrowBarToLeftIcon}
+        icon={loginIcon}
         href={`${import.meta.env.VITE_APP_PLUS_APP}${
           isExcalidrawPlusSignedUser ? "" : "/sign-up"
         }?utm_source=signin&utm_medium=app&utm_content=hamburger`}

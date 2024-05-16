@@ -12,13 +12,13 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { CLASSES } from "../constants";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
 } from "./types";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
@@ -39,7 +39,7 @@ import {
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
-import App from "../components/App";
+import type App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
 import {
@@ -79,12 +79,14 @@ export const textWysiwyg = ({
   app,
 }: {
   id: ExcalidrawElement["id"];
-  onChange?: (text: string) => void;
-  onSubmit: (data: {
-    text: string;
-    viaKeyboard: boolean;
-    originalText: string;
-  }) => void;
+  /**
+   * textWysiwyg only deals with `originalText`
+   *
+   * Note: `text`, which can be wrapped and therefore different from `originalText`,
+   *       is derived from `originalText`
+   */
+  onChange?: (nextOriginalText: string) => void;
+  onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -129,11 +131,8 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
       let maxWidth = updatedTextElement.width;
-
       let maxHeight = updatedTextElement.height;
       let textElementWidth = updatedTextElement.width;
-      // Set to element height by default since that's
-      // what is going to be used for unbounded text
       const textElementHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
@@ -226,6 +225,8 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
+      } else {
+        textElementWidth += 0.5;
       }
 
       // Make sure text editor height doesn't go beyond viewport
@@ -260,6 +261,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
+
       mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
@@ -276,7 +278,7 @@ export const textWysiwyg = ({
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
-  if (isBoundToContainer(element)) {
+  if (isBoundToContainer(element) || !element.autoResize) {
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
@@ -499,14 +501,12 @@ export const textWysiwyg = ({
     if (!updateElement) {
       return;
     }
-    let text = editable.value;
     const container = getContainerElement(
       updateElement,
       app.scene.getNonDeletedElementsMap(),
     );
 
     if (container) {
-      text = updateElement.text;
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -538,9 +538,8 @@ export const textWysiwyg = ({
     }
 
     onSubmit({
-      text,
       viaKeyboard: submittedViaKeyboard,
-      originalText: editable.value,
+      nextOriginalText: editable.value,
     });
   };
 
@@ -644,7 +643,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = Scene.getScene(element)!.addCallback(() => {
+  const unbindUpdate = Scene.getScene(element)!.onUpdate(() => {
     updateWysiwygStyle();
     const isColorPickerActive = !!document.activeElement?.closest(
       ".color-picker-content",

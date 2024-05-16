@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { RoughCanvas } from "roughjs/bin/canvas";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 import { renderStaticScene } from "../../renderer/staticScene";
 import { isShallowEqual } from "../../utils";
 import type { AppState, StaticCanvasAppState } from "../../types";
@@ -19,7 +19,7 @@ type StaticCanvasProps = {
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
-  versionNonce: number | undefined;
+  sceneNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
   appState: StaticCanvasAppState;
@@ -112,10 +112,10 @@ const areEqual = (
   nextProps: StaticCanvasProps,
 ) => {
   if (
-    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.sceneNonce !== nextProps.sceneNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if versionNonce didn't change (e.g. we filter elements out based
+    // even if sceneNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements

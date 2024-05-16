@@ -1,6 +1,6 @@
-import { NonDeletedExcalidrawElement } from "./types";
+import type { NonDeletedExcalidrawElement } from "./types";
 import { getSelectedElements } from "../scene";
-import { UIAppState } from "../types";
+import type { UIAppState } from "../types";
 
 export const showSelectedShapeActions = (
   appState: UIAppState,

@@ -1,7 +1,7 @@
 import "./ToolIcon.scss";
 
 import clsx from "clsx";
-import { ToolButtonSize } from "./ToolButton";
+import type { ToolButtonSize } from "./ToolButton";
 
 const DEFAULT_SIZE: ToolButtonSize = "small";
 

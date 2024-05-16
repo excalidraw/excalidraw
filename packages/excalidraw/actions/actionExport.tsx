@@ -16,7 +16,7 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import { Theme } from "../element/types";
+import type { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
 import { StoreAction } from "../store";

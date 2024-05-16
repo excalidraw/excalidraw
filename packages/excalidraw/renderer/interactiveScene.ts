@@ -21,23 +21,25 @@ import {
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "../groups";
-import {
-  getOmitSidesForDevice,
-  shouldShowBoundingBox,
+import type {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
+import {
+  getOmitSidesForDevice,
+  shouldShowBoundingBox,
+} from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import { InteractiveCanvasAppState, Point } from "../types";
+import type { InteractiveCanvasAppState, Point } from "../types";
 import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
-import {
-  maxBindingGap,
+import type {
   SuggestedBinding,
   SuggestedPointBinding,
 } from "../element/binding";
+import { maxBindingGap } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   bootstrapCanvas,
@@ -46,7 +48,7 @@ import {
 } from "./helpers";
 import oc from "open-color";
 import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
-import {
+import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -55,7 +57,7 @@ import {
   GroupId,
   NonDeleted,
 } from "../element/types";
-import {
+import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
   RenderableElementsMap,

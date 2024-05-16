@@ -1,19 +1,16 @@
 import rough from "roughjs/bin/rough";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "../element/types";
-import {
-  Bounds,
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "../element/bounds";
+import type { Bounds } from "../element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
 import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
-import { AppState, BinaryFiles } from "../types";
+import type { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
   FONT_FAMILY,
@@ -35,10 +32,10 @@ import {
   getRootElements,
 } from "../frame";
 import { newTextElement } from "../element";
-import { Mutable } from "../utility-types";
+import type { Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
-import { RenderableElementsMap } from "./types";
+import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 
@@ -342,7 +339,7 @@ export const exportToSvg = async (
     assetPath =
       window.EXCALIDRAW_ASSET_PATH ||
       `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-        import.meta.env.PKG_VERSION
+        import.meta.env.VITE_PKG_VERSION
       }`;
 
     if (assetPath?.startsWith("/")) {
