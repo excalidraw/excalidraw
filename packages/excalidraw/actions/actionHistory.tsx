@@ -65,7 +65,10 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   PanelComponent: ({ updateData, data }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
       history.onHistoryChangedEmitter,
-      new HistoryChangedEvent(),
+      new HistoryChangedEvent(
+        history.isUndoStackEmpty,
+        history.isRedoStackEmpty,
+      ),
     );
 
     return (
@@ -103,7 +106,10 @@ export const createRedoAction: ActionCreator = (history, store) => ({
   PanelComponent: ({ updateData, data }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,
-      new HistoryChangedEvent(),
+      new HistoryChangedEvent(
+        history.isUndoStackEmpty,
+        history.isRedoStackEmpty,
+      ),
     );
 
     return (
