@@ -150,7 +150,7 @@
     "zoomToFitSelection": "Transfocare pentru a cuprinde selecția",
     "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
     "installPWA": "Instalează Excalidraw la nivel local (PWA)",
-    "autoResize": ""
+    "autoResize": "Activare autoredimensionare text"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
