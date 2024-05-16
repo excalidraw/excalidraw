@@ -150,7 +150,7 @@
     "zoomToFitSelection": "Dopasuj widok do zaznaczenia",
     "zoomToFit": "Dopasuj widok do całej zawartości",
     "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)",
-    "autoResize": ""
+    "autoResize": "Włącz automatyczne zmiany rozmiaru tekstu"
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
