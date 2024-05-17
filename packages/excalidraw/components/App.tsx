@@ -331,6 +331,8 @@ import {
   getLineHeightInPx,
   isMeasureTextSupported,
   isValidTextContainer,
+  measureText,
+  wrapText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -430,6 +432,7 @@ import {
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { getVisibleSceneBounds } from "../element/bounds";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3342,6 +3345,19 @@ class App extends React.Component<AppProps, AppState> {
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
+    const fontString = getFontString({
+      fontSize: textElementProps.fontSize,
+      fontFamily: textElementProps.fontFamily,
+    });
+    const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
+    const [x1, , x2] = getVisibleSceneBounds(this.state);
+    const maxTextWidth = (x2 - x1) * 0.6;
+    // leave a little bit of padding so that the right side of the text
+    // is not touching the right edge of the scene
+    const padding = 16 / this.state.zoom.value;
+    const distanceToEdge = x2 - x - padding;
+    const textWidth =
+      distanceToEdge > maxTextWidth ? maxTextWidth : distanceToEdge;
 
     const LINE_GAP = 10;
     let currentY = y;
@@ -3349,21 +3365,35 @@ class App extends React.Component<AppProps, AppState> {
     const lines = isPlainPaste ? [text] : text.split("\n");
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
-        const text = line.trim();
-
-        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
-        if (text.length) {
+        const originalText = line.trim();
+        if (originalText.length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
             x,
             y: currentY,
           });
+
+          const metrics = measureText(originalText, fontString, lineHeight);
+          const isTextWrapped = metrics.width > textWidth;
+
+          const text = isTextWrapped
+            ? wrapText(
+                originalText,
+                getFontString({
+                  fontSize: textElementProps.fontSize,
+                  fontFamily: textElementProps.fontFamily,
+                }),
+                textWidth,
+              )
+            : originalText;
 
           const element = newTextElement({
             ...textElementProps,
             x,
             y: currentY,
             text,
+            originalText,
             lineHeight,
+            autoResize: !isTextWrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
