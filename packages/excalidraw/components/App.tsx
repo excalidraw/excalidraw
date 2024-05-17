@@ -285,6 +285,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  isRTL,
 } from "../utils";
 import {
   createSrcDoc,
@@ -3352,10 +3353,10 @@ class App extends React.Component<AppProps, AppState> {
     const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
     const [x1, , x2] = getVisibleSceneBounds(this.state);
     const maxTextWidth = (x2 - x1) * 0.6;
-    // leave a little bit of padding so that the right side of the text
-    // is not touching the right edge of the scene
+    // leave a little bit of padding so that the side of the text
+    // is not touching the edge of the scene
     const padding = 16 / this.state.zoom.value;
-    const distanceToEdge = x2 - x - padding;
+    const distanceToEdge = isRTL(text) ? x - x1 - padding : x2 - x - padding;
     const textWidth =
       distanceToEdge > maxTextWidth ? maxTextWidth : distanceToEdge;
 
