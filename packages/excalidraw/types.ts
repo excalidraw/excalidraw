@@ -509,10 +509,10 @@ export interface ExcalidrawProps {
   onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string; //zsviczian
   onBeforeTextSubmit?: (
     textElement: ExcalidrawTextElement,
-    textToSubmit: string,
-    originalText: string,
+    nextText: string, //wrapped
+    nextOriginalText: string,
     isDeleted: boolean,
-  ) => [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
+  ) => {updatedNextOriginalText: string, nextLink: string}; //zsviczian [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void; //zsviczian
   onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian

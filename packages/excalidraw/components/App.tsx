@@ -4558,36 +4558,23 @@ class App extends React.Component<AppProps, AppState> {
       isDeleted: boolean,
       rawText?: string, //zsviczian
       link?: string, //zsviczian
-      text?: string, //zsviczian need to double check why I need this in the first place, likely due to legacy {nnn} wrapping
     ) => {
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            //zsviczian
-            const dimensionsData = refreshTextDimensions(
-              _element,
-              getContainerElement(_element, elementsMap),
-              elementsMap,
-              nextOriginalText,
-            );
-            if (text && dimensionsData) {
-              dimensionsData.text = text;
-            }
-
             return newElementWith(_element, {
               originalText: nextOriginalText,
               rawText: rawText ?? nextOriginalText, //zsviczian
               link, //zsviczian
               isDeleted: isDeleted ?? _element.isDeleted,
               // returns (wrapped) text and new dimensions
-              ...dimensionsData, //zsviczian
-              /*...refreshTextDimensions(
+              ...refreshTextDimensions(
                 _element,
                 getContainerElement(_element, elementsMap),
                 elementsMap,
                 nextOriginalText,
-              ),*/ //zsviczian
+              ),
             });
           }
           return _element;
@@ -4598,11 +4585,12 @@ class App extends React.Component<AppProps, AppState> {
     //zsviczian
     if (isExistingElement && this.props.onBeforeTextEdit) {
       const text = this.props.onBeforeTextEdit(element);
-      if (text) {
+      if (text && text !== element.originalText) {
         this.scene.replaceAllElements([
           ...this.scene.getElementsIncludingDeleted().map((_element) => {
             if (_element.id === element.id && isTextElement(_element)) {
-              return newElementWith(_element, {
+              //changing the value of element so this gets edited by textWysiwyg
+              element = newElementWith(_element, {
                 originalText: text,
                 rawText: text, //zsviczian
                 isDeleted: false,
@@ -4614,6 +4602,7 @@ class App extends React.Component<AppProps, AppState> {
                   text,
                 ),
               });
+              return element;
             }
             return _element;
           }),
@@ -4647,7 +4636,6 @@ class App extends React.Component<AppProps, AppState> {
         const isDeleted = !nextOriginalText.trim();
         //zsviczian insert start
         const rawText = nextOriginalText; //should this be originalText??
-        let text = undefined;
         let link = undefined;
         if (this.props.onBeforeTextSubmit) {
           const _element = this.scene.getElementsIncludingDeleted().find((el) => 
@@ -4659,20 +4647,19 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
               nextOriginalText,
             );
-            const [updatedText, updatedOriginalText, l] =
+            const {updatedNextOriginalText, nextLink} =
               this.props.onBeforeTextSubmit(
                 element,
                 dismensionsData?.text??nextOriginalText, //should never be undefined
                 nextOriginalText,
                 isDeleted,
               );
-            text = updatedText ?? text;
-            nextOriginalText = updatedOriginalText ?? nextOriginalText;
-            link = l;
+            nextOriginalText = updatedNextOriginalText ?? nextOriginalText;
+            link = nextLink;
           }
         }
         //zsviczian insert end
-        updateElement(nextOriginalText, isDeleted, rawText, link, text); //zsviczian (added rawText, link, text)
+        updateElement(nextOriginalText, isDeleted, rawText, link); //zsviczian (added rawText, link, text)
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {

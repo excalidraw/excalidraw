@@ -263,6 +263,14 @@ export {
   mermaidToExcalidraw, //zsviczian
 } from "../utils/export";
 
+export {
+  refreshTextDimensions, 
+} from "./element/newElement"; //zsviczian
+
+export {
+  getContainerElement,
+} from "./element/textElement"; //zsviczian
+
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
   loadFromBlob,
