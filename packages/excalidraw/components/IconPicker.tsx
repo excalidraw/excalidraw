@@ -108,6 +108,7 @@ function Picker<T>({
       <div className="picker-content" ref={rGallery}>
         {options.map((option, i) => (
           <button
+            type="button"
             className={clsx("picker-option", {
               active: value === option.value,
             })}
@@ -171,6 +172,7 @@ export function IconPicker<T>({
     <div>
       <button
         name={group}
+        type="button"
         className={isActive ? "active" : ""}
         aria-label={label}
         onClick={() => setActive(!isActive)}
