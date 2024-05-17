@@ -88,6 +88,7 @@ import {
   isIOS,
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
+  DEFAULT_TEXT_ALIGN,
 } from "../constants";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -285,7 +286,6 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
-  isRTL,
 } from "../utils";
 import {
   createSrcDoc,
@@ -2572,6 +2572,11 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.MOUSE_MOVE,
         this.updateCurrentCursorPosition,
       ),
+      addEventListener(
+        document,
+        EVENT.POINTER_MOVE,
+        this.updateCurrentCursorPosition,
+      ),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
@@ -3342,7 +3347,7 @@ class App extends React.Component<AppProps, AppState> {
       text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
-      textAlign: this.state.currentItemTextAlign,
+      textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
@@ -3352,14 +3357,8 @@ class App extends React.Component<AppProps, AppState> {
     });
     const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
     const [x1, , x2] = getVisibleSceneBounds(this.state);
-    const maxTextWidth = (x2 - x1) * 0.6;
-    // leave a little bit of padding so that the side of the text
-    // is not touching the edge of the scene
-    const padding = 16 / this.state.zoom.value;
-    const distanceToEdge = isRTL(text) ? x - x1 - padding : x2 - x - padding;
-    const textWidth =
-      distanceToEdge > maxTextWidth ? maxTextWidth : distanceToEdge;
-
+    // long texts should not go beyond 800 pixels in width nor should it go below 200 px
+    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
     const LINE_GAP = 10;
     let currentY = y;
 
@@ -3373,24 +3372,24 @@ class App extends React.Component<AppProps, AppState> {
             y: currentY,
           });
 
-          const metrics = measureText(originalText, fontString, lineHeight);
-          const isTextWrapped = metrics.width > textWidth;
+          let metrics = measureText(originalText, fontString, lineHeight);
+          const isTextWrapped = metrics.width > maxTextWidth;
 
           const text = isTextWrapped
-            ? wrapText(
-                originalText,
-                getFontString({
-                  fontSize: textElementProps.fontSize,
-                  fontFamily: textElementProps.fontFamily,
-                }),
-                textWidth,
-              )
+            ? wrapText(originalText, fontString, maxTextWidth)
             : originalText;
+
+          metrics = isTextWrapped
+            ? measureText(text, fontString, lineHeight)
+            : metrics;
+
+          const startX = x - metrics.width / 2;
+          const startY = currentY - metrics.height / 2;
 
           const element = newTextElement({
             ...textElementProps,
-            x,
-            y: currentY,
+            x: startX,
+            y: startY,
             text,
             originalText,
             lineHeight,
