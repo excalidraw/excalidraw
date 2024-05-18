@@ -194,6 +194,7 @@ export const MobileMenu = ({
               !appState.openMenu &&
               !appState.openSidebar && (
                 <button
+                  type="button"
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({

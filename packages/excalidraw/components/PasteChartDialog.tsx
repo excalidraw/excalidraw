@@ -65,6 +65,7 @@ const ChartPreviewBtn = (props: {
 
   return (
     <button
+      type="button"
       className="ChartPreview"
       onClick={() => {
         if (chartElements) {
