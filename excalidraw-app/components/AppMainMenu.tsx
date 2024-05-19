@@ -27,7 +27,8 @@ export const AppMainMenu: React.FC<{
           onSelect={() => props.onCollabDialogOpen()}
         />
       )}
-      <MainMenu.DefaultItems.CommandPalette className="highlighted" />
+
+      <MainMenu.DefaultItems.CustomFonts />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />

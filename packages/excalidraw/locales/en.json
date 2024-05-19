@@ -565,5 +565,26 @@
     },
     "itemNotAvailable": "Command is not available...",
     "shortcutHint": "For Command palette, use {{shortcut}}"
+  },
+  "customFontsDialog": {
+    "title": "Custom Fonts...",
+    "subTitle": "Custom Fonts",
+    "paragraph1": "Custom fonts are an experimental feature that allows you to use your own fonts in Excalidraw.",
+    "paragraph2": "You can add your own fonts by config the target font file url. Supports WOFF2 format.",
+    "paragraph2Appendix": "Fonts",
+    "paragraph3": "More features are coming soon.",
+    "handwriting": {
+      "placeholder": "Paste your custom handwriting font url here, leave it empty to use default font.",
+      "label": "Handwriting Font"
+    },
+    "normal": {
+      "placeholder": "Paste your custom normal font url here, leave it empty to use default font.",
+      "label": "Normal Font"
+    },
+    "code": {
+      "placeholder": "Paste your custom code font url here, leave it empty to use default font.",
+      "label": "Code Font"
+    },
+    "confirm": "Confirm"
   }
 }

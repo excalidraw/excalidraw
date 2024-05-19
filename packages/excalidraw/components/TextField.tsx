@@ -22,6 +22,7 @@ type TextFieldProps = {
   selectOnRender?: boolean;
 
   label?: string;
+  labelIcon? : React.ReactNode;
   placeholder?: string;
   isRedacted?: boolean;
 } & ({ value: string } | { defaultValue: string });
@@ -31,6 +32,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     {
       onChange,
       label,
+      labelIcon,
       fullWidth,
       placeholder,
       readonly,
@@ -63,7 +65,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           innerRef.current?.focus();
         }}
       >
-        <div className="ExcTextField__label">{label}</div>
+        <div className="ExcTextField__label">{label}{labelIcon ? labelIcon : ''}</div>
         <div
           className={clsx("ExcTextField__input", {
             "ExcTextField__input--readonly": readonly,

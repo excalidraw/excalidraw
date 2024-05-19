@@ -521,5 +521,26 @@
     "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>和<classLink>类图</classLink>。其他类型在 Excalidraw 中将以图像呈现。",
     "syntax": "Mermaid 语法",
     "preview": "预览"
-  }
+  },
+  "customFontsDialog": {
+    "title": "自定义字体...",
+    "subTitle": "自定义字体",
+    "paragraph1": "自定义字体是一个实验性功能，允许您在Excalidraw中使用您自己的字体。",
+    "paragraph2": "您可以通过配置目标字体文件的URL来添加您自己的字体。支持woff2格式。",
+    "paragraph2Appendix": "字体",
+    "paragraph3": "更多功能即将推出。",
+    "handwriting": {
+      "placeholder": "在此处粘贴您的自定义手写字体URL，留空则使用默认字体。",
+      "label": "手写字体"
+    },
+    "normal": {
+      "placeholder": "在此处粘贴您的自定义普通字体URL，留空则使用默认字体。",
+      "label": "普通字体"
+    },
+    "code": {
+      "placeholder": "在此处粘贴您的自定义代码字体URL，留空则使用默认字体。",
+      "label": "代码字体"
+    },
+    "confirm": "确认"
+  }  
 }

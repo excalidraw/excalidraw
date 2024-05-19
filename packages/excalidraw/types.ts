@@ -292,7 +292,7 @@ export interface AppState {
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
     | null
-    | { name: "imageExport" | "help" | "jsonExport" }
+    | { name: "imageExport" | "help" | "jsonExport" | "customFonts" }
     | {
         name: "settings";
         source:
@@ -360,6 +360,11 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+  customFonts: {
+    handwriting: string | null;
+    normal: string | null;
+    code: string | null;
+  }
 }
 
 export type UIAppState = Omit<

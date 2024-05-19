@@ -60,6 +60,18 @@ const tablerIconProps: Opts = {
   strokeLinejoin: "round",
 } as const;
 
+const iconFontIconProps: Opts = {
+  width: 24,
+  height: 24,
+  viewBox: "0 0 1024 1024",
+  fill: "none",
+  strokeWidth: 2,
+  stroke: "currentColor",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
+
+
 const modifiedTablerIconProps: Opts = {
   width: 20,
   height: 20,
@@ -476,6 +488,19 @@ export const HelpIconThin = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const CustomFontsIcon = createIcon(
+  <path 
+    stroke="currentColor"
+    strokeWidth={0.5}
+    fill="currentColor"
+    opacity={0.75}
+    d="M479.8 640h-277l-85.3 213.3H25.6l273.1-682.6H384l273.1 682.7h-91.9l-85.3-213.3z m-34.1-85.3L341.3 293.8 237 554.7h208.7zM896 534.8V512h85.3v341.3H896v-22.8a170.7 170.7 0 1 1 0-295.7zM810.7 768a85.3 85.3 0 1 0 0-170.7 85.3 85.3 0 0 0 0 170.7z">
+    </path>
+  ,
+  iconFontIconProps,
+);
+
 
 export const ExternalLinkIcon = createIcon(
   <path

@@ -521,5 +521,26 @@
     "description": "",
     "syntax": "",
     "preview": ""
-  }
+  },
+  "customFontsDialog": {
+    "title": "自訂字體...",
+    "subTitle": "自訂字體",
+    "paragraph1": "自訂字體是一個實驗性功能，允許您在Excalidraw中使用您自己的字體。",
+    "paragraph2": "您可以通過配置目標字體文件的URL來添加您自己的字體。支援WOFF2格式。",
+    "paragraph2Appendix": "字體",
+    "paragraph3": "更多功能即將推出。",
+    "handwriting": {
+      "placeholder": "在此處粘貼您的自訂手寫字體URL，留空則使用預設字體。",
+      "label": "手寫字體"
+    },
+    "normal": {
+      "placeholder": "在此處粘貼您的自訂普通字體URL，留空則使用預設字體。",
+      "label": "普通字體"
+    },
+    "code": {
+      "placeholder": "在此處粘貼您的自訂代碼字體URL，留空則使用預設字體。",
+      "label": "代碼字體"
+    },
+    "confirm": "確認"
+  }  
 }
