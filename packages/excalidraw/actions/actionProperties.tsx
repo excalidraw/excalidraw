@@ -1,4 +1,4 @@
-import { AppClassProperties, AppState, Primitive } from "../types";
+import type { AppClassProperties, AppState, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -74,7 +74,7 @@ import {
   isLinearElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import {
+import type {
   Arrowhead,
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -96,6 +96,7 @@ import {
 import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
+import { StoreAction } from "../store";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -166,7 +167,7 @@ const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
   nextElement: ExcalidrawTextElement,
 ) => {
-  if (isBoundToContainer(nextElement)) {
+  if (isBoundToContainer(nextElement) || !nextElement.autoResize) {
     return nextElement;
   }
   return mutateElement(
@@ -231,7 +232,7 @@ const changeFontSize = (
           ? [...newFontSizes][0]
           : fallbackValue ?? appState.currentItemFontSize,
     },
-    commitToHistory: true,
+    storeAction: StoreAction.CAPTURE,
   };
 };
 
@@ -261,7 +262,9 @@ export const actionChangeStrokeColor = register({
         ...appState,
         ...value,
       },
-      commitToHistory: !!value.currentItemStrokeColor,
+      storeAction: !!value.currentItemStrokeColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -305,7 +308,9 @@ export const actionChangeBackgroundColor = register({
         ...appState,
         ...value,
       },
-      commitToHistory: !!value.currentItemBackgroundColor,
+      storeAction: !!value.currentItemBackgroundColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -349,7 +354,7 @@ export const actionChangeFillStyle = register({
         }),
       ),
       appState: { ...appState, currentItemFillStyle: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -422,7 +427,7 @@ export const actionChangeStrokeWidth = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -477,7 +482,7 @@ export const actionChangeSloppiness = register({
         }),
       ),
       appState: { ...appState, currentItemRoughness: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -528,7 +533,7 @@ export const actionChangeStrokeStyle = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeStyle: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -583,7 +588,7 @@ export const actionChangeOpacity = register({
         true,
       ),
       appState: { ...appState, currentItemOpacity: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -758,7 +763,7 @@ export const actionChangeFontFamily = register({
         ...appState,
         currentItemFontFamily: value,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -859,7 +864,7 @@ export const actionChangeTextAlign = register({
         ...appState,
         currentItemTextAlign: value,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -949,7 +954,7 @@ export const actionChangeVerticalAlign = register({
       appState: {
         ...appState,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -1030,7 +1035,7 @@ export const actionChangeRoundness = register({
         ...appState,
         currentItemRoundness: value,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1182,7 +1187,7 @@ export const actionChangeArrowhead = register({
           ? "currentItemStartArrowhead"
           : "currentItemEndArrowhead"]: value.type,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {

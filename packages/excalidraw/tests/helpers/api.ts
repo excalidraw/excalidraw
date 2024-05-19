@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
   ExcalidrawTextElement,
@@ -26,10 +26,10 @@ import {
   newImageElement,
   newMagicFrameElement,
 } from "../../element/newElement";
-import { Point } from "../../types";
+import type { Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
-import { Mutable } from "../../utility-types";
+import type { Mutable } from "../../utility-types";
 import { assertNever } from "../../utils";
 import { createTestHook } from "../../components/App";
 
@@ -69,9 +69,18 @@ export class API {
     return selectedElements[0];
   };
 
-  static getStateHistory = () => {
+  static getUndoStack = () => {
     // @ts-ignore
-    return h.history.stateHistory;
+    return h.history.undoStack;
+  };
+
+  static getRedoStack = () => {
+    // @ts-ignore
+    return h.history.redoStack;
+  };
+
+  static getSnapshot = () => {
+    return Array.from(h.store.snapshot.elements.values());
   };
 
   static clearSelection = () => {

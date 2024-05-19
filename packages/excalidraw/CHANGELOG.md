@@ -15,8 +15,14 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Added support for multiplayer undo/redo, by calculating invertible increments and storing them inside the local-only undo/redo stacks. [#7348](https://github.com/excalidraw/excalidraw/pull/7348)
+
+- `MainMenu.DefaultItems.ToggleTheme` now supports `onSelect(theme: string)` callback, and optionally `allowSystemTheme: boolean` alongside `theme: string` to indicate you want to allow users to set to system theme (you need to handle this yourself). [#7853](https://github.com/excalidraw/excalidraw/pull/7853)
+
 - Add `useHandleLibrary`'s `opts.adapter` as the new recommended pattern to handle library initialization and persistence on library updates. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
 - Add `useHandleLibrary`'s `opts.migrationAdapter` adapter to handle library migration during init, when migrating from one data store to another (e.g. from LocalStorage to IndexedDB). [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
 - Soft-deprecate `useHandleLibrary`'s `opts.getInitialLibraryItems` in favor of `opts.adapter`. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
 
 - Add `onPointerUp` prop [#7638](https://github.com/excalidraw/excalidraw/pull/7638).
@@ -28,6 +34,14 @@ Please add the latest change on the top under the correct section.
 - Keep customData when converting to ExcalidrawElement. [#7656](https://github.com/excalidraw/excalidraw/pull/7656)
 
 ### Breaking Changes
+
+- `updateScene` API has changed due to the added `Store` component as part of the multiplayer undo / redo initiative. Specifically, `sceneData` property `commitToHistory: boolean` was replaced with `storeAction: StoreActionType`. Make sure to update all instances of `updateScene` according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
+
+|  | Before `commitToHistory` | After `storeAction` | Notes |
+| --- | --- | --- | --- |
+| _Immediately undoable_ | `true` | `"capture"` | As before, use for all updates which should be recorded by the store & history. Should be used for the most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `false` | `"none"` | Similar to before, use for all updates which should not be recorded immediately (likely exceptions which are part of some async multi-step process) or those not meant to be recorded at all (i.e. updates to `collaborators` object, parts of `AppState` which are not observed by the store & history - not `ObservedAppState`).<br/><br/>**IMPORTANT** It's likely you should switch to `"update"` in all the other cases. Otherwise, all such updates would end up being recorded with the next `"capture"` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | n/a | `"update"` | **NEW**: previously there was no equivalent for this value. Now, it's recommended to use `"update"` for all remote updates (from the other clients), scene initialization, or those updates, which should not be locally "undoable". These updates will _never_ make it to the local undo / redo stacks. |
 
 - `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
@@ -90,8 +104,6 @@ define: {
 ### Fixes
 
 - Disable caching bounds for arrow labels [#7343](https://github.com/excalidraw/excalidraw/pull/7343)
-
----
 
 ## 0.17.0 (2023-11-14)
 

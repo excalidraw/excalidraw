@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
@@ -12,9 +12,9 @@ import {
   getSelectedGroupForElement,
   getElementsInGroup,
 } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
-import { ActionResult } from "./types";
+import type { ActionResult } from "./types";
 import { GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
@@ -32,6 +32,7 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 import { syncMovedIndices } from "../fractionalIndex";
+import { StoreAction } from "../store";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -54,13 +55,13 @@ export const actionDuplicateSelection = register({
       return {
         elements,
         appState: ret.appState,
-        commitToHistory: true,
+        storeAction: StoreAction.CAPTURE,
       };
     }
 
     return {
       ...duplicateElements(elements, appState),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
@@ -241,9 +242,10 @@ const duplicateElements = (
   }
 
   // step (3)
-  const finalElements = finalElementsReversed.reverse();
-
-  syncMovedIndices(finalElements, arrayToMap([...oldElements, ...newElements]));
+  const finalElements = syncMovedIndices(
+    finalElementsReversed.reverse(),
+    arrayToMap(newElements),
+  );
 
   // ---------------------------------------------------------------------------
 

@@ -5,6 +5,7 @@ import { isEmbeddableElement } from "../element/typeChecks";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
+import { StoreAction } from "../store";
 import { getShortcutKey } from "../utils";
 import { register } from "./register";
 
@@ -24,7 +25,7 @@ export const actionLink = register({
         showHyperlinkPopup: "editor",
         openMenu: null,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   trackEvent: { category: "hyperlink", action: "click" },

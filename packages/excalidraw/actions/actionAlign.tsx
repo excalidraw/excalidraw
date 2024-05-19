@@ -1,4 +1,5 @@
-import { alignElements, Alignment } from "../align";
+import type { Alignment } from "../align";
+import { alignElements } from "../align";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -10,12 +11,13 @@ import {
 import { ToolButton } from "../components/ToolButton";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
-import { AppClassProperties, AppState, UIAppState } from "../types";
+import { StoreAction } from "../store";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
@@ -70,7 +72,7 @@ export const actionAlignTop = register({
         position: "start",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -103,7 +105,7 @@ export const actionAlignBottom = register({
         position: "end",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -136,7 +138,7 @@ export const actionAlignLeft = register({
         position: "start",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -169,7 +171,7 @@ export const actionAlignRight = register({
         position: "end",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -202,7 +204,7 @@ export const actionAlignVerticallyCentered = register({
         position: "center",
         axis: "y",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (
@@ -231,7 +233,7 @@ export const actionAlignHorizontallyCentered = register({
         position: "center",
         axis: "x",
       }),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (

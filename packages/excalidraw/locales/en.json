@@ -87,7 +87,7 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
-    "showGrid": "Show grid",
+    "toggleGrid": "Toggle grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
@@ -110,6 +110,7 @@
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
     "toggleTheme": "Toggle light/dark theme",
+    "theme": "Theme",
     "personalLib": "Personal Library",
     "excalidrawLib": "Excalidraw Library",
     "decreaseFontSize": "Decrease font size",
@@ -128,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Edit line",
-      "exit": "Exit line editor"
+      "editArrow": "Edit arrow"
     },
     "elementLock": {
       "lock": "Lock",
@@ -147,7 +148,9 @@
     "discordChat": "Discord chat",
     "zoomToFitViewport": "Zoom to fit in viewport",
     "zoomToFitSelection": "Zoom to fit selection",
-    "zoomToFit": "Zoom to fit all elements"
+    "zoomToFit": "Zoom to fit all elements",
+    "installPWA": "Install Excalidraw locally (PWA)",
+    "autoResize": "Enable text auto-resizing"
   },
   "library": {
     "noItems": "No items added yet...",
@@ -180,6 +183,7 @@
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
+    "systemMode": "System mode",
     "zenMode": "Zen mode",
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",

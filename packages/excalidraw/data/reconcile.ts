@@ -1,7 +1,7 @@
-import { OrderedExcalidrawElement } from "../element/types";
+import type { OrderedExcalidrawElement } from "../element/types";
 import { orderByFractionalIndex, syncInvalidIndices } from "../fractionalIndex";
-import { AppState } from "../types";
-import { MakeBrand } from "../utility-types";
+import type { AppState } from "../types";
+import type { MakeBrand } from "../utility-types";
 import { arrayToMap } from "../utils";
 
 export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
@@ -20,7 +20,7 @@ const shouldDiscardRemoteElement = (
     // local element is being edited
     (local.id === localAppState.editingElement?.id ||
       local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.draggingElement?.id ||
+      local.id === localAppState.draggingElement?.id || // TODO: Is this still valid? As draggingElement is selection element, which is never part of the elements array
       // local element is newer
       local.version > remote.version ||
       // resolve conflicting edits deterministically by taking the one with

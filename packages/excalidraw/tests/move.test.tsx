@@ -5,7 +5,7 @@ import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";
-import {
+import type {
   ExcalidrawLinearElement,
   NonDeleted,
   ExcalidrawRectangleElement,
@@ -77,30 +77,30 @@ describe("move element", () => {
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
-    const line = UI.createElement("line", { x: 110, y: 50, size: 80 });
+    const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
     const elementsMap = h.app.scene.getNonDeletedElementsMap();
     // bind line to two rectangles
     bindOrUnbindLinearElement(
-      line.get() as NonDeleted<ExcalidrawLinearElement>,
+      arrow.get() as NonDeleted<ExcalidrawLinearElement>,
       rectA.get() as ExcalidrawRectangleElement,
       rectB.get() as ExcalidrawRectangleElement,
       elementsMap,
     );
 
-    // select the second rectangles
+    // select the second rectangle
     new Pointer("mouse").clickOn(rectB);
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `21`,
+      `20`,
     );
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`19`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`17`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([line.x, line.y]).toEqual([110, 50]);
-    expect([line.width, line.height]).toEqual([80, 80]);
+    expect([arrow.x, arrow.y]).toEqual([110, 50]);
+    expect([arrow.width, arrow.height]).toEqual([80, 80]);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -118,8 +118,10 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([Math.round(line.x), Math.round(line.y)]).toEqual([110, 50]);
-    expect([Math.round(line.width), Math.round(line.height)]).toEqual([81, 81]);
+    expect([Math.round(arrow.x), Math.round(arrow.y)]).toEqual([110, 50]);
+    expect([Math.round(arrow.width), Math.round(arrow.height)]).toEqual([
+      81, 81,
+    ]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

@@ -53,8 +53,8 @@ export const MagicSettings = (props: {
               marginLeft: "1rem",
               fontSize: 14,
               borderRadius: "12px",
-              color: "#000",
-              background: "pink",
+              background: "var(--color-promo)",
+              color: "var(--color-surface-lowest)",
             }}
           >
             Experimental

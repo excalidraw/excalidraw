@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawElementType,
   ExcalidrawSelectionElement,
@@ -8,13 +8,13 @@ import {
   PointBinding,
   StrokeRoundness,
 } from "../element/types";
-import {
+import type {
   AppState,
   BinaryFiles,
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
-import { ImportedDataState, LegacyAppState } from "./types";
+import type { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
@@ -37,7 +37,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
-import { MarkOptional, Mutable } from "../utility-types";
+import type { MarkOptional, Mutable } from "../utility-types";
 import {
   detectLineHeight,
   getContainerElement,
@@ -208,7 +208,7 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || text,
-
+        autoResize: element.autoResize ?? true,
         lineHeight,
       });
 
@@ -294,7 +294,7 @@ const restoreElement = (
 };
 
 /**
- * Repairs contaienr element's boundElements array by removing duplicates and
+ * Repairs container element's boundElements array by removing duplicates and
  * fixing containerId of bound elements if not present. Also removes any
  * bound elements that do not exist in the elements array.
  *

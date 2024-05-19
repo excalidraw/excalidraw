@@ -1,20 +1,20 @@
 import { COLOR_PALETTE } from "./colors";
+import type { EVENT } from "./constants";
 import {
   DEFAULT_VERSION,
-  EVENT,
   FONT_FAMILY,
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import { FontFamilyValues, FontString } from "./element/types";
-import {
+import type { FontFamilyValues, FontString } from "./element/types";
+import type {
   ActiveTool,
   AppState,
   ToolType,
   UnsubscribeCallback,
   Zoom,
 } from "./types";
-import { MaybePromise, ResolutionType } from "./utility-types";
+import type { MaybePromise, ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -671,7 +671,21 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
     return acc;
   }, new Map<string, [element: T, index: number]>());
 
+/**
+ * Transform array into an object, use only when array order is irrelevant.
+ */
+export const arrayToObject = <T>(
+  array: readonly T[],
+  groupBy?: (value: T) => string,
+) =>
+  array.reduce((acc, value) => {
+    acc[groupBy ? groupBy(value) : String(value)] = value;
+    return acc;
+  }, {} as { [key: string]: T });
+
 export const isTestEnv = () => import.meta.env.MODE === "test";
+
+export const isDevEnv = () => import.meta.env.MODE === "development";
 
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {

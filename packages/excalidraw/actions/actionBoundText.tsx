@@ -1,8 +1,8 @@
 import {
   BOUND_TEXT_PADDING,
   ROUNDNESS,
-  VERTICAL_ALIGN,
   TEXT_ALIGN,
+  VERTICAL_ALIGN,
 } from "../constants";
 import { isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
@@ -23,17 +23,18 @@ import {
   isTextBindableContainer,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { AppState } from "../types";
-import { Mutable } from "../utility-types";
+import type { AppState } from "../types";
+import type { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
+import { StoreAction } from "../store";
 
 export const actionUnbindText = register({
   name: "unbindText",
@@ -85,7 +86,7 @@ export const actionUnbindText = register({
     return {
       elements,
       appState,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });
@@ -141,6 +142,7 @@ export const actionBindText = register({
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
+      autoResize: true,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -161,7 +163,7 @@ export const actionBindText = register({
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
       appState: { ...appState, selectedElementIds: { [container.id]: true } },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });
@@ -295,6 +297,7 @@ export const actionWrapTextInContainer = register({
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
             textAlign: TEXT_ALIGN.CENTER,
+            autoResize: true,
           },
           false,
         );
@@ -320,7 +323,7 @@ export const actionWrapTextInContainer = register({
         ...appState,
         selectedElementIds: containerIds,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });

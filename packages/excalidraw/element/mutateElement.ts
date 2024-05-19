@@ -1,15 +1,15 @@
-import { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { Point } from "../types";
+import type { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
-import { Mutable } from "../utility-types";
+import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 
-type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
+export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
-  "id" | "version" | "versionNonce"
+  "id" | "version" | "versionNonce" | "updated"
 >;
 
 // This function tracks updates of text elements for the purposes for collaboration.
@@ -79,6 +79,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       didChange = true;
     }
   }
+
   if (!didChange) {
     return element;
   }
@@ -97,7 +98,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.updated = getUpdatedTimestamp();
 
   if (informMutation) {
-    Scene.getScene(element)?.informMutation();
+    Scene.getScene(element)?.triggerUpdate();
   }
 
   return element;
@@ -106,6 +107,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
+  /** pass `true` to always regenerate */
+  force = false,
 ): TElement => {
   let didChange = false;
   for (const key in updates) {
@@ -122,7 +125,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     }
   }
 
-  if (!didChange) {
+  if (!didChange && !force) {
     return element;
   }
 

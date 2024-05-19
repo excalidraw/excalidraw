@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import { BinaryFiles } from "../../types";
+import type { BinaryFiles } from "../../types";
 import { useApp } from "../App";
-import { NonDeletedExcalidrawElement } from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { ArrowRightIcon } from "../icons";
 import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";
 import Trans from "../Trans";
+import type { MermaidToExcalidrawLibProps } from "./common";
 import {
-  MermaidToExcalidrawLibProps,
   convertMermaidToExcalidraw,
   insertToEditor,
   saveMermaidDataToStorage,
@@ -18,7 +18,7 @@ import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { EDITOR_LS_KEYS } from "../../constants";
-import { debounce } from "../../utils";
+import { debounce, isDevEnv } from "../../utils";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MERMAID_EXAMPLE =
@@ -54,7 +54,11 @@ const MermaidToExcalidraw = ({
       mermaidToExcalidrawLib,
       setError,
       mermaidDefinition: deferredText,
-    }).catch(() => {});
+    }).catch((err) => {
+      if (isDevEnv()) {
+        console.error("Failed to parse mermaid definition", err);
+      }
+    });
 
     debouncedSaveMermaidDefinition(deferredText);
   }, [deferredText, mermaidToExcalidrawLib]);

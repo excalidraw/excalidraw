@@ -9,10 +9,10 @@ import {
   actionSendToBack,
   actionDuplicateSelection,
 } from "../actions";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { API } from "./helpers/api";
 import { selectGroupsForSelectedElements } from "../groups";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawSelectionElement,

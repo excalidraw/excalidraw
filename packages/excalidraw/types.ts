@@ -1,5 +1,5 @@
-import React from "react";
-import {
+import type React from "react";
+import type {
   PointerType,
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
@@ -22,24 +22,25 @@ import {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
 } from "./element/types";
-import { Action } from "./actions/types";
-import { Point as RoughPoint } from "roughjs/bin/geometry";
-import { LinearElementEditor } from "./element/linearElementEditor";
-import { SuggestedBinding } from "./element/binding";
-import { ImportedDataState } from "./data/types";
+import type { Action } from "./actions/types";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import type { LinearElementEditor } from "./element/linearElementEditor";
+import type { SuggestedBinding } from "./element/binding";
+import type { ImportedDataState } from "./data/types";
 import type App from "./components/App";
 import type { throttleRAF } from "./utils";
-import { Spreadsheet } from "./charts";
-import { Language } from "./i18n";
-import { ClipboardData } from "./clipboard";
-import { isOverScrollBars } from "./scene/scrollbars";
-import { MaybeTransformHandleType } from "./element/transformHandles";
-import Library from "./data/library";
+import type { Spreadsheet } from "./charts";
+import type { Language } from "./i18n";
+import type { ClipboardData } from "./clipboard";
+import type { isOverScrollBars } from "./scene/scrollbars";
+import type { MaybeTransformHandleType } from "./element/transformHandles";
+import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
-import { ContextMenuItems } from "./components/ContextMenu";
-import { SnapLine } from "./snapping";
-import { Merge, MaybePromise, ValueOf } from "./utility-types";
+import type { ContextMenuItems } from "./components/ContextMenu";
+import type { SnapLine } from "./snapping";
+import type { Merge, MaybePromise, ValueOf } from "./utility-types";
+import type { StoreActionType } from "./store";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -198,6 +199,24 @@ export type InteractiveCanvasAppState = Readonly<
     zenModeEnabled: AppState["zenModeEnabled"];
   }
 >;
+
+export type ObservedAppState = ObservedStandaloneAppState &
+  ObservedElementsAppState;
+
+export type ObservedStandaloneAppState = {
+  name: AppState["name"];
+  viewBackgroundColor: AppState["viewBackgroundColor"];
+};
+
+export type ObservedElementsAppState = {
+  editingGroupId: AppState["editingGroupId"];
+  selectedElementIds: AppState["selectedElementIds"];
+  selectedGroupIds: AppState["selectedGroupIds"];
+  // Avoiding storing whole instance, as it could lead into state incosistencies, empty undos/redos and etc.
+  editingLinearElementId: LinearElementEditor["elementId"] | null;
+  // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
+  selectedLinearElementId: LinearElementEditor["elementId"] | null;
+};
 
 export interface AppState {
   contextMenu: {
@@ -489,7 +508,7 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  commitToHistory?: boolean;
+  storeAction?: StoreActionType;
 };
 
 export enum UserIdleState {

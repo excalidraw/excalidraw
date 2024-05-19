@@ -1,18 +1,15 @@
 import { isPathALoop, isPointWithinBounds } from "../math";
 
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
 } from "./types";
 
 import { getElementBounds } from "./bounds";
-import { FrameNameBounds } from "../types";
-import {
-  Polygon,
-  GeometricShape,
-  getPolygonShape,
-} from "../../utils/geometry/shape";
+import type { FrameNameBounds } from "../types";
+import type { Polygon, GeometricShape } from "../../utils/geometry/shape";
+import { getPolygonShape } from "../../utils/geometry/shape";
 import { isPointInShape, isPointOnShape } from "../../utils/collision";
 import { isTransparent } from "../utils";
 import {
@@ -62,7 +59,9 @@ export const hitElementItself = ({
   frameNameBound = null,
 }: HitTestArgs) => {
   let hit = shouldTestInside(element)
-    ? isPointInShape([x, y], shape)
+    ? // Since `inShape` tests STRICTLY againt the insides of a shape
+      // we would need `onShape` as well to include the "borders"
+      isPointInShape([x, y], shape) || isPointOnShape([x, y], shape, threshold)
     : isPointOnShape([x, y], shape, threshold);
 
   // hit test against a frame's name

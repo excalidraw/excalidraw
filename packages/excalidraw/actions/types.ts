@@ -1,13 +1,17 @@
-import React from "react";
-import { ExcalidrawElement } from "../element/types";
-import {
+import type React from "react";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
+import type {
   AppClassProperties,
   AppState,
   ExcalidrawProps,
   BinaryFiles,
   UIAppState,
 } from "../types";
-import { MarkOptional } from "../utility-types";
+import type { MarkOptional } from "../utility-types";
+import type { StoreActionType } from "../store";
 
 export type ActionSource =
   | "ui"
@@ -25,14 +29,13 @@ export type ActionResult =
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
       files?: BinaryFiles | null;
-      commitToHistory: boolean;
-      syncHistory?: boolean;
+      storeAction: StoreActionType;
       replaceFiles?: boolean;
     }
   | false;
 
 type ActionFn = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly OrderedExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
   app: AppClassProperties,
@@ -131,7 +134,8 @@ export type ActionName =
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer"
-  | "commandPalette";
+  | "commandPalette"
+  | "autoResize";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

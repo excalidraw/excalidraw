@@ -12,14 +12,18 @@
  * to pure shapes
  */
 
-import {
+import { getElementAbsoluteCoords } from "../../excalidraw/element";
+import type {
+  ElementsMap,
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawIframeElement,
   ExcalidrawImageElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
@@ -132,6 +136,36 @@ export const getPolygonShape = (
   };
 };
 
+// return the selection box for an element, possibly rotated as well
+export const getSelectionBoxShape = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  padding = 10,
+) => {
+  let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+    true,
+  );
+
+  x1 -= padding;
+  x2 += padding;
+  y1 -= padding;
+  y2 += padding;
+
+  const angleInDegrees = angleToDegrees(element.angle);
+  const center: Point = [cx, cy];
+  const topLeft = pointRotate([x1, y1], angleInDegrees, center);
+  const topRight = pointRotate([x2, y1], angleInDegrees, center);
+  const bottomLeft = pointRotate([x1, y2], angleInDegrees, center);
+  const bottomRight = pointRotate([x2, y2], angleInDegrees, center);
+
+  return {
+    type: "polygon",
+    data: [topLeft, topRight, bottomRight, bottomLeft],
+  } as GeometricShape;
+};
+
 // ellipse
 export const getEllipseShape = (
   element: ExcalidrawEllipseElement,
@@ -233,18 +267,27 @@ export const getFreedrawShape = (
 };
 
 export const getClosedCurveShape = (
+  element: ExcalidrawLinearElement,
   roughShape: Drawable,
   startingPoint: Point = [0, 0],
   angleInRadian: number,
   center: Point,
 ): GeometricShape => {
-  const ops = getCurvePathOps(roughShape);
   const transform = (p: Point) =>
     pointRotate(
       [p[0] + startingPoint[0], p[1] + startingPoint[1]],
       angleToDegrees(angleInRadian),
       center,
     );
+
+  if (element.roundness === null) {
+    return {
+      type: "polygon",
+      data: close(element.points.map((p) => transform(p as Point))),
+    };
+  }
+
+  const ops = getCurvePathOps(roughShape);
 
   const points: Point[] = [];
   let odd = false;

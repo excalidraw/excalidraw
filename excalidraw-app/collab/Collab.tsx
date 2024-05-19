@@ -1,23 +1,25 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import {
+import type {
   ExcalidrawImperativeAPI,
   SocketId,
 } from "../../packages/excalidraw/types";
 import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
-import {
+import type { ImportedDataState } from "../../packages/excalidraw/data/types";
+import type {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import {
+  StoreAction,
   getSceneVersion,
   restoreElements,
   zoomToFitBounds,
-} from "../../packages/excalidraw/index";
-import { Collaborator, Gesture } from "../../packages/excalidraw/types";
+  reconcileElements,
+} from "../../packages/excalidraw";
+import type { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   assertNever,
   preventUnload,
@@ -34,12 +36,14 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
   WS_EVENTS,
 } from "../app_constants";
+import type {
+  SocketUpdateDataSource,
+  SyncableExcalidrawElement,
+} from "../data";
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
   getSyncableElements,
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
 } from "../data";
 import {
   isSavedToFirebase,
@@ -75,14 +79,13 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
+import type { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 import { collabErrorIndicatorAtom } from "./CollabError";
-import {
+import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
-  reconcileElements,
 } from "../../packages/excalidraw/data/reconcile";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -356,7 +359,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       this.excalidrawAPI.updateScene({
         elements,
-        commitToHistory: false,
+        storeAction: StoreAction.UPDATE,
       });
     }
   };
@@ -501,14 +504,13 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         }
         return element;
       });
-      // remove deleted elements from elements array & history to ensure we don't
+      // remove deleted elements from elements array to ensure we don't
       // expose potentially sensitive user data in case user manually deletes
       // existing elements (or clears scene), which would otherwise be persisted
       // to database even if deleted before creating the room.
-      this.excalidrawAPI.history.clear();
       this.excalidrawAPI.updateScene({
         elements,
-        commitToHistory: true,
+        storeAction: StoreAction.UPDATE,
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
@@ -544,9 +546,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               const remoteElements = decryptedData.payload.elements;
               const reconciledElements =
                 this._reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements, {
-                init: true,
-              });
+              this.handleRemoteSceneUpdate(reconciledElements);
               // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
@@ -745,18 +745,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private handleRemoteSceneUpdate = (
     elements: ReconciledExcalidrawElement[],
-    { init = false }: { init?: boolean } = {},
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
-      commitToHistory: !!init,
+      storeAction: StoreAction.UPDATE,
     });
-
-    // We haven't yet implemented multiplayer undo functionality, so we clear the undo stack
-    // when we receive any messages from another peer. This UX can be pretty rough -- if you
-    // undo, a user makes a change, and then try to redo, your element(s) will be lost. However,
-    // right now we think this is the right tradeoff.
-    this.excalidrawAPI.history.clear();
 
     this.loadImageFiles();
   };

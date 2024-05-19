@@ -38,8 +38,12 @@
         background-color: #ecfdf5;
         color: #064e3c;
       }
-      &.ExcalidrawPlus {
+      &.highlighted {
         color: var(--color-promo);
+        font-weight: 700;
+        .dropdown-menu-item__icon g {
+          stroke-width: 2;
+        }
       }
     }
   }

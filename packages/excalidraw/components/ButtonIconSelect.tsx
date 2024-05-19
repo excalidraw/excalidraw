@@ -28,6 +28,7 @@ export const ButtonIconSelect = <T extends Object>(
     {props.options.map((option) =>
       props.type === "button" ? (
         <button
+          type="button"
           key={option.text}
           onClick={(event) => props.onClick(option.value, event)}
           className={clsx({

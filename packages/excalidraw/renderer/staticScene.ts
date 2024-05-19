@@ -9,16 +9,17 @@ import {
 import {
   isEmbeddableElement,
   isIframeLikeElement,
+  isTextElement,
 } from "../element/typeChecks";
 import { renderElement } from "../renderer/renderElement";
 import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import { StaticCanvasAppState, Zoom } from "../types";
-import {
+import type { StaticCanvasAppState, Zoom } from "../types";
+import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import {
+import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
@@ -28,6 +29,7 @@ import {
 } from "../components/hyperlink/helpers";
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { throttleRAF } from "../utils";
+import { getBoundTextElement } from "../element/textElement";
 
 const strokeGrid = (
   context: CanvasRenderingContext2D,
@@ -237,12 +239,21 @@ const _renderStaticScene = ({
         const frameId = element.frameId || appState.frameToHighlight?.id;
 
         if (
+          isTextElement(element) &&
+          element.containerId &&
+          elementsMap.has(element.containerId)
+        ) {
+          // will be rendered with the container
+          return;
+        }
+
+        context.save();
+
+        if (
           frameId &&
           appState.frameRendering.enabled &&
           appState.frameRendering.clip
         ) {
-          context.save();
-
           const frame = getTargetFrame(element, elementsMap, appState);
 
           // TODO do we need to check isElementInFrame here?
@@ -258,7 +269,6 @@ const _renderStaticScene = ({
             renderConfig,
             appState,
           );
-          context.restore();
         } else {
           renderElement(
             element,
@@ -270,6 +280,22 @@ const _renderStaticScene = ({
             appState,
           );
         }
+
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement) {
+          renderElement(
+            boundTextElement,
+            elementsMap,
+            allElementsMap,
+            rc,
+            context,
+            renderConfig,
+            appState,
+          );
+        }
+
+        context.restore();
+
         if (!isExporting) {
           renderLinkIcon(element, context, appState, elementsMap);
         }

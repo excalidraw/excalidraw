@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
@@ -10,11 +10,11 @@ import {
   Ordered,
 } from "../element/types";
 import { isNonDeletedElement } from "../element";
-import { LinearElementEditor } from "../element/linearElementEditor";
+import type { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { getSelectedElements } from "./selection";
-import { AppState } from "../types";
-import { Assert, SameType } from "../utility-types";
+import type { AppState } from "../types";
+import type { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
 import {
   syncInvalidIndices,
@@ -138,10 +138,16 @@ class Scene {
     elements: null,
     cache: new Map(),
   };
-  private versionNonce: number | undefined;
+  /**
+   * Random integer regenerated each scene update.
+   *
+   * Does not relate to elements versions, it's only a renderer
+   * cache-invalidation nonce at the moment.
+   */
+  private sceneNonce: number | undefined;
 
-  getElementsMapIncludingDeleted() {
-    return this.elementsMap;
+  getSceneNonce() {
+    return this.sceneNonce;
   }
 
   getNonDeletedElementsMap() {
@@ -150,6 +156,10 @@ class Scene {
 
   getElementsIncludingDeleted() {
     return this.elements;
+  }
+
+  getElementsMapIncludingDeleted() {
+    return this.elementsMap;
   }
 
   getNonDeletedElements() {
@@ -212,10 +222,6 @@ class Scene {
 
   getElement<T extends ExcalidrawElement>(id: T["id"]): T | null {
     return (this.elementsMap.get(id) as T | undefined) || null;
-  }
-
-  getVersionNonce() {
-    return this.versionNonce;
   }
 
   getNonDeletedElement(
@@ -286,18 +292,18 @@ class Scene {
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
 
-    this.informMutation();
+    this.triggerUpdate();
   }
 
-  informMutation() {
-    this.versionNonce = randomInteger();
+  triggerUpdate() {
+    this.sceneNonce = randomInteger();
 
     for (const callback of Array.from(this.callbacks)) {
       callback();
     }
   }
 
-  addCallback(cb: SceneStateCallback): SceneStateCallbackRemover {
+  onUpdate(cb: SceneStateCallback): SceneStateCallbackRemover {
     if (this.callbacks.has(cb)) {
       throw new Error();
     }

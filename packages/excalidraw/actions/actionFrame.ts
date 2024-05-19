@@ -1,14 +1,15 @@
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
-import { AppClassProperties, AppState, UIAppState } from "../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -44,14 +45,14 @@ export const actionSelectAllElementsInFrame = register({
             return acc;
           }, {} as Record<ExcalidrawElement["id"], true>),
         },
-        commitToHistory: false,
+        storeAction: StoreAction.CAPTURE,
       };
     }
 
     return {
       elements,
       appState,
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -75,14 +76,14 @@ export const actionRemoveAllElementsFromFrame = register({
             [selectedElement.id]: true,
           },
         },
-        commitToHistory: true,
+        storeAction: StoreAction.CAPTURE,
       };
     }
 
     return {
       elements,
       appState,
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -104,7 +105,7 @@ export const actionupdateFrameRendering = register({
           enabled: !appState.frameRendering.enabled,
         },
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState: AppState) => appState.frameRendering.enabled,
@@ -134,7 +135,7 @@ export const actionSetFrameAsActiveTool = register({
           type: "frame",
         }),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) =>

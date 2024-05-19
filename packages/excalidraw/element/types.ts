@@ -1,13 +1,13 @@
-import { Point } from "../types";
-import {
+import type { Point } from "../types";
+import type {
   FONT_FAMILY,
   ROUNDNESS,
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
-import { MagicCacheData } from "../data/magic";
+import type { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
+import type { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -25,6 +25,11 @@ export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
 export type FractionalIndex = string & { _brand: "franctionalIndex" };
+
+export type BoundElement = Readonly<{
+  id: ExcalidrawLinearElement["id"];
+  type: "arrow" | "text";
+}>;
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -62,12 +67,7 @@ type _ExcalidrawElementBase = Readonly<{
   groupIds: readonly GroupId[];
   frameId: string | null;
   /** other elements that are bound to this element */
-  boundElements:
-    | readonly Readonly<{
-        id: ExcalidrawLinearElement["id"];
-        type: "arrow" | "text";
-      }>[]
-    | null;
+  boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
   link: string | null;
@@ -111,6 +111,7 @@ export type IframeData =
   | {
       intrinsicSize: { w: number; h: number };
       error?: Error;
+      sandbox?: { allowSameOrigin?: boolean };
     } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
@@ -192,6 +193,13 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /**
+     * If `true` the width will fit the text. If `false`, the text will
+     * wrap to fit the width.
+     *
+     * @default true
+     */
+    autoResize: boolean;
     /**
      * Unitless line height (aligned to W3C). To get line height in px, multiply
      *  with font size (using `getLineHeightInPx` helper).

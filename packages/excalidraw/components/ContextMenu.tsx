@@ -1,14 +1,13 @@
 import clsx from "clsx";
 import { Popover } from "./Popover";
-import { t, TranslationKeys } from "../i18n";
+import type { TranslationKeys } from "../i18n";
+import { t } from "../i18n";
 
 import "./ContextMenu.scss";
-import {
-  getShortcutFromShortcutName,
-  ShortcutName,
-} from "../actions/shortcuts";
-import { Action } from "../actions/types";
-import { ActionManager } from "../actions/manager";
+import type { ShortcutName } from "../actions/shortcuts";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import type { Action } from "../actions/types";
+import type { ActionManager } from "../actions/manager";
 import { useExcalidrawAppState, useExcalidrawElements } from "./App";
 import React from "react";
 
@@ -106,6 +105,7 @@ export const ContextMenu = React.memo(
                 }}
               >
                 <button
+                  type="button"
                   className={clsx("context-menu-item", {
                     dangerous: actionName === "deleteSelectedElements",
                     checkmark: item.checked?.(appState),

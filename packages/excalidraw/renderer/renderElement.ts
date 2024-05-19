@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
@@ -21,14 +21,14 @@ import {
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
-import {
+import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
 import { getCornerRadius, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
-import {
+import type {
   AppState,
   StaticCanvasAppState,
   Zoom,
@@ -41,8 +41,10 @@ import {
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MIME_TYPES,
+  THEME,
 } from "../constants";
-import { getStroke, StrokeOptions } from "perfect-freehand";
+import type { StrokeOptions } from "perfect-freehand";
+import { getStroke } from "perfect-freehand";
 import {
   getBoundTextElement,
   getContainerCoords,
@@ -79,7 +81,7 @@ const shouldResetImageFilter = (
   appState: StaticCanvasAppState,
 ) => {
   return (
-    appState.theme === "dark" &&
+    appState.theme === THEME.DARK &&
     isInitializedImageElement(element) &&
     !isPendingImageElement(element, renderConfig) &&
     renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
@@ -263,7 +265,6 @@ IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
 const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
-  zoomValue: AppState["zoom"]["value"],
 ) => {
   context.fillStyle = "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
@@ -356,7 +357,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, context, appState.zoom.value);
+        drawImagePlaceholder(element, context);
       }
       break;
     }
@@ -668,7 +669,7 @@ export const renderElement = (
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
           context.strokeStyle =
-            appState.theme === "light" ? "#7affd7" : "#1d8264";
+            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
         }
 
         if (FRAME_STYLE.radius && context.roundRect) {

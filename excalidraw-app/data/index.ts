@@ -9,30 +9,30 @@ import {
 } from "../../packages/excalidraw/data/encryption";
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
-import { SceneBounds } from "../../packages/excalidraw/element/bounds";
+import type { ImportedDataState } from "../../packages/excalidraw/data/types";
+import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
-import {
+import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
-import { MakeBrand } from "../../packages/excalidraw/utility-types";
+import type { MakeBrand } from "../../packages/excalidraw/utility-types";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
+import type { WS_SUBTYPES } from "../app_constants";
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
-  WS_SUBTYPES,
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
@@ -269,7 +269,6 @@ export const loadScene = async (
     // in the scene database/localStorage, and instead fetch them async
     // from a different database
     files: data.files,
-    commitToHistory: false,
   };
 };
 

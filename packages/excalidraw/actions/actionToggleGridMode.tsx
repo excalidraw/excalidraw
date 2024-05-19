@@ -1,11 +1,15 @@
 import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import { GRID_SIZE } from "../constants";
-import { AppState } from "../types";
+import type { AppState } from "../types";
+import { gridIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
-  label: "labels.showGrid",
+  icon: gridIcon,
+  keywords: ["snap"],
+  label: "labels.toggleGrid",
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -18,7 +22,7 @@ export const actionToggleGridMode = register({
         gridSize: this.checked!(appState) ? null : GRID_SIZE,
         objectsSnapModeEnabled: false,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState: AppState) => appState.gridSize !== null,
