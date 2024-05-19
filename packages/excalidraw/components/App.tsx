@@ -5097,8 +5097,11 @@ class App extends React.Component<AppProps, AppState> {
 
         this.translateCanvas({
           zoom: zoomState.zoom,
-          scrollX: zoomState.scrollX + deltaX / nextZoom,
-          scrollY: zoomState.scrollY + deltaY / nextZoom,
+          // 2x multiplier is just a magic number that makes this work correctly
+          // on touchscreen devices (note: if we get report that panning is slower/faster
+          // than actual movement, consider swapping with devicePixelRatio)
+          scrollX: zoomState.scrollX + 2 * (deltaX / nextZoom),
+          scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
           shouldCacheIgnoreZoom: true,
         });
       });
