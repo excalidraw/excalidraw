@@ -64,6 +64,7 @@
     "@babel/preset-typescript": "7.18.6",
     "babel-loader": "8.2.5",
     "babel-plugin-transform-class-properties": "6.24.1",
+    "chokidar": "3.6.0",
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
     "file-loader": "6.2.0",
@@ -79,8 +80,10 @@
   "scripts": {
     "gen:types": "rm -rf types && tsc",
     "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
+    "build:src": "rm -rf dist && node ../../scripts/buildUtils.js",
     "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
     "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
+    "clear": "rm -rf dist",
     "pack": "yarn build:umd && yarn pack"
   }
 }

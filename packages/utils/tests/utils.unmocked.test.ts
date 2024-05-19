@@ -1,7 +1,10 @@
-import { decodePngMetadata, decodeSvgMetadata } from "../excalidraw/data/image";
-import type { ImportedDataState } from "../excalidraw/data/types";
-import * as utils from "../utils";
-import { API } from "../excalidraw/tests/helpers/api";
+import {
+  decodePngMetadata,
+  decodeSvgMetadata,
+} from "../../excalidraw/data/image";
+import type { ImportedDataState } from "../../excalidraw/data/types";
+import * as utils from "../index";
+import { API } from "../../excalidraw/tests/helpers/api";
 
 // NOTE this test file is using the actual API, unmocked. Hence splitting it
 // from the other test file, because I couldn't figure out how to test

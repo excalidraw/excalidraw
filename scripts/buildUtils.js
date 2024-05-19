@@ -8,6 +8,7 @@ const browserConfig = {
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
+  external: ["@excalidraw/utils"],
 };
 
 // Will be used later for treeshaking
@@ -80,6 +81,7 @@ const rawConfig = {
   format: "esm",
   packages: "external",
   plugins: [sassPlugin()],
+  external: ["@excalidraw/utils"],
 };
 
 // const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;
@@ -119,5 +121,7 @@ const createESMRawBuild = async () => {
   fs.writeFileSync("meta-raw-prod.json", JSON.stringify(rawProd.metafile));
 };
 
+console.info("BUILDING UTILS STARTED");
 createESMRawBuild();
 createESMBrowserBuild();
+console.info("BUILDING UTILS COMPLETE");

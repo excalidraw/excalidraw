@@ -224,7 +224,7 @@ import type {
 } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey } from "../shapes";
-import type { GeometricShape } from "../../utils/geometry/shape";
+import type { GeometricShape } from "@excalidraw/utils";
 import {
   getClosedCurveShape,
   getCurveShape,
@@ -232,8 +232,8 @@ import {
   getFreedrawShape,
   getPolygonShape,
   getSelectionBoxShape,
-} from "../../utils/geometry/shape";
-import { isPointInShape } from "../../utils/collision";
+  isPointInShape,
+} from "@excalidraw/utils";
 import type {
   AppClassProperties,
   AppProps,
@@ -403,7 +403,7 @@ import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
 import type { MagicCacheData } from "../data/magic";
 import { diagramToHTML } from "../data/magic";
-import { exportToBlob } from "../../utils/export";
+import { exportToBlob } from "@excalidraw/utils";
 import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
