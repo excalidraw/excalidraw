@@ -79,6 +79,7 @@ export const createUndoAction: ActionCreator = (history, store) => ({
         onClick={updateData}
         size={data?.size || "medium"}
         disabled={isUndoStackEmpty}
+        data-testid="button-undo"
       />
     );
   },
@@ -120,6 +121,7 @@ export const createRedoAction: ActionCreator = (history, store) => ({
         onClick={updateData}
         size={data?.size || "medium"}
         disabled={isRedoStackEmpty}
+        data-testid="button-redo"
       />
     );
   },
