@@ -17320,7 +17320,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
+  "version": 7,
   "width": 10,
   "x": 10,
   "y": 0,
@@ -17352,7 +17352,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 9,
+  "version": 10,
   "width": 10,
   "x": 40,
   "y": 40,
@@ -17604,7 +17604,7 @@ History {
               "index": "a2",
             },
             "inserted": {
-              "index": "a0",
+              "index": "Zz",
             },
           },
           "id41" => Delta {
@@ -17612,7 +17612,7 @@ History {
               "index": "a3",
             },
             "inserted": {
-              "index": "a0V",
+              "index": "a0",
             },
           },
         },
