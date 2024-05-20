@@ -5,7 +5,7 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
 import type { AppState, PointerDownState } from "../types";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement, getLineHeightInPx } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import { isArrowElement, isFrameLikeElement } from "./typeChecks";
@@ -183,6 +183,13 @@ export const dragNewElement = (
     height += height;
     newX = originX - width / 2;
     newY = originY - height / 2;
+  }
+
+  if (draggingElement.type === "text") {
+    height = getLineHeightInPx(
+      draggingElement.fontSize,
+      draggingElement.lineHeight,
+    );
   }
 
   if (width !== 0 && height !== 0) {

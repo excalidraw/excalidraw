@@ -5918,10 +5918,20 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "text") {
+      // if there is already a text element underneath the cursor
+      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+      const element = this.getElementAtPosition(x, y, {
+        includeBoundTextElement: true,
+      });
+      if (isTextElement(element) || hasBoundTextElement(element)) {
+        this.handleTextOnPointerDown(event, pointerDownState);
+        return;
+      }
+      this.createSizedTextOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand" &&
-      this.state.activeTool.type !== "text"
+      this.state.activeTool.type !== "hand"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -6624,8 +6634,8 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private handleTextOnPointerUp = (
-    event: PointerEvent,
+  private handleTextOnPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): void => {
     // if we're currently still editing text, clicking outside
@@ -6637,6 +6647,7 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
+    // TODO: double computation, optimize
     const element = this.getElementAtPosition(sceneX, sceneY, {
       includeBoundTextElement: true,
     });
@@ -7014,6 +7025,55 @@ class App extends React.Component<AppProps, AppState> {
         }
       : null;
   }
+
+  private createSizedTextOnPointerDown = (
+    pointerDownState: PointerDownState,
+  ) => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
+        ? null
+        : this.state.gridSize,
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
+    const textElementProps = {
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roundness: null,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      text: "",
+      fontSize: this.state.currentItemFontSize,
+      fontFamily: this.state.currentItemFontFamily,
+      textAlign: this.state.currentItemTextAlign,
+      verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      locked: false,
+      autoResize: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+    };
+
+    const sizedText = newTextElement({
+      ...textElementProps,
+    });
+
+    this.scene.insertElement(sizedText);
+    this.setState({
+      multiElement: null,
+      draggingElement: sizedText,
+      editingElement: sizedText,
+    });
+  };
 
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
@@ -7760,11 +7820,6 @@ class App extends React.Component<AppProps, AppState> {
         isRotating,
       } = this.state;
 
-      if (activeTool.type === "text") {
-        this.handleTextOnPointerUp(childEvent, pointerDownState);
-        return;
-      }
-
       this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
@@ -8006,6 +8061,27 @@ class App extends React.Component<AppProps, AppState> {
             }));
           }
         }
+        return;
+      }
+
+      if (isTextElement(draggingElement)) {
+        // TODO: change how the min width is determined
+        if (draggingElement.width < 20) {
+          // create a normal text instead
+          mutateElement(draggingElement, {
+            autoResize: true,
+          });
+        }
+
+        this.setActiveTool({
+          type: "selection",
+        });
+
+        this.resetCursor();
+
+        this.handleTextWysiwyg(draggingElement, {
+          isExistingElement: true,
+        });
         return;
       }
 
