@@ -5859,10 +5859,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.activeTool.type === "text") {
-      this.handleTextOnPointerDown(event, pointerDownState);
-      return;
-    } else if (
+    if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
     ) {
@@ -5923,7 +5920,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand"
+      this.state.activeTool.type !== "hand" &&
+      this.state.activeTool.type !== "text"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -5982,6 +5980,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
+
     if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
@@ -6625,8 +6624,8 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private handleTextOnPointerDown = (
-    event: React.PointerEvent<HTMLElement>,
+  private handleTextOnPointerUp = (
+    event: PointerEvent,
     pointerDownState: PointerDownState,
   ): void => {
     // if we're currently still editing text, clicking outside
@@ -7760,6 +7759,11 @@ class App extends React.Component<AppProps, AppState> {
         isResizing,
         isRotating,
       } = this.state;
+
+      if (activeTool.type === "text") {
+        this.handleTextOnPointerUp(childEvent, pointerDownState);
+        return;
+      }
 
       this.setState((prevState) => ({
         isResizing: false,

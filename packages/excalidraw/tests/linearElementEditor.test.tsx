@@ -1051,11 +1051,11 @@ describe("Test Linear Elements", () => {
           arrayToMap(h.elements),
         ),
       ).toMatchInlineSnapshot(`
-          {
-            "x": 75,
-            "y": 60,
-          }
-        `);
+        {
+          "x": 75,
+          "y": 60,
+        }
+      `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 
@@ -1068,15 +1068,15 @@ describe("Test Linear Elements", () => {
           true,
         ),
       ).toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            105,
-            80,
-            55.45893770831013,
-            45,
-          ]
-        `);
+        [
+          20,
+          20,
+          105,
+          80,
+          55.45893770831013,
+          45,
+        ]
+      `);
 
       UI.resize(container, "ne", [300, 200]);
 
