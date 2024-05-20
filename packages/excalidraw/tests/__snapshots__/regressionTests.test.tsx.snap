@@ -336,7 +336,7 @@ History {
               "groupIds": [
                 "id5",
               ],
-              "index": "a1V",
+              "index": "a2",
             },
             "inserted": {
               "groupIds": [],
@@ -348,9 +348,11 @@ History {
               "groupIds": [
                 "id5",
               ],
+              "index": "a3",
             },
             "inserted": {
               "groupIds": [],
+              "index": "a2",
             },
           },
         },
@@ -719,7 +721,7 @@ History {
               "groupIds": [
                 "id4",
               ],
-              "index": "a1V",
+              "index": "a2",
             },
             "inserted": {
               "groupIds": [],
@@ -731,9 +733,11 @@ History {
               "groupIds": [
                 "id4",
               ],
+              "index": "a3",
             },
             "inserted": {
               "groupIds": [],
+              "index": "a2",
             },
           },
         },
@@ -1856,7 +1860,7 @@ History {
               "groupIds": [
                 "id5",
               ],
-              "index": "a1V",
+              "index": "a2",
             },
             "inserted": {
               "groupIds": [],
@@ -1868,9 +1872,11 @@ History {
               "groupIds": [
                 "id5",
               ],
+              "index": "a3",
             },
             "inserted": {
               "groupIds": [],
+              "index": "a2",
             },
           },
         },
@@ -12810,7 +12816,7 @@ History {
                 "id5",
                 "id3",
               ],
-              "index": "a1V",
+              "index": "a2",
             },
             "inserted": {
               "groupIds": [
@@ -12825,11 +12831,13 @@ History {
                 "id5",
                 "id3",
               ],
+              "index": "a3",
             },
             "inserted": {
               "groupIds": [
                 "id3",
               ],
+              "index": "a2",
             },
           },
         },
