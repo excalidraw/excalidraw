@@ -58,7 +58,7 @@
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
     "@excalidraw/laser-pointer": "1.3.1",
-    "@excalidraw/mermaid-to-excalidraw": "0.3.0",
+    "@excalidraw/mermaid-to-excalidraw": "1.0.0",
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-tabs": "1.0.2",
