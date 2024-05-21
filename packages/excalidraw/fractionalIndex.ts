@@ -6,6 +6,14 @@ import type {
   OrderedExcalidrawElement,
 } from "./element/types";
 import { InvalidFractionalIndexError } from "./errors";
+import { arrayToMap } from "./utils";
+
+/**
+ * Normalizes indices for all elements, to prevent possible issues caused by using stale (too old, too long) indices.
+ */
+export const normalizeIndices = (elements: ExcalidrawElement[]) => {
+  return syncMovedIndices(elements, arrayToMap(elements));
+};
 
 /**
  * Envisioned relation between array order and fractional indices:

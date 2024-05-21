@@ -26,6 +26,7 @@ import {
   TTDDialogTrigger,
   StoreAction,
   reconcileElements,
+  normalizeIndices,
 } from "../packages/excalidraw";
 import type {
   AppState,
@@ -305,14 +306,21 @@ const initializeScene = async (opts: {
       key: roomLinkData.roomKey,
     };
   } else if (scene) {
+    const normalizedScene = {
+      ...scene,
+      // non-collab scenes are always always normalized on init
+      // collab scenes are normalized only on "first-in-room" as part of collabAPI
+      elements: normalizeIndices(scene.elements),
+    };
+
     return isExternalScene && jsonBackendMatch
       ? {
-          scene,
+          scene: normalizedScene,
           isExternalScene,
           id: jsonBackendMatch[1],
           key: jsonBackendMatch[2],
         }
-      : { scene, isExternalScene: false };
+      : { scene: normalizedScene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
 };

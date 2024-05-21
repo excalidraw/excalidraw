@@ -222,6 +222,8 @@ export {
   restoreLibraryItems,
 } from "./data/restore";
 
+export { normalizeIndices } from "./fractionalIndex";
+
 export { reconcileElements } from "./data/reconcile";
 
 export {

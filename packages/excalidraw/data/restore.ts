@@ -46,9 +46,9 @@ import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
 import { detectLineHeight, getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
-import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
+import { normalizeIndices, syncInvalidIndices } from "../fractionalIndex";
 
 type RestoredAppState = Omit<
   AppState,
@@ -405,36 +405,41 @@ export const restoreElements = (
   elements: ImportedDataState["elements"],
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
+  opts?:
+    | {
+        refreshDimensions?: boolean;
+        repairBindings?: boolean;
+        normalizeIndices?: boolean;
+      }
+    | undefined,
 ): OrderedExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
   const localElementsMap = localElements ? arrayToMap(localElements) : null;
-  const restoredElements = syncInvalidIndices(
-    (elements || []).reduce((elements, element) => {
-      // filtering out selection, which is legacy, no longer kept in elements,
-      // and causing issues if retained
-      if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
-        let migratedElement: ExcalidrawElement | null = restoreElement(element);
-        if (migratedElement) {
-          const localElement = localElementsMap?.get(element.id);
-          if (localElement && localElement.version > migratedElement.version) {
-            migratedElement = bumpVersion(
-              migratedElement,
-              localElement.version,
-            );
-          }
-          if (existingIds.has(migratedElement.id)) {
-            migratedElement = { ...migratedElement, id: randomId() };
-          }
-          existingIds.add(migratedElement.id);
-
-          elements.push(migratedElement);
+  const restoredElementsTemp = (elements || []).reduce((elements, element) => {
+    // filtering out selection, which is legacy, no longer kept in elements,
+    // and causing issues if retained
+    if (element.type !== "selection" && !isInvisiblySmallElement(element)) {
+      let migratedElement: ExcalidrawElement | null = restoreElement(element);
+      if (migratedElement) {
+        const localElement = localElementsMap?.get(element.id);
+        if (localElement && localElement.version > migratedElement.version) {
+          migratedElement = bumpVersion(migratedElement, localElement.version);
         }
+        if (existingIds.has(migratedElement.id)) {
+          migratedElement = { ...migratedElement, id: randomId() };
+        }
+        existingIds.add(migratedElement.id);
+
+        elements.push(migratedElement);
       }
-      return elements;
-    }, [] as ExcalidrawElement[]),
-  );
+    }
+    return elements;
+  }, [] as ExcalidrawElement[]);
+
+  const restoredElements = opts?.normalizeIndices
+    ? normalizeIndices(restoredElementsTemp)
+    : syncInvalidIndices(restoredElementsTemp);
 
   if (!opts?.repairBindings) {
     return restoredElements;
@@ -601,7 +606,11 @@ export const restore = (
    */
   localAppState: Partial<AppState> | null | undefined,
   localElements: readonly ExcalidrawElement[] | null | undefined,
-  elementsConfig?: { refreshDimensions?: boolean; repairBindings?: boolean },
+  elementsConfig?: {
+    refreshDimensions?: boolean;
+    repairBindings?: boolean;
+    normalizeIndices?: boolean;
+  },
 ): RestoredDataState => {
   return {
     elements: restoreElements(data?.elements, localElements, elementsConfig),

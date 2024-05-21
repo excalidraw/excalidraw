@@ -18,6 +18,7 @@ import {
   restoreElements,
   zoomToFitBounds,
   reconcileElements,
+  normalizeIndices,
 } from "../../packages/excalidraw";
 import type { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
@@ -637,7 +638,16 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         fetchScene: true,
         roomLinkData: existingRoomLinkData,
       });
-      scenePromise.resolve(sceneData);
+
+      if (sceneData) {
+        scenePromise.resolve({
+          ...sceneData,
+          // normalize fractional indices on init for shared scenes, while making sure there are no other collaborators
+          elements: normalizeIndices([...sceneData.elements]),
+        });
+      } else {
+        scenePromise.resolve(null);
+      }
     });
 
     this.portal.socket.on(

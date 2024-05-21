@@ -4,6 +4,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FractionalIndex,
 } from "../../element/types";
 import * as sizeHelpers from "../../element/sizeHelpers";
 import { API } from "../helpers/api";
@@ -574,6 +575,45 @@ describe("restore", () => {
       expect.objectContaining({
         id: ellipse.id,
         version: ellipse.version + 1,
+      }),
+    ]);
+  });
+});
+
+describe("normalize indices", () => {
+  it("shoudl normalize indices of all elements when normalize is true", () => {
+    const ellipse = API.createElement({
+      type: "ellipse",
+      index: "Zz" as FractionalIndex,
+    });
+    const container = API.createElement({
+      type: "rectangle",
+      index: undefined,
+    });
+    const boundElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+      index: "a0000000000000000000000" as FractionalIndex,
+    });
+
+    const restoredElements = restore.restoreElements(
+      [ellipse, container, boundElement],
+      null,
+      { normalizeIndices: true },
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: ellipse.id,
+        index: "a0",
+      }),
+      expect.objectContaining({
+        id: container.id,
+        index: "a1",
+      }),
+      expect.objectContaining({
+        id: boundElement.id,
+        index: "a2",
       }),
     ]);
   });
