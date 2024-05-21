@@ -2569,11 +2569,6 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
         document,
-        EVENT.MOUSE_MOVE,
-        this.updateCurrentCursorPosition,
-      ),
-      addEventListener(
-        document,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
       ),
