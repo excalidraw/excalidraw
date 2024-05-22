@@ -6,7 +6,7 @@ import { deepCopyElement } from "./element/newElement";
 import type { OrderedExcalidrawElement } from "./element/types";
 import { Emitter } from "./emitter";
 import type { AppState, ObservedAppState } from "./types";
-import { ValueOf } from "./utility-types";
+import type { ValueOf } from "./utility-types";
 import { isShallowEqual } from "./utils";
 
 // hidden non-enumerable property for runtime checks
