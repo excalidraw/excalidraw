@@ -47,6 +47,15 @@ export const StoreAction = {
    */
   CAPTURE: "capture",
   /**
+   * Never undoable.
+   *
+   * Use for updates which should never be recorded, such as remote updates
+   * or scene initialization.
+   *
+   * These updates will _never_ make it to the local undo / redo stacks.
+   */
+  UPDATE: "update",
+  /**
    * Eventually undoable.
    *
    * Use for updates which should not be captured immediately - likely
@@ -56,15 +65,6 @@ export const StoreAction = {
    * or internally by the editor.
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
-   */
-  UPDATE: "update",
-  /**
-   * Never undoable.
-   *
-   * Use for updates which should never be recorded, such as remote updates
-   * or scene initialization.
-   *
-   * These updates will _never_ make it to the local undo / redo stacks.
    */
   NONE: "none",
 } as const;
