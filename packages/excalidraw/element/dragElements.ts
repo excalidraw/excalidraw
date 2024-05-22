@@ -187,6 +187,7 @@ export const dragNewElement = (
 
   if (draggingElement.type === "text") {
     height = draggingElement.height;
+    newY = originY;
     if (shouldResizeFromCenter) {
       newX = originX - width / 2;
       newY = originY - height / 2;
