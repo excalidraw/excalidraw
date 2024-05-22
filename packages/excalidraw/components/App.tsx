@@ -7042,9 +7042,15 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
+    const height = getLineHeightInPx(
+      this.state.currentItemFontSize,
+      getDefaultLineHeight(this.state.currentItemFontFamily),
+    );
+
     const textElementProps = {
       x: gridX,
       y: gridY,
+      height,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
