@@ -6,6 +6,7 @@ import { deepCopyElement } from "./element/newElement";
 import type { OrderedExcalidrawElement } from "./element/types";
 import { Emitter } from "./emitter";
 import type { AppState, ObservedAppState } from "./types";
+import type { ValueOf } from "./utility-types";
 import { isShallowEqual } from "./utils";
 
 // hidden non-enumerable property for runtime checks
@@ -35,15 +36,40 @@ const isObservedAppState = (
 ): appState is ObservedAppState =>
   !!Reflect.get(appState, hiddenObservedAppStateProp);
 
-export type StoreActionType = "capture" | "update" | "none";
-
-export const StoreAction: {
-  [K in Uppercase<StoreActionType>]: StoreActionType;
-} = {
+export const StoreAction = {
+  /**
+   * Immediately undoable.
+   *
+   * Use for updates which should be captured.
+   * Should be used for most of the local updates.
+   *
+   * These updates will _immediately_ make it to the local undo / redo stacks.
+   */
   CAPTURE: "capture",
+  /**
+   * Never undoable.
+   *
+   * Use for updates which should never be recorded, such as remote updates
+   * or scene initialization.
+   *
+   * These updates will _never_ make it to the local undo / redo stacks.
+   */
   UPDATE: "update",
+  /**
+   * Eventually undoable.
+   *
+   * Use for updates which should not be captured immediately - likely
+   * exceptions which are part of some async multi-step process. Otherwise, all
+   * such updates would end up being captured with the next
+   * `StoreAction.CAPTURE` - triggered either by the next `updateScene`
+   * or internally by the editor.
+   *
+   * These updates will _eventually_ make it to the local undo / redo stacks.
+   */
   NONE: "none",
 } as const;
+
+export type StoreActionType = ValueOf<typeof StoreAction>;
 
 /**
  * Represent an increment to the Store.
