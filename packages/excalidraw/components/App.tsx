@@ -329,9 +329,9 @@ import {
   getContainerElement,
   getDefaultLineHeight,
   getLineHeightInPx,
+  getMinTextElementWidth,
   isMeasureTextSupported,
   isValidTextContainer,
-  measureText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -8072,18 +8072,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isTextElement(draggingElement)) {
-        // TODO: change how the min width is determined
-        const minWidth = measureText(
-          "",
+        const minWidth = getMinTextElementWidth(
           getFontString({
             fontSize: draggingElement.fontSize,
             fontFamily: draggingElement.fontFamily,
           }),
           draggingElement.lineHeight,
-        ).width;
+        );
 
         mutateElement(draggingElement, {
-          autoResize: draggingElement.width <= minWidth,
+          autoResize: draggingElement.width < minWidth,
         });
 
         this.setActiveTool({

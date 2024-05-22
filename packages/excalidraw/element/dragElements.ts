@@ -5,7 +5,7 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
 import type { AppState, PointerDownState } from "../types";
-import { getBoundTextElement, measureText } from "./textElement";
+import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import { isArrowElement, isFrameLikeElement } from "./typeChecks";
@@ -188,14 +188,13 @@ export const dragNewElement = (
 
   if (draggingElement.type === "text") {
     height = draggingElement.height;
-    const minWidth = measureText(
-      "",
+    const minWidth = getMinTextElementWidth(
       getFontString({
         fontSize: draggingElement.fontSize,
         fontFamily: draggingElement.fontFamily,
       }),
       draggingElement.lineHeight,
-    ).width;
+    );
     width = Math.max(width, minWidth);
 
     newY = originY;

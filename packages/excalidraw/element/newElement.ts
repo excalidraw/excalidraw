@@ -250,7 +250,7 @@ export const newTextElement = (
     verticalAlign,
     x: opts.x - offsets.x,
     y: opts.y - offsets.y,
-    width: metrics.width,
+    width: 0,
     height: metrics.height,
     containerId: opts.containerId || null,
     originalText: text,
