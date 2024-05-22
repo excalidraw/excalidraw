@@ -13,7 +13,10 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import { renderSelectionElement } from "../renderer/renderElement";
+import {
+  renderSelectionElement,
+  renderTextBox,
+} from "../renderer/renderElement";
 import { getClientColor, renderRemoteCursors } from "../clients";
 import {
   isSelectedViaGroup,
@@ -47,13 +50,18 @@ import {
   getNormalizedCanvasDimensions,
 } from "./helpers";
 import oc from "open-color";
-import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
+import {
+  isFrameLikeElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
   GroupId,
   NonDeleted,
 } from "../element/types";
@@ -62,6 +70,7 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
+import Scene from "../scene/Scene";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -630,6 +639,14 @@ const _renderInteractiveScene = ({
     } catch (error: any) {
       console.error(error);
     }
+  }
+
+  if (appState.draggingElement && isTextElement(appState.draggingElement)) {
+    // latest element
+    const scene = Scene.getScene(appState.draggingElement);
+    const text = (scene?.getElement(appState.draggingElement.id) ??
+      appState.draggingElement) as ExcalidrawTextElement;
+    renderTextBox(text, context, appState);
   }
 
   if (appState.isBindingEnabled) {
