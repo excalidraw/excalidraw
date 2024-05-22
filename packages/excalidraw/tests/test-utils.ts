@@ -252,7 +252,10 @@ expect.addSnapshotSerializer({
   },
   test(val) {
     return (
-      typeof val === "number" && !Number.isNaN(val) && !Number.isInteger(val)
+      typeof val === "number" &&
+      Number.isFinite(val) &&
+      !Number.isNaN(val) &&
+      !Number.isInteger(val)
     );
   },
 });
