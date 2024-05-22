@@ -646,7 +646,10 @@ const _renderInteractiveScene = ({
     const scene = Scene.getScene(appState.draggingElement);
     const text = (scene?.getElement(appState.draggingElement.id) ??
       appState.draggingElement) as ExcalidrawTextElement;
-    renderTextBox(text, context, appState);
+
+    if (!text.autoResize) {
+      renderTextBox(text, context, appState);
+    }
   }
 
   if (appState.isBindingEnabled) {

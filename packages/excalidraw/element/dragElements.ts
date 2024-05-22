@@ -5,10 +5,11 @@ import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
 import type { AppState, PointerDownState } from "../types";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement, measureText } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import { isArrowElement, isFrameLikeElement } from "./typeChecks";
+import { getFontString } from "../utils";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -187,6 +188,16 @@ export const dragNewElement = (
 
   if (draggingElement.type === "text") {
     height = draggingElement.height;
+    const minWidth = measureText(
+      "",
+      getFontString({
+        fontSize: draggingElement.fontSize,
+        fontFamily: draggingElement.fontFamily,
+      }),
+      draggingElement.lineHeight,
+    ).width;
+    width = Math.max(width, minWidth);
+
     newY = originY;
     if (shouldResizeFromCenter) {
       newX = originX - width / 2;

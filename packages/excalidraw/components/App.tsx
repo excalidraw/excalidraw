@@ -331,6 +331,7 @@ import {
   getLineHeightInPx,
   isMeasureTextSupported,
   isValidTextContainer,
+  measureText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -8072,12 +8073,18 @@ class App extends React.Component<AppProps, AppState> {
 
       if (isTextElement(draggingElement)) {
         // TODO: change how the min width is determined
-        if (draggingElement.width < 20) {
-          // create a normal text instead
-          mutateElement(draggingElement, {
-            autoResize: true,
-          });
-        }
+        const minWidth = measureText(
+          "",
+          getFontString({
+            fontSize: draggingElement.fontSize,
+            fontFamily: draggingElement.fontFamily,
+          }),
+          draggingElement.lineHeight,
+        ).width;
+
+        mutateElement(draggingElement, {
+          autoResize: draggingElement.width <= minWidth,
+        });
 
         this.setActiveTool({
           type: "selection",
