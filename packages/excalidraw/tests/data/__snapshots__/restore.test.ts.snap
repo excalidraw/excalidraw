@@ -316,7 +316,7 @@ exports[`restoreElements > should restore text element correctly passing value f
   "id": "id-text01",
   "index": "a0",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -338,7 +338,7 @@ exports[`restoreElements > should restore text element correctly passing value f
   "verticalAlign": "middle",
   "width": 100,
   "x": -20,
-  "y": -8.75,
+  "y": "-8.75000",
 }
 `;
 
@@ -359,7 +359,7 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "id": "id-text01",
   "index": "a0",
   "isDeleted": true,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
