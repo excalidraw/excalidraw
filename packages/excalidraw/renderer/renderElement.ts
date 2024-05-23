@@ -644,7 +644,13 @@ export const renderTextBox = (
   appState: InteractiveCanvasAppState,
 ) => {
   context.save();
-  context.translate(text.x + appState.scrollX, text.y + appState.scrollY);
+  const cx = text.x + text.width / 2;
+  const cy = text.y + text.height / 2;
+  const shiftX = text.width / 2;
+  const shiftY = text.height / 2;
+  context.translate(cx + appState.scrollX, cy + appState.scrollY);
+  context.rotate(text.angle);
+  context.translate(-shiftX, -shiftY);
   context.lineWidth = 1 / appState.zoom.value;
   context.strokeStyle = "rgb(105, 101, 219)";
   context.strokeRect(0, 0, text.width, text.height);
