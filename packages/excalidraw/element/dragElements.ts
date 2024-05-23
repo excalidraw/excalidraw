@@ -8,7 +8,11 @@ import type { AppState, PointerDownState } from "../types";
 import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
-import { isArrowElement, isFrameLikeElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isFrameLikeElement,
+  isTextElement,
+} from "./typeChecks";
 import { getFontString } from "../utils";
 
 export const dragSelectedElements = (
@@ -186,7 +190,9 @@ export const dragNewElement = (
     newY = originY - height / 2;
   }
 
-  if (draggingElement.type === "text") {
+  let textAutoResize = {};
+
+  if (isTextElement(draggingElement)) {
     height = draggingElement.height;
     const minWidth = getMinTextElementWidth(
       getFontString({
@@ -196,6 +202,13 @@ export const dragNewElement = (
       draggingElement.lineHeight,
     );
     width = Math.max(width, minWidth);
+
+    const DRAG_THRESHOLD = 1;
+    if (Math.abs(x - originX) > DRAG_THRESHOLD) {
+      textAutoResize = {
+        autoResize: false,
+      };
+    }
 
     newY = originY;
     if (shouldResizeFromCenter) {
@@ -210,6 +223,7 @@ export const dragNewElement = (
       y: newY + (originOffset?.y ?? 0),
       width,
       height,
+      ...textAutoResize,
     });
   }
 };

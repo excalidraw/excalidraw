@@ -7066,7 +7066,6 @@ class App extends React.Component<AppProps, AppState> {
       textAlign: this.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
-      autoResize: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
     };
 
