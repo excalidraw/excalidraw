@@ -215,6 +215,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
@@ -253,7 +254,7 @@ export const newTextElement = (
     width: metrics.width,
     height: metrics.height,
     containerId: opts.containerId || null,
-    originalText: text,
+    originalText: opts.originalText ?? text,
     autoResize: opts.autoResize ?? true,
     lineHeight,
   };
