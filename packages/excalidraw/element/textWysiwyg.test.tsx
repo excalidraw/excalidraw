@@ -576,7 +576,7 @@ describe("textWysiwyg", () => {
 
     it("text should never go beyond max width", async () => {
       UI.clickTool("text");
-      mouse.clickAt(750, 300);
+      mouse.click(0, 0);
 
       textarea = await getTextEditor(textEditorSelector, true);
       updateTextEditor(
