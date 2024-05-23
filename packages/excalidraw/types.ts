@@ -197,7 +197,7 @@ export type InteractiveCanvasAppState = Readonly<
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
-    draggingElement: AppState["draggingElement"];
+    editingElement: AppState["editingElement"];
   }
 >;
 

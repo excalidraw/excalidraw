@@ -641,11 +641,11 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (appState.draggingElement && isTextElement(appState.draggingElement)) {
+  if (appState.editingElement && isTextElement(appState.editingElement)) {
     // latest element
-    const scene = Scene.getScene(appState.draggingElement);
-    const text = (scene?.getElement(appState.draggingElement.id) ??
-      appState.draggingElement) as ExcalidrawTextElement;
+    const scene = Scene.getScene(appState.editingElement);
+    const text = (scene?.getElement(appState.editingElement.id) ??
+      appState.editingElement) as ExcalidrawTextElement;
 
     if (!text.autoResize) {
       renderTextBox(text, context, appState);

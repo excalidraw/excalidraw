@@ -197,7 +197,7 @@ const getRelevantAppStateProps = (
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
-  draggingElement: appState.draggingElement,
+  editingElement: appState.editingElement,
 });
 
 const areEqual = (
