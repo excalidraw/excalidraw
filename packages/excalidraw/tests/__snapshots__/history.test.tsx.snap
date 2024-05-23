@@ -181,7 +181,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 99.19725525211979,
+  "height": "99.19726",
   "id": "id163",
   "index": "a2",
   "isDeleted": false,
@@ -195,8 +195,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      98.40367721010284,
-      99.19725525211979,
+      "98.40368",
+      "99.19726",
     ],
   ],
   "roughness": 1,
@@ -211,7 +211,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 54,
-  "width": 98.40367721010284,
+  "width": "98.40368",
   "x": 1,
   "y": 0,
 }
@@ -278,10 +278,10 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id162",
-                "focus": 0.009900990099009901,
+                "focus": "0.00990",
                 "gap": 1,
               },
-              "height": 0.9800031696987099,
+              "height": "0.98000",
               "points": [
                 [
                   0,
@@ -289,22 +289,22 @@ History {
                 ],
                 [
                   98,
-                  -0.9800031696987099,
+                  "-0.98000",
                 ],
               ],
               "startBinding": {
                 "elementId": "id161",
-                "focus": 0.0297029702970297,
+                "focus": "0.02970",
                 "gap": 1,
               },
             },
             "inserted": {
               "endBinding": {
                 "elementId": "id162",
-                "focus": -0.02,
+                "focus": "-0.02000",
                 "gap": 1,
               },
-              "height": 0.0002487679019458344,
+              "height": "0.00025",
               "points": [
                 [
                   0,
@@ -312,12 +312,12 @@ History {
                 ],
                 [
                   98,
-                  0.0002487679019458344,
+                  "0.00025",
                 ],
               ],
               "startBinding": {
                 "elementId": "id161",
-                "focus": 0.02,
+                "focus": "0.02000",
                 "gap": 1,
               },
             },
@@ -369,15 +369,15 @@ History {
                 "focus": 0,
                 "gap": 1,
               },
-              "height": 99.19725525211979,
+              "height": "99.19726",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  98.40367721010284,
-                  99.19725525211979,
+                  "98.40368",
+                  "99.19726",
                 ],
               ],
               "startBinding": null,
@@ -386,10 +386,10 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id162",
-                "focus": 0.009900990099009901,
+                "focus": "0.00990",
                 "gap": 1,
               },
-              "height": 0.9802432787444684,
+              "height": "0.98024",
               "points": [
                 [
                   0,
@@ -397,15 +397,15 @@ History {
                 ],
                 [
                   98,
-                  -0.9802432787444684,
+                  "-0.98024",
                 ],
               ],
               "startBinding": {
                 "elementId": "id161",
-                "focus": 0.0297029702970297,
+                "focus": "0.02970",
                 "gap": 1,
               },
-              "y": 0.9903686540602428,
+              "y": "0.99037",
             },
           },
           "id166" => Delta {
@@ -1188,7 +1188,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0.03596020595764898,
+  "height": "0.03596",
   "id": "id169",
   "index": "Zz",
   "isDeleted": false,
@@ -1203,7 +1203,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     ],
     [
       98,
-      -0.03596020595764898,
+      "-0.03596",
     ],
   ],
   "roughness": 1,
@@ -1224,7 +1224,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "version": 15,
   "width": 98,
   "x": 1,
-  "y": 0.05467419069071122,
+  "y": "0.05467",
 }
 `;
 
@@ -1531,7 +1531,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0.03596020595764898,
+  "height": "0.03596",
   "id": "id172",
   "index": "a0",
   "isDeleted": false,
@@ -1546,7 +1546,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     ],
     [
       98,
-      -0.03596020595764898,
+      "-0.03596",
     ],
   ],
   "roughness": 1,
@@ -1567,7 +1567,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "version": 15,
   "width": 98,
   "x": 1,
-  "y": 0.05467419069071122,
+  "y": "0.05467",
 }
 `;
 
@@ -1680,7 +1680,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 2.6199110083015196,
+              "height": "2.61991",
               "index": "a0",
               "isDeleted": false,
               "lastCommittedPoint": null,
@@ -1694,7 +1694,7 @@ History {
                 ],
                 [
                   98,
-                  -2.6199110083015196,
+                  "-2.61991",
                 ],
               ],
               "roughness": 1,
@@ -1713,7 +1713,7 @@ History {
               "type": "arrow",
               "width": 98,
               "x": 1,
-              "y": 3.98333408405027,
+              "y": "3.98333",
             },
             "inserted": {
               "isDeleted": true,
@@ -2206,7 +2206,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 373.7994222717614,
+  "height": "373.79942",
   "id": "id177",
   "index": "a2",
   "isDeleted": false,
@@ -2221,7 +2221,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     ],
     [
       498,
-      -373.7994222717614,
+      "-373.79942",
     ],
   ],
   "roughness": 1,
@@ -2242,7 +2242,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "version": 12,
   "width": 498,
   "x": 1,
-  "y": -37.91991400161248,
+  "y": "-37.91991",
 }
 `;
 
@@ -2598,7 +2598,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id143",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -2639,7 +2639,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id144",
   "index": "a2",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -2889,7 +2889,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id146",
   "index": "a0",
   "isDeleted": true,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -2930,7 +2930,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id147",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -3165,7 +3165,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id134",
   "index": "a0V",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -3206,7 +3206,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id133",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -3483,7 +3483,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id136",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -3724,7 +3724,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id131",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -3956,7 +3956,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id139",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -4207,7 +4207,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id141",
   "index": "a0",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -4267,7 +4267,7 @@ History {
               "height": 25,
               "index": "a0",
               "isDeleted": false,
-              "lineHeight": 1.25,
+              "lineHeight": "1.25000",
               "link": null,
               "locked": false,
               "opacity": 100,
@@ -4472,7 +4472,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id155",
   "index": "a0",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -4695,7 +4695,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id153",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -4913,7 +4913,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id149",
   "index": "a1",
   "isDeleted": true,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -5139,7 +5139,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "id": "id151",
   "index": "a0",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -13995,7 +13995,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "id": "id51",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -14015,7 +14015,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
-  "y": -12.5,
+  "y": "-12.50000",
 }
 `;
 
@@ -14254,7 +14254,7 @@ History {
               "height": 100,
               "index": "a1",
               "isDeleted": false,
-              "lineHeight": 1.25,
+              "lineHeight": "1.25000",
               "link": null,
               "locked": false,
               "opacity": 100,
@@ -14389,7 +14389,7 @@ History {
               "verticalAlign": "middle",
               "width": 30,
               "x": -65,
-              "y": -12.5,
+              "y": "-12.50000",
             },
             "inserted": {
               "containerId": null,
@@ -14677,7 +14677,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "id": "id45",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -14697,7 +14697,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
-  "y": -12.5,
+  "y": "-12.50000",
 }
 `;
 
@@ -14860,7 +14860,7 @@ History {
               "height": 100,
               "index": "a1",
               "isDeleted": false,
-              "lineHeight": 1.25,
+              "lineHeight": "1.25000",
               "link": null,
               "locked": false,
               "opacity": 100,
@@ -14995,7 +14995,7 @@ History {
               "verticalAlign": "middle",
               "width": 30,
               "x": -65,
-              "y": -12.5,
+              "y": "-12.50000",
             },
             "inserted": {
               "containerId": null,
@@ -15283,7 +15283,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "id": "id57",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -15303,7 +15303,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
-  "y": -12.5,
+  "y": "-12.50000",
 }
 `;
 
@@ -15466,7 +15466,7 @@ History {
               "height": 100,
               "index": "a1",
               "isDeleted": false,
-              "lineHeight": 1.25,
+              "lineHeight": "1.25000",
               "link": null,
               "locked": false,
               "opacity": 100,
@@ -15601,7 +15601,7 @@ History {
               "verticalAlign": "middle",
               "width": 30,
               "x": -65,
-              "y": -12.5,
+              "y": "-12.50000",
             },
             "inserted": {
               "containerId": null,
@@ -15887,7 +15887,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "id": "id63",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -15907,7 +15907,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
-  "y": -12.5,
+  "y": "-12.50000",
 }
 `;
 
@@ -16140,7 +16140,7 @@ History {
               "height": 100,
               "index": "a1",
               "isDeleted": false,
-              "lineHeight": 1.25,
+              "lineHeight": "1.25000",
               "link": null,
               "locked": false,
               "opacity": 100,
@@ -16275,7 +16275,7 @@ History {
               "verticalAlign": "middle",
               "width": 30,
               "x": -65,
-              "y": -12.5,
+              "y": "-12.50000",
             },
             "inserted": {
               "containerId": null,
@@ -16587,7 +16587,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "id": "id70",
   "index": "a1",
   "isDeleted": false,
-  "lineHeight": 1.25,
+  "lineHeight": "1.25000",
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -16607,7 +16607,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "verticalAlign": "middle",
   "width": 30,
   "x": -65,
-  "y": -12.5,
+  "y": "-12.50000",
 }
 `;
 
@@ -16855,7 +16855,7 @@ History {
               "height": 100,
               "index": "a1",
               "isDeleted": false,
-              "lineHeight": 1.25,
+              "lineHeight": "1.25000",
               "link": null,
               "locked": false,
               "opacity": 100,
@@ -16990,7 +16990,7 @@ History {
               "verticalAlign": "middle",
               "width": 30,
               "x": -65,
-              "y": -12.5,
+              "y": "-12.50000",
             },
             "inserted": {
               "containerId": null,
