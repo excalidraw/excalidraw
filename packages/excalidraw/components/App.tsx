@@ -4881,19 +4881,18 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const now = Date.now();
-    if (now - this.debounceDoubleClickTimestamp < 200) {
-      //handleCanvasDoubleClick click fires twice in case of touch.
-      //Once from the onTouchStart event handler, once from the double click event handler
-      return;
-    }
-    this.debounceDoubleClickTimestamp = now;
-
     if (
       this.state.penMode &&
       this.lastPointerDownEvent?.pointerType === "touch" &&
       this.state.activeTool.type !== "selection"
     ) {
+      const now = Date.now();
+      if (now - this.debounceDoubleClickTimestamp < 200) {
+        //handleCanvasDoubleClick click fires twice in case of touch.
+        //Once from the onTouchStart event handler, once from the double click event handler
+        return;
+      }
+      this.debounceDoubleClickTimestamp = now;  
       this.updateScene(actionToggleEraserTool.perform([] as any, this.state));
       return;
     }
