@@ -830,7 +830,12 @@ const _renderInteractiveScene = ({
         "mouse", // when we render we don't know which pointer type so use mouse,
         getOmitSidesForDevice(device),
       );
-      if (!appState.viewModeEnabled && showBoundingBox) {
+      if (
+        !appState.viewModeEnabled &&
+        showBoundingBox &&
+        // do not show transform handles when text is being edited
+        !isTextElement(appState.editingElement)
+      ) {
         renderTransformHandles(
           context,
           renderConfig,

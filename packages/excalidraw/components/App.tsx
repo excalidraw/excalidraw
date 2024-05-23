@@ -8130,7 +8130,6 @@ class App extends React.Component<AppProps, AppState> {
         this.handleTextWysiwyg(draggingElement, {
           isExistingElement: true,
         });
-        return;
       }
 
       if (
