@@ -4892,7 +4892,7 @@ class App extends React.Component<AppProps, AppState> {
         //Once from the onTouchStart event handler, once from the double click event handler
         return;
       }
-      this.debounceDoubleClickTimestamp = now;  
+      this.debounceDoubleClickTimestamp = now;
       this.updateScene(actionToggleEraserTool.perform([] as any, this.state));
       return;
     }
