@@ -34,7 +34,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${
-          import.meta.env.VITE_APP_PLUS_APP
+          import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
         className=""
       >
