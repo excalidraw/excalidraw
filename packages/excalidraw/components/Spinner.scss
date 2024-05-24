@@ -1,0 +1,49 @@
+@import "open-color/open-color.scss";
+
+$duration: 1.6s;
+
+.excalidraw {
+  .Spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+
+    --spinner-color: var(--icon-fill-color);
+
+    svg {
+      animation: rotate $duration linear infinite;
+      animation-delay: var(--spinner-delay);
+      transform-origin: center center;
+    }
+
+    circle {
+      stroke: var(--spinner-color);
+      animation: dash $duration linear 0s infinite;
+      stroke-linecap: round;
+    }
+  }
+
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes dash {
+    0% {
+      stroke-dasharray: 1, 300;
+      stroke-dashoffset: 0;
+    }
+    50% {
+      stroke-dasharray: 150, 300;
+      stroke-dashoffset: -200;
+    }
+    100% {
+      stroke-dasharray: 1, 300;
+      stroke-dashoffset: -280;
+    }
+  }
+}

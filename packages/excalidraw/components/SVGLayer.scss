@@ -1,0 +1,24 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .SVGLayer {
+    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    z-index: var(--zIndex-svgLayer);
+
+    & svg {
+      image-rendering: auto;
+      overflow: visible;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+  }
+}

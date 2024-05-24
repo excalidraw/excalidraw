@@ -1,0 +1,250 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .ExcButton {
+    --text-color: transparent;
+    --border-color: transparent;
+    --back-color: transparent;
+
+    color: var(--text-color);
+    background-color: var(--back-color);
+    border-color: var(--border-color);
+
+    &:hover {
+      transition: all 150ms ease-out;
+    }
+
+    .Spinner {
+      --spinner-color: var(--color-surface-lowest);
+      position: absolute;
+      visibility: visible;
+    }
+
+    &[disabled] {
+      pointer-events: none;
+
+      .ExcButton__contents {
+        visibility: hidden;
+      }
+    }
+
+    &,
+    &__contents {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      flex-wrap: nowrap;
+      // needed because of .Spinner
+      position: relative;
+    }
+
+    &--color-primary {
+      &.ExcButton--variant-filled {
+        --text-color: var(--color-surface-lowest);
+        --back-color: var(--color-primary);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --back-color: var(--color-brand-hover);
+        }
+
+        &:active {
+          --back-color: var(--color-brand-active);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-primary);
+        --border-color: var(--color-primary);
+        --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --text-color: var(--color-brand-hover);
+          --border-color: var(--color-brand-hover);
+        }
+
+        &:active {
+          --text-color: var(--color-brand-active);
+          --border-color: var(--color-brand-active);
+        }
+      }
+    }
+
+    &--color-danger {
+      &.ExcButton--variant-filled {
+        --text-color: var(--color-danger-text);
+        --back-color: var(--color-danger-dark);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --back-color: var(--color-danger-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-danger-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-danger);
+        --border-color: var(--color-danger);
+        --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --text-color: var(--color-danger-darkest);
+          --border-color: var(--color-danger-darkest);
+        }
+
+        &:active {
+          --text-color: var(--color-danger-darker);
+          --border-color: var(--color-danger-darker);
+        }
+      }
+    }
+
+    &--color-muted {
+      &.ExcButton--variant-filled {
+        --text-color: var(--island-bg-color);
+        --back-color: var(--color-gray-50);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --back-color: var(--color-gray-60);
+        }
+
+        &:active {
+          --back-color: var(--color-gray-80);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-muted-background);
+        --border-color: var(--color-muted);
+        --back-color: var(--island-bg-color);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --text-color: var(--color-muted-background-darker);
+          --border-color: var(--color-muted-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-muted-background-darker);
+          --border-color: var(--color-muted-darkest);
+        }
+      }
+    }
+
+    &--color-warning {
+      &.ExcButton--variant-filled {
+        --text-color: black;
+        --back-color: var(--color-warning-dark);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --back-color: var(--color-warning-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-warning-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-warning-dark);
+        --border-color: var(--color-warning-dark);
+        --back-color: var(--input-bg-color);
+
+        .Spinner {
+          --spinner-color: var(--text-color);
+        }
+
+        &:hover {
+          --text-color: var(--color-warning-darker);
+          --border-color: var(--color-warning-darker);
+        }
+
+        &:active {
+          --text-color: var(--color-warning-darkest);
+          --border-color: var(--color-warning-darkest);
+        }
+      }
+    }
+
+    border-radius: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
+
+    font-family: var(--font-family);
+
+    user-select: none;
+
+    &--size-large {
+      font-weight: 600;
+      font-size: 0.875rem;
+      min-height: 3rem;
+      padding: 0.5rem 1.5rem;
+
+      letter-spacing: 0.4px;
+
+      .ExcButton__contents {
+        gap: 0.75rem;
+      }
+    }
+
+    &--size-medium {
+      font-weight: 600;
+      font-size: 0.75rem;
+      min-height: 2.5rem;
+      padding: 0.5rem 1rem;
+
+      letter-spacing: normal;
+
+      .ExcButton__contents {
+        gap: 0.5rem;
+      }
+    }
+
+    &--variant-icon {
+      padding: 0.5rem 0.75rem;
+      width: 3rem;
+    }
+
+    &--fullWidth {
+      width: 100%;
+    }
+
+    &__icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+}

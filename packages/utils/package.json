@@ -1,0 +1,86 @@
+{
+  "name": "@excalidraw/utils",
+  "version": "0.1.2",
+  "main": "./dist/prod/index.js",
+  "type": "module",
+  "module": "./dist/prod/index.js",
+  "exports": {
+    ".": {
+      "development": "./dist/dev/index.js",
+      "default": "./dist/prod/index.js"
+    }
+  },
+  "types": "./dist/utils/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "description": "Excalidraw utilities functions",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-utils"
+  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@braintree/sanitize-url": "6.0.2",
+    "@excalidraw/laser-pointer": "1.3.1",
+    "browser-fs-access": "0.29.1",
+    "open-color": "1.9.1",
+    "pako": "1.0.11",
+    "perfect-freehand": "1.2.0",
+    "png-chunk-text": "1.0.0",
+    "png-chunks-encode": "1.0.0",
+    "png-chunks-extract": "1.0.0",
+    "roughjs": "4.6.4"
+  },
+  "devDependencies": {
+    "@babel/core": "7.18.9",
+    "@babel/plugin-transform-arrow-functions": "7.18.6",
+    "@babel/plugin-transform-async-to-generator": "7.18.6",
+    "@babel/plugin-transform-runtime": "7.18.6",
+    "@babel/plugin-transform-typescript": "7.18.8",
+    "@babel/preset-env": "7.18.9",
+    "@babel/preset-typescript": "7.18.6",
+    "babel-loader": "8.2.5",
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "cross-env": "7.0.3",
+    "css-loader": "6.7.1",
+    "file-loader": "6.2.0",
+    "sass-loader": "13.0.2",
+    "ts-loader": "9.3.1",
+    "typescript": "4.9.4",
+    "webpack": "5.76.0",
+    "webpack-bundle-analyzer": "4.5.0",
+    "webpack-cli": "4.10.0"
+  },
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "scripts": {
+    "gen:types": "rm -rf types && tsc",
+    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
+    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
+    "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
+    "pack": "yarn build:umd && yarn pack"
+  }
+}

@@ -21,8 +21,9 @@ npm-debug.log*
 package-lock.json
 yarn-debug.log*
 yarn-error.log*
-src/packages/excalidraw/types
-src/packages/excalidraw/example/public/bundle.js
-src/packages/excalidraw/example/public/excalidraw-assets-dev
-src/packages/excalidraw/example/public/excalidraw.development.js
+packages/excalidraw/types
 coverage
+dev-dist
+html
+examples/**/bundle.*
+meta*.json

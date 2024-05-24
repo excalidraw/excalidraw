@@ -1,0 +1,59 @@
+.excalidraw {
+  .follow-mode {
+    position: absolute;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 2px solid var(--color-primary-hover);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    &__badge {
+      background-color: var(--color-primary-hover);
+      color: var(--color-primary-light);
+      padding: 0.25rem 0.5rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      pointer-events: all;
+      font-size: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      &__label {
+        display: flex;
+        white-space: pre-wrap;
+        line-height: 1;
+      }
+
+      &__username {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+      }
+    }
+
+    &__disconnect-btn {
+      all: unset;
+      cursor: pointer;
+      border-radius: 0.25rem;
+
+      &:hover {
+        background-color: var(--color-primary-darker);
+      }
+
+      &:active {
+        background-color: var(--color-primary-darkest);
+      }
+
+      svg {
+        display: block;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+}

@@ -1,10 +1,10 @@
 # UIOptions
 
-This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions), [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint) and [`welcomeScreen`](#welcmescreen).
+This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions), [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint) [`welcomeScreen`](#welcmescreen) and [`tools`](#tools).
 
 <pre>
   &#123;
-  <br /> canvasActions?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L372">
+  <br /> canvasActions?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L372">
     CanvasActions
   </a>, <br /> dockedSidebarBreakpoint?: number, <br /> welcomeScreen?: boolean <br />
 
@@ -55,7 +55,7 @@ If `UIOptions.canvasActions.export` is `false` the export button will not be ren
 
 ## dockedSidebarBreakpoint
 
-This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/src/constants.ts#L161).  
+This prop indicates at what point should we break to a docked, permanent sidebar. If not passed it defaults to [`MQ_RIGHT_SIDEBAR_MAX_WIDTH_PORTRAIT`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/constants.ts#L161).  
 If the _width_ of the _excalidraw_ container exceeds _dockedSidebarBreakpoint_, the sidebar will be `dockable` and the button to `dock` the sidebar will be shown  
 If user choses to `dock` the sidebar, it will push the right part of the UI towards the left, making space for the sidebar as shown below.
 
@@ -70,3 +70,12 @@ function App() {
   );
 }
 ```
+
+## tools
+
+This `prop` controls the visibility of the tools in the editor.
+Currently you can control the visibility of `image` tool via this prop.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| image | boolean | true | Decides whether `image` tool should be visible.

@@ -9,14 +9,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Node.js 14.x
+      - name: Setup Node.js 18.x
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 18.x
 
       - name: Install and lint
         run: |
-          yarn --frozen-lockfile
+          yarn install
           yarn test:other
           yarn test:code
           yarn test:typecheck

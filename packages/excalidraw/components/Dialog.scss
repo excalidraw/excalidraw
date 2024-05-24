@@ -1,0 +1,54 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .Dialog {
+    user-select: text;
+    cursor: auto;
+  }
+
+  .Dialog__title {
+    margin: 0;
+    text-align: left;
+    font-size: 1.25rem;
+    border-bottom: 1px solid var(--dialog-border-color);
+    padding: 0 0 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .Dialog__close {
+    color: var(--color-gray-40);
+    margin: 0;
+    position: absolute;
+    top: 0.75rem;
+    right: 0.5rem;
+    border: 0;
+    background-color: transparent;
+    line-height: 0;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-gray-60);
+    }
+    &:active {
+      color: var(--color-gray-40);
+    }
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    & + .Dialog__content {
+      --offset: 28px;
+      height: calc(100% - var(--offset)) !important;
+      margin-top: var(--offset) !important;
+    }
+  }
+
+  .Dialog--fullscreen {
+    .Dialog__close {
+      top: 1.25rem;
+      right: 1.25rem;
+    }
+  }
+}

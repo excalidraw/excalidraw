@@ -32,10 +32,10 @@ jobs:
         with:
           ref: ${{ steps.sha.outputs.result }}
           fetch-depth: 2
-      - name: Setup Node.js 14.x
+      - name: Setup Node.js 18.x
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 18.x
       - name: Set up publish access
         run: |
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
@@ -44,7 +44,7 @@ jobs:
       - name: Auto release preview
         id: "autorelease"
         run: |
-          yarn add @actions/core
+          yarn add @actions/core -W
           yarn autorelease preview ${{ github.event.issue.number }}
       - name: Post comment post release
         if: always()
