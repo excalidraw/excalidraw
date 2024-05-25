@@ -571,6 +571,7 @@ const LayerUI = ({
             )}
             {appState.scrolledOutside && (
               <button
+                type="button"
                 className="scroll-back-to-content"
                 onClick={() => {
                   setAppState((appState) => ({

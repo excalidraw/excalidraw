@@ -114,6 +114,7 @@ export const ContextMenu = React.memo(
                 }}
               >
                 <button
+                  type="button"
                   className={clsx("context-menu-item", {
                     dangerous: actionName === "deleteSelectedElements",
                     checkmark: item.checked?.(appState),

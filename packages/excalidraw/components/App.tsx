@@ -89,6 +89,7 @@ import {
   isIOS,
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
+  DEFAULT_TEXT_ALIGN,
 } from "../constants";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -333,6 +334,8 @@ import {
   getLineHeightInPx,
   isMeasureTextSupported,
   isValidTextContainer,
+  measureText,
+  wrapText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -442,6 +445,7 @@ import {
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { resizeSingleElement } from "../element/resizeElements"; //zsviczian
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { getVisibleSceneBounds } from "../element/bounds";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2638,7 +2642,7 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
         document,
-        EVENT.MOUSE_MOVE,
+        EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
       ),
       // rerender text elements on font load to fix #637 && #1553
@@ -2667,6 +2671,9 @@ class App extends React.Component<AppProps, AppState> {
       ),
       addEventListener(window, EVENT.FOCUS, () => {
         this.maybeCleanupAfterMissingPointerUp(null);
+        // browsers (chrome?) tend to free up memory a lot, which results
+        // in canvas context being cleared. Thus re-render on focus.
+        this.triggerRender(true);
       }),
     );
 
@@ -3416,33 +3423,54 @@ class App extends React.Component<AppProps, AppState> {
       rawText: text,
       fontSize: getFontSize(this.state.currentItemFontSize,this.state.zoom.value),//zsviczian
       fontFamily: this.state.currentItemFontFamily,
-      textAlign: this.state.currentItemTextAlign,
+      textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
-
+    const fontString = getFontString({
+      fontSize: textElementProps.fontSize,
+      fontFamily: textElementProps.fontFamily,
+    });
+    const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
+    const [x1, , x2] = getVisibleSceneBounds(this.state);
+    // long texts should not go beyond 800 pixels in width nor should it go below 200 px
+    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
     const LINE_GAP = 10;
     let currentY = y;
 
     const lines = isPlainPaste ? [text] : text.split("\n");
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
-        const text = line.trim();
-
-        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
-        if (text.length) {
+        const originalText = line.trim();
+        if (originalText.length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
             x,
             y: currentY,
           });
 
+          let metrics = measureText(originalText, fontString, lineHeight);
+          const isTextWrapped = metrics.width > maxTextWidth;
+
+          const text = isTextWrapped
+            ? wrapText(originalText, fontString, maxTextWidth)
+            : originalText;
+
+          metrics = isTextWrapped
+            ? measureText(text, fontString, lineHeight)
+            : metrics;
+
+          const startX = x - metrics.width / 2;
+          const startY = currentY - metrics.height / 2;
+
           const element = newTextElement({
             ...textElementProps,
-            x,
-            y: currentY,
+            x: startX,
+            y: startY,
             text,
-            rawText: text, //zsviczian
+            rawText: originalText, //zsviczian
+            originalText,
             lineHeight,
+            autoResize: !isTextWrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
@@ -3913,7 +3941,7 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      /** @default StoreAction.CAPTURE */
+      /** @default StoreAction.NONE */
       storeAction?: SceneData["storeAction"];
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
@@ -3964,8 +3992,15 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private triggerRender = () => {
-    this.setState({});
+  private triggerRender = (
+    /** force always re-renders canvas even if no change */
+    force?: boolean,
+  ) => {
+    if (force === true) {
+      this.scene.triggerUpdate();
+    } else {
+      this.setState({});
+    }
   };
 
   /**
@@ -5433,8 +5468,11 @@ class App extends React.Component<AppProps, AppState> {
 
         this.translateCanvas({
           zoom: zoomState.zoom,
-          scrollX: zoomState.scrollX + 2*(deltaX / nextZoom), //zsviczian
-          scrollY: zoomState.scrollY + 2*(deltaY / nextZoom), //zsviczian
+          // 2x multiplier is just a magic number that makes this work correctly
+          // on touchscreen devices (note: if we get report that panning is slower/faster
+          // than actual movement, consider swapping with devicePixelRatio)
+          scrollX: zoomState.scrollX + 2 * (deltaX / nextZoom),
+          scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
           shouldCacheIgnoreZoom: true,
         });
       });

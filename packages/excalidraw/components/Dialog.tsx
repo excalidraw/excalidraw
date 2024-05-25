@@ -126,6 +126,7 @@ export const Dialog = (props: DialogProps) => {
             onClick={onClose}
             title={t("buttons.close")}
             aria-label={t("buttons.close")}
+            type="button"
           >
             {CloseIcon}
           </button>
