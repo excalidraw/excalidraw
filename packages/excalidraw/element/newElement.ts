@@ -260,6 +260,7 @@ export const newTextElement = (
     x: opts.x - offsets.x,
     y: opts.y - offsets.y,
     width: metrics.width,
+    //width: Math.max(opts.width??0,metrics.width), //zsviczian
     height: metrics.height,
     containerId: opts.containerId || null,
     originalText: opts.originalText ?? text,

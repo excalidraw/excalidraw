@@ -5122,6 +5122,11 @@ class App extends React.Component<AppProps, AppState> {
       y: sceneY,
     });
 
+    /*const shouldWrapText = !shouldBindToContainer && //zsviczian
+      this.lastPointerDownEvent?.pointerType === "pen";
+    const [x1, , x2] = getVisibleSceneBounds(this.state); //zsviczian
+    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.85, 800), 200); //zsviczian*/
+
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
@@ -5153,6 +5158,12 @@ class App extends React.Component<AppProps, AppState> {
           lineHeight,
           angle: container?.angle ?? 0,
           frameId: topLayerFrame ? topLayerFrame.id : null,
+          /*...shouldWrapText //zsviczian
+            ? {
+              width: maxTextWidth,
+              autoResize: false,
+            }
+            : {},*/
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
