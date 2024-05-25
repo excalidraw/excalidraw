@@ -27,7 +27,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -130,7 +130,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -182,7 +182,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -248,7 +248,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -288,7 +288,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -406,7 +406,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -453,7 +453,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -505,7 +505,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -554,7 +554,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -603,7 +603,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -643,7 +643,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4448,7 +4448,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4551,7 +4551,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4603,7 +4603,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4669,7 +4669,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4709,7 +4709,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4827,7 +4827,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4874,7 +4874,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4926,7 +4926,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4975,7 +4975,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5024,7 +5024,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5064,7 +5064,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5567,7 +5567,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5670,7 +5670,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5722,7 +5722,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5788,7 +5788,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5828,7 +5828,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5946,7 +5946,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5993,7 +5993,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6045,7 +6045,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6094,7 +6094,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6143,7 +6143,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6183,7 +6183,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6741,7 +6741,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6793,7 +6793,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7005,7 +7005,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7061,7 +7061,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7105,7 +7105,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7158,7 +7158,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           <g
             fill="none"
             stroke="currentColor"
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7200,7 +7200,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7393,7 +7393,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7496,7 +7496,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7548,7 +7548,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7614,7 +7614,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7654,7 +7654,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7772,7 +7772,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7819,7 +7819,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7871,7 +7871,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7920,7 +7920,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7969,7 +7969,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8009,7 +8009,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8279,7 +8279,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8382,7 +8382,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8434,7 +8434,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8500,7 +8500,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8540,7 +8540,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8658,7 +8658,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8705,7 +8705,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8757,7 +8757,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8806,7 +8806,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8855,7 +8855,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8895,7 +8895,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
