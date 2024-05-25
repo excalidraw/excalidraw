@@ -374,6 +374,7 @@ import {
   zoomToFit,
   zoomToFitElements,
   actionToggleLaserPointer,
+  actionToggleEraserTool,
 } from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
@@ -5147,6 +5148,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  private debounceDoubleClickTimestamp: number = 0; //zsviczian
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
@@ -5156,18 +5158,21 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    //zsviczian
-    /*
-    if (this.state.viewModeEnabled && !isExcaliBrainView()) {
-      if (this.state.activeTool.type === "laser") {
-        this.setActiveTool({ type: "selection" });
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else {
-        this.setActiveTool({ type: "laser" });
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    if ( //zsviczian - double click eraser
+      this.state.penMode &&
+      this.lastPointerDownEvent?.pointerType === "touch" &&
+      this.state.activeTool.type !== "selection"
+    ) {
+      const now = Date.now();
+      if (now - this.debounceDoubleClickTimestamp < 200) {
+        //handleCanvasDoubleClick click fires twice in case of touch.
+        //Once from the onTouchStart event handler, once from the double click event handler
+        return;
       }
+      this.debounceDoubleClickTimestamp = now;  
+      this.updateScene(actionToggleEraserTool.perform([] as any, this.state));
       return;
-    }*/
+    } // zsviczian - end
 
     // we should only be able to double click when mode is selection
     if (this.state.activeTool.type !== "selection") {

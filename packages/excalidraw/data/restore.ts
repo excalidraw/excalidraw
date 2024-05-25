@@ -141,7 +141,7 @@ const restoreElementWithProperties = <
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
-    roundness: typeof element.roundness !== "undefined"
+    roundness: (element.type === "image" && typeof element.roundness !== "undefined") //zsviczian
       ? element.roundness
       : element.strokeSharpness === "round"
       ? {
