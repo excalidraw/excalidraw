@@ -141,9 +141,9 @@ const restoreElementWithProperties = <
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
-    roundness: (element.type === "image" && typeof element.roundness !== "undefined") //zsviczian
+    roundness: element.roundness
       ? element.roundness
-      : element.strokeSharpness === "round"
+      : (element.strokeSharpness === "round" && element.type !== "image")
       ? {
           // for old elements that would now use adaptive radius algo,
           // use legacy algo instead

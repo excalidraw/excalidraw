@@ -73,14 +73,14 @@ const PickerColorList = ({
             }}
             title={`${label}${
               color.startsWith("#") ? ` ${color}` : ""
-            } — ${keybinding}`}
-            aria-label={`${label} — ${keybinding}`}
+            } — ${keybinding??""}`} //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1798
+            aria-label={`${label} — ${keybinding??"No shortcut"}`} //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1798
             style={color ? { "--swatch-color": color } : undefined}
             data-testid={`color-${key}`}
             key={key}
           >
             <div className="color-picker__button-outline" />
-            <HotkeyLabel color={color} keyLabel={keybinding} />
+            <HotkeyLabel color={color} keyLabel={keybinding??""} /> 
           </button>
         );
       })}
