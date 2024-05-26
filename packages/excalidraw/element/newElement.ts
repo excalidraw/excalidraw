@@ -215,6 +215,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
@@ -222,6 +223,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
+    autoResize?: ExcalidrawTextElement["autoResize"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -252,8 +254,8 @@ export const newTextElement = (
     width: metrics.width,
     height: metrics.height,
     containerId: opts.containerId || null,
-    originalText: text,
-    autoResize: true,
+    originalText: opts.originalText ?? text,
+    autoResize: opts.autoResize ?? true,
     lineHeight,
   };
 
