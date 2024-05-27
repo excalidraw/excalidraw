@@ -45,6 +45,7 @@ import {
 } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
+import { getSizeFromPoints } from "../points";
 
 type RestoredAppState = Omit<
   AppState,
@@ -270,6 +271,7 @@ const restoreElement = (
         points,
         x,
         y,
+        ...getSizeFromPoints(points),
       });
     }
 
