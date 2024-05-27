@@ -8117,9 +8117,11 @@ class App extends React.Component<AppProps, AppState> {
           draggingElement.lineHeight,
         );
 
-        mutateElement(draggingElement, {
-          autoResize: draggingElement.width < minWidth,
-        });
+        if (draggingElement.width < minWidth) {
+          mutateElement(draggingElement, {
+            autoResize: true,
+          });
+        }
 
         this.setActiveTool({
           type: "selection",
@@ -9499,6 +9501,7 @@ class App extends React.Component<AppProps, AppState> {
         distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state.zoom.value,
       );
     } else {
       let [gridX, gridY] = getGridPoint(
@@ -9556,6 +9559,7 @@ class App extends React.Component<AppProps, AppState> {
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state.zoom.value,
         aspectRatio,
         this.state.originSnapOffset,
       );

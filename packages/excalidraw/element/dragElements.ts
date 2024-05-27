@@ -4,7 +4,7 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
-import type { AppState, PointerDownState } from "../types";
+import type { AppState, NormalizedZoomValue, PointerDownState } from "../types";
 import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
@@ -14,6 +14,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { getFontString } from "../utils";
+import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -145,6 +146,7 @@ export const dragNewElement = (
   height: number,
   shouldMaintainAspectRatio: boolean,
   shouldResizeFromCenter: boolean,
+  zoom: NormalizedZoomValue,
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null,
@@ -190,7 +192,7 @@ export const dragNewElement = (
     newY = originY - height / 2;
   }
 
-  let textAutoResize = {};
+  let textAutoResize = null;
 
   if (isTextElement(draggingElement)) {
     height = draggingElement.height;
@@ -203,8 +205,7 @@ export const dragNewElement = (
     );
     width = Math.max(width, minWidth);
 
-    const DRAG_THRESHOLD = 1;
-    if (Math.abs(x - originX) > DRAG_THRESHOLD) {
+    if (Math.abs(x - originX) > TEXT_AUTOWRAP_THRESHOLD / zoom) {
       textAutoResize = {
         autoResize: false,
       };
