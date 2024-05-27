@@ -1,18 +1,14 @@
 import { ENV } from "./constants";
+import type { BindableProp, BindingProp } from "./element/binding";
 import {
   BoundElement,
   BindableElement,
-  BindableProp,
-  BindingProp,
   bindingProperties,
   updateBoundElements,
 } from "./element/binding";
 import { LinearElementEditor } from "./element/linearElementEditor";
-import {
-  ElementUpdate,
-  mutateElement,
-  newElementWith,
-} from "./element/mutateElement";
+import type { ElementUpdate } from "./element/mutateElement";
+import { mutateElement, newElementWith } from "./element/mutateElement";
 import {
   getBoundTextElementId,
   redrawTextBoundingBox,
@@ -23,7 +19,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -34,13 +30,13 @@ import {
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
 import { getObservedAppState } from "./store";
-import {
+import type {
   AppState,
   ObservedAppState,
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import { SubtypeOf, ValueOf } from "./utility-types";
+import type { SubtypeOf, ValueOf } from "./utility-types";
 import {
   arrayToMap,
   arrayToObject,
@@ -1481,19 +1477,28 @@ export class ElementsChange implements Change<SceneElementsMap> {
       return elements;
     }
 
-    const previous = Array.from(elements.values());
-    const reordered = orderByFractionalIndex([...previous]);
+    const unordered = Array.from(elements.values());
+    const ordered = orderByFractionalIndex([...unordered]);
+    const moved = Delta.getRightDifferences(unordered, ordered, true).reduce(
+      (acc, arrayIndex) => {
+        const candidate = unordered[Number(arrayIndex)];
+        if (candidate && changed.has(candidate.id)) {
+          acc.set(candidate.id, candidate);
+        }
 
-    if (
-      !flags.containsVisibleDifference &&
-      Delta.isRightDifferent(previous, reordered, true)
-    ) {
+        return acc;
+      },
+      new Map(),
+    );
+
+    if (!flags.containsVisibleDifference && moved.size) {
       // we found a difference in order!
       flags.containsVisibleDifference = true;
     }
 
-    // let's synchronize all invalid indices of moved elements
-    return arrayToMap(syncMovedIndices(reordered, changed)) as typeof elements;
+    // synchronize all elements that were actually moved
+    // could fallback to synchronizing all invalid indices
+    return arrayToMap(syncMovedIndices(ordered, moved)) as typeof elements;
   }
 
   /**

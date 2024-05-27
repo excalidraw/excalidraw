@@ -1,6 +1,6 @@
 import { generateNKeysBetween } from "fractional-indexing";
 import { mutateElement } from "./element/mutateElement";
-import {
+import type {
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,
@@ -133,27 +133,11 @@ const getMovedIndicesGroups = (
   let i = 0;
 
   while (i < elements.length) {
-    if (
-      movedElements.has(elements[i].id) &&
-      !isValidFractionalIndex(
-        elements[i]?.index,
-        elements[i - 1]?.index,
-        elements[i + 1]?.index,
-      )
-    ) {
+    if (movedElements.has(elements[i].id)) {
       const indicesGroup = [i - 1, i]; // push the lower bound index as the first item
 
       while (++i < elements.length) {
-        if (
-          !(
-            movedElements.has(elements[i].id) &&
-            !isValidFractionalIndex(
-              elements[i]?.index,
-              elements[i - 1]?.index,
-              elements[i + 1]?.index,
-            )
-          )
-        ) {
+        if (!movedElements.has(elements[i].id)) {
           break;
         }
 

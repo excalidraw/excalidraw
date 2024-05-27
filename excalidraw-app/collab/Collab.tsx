@@ -1,23 +1,25 @@
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
-import {
+import type {
   ExcalidrawImperativeAPI,
   SocketId,
 } from "../../packages/excalidraw/types";
 import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
 import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
-import {
+import type { ImportedDataState } from "../../packages/excalidraw/data/types";
+import type {
   ExcalidrawElement,
   InitializedExcalidrawImageElement,
   OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import {
+  StoreAction,
   getSceneVersion,
   restoreElements,
   zoomToFitBounds,
-} from "../../packages/excalidraw/index";
-import { Collaborator, Gesture } from "../../packages/excalidraw/types";
+  reconcileElements,
+} from "../../packages/excalidraw";
+import type { Collaborator, Gesture } from "../../packages/excalidraw/types";
 import {
   assertNever,
   preventUnload,
@@ -34,12 +36,14 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
   WS_EVENTS,
 } from "../app_constants";
+import type {
+  SocketUpdateDataSource,
+  SyncableExcalidrawElement,
+} from "../data";
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
   getSyncableElements,
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
 } from "../data";
 import {
   isSavedToFirebase,
@@ -75,14 +79,13 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
-import { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
+import type { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
 import { collabErrorIndicatorAtom } from "./CollabError";
-import {
+import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
-  reconcileElements,
 } from "../../packages/excalidraw/data/reconcile";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -356,6 +359,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       this.excalidrawAPI.updateScene({
         elements,
+        storeAction: StoreAction.UPDATE,
       });
     }
   };
@@ -506,6 +510,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       // to database even if deleted before creating the room.
       this.excalidrawAPI.updateScene({
         elements,
+        storeAction: StoreAction.UPDATE,
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
@@ -743,6 +748,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
+      storeAction: StoreAction.UPDATE,
     });
 
     this.loadImageFiles();

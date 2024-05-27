@@ -1,8 +1,8 @@
 import {
   BOUND_TEXT_PADDING,
   ROUNDNESS,
-  VERTICAL_ALIGN,
   TEXT_ALIGN,
+  VERTICAL_ALIGN,
 } from "../constants";
 import { isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
@@ -23,14 +23,14 @@ import {
   isTextBindableContainer,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
 } from "../element/types";
-import { AppState } from "../types";
-import { Mutable } from "../utility-types";
+import type { AppState } from "../types";
+import type { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
@@ -142,6 +142,7 @@ export const actionBindText = register({
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
+      autoResize: true,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -296,6 +297,7 @@ export const actionWrapTextInContainer = register({
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
             textAlign: TEXT_ALIGN.CENTER,
+            autoResize: true,
           },
           false,
         );

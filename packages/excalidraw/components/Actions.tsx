@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ActionManager } from "../actions/manager";
-import {
+import type { ActionManager } from "../actions/manager";
+import type {
   ExcalidrawElement,
   ExcalidrawElementType,
   NonDeletedElementsMap,
@@ -17,13 +17,17 @@ import {
   hasStrokeWidth,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
 import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
@@ -114,6 +118,11 @@ export const SelectedShapeActions = ({
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
 
+  const showLineEditorAction =
+    !appState.editingLinearElement &&
+    targetElements.length === 1 &&
+    isLinearElement(targetElements[0]);
+
   return (
     <div className="panelColumn">
       <div>
@@ -173,8 +182,8 @@ export const SelectedShapeActions = ({
         <div className="buttonList">
           {renderAction("sendToBack")}
           {renderAction("sendBackward")}
-          {renderAction("bringToFront")}
           {renderAction("bringForward")}
+          {renderAction("bringToFront")}
         </div>
       </fieldset>
 
@@ -229,6 +238,7 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
+            {showLineEditorAction && renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
       )}
@@ -333,8 +343,8 @@ export const ShapesSwitcher = ({
                 fontSize: 8,
                 fontFamily: "Cascadia, monospace",
                 position: "absolute",
-                background: "pink",
-                color: "black",
+                background: "var(--color-promo)",
+                color: "var(--color-surface-lowest)",
                 bottom: 3,
                 right: 4,
               }}
@@ -458,6 +468,7 @@ export const ExitZenModeAction = ({
   showExitZenModeBtn: boolean;
 }) => (
   <button
+    type="button"
     className={clsx("disable-zen-mode", {
       "disable-zen-mode--visible": showExitZenModeBtn,
     })}

@@ -10,15 +10,20 @@ import { Excalidraw } from "../index";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
-import { AppState, ExcalidrawImperativeAPI } from "../types";
+import type { AppState, ExcalidrawImperativeAPI } from "../types";
 import { arrayToMap, resolvablePromise } from "../utils";
-import { COLOR_PALETTE } from "../colors";
+import {
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+} from "../colors";
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
-import {
+import type {
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
@@ -35,7 +40,7 @@ import { vi } from "vitest";
 import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
-import { Snapshot } from "../store";
+import { Snapshot, StoreAction } from "../store";
 
 const { h } = window;
 
@@ -45,7 +50,6 @@ const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
-
   // `scrolledOutside` does not appear to be stable between test runs
   // `selectedLinearElemnt` includes `startBindingElement` containing seed and versionNonce
   const {
@@ -67,10 +71,11 @@ const checkpoint = (name: string) => {
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const transparent = COLOR_PALETTE.transparent;
-const red = COLOR_PALETTE.red[1];
-const blue = COLOR_PALETTE.blue[1];
-const yellow = COLOR_PALETTE.yellow[1];
-const violet = COLOR_PALETTE.violet[1];
+const black = COLOR_PALETTE.black;
+const red = COLOR_PALETTE.red[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+const blue = COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+const yellow = COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+const violet = COLOR_PALETTE.violet[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 
 describe("history", () => {
   beforeEach(() => {
@@ -176,7 +181,7 @@ describe("history", () => {
 
       excalidrawAPI.updateScene({
         elements: [rect1, rect2],
-        commitToStore: true,
+        storeAction: StoreAction.CAPTURE,
       });
 
       expect(API.getUndoStack().length).toBe(1);
@@ -188,7 +193,7 @@ describe("history", () => {
 
       excalidrawAPI.updateScene({
         elements: [rect1, rect2],
-        commitToStore: true, // even though the flag is on, same elements are passed, nothing to commit
+        storeAction: StoreAction.CAPTURE, // even though the flag is on, same elements are passed, nothing to commit
       });
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(0);
@@ -556,7 +561,7 @@ describe("history", () => {
         appState: {
           name: "New name",
         },
-        commitToStore: true,
+        storeAction: StoreAction.CAPTURE,
       });
 
       expect(API.getUndoStack().length).toBe(1);
@@ -567,7 +572,7 @@ describe("history", () => {
         appState: {
           viewBackgroundColor: "#000",
         },
-        commitToStore: true,
+        storeAction: StoreAction.CAPTURE,
       });
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -580,7 +585,7 @@ describe("history", () => {
           name: "New name",
           viewBackgroundColor: "#000",
         },
-        commitToStore: true,
+        storeAction: StoreAction.CAPTURE,
       });
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -973,6 +978,69 @@ describe("history", () => {
       ]);
     });
 
+    it("should create entry when selecting freedraw", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      UI.clickTool("rectangle");
+      mouse.down(-10, -10);
+      mouse.up(10, 10);
+
+      UI.clickTool("freedraw");
+      mouse.down(40, -20);
+      mouse.up(50, 10);
+
+      const rectangle = h.elements[0];
+      const freedraw1 = h.elements[1];
+
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+        expect.objectContaining({ id: freedraw1.id, strokeColor: black }),
+      ]);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(2);
+      expect(API.getRedoStack().length).toBe(1);
+      expect(API.getSelectedElements().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+        expect.objectContaining({
+          id: freedraw1.id,
+          strokeColor: black,
+          isDeleted: true,
+        }),
+      ]);
+
+      togglePopover("Stroke");
+      UI.clickOnTestId("color-red");
+      mouse.down(40, -20);
+      mouse.up(50, 10);
+
+      const freedraw2 = h.elements[2];
+
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+        expect.objectContaining({
+          id: freedraw1.id,
+          strokeColor: black,
+          isDeleted: true,
+        }),
+        expect.objectContaining({
+          id: freedraw2.id,
+          strokeColor: COLOR_PALETTE.red[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+        }),
+      ]);
+
+      // ensure we don't end up with duplicated entries
+      UI.clickTool("freedraw");
+      expect(API.getUndoStack().length).toBe(3);
+      expect(API.getRedoStack().length).toBe(0);
+    });
+
     it("should support duplication of groups, appstate group selection and editing group", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       const rect1 = API.createElement({
@@ -1235,7 +1303,7 @@ describe("history", () => {
 
         excalidrawAPI.updateScene({
           elements: [rect1, text, rect2],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // bind text1 to rect1
@@ -1620,6 +1688,129 @@ describe("history", () => {
         ]);
       });
     });
+
+    it("should disable undo/redo buttons when stacks empty", async () => {
+      const { container } = await render(
+        <Excalidraw
+          initialData={{
+            elements: [API.createElement({ type: "rectangle", id: "A" })],
+          }}
+        />,
+      );
+
+      const undoAction = createUndoAction(h.history, h.store);
+      const redoAction = createRedoAction(h.history, h.store);
+
+      await waitFor(() => {
+        expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+        expect(h.history.isUndoStackEmpty).toBeTruthy();
+        expect(h.history.isRedoStackEmpty).toBeTruthy();
+      });
+
+      const undoButton = queryByTestId(container, "button-undo");
+      const redoButton = queryByTestId(container, "button-redo");
+
+      expect(undoButton).toBeDisabled();
+      expect(redoButton).toBeDisabled();
+
+      const rectangle = UI.createElement("rectangle");
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: rectangle.id }),
+      ]);
+
+      expect(h.history.isUndoStackEmpty).toBeFalsy();
+      expect(h.history.isRedoStackEmpty).toBeTruthy();
+      expect(undoButton).not.toBeDisabled();
+      expect(redoButton).toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(undoAction));
+
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
+      expect(h.history.isRedoStackEmpty).toBeFalsy();
+      expect(undoButton).toBeDisabled();
+      expect(redoButton).not.toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(redoAction));
+
+      expect(h.history.isUndoStackEmpty).toBeFalsy();
+      expect(h.history.isRedoStackEmpty).toBeTruthy();
+      expect(undoButton).not.toBeDisabled();
+      expect(redoButton).toBeDisabled();
+    });
+
+    it("remounting undo/redo buttons should initialize undo/redo state correctly", async () => {
+      const { container } = await render(
+        <Excalidraw
+          initialData={{
+            elements: [API.createElement({ type: "rectangle", id: "A" })],
+          }}
+        />,
+      );
+
+      const undoAction = createUndoAction(h.history, h.store);
+
+      await waitFor(() => {
+        expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+        expect(h.history.isUndoStackEmpty).toBeTruthy();
+        expect(h.history.isRedoStackEmpty).toBeTruthy();
+      });
+
+      expect(queryByTestId(container, "button-undo")).toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).toBeDisabled();
+
+      // testing undo button
+      // -----------------------------------------------------------------------
+
+      const rectangle = UI.createElement("rectangle");
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: rectangle.id }),
+      ]);
+
+      expect(h.history.isUndoStackEmpty).toBeFalsy();
+      expect(h.history.isRedoStackEmpty).toBeTruthy();
+      expect(queryByTestId(container, "button-undo")).not.toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(true);
+
+      expect(queryByTestId(container, "button-undo")).toBeNull();
+      expect(queryByTestId(container, "button-redo")).toBeNull();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(false);
+
+      await waitFor(() => {
+        expect(queryByTestId(container, "button-undo")).not.toBeDisabled();
+        expect(queryByTestId(container, "button-redo")).toBeDisabled();
+      });
+
+      // testing redo button
+      // -----------------------------------------------------------------------
+
+      act(() => h.app.actionManager.executeAction(undoAction));
+
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
+      expect(h.history.isRedoStackEmpty).toBeFalsy();
+      expect(queryByTestId(container, "button-undo")).toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(true);
+
+      expect(queryByTestId(container, "button-undo")).toBeNull();
+      expect(queryByTestId(container, "button-redo")).toBeNull();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(false);
+
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
+      expect(h.history.isRedoStackEmpty).toBeFalsy();
+      expect(queryByTestId(container, "button-undo")).toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
+    });
   });
 
   describe("multiplayer undo/redo", () => {
@@ -1638,6 +1829,7 @@ describe("history", () => {
         <Excalidraw
           excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
           handleKeyboardGlobally={true}
+          isCollaborating={true}
         />,
       );
       excalidrawAPI = await excalidrawAPIPromise;
@@ -1663,6 +1855,7 @@ describe("history", () => {
             strokeColor: blue,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -1700,6 +1893,7 @@ describe("history", () => {
             strokeColor: yellow,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -1747,6 +1941,7 @@ describe("history", () => {
             backgroundColor: yellow,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       // At this point our entry gets updated from `red` -> `blue` into `red` -> `yellow`
@@ -1762,6 +1957,7 @@ describe("history", () => {
             backgroundColor: violet,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       // At this point our (inversed) entry gets updated from `red` -> `yellow` into `violet` -> `yellow`
@@ -1790,6 +1986,7 @@ describe("history", () => {
       // Initialize scene
       excalidrawAPI.updateScene({
         elements: [rect1, rect2],
+        storeAction: StoreAction.UPDATE,
       });
 
       // Simulate local update
@@ -1798,7 +1995,7 @@ describe("history", () => {
           newElementWith(h.elements[0], { groupIds: ["A"] }),
           newElementWith(h.elements[1], { groupIds: ["A"] }),
         ],
-        commitToStore: true,
+        storeAction: StoreAction.CAPTURE,
       });
 
       const rect3 = API.createElement({ type: "rectangle", groupIds: ["B"] });
@@ -1812,6 +2009,7 @@ describe("history", () => {
           rect3,
           rect4,
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -1857,6 +2055,7 @@ describe("history", () => {
             ],
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo(); // undo `actionFinalize`
@@ -1951,6 +2150,7 @@ describe("history", () => {
             isDeleted: false, // undeletion might happen due to concurrency between clients
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       expect(API.getSelectedElements()).toEqual([]);
@@ -2027,6 +2227,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       expect(h.elements).toEqual([
@@ -2088,6 +2289,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2163,6 +2365,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2201,6 +2404,7 @@ describe("history", () => {
             isDeleted: false,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.redo();
@@ -2246,6 +2450,7 @@ describe("history", () => {
       // Simulate remote update
       excalidrawAPI.updateScene({
         elements: [rect1, rect2],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -2255,6 +2460,7 @@ describe("history", () => {
       // Simulate remote update
       excalidrawAPI.updateScene({
         elements: [h.elements[0], h.elements[1], rect3, rect4],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -2275,6 +2481,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2299,6 +2506,7 @@ describe("history", () => {
             isDeleted: false,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.redo();
@@ -2309,6 +2517,7 @@ describe("history", () => {
       // Simulate remote update
       excalidrawAPI.updateScene({
         elements: [h.elements[0], h.elements[1], rect3, rect4],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.redo();
@@ -2354,6 +2563,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2374,6 +2584,7 @@ describe("history", () => {
           }),
           h.elements[1],
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2416,6 +2627,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2458,6 +2670,7 @@ describe("history", () => {
           h.elements[0],
           h.elements[1],
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       expect(API.getUndoStack().length).toBe(2);
@@ -2496,6 +2709,7 @@ describe("history", () => {
           h.elements[0],
           h.elements[1],
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       expect(API.getUndoStack().length).toBe(2);
@@ -2546,6 +2760,7 @@ describe("history", () => {
           h.elements[0], // rect2
           h.elements[1], // rect1
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2575,6 +2790,7 @@ describe("history", () => {
           h.elements[0], // rect3
           h.elements[2], // rect1
         ],
+        storeAction: StoreAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2604,6 +2820,7 @@ describe("history", () => {
       // Simulate remote update
       excalidrawAPI.updateScene({
         elements: [...h.elements, rect],
+        storeAction: StoreAction.UPDATE,
       });
 
       mouse.moveTo(60, 60);
@@ -2655,6 +2872,7 @@ describe("history", () => {
       // // Simulate remote update
       excalidrawAPI.updateScene({
         elements: [...h.elements, rect3],
+        storeAction: StoreAction.UPDATE,
       });
 
       mouse.moveTo(100, 100);
@@ -2744,6 +2962,7 @@ describe("history", () => {
       // Simulate remote update
       excalidrawAPI.updateScene({
         elements: [...h.elements, rect3],
+        storeAction: StoreAction.UPDATE,
       });
 
       mouse.moveTo(100, 100);
@@ -2920,6 +3139,7 @@ describe("history", () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [container, text],
+          storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
@@ -2932,7 +3152,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -2963,6 +3183,7 @@ describe("history", () => {
               x: h.elements[1].x + 10,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3005,6 +3226,7 @@ describe("history", () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [container, text],
+          storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
@@ -3017,7 +3239,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3051,6 +3273,7 @@ describe("history", () => {
             remoteText,
             h.elements[1],
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3106,6 +3329,7 @@ describe("history", () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [container, text],
+          storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
@@ -3118,7 +3342,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3155,6 +3379,7 @@ describe("history", () => {
               containerId: remoteContainer.id,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3212,7 +3437,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [container],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3223,6 +3448,7 @@ describe("history", () => {
             }),
             newElementWith(text, { containerId: container.id }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3272,7 +3498,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [text],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3283,6 +3509,7 @@ describe("history", () => {
             }),
             newElementWith(text, { containerId: container.id }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3331,7 +3558,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [container],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3344,6 +3571,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         Keyboard.undo();
@@ -3380,6 +3608,7 @@ describe("history", () => {
             // rebinding the container with a new text element!
             remoteText,
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3436,7 +3665,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [text],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3449,6 +3678,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         Keyboard.undo();
@@ -3485,6 +3715,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3540,7 +3771,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [container],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3554,6 +3785,7 @@ describe("history", () => {
               isDeleted: true,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3596,7 +3828,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [text],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3610,6 +3842,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3652,6 +3885,7 @@ describe("history", () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [container],
+          storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
@@ -3663,7 +3897,7 @@ describe("history", () => {
               angle: 90,
             }),
           ],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3676,6 +3910,7 @@ describe("history", () => {
             }),
             newElementWith(text, { containerId: container.id }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         expect(h.elements).toEqual([
@@ -3768,6 +4003,7 @@ describe("history", () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [text],
+          storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
@@ -3779,7 +4015,7 @@ describe("history", () => {
               angle: 90,
             }),
           ],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3794,6 +4030,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         expect(API.getUndoStack().length).toBe(0);
@@ -3884,7 +4121,7 @@ describe("history", () => {
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [rect1, rect2],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         mouse.reset();
@@ -3900,10 +4137,16 @@ describe("history", () => {
 
         const arrowId = h.elements[2].id;
 
-        // create binding
+        // create start binding
         mouse.downAt(0, 0);
         mouse.moveTo(0, 1);
         mouse.moveTo(0, 0);
+        mouse.up();
+
+        // create end binding
+        mouse.downAt(100, 0);
+        mouse.moveTo(100, 1);
+        mouse.moveTo(100, 0);
         mouse.up();
 
         expect(h.elements).toEqual([
@@ -3930,9 +4173,10 @@ describe("history", () => {
           }),
         ]);
 
-        Keyboard.undo();
+        Keyboard.undo(); // undo start binding
+        Keyboard.undo(); // undo end binding
         expect(API.getUndoStack().length).toBe(2);
-        expect(API.getRedoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(2);
         expect(h.elements).toEqual([
           expect.objectContaining({
             id: rect1.id,
@@ -3962,11 +4206,13 @@ describe("history", () => {
               x: h.elements[1].x + 50,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
           Keyboard.redo();
-          expect(API.getUndoStack().length).toBe(3);
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(4);
           expect(API.getRedoStack().length).toBe(0);
           expect(h.elements).toEqual([
             expect.objectContaining({
@@ -3993,8 +4239,9 @@ describe("history", () => {
           ]);
 
           Keyboard.undo();
+          Keyboard.undo();
           expect(API.getUndoStack().length).toBe(2);
-          expect(API.getRedoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(2);
           expect(h.elements).toEqual([
             expect.objectContaining({
               id: rect1.id,
@@ -4020,10 +4267,15 @@ describe("history", () => {
 
         const arrowId = h.elements[2].id;
 
-        // create binding
+        // create start binding
         mouse.downAt(0, 0);
         mouse.moveTo(0, 1);
         mouse.upAt(0, 0);
+
+        // create end binding
+        mouse.downAt(100, 0);
+        mouse.moveTo(100, 1);
+        mouse.upAt(100, 0);
 
         expect(h.elements).toEqual([
           expect.objectContaining({
@@ -4050,8 +4302,9 @@ describe("history", () => {
         ]);
 
         Keyboard.undo();
+        Keyboard.undo();
         expect(API.getUndoStack().length).toBe(2);
-        expect(API.getRedoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(2);
         expect(h.elements).toEqual([
           expect.objectContaining({
             id: rect1.id,
@@ -4082,11 +4335,13 @@ describe("history", () => {
             }),
             remoteContainer,
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
           Keyboard.redo();
-          expect(API.getUndoStack().length).toBe(3);
+          Keyboard.redo();
+          expect(API.getUndoStack().length).toBe(4);
           expect(API.getRedoStack().length).toBe(0);
           expect(h.elements).toEqual([
             expect.objectContaining({
@@ -4118,8 +4373,9 @@ describe("history", () => {
           ]);
 
           Keyboard.undo();
+          Keyboard.undo();
           expect(API.getUndoStack().length).toBe(2);
-          expect(API.getRedoStack().length).toBe(1);
+          expect(API.getRedoStack().length).toBe(2);
           expect(h.elements).toEqual([
             expect.objectContaining({
               id: rect1.id,
@@ -4166,6 +4422,7 @@ describe("history", () => {
               boundElements: [{ id: arrow.id, type: "arrow" }],
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4230,7 +4487,10 @@ describe("history", () => {
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({ elements: [arrow], commitToStore: true });
+        excalidrawAPI.updateScene({
+          elements: [arrow],
+          storeAction: StoreAction.CAPTURE,
+        });
 
         // Simulate remote update
         excalidrawAPI.updateScene({
@@ -4246,6 +4506,7 @@ describe("history", () => {
               boundElements: [{ id: arrow.id, type: "arrow" }],
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4357,6 +4618,7 @@ describe("history", () => {
             newElementWith(h.elements[1], { x: 500, y: -500 }),
             h.elements[2],
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         Keyboard.redo();
@@ -4424,12 +4686,13 @@ describe("history", () => {
         // Initialize the scene
         excalidrawAPI.updateScene({
           elements: [frame],
+          storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
         excalidrawAPI.updateScene({
           elements: [rect, h.elements[0]],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate local update
@@ -4440,7 +4703,7 @@ describe("history", () => {
             }),
             h.elements[1],
           ],
-          commitToStore: true,
+          storeAction: StoreAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -4484,6 +4747,7 @@ describe("history", () => {
               isDeleted: true,
             }),
           ],
+          storeAction: StoreAction.UPDATE,
         });
 
         Keyboard.redo();

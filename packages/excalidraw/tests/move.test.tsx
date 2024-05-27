@@ -5,7 +5,7 @@ import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import { reseed } from "../random";
 import { bindOrUnbindLinearElement } from "../element/binding";
-import {
+import type {
   ExcalidrawLinearElement,
   NonDeleted,
   ExcalidrawRectangleElement,

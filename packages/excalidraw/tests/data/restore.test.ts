@@ -1,5 +1,5 @@
 import * as restore from "../../data/restore";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -8,8 +8,8 @@ import {
 import * as sizeHelpers from "../../element/sizeHelpers";
 import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
-import { ImportedDataState } from "../../data/types";
-import { NormalizedZoomValue } from "../../types";
+import type { ImportedDataState } from "../../data/types";
+import type { NormalizedZoomValue } from "../../types";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 import { vi } from "vitest";

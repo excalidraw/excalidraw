@@ -1,7 +1,7 @@
 import { THEME } from "../constants";
-import { Theme } from "../element/types";
-import { DataURL } from "../types";
-import { OpenAIInput, OpenAIOutput } from "./ai/types";
+import type { Theme } from "../element/types";
+import type { DataURL } from "../types";
+import type { OpenAIInput, OpenAIOutput } from "./ai/types";
 
 export type MagicCacheData =
   | {

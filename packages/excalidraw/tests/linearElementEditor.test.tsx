@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
@@ -14,7 +14,7 @@ import * as InteractiveCanvas from "../renderer/interactiveScene";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
-import { Point } from "../types";
+import type { Point } from "../types";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { queryByTestId, queryByText } from "@testing-library/react";
@@ -214,7 +214,7 @@ describe("Test Linear Elements", () => {
       clientY: midpoint[1],
     });
     // Enter line editor
-    let contextMenu = document.querySelector(".context-menu");
+    const contextMenu = document.querySelector(".context-menu");
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
       clientX: midpoint[0],
@@ -223,23 +223,6 @@ describe("Test Linear Elements", () => {
     fireEvent.click(queryByText(contextMenu as HTMLElement, "Edit line")!);
 
     expect(h.state.editingLinearElement?.elementId).toEqual(h.elements[0].id);
-
-    // Exiting line editor
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    contextMenu = document.querySelector(".context-menu");
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: midpoint[0],
-      clientY: midpoint[1],
-    });
-    fireEvent.click(
-      queryByText(contextMenu as HTMLElement, "Exit line editor")!,
-    );
-    expect(h.state.editingLinearElement?.elementId).toBeUndefined();
   });
 
   it("should enter line editor when using double clicked with ctrl key", () => {
@@ -336,12 +319,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            55.9697848965255,
-            47.442326230998205,
+            "55.96978",
+            "47.44233",
           ],
           [
-            76.08587175006699,
-            43.294165939653226,
+            "76.08587",
+            "43.29417",
           ],
         ]
       `);
@@ -398,12 +381,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            105.96978489652551,
-            67.4423262309982,
+            "105.96978",
+            "67.44233",
           ],
           [
-            126.08587175006699,
-            63.294165939653226,
+            "126.08587",
+            "63.29417",
           ],
         ]
       `);
@@ -644,16 +627,16 @@ describe("Test Linear Elements", () => {
                 0,
               ],
               [
-                85.96978489652551,
-                77.4423262309982,
+                "85.96978",
+                "77.44233",
               ],
               [
                 70,
                 50,
               ],
               [
-                106.08587175006699,
-                73.29416593965323,
+                "106.08587",
+                "73.29417",
               ],
               [
                 40,
@@ -700,12 +683,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              31.884084517616053,
-              23.13275505472383,
+              "31.88408",
+              "23.13276",
             ],
             [
-              77.74792546875662,
-              44.57840982272327,
+              "77.74793",
+              "44.57841",
             ],
           ]
         `);
@@ -786,12 +769,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              55.9697848965255,
-              47.442326230998205,
+              "55.96978",
+              "47.44233",
             ],
             [
-              76.08587175006699,
-              43.294165939653226,
+              "76.08587",
+              "43.29417",
             ],
           ]
         `);
@@ -945,8 +928,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": 85.82201843191861,
-            "y": 75.63461309860818,
+            "x": "85.82202",
+            "y": "75.63461",
           }
         `);
       });
@@ -989,10 +972,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
-          collaboration made 
-          easy"
-        `);
+        "Online whiteboard 
+        collaboration made 
+        easy"
+      `);
     });
 
     it("should bind text to arrow when clicked on arrow and enter pressed", async () => {
@@ -1023,10 +1006,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard 
-          collaboration made 
-          easy"
-        `);
+        "Online whiteboard 
+        collaboration made 
+        easy"
+      `);
     });
 
     it("should not bind text to line when double clicked", async () => {
@@ -1085,15 +1068,15 @@ describe("Test Linear Elements", () => {
           true,
         ),
       ).toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            105,
-            80,
-            55.45893770831013,
-            45,
-          ]
-        `);
+        [
+          20,
+          20,
+          105,
+          80,
+          "55.45894",
+          45,
+        ]
+      `);
 
       UI.resize(container, "ne", [300, 200]);
 
@@ -1101,7 +1084,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": 366.11716195150507,
+            "width": "366.11716",
           }
         `);
 
@@ -1112,11 +1095,11 @@ describe("Test Linear Elements", () => {
           arrayToMap(h.elements),
         ),
       ).toMatchInlineSnapshot(`
-          {
-            "x": 271.11716195150507,
-            "y": 45,
-          }
-        `);
+        {
+          "x": "271.11716",
+          "y": 45,
+        }
+      `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
           "Online whiteboard 
@@ -1129,15 +1112,15 @@ describe("Test Linear Elements", () => {
           true,
         ),
       ).toMatchInlineSnapshot(`
-          [
-            20,
-            35,
-            501.11716195150507,
-            95,
-            205.4589377083102,
-            52.5,
-          ]
-        `);
+        [
+          20,
+          35,
+          "501.11716",
+          95,
+          "205.45894",
+          "52.50000",
+        ]
+      `);
     });
 
     it("should resize and position the bound text correctly when 2 pointer linear element resized", () => {

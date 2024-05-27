@@ -2,7 +2,8 @@ import { Dialog } from "../Dialog";
 import { useApp, useExcalidrawSetAppState } from "../App";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import TTDDialogTabs from "./TTDDialogTabs";
-import { ChangeEventHandler, useEffect, useRef, useState } from "react";
+import type { ChangeEventHandler } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUIAppState } from "../../context/ui-appState";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
@@ -13,14 +14,14 @@ import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogPanels } from "./TTDDialogPanels";
+import type { MermaidToExcalidrawLibProps } from "./common";
 import {
-  MermaidToExcalidrawLibProps,
   convertMermaidToExcalidraw,
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
-import { NonDeletedExcalidrawElement } from "../../element/types";
-import { BinaryFiles } from "../../types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type { BinaryFiles } from "../../types";
 import { ArrowRightIcon } from "../icons";
 
 import "./TTDDialog.scss";
@@ -253,8 +254,8 @@ export const TTDDialogBase = withInternalFallback(
                       marginLeft: "10px",
                       fontSize: 10,
                       borderRadius: "12px",
-                      background: "pink",
-                      color: "#000",
+                      background: "var(--color-promo)",
+                      color: "var(--color-surface-lowest)",
                     }}
                   >
                     AI Beta

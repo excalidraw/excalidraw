@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElement,
@@ -27,7 +27,7 @@ import {
 import { randomInteger, randomId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
@@ -46,7 +46,7 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkOptional, Merge, Mutable } from "../utility-types";
+import type { MarkOptional, Merge, Mutable } from "../utility-types";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -215,6 +215,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
@@ -222,6 +223,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     strokeWidth?: ExcalidrawTextElement["strokeWidth"];
+    autoResize?: ExcalidrawTextElement["autoResize"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -240,24 +242,28 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElement = newElementWith(
-    {
-      ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text,
-      fontSize,
-      fontFamily,
-      textAlign,
-      verticalAlign,
-      x: opts.x - offsets.x,
-      y: opts.y - offsets.y,
-      width: metrics.width,
-      height: metrics.height,
-      containerId: opts.containerId || null,
-      originalText: text,
-      lineHeight,
-    },
+  const textElementProps: ExcalidrawTextElement = {
+    ..._newElementBase<ExcalidrawTextElement>("text", opts),
+    text,
+    fontSize,
+    fontFamily,
+    textAlign,
+    verticalAlign,
+    x: opts.x - offsets.x,
+    y: opts.y - offsets.y,
+    width: metrics.width,
+    height: metrics.height,
+    containerId: opts.containerId || null,
+    originalText: opts.originalText ?? text,
+    autoResize: opts.autoResize ?? true,
+    lineHeight,
+  };
+
+  const textElement: ExcalidrawTextElement = newElementWith(
+    textElementProps,
     {},
   );
+
   return textElement;
 };
 
@@ -271,18 +277,25 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
-  const { width: nextWidth, height: nextHeight } = measureText(
+  let { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
     element.lineHeight,
   );
+
+  // wrapped text
+  if (!element.autoResize) {
+    nextWidth = element.width;
+  }
+
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
   if (
     textAlign === "center" &&
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
-    !element.containerId
+    !element.containerId &&
+    element.autoResize
   ) {
     const prevMetrics = measureText(
       element.text,
@@ -343,36 +356,17 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (container) {
+  if (container || !textElement.autoResize) {
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container, textElement),
+      container
+        ? getBoundTextMaxWidth(container, textElement)
+        : textElement.width,
     );
   }
   const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
-};
-
-export const updateTextElement = (
-  textElement: ExcalidrawTextElement,
-  container: ExcalidrawTextContainer | null,
-  elementsMap: ElementsMap,
-  {
-    text,
-    isDeleted,
-    originalText,
-  }: {
-    text: string;
-    isDeleted?: boolean;
-    originalText: string;
-  },
-): ExcalidrawTextElement => {
-  return newElementWith(textElement, {
-    originalText,
-    isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
-  });
 };
 
 export const newFreeDrawElement = (

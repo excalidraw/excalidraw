@@ -1,5 +1,5 @@
 import { distance2d } from "../../excalidraw/math";
-import {
+import type {
   Point,
   Line,
   Polygon,

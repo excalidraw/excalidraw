@@ -1,6 +1,5 @@
 import {
   getElementAbsoluteCoords,
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   getTransformHandlesFromCoords,
   getTransformHandles,
   getCommonBounds,
@@ -22,23 +21,25 @@ import {
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "../groups";
-import {
-  OMIT_SIDES_FOR_FRAME,
-  shouldShowBoundingBox,
+import type {
   TransformHandles,
   TransformHandleType,
 } from "../element/transformHandles";
+import {
+  getOmitSidesForDevice,
+  shouldShowBoundingBox,
+} from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import { InteractiveCanvasAppState, Point } from "../types";
+import type { InteractiveCanvasAppState, Point } from "../types";
 import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
-import {
-  maxBindingGap,
+import type {
   SuggestedBinding,
   SuggestedPointBinding,
 } from "../element/binding";
+import { maxBindingGap } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   bootstrapCanvas,
@@ -47,7 +48,7 @@ import {
 } from "./helpers";
 import oc from "open-color";
 import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
-import {
+import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -56,7 +57,7 @@ import {
   GroupId,
   NonDeleted,
 } from "../element/types";
-import {
+import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
@@ -577,6 +578,7 @@ const _renderInteractiveScene = ({
   scale,
   appState,
   renderConfig,
+  device,
 }: InteractiveSceneRenderConfig) => {
   if (canvas === null) {
     return { atLeastOneVisibleElement: false, elementsMap };
@@ -806,6 +808,7 @@ const _renderInteractiveScene = ({
         appState.zoom,
         elementsMap,
         "mouse", // when we render we don't know which pointer type so use mouse,
+        getOmitSidesForDevice(device),
       );
       if (!appState.viewModeEnabled && showBoundingBox) {
         renderTransformHandles(
@@ -844,8 +847,8 @@ const _renderInteractiveScene = ({
         appState.zoom,
         "mouse",
         isFrameSelected
-          ? OMIT_SIDES_FOR_FRAME
-          : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+          ? { ...getOmitSidesForDevice(device), rotation: true }
+          : getOmitSidesForDevice(device),
       );
       if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(

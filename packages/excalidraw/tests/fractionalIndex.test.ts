@@ -7,7 +7,7 @@ import {
 import { API } from "./helpers/api";
 import { arrayToMap } from "../utils";
 import { InvalidFractionalIndexError } from "../errors";
-import { ExcalidrawElement, FractionalIndex } from "../element/types";
+import type { ExcalidrawElement, FractionalIndex } from "../element/types";
 import { deepCopyElement } from "../element/newElement";
 import { generateKeyBetween } from "fractional-indexing";
 
@@ -73,97 +73,6 @@ describe("sync invalid indices with array order", () => {
       expect: {
         unchangedElements: ["A", "B", "C"],
         validInput: true,
-      },
-    });
-  });
-
-  describe("should NOT sync index when it is already valid", () => {
-    testMovedIndicesSync({
-      elements: [
-        { id: "A", index: "a2" },
-        { id: "B", index: "a4" },
-      ],
-      movedElements: ["A"],
-      expect: {
-        validInput: true,
-        unchangedElements: ["A", "B"],
-      },
-    });
-
-    testMovedIndicesSync({
-      elements: [
-        { id: "A", index: "a2" },
-        { id: "B", index: "a4" },
-      ],
-      movedElements: ["B"],
-      expect: {
-        validInput: true,
-        unchangedElements: ["A", "B"],
-      },
-    });
-  });
-
-  describe("should NOT sync indices when they are already valid", () => {
-    {
-      testMovedIndicesSync({
-        elements: [
-          { id: "A", index: "a1" },
-          { id: "B", index: "a0" },
-          { id: "C", index: "a2" },
-        ],
-        movedElements: ["B", "C"],
-        expect: {
-          // this should not sync 'C'
-          unchangedElements: ["A", "C"],
-        },
-      });
-
-      testMovedIndicesSync({
-        elements: [
-          { id: "A", index: "a1" },
-          { id: "B", index: "a0" },
-          { id: "C", index: "a2" },
-        ],
-        movedElements: ["A", "B"],
-        expect: {
-          // but this should sync 'A' as it's invalid!
-          unchangedElements: ["C"],
-        },
-      });
-    }
-
-    testMovedIndicesSync({
-      elements: [
-        { id: "A", index: "a0" },
-        { id: "B", index: "a2" },
-        { id: "C", index: "a1" },
-        { id: "D", index: "a1" },
-        { id: "E", index: "a2" },
-      ],
-      movedElements: ["B", "D", "E"],
-      expect: {
-        // should not sync 'E'
-        unchangedElements: ["A", "C", "E"],
-      },
-    });
-
-    testMovedIndicesSync({
-      elements: [
-        { id: "A" },
-        { id: "B" },
-        { id: "C", index: "a0" },
-        { id: "D", index: "a2" },
-        { id: "E" },
-        { id: "F", index: "a3" },
-        { id: "G" },
-        { id: "H", index: "a1" },
-        { id: "I", index: "a2" },
-        { id: "J" },
-      ],
-      movedElements: ["A", "B", "D", "E", "F", "G", "J"],
-      expect: {
-        // should not sync 'D' and 'F'
-        unchangedElements: ["C", "D", "F"],
       },
     });
   });
@@ -380,6 +289,122 @@ describe("sync invalid indices with array order", () => {
       ],
       expect: {
         unchangedElements: ["C", "D", "F"],
+      },
+    });
+  });
+
+  describe("should sync all moved elements regardless of their validity", () => {
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a4" },
+      ],
+      movedElements: ["A"],
+      expect: {
+        validInput: true,
+        unchangedElements: ["B"],
+      },
+    });
+
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a2" },
+        { id: "B", index: "a4" },
+      ],
+      movedElements: ["B"],
+      expect: {
+        validInput: true,
+        unchangedElements: ["A"],
+      },
+    });
+
+    testMovedIndicesSync({
+      elements: [
+        { id: "C", index: "a2" },
+        { id: "D", index: "a3" },
+        { id: "A", index: "a0" },
+        { id: "B", index: "a1" },
+      ],
+      movedElements: ["C", "D"],
+      expect: {
+        unchangedElements: ["A", "B"],
+      },
+    });
+
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a2" },
+        { id: "D", index: "a4" },
+        { id: "C", index: "a3" },
+        { id: "F", index: "a6" },
+        { id: "E", index: "a5" },
+        { id: "H", index: "a8" },
+        { id: "G", index: "a7" },
+        { id: "I", index: "a9" },
+      ],
+      movedElements: ["D", "F", "H"],
+      expect: {
+        unchangedElements: ["A", "B", "C", "E", "G", "I"],
+      },
+    });
+
+    {
+      testMovedIndicesSync({
+        elements: [
+          { id: "A", index: "a1" },
+          { id: "B", index: "a0" },
+          { id: "C", index: "a2" },
+        ],
+        movedElements: ["B", "C"],
+        expect: {
+          unchangedElements: ["A"],
+        },
+      });
+
+      testMovedIndicesSync({
+        elements: [
+          { id: "A", index: "a1" },
+          { id: "B", index: "a0" },
+          { id: "C", index: "a2" },
+        ],
+        movedElements: ["A", "B"],
+        expect: {
+          unchangedElements: ["C"],
+        },
+      });
+    }
+
+    testMovedIndicesSync({
+      elements: [
+        { id: "A", index: "a0" },
+        { id: "B", index: "a2" },
+        { id: "C", index: "a1" },
+        { id: "D", index: "a1" },
+        { id: "E", index: "a2" },
+      ],
+      movedElements: ["B", "D", "E"],
+      expect: {
+        unchangedElements: ["A", "C"],
+      },
+    });
+
+    testMovedIndicesSync({
+      elements: [
+        { id: "A" },
+        { id: "B" },
+        { id: "C", index: "a0" },
+        { id: "D", index: "a2" },
+        { id: "E" },
+        { id: "F", index: "a3" },
+        { id: "G" },
+        { id: "H", index: "a1" },
+        { id: "I", index: "a2" },
+        { id: "J" },
+      ],
+      movedElements: ["A", "B", "D", "E", "F", "G", "J"],
+      expect: {
+        unchangedElements: ["C", "H", "I"],
       },
     });
   });

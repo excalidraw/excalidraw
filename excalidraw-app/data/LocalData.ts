@@ -20,19 +20,19 @@ import {
   get,
 } from "idb-keyval";
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
-import { LibraryPersistedData } from "../../packages/excalidraw/data/library";
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
+import type { LibraryPersistedData } from "../../packages/excalidraw/data/library";
+import type { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
-import {
+import type {
   ExcalidrawElement,
   FileId,
 } from "../../packages/excalidraw/element/types";
-import {
+import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
 } from "../../packages/excalidraw/types";
-import { MaybePromise } from "../../packages/excalidraw/utility-types";
+import type { MaybePromise } from "../../packages/excalidraw/utility-types";
 import { debounce } from "../../packages/excalidraw/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";

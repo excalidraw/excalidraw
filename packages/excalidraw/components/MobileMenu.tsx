@@ -1,5 +1,5 @@
 import React from "react";
-import {
+import type {
   AppClassProperties,
   AppProps,
   AppState,
@@ -7,11 +7,11 @@ import {
   ExcalidrawProps,
   UIAppState,
 } from "../types";
-import { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
 import { showSelectedShapeActions } from "../element";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import type { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
@@ -194,6 +194,7 @@ export const MobileMenu = ({
               !appState.openMenu &&
               !appState.openSidebar && (
                 <button
+                  type="button"
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({

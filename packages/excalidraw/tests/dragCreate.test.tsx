@@ -9,7 +9,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
-import { ExcalidrawLinearElement } from "../element/types";
+import type { ExcalidrawLinearElement } from "../element/types";
 import { reseed } from "../random";
 import { vi } from "vitest";
 

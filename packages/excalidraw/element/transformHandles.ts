@@ -1,16 +1,20 @@
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   PointerType,
 } from "./types";
 
-import { Bounds, getElementAbsoluteCoords } from "./bounds";
+import type { Bounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
-import { InteractiveCanvasAppState, Zoom } from "../types";
-import { isTextElement } from ".";
+import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import { isFrameLikeElement, isLinearElement } from "./typeChecks";
-import { DEFAULT_TRANSFORM_HANDLE_SPACING } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  isAndroid,
+  isIOS,
+} from "../constants";
 
 export type TransformHandleDirection =
   | "n"
@@ -38,6 +42,13 @@ const transformHandleSizes: { [k in PointerType]: number } = {
 
 const ROTATION_RESIZE_HANDLE_GAP = 16;
 
+export const DEFAULT_OMIT_SIDES = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+};
+
 export const OMIT_SIDES_FOR_MULTIPLE_ELEMENTS = {
   e: true,
   s: true,
@@ -51,13 +62,6 @@ export const OMIT_SIDES_FOR_FRAME = {
   n: true,
   w: true,
   rotation: true,
-};
-
-const OMIT_SIDES_FOR_TEXT_ELEMENT = {
-  e: true,
-  s: true,
-  n: true,
-  w: true,
 };
 
 const OMIT_SIDES_FOR_LINE_SLASH = {
@@ -87,6 +91,26 @@ const generateTransformHandle = (
 ): TransformHandle => {
   const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
   return [xx - width / 2, yy - height / 2, width, height];
+};
+
+export const canResizeFromSides = (device: Device) => {
+  if (device.viewport.isMobile) {
+    return false;
+  }
+
+  if (device.isTouchScreen && (isAndroid || isIOS)) {
+    return false;
+  }
+
+  return true;
+};
+
+export const getOmitSidesForDevice = (device: Device) => {
+  if (canResizeFromSides(device)) {
+    return DEFAULT_OMIT_SIDES;
+  }
+
+  return {};
 };
 
 export const getTransformHandlesFromCoords = (
@@ -232,8 +256,8 @@ export const getTransformHandles = (
   element: ExcalidrawElement,
   zoom: Zoom,
   elementsMap: ElementsMap,
-
   pointerType: PointerType = "mouse",
+  omitSides: { [T in TransformHandleType]?: boolean } = DEFAULT_OMIT_SIDES,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -242,7 +266,6 @@ export const getTransformHandles = (
     return {};
   }
 
-  let omitSides: { [T in TransformHandleType]?: boolean } = {};
   if (element.type === "freedraw" || isLinearElement(element)) {
     if (element.points.length === 2) {
       // only check the last point because starting point is always (0,0)
@@ -259,10 +282,9 @@ export const getTransformHandles = (
         omitSides = OMIT_SIDES_FOR_LINE_BACKSLASH;
       }
     }
-  } else if (isTextElement(element)) {
-    omitSides = OMIT_SIDES_FOR_TEXT_ELEMENT;
   } else if (isFrameLikeElement(element)) {
     omitSides = {
+      ...omitSides,
       rotation: true,
     };
   }
