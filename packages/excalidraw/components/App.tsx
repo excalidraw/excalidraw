@@ -8124,10 +8124,6 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
-        this.setActiveTool({
-          type: "selection",
-        });
-
         this.resetCursor();
 
         this.handleTextWysiwyg(draggingElement, {
