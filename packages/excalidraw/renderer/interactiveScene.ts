@@ -308,7 +308,6 @@ const renderSelectionBorder = (
     cy: number;
     activeEmbeddable: boolean;
   },
-  padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2,
 ) => {
   const {
     angle,
@@ -324,6 +323,8 @@ const renderSelectionBorder = (
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
+
+  const padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
   const linePadding = padding / appState.zoom.value;
   const lineWidth = 8 / appState.zoom.value;
@@ -579,18 +580,21 @@ const renderTextBox = (
   text: NonDeleted<ExcalidrawTextElement>,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
-  const cx = text.x + text.width / 2;
-  const cy = text.y + text.height / 2;
-  const shiftX = text.width / 2;
-  const shiftY = text.height / 2;
+  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const width = text.width + padding * 2;
+  const height = text.height + padding * 2;
+  const cx = text.x + width / 2;
+  const cy = text.y + height / 2;
+  const shiftX = -(width / 2 + padding);
+  const shiftY = -(height / 2 + padding);
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
-  context.translate(-shiftX, -shiftY);
   context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = "rgb(105, 101, 219)";
-  context.strokeRect(0, 0, text.width, text.height);
+  context.strokeStyle = selectionColor;
+  context.strokeRect(shiftX, shiftY, width, height);
   context.restore();
 };
 
@@ -651,7 +655,12 @@ const _renderInteractiveScene = ({
   // Paint selection element
   if (appState.selectionElement) {
     try {
-      renderSelectionElement(appState.selectionElement, context, appState);
+      renderSelectionElement(
+        appState.selectionElement,
+        context,
+        appState,
+        renderConfig.selectionColor,
+      );
     } catch (error: any) {
       console.error(error);
     }
@@ -662,7 +671,12 @@ const _renderInteractiveScene = ({
       | ExcalidrawTextElement
       | undefined;
     if (textElement && !textElement.autoResize) {
-      renderTextBox(textElement, context, appState);
+      renderTextBox(
+        textElement,
+        context,
+        appState,
+        renderConfig.selectionColor,
+      );
     }
   }
 

@@ -55,7 +55,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
-  selectionColor?: string;
+  selectionColor: string;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;
