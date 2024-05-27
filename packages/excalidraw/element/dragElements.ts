@@ -194,6 +194,9 @@ export const dragNewElement = (
 
   let textAutoResize = null;
 
+  // NOTE this should apply only to creating text elements, not existing
+  // (once we rewrite appState.draggingElement to actually mean dragging
+  // elements)
   if (isTextElement(draggingElement)) {
     height = draggingElement.height;
     const minWidth = getMinTextElementWidth(
