@@ -4720,6 +4720,7 @@ class App extends React.Component<AppProps, AppState> {
     sceneY,
     insertAtParentCenter = true,
     container,
+    autoEdit = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -4728,6 +4729,7 @@ class App extends React.Component<AppProps, AppState> {
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
+    autoEdit?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -4860,13 +4862,16 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    this.setState({
-      editingElement: element,
-    });
-
-    this.handleTextWysiwyg(element, {
-      isExistingElement: !!existingTextElement,
-    });
+    if (autoEdit || existingTextElement || container) {
+      this.handleTextWysiwyg(element, {
+        isExistingElement: !!existingTextElement,
+      });
+    } else {
+      this.setState({
+        draggingElement: element,
+        multiElement: null,
+      });
+    }
   };
 
   private handleCanvasDoubleClick = (
@@ -5899,7 +5904,9 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (
+    if (this.state.activeTool.type === "text") {
+      this.handleTextOnPointerDown(event, pointerDownState);
+    } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
     ) {
@@ -5958,17 +5965,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
-    } else if (this.state.activeTool.type === "text") {
-      // if there is already a text element underneath the cursor
-      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-      const element = this.getElementAtPosition(x, y, {
-        includeBoundTextElement: true,
-      });
-      if (isTextElement(element) || hasBoundTextElement(element)) {
-        this.handleTextOnPointerDown(event, pointerDownState);
-        return;
-      }
-      this.createSizedTextOnPointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand"
@@ -6687,7 +6683,6 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
-    // TODO: double computation, optimize
     const element = this.getElementAtPosition(sceneX, sceneY, {
       includeBoundTextElement: true,
     });
@@ -6705,6 +6700,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       insertAtParentCenter: !event.altKey,
       container,
+      autoEdit: false,
     });
 
     resetCursor(this.interactiveCanvas);
@@ -7065,60 +7061,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       : null;
   }
-
-  private createSizedTextOnPointerDown = (
-    pointerDownState: PointerDownState,
-  ) => {
-    const [gridX, gridY] = getGridPoint(
-      pointerDownState.origin.x,
-      pointerDownState.origin.y,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.state.gridSize,
-    );
-
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: gridX,
-      y: gridY,
-    });
-
-    const height = getLineHeightInPx(
-      this.state.currentItemFontSize,
-      getDefaultLineHeight(this.state.currentItemFontFamily),
-    );
-
-    const textElementProps = {
-      x: gridX,
-      y: gridY,
-      height,
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
-      strokeStyle: this.state.currentItemStrokeStyle,
-      roundness: null,
-      roughness: this.state.currentItemRoughness,
-      opacity: this.state.currentItemOpacity,
-      text: "",
-      fontSize: this.state.currentItemFontSize,
-      fontFamily: this.state.currentItemFontFamily,
-      textAlign: this.state.currentItemTextAlign,
-      verticalAlign: DEFAULT_VERTICAL_ALIGN,
-      locked: false,
-      frameId: topLayerFrame ? topLayerFrame.id : null,
-    };
-
-    const sizedText = newTextElement({
-      ...textElementProps,
-    });
-
-    this.scene.insertElement(sizedText);
-    this.setState({
-      multiElement: null,
-      draggingElement: sizedText,
-      editingElement: sizedText,
-    });
-  };
 
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
