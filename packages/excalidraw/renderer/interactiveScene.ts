@@ -67,7 +67,6 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import Scene from "../scene/Scene";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -600,6 +599,7 @@ const _renderInteractiveScene = ({
   elementsMap,
   visibleElements,
   selectedElements,
+  allElementsMap,
   scale,
   appState,
   renderConfig,
@@ -658,13 +658,11 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.editingElement && isTextElement(appState.editingElement)) {
-    // latest element
-    const scene = Scene.getScene(appState.editingElement);
-    const text = (scene?.getElement(appState.editingElement.id) ??
-      appState.editingElement) as ExcalidrawTextElement;
-
-    if (!text.autoResize) {
-      renderTextBox(text, context, appState);
+    const textElement = allElementsMap.get(appState.editingElement.id) as
+      | ExcalidrawTextElement
+      | undefined;
+    if (textElement && !textElement.autoResize) {
+      renderTextBox(textElement, context, appState);
     }
   }
 

@@ -1697,6 +1697,7 @@ class App extends React.Component<AppProps, AppState> {
                           canvas={this.interactiveCanvas}
                           elementsMap={elementsMap}
                           visibleElements={visibleElements}
+                          allElementsMap={allElementsMap}
                           selectedElements={selectedElements}
                           sceneNonce={sceneNonce}
                           selectionNonce={
