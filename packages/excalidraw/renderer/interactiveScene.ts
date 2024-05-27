@@ -13,10 +13,7 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import {
-  renderSelectionElement,
-  renderTextBox,
-} from "../renderer/renderElement";
+import { renderSelectionElement } from "../renderer/renderElement";
 import { getClientColor, renderRemoteCursors } from "../clients";
 import {
   isSelectedViaGroup,
@@ -577,6 +574,25 @@ const renderTransformHandles = (
       context.restore();
     }
   });
+};
+
+const renderTextBox = (
+  text: NonDeleted<ExcalidrawTextElement>,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+) => {
+  context.save();
+  const cx = text.x + text.width / 2;
+  const cy = text.y + text.height / 2;
+  const shiftX = text.width / 2;
+  const shiftY = text.height / 2;
+  context.translate(cx + appState.scrollX, cy + appState.scrollY);
+  context.rotate(text.angle);
+  context.translate(-shiftX, -shiftY);
+  context.lineWidth = 1 / appState.zoom.value;
+  context.strokeStyle = "rgb(105, 101, 219)";
+  context.strokeRect(0, 0, text.width, text.height);
+  context.restore();
 };
 
 const _renderInteractiveScene = ({

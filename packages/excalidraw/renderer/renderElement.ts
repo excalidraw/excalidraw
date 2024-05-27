@@ -8,7 +8,6 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
-  NonDeleted,
 } from "../element/types";
 import {
   isTextElement,
@@ -635,25 +634,6 @@ export const renderSelectionElement = (
   context.strokeStyle = " rgb(105, 101, 219)";
   context.strokeRect(offset, offset, element.width, element.height);
 
-  context.restore();
-};
-
-export const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-) => {
-  context.save();
-  const cx = text.x + text.width / 2;
-  const cy = text.y + text.height / 2;
-  const shiftX = text.width / 2;
-  const shiftY = text.height / 2;
-  context.translate(cx + appState.scrollX, cy + appState.scrollY);
-  context.rotate(text.angle);
-  context.translate(-shiftX, -shiftY);
-  context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = "rgb(105, 101, 219)";
-  context.strokeRect(0, 0, text.width, text.height);
   context.restore();
 };
 
