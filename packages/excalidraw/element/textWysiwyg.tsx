@@ -491,6 +491,11 @@ export const textWysiwyg = ({
   // so that we don't need to create separate a callback for event handlers
   let submittedViaKeyboard = false;
   const handleSubmit = () => {
+    // prevent double submit
+    if (isDestroyed) {
+      return;
+    }
+    isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
@@ -544,10 +549,6 @@ export const textWysiwyg = ({
   };
 
   const cleanup = () => {
-    if (isDestroyed) {
-      return;
-    }
-    isDestroyed = true;
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.oninput = null;
@@ -639,6 +640,16 @@ export const textWysiwyg = ({
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
       window.addEventListener("blur", handleSubmit);
+    } else if (
+      event.target instanceof HTMLElement &&
+      !event.target.contains(editable) &&
+      // Vitest simply ignores stopPropagation, capture-mode, or rAF
+      // so without introducing crazier hacks, nothing we can do
+      !isTestEnv()
+    ) {
+      // on mobile, blur event doesn't seem to always fire correctly,
+      // so we want to also submit on pointerdown outside the wysiwyg
+      handleSubmit();
     }
   };
 
@@ -674,7 +685,13 @@ export const textWysiwyg = ({
     window.addEventListener("resize", updateWysiwygStyle);
   }
 
-  window.addEventListener("pointerdown", onPointerDown);
+  editable.onpointerdown = (event) => event.stopPropagation();
+
+  // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
+  // triggered the wysiwyg
+  requestAnimationFrame(() => {
+    window.addEventListener("pointerdown", onPointerDown, { capture: true });
+  });
   window.addEventListener("wheel", stopEvent, {
     passive: false,
     capture: true,
