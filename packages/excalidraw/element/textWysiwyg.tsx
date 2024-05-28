@@ -77,6 +77,7 @@ export const textWysiwyg = ({
   canvas,
   excalidrawContainer,
   app,
+  autoSelect = true,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -92,6 +93,7 @@ export const textWysiwyg = ({
   canvas: HTMLCanvasElement;
   excalidrawContainer: HTMLDivElement | null;
   app: App;
+  autoSelect?: boolean;
 }) => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
@@ -657,9 +659,11 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  // select on init (focusing is done separately inside the bindBlurEvent()
-  // because we need it to happen *after* the blur event from `pointerdown`)
-  editable.select();
+  if (autoSelect) {
+    // select on init (focusing is done separately inside the bindBlurEvent()
+    // because we need it to happen *after* the blur event from `pointerdown`)
+    editable.select();
+  }
   bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
