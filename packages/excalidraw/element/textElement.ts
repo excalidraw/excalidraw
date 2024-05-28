@@ -938,3 +938,10 @@ export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
   }
   return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
 };
+
+export const getMinTextElementWidth = (
+  font: FontString,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+) => {
+  return measureText("", font, lineHeight).width + BOUND_TEXT_PADDING * 2;
+};

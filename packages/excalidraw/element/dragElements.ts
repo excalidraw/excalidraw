@@ -4,11 +4,17 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
-import type { AppState, PointerDownState } from "../types";
-import { getBoundTextElement } from "./textElement";
+import type { AppState, NormalizedZoomValue, PointerDownState } from "../types";
+import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
-import { isArrowElement, isFrameLikeElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isFrameLikeElement,
+  isTextElement,
+} from "./typeChecks";
+import { getFontString } from "../utils";
+import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -140,6 +146,7 @@ export const dragNewElement = (
   height: number,
   shouldMaintainAspectRatio: boolean,
   shouldResizeFromCenter: boolean,
+  zoom: NormalizedZoomValue,
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null,
@@ -185,12 +192,41 @@ export const dragNewElement = (
     newY = originY - height / 2;
   }
 
+  let textAutoResize = null;
+
+  // NOTE this should apply only to creating text elements, not existing
+  // (once we rewrite appState.draggingElement to actually mean dragging
+  // elements)
+  if (isTextElement(draggingElement)) {
+    height = draggingElement.height;
+    const minWidth = getMinTextElementWidth(
+      getFontString({
+        fontSize: draggingElement.fontSize,
+        fontFamily: draggingElement.fontFamily,
+      }),
+      draggingElement.lineHeight,
+    );
+    width = Math.max(width, minWidth);
+
+    if (Math.abs(x - originX) > TEXT_AUTOWRAP_THRESHOLD / zoom) {
+      textAutoResize = {
+        autoResize: false,
+      };
+    }
+
+    newY = originY;
+    if (shouldResizeFromCenter) {
+      newX = originX - width / 2;
+    }
+  }
+
   if (width !== 0 && height !== 0) {
     mutateElement(draggingElement, {
       x: newX + (originOffset?.x ?? 0),
       y: newY + (originOffset?.y ?? 0),
       width,
       height,
+      ...textAutoResize,
     });
   }
 };

@@ -1051,11 +1051,11 @@ describe("Test Linear Elements", () => {
           arrayToMap(h.elements),
         ),
       ).toMatchInlineSnapshot(`
-          {
-            "x": 75,
-            "y": 60,
-          }
-        `);
+        {
+          "x": 75,
+          "y": 60,
+        }
+      `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 

@@ -9,7 +9,10 @@ import type {
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
@@ -19,6 +22,7 @@ type InteractiveCanvasProps = {
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
+  allElementsMap: NonDeletedSceneElementsMap;
   sceneNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
@@ -122,6 +126,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         elementsMap: props.elementsMap,
         visibleElements: props.visibleElements,
         selectedElements: props.selectedElements,
+        allElementsMap: props.allElementsMap,
         scale: window.devicePixelRatio,
         appState: props.appState,
         renderConfig: {
@@ -197,6 +202,7 @@ const getRelevantAppStateProps = (
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
+  editingElement: appState.editingElement,
 });
 
 const areEqual = (
