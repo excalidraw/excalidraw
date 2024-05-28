@@ -647,9 +647,15 @@ export const textWysiwyg = ({
       // so without introducing crazier hacks, nothing we can do
       !isTestEnv()
     ) {
-      // on mobile, blur event doesn't seem to always fire correctly,
-      // so we want to also submit on pointerdown outside the wysiwyg
-      handleSubmit();
+      // On mobile, blur event doesn't seem to always fire correctly,
+      // so we want to also submit on pointerdown outside the wysiwyg.
+      // Done in the next frame to prevent pointerdown from creating a new text
+      // immediately (if tools locked) so that users on mobile have chance
+      // to submit first (to hide virtual keyboard).
+      // Note: revisit if we want to differ this behavior on Desktop
+      requestAnimationFrame(() => {
+        handleSubmit();
+      });
     }
   };
 
