@@ -6,10 +6,9 @@ import { mutateElement } from "../element/mutateElement";
 import { resizeSingleElement } from "../element/resizeElements";
 import type { ElementsMap, ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
-import { degreeToRadian, radianToDegree, rotatePoint } from "../math";
-import Scene from "../scene/Scene";
+import { degreeToRadian, radianToDegree } from "../math";
 import type { AppState, Point } from "../types";
-import { arrayToMap } from "../utils";
+import { deepCopyElement } from "../element/newElement";
 
 const shouldKeepAspectRatio = (element: ExcalidrawElement) => {
   return element.type === "image";
@@ -35,10 +34,8 @@ const DragInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
-  const originalElementsMap = useMemo(
-    () => arrayToMap(Scene.getScene(element)?.getNonDeletedElements() ?? []),
-    [element],
-  );
+  const originalElement = useRef<ExcalidrawElement>();
+  const accumulatedDimensionChange = useRef(0);
 
   const handleChange = useMemo(
     () =>
@@ -48,7 +45,7 @@ const DragInput = ({
         source: "pointerMove" | "keyDown",
         pointerOffset?: number,
       ) => {
-        if (inputRef.current) {
+        if (inputRef.current && originalElement.current) {
           const keepAspectRatio = shouldKeepAspectRatio(element);
 
           if (
@@ -57,10 +54,11 @@ const DragInput = ({
             pointerOffset
           ) {
             const handles = getTransformHandles(
-              element,
+              originalElement.current,
               zoom,
               elementsMap,
               "mouse",
+              {},
             );
 
             let referencePoint: Point | undefined;
@@ -78,26 +76,28 @@ const DragInput = ({
             }
 
             if (referencePoint !== undefined && handleDirection !== undefined) {
-              const pointerRotated = rotatePoint(
-                [
-                  referencePoint[0] +
-                    (property === "width" ? pointerOffset : 0),
-                  referencePoint[1] +
-                    (property === "height" ? pointerOffset : 0),
-                ],
-                referencePoint,
-                element.angle,
-              );
+              accumulatedDimensionChange.current += pointerOffset;
+
+              const pointer: Point = [
+                referencePoint[0] +
+                  (property === "width"
+                    ? accumulatedDimensionChange.current
+                    : 0),
+                referencePoint[1] +
+                  (property === "height"
+                    ? accumulatedDimensionChange.current
+                    : 0),
+              ];
 
               resizeSingleElement(
-                originalElementsMap,
+                elementsMap,
                 keepAspectRatio,
                 element,
                 elementsMap,
                 handleDirection,
                 false,
-                pointerRotated[0],
-                pointerRotated[1],
+                pointer[0],
+                pointer[1],
               );
             }
           } else if (
@@ -130,10 +130,11 @@ const DragInput = ({
             mutateElement(element, {
               [property]: newVal,
             });
+            originalElement.current = deepCopyElement(element);
           }
         }
       },
-    [element, property, zoom, elementsMap, originalElementsMap],
+    [element, property, zoom, elementsMap],
   );
 
   const hangleChangeThrottled = useMemo(() => {
@@ -157,6 +158,11 @@ const DragInput = ({
     hangleChangeThrottled.cancel();
   });
 
+  useEffect(() => {
+    accumulatedDimensionChange.current = 0;
+    originalElement.current = undefined;
+  }, [element.id]);
+
   return (
     <label className="color-input-container">
       <div
@@ -166,6 +172,14 @@ const DragInput = ({
           width: "20px",
         }}
         onPointerDown={(event) => {
+          if (!originalElement.current) {
+            originalElement.current = deepCopyElement(element);
+          }
+
+          if (!accumulatedDimensionChange.current) {
+            accumulatedDimensionChange.current = 0;
+          }
+
           if (inputRef.current) {
             const startPosition = event.clientX;
             let startValue = Number(inputRef.current.value);
@@ -213,6 +227,10 @@ const DragInput = ({
               false,
             );
           }
+        }}
+        onPointerUp={(event) => {
+          accumulatedDimensionChange.current = 0;
+          originalElement.current = undefined;
         }}
         onPointerEnter={() => {
           if (labelRef.current) {

@@ -116,14 +116,6 @@ export const Stats = (props: StatsProps) => {
                 {(
                   [
                     {
-                      label: "X",
-                      property: "x",
-                    },
-                    {
-                      label: "Y",
-                      property: "y",
-                    },
-                    {
                       label: "W",
                       property: "width",
                     },
