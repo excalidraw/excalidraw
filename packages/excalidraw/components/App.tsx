@@ -4421,6 +4421,11 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
+      // when text is selected, it's hard (at least on iOS) to re-position the
+      // caret (i.e. deselect). There's not much use for always selecting
+      // the text on edit anyway (and users can select-all from contextmenu
+      // if needed)
+      autoSelect: !this.device.isTouchScreen,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
