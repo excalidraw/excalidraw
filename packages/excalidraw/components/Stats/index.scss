@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@import "../../css/variables.module.scss";
 
 .excalidraw {
   .Stats {
@@ -24,18 +24,13 @@
     }
 
     .statsItem {
+      width: 100%;
       margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      // margin-right: 8px;
+      display: grid;
+      gap: 4px;
 
       .label {
         margin-right: 4px;
-        width: 10px;
-      }
-
-      .input {
-        width: 55px;
       }
     }
 

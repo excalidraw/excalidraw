@@ -1,17 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getCommonBounds } from "../element/bounds";
-import type { NonDeletedExcalidrawElement } from "../element/types";
-import { t } from "../i18n";
-import { getTargetElements } from "../scene";
-import type Scene from "../scene/Scene";
-import type { AppState, ExcalidrawProps } from "../types";
-import { CloseIcon } from "./icons";
-import { Island } from "./Island";
-import "./Stats.scss";
+import { getCommonBounds } from "../../element/bounds";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
+import { t } from "../../i18n";
+import { getTargetElements } from "../../scene";
+import type Scene from "../../scene/Scene";
+import type { AppState, ExcalidrawProps } from "../../types";
+import { CloseIcon } from "../icons";
+import { Island } from "../Island";
 import { throttle } from "lodash";
-import DragInput from "./DragInput";
+import Dimension from "./Dimension";
+import Angle from "./Angle";
 
-const STATS_TIMEOUT = 50;
+import "./index.scss";
+import FontSize from "./FontSize";
+
 interface StatsProps {
   appState: AppState;
   scene: Scene;
@@ -19,14 +21,11 @@ interface StatsProps {
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
-
-type ElementStatItem = {
-  label: string;
-  property: "x" | "y" | "width" | "height" | "angle";
-};
+const STATS_TIMEOUT = 50;
 
 export const Stats = (props: StatsProps) => {
   const elements = props.scene.getNonDeletedElements();
+  const elementsMap = props.scene.getNonDeletedElementsMap();
   const sceneNonce = props.scene.getSceneNonce();
   const selectedElements = getTargetElements(elements, props.appState);
 
@@ -106,39 +105,16 @@ export const Stats = (props: StatsProps) => {
                 {t(`element.${singleElement.type}`)}
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "4px 8px",
-                }}
-              >
-                {(
-                  [
-                    {
-                      label: "W",
-                      property: "width",
-                    },
-                    {
-                      label: "H",
-                      property: "height",
-                    },
-                    {
-                      label: "A",
-                      property: "angle",
-                    },
-                  ] as ElementStatItem[]
-                ).map((statsItem) => (
-                  <DragInput
-                    key={statsItem.label}
-                    label={statsItem.label}
-                    property={statsItem.property}
-                    element={singleElement}
-                    elementsMap={props.scene.getNonDeletedElementsMap()}
-                    zoom={props.appState.zoom}
-                  />
-                ))}
+              <div className="statsItem">
+                <Dimension property="width" element={singleElement} />
+                <Dimension property="height" element={singleElement} />
+                <Angle element={singleElement} />
+                {singleElement.type === "text" && (
+                  <FontSize element={singleElement} elementsMap={elementsMap} />
+                )}
               </div>
+
+              {singleElement.type === "text" && <div></div>}
             </div>
           </div>
         )}
