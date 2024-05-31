@@ -87,7 +87,7 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
-    "toggleGrid": "",
+    "toggleGrid": "Prepnúť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice…",
@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Upraviť čiaru",
-      "editArrow": ""
+      "editArrow": "Upraviť šípku"
     },
     "elementLock": {
       "lock": "Zamknúť",
@@ -149,8 +149,8 @@
     "zoomToFitViewport": "Priblížiť na veľkosť zobrazenia",
     "zoomToFitSelection": "Priblížiť na výber",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
-    "installPWA": "",
-    "autoResize": ""
+    "installPWA": "Inštalovať Excalidraw lokálne (PWA)",
+    "autoResize": "Zapnúť automatickú zmenu veľkosti textu"
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
