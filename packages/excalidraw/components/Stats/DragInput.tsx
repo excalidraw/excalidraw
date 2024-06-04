@@ -7,6 +7,7 @@ import { deepCopyElement } from "../../element/newElement";
 
 import "./DragInput.scss";
 import clsx from "clsx";
+import { useApp } from "../App";
 
 export type DragInputCallbackType = (
   accumulatedChange: number,
@@ -34,6 +35,7 @@ const StatsDragInput = ({
   editable = true,
   shouldKeepAspectRatio,
 }: StatsDragInputProps) => {
+  const app = useApp();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
@@ -110,6 +112,8 @@ const StatsDragInput = ({
                   false,
                 );
 
+                app.store.shouldCaptureIncrement();
+
                 lastPointer = null;
                 accumulatedChange = null;
                 stateAtStart = null;
@@ -153,6 +157,7 @@ const StatsDragInput = ({
                 false,
                 v,
               );
+              app.store.shouldCaptureIncrement();
               eventTarget.blur();
             }
           }

@@ -592,6 +592,7 @@ export type AppClassProperties = {
   files: BinaryFiles;
   device: App["device"];
   scene: App["scene"];
+  store: App["store"];
   pasteFromClipboard: App["pasteFromClipboard"];
   id: App["id"];
   onInsertElements: App["onInsertElements"];
