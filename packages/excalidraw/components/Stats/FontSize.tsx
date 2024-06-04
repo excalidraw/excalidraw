@@ -14,14 +14,12 @@ const MIN_FONT_SIZE = 4;
 const STEP_SIZE = 4;
 
 const FontSize = ({ element, elementsMap }: FontSizeProps) => {
-  const handleFontSizeChange: DragInputCallbackType = (
+  const handleFontSizeChange: DragInputCallbackType = ({
     accumulatedChange,
-    instantChange,
     stateAtStart,
-    shouldKeepAspectRatio,
     shouldChangeByStepSize,
     nextValue,
-  ) => {
+  }) => {
     const _stateAtStart = stateAtStart[0];
     if (_stateAtStart) {
       if (nextValue) {

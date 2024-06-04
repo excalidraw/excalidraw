@@ -1,7 +1,12 @@
-import { getCommonBounds } from "../../element";
+import { getCommonBounds, isTextElement } from "../../element";
+import { updateBoundElements } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
 import { rescalePointsInElement } from "../../element/resizeElements";
-import type { ExcalidrawElement } from "../../element/types";
+import {
+  getBoundTextElement,
+  handleBindTextResize,
+} from "../../element/textElement";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue } from "./utils";
@@ -9,6 +14,7 @@ import { getStepSizedValue } from "./utils";
 interface MultiDimensionProps {
   property: "width" | "height";
   elements: ExcalidrawElement[];
+  elementsMap: ElementsMap;
 }
 
 const STEP_SIZE = 10;
@@ -32,18 +38,66 @@ const getResizedUpdates = (
     x,
     y,
     ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, false),
+    ...(isTextElement(stateAtStart)
+      ? { fontSize: stateAtStart.fontSize * scale }
+      : {}),
   };
 };
 
-const MultiDimension = ({ property, elements }: MultiDimensionProps) => {
-  const handleDimensionChange: DragInputCallbackType = (
+const resizeElement = (
+  anchorX: number,
+  anchorY: number,
+  property: MultiDimensionProps["property"],
+  scale: number,
+  latestElement: ExcalidrawElement,
+  origElement: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  originalElementsMap: ElementsMap,
+  shouldInformMutation: boolean,
+) => {
+  const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
+
+  mutateElement(latestElement, updates, shouldInformMutation);
+  const boundTextElement = getBoundTextElement(
+    origElement,
+    originalElementsMap,
+  );
+  if (boundTextElement) {
+    const newFontSize = boundTextElement.fontSize * scale;
+    updateBoundElements(latestElement, elementsMap, {
+      newSize: { width: updates.width, height: updates.height },
+    });
+    const latestBoundTextElement = elementsMap.get(boundTextElement.id);
+    if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
+      mutateElement(
+        latestBoundTextElement,
+        {
+          fontSize: newFontSize,
+        },
+        shouldInformMutation,
+      );
+      handleBindTextResize(
+        latestElement,
+        elementsMap,
+        property === "width" ? "e" : "s",
+        true,
+      );
+    }
+  }
+};
+
+const MultiDimension = ({
+  property,
+  elements,
+  elementsMap,
+}: MultiDimensionProps) => {
+  const handleDimensionChange: DragInputCallbackType = ({
     accumulatedChange,
-    instantChange,
     stateAtStart,
-    shouldKeepAspectRatio,
+    originalElementsMap,
     shouldChangeByStepSize,
     nextValue,
-  ) => {
+  }) => {
     const [x1, y1, x2, y2] = getCommonBounds(stateAtStart);
     const initialWidth = x2 - x1;
     const initialHeight = y2 - y1;
@@ -60,15 +114,21 @@ const MultiDimension = ({ property, elements }: MultiDimensionProps) => {
 
       let i = 0;
       while (i < stateAtStart.length) {
-        const element = elements[i];
+        const latestElement = elements[i];
         const origElement = stateAtStart[i];
 
         // it should never happen that element and origElement are different
         // but check just in case
-        if (element.id === origElement.id) {
-          mutateElement(
-            element,
-            getResizedUpdates(anchorX, anchorY, scale, origElement),
+        if (latestElement.id === origElement.id) {
+          resizeElement(
+            anchorX,
+            anchorY,
+            property,
+            scale,
+            latestElement,
+            origElement,
+            elementsMap,
+            originalElementsMap,
             i === stateAtStart.length - 1,
           );
         }
@@ -113,13 +173,19 @@ const MultiDimension = ({ property, elements }: MultiDimensionProps) => {
 
     let i = 0;
     while (i < stateAtStart.length) {
-      const element = elements[i];
+      const latestElement = elements[i];
       const origElement = stateAtStart[i];
 
-      if (element.id === origElement.id) {
-        mutateElement(
-          element,
-          getResizedUpdates(anchorX, anchorY, scale, origElement),
+      if (latestElement.id === origElement.id) {
+        resizeElement(
+          anchorX,
+          anchorY,
+          property,
+          scale,
+          latestElement,
+          origElement,
+          elementsMap,
+          originalElementsMap,
           i === stateAtStart.length - 1,
         );
       }

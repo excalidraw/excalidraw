@@ -2,21 +2,30 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import throttle from "lodash.throttle";
 import { EVENT } from "../../constants";
 import { KEYS } from "../../keys";
-import type { ExcalidrawElement } from "../../element/types";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { deepCopyElement } from "../../element/newElement";
 
 import "./DragInput.scss";
 import clsx from "clsx";
 import { useApp } from "../App";
 
-export type DragInputCallbackType = (
-  accumulatedChange: number,
-  instantChange: number,
-  stateAtStart: ExcalidrawElement[],
-  shouldKeepAspectRatio: boolean,
-  shouldChangeByStepSize: boolean,
-  nextValue?: number,
-) => void;
+export type DragInputCallbackType = ({
+  accumulatedChange,
+  instantChange,
+  stateAtStart,
+  originalElementsMap,
+  shouldKeepAspectRatio,
+  shouldChangeByStepSize,
+  nextValue,
+}: {
+  accumulatedChange: number;
+  instantChange: number;
+  stateAtStart: ExcalidrawElement[];
+  originalElementsMap: ElementsMap;
+  shouldKeepAspectRatio: boolean;
+  shouldChangeByStepSize: boolean;
+  nextValue?: number;
+}) => void;
 
 interface StatsDragInputProps {
   label: string | React.ReactNode;
@@ -67,6 +76,8 @@ const StatsDragInput = ({
             } | null = null;
 
             let stateAtStart: ExcalidrawElement[] | null = null;
+            let originalElementsMap: Map<string, ExcalidrawElement> | null =
+              null;
 
             let accumulatedChange: number | null = null;
 
@@ -79,6 +90,15 @@ const StatsDragInput = ({
                 );
               }
 
+              if (!originalElementsMap) {
+                originalElementsMap = app.scene
+                  .getNonDeletedElements()
+                  .reduce((acc, element) => {
+                    acc.set(element.id, deepCopyElement(element));
+                    return acc;
+                  }, new Map() as ElementsMap);
+              }
+
               if (!accumulatedChange) {
                 accumulatedChange = 0;
               }
@@ -87,13 +107,14 @@ const StatsDragInput = ({
                 const instantChange = event.clientX - lastPointer.x;
                 accumulatedChange += instantChange;
 
-                cbThrottled(
+                cbThrottled({
                   accumulatedChange,
                   instantChange,
                   stateAtStart,
-                  shouldKeepAspectRatio!!,
-                  event.shiftKey,
-                );
+                  originalElementsMap,
+                  shouldKeepAspectRatio: shouldKeepAspectRatio!!,
+                  shouldChangeByStepSize: event.shiftKey,
+                });
               }
 
               lastPointer = {
@@ -117,6 +138,7 @@ const StatsDragInput = ({
                 lastPointer = null;
                 accumulatedChange = null;
                 stateAtStart = null;
+                originalElementsMap = null;
 
                 document.body.classList.remove("dragResize");
               },
@@ -149,14 +171,16 @@ const StatsDragInput = ({
                 setInputValue(value.toString());
                 return;
               }
-              dragInputCallback(
-                0,
-                0,
-                elements,
-                shouldKeepAspectRatio!!,
-                false,
-                v,
-              );
+
+              dragInputCallback({
+                accumulatedChange: 0,
+                instantChange: 0,
+                stateAtStart: elements,
+                originalElementsMap: app.scene.getNonDeletedElementsMap(),
+                shouldKeepAspectRatio: shouldKeepAspectRatio!!,
+                shouldChangeByStepSize: false,
+                nextValue: v,
+              });
               app.store.shouldCaptureIncrement();
               eventTarget.blur();
             }

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getCommonBounds } from "../../element/bounds";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
-import { getTargetElements } from "../../scene";
+import { getSelectedElements } from "../../scene";
 import type Scene from "../../scene/Scene";
 import type { AppState, ExcalidrawProps } from "../../types";
 import { CloseIcon } from "../icons";
@@ -29,7 +29,14 @@ export const Stats = (props: StatsProps) => {
   const elements = props.scene.getNonDeletedElements();
   const elementsMap = props.scene.getNonDeletedElementsMap();
   const sceneNonce = props.scene.getSceneNonce();
-  const selectedElements = getTargetElements(elements, props.appState);
+  // const selectedElements = getTargetElements(elements, props.appState);
+  const selectedElements = getSelectedElements(
+    props.scene.getNonDeletedElementsMap(),
+    props.appState,
+    {
+      includeBoundTextElement: false,
+    },
+  );
 
   const singleElement =
     selectedElements.length === 1 ? selectedElements[0] : null;
@@ -112,9 +119,17 @@ export const Stats = (props: StatsProps) => {
                 </div>
 
                 <div className="statsItem">
-                  <Dimension property="width" element={singleElement} />
-                  <Dimension property="height" element={singleElement} />
-                  <Angle element={singleElement} />
+                  <Dimension
+                    property="width"
+                    element={singleElement}
+                    elementsMap={elementsMap}
+                  />
+                  <Dimension
+                    property="height"
+                    element={singleElement}
+                    elementsMap={elementsMap}
+                  />
+                  <Angle element={singleElement} elementsMap={elementsMap} />
                   {singleElement.type === "text" && (
                     <FontSize
                       element={singleElement}
@@ -142,10 +157,12 @@ export const Stats = (props: StatsProps) => {
                   <MultiDimension
                     property="width"
                     elements={multipleElements}
+                    elementsMap={elementsMap}
                   />
                   <MultiDimension
                     property="height"
                     elements={multipleElements}
+                    elementsMap={elementsMap}
                   />
                 </div>
               </div>

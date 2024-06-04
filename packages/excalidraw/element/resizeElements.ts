@@ -199,7 +199,7 @@ export const rescalePointsInElement = (
       }
     : {};
 
-const measureFontSizeFromWidth = (
+export const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   elementsMap: ElementsMap,
   nextWidth: number,

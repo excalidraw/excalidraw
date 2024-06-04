@@ -1,5 +1,7 @@
 import { mutateElement } from "../../element/mutateElement";
-import type { ExcalidrawElement } from "../../element/types";
+import { getBoundTextElement } from "../../element/textElement";
+import { isArrowElement } from "../../element/typeChecks";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -7,19 +9,18 @@ import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 interface AngleProps {
   element: ExcalidrawElement;
+  elementsMap: ElementsMap;
 }
 
 const STEP_SIZE = 15;
 
-const Angle = ({ element }: AngleProps) => {
-  const handleDegreeChange: DragInputCallbackType = (
+const Angle = ({ element, elementsMap }: AngleProps) => {
+  const handleDegreeChange: DragInputCallbackType = ({
     accumulatedChange,
-    instantChange,
     stateAtStart,
-    shouldKeepAspectRatio,
     shouldChangeByStepSize,
     nextValue,
-  ) => {
+  }) => {
     const _stateAtStart = stateAtStart[0];
     if (_stateAtStart) {
       if (nextValue !== undefined) {
@@ -27,6 +28,12 @@ const Angle = ({ element }: AngleProps) => {
         mutateElement(element, {
           angle: nextAngle,
         });
+
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement && !isArrowElement(element)) {
+          mutateElement(boundTextElement, { angle: nextAngle });
+        }
+
         return;
       }
 
@@ -38,13 +45,19 @@ const Angle = ({ element }: AngleProps) => {
         nextAngleInDegrees = getStepSizedValue(nextAngleInDegrees, STEP_SIZE);
       }
 
+      nextAngleInDegrees =
+        nextAngleInDegrees < 0 ? nextAngleInDegrees + 360 : nextAngleInDegrees;
+
+      const nextAngle = degreeToRadian(nextAngleInDegrees);
+
       mutateElement(element, {
-        angle: degreeToRadian(
-          nextAngleInDegrees < 0
-            ? nextAngleInDegrees + 360
-            : nextAngleInDegrees,
-        ),
+        angle: nextAngle,
       });
+
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      if (boundTextElement && !isArrowElement(element)) {
+        mutateElement(boundTextElement, { angle: nextAngle });
+      }
     }
   };
 

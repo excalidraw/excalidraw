@@ -1,13 +1,26 @@
-import type { ExcalidrawElement } from "../../element/types";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { mutateElement } from "../../element/mutateElement";
-import { rescalePointsInElement } from "../../element/resizeElements";
+import {
+  measureFontSizeFromWidth,
+  rescalePointsInElement,
+} from "../../element/resizeElements";
+import {
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getBoundTextElement,
+  getBoundTextMaxWidth,
+  handleBindTextResize,
+} from "../../element/textElement";
+import { getFontString } from "../../utils";
+import { updateBoundElements } from "../../element/binding";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
   element: ExcalidrawElement;
+  elementsMap: ElementsMap;
 }
 
 const STEP_SIZE = 10;
@@ -51,13 +64,16 @@ export const newOrigin = (
   };
 };
 
-const getResizedUpdates = (
+const resizeElement = (
   nextWidth: number,
   nextHeight: number,
+  keepAspectRatio: boolean,
   latestState: ExcalidrawElement,
   stateAtStart: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  originalElementsMap: Map<string, ExcalidrawElement>,
 ) => {
-  return {
+  mutateElement(latestState, {
     ...newOrigin(
       latestState.x,
       latestState.y,
@@ -70,18 +86,72 @@ const getResizedUpdates = (
     width: nextWidth,
     height: nextHeight,
     ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, true),
-  };
+  });
+
+  let boundTextFont: { fontSize?: number } = {};
+  const boundTextElement = getBoundTextElement(latestState, elementsMap);
+
+  if (boundTextElement) {
+    boundTextFont = {
+      fontSize: boundTextElement.fontSize,
+    };
+    if (keepAspectRatio) {
+      const updatedElement = {
+        ...latestState,
+        width: nextWidth,
+        height: nextHeight,
+      };
+
+      const nextFont = measureFontSizeFromWidth(
+        boundTextElement,
+        elementsMap,
+        getBoundTextMaxWidth(updatedElement, boundTextElement),
+      );
+      boundTextFont = {
+        fontSize: nextFont?.size ?? boundTextElement.fontSize,
+      };
+    } else {
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
+      nextWidth = Math.max(nextWidth, minWidth);
+      nextHeight = Math.max(nextHeight, minHeight);
+    }
+  }
+
+  updateBoundElements(latestState, elementsMap, {
+    newSize: {
+      width: nextWidth,
+      height: nextHeight,
+    },
+  });
+
+  if (boundTextElement && boundTextFont) {
+    mutateElement(boundTextElement, {
+      fontSize: boundTextFont.fontSize,
+    });
+  }
+  handleBindTextResize(latestState, elementsMap, "e", keepAspectRatio);
 };
 
-const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
-  const handleDimensionChange: DragInputCallbackType = (
+const DimensionDragInput = ({
+  property,
+  element,
+  elementsMap,
+}: DimensionDragInputProps) => {
+  const handleDimensionChange: DragInputCallbackType = ({
     accumulatedChange,
-    instantChange,
     stateAtStart,
+    originalElementsMap,
     shouldKeepAspectRatio,
     shouldChangeByStepSize,
     nextValue,
-  ) => {
+  }) => {
     const _stateAtStart = stateAtStart[0];
     if (_stateAtStart) {
       const keepAspectRatio =
@@ -106,10 +176,16 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
           0,
         );
 
-        mutateElement(
+        resizeElement(
+          nextWidth,
+          nextHeight,
+          keepAspectRatio,
           element,
-          getResizedUpdates(nextWidth, nextHeight, element, _stateAtStart),
+          _stateAtStart,
+          elementsMap,
+          originalElementsMap,
         );
+
         return;
       }
       const changeInWidth = property === "width" ? accumulatedChange : 0;
@@ -141,9 +217,14 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
         }
       }
 
-      mutateElement(
+      resizeElement(
+        nextWidth,
+        nextHeight,
+        keepAspectRatio,
         element,
-        getResizedUpdates(nextWidth, nextHeight, element, _stateAtStart),
+        _stateAtStart,
+        elementsMap,
+        originalElementsMap,
       );
     }
   };
