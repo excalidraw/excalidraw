@@ -3,6 +3,7 @@ import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { mutateElement } from "../../element/mutateElement";
+import { rescalePointsInElement } from "../../element/resizeElements";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
@@ -50,6 +51,28 @@ export const newOrigin = (
   };
 };
 
+const getResizedUpdates = (
+  nextWidth: number,
+  nextHeight: number,
+  latestState: ExcalidrawElement,
+  stateAtStart: ExcalidrawElement,
+) => {
+  return {
+    ...newOrigin(
+      latestState.x,
+      latestState.y,
+      latestState.width,
+      latestState.height,
+      nextWidth,
+      nextHeight,
+      latestState.angle,
+    ),
+    width: nextWidth,
+    height: nextHeight,
+    ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, true),
+  };
+};
+
 const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
   const handleDimensionChange: DragInputCallbackType = (
     accumulatedChange,
@@ -83,19 +106,10 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
           0,
         );
 
-        mutateElement(element, {
-          ...newOrigin(
-            element.x,
-            element.y,
-            element.width,
-            element.height,
-            nextWidth,
-            nextHeight,
-            element.angle,
-          ),
-          width: nextWidth,
-          height: nextHeight,
-        });
+        mutateElement(
+          element,
+          getResizedUpdates(nextWidth, nextHeight, element, _stateAtStart),
+        );
         return;
       }
       const changeInWidth = property === "width" ? accumulatedChange : 0;
@@ -127,19 +141,10 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
         }
       }
 
-      mutateElement(element, {
-        width: nextWidth,
-        height: nextHeight,
-        ...newOrigin(
-          _stateAtStart.x,
-          _stateAtStart.y,
-          _stateAtStart.width,
-          _stateAtStart.height,
-          nextWidth,
-          nextHeight,
-          _stateAtStart.angle,
-        ),
-      });
+      mutateElement(
+        element,
+        getResizedUpdates(nextWidth, nextHeight, element, _stateAtStart),
+      );
     }
   };
 

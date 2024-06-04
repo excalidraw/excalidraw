@@ -182,7 +182,7 @@ const rotateSingleElement = (
   }
 };
 
-const rescalePointsInElement = (
+export const rescalePointsInElement = (
   element: NonDeletedExcalidrawElement,
   width: number,
   height: number,

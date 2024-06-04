@@ -1,5 +1,6 @@
 import { getCommonBounds } from "../../element";
 import { mutateElement } from "../../element/mutateElement";
+import { rescalePointsInElement } from "../../element/resizeElements";
 import type { ExcalidrawElement } from "../../element/types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -11,6 +12,28 @@ interface MultiDimensionProps {
 }
 
 const STEP_SIZE = 10;
+
+const getResizedUpdates = (
+  anchorX: number,
+  anchorY: number,
+  scale: number,
+  stateAtStart: ExcalidrawElement,
+) => {
+  const offsetX = stateAtStart.x - anchorX;
+  const offsetY = stateAtStart.y - anchorY;
+  const nextWidth = stateAtStart.width * scale;
+  const nextHeight = stateAtStart.height * scale;
+  const x = anchorX + offsetX * scale;
+  const y = anchorY + offsetY * scale;
+
+  return {
+    width: nextWidth,
+    height: nextHeight,
+    x,
+    y,
+    ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, false),
+  };
+};
 
 const MultiDimension = ({ property, elements }: MultiDimensionProps) => {
   const handleDimensionChange: DragInputCallbackType = (
@@ -43,21 +66,9 @@ const MultiDimension = ({ property, elements }: MultiDimensionProps) => {
         // it should never happen that element and origElement are different
         // but check just in case
         if (element.id === origElement.id) {
-          const offsetX = origElement.x - anchorX;
-          const offsetY = origElement.y - anchorY;
-          const nextWidth = origElement.width * scale;
-          const nextHeight = origElement.height * scale;
-          const x = anchorX + offsetX * scale;
-          const y = anchorY + offsetY * scale;
-
           mutateElement(
             element,
-            {
-              width: nextWidth,
-              height: nextHeight,
-              x,
-              y,
-            },
+            getResizedUpdates(anchorX, anchorY, scale, origElement),
             i === stateAtStart.length - 1,
           );
         }
@@ -105,23 +116,13 @@ const MultiDimension = ({ property, elements }: MultiDimensionProps) => {
       const element = elements[i];
       const origElement = stateAtStart[i];
 
-      const offsetX = origElement.x - anchorX;
-      const offsetY = origElement.y - anchorY;
-      const nextWidth = origElement.width * scale;
-      const nextHeight = origElement.height * scale;
-      const x = anchorX + offsetX * scale;
-      const y = anchorY + offsetY * scale;
-
-      mutateElement(
-        element,
-        {
-          width: nextWidth,
-          height: nextHeight,
-          x,
-          y,
-        },
-        i === stateAtStart.length - 1,
-      );
+      if (element.id === origElement.id) {
+        mutateElement(
+          element,
+          getResizedUpdates(anchorX, anchorY, scale, origElement),
+          i === stateAtStart.length - 1,
+        );
+      }
       i++;
     }
   };
