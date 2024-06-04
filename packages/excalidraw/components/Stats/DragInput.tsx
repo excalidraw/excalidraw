@@ -11,7 +11,7 @@ import clsx from "clsx";
 export type DragInputCallbackType = (
   accumulatedChange: number,
   instantChange: number,
-  stateAtStart: ExcalidrawElement,
+  stateAtStart: ExcalidrawElement[],
   shouldKeepAspectRatio: boolean,
   shouldChangeByStepSize: boolean,
   nextValue?: number,
@@ -20,7 +20,7 @@ export type DragInputCallbackType = (
 interface StatsDragInputProps {
   label: string | React.ReactNode;
   value: number;
-  element: ExcalidrawElement;
+  elements: ExcalidrawElement[];
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
   dragInputCallback: DragInputCallbackType;
@@ -30,7 +30,7 @@ const StatsDragInput = ({
   label,
   dragInputCallback,
   value,
-  element,
+  elements,
   editable = true,
   shouldKeepAspectRatio,
 }: StatsDragInputProps) => {
@@ -64,7 +64,7 @@ const StatsDragInput = ({
               y: number;
             } | null = null;
 
-            let stateAtStart: ExcalidrawElement | null = null;
+            let stateAtStart: ExcalidrawElement[] | null = null;
 
             let accumulatedChange: number | null = null;
 
@@ -72,7 +72,9 @@ const StatsDragInput = ({
 
             const onPointerMove = (event: PointerEvent) => {
               if (!stateAtStart) {
-                stateAtStart = deepCopyElement(element);
+                stateAtStart = elements.map((element) =>
+                  deepCopyElement(element),
+                );
               }
 
               if (!accumulatedChange) {
@@ -146,11 +148,12 @@ const StatsDragInput = ({
               dragInputCallback(
                 0,
                 0,
-                element,
+                elements,
                 shouldKeepAspectRatio!!,
                 false,
                 v,
               );
+              eventTarget.blur();
             }
           }
         }}

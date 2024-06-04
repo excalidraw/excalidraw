@@ -14,7 +14,7 @@ const _shouldKeepAspectRatio = (element: ExcalidrawElement) => {
   return element.type === "image";
 };
 
-const newOrigin = (
+export const newOrigin = (
   x1: number,
   y1: number,
   w1: number,
@@ -59,10 +59,11 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
     shouldChangeByStepSize,
     nextValue,
   ) => {
-    if (stateAtStart) {
+    const _stateAtStart = stateAtStart[0];
+    if (_stateAtStart) {
       const keepAspectRatio =
         shouldKeepAspectRatio || _shouldKeepAspectRatio(element);
-      const aspectRatio = stateAtStart.width / stateAtStart.height;
+      const aspectRatio = _stateAtStart.width / _stateAtStart.height;
 
       if (nextValue !== undefined) {
         const nextWidth = Math.max(
@@ -70,7 +71,7 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
             ? nextValue
             : keepAspectRatio
             ? nextValue * aspectRatio
-            : stateAtStart.width,
+            : _stateAtStart.width,
           0,
         );
         const nextHeight = Math.max(
@@ -78,7 +79,7 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
             ? nextValue
             : keepAspectRatio
             ? nextValue / aspectRatio
-            : stateAtStart.height,
+            : _stateAtStart.height,
           0,
         );
 
@@ -100,7 +101,7 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
       const changeInWidth = property === "width" ? accumulatedChange : 0;
       const changeInHeight = property === "height" ? accumulatedChange : 0;
 
-      let nextWidth = Math.max(0, stateAtStart.width + changeInWidth);
+      let nextWidth = Math.max(0, _stateAtStart.width + changeInWidth);
       if (property === "width") {
         if (shouldChangeByStepSize) {
           nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
@@ -109,7 +110,7 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
         }
       }
 
-      let nextHeight = Math.max(0, stateAtStart.height + changeInHeight);
+      let nextHeight = Math.max(0, _stateAtStart.height + changeInHeight);
       if (property === "height") {
         if (shouldChangeByStepSize) {
           nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
@@ -130,13 +131,13 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
         width: nextWidth,
         height: nextHeight,
         ...newOrigin(
-          stateAtStart.x,
-          stateAtStart.y,
-          stateAtStart.width,
-          stateAtStart.height,
+          _stateAtStart.x,
+          _stateAtStart.y,
+          _stateAtStart.width,
+          _stateAtStart.height,
           nextWidth,
           nextHeight,
-          stateAtStart.angle,
+          _stateAtStart.angle,
         ),
       });
     }
@@ -145,7 +146,7 @@ const DimensionDragInput = ({ property, element }: DimensionDragInputProps) => {
   return (
     <DragInput
       label={property === "width" ? "W" : "H"}
-      element={element}
+      elements={[element]}
       dragInputCallback={handleDimensionChange}
       value={
         Math.round(

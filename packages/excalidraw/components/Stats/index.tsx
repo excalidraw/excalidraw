@@ -13,6 +13,8 @@ import Angle from "./Angle";
 
 import "./index.scss";
 import FontSize from "./FontSize";
+import MultiDimension from "./MultiDimension";
+import { elementsAreInSameGroup } from "../../groups";
 
 interface StatsProps {
   appState: AppState;
@@ -31,6 +33,9 @@ export const Stats = (props: StatsProps) => {
 
   const singleElement =
     selectedElements.length === 1 ? selectedElements[0] : null;
+
+  const multipleElements =
+    selectedElements.length > 1 ? selectedElements : null;
 
   const [sceneDimension, setSceneDimension] = useState<{
     width: number;
@@ -91,7 +96,7 @@ export const Stats = (props: StatsProps) => {
           </table>
         </div>
 
-        {singleElement && (
+        {selectedElements.length > 0 && (
           <div
             className="section"
             style={{
@@ -100,22 +105,51 @@ export const Stats = (props: StatsProps) => {
           >
             <h3>{t("stats.elementStats")}</h3>
 
-            <div className="sectionContent">
-              <div className="elementType">
-                {t(`element.${singleElement.type}`)}
-              </div>
+            {singleElement && (
+              <div className="sectionContent">
+                <div className="elementType">
+                  {t(`element.${singleElement.type}`)}
+                </div>
 
-              <div className="statsItem">
-                <Dimension property="width" element={singleElement} />
-                <Dimension property="height" element={singleElement} />
-                <Angle element={singleElement} />
-                {singleElement.type === "text" && (
-                  <FontSize element={singleElement} elementsMap={elementsMap} />
+                <div className="statsItem">
+                  <Dimension property="width" element={singleElement} />
+                  <Dimension property="height" element={singleElement} />
+                  <Angle element={singleElement} />
+                  {singleElement.type === "text" && (
+                    <FontSize
+                      element={singleElement}
+                      elementsMap={elementsMap}
+                    />
+                  )}
+                </div>
+
+                {singleElement.type === "text" && <div></div>}
+              </div>
+            )}
+
+            {multipleElements && (
+              <div className="sectionContent">
+                {elementsAreInSameGroup(multipleElements) && (
+                  <div className="elementType">{t("element.group")}</div>
                 )}
-              </div>
 
-              {singleElement.type === "text" && <div></div>}
-            </div>
+                <div className="elementsCount">
+                  <div>{t("stats.elements")}</div>
+                  <div>{selectedElements.length}</div>
+                </div>
+
+                <div className="statsItem">
+                  <MultiDimension
+                    property="width"
+                    elements={multipleElements}
+                  />
+                  <MultiDimension
+                    property="height"
+                    elements={multipleElements}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Island>

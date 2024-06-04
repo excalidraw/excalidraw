@@ -22,40 +22,43 @@ const FontSize = ({ element, elementsMap }: FontSizeProps) => {
     shouldChangeByStepSize,
     nextValue,
   ) => {
-    if (nextValue) {
-      const nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
+    const _stateAtStart = stateAtStart[0];
+    if (_stateAtStart) {
+      if (nextValue) {
+        const nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
 
-      const newElement = {
-        ...element,
-        fontSize: nextFontSize,
-      };
-      const updates = refreshTextDimensions(newElement, null, elementsMap);
-      mutateElement(element, {
-        ...updates,
-        fontSize: nextFontSize,
-      });
-      return;
-    }
-
-    if (stateAtStart && stateAtStart.type === "text") {
-      const originalFontSize = Math.round(stateAtStart.fontSize);
-      const changeInFontSize = Math.round(accumulatedChange);
-      let nextFontSize = Math.max(
-        originalFontSize + changeInFontSize,
-        MIN_FONT_SIZE,
-      );
-      if (shouldChangeByStepSize) {
-        nextFontSize = getStepSizedValue(nextFontSize, STEP_SIZE);
+        const newElement = {
+          ...element,
+          fontSize: nextFontSize,
+        };
+        const updates = refreshTextDimensions(newElement, null, elementsMap);
+        mutateElement(element, {
+          ...updates,
+          fontSize: nextFontSize,
+        });
+        return;
       }
-      const newElement = {
-        ...element,
-        fontSize: nextFontSize,
-      };
-      const updates = refreshTextDimensions(newElement, null, elementsMap);
-      mutateElement(element, {
-        ...updates,
-        fontSize: nextFontSize,
-      });
+
+      if (_stateAtStart.type === "text") {
+        const originalFontSize = Math.round(_stateAtStart.fontSize);
+        const changeInFontSize = Math.round(accumulatedChange);
+        let nextFontSize = Math.max(
+          originalFontSize + changeInFontSize,
+          MIN_FONT_SIZE,
+        );
+        if (shouldChangeByStepSize) {
+          nextFontSize = getStepSizedValue(nextFontSize, STEP_SIZE);
+        }
+        const newElement = {
+          ...element,
+          fontSize: nextFontSize,
+        };
+        const updates = refreshTextDimensions(newElement, null, elementsMap);
+        mutateElement(element, {
+          ...updates,
+          fontSize: nextFontSize,
+        });
+      }
     }
   };
 
@@ -63,7 +66,7 @@ const FontSize = ({ element, elementsMap }: FontSizeProps) => {
     <StatsDragInput
       label="F"
       value={Math.round(element.fontSize * 10) / 10}
-      element={element}
+      elements={[element]}
       dragInputCallback={handleFontSizeChange}
     />
   );

@@ -20,17 +20,18 @@ const Angle = ({ element }: AngleProps) => {
     shouldChangeByStepSize,
     nextValue,
   ) => {
-    if (nextValue !== undefined) {
-      const nextAngle = degreeToRadian(nextValue);
-      mutateElement(element, {
-        angle: nextAngle,
-      });
-      return;
-    }
+    const _stateAtStart = stateAtStart[0];
+    if (_stateAtStart) {
+      if (nextValue !== undefined) {
+        const nextAngle = degreeToRadian(nextValue);
+        mutateElement(element, {
+          angle: nextAngle,
+        });
+        return;
+      }
 
-    if (stateAtStart) {
       const originalAngleInDegrees =
-        Math.round(radianToDegree(stateAtStart.angle) * 100) / 100;
+        Math.round(radianToDegree(_stateAtStart.angle) * 100) / 100;
       const changeInDegrees = Math.round(accumulatedChange);
       let nextAngleInDegrees = (originalAngleInDegrees + changeInDegrees) % 360;
       if (shouldChangeByStepSize) {
@@ -51,7 +52,7 @@ const Angle = ({ element }: AngleProps) => {
     <DragInput
       label="A"
       value={Math.round(radianToDegree(element.angle) * 100) / 100}
-      element={element}
+      elements={[element]}
       dragInputCallback={handleDegreeChange}
       editable={isPropertyEditable(element, "angle")}
     />
