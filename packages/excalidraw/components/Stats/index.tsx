@@ -17,6 +17,8 @@ import MultiDimension from "./MultiDimension";
 import { elementsAreInSameGroup } from "../../groups";
 import MultiAngle from "./MultiAngle";
 import MultiFontSize from "./MultiFontSize";
+import Position from "./Position";
+import MultiPosition from "./MultiPosition";
 
 interface StatsProps {
   appState: AppState;
@@ -122,6 +124,16 @@ export const Stats = (props: StatsProps) => {
                 </div>
 
                 <div className="statsItem">
+                  <Position
+                    element={singleElement}
+                    property="x"
+                    elementsMap={elementsMap}
+                  />
+                  <Position
+                    element={singleElement}
+                    property="y"
+                    elementsMap={elementsMap}
+                  />
                   <Dimension
                     property="width"
                     element={singleElement}
@@ -155,6 +167,16 @@ export const Stats = (props: StatsProps) => {
                 </div>
 
                 <div className="statsItem">
+                  <MultiPosition
+                    property="x"
+                    elements={multipleElements}
+                    elementsMap={elementsMap}
+                  />
+                  <MultiPosition
+                    property="y"
+                    elements={multipleElements}
+                    elementsMap={elementsMap}
+                  />
                   <MultiDimension
                     property="width"
                     elements={multipleElements}
