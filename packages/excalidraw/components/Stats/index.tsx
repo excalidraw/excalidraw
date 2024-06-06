@@ -15,6 +15,7 @@ import "./index.scss";
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
 import { elementsAreInSameGroup } from "../../groups";
+import MultiAngle from "./MultiAngle";
 
 interface StatsProps {
   appState: AppState;
@@ -166,6 +167,10 @@ export const Stats = (props: StatsProps) => {
                     elements={multipleElements}
                     elementsMap={elementsMap}
                     appState={props.appState}
+                  />
+                  <MultiAngle
+                    elements={multipleElements}
+                    elementsMap={elementsMap}
                   />
                 </div>
               </div>
