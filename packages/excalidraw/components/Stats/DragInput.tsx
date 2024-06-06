@@ -58,7 +58,7 @@ const StatsDragInput = ({
     setInputValue(value.toString());
   }, [value]);
 
-  return (
+  return editable ? (
     <div
       className={clsx("drag-input-container", !editable && "disabled")}
       data-testid={label}
@@ -205,6 +205,8 @@ const StatsDragInput = ({
         disabled={!editable}
       ></input>
     </div>
+  ) : (
+    <></>
   );
 };
 

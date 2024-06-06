@@ -147,7 +147,7 @@ const MultiDimension = ({
   });
 
   const individualSizes = elements
-    .filter((el) => !isInGroup(el))
+    .filter((el) => !isInGroup(el) && isPropertyEditable(el, property))
     .map((el) => Math.round(el[property] * 10) / 10);
 
   const sizes = [...individualSizes, ...groupSizes];
@@ -156,6 +156,8 @@ const MultiDimension = ({
     new Set([...individualSizes, ...groupSizes]).size === 1
       ? Math.round(sizes[0] * 100) / 100
       : "Mixed";
+
+  const editable = sizes.length > 0;
 
   const handleDimensionChange: DragInputCallbackType = ({
     accumulatedChange,
@@ -343,6 +345,7 @@ const MultiDimension = ({
       elements={elements}
       dragInputCallback={handleDimensionChange}
       value={value}
+      editable={editable}
     />
   );
 };
