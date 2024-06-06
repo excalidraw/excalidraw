@@ -105,6 +105,7 @@ export const Stats = (props: StatsProps) => {
 
         {selectedElements.length > 0 && (
           <div
+            id="elementStats"
             className="section"
             style={{
               marginTop: 12,
@@ -158,11 +159,13 @@ export const Stats = (props: StatsProps) => {
                     property="width"
                     elements={multipleElements}
                     elementsMap={elementsMap}
+                    appState={props.appState}
                   />
                   <MultiDimension
                     property="height"
                     elements={multipleElements}
                     elementsMap={elementsMap}
+                    appState={props.appState}
                   />
                 </div>
               </div>

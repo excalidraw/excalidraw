@@ -29,7 +29,7 @@ export type DragInputCallbackType = ({
 
 interface StatsDragInputProps {
   label: string | React.ReactNode;
-  value: number;
+  value: number | "Mixed";
   elements: ExcalidrawElement[];
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
@@ -59,7 +59,10 @@ const StatsDragInput = ({
   }, [value]);
 
   return (
-    <div className={clsx("drag-input-container", !editable && "disabled")}>
+    <div
+      className={clsx("drag-input-container", !editable && "disabled")}
+      data-testid={label}
+    >
       <div
         className="drag-input-label"
         ref={labelRef}

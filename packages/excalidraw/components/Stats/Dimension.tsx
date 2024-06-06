@@ -64,7 +64,7 @@ export const newOrigin = (
   };
 };
 
-const resizeElement = (
+export const resizeElement = (
   nextWidth: number,
   nextHeight: number,
   keepAspectRatio: boolean,
@@ -72,21 +72,26 @@ const resizeElement = (
   stateAtStart: ExcalidrawElement,
   elementsMap: ElementsMap,
   originalElementsMap: Map<string, ExcalidrawElement>,
+  shouldInformMutation = true,
 ) => {
-  mutateElement(latestState, {
-    ...newOrigin(
-      latestState.x,
-      latestState.y,
-      latestState.width,
-      latestState.height,
-      nextWidth,
-      nextHeight,
-      latestState.angle,
-    ),
-    width: nextWidth,
-    height: nextHeight,
-    ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, true),
-  });
+  mutateElement(
+    latestState,
+    {
+      ...newOrigin(
+        latestState.x,
+        latestState.y,
+        latestState.width,
+        latestState.height,
+        nextWidth,
+        nextHeight,
+        latestState.angle,
+      ),
+      width: nextWidth,
+      height: nextHeight,
+      ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, true),
+    },
+    shouldInformMutation,
+  );
 
   let boundTextFont: { fontSize?: number } = {};
   const boundTextElement = getBoundTextElement(latestState, elementsMap);
