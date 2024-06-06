@@ -16,6 +16,7 @@ import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
 import { elementsAreInSameGroup } from "../../groups";
 import MultiAngle from "./MultiAngle";
+import MultiFontSize from "./MultiFontSize";
 
 interface StatsProps {
   appState: AppState;
@@ -139,8 +140,6 @@ export const Stats = (props: StatsProps) => {
                     />
                   )}
                 </div>
-
-                {singleElement.type === "text" && <div></div>}
               </div>
             )}
 
@@ -169,6 +168,10 @@ export const Stats = (props: StatsProps) => {
                     appState={props.appState}
                   />
                   <MultiAngle
+                    elements={multipleElements}
+                    elementsMap={elementsMap}
+                  />
+                  <MultiFontSize
                     elements={multipleElements}
                     elementsMap={elementsMap}
                   />

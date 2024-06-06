@@ -1,11 +1,12 @@
 import { mutateElement } from "../../element/mutateElement";
 import { getBoundTextElement } from "../../element/textElement";
 import { isArrowElement } from "../../element/typeChecks";
-import { ElementsMap, ExcalidrawElement } from "../../element/types";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { isInGroup } from "../../groups";
 import { degreeToRadian, radianToDegree } from "../../math";
 import Scene from "../../scene/Scene";
-import DragInput, { DragInputCallbackType } from "./DragInput";
+import DragInput from "./DragInput";
+import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 interface MultiAngleProps {
