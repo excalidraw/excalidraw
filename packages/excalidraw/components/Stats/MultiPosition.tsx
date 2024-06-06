@@ -18,7 +18,6 @@ const moveElements = (
   property: MultiPositionProps["property"],
   changeInTopX: number,
   changeInTopY: number,
-  shouldChangeByStepSize: boolean,
   elements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
@@ -41,22 +40,10 @@ const moveElements = (
     );
 
     const newTopLeftX =
-      property === "x"
-        ? Math.round(
-            shouldChangeByStepSize
-              ? getStepSizedValue(origElement.x + changeInTopX, STEP_SIZE)
-              : topLeftX + changeInTopX,
-          )
-        : topLeftX;
+      property === "x" ? Math.round(topLeftX + changeInTopX) : topLeftX;
 
     const newTopLeftY =
-      property === "y"
-        ? Math.round(
-            shouldChangeByStepSize
-              ? getStepSizedValue(origElement.y + changeInTopY, STEP_SIZE)
-              : topLeftY + changeInTopY,
-          )
-        : topLeftY;
+      property === "y" ? Math.round(topLeftY + changeInTopY) : topLeftY;
 
     moveElement(
       newTopLeftX,
@@ -125,14 +112,17 @@ const MultiPosition = ({
       return;
     }
 
-    const changeInTopX = property === "x" ? accumulatedChange : 0;
-    const changeInTopY = property === "y" ? accumulatedChange : 0;
+    const change = shouldChangeByStepSize
+      ? getStepSizedValue(accumulatedChange, STEP_SIZE)
+      : accumulatedChange;
+
+    const changeInTopX = property === "x" ? change : 0;
+    const changeInTopY = property === "y" ? change : 0;
 
     moveElements(
       property,
       changeInTopX,
       changeInTopY,
-      shouldChangeByStepSize,
       elements,
       stateAtStart,
       elementsMap,
