@@ -32,7 +32,7 @@ const MultiFontSize = ({ elements, elementsMap }: MultiFontSizeProps) => {
 
   const handleFontSizeChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     shouldChangeByStepSize,
     nextValue,
   }) => {
@@ -59,7 +59,7 @@ const MultiFontSize = ({ elements, elementsMap }: MultiFontSizeProps) => {
       return;
     }
 
-    const originalTextElements = stateAtStart.filter(
+    const originalTextElements = originalElements.filter(
       (el) => !isInGroup(el) && isTextElement(el) && !isBoundToContainer(el),
     ) as ExcalidrawTextElement[];
 

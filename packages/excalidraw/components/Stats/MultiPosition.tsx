@@ -74,14 +74,14 @@ const MultiPosition = ({
 
   const handlePositionChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     originalElementsMap,
     shouldChangeByStepSize,
     nextValue,
   }) => {
     if (nextValue) {
       for (let i = 0; i < elements.length; i++) {
-        const origElement = stateAtStart[i];
+        const origElement = originalElements[i];
         const latestElement = elements[i];
         const [cx, cy] = [
           origElement.x + origElement.width / 2,
@@ -124,7 +124,7 @@ const MultiPosition = ({
       changeInTopX,
       changeInTopY,
       elements,
-      stateAtStart,
+      originalElements,
       elementsMap,
       originalElementsMap,
     );

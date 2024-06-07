@@ -86,12 +86,12 @@ const Position = ({ property, element, elementsMap }: PositionProps) => {
 
   const handlePositionChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     originalElementsMap,
     shouldChangeByStepSize,
     nextValue,
   }) => {
-    const origElement = stateAtStart[0];
+    const origElement = originalElements[0];
     const [cx, cy] = [
       origElement.x + origElement.width / 2,
       origElement.y + origElement.height / 2,

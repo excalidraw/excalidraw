@@ -17,12 +17,12 @@ const STEP_SIZE = 15;
 const Angle = ({ element, elementsMap }: AngleProps) => {
   const handleDegreeChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     shouldChangeByStepSize,
     nextValue,
   }) => {
-    const _stateAtStart = stateAtStart[0];
-    if (_stateAtStart) {
+    const origElement = originalElements[0];
+    if (origElement) {
       if (nextValue !== undefined) {
         const nextAngle = degreeToRadian(nextValue);
         mutateElement(element, {
@@ -38,7 +38,7 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
       }
 
       const originalAngleInDegrees =
-        Math.round(radianToDegree(_stateAtStart.angle) * 100) / 100;
+        Math.round(radianToDegree(origElement.angle) * 100) / 100;
       const changeInDegrees = Math.round(accumulatedChange);
       let nextAngleInDegrees = (originalAngleInDegrees + changeInDegrees) % 360;
       if (shouldChangeByStepSize) {

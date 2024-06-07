@@ -32,12 +32,12 @@ const getResizedUpdates = (
   anchorX: number,
   anchorY: number,
   scale: number,
-  stateAtStart: ExcalidrawElement,
+  origElement: ExcalidrawElement,
 ) => {
-  const offsetX = stateAtStart.x - anchorX;
-  const offsetY = stateAtStart.y - anchorY;
-  const nextWidth = stateAtStart.width * scale;
-  const nextHeight = stateAtStart.height * scale;
+  const offsetX = origElement.x - anchorX;
+  const offsetY = origElement.y - anchorY;
+  const nextWidth = origElement.width * scale;
+  const nextHeight = origElement.height * scale;
   const x = anchorX + offsetX * scale;
   const y = anchorY + offsetY * scale;
 
@@ -46,9 +46,9 @@ const getResizedUpdates = (
     height: nextHeight,
     x,
     y,
-    ...rescalePointsInElement(stateAtStart, nextWidth, nextHeight, false),
-    ...(isTextElement(stateAtStart)
-      ? { fontSize: stateAtStart.fontSize * scale }
+    ...rescalePointsInElement(origElement, nextWidth, nextHeight, false),
+    ...(isTextElement(origElement)
+      ? { fontSize: origElement.fontSize * scale }
       : {}),
   };
 };
@@ -161,7 +161,7 @@ const MultiDimension = ({
 
   const handleDimensionChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     originalElementsMap,
     shouldChangeByStepSize,
     nextValue,
@@ -169,14 +169,14 @@ const MultiDimension = ({
     const elementsInGroups = selectedGroupIds.map((gid) => ({
       groupId: gid,
       latestElements: getElementsInGroup(elements, gid),
-      originalElements: getElementsInGroup(stateAtStart, gid),
+      originalElements: getElementsInGroup(originalElements, gid),
     }));
 
     const editableLatestIndividualElements = elements.filter(
       (el) => isPropertyEditable(el, property) && !isInGroup(el),
     );
 
-    const editableOriginalIndividualElements = stateAtStart.filter(
+    const editableOriginalIndividualElements = originalElements.filter(
       (el) => isPropertyEditable(el, property) && !isInGroup(el),
     );
 
@@ -184,14 +184,14 @@ const MultiDimension = ({
       const elementsInGroups = selectedGroupIds.map((gid) => ({
         groupId: gid,
         latestElements: getElementsInGroup(elements, gid),
-        originalElements: getElementsInGroup(stateAtStart, gid),
+        originalElements: getElementsInGroup(originalElements, gid),
       }));
 
       const editableLatestIndividualElements = elements.filter(
         (el) => isPropertyEditable(el, property) && !isInGroup(el),
       );
 
-      const editableOriginalIndividualElements = stateAtStart.filter(
+      const editableOriginalIndividualElements = originalElements.filter(
         (el) => isPropertyEditable(el, property) && !isInGroup(el),
       );
 

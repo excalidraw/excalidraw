@@ -16,13 +16,13 @@ const STEP_SIZE = 4;
 const FontSize = ({ element, elementsMap }: FontSizeProps) => {
   const handleFontSizeChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     shouldChangeByStepSize,
     nextValue,
   }) => {
-    const _stateAtStart = stateAtStart[0];
-    if (_stateAtStart) {
-      if (nextValue) {
+    const origElement = originalElements[0];
+    if (origElement) {
+      if (nextValue !== undefined) {
         const nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
 
         const newElement = {
@@ -37,8 +37,8 @@ const FontSize = ({ element, elementsMap }: FontSizeProps) => {
         return;
       }
 
-      if (_stateAtStart.type === "text") {
-        const originalFontSize = Math.round(_stateAtStart.fontSize);
+      if (origElement.type === "text") {
+        const originalFontSize = Math.round(origElement.fontSize);
         const changeInFontSize = Math.round(accumulatedChange);
         let nextFontSize = Math.max(
           originalFontSize + changeInFontSize,

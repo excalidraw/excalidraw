@@ -12,7 +12,7 @@ import { useApp } from "../App";
 export type DragInputCallbackType = ({
   accumulatedChange,
   instantChange,
-  stateAtStart,
+  originalElements,
   originalElementsMap,
   shouldKeepAspectRatio,
   shouldChangeByStepSize,
@@ -20,7 +20,7 @@ export type DragInputCallbackType = ({
 }: {
   accumulatedChange: number;
   instantChange: number;
-  stateAtStart: ExcalidrawElement[];
+  originalElements: ExcalidrawElement[];
   originalElementsMap: ElementsMap;
   shouldKeepAspectRatio: boolean;
   shouldChangeByStepSize: boolean;
@@ -56,7 +56,25 @@ const StatsDragInput = ({
 
   useEffect(() => {
     setInputValue(value.toString());
-  }, [value]);
+  }, [value, elements]);
+
+  const handleInputValue = (v: number) => {
+    if (isNaN(v)) {
+      setInputValue(value.toString());
+      return;
+    }
+    const roundedV = v.toFixed(2);
+    dragInputCallback({
+      accumulatedChange: 0,
+      instantChange: 0,
+      originalElements: elements,
+      originalElementsMap: app.scene.getNonDeletedElementsMap(),
+      shouldKeepAspectRatio: shouldKeepAspectRatio!!,
+      shouldChangeByStepSize: false,
+      nextValue: Number(roundedV),
+    });
+    app.store.shouldCaptureIncrement();
+  };
 
   return editable ? (
     <div
@@ -113,7 +131,7 @@ const StatsDragInput = ({
                 cbThrottled({
                   accumulatedChange,
                   instantChange,
-                  stateAtStart,
+                  originalElements: stateAtStart,
                   originalElementsMap,
                   shouldKeepAspectRatio: shouldKeepAspectRatio!!,
                   shouldChangeByStepSize: event.shiftKey,
@@ -170,21 +188,7 @@ const StatsDragInput = ({
               event.key === KEYS.ENTER
             ) {
               const v = Number(eventTarget.value);
-              if (isNaN(v)) {
-                setInputValue(value.toString());
-                return;
-              }
-
-              dragInputCallback({
-                accumulatedChange: 0,
-                instantChange: 0,
-                stateAtStart: elements,
-                originalElementsMap: app.scene.getNonDeletedElementsMap(),
-                shouldKeepAspectRatio: shouldKeepAspectRatio!!,
-                shouldChangeByStepSize: false,
-                nextValue: v,
-              });
-              app.store.shouldCaptureIncrement();
+              handleInputValue(v);
               eventTarget.blur();
             }
           }
@@ -197,9 +201,17 @@ const StatsDragInput = ({
             setInputValue(event.target.value);
           }
         }}
-        onBlur={() => {
+        onBlur={(event) => {
           if (!inputValue) {
             setInputValue(value.toString());
+          } else if (editable) {
+            const eventTarget = event.target;
+
+            if (eventTarget instanceof HTMLInputElement) {
+              const v = Number(eventTarget.value);
+              handleInputValue(v);
+              app.store.shouldCaptureIncrement();
+            }
           }
         }}
         disabled={!editable}

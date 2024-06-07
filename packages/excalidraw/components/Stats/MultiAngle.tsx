@@ -19,14 +19,14 @@ const STEP_SIZE = 15;
 const MultiAngle = ({ elements, elementsMap }: MultiAngleProps) => {
   const handleDegreeChange: DragInputCallbackType = ({
     accumulatedChange,
-    stateAtStart,
+    originalElements,
     shouldChangeByStepSize,
     nextValue,
   }) => {
     const editableLatestIndividualElements = elements.filter(
       (el) => !isInGroup(el) && isPropertyEditable(el, "angle"),
     );
-    const editableOriginalIndividualElements = stateAtStart.filter(
+    const editableOriginalIndividualElements = originalElements.filter(
       (el) => !isInGroup(el) && isPropertyEditable(el, "angle"),
     );
 
