@@ -11,8 +11,8 @@
     "copyAsPng": "Kopiatu arbelera PNG gisa",
     "copyAsSvg": "Kopiatu arbelera SVG gisa",
     "copyText": "Kopiatu arbelera testu gisa",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Kopiatu jatorria arbelean",
+    "convertToCode": "Kodera bihurtu",
     "bringForward": "Ekarri aurrerago",
     "sendToBack": "Eraman atzera",
     "bringToFront": "Ekarri aurrera",
@@ -21,9 +21,9 @@
     "copyStyles": "Kopiatu estiloak",
     "pasteStyles": "Itsatsi estiloak",
     "stroke": "Marra",
-    "changeStroke": "",
+    "changeStroke": "Marraren kolorea aldatu",
     "background": "Atzeko planoa",
-    "changeBackground": "",
+    "changeBackground": "Atzealdeko kolorea aldatu",
     "fill": "Bete",
     "strokeWidth": "Marraren zabalera",
     "strokeStyle": "Marraren estiloa",
@@ -40,12 +40,12 @@
     "arrowhead_none": "Bat ere ez",
     "arrowhead_arrow": "Gezia",
     "arrowhead_bar": "Barra",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Zirkulua",
+    "arrowhead_circle_outline": "Zirkulua (eskema)",
     "arrowhead_triangle": "Hirukia",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triangelua (eskema)",
+    "arrowhead_diamond": "Erromboa",
+    "arrowhead_diamond_outline": "Erromboa (eskema)",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
@@ -74,7 +74,7 @@
     "canvasColors": "Oihalean erabilita",
     "canvasBackground": "Oihalaren atzeko planoa",
     "drawingCanvas": "Marrazteko oihala",
-    "clearCanvas": "",
+    "clearCanvas": "Garbitu",
     "layers": "Geruzak",
     "actions": "Ekintzak",
     "language": "Hizkuntza",
@@ -87,13 +87,13 @@
     "group": "Hautapena taldea bihurtu",
     "ungroup": "Desegin hautapenaren taldea",
     "collaborators": "Kolaboratzaileak",
-    "toggleGrid": "",
+    "toggleGrid": "Txandakatu sareta",
     "addToLibrary": "Gehitu liburutegira",
     "removeFromLibrary": "Kendu liburutegitik",
     "libraryLoadingMessage": "Liburutegia kargatzen…",
     "libraries": "Arakatu liburutegiak",
     "loadingScene": "Eszena kargatzen…",
-    "loadScene": "",
+    "loadScene": "Fitxategitik kargatu",
     "align": "Lerrokatu",
     "alignTop": "Lerrokatu goian",
     "alignBottom": "Lerrokatu behean",
@@ -109,8 +109,8 @@
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
-    "toggleTheme": "",
-    "theme": "",
+    "toggleTheme": "Gaia argia/iluna aktibatu",
+    "theme": "Itxura",
     "personalLib": "Liburutegi pertsonala",
     "excalidrawLib": "Excalidraw liburutegia",
     "decreaseFontSize": "Txikitu letra tamaina",
@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Editatu lerroa",
-      "editArrow": ""
+      "editArrow": "Gezia aldatu"
     },
     "elementLock": {
       "lock": "Blokeatu",
@@ -142,15 +142,15 @@
     "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
     "removeAllElementsFromFrame": "Kendu markoko elementu guztiak",
     "eyeDropper": "Aukeratu kolorea oihaletik",
-    "textToDiagram": "",
-    "prompt": "",
-    "followUs": "",
-    "discordChat": "",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
-    "installPWA": "",
-    "autoResize": ""
+    "textToDiagram": "Testutik diagramara",
+    "prompt": "Galdetu",
+    "followUs": "Jarraitu gaitzazu",
+    "discordChat": "Discord txata",
+    "zoomToFitViewport": "Zoom ikuspegira",
+    "zoomToFitSelection": "Zoom hautapenera",
+    "zoomToFit": "Egin zoom elementu guztiak ikusteko",
+    "installPWA": "Instalatu Excalidraw lokalean (PWA)",
+    "autoResize": "Textu zabalera automatikoa aktibatu"
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -224,13 +224,13 @@
     "imageInsertError": "Ezin izan da irudia txertatu. Saiatu berriro geroago...",
     "fileTooBig": "Fitxategia handiegia da. Onartutako gehienezko tamaina {{maxSize}} da.",
     "svgImageInsertError": "Ezin izan da SVG irudia txertatu. SVG markak baliogabea dirudi.",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "Ezin izan da irudia eskuratu.",
     "cannotResolveCollabServer": "Ezin izan da elkarlaneko zerbitzarira konektatu. Mesedez, berriro kargatu orria eta saiatu berriro.",
     "importLibraryError": "Ezin izan da liburutegia kargatu",
-    "saveLibraryError": "",
+    "saveLibraryError": "Ezin izan da liburutegian gorde. Mesedez, gorde fitxategi lokal batetara aldaketarik ez galtzeko.",
     "collabSaveFailed": "Ezin izan da backend datu-basean gorde. Arazoak jarraitzen badu, zure fitxategia lokalean gorde beharko zenuke zure lana ez duzula galtzen ziurtatzeko.",
     "collabSaveFailed_sizeExceeded": "Ezin izan da backend datu-basean gorde, ohiala handiegia dela dirudi. Fitxategia lokalean gorde beharko zenuke zure lana galtzen ez duzula ziurtatzeko.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Irudiak desgaituak daude.",
     "brave_measure_text_error": {
       "line1": "Brave arakatzailea erabiltzen ari zarela dirudi <bold>Blokeatu hatz-markak erasokorki</bold> ezarpena gaituta.",
       "line2": "Honek zure marrazkietako <bold>Testu-elementuak</bold> hautsi ditzake.",
@@ -239,12 +239,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
-      "iframe": "",
+      "iframe": "Kapsulatutako elementuak ezin dira liburutegira gehitu.",
       "image": "Laster egongo da irudiak liburutegian gehitzeko laguntza!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Ezin izan da itsatsi (ezin izan da sistemaren arbeletik irakurri).",
+    "asyncPasteFailedOnParse": "Ezin izan da itsatsi.",
+    "copyToSystemClipboardFailed": "Ezin izan da arbelean kopiatu."
   },
   "toolBar": {
     "selection": "Hautapena",
@@ -259,16 +259,16 @@
     "library": "Liburutegia",
     "lock": "Mantendu aktibo hautatutako tresna marraztu ondoren",
     "penMode": "Luma modua - ukipena saihestu",
-    "link": "",
+    "link": "Gehitu / Eguneratu esteka hautatutako forma baterako",
     "eraser": "Borragoma",
     "frame": "Marko tresna",
-    "magicframe": "",
+    "magicframe": "Wireframetik kodera",
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "Mermaid-etik Excalidraw-ra",
+    "magicSettings": "AI ezarpenak"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -313,11 +313,11 @@
     "sceneContent": "Eszenaren edukia:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Edo"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Gonbidatu jendea zure marrazkira.",
+    "desc_privacy": "Lasai, sesioa encriptatua dago eta erabat pribatua da. Gure zerbitzarian ere ezin da ikusi zure marrazkia.",
     "button_startSession": "Hasi saioa",
     "button_stopSession": "Itxi saioa",
     "desc_inProgressIntro": "Zuzeneko lankidetza saioa abian da.",
@@ -426,8 +426,8 @@
       "copyPngToClipboard": "Kopiatu PNG arbelera"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Kopiatu arbelean"
     }
   },
@@ -513,7 +513,7 @@
         "description": "Esportatu eszenaren datuak geroago inportatu ahal izango duzun fitxategi batan."
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Esportatu Excalidraw+ra",
         "description": "Gorde eszena zure Excalidraw+ laneko areara."
       }
@@ -532,22 +532,22 @@
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
-    "preview": ""
+    "title": "Mermaid-etik Excalidraw-ra",
+    "button": "Txertatu",
+    "description": "Momentu honetan <flowchartLink>Flowchart</flowchartLink>, <sequenceLink> Sequence, </sequenceLink> eta <classLink>Class </classLink>Diagramak onartzen dira. Beste motak irudi gisa errendatuko dira Excalidrawn.",
+    "syntax": "Mermaid sintaxia",
+    "preview": "Aurrebista"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Bilaketa Azkarra",
+      "empty": "Ez erabiltzailerik topatu"
     },
     "hint": {
-      "text": "",
-      "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
+      "text": "Klik erabiltzailean jarraitzeko",
+      "followStatus": "Dagoeneko erabiltzaile hau jarraitzen ari zara",
+      "inCall": "Erabiltzailea dei batean dago",
+      "micMuted": "Erabiltzailearen mikronofoa isildua dago",
       "isSpeaking": ""
     }
   },
