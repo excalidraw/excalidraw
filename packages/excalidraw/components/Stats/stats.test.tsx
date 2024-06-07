@@ -1,5 +1,5 @@
 import { fireEvent, queryByText } from "@testing-library/react";
-import { Pointer, UI } from "../../tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getStepSizedValue } from "./utils";
 import {
   GlobalTestState,
@@ -19,8 +19,10 @@ import type {
 } from "../../element/types";
 import { degreeToRadian, rotate } from "../../math";
 import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
-import { isTextElement } from "../../element";
+import { getCommonBounds, isTextElement } from "../../element";
 import { API } from "../../tests/helpers/api";
+import { actionGroup } from "../../actions";
+import { isInGroup } from "../../groups";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -400,5 +402,240 @@ describe("stats for a non-generic element", () => {
     testInputProperty(image, "height", "H", image.height, 80);
     expect(image.height).toBe(80);
     expect(image.width / image.height).toBe(widthToHeight);
+  });
+});
+
+// multiple elements
+describe("stats for multiple elements", () => {
+  beforeEach(async () => {
+    mouse.reset();
+    localStorage.clear();
+    renderStaticScene.mockClear();
+    reseed(7);
+    setDateTimeForTests("201933152653");
+
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    h.elements = [];
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByText(contextMenu!, "Stats")!);
+    stats = UI.queryStats();
+  });
+
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("should display MIXED for elements with different values", () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(200, 100);
+
+    UI.clickTool("ellipse");
+    mouse.down(50, 50);
+    mouse.up(100, 100);
+
+    UI.clickTool("diamond");
+    mouse.down(-100, -100);
+    mouse.up(125, 145);
+
+    h.setState({
+      selectedElementIds: h.elements.reduce((acc, el) => {
+        acc[el.id] = true;
+        return acc;
+      }, {} as Record<string, true>),
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    const width = getStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(width?.value).toBe("Mixed");
+    const height = getStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(height?.value).toBe("Mixed");
+    const angle = getStatsProperty("A")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(angle.value).toBe("0");
+
+    width.focus();
+    width.value = "250";
+    width.blur();
+    h.elements.forEach((el) => {
+      expect(el.width).toBe(250);
+    });
+
+    height.focus();
+    height.value = "450";
+    height.blur();
+    h.elements.forEach((el) => {
+      expect(el.height).toBe(450);
+    });
+  });
+
+  it("should display a property when one of the elements is editable for that property", async () => {
+    // text, rectangle, frame
+    UI.clickTool("text");
+    mouse.clickAt(20, 30);
+    const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
+    const editor = await getTextEditor(textEditorSelector, true);
+    await new Promise((r) => setTimeout(r, 0));
+    updateTextEditor(editor, "Hello!");
+    editor.blur();
+
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(200, 100);
+
+    const frame = API.createElement({
+      id: "id0",
+      type: "frame",
+      x: 150,
+      width: 150,
+    });
+
+    h.elements = [...h.elements, frame];
+
+    const text = h.elements.find((el) => el.type === "text");
+    const rectangle = h.elements.find((el) => el.type === "rectangle");
+
+    h.setState({
+      selectedElementIds: h.elements.reduce((acc, el) => {
+        acc[el.id] = true;
+        return acc;
+      }, {} as Record<string, true>),
+    });
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    const width = getStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(width).not.toBeNull();
+    expect(width.value).toBe("Mixed");
+
+    const height = getStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(height).not.toBeNull();
+    expect(height.value).toBe("Mixed");
+
+    const angle = getStatsProperty("A")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(angle).not.toBeNull();
+    expect(angle.value).toBe("0");
+
+    const fontSize = getStatsProperty("F")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(fontSize).not.toBeNull();
+
+    // changing width does not affect text
+    width.focus();
+    width.value = "200";
+    width.blur();
+
+    expect(rectangle?.width).toBe(200);
+    expect(frame.width).toBe(200);
+    expect(text?.width).not.toBe(200);
+
+    angle.focus();
+    angle.value = "40";
+    angle.blur();
+
+    const angleInRadian = degreeToRadian(40);
+    expect(rectangle?.angle).toBeCloseTo(angleInRadian, 4);
+    expect(text?.angle).not.toBeCloseTo(angleInRadian, 4);
+    expect(frame.angle).toBe(0);
+  });
+
+  it("should treat groups as single units", () => {
+    const createAndSelectGroupAndRectangle = () => {
+      UI.clickTool("rectangle");
+      mouse.down();
+      mouse.up(100, 100);
+
+      UI.clickTool("rectangle");
+      mouse.down(0, 0);
+      mouse.up(100, 100);
+
+      // Select the first element.
+      // The second rectangle is already reselected because it was the last element created
+      mouse.reset();
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.click();
+      });
+
+      h.app.actionManager.executeAction(actionGroup);
+
+      mouse.reset();
+      UI.clickTool("rectangle");
+      mouse.down(200, 200);
+      mouse.up(100, 100);
+
+      // Add the created group to the current selection
+      mouse.restorePosition(0, 0);
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.click();
+      });
+    };
+
+    createAndSelectGroupAndRectangle();
+
+    elementStats = stats?.querySelector("#elementStats");
+
+    const width = getStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(width).not.toBeNull();
+    expect(width.value).toBe("Mixed");
+
+    const height = getStatsProperty("H")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    width.focus();
+    width.value = "400";
+    width.blur();
+
+    const elementsInGroup = h.elements.filter((el) => isInGroup(el));
+    const individualElements = h.elements.filter((el) => !isInGroup(el));
+    let [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
+    let newGroupWidth = x2 - x1;
+
+    expect(newGroupWidth).toBeCloseTo(individualElements[0].width, 4);
+    expect(newGroupWidth).toBeCloseTo(400, 4);
+
+    width.focus();
+    width.value = "300";
+    width.blur();
+
+    [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
+    newGroupWidth = x2 - x1;
+    expect(newGroupWidth).toBeCloseTo(individualElements[0].width, 4);
+    expect(newGroupWidth).toBeCloseTo(300, 4);
+
+    height.focus();
+    height.value = "500";
+    height.blur();
+
+    [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
+    const newGroupHeight = y2 - y1;
+    expect(newGroupHeight).toBeCloseTo(individualElements[0].height, 4);
+    expect(newGroupHeight).toBeCloseTo(500, 4);
   });
 });
