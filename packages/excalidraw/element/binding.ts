@@ -26,7 +26,7 @@ import type {
 
 import { getElementAbsoluteCoords } from "./bounds";
 import type { AppClassProperties, AppState, Point } from "../types";
-import { isPointOnShape } from "../../utils/collision";
+import { isPointInsideFrame, isPointOnShape } from "../../utils/collision";
 import { getElementAtPosition } from "../scene";
 import {
   isArrowElement,
@@ -409,6 +409,24 @@ export const isLinearElementSimpleAndAlreadyBound = (
   );
 };
 
+export const isBindAbleElementInsideFrame = (
+  pointerCoords: { x: number; y: number },
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: NonDeletedSceneElementsMap,
+): boolean => {
+  // if element is not inside frame pointAble.
+  if (!bindableElement.frameId) {
+    return true;
+  }
+
+  const frame = elementsMap.get(
+    bindableElement.frameId,
+  ) as NonDeleted<ExcalidrawFrameLikeElement>;
+
+  // if bindableElement is inside frame then point must be inside frame too. (disable binding to non visible edge)
+  return isPointInsideFrame([pointerCoords.x, pointerCoords.y], frame);
+};
+
 const isLinearElementSimple = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): boolean => linearElement.points.length < 3;
@@ -437,7 +455,12 @@ export const getHoveredElementForBinding = (
     app.scene.getNonDeletedElements(),
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(element, pointerCoords, app),
+      bindingBorderTest(element, pointerCoords, app) &&
+      isBindAbleElementInsideFrame(
+        pointerCoords,
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      ),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };

@@ -1,4 +1,6 @@
 import type { Point, Polygon, GeometricShape } from "./geometry/shape";
+import type { ExcalidrawFrameLikeElement } from "@excalidraw/excalidraw/element/types";
+import { getPolygonShape } from "./geometry/shape";
 import {
   pointInEllipse,
   pointInPolygon,
@@ -63,4 +65,13 @@ export const isPointInShape = (point: Point, shape: GeometricShape) => {
 // check if the given element is in the given bounds
 export const isPointInBounds = (point: Point, bounds: Polygon) => {
   return pointInPolygon(point, bounds);
+};
+
+// check if the given point inside of frame
+export const isPointInsideFrame = (
+  point: Point,
+  frame: ExcalidrawFrameLikeElement,
+) => {
+  const frameShape = getPolygonShape(frame);
+  return isPointInShape(point, frameShape);
 };
