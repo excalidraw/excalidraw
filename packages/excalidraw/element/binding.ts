@@ -409,7 +409,7 @@ export const isLinearElementSimpleAndAlreadyBound = (
   );
 };
 
-export const isBindAbleElementInsideFrame = (
+export const isElementInsideFrameBindable = (
   pointerCoords: { x: number; y: number },
   bindableElement: ExcalidrawBindableElement,
   elementsMap: NonDeletedSceneElementsMap,
@@ -456,7 +456,7 @@ export const getHoveredElementForBinding = (
     (element) =>
       isBindableElement(element, false) &&
       bindingBorderTest(element, pointerCoords, app) &&
-      isBindAbleElementInsideFrame(
+      isElementInsideFrameBindable(
         pointerCoords,
         element,
         app.scene.getNonDeletedElementsMap(),
