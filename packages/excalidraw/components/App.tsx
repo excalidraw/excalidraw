@@ -3978,11 +3978,9 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      flushSync(() => {
-        if (sceneData.appState) {
-          this.setState(sceneData.appState);
-        }
-      });
+      if (sceneData.appState) {
+        this.setState(sceneData.appState);
+      }
 
       if (sceneData.elements) {
         this.scene.replaceAllElements(nextElements);
