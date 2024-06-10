@@ -399,6 +399,96 @@ body.dragResize * {
     position: absolute;
   }
 
+  .App-menu > .Stats {
+    width: 204px;
+    position: absolute;
+    top: 60px;
+    font-size: 12px;
+    z-index: var(--zIndex-layerUI);
+    pointer-events: var(--ui-pointerEvents);
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        margin: 0;
+      }
+    }
+
+    .sectionContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .elementType {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .elementsCount {
+      width: 100%;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .statsItem {
+      width: 100%;
+      margin-bottom: 4px;
+      display: grid;
+      gap: 4px;
+
+      .label {
+        margin-right: 4px;
+      }
+    }
+
+    h3 {
+      white-space: nowrap;
+    }
+
+    .close {
+      height: 16px;
+      width: 16px;
+      cursor: pointer;
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    table {
+      width: 100%;
+      th {
+        border-bottom: 1px solid var(--input-border-color);
+        padding: 4px;
+      }
+      tr {
+        td:nth-child(2) {
+          min-width: 24px;
+          text-align: right;
+        }
+      }
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background-color: var(--default-border-color);
+    }
+
+    :root[dir="rtl"] & {
+      left: 12px;
+      right: initial;
+    }
+  }
+
   .dropdown-select {
     height: 1.5rem;
     padding: 0;

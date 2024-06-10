@@ -434,7 +434,6 @@ import {
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
-import { Stats } from "./Stats";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1668,19 +1667,6 @@ class App extends React.Component<AppProps, AppState> {
                                 callback?.();
                               });
                             }}
-                          />
-                        )}
-                        {this.state.showStats && (
-                          <Stats
-                            appState={this.state}
-                            setAppState={this.setState}
-                            scene={this.scene}
-                            onClose={() => {
-                              this.actionManager.executeAction(
-                                actionToggleStats,
-                              );
-                            }}
-                            renderCustomStats={renderCustomStats}
                           />
                         )}
                         <StaticCanvas

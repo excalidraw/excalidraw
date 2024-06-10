@@ -62,6 +62,8 @@ import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { MagicSettings } from "./MagicSettings";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -352,6 +354,16 @@ const LayerUI = ({
                 <tunnels.DefaultSidebarTriggerTunnel.Out />
               )}
           </div>
+
+          {appState.showStats && (
+            <Stats
+              scene={app.scene}
+              onClose={() => {
+                actionManager.executeAction(actionToggleStats);
+              }}
+              renderCustomStats={renderCustomStats}
+            />
+          )}
         </div>
       </FixedSideContainer>
     );

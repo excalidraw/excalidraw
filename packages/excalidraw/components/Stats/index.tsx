@@ -1,17 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getCommonBounds } from "../../element/bounds";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
 import { getSelectedElements } from "../../scene";
-import type Scene from "../../scene/Scene";
-import type { AppState, ExcalidrawProps } from "../../types";
+import type { ExcalidrawProps } from "../../types";
 import { CloseIcon } from "../icons";
 import { Island } from "../Island";
 import { throttle } from "lodash";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
 
-import "./index.scss";
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
 import { elementsAreInSameGroup } from "../../groups";
@@ -20,24 +18,26 @@ import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
 import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
+import type Scene from "../../scene/Scene";
+import { useExcalidrawAppState } from "../App";
 
 interface StatsProps {
-  appState: AppState;
   scene: Scene;
-  setAppState: React.Component<any, AppState>["setState"];
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
 const STATS_TIMEOUT = 50;
 
-export const Stats = (props: StatsProps) => {
-  const elements = props.scene.getNonDeletedElements();
-  const elementsMap = props.scene.getNonDeletedElementsMap();
-  const sceneNonce = props.scene.getSceneNonce();
+export const Stats = ({ scene, onClose, renderCustomStats }: StatsProps) => {
+  const appState = useExcalidrawAppState();
+
+  const elements = scene.getNonDeletedElements();
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const sceneNonce = scene.getSceneNonce();
   // const selectedElements = getTargetElements(elements, props.appState);
   const selectedElements = getSelectedElements(
-    props.scene.getNonDeletedElementsMap(),
-    props.appState,
+    scene.getNonDeletedElementsMap(),
+    appState,
     {
       includeBoundTextElement: false,
     },
@@ -86,7 +86,7 @@ export const Stats = (props: StatsProps) => {
       <Island padding={3}>
         <div className="title">
           <h2>Stats</h2>
-          <div className="close" onClick={props.onClose}>
+          <div className="close" onClick={onClose}>
             {CloseIcon}
           </div>
         </div>
@@ -113,7 +113,7 @@ export const Stats = (props: StatsProps) => {
                 <td>{t("stats.height")}</td>
                 <td>{sceneDimension.height}</td>
               </tr>
-              {props.renderCustomStats?.(elements, props.appState)}
+              {renderCustomStats?.(elements, appState)}
             </tbody>
           </table>
         </Collapsible>
@@ -194,13 +194,13 @@ export const Stats = (props: StatsProps) => {
                       property="width"
                       elements={multipleElements}
                       elementsMap={elementsMap}
-                      appState={props.appState}
+                      appState={appState}
                     />
                     <MultiDimension
                       property="height"
                       elements={multipleElements}
                       elementsMap={elementsMap}
-                      appState={props.appState}
+                      appState={appState}
                     />
                     <MultiAngle
                       elements={multipleElements}
