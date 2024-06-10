@@ -153,9 +153,7 @@ const MultiDimension = ({
   const sizes = [...individualSizes, ...groupSizes];
 
   const value =
-    new Set([...individualSizes, ...groupSizes]).size === 1
-      ? Math.round(sizes[0] * 100) / 100
-      : "Mixed";
+    new Set(sizes).size === 1 ? Math.round(sizes[0] * 100) / 100 : "Mixed";
 
   const editable = sizes.length > 0;
 
