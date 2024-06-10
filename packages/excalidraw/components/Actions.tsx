@@ -21,7 +21,7 @@ import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { hasStrokeColor } from "../scene/comparisons";
+import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import {
   hasBoundTextElement,
@@ -153,6 +153,11 @@ export const SelectedShapeActions = ({
       {(canChangeRoundness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeRoundness(element.type))) && (
         <>{renderAction("changeRoundness")}</>
+      )}
+
+      {(toolIsArrow(appState.activeTool.type) ||
+        targetElements.some((element) => toolIsArrow(element.type))) && (
+        <>{renderAction("changeArrowType")}</>
       )}
 
       {(appState.activeTool.type === "text" ||

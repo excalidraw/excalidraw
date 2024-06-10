@@ -259,6 +259,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
+    elbowed: boolean;
   }>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &

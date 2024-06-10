@@ -50,6 +50,9 @@ import {
   ArrowheadDiamondIcon,
   ArrowheadDiamondOutlineIcon,
   fontSizeIcon,
+  arrowUpRightIcon,
+  arrowCurveRight,
+  arrowGuideIcon,
 } from "../components/icons";
 import {
   DEFAULT_FONT_FAMILY,
@@ -70,6 +73,7 @@ import {
   getDefaultLineHeight,
 } from "../element/textElement";
 import {
+  isArrowElement,
   isBoundToContainer,
   isLinearElement,
   isUsingAdaptiveRadius,
@@ -1070,7 +1074,8 @@ export const actionChangeRoundness = register({
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
-            (element) => element.hasOwnProperty("roundness"),
+            (element) =>
+              !isArrowElement(element) && element.hasOwnProperty("roundness"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemRoundness,
           )}
@@ -1229,6 +1234,94 @@ export const actionChangeArrowhead = register({
             onChange={(value) => updateData({ position: "end", type: value })}
           />
         </div>
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeArrowType = register({
+  name: "changeArrowType",
+  label: "Change arrow types",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (!isArrowElement(el)) {
+          return el;
+        }
+        const newElement = newElementWith(el, {
+          roundness:
+            value === "round"
+              ? {
+                  type: ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : null,
+          elbowed: value === "elbow",
+        });
+
+        if (value === "elbow") {
+        }
+
+        return newElement;
+      }),
+      appState: {
+        ...appState,
+        currentItemRoundness: value === "round" ? value : null,
+        currentItemElbowArrow: value === "elbow",
+      },
+      storeAction: StoreAction.CAPTURE,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <legend>{t("labels.arrowtypes")}</legend>
+        <ButtonIconSelect
+          group="arrowtypes"
+          options={[
+            {
+              value: "sharp",
+              text: t("labels.arrowtype_sharp"),
+              icon: arrowUpRightIcon,
+            },
+            {
+              value: "round",
+              text: t("labels.arrowtype_round"),
+              icon: arrowCurveRight,
+            },
+            {
+              value: "elbow",
+              text: t("labels.arrowtype_elbowed"),
+              icon: arrowGuideIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              //console.log(element.elbowed);
+              if (isArrowElement(element)) {
+                return element.elbowed
+                  ? "elbow"
+                  : element.roundness
+                  ? "round"
+                  : "sharp";
+              }
+
+              return null;
+            },
+            (element) => isArrowElement(element),
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemElbowArrow
+                ? "elbow"
+                : appState.currentItemRoundness
+                ? "round"
+                : "sharp",
+          )}
+          onChange={(value) => updateData(value)}
+        />
       </fieldset>
     );
   },

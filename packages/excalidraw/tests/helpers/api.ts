@@ -256,8 +256,6 @@ export class API {
           width,
           height,
           type,
-          startArrowhead: null,
-          endArrowhead: null,
           points: rest.points ?? [
             [0, 0],
             [100, 100],

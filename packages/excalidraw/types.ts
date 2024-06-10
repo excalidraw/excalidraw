@@ -279,6 +279,7 @@ export interface AppState {
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
   currentItemRoundness: StrokeRoundness;
+  currentItemElbowArrow: boolean;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;

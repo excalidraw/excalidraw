@@ -112,6 +112,7 @@ import {
   isTextElement,
   newElement,
   newLinearElement,
+  newArrowElement,
   newTextElement,
   newImageElement,
   transformElements,
@@ -6999,26 +7000,47 @@ class App extends React.Component<AppProps, AppState> {
           ? [currentItemStartArrowhead, currentItemEndArrowhead]
           : [null, null];
 
-      const element = newLinearElement({
-        type: elementType,
-        x: gridX,
-        y: gridY,
-        strokeColor: this.state.currentItemStrokeColor,
-        backgroundColor: this.state.currentItemBackgroundColor,
-        fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
-        strokeStyle: this.state.currentItemStrokeStyle,
-        roughness: this.state.currentItemRoughness,
-        opacity: this.state.currentItemOpacity,
-        roundness:
-          this.state.currentItemRoundness === "round"
-            ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-            : null,
-        startArrowhead,
-        endArrowhead,
-        locked: false,
-        frameId: topLayerFrame ? topLayerFrame.id : null,
-      });
+      const element =
+        elementType === "arrow"
+          ? newArrowElement({
+              type: elementType,
+              x: gridX,
+              y: gridY,
+              strokeColor: this.state.currentItemStrokeColor,
+              backgroundColor: this.state.currentItemBackgroundColor,
+              fillStyle: this.state.currentItemFillStyle,
+              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeStyle: this.state.currentItemStrokeStyle,
+              roughness: this.state.currentItemRoughness,
+              opacity: this.state.currentItemOpacity,
+              roundness:
+                this.state.currentItemRoundness === "round"
+                  ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+                  : null,
+              startArrowhead,
+              endArrowhead,
+              locked: false,
+              frameId: topLayerFrame ? topLayerFrame.id : null,
+              elbowed: false,
+            })
+          : newLinearElement({
+              type: elementType,
+              x: gridX,
+              y: gridY,
+              strokeColor: this.state.currentItemStrokeColor,
+              backgroundColor: this.state.currentItemBackgroundColor,
+              fillStyle: this.state.currentItemFillStyle,
+              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeStyle: this.state.currentItemStrokeStyle,
+              roughness: this.state.currentItemRoughness,
+              opacity: this.state.currentItemOpacity,
+              roundness:
+                this.state.currentItemRoundness === "round"
+                  ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+                  : null,
+              locked: false,
+              frameId: topLayerFrame ? topLayerFrame.id : null,
+            });
       this.setState((prevState) => {
         const nextSelectedElementIds = {
           ...prevState.selectedElementIds,
