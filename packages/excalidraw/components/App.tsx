@@ -48,7 +48,8 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { DEFAULT_FONT_SIZE, EXPORT_IMAGE_TYPES } from "../constants";
+import type { EXPORT_IMAGE_TYPES } from "../constants";
+import { DEFAULT_FONT_SIZE } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
