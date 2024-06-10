@@ -75,6 +75,7 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  scene: Scene,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -86,7 +87,7 @@ export const transformElements = (
         pointerY,
         shouldRotateWithDiscreteAngle,
       );
-      updateBoundElements(element, elementsMap);
+      updateBoundElements(element, elementsMap, scene);
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         originalElements,
@@ -97,7 +98,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      updateBoundElements(element, elementsMap);
+      updateBoundElements(element, elementsMap, scene);
     } else if (transformHandleType) {
       resizeSingleElement(
         originalElements,
@@ -108,6 +109,7 @@ export const transformElements = (
         shouldResizeFromCenter,
         pointerX,
         pointerY,
+        scene,
       );
     }
 
@@ -123,6 +125,7 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
         centerX,
         centerY,
+        scene,
       );
       return true;
     } else if (transformHandleType) {
@@ -135,6 +138,7 @@ export const transformElements = (
         shouldMaintainAspectRatio,
         pointerX,
         pointerY,
+        scene,
       );
       return true;
     }
@@ -431,7 +435,17 @@ export const resizeSingleElement = (
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
+  scene: Scene,
 ) => {
+  // Elbow arrows cannot be resized when bound on either end
+  if (
+    isArrowElement(element) &&
+    element.elbowed &&
+    (element.startBinding || element.endBinding)
+  ) {
+    return;
+  }
+
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
@@ -701,7 +715,7 @@ export const resizeSingleElement = (
   ) {
     mutateElement(element, resizedElement);
 
-    updateBoundElements(element, elementsMap, {
+    updateBoundElements(element, elementsMap, scene, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
     });
 
@@ -728,6 +742,7 @@ export const resizeMultipleElements = (
   shouldMaintainAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
+  scene: Scene,
 ) => {
   // map selected elements to the original elements. While it never should
   // happen that pointerDownState.originalElements won't contain the selected
@@ -959,7 +974,7 @@ export const resizeMultipleElements = (
 
     mutateElement(element, update, false);
 
-    updateBoundElements(element, elementsMap, {
+    updateBoundElements(element, elementsMap, scene, {
       simultaneouslyUpdated: elementsToUpdate,
       newSize: { width, height },
     });
@@ -990,6 +1005,7 @@ const rotateMultipleElements = (
   shouldRotateWithDiscreteAngle: boolean,
   centerX: number,
   centerY: number,
+  scene: Scene,
 ) => {
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
@@ -1022,7 +1038,7 @@ const rotateMultipleElements = (
         },
         false,
       );
-      updateBoundElements(element, elementsMap, {
+      updateBoundElements(element, elementsMap, scene, {
         simultaneouslyUpdated: elements,
       });
 

@@ -41,6 +41,7 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
+import type Scene from "../scene/Scene";
 
 const { h } = window;
 
@@ -114,6 +115,7 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
+              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -135,6 +137,7 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
+              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -438,8 +441,8 @@ describe("history", () => {
         expect(h.history.isUndoStackEmpty).toBeTruthy();
       });
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history, h.store, h.scene);
+      const redoAction = createRedoAction(h.history, h.store, h.scene);
       // noop
       act(() => h.app.actionManager.executeAction(undoAction));
       expect(h.elements).toEqual([
@@ -515,8 +518,8 @@ describe("history", () => {
         expect.objectContaining({ id: "B", isDeleted: false }),
       ]);
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history, h.store, h.scene);
+      const redoAction = createRedoAction(h.history, h.store, h.scene);
       act(() => h.app.actionManager.executeAction(undoAction));
 
       expect(API.getSnapshot()).toEqual([
@@ -1698,8 +1701,8 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history, h.store, h.scene);
+      const redoAction = createRedoAction(h.history, h.store, h.scene);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -1748,7 +1751,7 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history, h.store, h.scene);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);

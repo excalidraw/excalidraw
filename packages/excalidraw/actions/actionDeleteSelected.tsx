@@ -130,7 +130,11 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        element,
+        selectedPointsIndices,
+        app.scene,
+      );
 
       return {
         elements,

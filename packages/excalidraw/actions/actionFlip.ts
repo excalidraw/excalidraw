@@ -120,6 +120,7 @@ const flipElements = (
     true,
     flipDirection === "horizontal" ? maxX : minX,
     flipDirection === "horizontal" ? minY : maxY,
+    app.scene,
   );
 
   bindOrUnbindLinearElements(
