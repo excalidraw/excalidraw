@@ -48,7 +48,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import type { EXPORT_IMAGE_TYPES } from "../constants";
+import { DEFAULT_FONT_SIZE, EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -3057,7 +3057,7 @@ class App extends React.Component<AppProps, AppState> {
           try {
             const { elements: skeletonElements, files } =
               await api.parseMermaidToExcalidraw(data.text, {
-                fontSize: 24,
+                fontSize: DEFAULT_FONT_SIZE,
               });
 
             const elements = convertToExcalidrawElements(skeletonElements, {
@@ -3071,8 +3071,10 @@ class App extends React.Component<AppProps, AppState> {
             });
 
             return;
-          } catch (err) {
-            console.error(err);
+          } catch (err: any) {
+            console.warn(
+              `parsing pasted text as mermaid definition failed: ${err.message}`,
+            );
           }
         }
 
