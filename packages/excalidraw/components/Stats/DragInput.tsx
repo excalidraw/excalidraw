@@ -185,13 +185,11 @@ const StatsDragInput = ({
         onKeyDown={(event) => {
           if (editable) {
             const eventTarget = event.target;
-
             if (
               eventTarget instanceof HTMLInputElement &&
               event.key === KEYS.ENTER
             ) {
-              const v = Number(eventTarget.value);
-              handleInputValue(v);
+              handleInputValue(Number(eventTarget.value));
               eventTarget.blur();
             }
           }
@@ -199,22 +197,18 @@ const StatsDragInput = ({
         ref={inputRef}
         value={inputValue}
         onChange={(event) => {
-          const eventTarget = event.target;
-          if (eventTarget instanceof HTMLInputElement) {
-            setInputValue(event.target.value);
-          }
+          setInputValue(event.target.value);
+        }}
+        onFocus={(event) => {
+          event.target.select();
         }}
         onBlur={(event) => {
           if (!inputValue) {
             setInputValue(value.toString());
           } else if (editable) {
-            const eventTarget = event.target;
-
-            if (eventTarget instanceof HTMLInputElement) {
-              const v = Number(eventTarget.value);
-              handleInputValue(v);
-              app.store.shouldCaptureIncrement();
-            }
+            const v = Number(event.target.value);
+            handleInputValue(v);
+            app.store.shouldCaptureIncrement();
           }
         }}
         disabled={!editable}
