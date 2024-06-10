@@ -79,7 +79,7 @@ export const Stats = ({ scene, onClose, renderCustomStats }: StatsProps) => {
   );
 
   const [generalStatsOpen, setGeneralStatsOpen] = useState(true);
-  const [elementStatsOpen, setElementStatsOpen] = useState(true);
+  const [elementPropertiesOpen, setElementPropertiesOpen] = useState(true);
 
   return (
     <div className="Stats">
@@ -127,8 +127,8 @@ export const Stats = ({ scene, onClose, renderCustomStats }: StatsProps) => {
           >
             <Collapsible
               label={<h3>{t("stats.elementProperties")}</h3>}
-              open={elementStatsOpen}
-              openTrigger={() => setElementStatsOpen((open) => !open)}
+              open={elementPropertiesOpen}
+              openTrigger={() => setElementPropertiesOpen((open) => !open)}
             >
               {singleElement && (
                 <div className="sectionContent">

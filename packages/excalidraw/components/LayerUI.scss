@@ -40,6 +40,7 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
+          margin-bottom: 12px;
 
           h2 {
             margin: 0;
@@ -56,7 +57,7 @@
         .elementType {
           font-size: 12px;
           font-weight: 700;
-          margin-bottom: 8px;
+          margin-top: 8px;
         }
 
         .elementsCount {
@@ -64,10 +65,11 @@
           font-size: 12px;
           display: flex;
           justify-content: space-between;
-          margin-bottom: 12px;
+          margin-top: 8px;
         }
 
         .statsItem {
+          margin-top: 8px;
           width: 100%;
           margin-bottom: 4px;
           display: grid;
@@ -80,6 +82,7 @@
 
         h3 {
           white-space: nowrap;
+          margin: 0;
         }
 
         .close {
