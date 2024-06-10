@@ -181,20 +181,6 @@ const MultiDimension = ({
     );
 
     if (nextValue !== undefined) {
-      const elementsInGroups = selectedGroupIds.map((gid) => ({
-        groupId: gid,
-        latestElements: getElementsInGroup(elements, gid),
-        originalElements: getElementsInGroup(originalElements, gid),
-      }));
-
-      const editableLatestIndividualElements = elements.filter(
-        (el) => isPropertyEditable(el, property) && !isInGroup(el),
-      );
-
-      const editableOriginalIndividualElements = originalElements.filter(
-        (el) => isPropertyEditable(el, property) && !isInGroup(el),
-      );
-
       for (const elementsInGroup of elementsInGroups) {
         const { latestElements, originalElements } = elementsInGroup;
         const [x1, y1, x2, y2] = getCommonBounds(originalElements);
