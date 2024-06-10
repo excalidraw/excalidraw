@@ -435,6 +435,7 @@ import {
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
+import { isMaybeMermaidDefinition } from "../mermaid";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3050,6 +3051,31 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        if (data.text && isMaybeMermaidDefinition(data.text)) {
+          const api = await import("@excalidraw/mermaid-to-excalidraw");
+
+          try {
+            const { elements: skeletonElements, files } =
+              await api.parseMermaidToExcalidraw(data.text, {
+                fontSize: 24,
+              });
+
+            const elements = convertToExcalidrawElements(skeletonElements, {
+              regenerateIds: true,
+            });
+
+            this.addElementsFromPasteOrLibrary({
+              elements,
+              files,
+              position: "cursor",
+            });
+
+            return;
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
         const nonEmptyLines = normalizeEOL(data.text)
           .split(/\n+/)
           .map((s) => s.trim())
