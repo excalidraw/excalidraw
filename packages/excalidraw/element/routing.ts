@@ -13,7 +13,12 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugClear, debugDrawBounds, debugDrawPoint } from "../visualdebug";
+import {
+  debugClear,
+  debugDrawBounds,
+  debugDrawPoint,
+  debugDrawSegments,
+} from "../visualdebug";
 import type { Bounds } from "./bounds";
 import { isBindableElement } from "./typeChecks";
 import type {
@@ -40,33 +45,17 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
   const [startAABB, endAABB] = [
     startElement && aabbForElement(startElement),
     endElement && aabbForElement(endElement),
-  ].filter((x) => x !== null);
+  ];
 
-  [startAABB, endAABB].forEach((aabb) =>
-    debugDrawBounds(
-      // @ts-ignore
-      aabb,
-    ),
-  );
+  [startAABB, endAABB].forEach((aabb) => aabb && debugDrawBounds(aabb));
 
   const [startHeading, endHeading] = [
     startElement &&
       startAABB &&
-      headingForPointOnElement(
-        startElement,
-        startAABB,
-        translatePoint(arrow.points[0], startGlobalPoint as Vector),
-      ),
+      headingForPointOnElement(startElement, startAABB, startGlobalPoint),
     endElement &&
       endAABB &&
-      headingForPointOnElement(
-        endElement,
-        endAABB,
-        translatePoint(
-          arrow.points[arrow.points.length - 1],
-          endGlobalPoint as Vector,
-        ),
-      ),
+      headingForPointOnElement(endElement, endAABB, endGlobalPoint),
   ];
 
   calculateGrid(
@@ -100,19 +89,20 @@ const calculateGrid = (
     vertical.add(aabb[3]);
   });
 
-  // Binding points are also
+  // Binding points are also nodes
   if (startHeading) {
     if (startHeading === HEADING_RIGHT || startHeading === HEADING_LEFT) {
-      horizontal.add(start[0]);
+      vertical.add(start[1]);
     } else {
+      horizontal.add(start[0]);
       vertical.add(start[1]);
     }
   }
   if (endHeading) {
     if (endHeading === HEADING_RIGHT || endHeading === HEADING_LEFT) {
-      horizontal.add(end[0]);
-    } else {
       vertical.add(end[1]);
+    } else {
+      horizontal.add(end[0]);
     }
   }
 
@@ -140,7 +130,13 @@ const calculateGrid = (
   return Array.from(horizontal)
     .sort((a, b) => a - b) // TODO: Do we need sorting?
     .flatMap((x) => _vertical.map((y) => [x, y] as Point))
-    .filter(filterUnique);
+    .filter(filterUnique)
+    .filter(
+      (point) =>
+        Math.max(
+          ...aabbs.map((aabb) => (pointInsideOrOnBounds(point, aabb) ? 1 : 0)),
+        ) === 0,
+    );
 };
 
 /**
@@ -230,15 +226,6 @@ const headingForPointOnElement = (
     ROTATION,
   );
 
-  // debugDrawSegments(
-  //   [
-  //     [topLeft, topRight],
-  //     [topRight, midPoint],
-  //     [midPoint, topLeft],
-  //   ],
-  //   "red",
-  // );
-
   if (element.type === "diamond") {
     // TODO: Optimize this. No need for triangle searchlights
     return PointInTriangle(point, topLeft, topRight, midPoint)
@@ -287,3 +274,9 @@ const getBindableElementForId = (
 
 const filterUnique = <T>(item: T, idx: number, coords: T[]) =>
   coords.indexOf(item) === idx;
+
+const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
+  p[0] >= bounds[0] &&
+  p[0] <= bounds[2] &&
+  p[1] >= bounds[1] &&
+  p[1] <= bounds[3];
