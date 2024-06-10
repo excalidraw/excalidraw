@@ -20,7 +20,6 @@ import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
 import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState } from "../App";
-import clsx from "clsx";
 
 interface StatsProps {
   scene: Scene;

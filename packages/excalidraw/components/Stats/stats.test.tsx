@@ -132,7 +132,7 @@ describe("stats for a generic element", () => {
 
     // title
     const title = elementStats?.querySelector("h3");
-    expect(title?.lastChild?.nodeValue)?.toBe(t("stats.elementStats"));
+    expect(title?.lastChild?.nodeValue)?.toBe(t("stats.elementProperties"));
 
     // element type
     const elementType = elementStats?.querySelector(".elementType");

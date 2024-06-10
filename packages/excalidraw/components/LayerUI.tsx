@@ -241,6 +241,11 @@ const LayerUI = ({
       elements,
     );
 
+    const shouldShowStats =
+      appState.showStats &&
+      !appState.zenModeEnabled &&
+      !appState.viewModeEnabled;
+
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
@@ -353,17 +358,16 @@ const LayerUI = ({
                 appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
                 <tunnels.DefaultSidebarTriggerTunnel.Out />
               )}
+            {shouldShowStats && (
+              <Stats
+                scene={app.scene}
+                onClose={() => {
+                  actionManager.executeAction(actionToggleStats);
+                }}
+                renderCustomStats={renderCustomStats}
+              />
+            )}
           </div>
-
-          {appState.showStats && (
-            <Stats
-              scene={app.scene}
-              onClose={() => {
-                actionManager.executeAction(actionToggleStats);
-              }}
-              renderCustomStats={renderCustomStats}
-            />
-          )}
         </div>
       </FixedSideContainer>
     );
