@@ -13,6 +13,7 @@ import type {
 import { getCurvePathOps } from "./element/bounds";
 import type { Mutable } from "./utility-types";
 import { ShapeCache } from "./scene/ShapeCache";
+import type { Vector } from "../utils/geometry/shape";
 
 export const rotate = (
   // target point to rotate
@@ -510,4 +511,39 @@ export const rangeIntersection = (
 
 export const isValueInRange = (value: number, min: number, max: number) => {
   return value >= min && value <= max;
+};
+
+export const translatePoint = (p: Point, v: Vector): Point => [
+  p[0] + v[0],
+  p[1] + v[1],
+];
+
+export const scaleVector = (v: Vector, scalar: number): Vector => [
+  v[0] * scalar,
+  v[1] * scalar,
+];
+
+export const pointToVector = (p: Point, origin: Point = [0, 0]): Vector => [
+  p[0] - origin[0],
+  p[1] - origin[1],
+];
+
+export const HEADING_RIGHT = [1, 0] as Heading;
+export const HEADING_DOWN = [0, 1] as Heading;
+export const HEADING_LEFT = [-1, 0] as Heading;
+export const HEADING_UP = [0, -1] as Heading;
+export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
+
+export const vectorToHeading = (vec: Vector): Heading => {
+  const [x, y] = vec;
+  const absX = Math.abs(x);
+  const absY = Math.abs(y);
+  if (x > absY) {
+    return HEADING_RIGHT;
+  } else if (x <= -absY) {
+    return HEADING_LEFT;
+  } else if (y > absX) {
+    return HEADING_DOWN;
+  }
+  return HEADING_UP;
 };

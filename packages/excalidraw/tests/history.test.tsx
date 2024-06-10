@@ -4334,7 +4334,12 @@ describe("history", () => {
             h.elements[0],
             newElementWith(h.elements[1], { boundElements: [] }),
             newElementWith(h.elements[2] as ExcalidrawLinearElement, {
-              endBinding: { elementId: remoteContainer.id, gap: 1, focus: 0 },
+              endBinding: {
+                elementId: remoteContainer.id,
+                gap: 1,
+                focus: 0,
+                ratio: [0.5, 1],
+              },
             }),
             remoteContainer,
           ],
@@ -4410,8 +4415,18 @@ describe("history", () => {
       it("should rebind remotely added arrow when it's bindable elements are added through the history", async () => {
         const arrow = API.createElement({
           type: "arrow",
-          startBinding: { elementId: rect1.id, gap: 1, focus: 0 },
-          endBinding: { elementId: rect2.id, gap: 1, focus: 0 },
+          startBinding: {
+            elementId: rect1.id,
+            gap: 1,
+            focus: 0,
+            ratio: [1, 0.5],
+          },
+          endBinding: {
+            elementId: rect2.id,
+            gap: 1,
+            focus: 0,
+            ratio: [0.5, 1],
+          },
         });
 
         // Simulate remote update
@@ -4499,8 +4514,18 @@ describe("history", () => {
         excalidrawAPI.updateScene({
           elements: [
             newElementWith(h.elements[0] as ExcalidrawLinearElement, {
-              startBinding: { elementId: rect1.id, gap: 1, focus: 0 },
-              endBinding: { elementId: rect2.id, gap: 1, focus: 0 },
+              startBinding: {
+                elementId: rect1.id,
+                gap: 1,
+                focus: 0,
+                ratio: [0.5, 1],
+              },
+              endBinding: {
+                elementId: rect2.id,
+                gap: 1,
+                focus: 0,
+                ratio: [1, 0.5],
+              },
             }),
             newElementWith(rect1, {
               boundElements: [{ id: arrow.id, type: "arrow" }],

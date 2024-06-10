@@ -1,33 +1,48 @@
 import * as GA from "../ga";
-import * as GAPoint from "../gapoints";
 import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
+import * as GAPoint from "../gapoints";
 import * as GATransform from "../gatransforms";
 
 import type {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawRectangleElement,
-  ExcalidrawDiamondElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawIframeLikeElement,
-  NonDeleted,
-  ExcalidrawLinearElement,
-  PointBinding,
-  NonDeletedExcalidrawElement,
   ElementsMap,
-  NonDeletedSceneElementsMap,
-  ExcalidrawTextElement,
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
+  ExcalidrawDiamondElement,
+  ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawIframeLikeElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  ExcalidrawRectangleElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+  PointBinding,
 } from "./types";
 
-import { getElementAbsoluteCoords } from "./bounds";
-import type { AppClassProperties, AppState, Point } from "../types";
 import { isPointOnShape } from "../../utils/collision";
+import { KEYS } from "../keys";
+import {
+  pointToVector,
+  rotatePoint,
+  scaleVector,
+  translatePoint,
+  vectorToHeading,
+} from "../math";
 import { getElementAtPosition } from "../scene";
+import Scene from "../scene/Scene";
+import { getElementShape } from "../shapes";
+import type { AppClassProperties, AppState, Point } from "../types";
+import { arrayToMap, tupleToCoors } from "../utils";
+import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import { LinearElementEditor } from "./linearElementEditor";
+import type { ElementUpdate } from "./mutateElement";
+import { mutateElement } from "./mutateElement";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
   isBindableElement,
@@ -36,14 +51,6 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import type { ElementUpdate } from "./mutateElement";
-import { mutateElement } from "./mutateElement";
-import Scene from "../scene/Scene";
-import { LinearElementEditor } from "./linearElementEditor";
-import { arrayToMap, tupleToCoors } from "../utils";
-import { KEYS } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { getElementShape } from "../shapes";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -370,6 +377,12 @@ export const bindLinearElement = (
         startOrEnd,
         elementsMap,
       ),
+      ...calculateRatioForElbowArrowBinding(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
     } as PointBinding,
   });
 
@@ -572,6 +585,29 @@ const getSimultaneouslyUpdatedElementIds = (
   return new Set((simultaneouslyUpdated || []).map((element) => element.id));
 };
 
+const updateBindPointToSnapToElementOutline = (
+  point: Point,
+  startOrEnd: "startBinding" | "endBinding",
+  arrow: ExcalidrawArrowElement,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): Point => {
+  return translatePoint(
+    point,
+    scaleVector(
+      startOrEnd === "startBinding"
+        ? vectorToHeading(pointToVector(arrow.points[0], arrow.points[1]))
+        : vectorToHeading(
+            pointToVector(
+              arrow.points[arrow.points.length - 1],
+              arrow.points[arrow.points.length - 2],
+            ),
+          ),
+      distanceToBindableElement(bindableElement, point, elementsMap) - 5,
+    ),
+  );
+};
+
 const updateBoundPoint = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "startBinding" | "endBinding",
@@ -591,40 +627,83 @@ const updateBoundPoint = (
 
   const direction = startOrEnd === "startBinding" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
-  const adjacentPointIndex = edgePointIndex - direction;
-  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    adjacentPointIndex,
-    elementsMap,
-  );
-  const focusPointAbsolute = determineFocusPoint(
-    bindableElement,
-    binding.focus,
-    adjacentPoint,
-    elementsMap,
-  );
-  let newEdgePoint;
-  // The linear element was not originally pointing inside the bound shape,
-  // we can point directly at the focus point
-  if (binding.gap === 0) {
-    newEdgePoint = focusPointAbsolute;
+  let newEdgePoint: Point;
+
+  if (isArrowElement(linearElement) && linearElement.elbowed) {
+    const ratio = binding.ratio
+      ? binding.ratio
+      : calculateRatioForElbowArrowBinding(
+          linearElement,
+          bindableElement,
+          startOrEnd === "startBinding" ? "start" : "end",
+          elementsMap,
+        ).ratio;
+
+    const unrotatedBounds = [
+      bindableElement.x,
+      bindableElement.y,
+      bindableElement.x + bindableElement.width,
+      bindableElement.y + bindableElement.height,
+    ];
+    const localX = (unrotatedBounds[2] - unrotatedBounds[0]) * ratio[0];
+    const localY = (unrotatedBounds[3] - unrotatedBounds[1]) * ratio[1];
+    const globalX = unrotatedBounds[0] + localX;
+    const globalY = unrotatedBounds[1] + localY;
+    const globalMidPoint = [
+      unrotatedBounds[0] + (unrotatedBounds[2] - unrotatedBounds[0]) / 2,
+      unrotatedBounds[1] + (unrotatedBounds[3] - unrotatedBounds[1]) / 2,
+    ] as Point;
+    const [rotatedGlobalX, rotatedGlobalY] = rotatePoint(
+      [globalX, globalY],
+      globalMidPoint,
+      bindableElement.angle,
+    );
+
+    // newEdgePoint = updateBindPointToSnapToElementOutline(
+    //   [rotatedGlobalX, rotatedGlobalY],
+    //   startOrEnd,
+    //   linearElement,
+    //   bindableElement,
+    //   elementsMap,
+    // );
+    newEdgePoint = [rotatedGlobalX, rotatedGlobalY];
   } else {
-    const intersections = intersectElementWithLine(
-      bindableElement,
-      adjacentPoint,
-      focusPointAbsolute,
-      binding.gap,
+    const adjacentPointIndex = edgePointIndex - direction;
+    const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      linearElement,
+      adjacentPointIndex,
       elementsMap,
     );
-    if (intersections.length === 0) {
-      // This should never happen, since focusPoint should always be
-      // inside the element, but just in case, bail out
+    const focusPointAbsolute = determineFocusPoint(
+      bindableElement,
+      binding.focus,
+      adjacentPoint,
+      elementsMap,
+    );
+
+    // The linear element was not originally pointing inside the bound shape,
+    // we can point directly at the focus point
+    if (binding.gap === 0) {
       newEdgePoint = focusPointAbsolute;
     } else {
-      // Guaranteed to intersect because focusPoint is always inside the shape
-      newEdgePoint = intersections[0];
+      const intersections = intersectElementWithLine(
+        bindableElement,
+        adjacentPoint,
+        focusPointAbsolute,
+        binding.gap,
+        elementsMap,
+      );
+      if (intersections.length === 0) {
+        // This should never happen, since focusPoint should always be
+        // inside the element, but just in case, bail out
+        newEdgePoint = focusPointAbsolute;
+      } else {
+        // Guaranteed to intersect because focusPoint is always inside the shape
+        newEdgePoint = intersections[0];
+      }
     }
   }
+
   LinearElementEditor.movePoints(
     linearElement,
     [
@@ -642,6 +721,43 @@ const updateBoundPoint = (
   );
 };
 
+const calculateRatioForElbowArrowBinding = (
+  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  hoveredElement: ExcalidrawBindableElement,
+  startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
+) => {
+  const bounds = getElementBounds(hoveredElement, elementsMap);
+  const edgePointIndex =
+    startOrEnd === "start" ? 0 : linearElement.points.length - 1;
+
+  const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    edgePointIndex,
+    elementsMap,
+  );
+  const globalMidPoint = [
+    bounds[0] + (bounds[2] - bounds[0]) / 2,
+    bounds[1] + (bounds[3] - bounds[1]) / 2,
+  ] as Point;
+  const nonRotatedGlobalPoint = rotatePoint(
+    globalPoint,
+    globalMidPoint,
+    -hoveredElement.angle,
+  );
+  const localPoint = [
+    nonRotatedGlobalPoint[0] - bounds[0],
+    nonRotatedGlobalPoint[1] - bounds[1],
+  ] as Point;
+
+  const ratio = [
+    localPoint[0] / (bounds[2] - bounds[0]),
+    localPoint[1] / (bounds[3] - bounds[1]),
+  ];
+
+  return { ratio };
+};
+
 const maybeCalculateNewGapWhenScaling = (
   changedElement: ExcalidrawBindableElement,
   currentBinding: PointBinding | null | undefined,
@@ -650,7 +766,7 @@ const maybeCalculateNewGapWhenScaling = (
   if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
-  const { gap, focus, elementId } = currentBinding;
+  const { gap, focus, ratio, elementId } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
   const newGap = Math.max(
@@ -660,7 +776,7 @@ const maybeCalculateNewGapWhenScaling = (
       gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
     ),
   );
-  return { elementId, gap: newGap, focus };
+  return { elementId, gap: newGap, focus, ratio };
 };
 
 const getElligibleElementForBindingElement = (
@@ -783,10 +899,11 @@ const newBindingAfterDuplication = (
   if (binding == null) {
     return null;
   }
-  const { elementId, focus, gap } = binding;
+  const { elementId, focus, gap, ratio } = binding;
   return {
     focus,
     gap,
+    ratio,
     elementId: oldIdToDuplicatedId.get(elementId) ?? elementId,
   };
 };

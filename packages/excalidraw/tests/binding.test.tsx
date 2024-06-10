@@ -318,11 +318,13 @@ describe("element binding", () => {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        ratio: [0.5, 1],
       },
       endBinding: {
         elementId: "text1",
         focus: 0.2,
         gap: 7,
+        ratio: [1, 0.5],
       },
     });
 
@@ -337,11 +339,13 @@ describe("element binding", () => {
         elementId: "text1",
         focus: 0.2,
         gap: 7,
+        ratio: [0.5, 1],
       },
       endBinding: {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        ratio: [1, 0.5],
       },
     });
 
