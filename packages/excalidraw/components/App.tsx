@@ -330,6 +330,7 @@ import {
   getContainerElement,
   getDefaultLineHeight,
   getLineHeightInPx,
+  getMinTextElementWidth,
   isMeasureTextSupported,
   isValidTextContainer,
   measureText,
@@ -1696,6 +1697,7 @@ class App extends React.Component<AppProps, AppState> {
                           canvas={this.interactiveCanvas}
                           elementsMap={elementsMap}
                           visibleElements={visibleElements}
+                          allElementsMap={allElementsMap}
                           selectedElements={selectedElements}
                           sceneNonce={sceneNonce}
                           selectionNonce={
@@ -4419,6 +4421,11 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
+      // when text is selected, it's hard (at least on iOS) to re-position the
+      // caret (i.e. deselect). There's not much use for always selecting
+      // the text on edit anyway (and users can select-all from contextmenu
+      // if needed)
+      autoSelect: !this.device.isTouchScreen,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -4718,6 +4725,7 @@ class App extends React.Component<AppProps, AppState> {
     sceneY,
     insertAtParentCenter = true,
     container,
+    autoEdit = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -4726,6 +4734,7 @@ class App extends React.Component<AppProps, AppState> {
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
+    autoEdit?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -4858,13 +4867,16 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    this.setState({
-      editingElement: element,
-    });
-
-    this.handleTextWysiwyg(element, {
-      isExistingElement: !!existingTextElement,
-    });
+    if (autoEdit || existingTextElement || container) {
+      this.handleTextWysiwyg(element, {
+        isExistingElement: !!existingTextElement,
+      });
+    } else {
+      this.setState({
+        draggingElement: element,
+        multiElement: null,
+      });
+    }
   };
 
   private handleCanvasDoubleClick = (
@@ -5899,7 +5911,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
-      return;
     } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
@@ -6020,6 +6031,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
+
     if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
@@ -6693,6 +6705,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       insertAtParentCenter: !event.altKey,
       container,
+      autoEdit: false,
     });
 
     resetCursor(this.interactiveCanvas);
@@ -8041,6 +8054,28 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
         return;
+      }
+
+      if (isTextElement(draggingElement)) {
+        const minWidth = getMinTextElementWidth(
+          getFontString({
+            fontSize: draggingElement.fontSize,
+            fontFamily: draggingElement.fontFamily,
+          }),
+          draggingElement.lineHeight,
+        );
+
+        if (draggingElement.width < minWidth) {
+          mutateElement(draggingElement, {
+            autoResize: true,
+          });
+        }
+
+        this.resetCursor();
+
+        this.handleTextWysiwyg(draggingElement, {
+          isExistingElement: true,
+        });
       }
 
       if (
@@ -9410,6 +9445,7 @@ class App extends React.Component<AppProps, AppState> {
         distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state.zoom.value,
       );
     } else {
       let [gridX, gridY] = getGridPoint(
@@ -9467,6 +9503,7 @@ class App extends React.Component<AppProps, AppState> {
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state.zoom.value,
         aspectRatio,
         this.state.originSnapOffset,
       );
