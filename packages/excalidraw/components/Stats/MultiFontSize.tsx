@@ -14,7 +14,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue } from "./utils";
 
 interface MultiFontSizeProps {
-  elements: ExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
 }
 

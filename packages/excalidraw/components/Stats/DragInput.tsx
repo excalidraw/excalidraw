@@ -21,7 +21,7 @@ export type DragInputCallbackType = ({
 }: {
   accumulatedChange: number;
   instantChange: number;
-  originalElements: ExcalidrawElement[];
+  originalElements: readonly ExcalidrawElement[];
   originalElementsMap: ElementsMap;
   shouldKeepAspectRatio: boolean;
   shouldChangeByStepSize: boolean;
@@ -32,7 +32,7 @@ interface StatsDragInputProps {
   label: string | React.ReactNode;
   icon?: React.ReactNode;
   value: number | "Mixed";
-  elements: ExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
   dragInputCallback: DragInputCallbackType;

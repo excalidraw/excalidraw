@@ -15,7 +15,7 @@ import type { AppState } from "../../types";
 
 interface MultiPositionProps {
   property: "x" | "y";
-  elements: ExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
   appState: AppState;
 }
@@ -26,8 +26,8 @@ const moveElements = (
   property: MultiPositionProps["property"],
   changeInTopX: number,
   changeInTopY: number,
-  elements: ExcalidrawElement[],
-  originalElements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
+  originalElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
 ) => {

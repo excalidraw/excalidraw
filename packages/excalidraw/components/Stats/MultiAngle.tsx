@@ -11,7 +11,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 interface MultiAngleProps {
-  elements: ExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
 }
 

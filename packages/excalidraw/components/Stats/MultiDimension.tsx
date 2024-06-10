@@ -21,7 +21,7 @@ import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 interface MultiDimensionProps {
   property: "width" | "height";
-  elements: ExcalidrawElement[];
+  elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
   appState: AppState;
 }
