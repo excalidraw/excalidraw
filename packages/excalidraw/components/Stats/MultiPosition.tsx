@@ -79,7 +79,7 @@ const MultiPosition = ({
     shouldChangeByStepSize,
     nextValue,
   }) => {
-    if (nextValue) {
+    if (nextValue !== undefined) {
       for (let i = 0; i < elements.length; i++) {
         const origElement = originalElements[i];
         const latestElement = elements[i];

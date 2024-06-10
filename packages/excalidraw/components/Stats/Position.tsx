@@ -104,7 +104,7 @@ const Position = ({ property, element, elementsMap }: PositionProps) => {
       origElement.angle,
     );
 
-    if (nextValue) {
+    if (nextValue !== undefined) {
       const newTopLeftX = property === "x" ? nextValue : topLeftX;
       const newTopLeftY = property === "y" ? nextValue : topLeftY;
       moveElement(
