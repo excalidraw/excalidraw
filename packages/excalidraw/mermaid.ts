@@ -23,7 +23,9 @@ export const isMaybeMermaidDefinition = (text: string) => {
   ];
 
   const re = new RegExp(
-    `^${chartTypes.map((x) => `\\b${x}(-beta)?`).join("|")}\\b`,
+    `^(?:%%{.*?}%%[\\s\\n]*)?\\b${chartTypes
+      .map((x) => `${x}(-beta)?`)
+      .join("|")}\\b`,
   );
 
   return re.test(text.trim());
