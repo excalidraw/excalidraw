@@ -10,6 +10,16 @@
     z-index: 10;
     pointer-events: var(--ui-pointerEvents);
 
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        margin: 0;
+      }
+    }
+
     .sectionContent {
       display: flex;
       flex-direction: column;
@@ -43,12 +53,10 @@
     }
 
     h3 {
-      margin: 0 24px 8px 0;
       white-space: nowrap;
     }
 
     .close {
-      float: right;
       height: 16px;
       width: 16px;
       cursor: pointer;
@@ -81,13 +89,6 @@
     :root[dir="rtl"] & {
       left: 12px;
       right: initial;
-
-      h3 {
-        margin: 0 0 8px 24px;
-      }
-      .close {
-        float: left;
-      }
     }
   }
 }

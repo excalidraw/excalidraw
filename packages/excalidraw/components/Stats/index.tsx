@@ -19,6 +19,7 @@ import MultiAngle from "./MultiAngle";
 import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
 import MultiPosition from "./MultiPosition";
+import Collapsible from "./Collapsible";
 
 interface StatsProps {
   appState: AppState;
@@ -77,14 +78,24 @@ export const Stats = (props: StatsProps) => {
     [throttledSetSceneDimension],
   );
 
+  const [generalStatsOpen, setGeneralStatsOpen] = useState(true);
+  const [elementStatsOpen, setElementStatsOpen] = useState(true);
+
   return (
     <div className="Stats">
       <Island padding={3}>
-        <div className="section">
+        <div className="title">
+          <h2>Stats</h2>
           <div className="close" onClick={props.onClose}>
             {CloseIcon}
           </div>
-          <h3>{t("stats.generalStats")}</h3>
+        </div>
+
+        <Collapsible
+          label={<h3>{t("stats.generalStats")}</h3>}
+          open={generalStatsOpen}
+          openTrigger={() => setGeneralStatsOpen((open) => !open)}
+        >
           <table>
             <tbody>
               <tr>
@@ -105,101 +116,104 @@ export const Stats = (props: StatsProps) => {
               {props.renderCustomStats?.(elements, props.appState)}
             </tbody>
           </table>
-        </div>
+        </Collapsible>
 
         {selectedElements.length > 0 && (
           <div
             id="elementStats"
-            className="section"
             style={{
               marginTop: 12,
             }}
           >
-            <h3>{t("stats.elementStats")}</h3>
+            <Collapsible
+              label={<h3>{t("stats.elementStats")}</h3>}
+              open={elementStatsOpen}
+              openTrigger={() => setElementStatsOpen((open) => !open)}
+            >
+              {singleElement && (
+                <div className="sectionContent">
+                  <div className="elementType">
+                    {t(`element.${singleElement.type}`)}
+                  </div>
 
-            {singleElement && (
-              <div className="sectionContent">
-                <div className="elementType">
-                  {t(`element.${singleElement.type}`)}
-                </div>
-
-                <div className="statsItem">
-                  <Position
-                    element={singleElement}
-                    property="x"
-                    elementsMap={elementsMap}
-                  />
-                  <Position
-                    element={singleElement}
-                    property="y"
-                    elementsMap={elementsMap}
-                  />
-                  <Dimension
-                    property="width"
-                    element={singleElement}
-                    elementsMap={elementsMap}
-                  />
-                  <Dimension
-                    property="height"
-                    element={singleElement}
-                    elementsMap={elementsMap}
-                  />
-                  <Angle element={singleElement} elementsMap={elementsMap} />
-                  {singleElement.type === "text" && (
-                    <FontSize
+                  <div className="statsItem">
+                    <Position
+                      element={singleElement}
+                      property="x"
+                      elementsMap={elementsMap}
+                    />
+                    <Position
+                      element={singleElement}
+                      property="y"
+                      elementsMap={elementsMap}
+                    />
+                    <Dimension
+                      property="width"
                       element={singleElement}
                       elementsMap={elementsMap}
                     />
+                    <Dimension
+                      property="height"
+                      element={singleElement}
+                      elementsMap={elementsMap}
+                    />
+                    <Angle element={singleElement} elementsMap={elementsMap} />
+                    {singleElement.type === "text" && (
+                      <FontSize
+                        element={singleElement}
+                        elementsMap={elementsMap}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {multipleElements && (
+                <div className="sectionContent">
+                  {elementsAreInSameGroup(multipleElements) && (
+                    <div className="elementType">{t("element.group")}</div>
                   )}
-                </div>
-              </div>
-            )}
 
-            {multipleElements && (
-              <div className="sectionContent">
-                {elementsAreInSameGroup(multipleElements) && (
-                  <div className="elementType">{t("element.group")}</div>
-                )}
+                  <div className="elementsCount">
+                    <div>{t("stats.elements")}</div>
+                    <div>{selectedElements.length}</div>
+                  </div>
 
-                <div className="elementsCount">
-                  <div>{t("stats.elements")}</div>
-                  <div>{selectedElements.length}</div>
+                  <div className="statsItem">
+                    <MultiPosition
+                      property="x"
+                      elements={multipleElements}
+                      elementsMap={elementsMap}
+                    />
+                    <MultiPosition
+                      property="y"
+                      elements={multipleElements}
+                      elementsMap={elementsMap}
+                    />
+                    <MultiDimension
+                      property="width"
+                      elements={multipleElements}
+                      elementsMap={elementsMap}
+                      appState={props.appState}
+                    />
+                    <MultiDimension
+                      property="height"
+                      elements={multipleElements}
+                      elementsMap={elementsMap}
+                      appState={props.appState}
+                    />
+                    <MultiAngle
+                      elements={multipleElements}
+                      elementsMap={elementsMap}
+                    />
+                    <MultiFontSize
+                      elements={multipleElements}
+                      elementsMap={elementsMap}
+                    />
+                  </div>
                 </div>
-
-                <div className="statsItem">
-                  <MultiPosition
-                    property="x"
-                    elements={multipleElements}
-                    elementsMap={elementsMap}
-                  />
-                  <MultiPosition
-                    property="y"
-                    elements={multipleElements}
-                    elementsMap={elementsMap}
-                  />
-                  <MultiDimension
-                    property="width"
-                    elements={multipleElements}
-                    elementsMap={elementsMap}
-                    appState={props.appState}
-                  />
-                  <MultiDimension
-                    property="height"
-                    elements={multipleElements}
-                    elementsMap={elementsMap}
-                    appState={props.appState}
-                  />
-                  <MultiAngle
-                    elements={multipleElements}
-                    elementsMap={elementsMap}
-                  />
-                  <MultiFontSize
-                    elements={multipleElements}
-                    elementsMap={elementsMap}
-                  />
-                </div>
-              </div>
-            )}
+              )}
+            </Collapsible>
           </div>
         )}
       </Island>

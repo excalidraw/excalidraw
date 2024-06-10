@@ -2073,3 +2073,19 @@ export const lineEditorIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const collapseDownIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 9l6 6l6 -6" />
+  </g>,
+  tablerIconProps,
+);
+
+export const collapseUpIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 15l6 -6l6 6" />
+  </g>,
+  tablerIconProps,
+);
