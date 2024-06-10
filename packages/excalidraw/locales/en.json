@@ -461,7 +461,7 @@
     "storage": "Storage",
     "title": "Stats",
     "generalStats": "General stats",
-    "elementStats": "Element stats",
+    "elementProperties": "Element properties",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",

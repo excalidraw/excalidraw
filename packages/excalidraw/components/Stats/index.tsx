@@ -20,6 +20,7 @@ import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
 import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState } from "../App";
+import clsx from "clsx";
 
 interface StatsProps {
   scene: Scene;
@@ -85,7 +86,7 @@ export const Stats = ({ scene, onClose, renderCustomStats }: StatsProps) => {
     <div className="Stats">
       <Island padding={3}>
         <div className="title">
-          <h2>Stats</h2>
+          <h2>{t("stats.title")}</h2>
           <div className="close" onClick={onClose}>
             {CloseIcon}
           </div>
@@ -126,7 +127,7 @@ export const Stats = ({ scene, onClose, renderCustomStats }: StatsProps) => {
             }}
           >
             <Collapsible
-              label={<h3>{t("stats.elementStats")}</h3>}
+              label={<h3>{t("stats.elementProperties")}</h3>}
               open={elementStatsOpen}
               openTrigger={() => setElementStatsOpen((open) => !open)}
             >
