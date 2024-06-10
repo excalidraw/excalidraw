@@ -184,11 +184,13 @@ export const Stats = ({ scene, onClose, renderCustomStats }: StatsProps) => {
                       property="x"
                       elements={multipleElements}
                       elementsMap={elementsMap}
+                      appState={appState}
                     />
                     <MultiPosition
                       property="y"
                       elements={multipleElements}
                       elementsMap={elementsMap}
+                      appState={appState}
                     />
                     <MultiDimension
                       property="width"
