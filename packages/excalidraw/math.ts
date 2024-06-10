@@ -547,3 +547,23 @@ export const vectorToHeading = (vec: Vector): Heading => {
   }
   return HEADING_UP;
 };
+
+export const scalePointFromOrigin = (
+  p: Point,
+  mid: Point,
+  multiplier: number,
+) => translatePoint(mid, scaleVector(pointToVector(p, mid), multiplier));
+
+const triangleSign = (p1: Point, p2: Point, p3: Point): number =>
+  (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
+
+export const PointInTriangle = (pt: Point, v1: Point, v2: Point, v3: Point) => {
+  const d1 = triangleSign(pt, v1, v2);
+  const d2 = triangleSign(pt, v2, v3);
+  const d3 = triangleSign(pt, v3, v1);
+
+  const has_neg = d1 < 0 || d2 < 0 || d3 < 0;
+  const has_pos = d1 > 0 || d2 > 0 || d3 > 0;
+
+  return !(has_neg && has_pos);
+};
