@@ -43,6 +43,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { getElementShape } from "../shapes";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -829,7 +830,7 @@ const bindingBorderTest = (
   app: AppClassProperties,
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height);
-  const shape = app.getElementShape(element);
+  const shape = getElementShape(element, app.scene.getNonDeletedElementsMap());
   return isPointOnShape([x, y], shape, threshold);
 };
 
