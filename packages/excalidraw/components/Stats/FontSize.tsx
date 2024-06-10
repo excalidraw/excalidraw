@@ -4,6 +4,7 @@ import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { mutateElement } from "../../element/mutateElement";
 import { getStepSizedValue } from "./utils";
+import { fontSizeIcon } from "../icons";
 
 interface FontSizeProps {
   element: ExcalidrawTextElement;
@@ -66,6 +67,7 @@ const FontSize = ({ element, elementsMap }: FontSizeProps) => {
       value={Math.round(element.fontSize * 10) / 10}
       elements={[element]}
       dragInputCallback={handleFontSizeChange}
+      icon={fontSizeIcon}
     />
   );
 };

@@ -15,12 +15,13 @@
   }
 
   .drag-input-label {
-    height: var(--default-button-size);
     flex-shrink: 0;
-    padding: 0.5rem 0.5rem 0.5rem 0.75rem;
     border: 1px solid var(--default-border-color);
     border-right: 0;
+    width: 2rem;
+    height: 2rem;
     box-sizing: border-box;
+    color: var(--popup-text-color);
 
     :root[dir="ltr"] & {
       border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
@@ -32,7 +33,6 @@
       border-left: 0;
     }
 
-    color: var(--input-label-color);
     display: flex;
     align-items: center;
     justify-content: center;

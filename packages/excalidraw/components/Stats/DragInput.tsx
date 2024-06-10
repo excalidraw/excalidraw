@@ -8,6 +8,7 @@ import { deepCopyElement } from "../../element/newElement";
 import "./DragInput.scss";
 import clsx from "clsx";
 import { useApp } from "../App";
+import { InlineIcon } from "../InlineIcon";
 
 export type DragInputCallbackType = ({
   accumulatedChange,
@@ -29,6 +30,7 @@ export type DragInputCallbackType = ({
 
 interface StatsDragInputProps {
   label: string | React.ReactNode;
+  icon?: React.ReactNode;
   value: number | "Mixed";
   elements: ExcalidrawElement[];
   editable?: boolean;
@@ -38,6 +40,7 @@ interface StatsDragInputProps {
 
 const StatsDragInput = ({
   label,
+  icon,
   dragInputCallback,
   value,
   elements,
@@ -173,7 +176,7 @@ const StatsDragInput = ({
           }
         }}
       >
-        {label}
+        {icon ? <InlineIcon icon={icon} /> : label}
       </div>
       <input
         className="drag-input"

@@ -5,6 +5,7 @@ import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { isInGroup } from "../../groups";
 import { degreeToRadian, radianToDegree } from "../../math";
 import Scene from "../../scene/Scene";
+import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
@@ -100,6 +101,7 @@ const MultiAngle = ({ elements, elementsMap }: MultiAngleProps) => {
   return (
     <DragInput
       label="A"
+      icon={angleIcon}
       value={value}
       elements={elements}
       dragInputCallback={handleDegreeChange}

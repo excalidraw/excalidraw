@@ -8,6 +8,7 @@ import type {
 } from "../../element/types";
 import { isInGroup } from "../../groups";
 import Scene from "../../scene/Scene";
+import { fontSizeIcon } from "../icons";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue } from "./utils";
@@ -97,6 +98,7 @@ const MultiFontSize = ({ elements, elementsMap }: MultiFontSizeProps) => {
   return (
     <StatsDragInput
       label="F"
+      icon={fontSizeIcon}
       elements={elements}
       dragInputCallback={handleFontSizeChange}
       value={value}

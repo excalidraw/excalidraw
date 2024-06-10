@@ -3,6 +3,7 @@ import { getBoundTextElement } from "../../element/textElement";
 import { isArrowElement } from "../../element/typeChecks";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
+import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
@@ -64,6 +65,7 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
   return (
     <DragInput
       label="A"
+      icon={angleIcon}
       value={Math.round(radianToDegree(element.angle) * 100) / 100}
       elements={[element]}
       dragInputCallback={handleDegreeChange}
