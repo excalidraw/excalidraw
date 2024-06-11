@@ -94,7 +94,7 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
     startHeading,
     endGlobalPoint,
     endHeading,
-    4,
+    0.001, // TODO: Is this even needed?
   );
 
   const startDonglePosition =
@@ -109,32 +109,16 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
     getDonglePosition(endGlobalPoint, endHeading, grid);
   const endDongle =
     endDonglePosition && pointToGridNode(endDonglePosition, grid);
-  // if (endDongle && endHeading) {
-  //   endDongle.parent = {
-  //     f: Infinity,
-  //     g: Infinity,
-  //     h: Infinity,
-  //     direction: endHeading,
-  //     closed: false,
-  //     visited: true,
-  //     parent: null,
-  //     pos: startGlobalPoint,
-  //     addr: [-1, -1],
-  //   };
-  // }
-  // if (startDongle && startHeading) {
-  //   startDongle.parent = {
-  //     f: Infinity,
-  //     g: Infinity,
-  //     h: Infinity,
-  //     //direction: startHeading,
-  //     closed: false,
-  //     visited: true,
-  //     parent: null,
-  //     pos: endGlobalPoint,
-  //     addr: [-1, -1],
-  //   };
-  // }
+
+  // Do not allow stepping on the true end or true start points
+  const endNode = pointToGridNode(endGlobalPoint, grid);
+  if (endNode) {
+    endNode.closed = true;
+  }
+  const startNode = pointToGridNode(startGlobalPoint, grid);
+  if (startNode) {
+    startNode.closed = true;
+  }
 
   // Create path to end dongle from start dongle
   const path =
@@ -167,22 +151,14 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
   //     ),
   // );
   for (let col = 0; col < grid.col; col++) {
-    debugDrawSegments(
-      [
-        gridNodeFromAddr([col, 0], grid)!.pos,
-        gridNodeFromAddr([col, grid.row - 1], grid)!.pos,
-      ],
-      "#DDD",
-    );
+    const a = gridNodeFromAddr([col, 0], grid)?.pos;
+    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
   }
   for (let row = 0; row < grid.row; row++) {
-    debugDrawSegments(
-      [
-        gridNodeFromAddr([0, row], grid)!.pos,
-        gridNodeFromAddr([grid.col - 1, row], grid)!.pos,
-      ],
-      "#DDD",
-    );
+    const a = gridNodeFromAddr([0, row], grid)?.pos;
+    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
   }
 };
 
@@ -242,8 +218,9 @@ const astar = (
       const directionChange = previousDirection !== neighborDirection;
       const gScore =
         current.g +
-        magnitudeSq(pointToVector(neighbor.pos, current.pos)) +
-        (directionChange ? multiplier * multiplier : 0);
+        magnitudeSq(pointToVector(neighbor.pos, current.pos)) + // Right triangle a^2 + b^2 = hypot^2
+        (directionChange ? multiplier * multiplier * 10000 : 0); // TODO: 10000 here is just an approx!
+      //console.log(gScore, multiplier * multiplier);
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
@@ -263,7 +240,7 @@ const astar = (
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
 
-        // If the neighbour is closer than the current closestNode or if it's equally close but has
+        // If the neighbour is closer than the current closest node or if it's equally close but has
         // a cheaper path than the current closest node then it becomes the closest node
         if (
           neighbor.h < closest.h ||
@@ -444,18 +421,22 @@ const calculateGrid = (
 
   // Binding points are also nodes
   if (startHeading) {
-    if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
-      vertical.add(start[1]);
-    } else {
-      horizontal.add(start[0]);
-    }
+    // if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
+    //   vertical.add(start[1]);
+    // } else {
+    //   horizontal.add(start[0]);
+    // }
+    vertical.add(start[1]);
+    horizontal.add(start[0]);
   }
   if (endHeading) {
-    if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
-      vertical.add(end[1]);
-    } else {
-      horizontal.add(end[0]);
-    }
+    vertical.add(end[1]);
+    horizontal.add(end[0]);
+    // if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
+    //   vertical.add(end[1]);
+    // } else {
+    //   horizontal.add(end[0]);
+    // }
   }
 
   // Add halfway points as well
