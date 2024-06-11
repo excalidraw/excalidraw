@@ -1,10 +1,8 @@
-import { mutateElement } from "../../element/mutateElement";
-import { getBoundTextElement } from "../../element/textElement";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { rotate } from "../../math";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue } from "./utils";
+import { getStepSizedValue, moveElement } from "./utils";
 
 interface PositionProps {
   property: "x" | "y";
@@ -13,65 +11,6 @@ interface PositionProps {
 }
 
 const STEP_SIZE = 10;
-
-export const moveElement = (
-  newTopLeftX: number,
-  newTopLeftY: number,
-  latestElement: ExcalidrawElement,
-  originalElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
-  originalElementsMap: ElementsMap,
-  shouldInformMutation = true,
-) => {
-  const [cx, cy] = [
-    originalElement.x + originalElement.width / 2,
-    originalElement.y + originalElement.height / 2,
-  ];
-  const [topLeftX, topLeftY] = rotate(
-    originalElement.x,
-    originalElement.y,
-    cx,
-    cy,
-    originalElement.angle,
-  );
-
-  const changeInX = newTopLeftX - topLeftX;
-  const changeInY = newTopLeftY - topLeftY;
-
-  const [x, y] = rotate(
-    newTopLeftX,
-    newTopLeftY,
-    cx + changeInX,
-    cy + changeInY,
-    -originalElement.angle,
-  );
-
-  mutateElement(
-    latestElement,
-    {
-      x,
-      y,
-    },
-    shouldInformMutation,
-  );
-
-  const boundTextElement = getBoundTextElement(
-    originalElement,
-    originalElementsMap,
-  );
-  if (boundTextElement) {
-    const latestBoundTextElement = elementsMap.get(boundTextElement.id);
-    latestBoundTextElement &&
-      mutateElement(
-        latestBoundTextElement,
-        {
-          x: boundTextElement.x + changeInX,
-          y: boundTextElement.y + changeInY,
-        },
-        shouldInformMutation,
-      );
-  }
-};
 
 const Position = ({ property, element, elementsMap }: PositionProps) => {
   const [topLeftX, topLeftY] = rotate(

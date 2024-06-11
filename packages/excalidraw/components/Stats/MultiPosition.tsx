@@ -3,12 +3,11 @@ import { rotate } from "../../math";
 import Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { moveElement } from "./Position";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { getCommonBounds, isTextElement } from "../../element";
 import { useMemo } from "react";
-import { getElementsInAtomicUnit } from ".";
-import type { AtomicUnit } from ".";
+import { getElementsInAtomicUnit, moveElement } from "./utils";
+import type { AtomicUnit } from "./utils";
 
 interface MultiPositionProps {
   property: "x" | "y";

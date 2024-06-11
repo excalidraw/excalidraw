@@ -27,29 +27,13 @@ import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
 import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState } from "../App";
+import { AtomicUnit } from "./utils";
 
 interface StatsProps {
   scene: Scene;
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
-
-export type AtomicUnit = Record<string, true>;
-export const getElementsInAtomicUnit = (
-  atomicUnit: AtomicUnit,
-  elementsMap: ElementsMap,
-  originalElementsMap?: ElementsMap,
-) => {
-  return Object.keys(atomicUnit)
-    .map((id) => ({
-      original: (originalElementsMap ?? elementsMap).get(id),
-      latest: elementsMap.get(id),
-    }))
-    .filter((el) => el.original !== undefined && el.latest !== undefined) as {
-    original: NonDeletedExcalidrawElement;
-    latest: NonDeletedExcalidrawElement;
-  }[];
-};
 
 const STATS_TIMEOUT = 50;
 

@@ -1,21 +1,7 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
-import { mutateElement } from "../../element/mutateElement";
-import {
-  measureFontSizeFromWidth,
-  rescalePointsInElement,
-} from "../../element/resizeElements";
-import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextMaxWidth,
-  handleBindTextResize,
-} from "../../element/textElement";
-import { getFontString } from "../../utils";
-import { updateBoundElements } from "../../element/binding";
+import { getStepSizedValue, isPropertyEditable, resizeElement } from "./utils";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
@@ -26,124 +12,6 @@ interface DimensionDragInputProps {
 const STEP_SIZE = 10;
 const _shouldKeepAspectRatio = (element: ExcalidrawElement) => {
   return element.type === "image";
-};
-
-export const newOrigin = (
-  x1: number,
-  y1: number,
-  w1: number,
-  h1: number,
-  w2: number,
-  h2: number,
-  angle: number,
-) => {
-  /**
-   * The formula below is the result of solving
-   *   rotate(x1, y1, cx1, cy1, angle) = rotate(x2, y2, cx2, cy2, angle)
-   * where rotate is the function defined in math.ts
-   *
-   * This is so that the new origin (x2, y2),
-   * when rotated against the new center (cx2, cy2),
-   * coincides with (x1, y1) rotated against (cx1, cy1)
-   *
-   * The reason for doing this computation is so the element's top left corner
-   * on the canvas remains fixed after any changes in its dimension.
-   */
-
-  return {
-    x:
-      x1 +
-      (w1 - w2) / 2 +
-      ((w2 - w1) / 2) * Math.cos(angle) +
-      ((h1 - h2) / 2) * Math.sin(angle),
-    y:
-      y1 +
-      (h1 - h2) / 2 +
-      ((w2 - w1) / 2) * Math.sin(angle) +
-      ((h2 - h1) / 2) * Math.cos(angle),
-  };
-};
-
-export const resizeElement = (
-  nextWidth: number,
-  nextHeight: number,
-  keepAspectRatio: boolean,
-  latestElement: ExcalidrawElement,
-  origElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
-  originalElementsMap: Map<string, ExcalidrawElement>,
-  shouldInformMutation = true,
-) => {
-  let boundTextFont: { fontSize?: number } = {};
-  const boundTextElement = getBoundTextElement(latestElement, elementsMap);
-
-  if (boundTextElement) {
-    const minWidth = getApproxMinLineWidth(
-      getFontString(boundTextElement),
-      boundTextElement.lineHeight,
-    );
-    const minHeight = getApproxMinLineHeight(
-      boundTextElement.fontSize,
-      boundTextElement.lineHeight,
-    );
-    nextWidth = Math.max(nextWidth, minWidth);
-    nextHeight = Math.max(nextHeight, minHeight);
-  }
-
-  mutateElement(
-    latestElement,
-    {
-      ...newOrigin(
-        latestElement.x,
-        latestElement.y,
-        latestElement.width,
-        latestElement.height,
-        nextWidth,
-        nextHeight,
-        latestElement.angle,
-      ),
-      width: nextWidth,
-      height: nextHeight,
-      ...rescalePointsInElement(origElement, nextWidth, nextHeight, true),
-    },
-    shouldInformMutation,
-  );
-
-  if (boundTextElement) {
-    boundTextFont = {
-      fontSize: boundTextElement.fontSize,
-    };
-    if (keepAspectRatio) {
-      const updatedElement = {
-        ...latestElement,
-        width: nextWidth,
-        height: nextHeight,
-      };
-
-      const nextFont = measureFontSizeFromWidth(
-        boundTextElement,
-        elementsMap,
-        getBoundTextMaxWidth(updatedElement, boundTextElement),
-      );
-      boundTextFont = {
-        fontSize: nextFont?.size ?? boundTextElement.fontSize,
-      };
-    }
-  }
-
-  updateBoundElements(latestElement, elementsMap, {
-    newSize: {
-      width: nextWidth,
-      height: nextHeight,
-    },
-  });
-
-  if (boundTextElement && boundTextFont) {
-    mutateElement(boundTextElement, {
-      fontSize: boundTextFont.fontSize,
-    });
-  }
-  handleBindTextResize(latestElement, elementsMap, "e", keepAspectRatio);
 };
 
 const DimensionDragInput = ({

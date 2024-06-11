@@ -10,12 +10,11 @@ import {
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import Scene from "../../scene/Scene";
 import type { Point } from "../../types";
-import { resizeElement } from "./Dimension";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
-import { getElementsInAtomicUnit } from ".";
-import type { AtomicUnit } from ".";
+import { getElementsInAtomicUnit, resizeElement } from "./utils";
+import type { AtomicUnit } from "./utils";
 
 interface MultiDimensionProps {
   property: "width" | "height";
