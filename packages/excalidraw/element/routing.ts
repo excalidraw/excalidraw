@@ -45,7 +45,10 @@ type Grid = {
   data: (Node | null)[];
 };
 
-export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
+export const mutateElbowArrow = (
+  arrow: ExcalidrawArrowElement,
+  scene: Scene,
+) => {
   debugClear();
 
   const [startGlobalPoint, endGlobalPoint] = [
@@ -583,25 +586,6 @@ const neighborIndexToHeading = (index: 0 | 1 | 2 | 3): Heading => {
       return HEADING_DOWN;
   }
   return HEADING_LEFT;
-};
-
-/**
- * Get grid address for position (if exists)
- */
-const pointToGridAddress = (
-  point: Point,
-  grid: Grid,
-): [number, number] | null => {
-  for (let col = 0; col < grid.col; col++) {
-    for (let row = 0; row < grid.row; row++) {
-      const candidate = gridNodeFromAddr([col, row], grid)?.pos;
-      if (candidate && point[0] === candidate[0] && point[1] === candidate[1]) {
-        return [col, row];
-      }
-    }
-  }
-
-  return null;
 };
 
 /**

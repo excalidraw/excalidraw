@@ -51,7 +51,7 @@ import { DRAGGING_THRESHOLD } from "../constants";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
-import { testElbowArrow } from "./routing";
+import { mutateElbowArrow } from "./routing";
 import type Scene from "../scene/Scene";
 
 const editorMidPointsCache: {
@@ -1355,7 +1355,7 @@ export class LinearElementEditor {
       x: element.x + rotated[0],
       y: element.y + rotated[1],
     });
-    testElbowArrow(element as ExcalidrawArrowElement, scene);
+    mutateElbowArrow(element as ExcalidrawArrowElement, scene);
   }
 
   private static _getShiftLockedDelta(

@@ -101,7 +101,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
-import { testElbowArrow } from "../element/routing";
+import { mutateElbowArrow } from "../element/routing";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1262,7 +1262,7 @@ export const actionChangeArrowType = register({
 
         if (value === "elbow") {
           // TODO: Convert to elbow arrow
-          testElbowArrow(newElement, app.scene);
+          mutateElbowArrow(newElement, app.scene);
         }
 
         return newElement;

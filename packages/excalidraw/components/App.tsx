@@ -215,7 +215,7 @@ import {
   newIframeElement,
   newMagicFrameElement,
 } from "../element/newElement";
-import { testElbowArrow } from "../element/routing";
+import { mutateElbowArrow } from "../element/routing";
 import { isElementInViewport } from "../element/sizeHelpers";
 import {
   bindTextToShapeAfterDuplication,
@@ -5311,7 +5311,7 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isArrowElement(multiElement) && multiElement.elbowed) {
-          testElbowArrow(multiElement, this.scene);
+          mutateElbowArrow(multiElement, this.scene);
         }
         // update last uncommitted point
         mutateElement(multiElement, {
