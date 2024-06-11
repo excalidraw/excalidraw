@@ -564,7 +564,7 @@ describe("stats for multiple elements", () => {
   });
 
   it("should treat groups as single units", () => {
-    const createAndSelectGroupAndRectangle = () => {
+    const createAndSelectGroup = () => {
       UI.clickTool("rectangle");
       mouse.down();
       mouse.up(100, 100);
@@ -573,51 +573,70 @@ describe("stats for multiple elements", () => {
       mouse.down(0, 0);
       mouse.up(100, 100);
 
-      // Select the first element.
-      // The second rectangle is already reselected because it was the last element created
       mouse.reset();
       Keyboard.withModifierKeys({ shift: true }, () => {
         mouse.click();
       });
 
       h.app.actionManager.executeAction(actionGroup);
-
-      mouse.reset();
-      UI.clickTool("rectangle");
-      mouse.down(200, 200);
-      mouse.up(100, 100);
-
-      // Add the created group to the current selection
-      mouse.restorePosition(0, 0);
-      Keyboard.withModifierKeys({ shift: true }, () => {
-        mouse.click();
-      });
     };
 
-    createAndSelectGroupAndRectangle();
+    createAndSelectGroup();
+
+    const elementsInGroup = h.elements.filter((el) => isInGroup(el));
+    let [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
 
     elementStats = stats?.querySelector("#elementStats");
+
+    const x = getStatsProperty("X")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(x).not.toBeNull();
+    expect(Number(x.value)).toBe(x1);
+
+    x.focus();
+    x.value = "300";
+    x.blur();
+
+    expect(h.elements[0].x).toBe(300);
+    expect(h.elements[1].x).toBe(400);
+    expect(x.value).toBe("300");
+
+    const y = getStatsProperty("Y")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(y).not.toBeNull();
+    expect(Number(y.value)).toBe(y1);
+
+    y.focus();
+    y.value = "200";
+    y.blur();
+
+    expect(h.elements[0].y).toBe(200);
+    expect(h.elements[1].y).toBe(300);
+    expect(y.value).toBe("200");
 
     const width = getStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(width).not.toBeNull();
-    expect(width.value).toBe("Mixed");
+    expect(Number(width.value)).toBe(200);
 
     const height = getStatsProperty("H")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
+    expect(height).not.toBeNull();
+    expect(Number(height.value)).toBe(200);
 
     width.focus();
     width.value = "400";
     width.blur();
 
-    const elementsInGroup = h.elements.filter((el) => isInGroup(el));
-    const individualElements = h.elements.filter((el) => !isInGroup(el));
-    let [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
+    [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     let newGroupWidth = x2 - x1;
 
-    expect(newGroupWidth).toBeCloseTo(individualElements[0].width, 4);
     expect(newGroupWidth).toBeCloseTo(400, 4);
 
     width.focus();
@@ -626,7 +645,6 @@ describe("stats for multiple elements", () => {
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     newGroupWidth = x2 - x1;
-    expect(newGroupWidth).toBeCloseTo(individualElements[0].width, 4);
     expect(newGroupWidth).toBeCloseTo(300, 4);
 
     height.focus();
@@ -635,7 +653,6 @@ describe("stats for multiple elements", () => {
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     const newGroupHeight = y2 - y1;
-    expect(newGroupHeight).toBeCloseTo(individualElements[0].height, 4);
     expect(newGroupHeight).toBeCloseTo(500, 4);
   });
 });
