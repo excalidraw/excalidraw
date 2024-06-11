@@ -217,7 +217,7 @@ const StatsDragInput = ({
               event.key === KEYS.ENTER
             ) {
               handleInputValue(eventTarget.value);
-              eventTarget.blur();
+              app.focusContainer();
             }
           }
         }}
