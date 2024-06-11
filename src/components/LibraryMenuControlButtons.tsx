@@ -1,5 +1,5 @@
 import { ExcalidrawProps, UIAppState } from "../types";
-import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
+// import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 import clsx from "clsx";
 
 export const LibraryMenuControlButtons = ({
@@ -22,12 +22,12 @@ export const LibraryMenuControlButtons = ({
       className={clsx("library-menu-control-buttons", className)}
       style={style}
     >
-      <LibraryMenuBrowseButton
+      {/* <LibraryMenuBrowseButton
         id={id}
         libraryReturnUrl={libraryReturnUrl}
         theme={theme}
       />
-      {children}
+      {children} */}
     </div>
   );
 };
