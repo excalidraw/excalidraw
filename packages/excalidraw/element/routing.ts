@@ -6,18 +6,19 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
-  magnitude,
   magnitudeSq,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
   translatePoint,
+  vectorToHeading,
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { debugClear, debugDrawPoint, debugDrawSegments } from "../visualdebug";
 import { maxBindingGap } from "./binding";
 import type { Bounds } from "./bounds";
+import { mutateElement } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
 import type {
   ElementsMap,
@@ -30,7 +31,7 @@ type Node = {
   f: number;
   g: number;
   h: number;
-  direction: Heading | null;
+  //direction: Heading | null;
   closed: boolean;
   visited: boolean;
   parent: Node | null;
@@ -121,42 +122,38 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
   //     addr: [-1, -1],
   //   };
   // }
-  if (startDongle && startHeading) {
-    startDongle.parent = {
-      f: Infinity,
-      g: Infinity,
-      h: Infinity,
-      direction: startHeading,
-      closed: false,
-      visited: true,
-      parent: null,
-      pos: endGlobalPoint,
-      addr: [-1, -1],
-    };
-  }
+  // if (startDongle && startHeading) {
+  //   startDongle.parent = {
+  //     f: Infinity,
+  //     g: Infinity,
+  //     h: Infinity,
+  //     //direction: startHeading,
+  //     closed: false,
+  //     visited: true,
+  //     parent: null,
+  //     pos: endGlobalPoint,
+  //     addr: [-1, -1],
+  //   };
+  // }
 
   // Create path to end dongle from start dongle
   const path =
     startDongle &&
     endDongle &&
     endHeading &&
-    astar(startDongle, endDongle, grid, endHeading);
+    astar(startDongle, endDongle, grid, startHeading, endHeading);
 
   if (path) {
-    startGlobalPoint && debugDrawPoint(startGlobalPoint, "red");
+    startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
     path.forEach((node) => debugDrawPoint(node.pos, "red"));
-    endGlobalPoint && debugDrawPoint(endGlobalPoint, "red");
+    endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
 
     // mutateElement(arrow, {
     //   ...normalizedArrowElementUpdate(
-    //     path.map((node) => [
-    //       node.pos[0] - arrow.x,
-    //       node.pos[1] - arrow.y,
-    //     ]) as Point[],
+    //     path.map((node) => [node.pos[0], node.pos[1]]) as Point[],
     //   ),
     // });
   }
-  //arrow.points.forEach((point) => console.log(point));
 
   // Debug
   // grid.data.forEach(
@@ -192,7 +189,13 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
 /**
  * Routing algorithm.
  */
-const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
+const astar = (
+  start: Node,
+  end: Node,
+  grid: Grid,
+  startHeading: Heading,
+  endHeading: Heading,
+) => {
   const multiplier = magnitudeSq(pointToVector(end.pos, start.pos));
   const open = new BinaryHeap<Node>((node) => node.f);
 
@@ -232,24 +235,22 @@ const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      const neighborDistance = magnitudeSq(
-        pointToVector(current.pos, current.parent?.pos ?? start.pos),
-      );
-      neighbor.direction = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
-      const previousDirection =
-        neighbor.parent?.direction ?? neighbor.direction;
-      const directionChange = neighbor.direction !== previousDirection;
+      const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
+      const previousDirection = current.parent
+        ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
+        : startHeading;
+      const directionChange = previousDirection !== neighborDirection;
       const gScore =
         current.g +
-        neighborDistance +
-        (directionChange ? Math.pow(multiplier, 2) : 0);
+        magnitudeSq(pointToVector(neighbor.pos, current.pos)) +
+        (directionChange ? multiplier * multiplier : 0);
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
         const estBendCount = estimateSegmentCount(
           neighbor,
           end,
-          neighbor.direction,
+          neighborDirection,
           endHeading,
         );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
@@ -258,7 +259,7 @@ const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
         neighbor.h =
           neighbor.h ||
           magnitudeSq(pointToVector(end.pos, neighbor.pos)) +
-            estBendCount * Math.pow(multiplier, 2);
+            estBendCount * multiplier * multiplier;
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
 
@@ -488,7 +489,7 @@ const calculateGrid = (
             f: 0,
             g: 0,
             h: 0,
-            direction: null,
+            //direction: null,
             closed: false,
             visited: false,
             parent: null,
