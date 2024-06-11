@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import throttle from "lodash.throttle";
+import { useEffect, useRef, useState } from "react";
 import { EVENT } from "../../constants";
 import { KEYS } from "../../keys";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
@@ -51,10 +50,6 @@ const StatsDragInput = ({
   const app = useApp();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
-
-  const cbThrottled = useMemo(() => {
-    return throttle(dragInputCallback, 16);
-  }, [dragInputCallback]);
 
   const [inputValue, setInputValue] = useState(value.toString());
 
@@ -162,7 +157,7 @@ const StatsDragInput = ({
                 const instantChange = event.clientX - lastPointer.x;
                 accumulatedChange += instantChange;
 
-                cbThrottled({
+                dragInputCallback({
                   accumulatedChange,
                   instantChange,
                   originalElements,
