@@ -167,7 +167,6 @@ const MultiDimension = ({
 
   const handleDimensionChange: DragInputCallbackType = ({
     accumulatedChange,
-    originalElements,
     originalElementsMap,
     shouldChangeByStepSize,
     nextValue,

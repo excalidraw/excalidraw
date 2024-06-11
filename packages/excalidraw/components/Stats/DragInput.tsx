@@ -111,7 +111,7 @@ const StatsDragInput = ({
               y: number;
             } | null = null;
 
-            let stateAtStart: ExcalidrawElement[] | null = null;
+            let originalElements: ExcalidrawElement[] | null = null;
             let originalElementsMap: Map<string, ExcalidrawElement> | null =
               null;
 
@@ -120,12 +120,6 @@ const StatsDragInput = ({
             document.body.classList.add("dragResize");
 
             const onPointerMove = (event: PointerEvent) => {
-              if (!stateAtStart) {
-                stateAtStart = elements.map((element) =>
-                  deepCopyElement(element),
-                );
-              }
-
               if (!originalElementsMap) {
                 originalElementsMap = app.scene
                   .getNonDeletedElements()
@@ -135,18 +129,28 @@ const StatsDragInput = ({
                   }, new Map() as ElementsMap);
               }
 
+              if (!originalElements) {
+                originalElements = elements.map(
+                  (element) => originalElementsMap!.get(element.id)!,
+                );
+              }
+
               if (!accumulatedChange) {
                 accumulatedChange = 0;
               }
 
-              if (lastPointer && stateAtStart && accumulatedChange !== null) {
+              if (
+                lastPointer &&
+                originalElementsMap !== null &&
+                accumulatedChange !== null
+              ) {
                 const instantChange = event.clientX - lastPointer.x;
                 accumulatedChange += instantChange;
 
                 cbThrottled({
                   accumulatedChange,
                   instantChange,
-                  originalElements: stateAtStart,
+                  originalElements,
                   originalElementsMap,
                   shouldKeepAspectRatio: shouldKeepAspectRatio!!,
                   shouldChangeByStepSize: event.shiftKey,
@@ -173,7 +177,7 @@ const StatsDragInput = ({
 
                 lastPointer = null;
                 accumulatedChange = null;
-                stateAtStart = null;
+                originalElements = null;
                 originalElementsMap = null;
 
                 document.body.classList.remove("dragResize");
