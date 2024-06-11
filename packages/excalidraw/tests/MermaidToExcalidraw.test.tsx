@@ -1,28 +1,12 @@
 import { act, render, waitFor } from "./test-utils";
 import { Excalidraw } from "../index";
-import React from "react";
-import { expect, vi } from "vitest";
-import * as MermaidToExcalidraw from "@excalidraw/mermaid-to-excalidraw";
+import { expect } from "vitest";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
+import { mockMermaidToExcalidraw } from "./helpers/mocks";
 
-vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
-  const module = (await importActual()) as any;
-
-  return {
-    __esModule: true,
-    ...module,
-  };
-});
-const parseMermaidToExcalidrawSpy = vi.spyOn(
-  MermaidToExcalidraw,
-  "parseMermaidToExcalidraw",
-);
-
-parseMermaidToExcalidrawSpy.mockImplementation(
-  async (
-    definition: string,
-    options?: MermaidToExcalidraw.MermaidOptions | undefined,
-  ) => {
+mockMermaidToExcalidraw({
+  mockRef: true,
+  parseMermaidToExcalidraw: async (definition) => {
     const firstLine = definition.split("\n")[0];
     return new Promise((resolve, reject) => {
       if (firstLine === "flowchart TD") {
@@ -87,12 +71,6 @@ parseMermaidToExcalidrawSpy.mockImplementation(
         reject(new Error("ERROR"));
       }
     });
-  },
-);
-
-vi.spyOn(React, "useRef").mockReturnValue({
-  current: {
-    parseMermaidToExcalidraw: parseMermaidToExcalidrawSpy,
   },
 });
 
