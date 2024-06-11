@@ -567,3 +567,14 @@ export const PointInTriangle = (pt: Point, v1: Point, v2: Point, v3: Point) => {
 
   return !(has_neg && has_pos);
 };
+
+export const magnitudeSq = (vector: Vector) =>
+  vector[0] * vector[0] + vector[1] * vector[1];
+
+export const magnitude = (vector: Vector) => Math.sqrt(magnitudeSq(vector));
+
+export const normalize = (vector: Vector): Vector => {
+  const m = magnitude(vector);
+
+  return [vector[0] / m, vector[1] / m];
+};
