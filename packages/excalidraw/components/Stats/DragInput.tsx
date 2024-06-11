@@ -91,6 +91,21 @@ const StatsDragInput = ({
     }
   };
 
+  const handleInputValueRef = useRef(handleInputValue);
+  handleInputValueRef.current = handleInputValue;
+
+  // make sure that clicking on canvas (which umounts the component)
+  // updates current input value (blur isn't triggered)
+  useEffect(() => {
+    const input = inputRef.current;
+    return () => {
+      const nextValue = input?.value;
+      if (nextValue) {
+        handleInputValueRef.current(nextValue);
+      }
+    };
+  }, []);
+
   return editable ? (
     <div
       className={clsx("drag-input-container", !editable && "disabled")}
