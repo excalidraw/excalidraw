@@ -559,7 +559,7 @@ describe("stats for multiple elements", () => {
 
     const angleInRadian = degreeToRadian(40);
     expect(rectangle?.angle).toBeCloseTo(angleInRadian, 4);
-    expect(text?.angle).not.toBeCloseTo(angleInRadian, 4);
+    expect(text?.angle).toBeCloseTo(angleInRadian, 4);
     expect(frame.angle).toBe(0);
   });
 
