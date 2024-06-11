@@ -17,9 +17,9 @@ import {
   TrashIcon,
   usersIcon,
 } from "../icons";
-import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
+// import { GithubIcon, DiscordIcon, TwitterIcon } from "../icons";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
-import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
+// import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import {
   actionClearCanvas,
   actionLoadScene,
@@ -243,7 +243,7 @@ Export.displayName = "Export";
 
 export const Socials = () => (
   <>
-    <DropdownMenuItemLink
+    {/* <DropdownMenuItemLink
       icon={GithubIcon}
       href="https://github.com/excalidraw/excalidraw"
       aria-label="GitHub"
@@ -263,7 +263,7 @@ export const Socials = () => (
       aria-label="Twitter"
     >
       Twitter
-    </DropdownMenuItemLink>
+    </DropdownMenuItemLink> */}
   </>
 );
 Socials.displayName = "Socials";
