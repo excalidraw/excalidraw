@@ -14,12 +14,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import {
-  debugClear,
-  debugDrawBounds,
-  debugDrawPoint,
-  debugDrawSegments,
-} from "../visualdebug";
+import { debugClear, debugDrawPoint, debugDrawSegments } from "../visualdebug";
 import { maxBindingGap } from "./binding";
 import type { Bounds } from "./bounds";
 import { isBindableElement } from "./typeChecks";
@@ -49,6 +44,8 @@ type Grid = {
 };
 
 export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
+  debugClear();
+
   const [startGlobalPoint, endGlobalPoint] = [
     translatePoint(arrow.points[0], [arrow.x, arrow.y]),
     translatePoint(arrow.points[arrow.points.length - 1], [arrow.x, arrow.y]),
@@ -88,10 +85,6 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
       headingForPointOnElement(endElement, endAABB, endGlobalPoint),
   ];
 
-  // Debug
-  debugClear();
-
-  [startAABB, endAABB, common].forEach((aabb) => aabb && debugDrawBounds(aabb));
   const grid = calculateGrid(
     [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
     [common],
@@ -101,6 +94,46 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
     endHeading,
     bias,
   );
+
+  const startDonglePosition =
+    startGlobalPoint &&
+    startHeading &&
+    getDonglePosition(startGlobalPoint, startHeading, grid);
+  const startDongle =
+    startDonglePosition && pointToGridNode(startDonglePosition, grid);
+  const endDonglePosition =
+    endGlobalPoint &&
+    endHeading &&
+    getDonglePosition(endGlobalPoint, endHeading, grid);
+  const endDongle =
+    endDonglePosition && pointToGridNode(endDonglePosition, grid);
+
+  // Create path to end dongle from start dongle
+  const path =
+    startDongle &&
+    endDongle &&
+    endHeading &&
+    astar(
+      gridNodeFromAddr(pointToGridAddress(startDongle.pos, grid)!, grid)!,
+      gridNodeFromAddr(pointToGridAddress(endDongle.pos, grid)!, grid)!,
+      grid,
+      endHeading,
+    );
+  if (path) {
+    startGlobalPoint && debugDrawPoint(startGlobalPoint, "red");
+    path.forEach((node) => debugDrawPoint(node.pos, "red"));
+    endGlobalPoint && debugDrawPoint(endGlobalPoint, "red");
+
+    // mutateElement(arrow, {
+    //   ...normalizedArrowElementUpdate(
+    //     path.map((node) => [
+    //       node.pos[0] - arrow.x,
+    //       node.pos[1] - arrow.y,
+    //     ]) as Point[],
+    //   ),
+    // });
+  }
+  //arrow.points.forEach((point) => console.log(point));
 
   // Debug
   // grid.data.forEach(
@@ -131,47 +164,53 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
       "#DDD",
     );
   }
+};
 
-  const startAddress = pointToGridAddress(startGlobalPoint, grid);
-  const startDongle =
-    startAddress &&
-    startHeading &&
-    getNeighbors(startAddress, grid).filter(
-      (_, idx) => idx === headingToNeighborIndex(startHeading),
-    )[0];
-
-  const endAddress = pointToGridAddress(endGlobalPoint, grid);
-  const endDongle =
-    endAddress &&
-    endHeading &&
-    getNeighbors(endAddress, grid).filter(
-      (_, idx) => idx === headingToNeighborIndex(endHeading),
-    )[0];
-
-  const startNode = startAddress && gridNodeFromAddr(startAddress, grid);
-  const endNode = endAddress && gridNodeFromAddr(endAddress, grid);
-
-  const path =
-    startNode &&
-    startDongle &&
-    endNode &&
-    endDongle &&
-    endHeading &&
-    astar(startDongle, endDongle, grid, endHeading);
-  if (path) {
-    startNode && debugDrawPoint(startNode.pos, "red");
-    endNode && debugDrawPoint(endNode.pos, "red");
-    path.forEach((node) => debugDrawPoint(node.pos, "red"));
-    // mutateElement(arrow, {
-    //   ...normalizedArrowElementUpdate(
-    //     path.map((node) => [
-    //       node.pos[0] - arrow.x,
-    //       node.pos[1] - arrow.y,
-    //     ]) as Point[],
-    //   ),
-    // });
+const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
+  switch (heading) {
+    case HEADING_UP:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] < p[1])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[1] > closest[1] ? node.pos : closest,
+            [p[0], -Infinity] as Point,
+          ) ?? p
+      );
+    case HEADING_DOWN:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] > p[1])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[1] < closest[1] ? node.pos : closest,
+            [p[0], Infinity] as Point,
+          ) ?? p
+      );
+    case HEADING_LEFT:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] < p[0])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[0] > closest[0] ? node.pos : closest,
+            [-Infinity, p[1]] as Point,
+          ) ?? p
+      );
+    case HEADING_RIGHT:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] > p[0])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[0] < closest[0] ? node.pos : closest,
+            [Infinity, p[1]] as Point,
+          ) ?? p
+      );
   }
-  //arrow.points.forEach((point) => console.log(point));
+
+  return p;
 };
 
 /**
@@ -433,12 +472,18 @@ const calculateGrid = (
 
   // Binding points are also nodes
   if (startHeading) {
-    horizontal.add(start[0]);
-    vertical.add(start[1]);
+    if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
+      vertical.add(start[1]);
+    } else {
+      horizontal.add(start[0]);
+    }
   }
   if (endHeading) {
-    vertical.add(end[1]);
-    horizontal.add(end[0]);
+    if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
+      vertical.add(end[1]);
+    } else {
+      horizontal.add(end[0]);
+    }
   }
 
   // Add halfway points as well
@@ -459,9 +504,6 @@ const calculateGrid = (
     }
   }
 
-  // const common = commonAABB(additionalAabbs);
-  // const commonX = (common[2] - common[0]) / 2;
-  // const commonY = (common[3] - common[1]) / 2;
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
 
@@ -555,6 +597,26 @@ const pointToGridAddress = (
       const candidate = gridNodeFromAddr([col, row], grid)?.pos;
       if (candidate && point[0] === candidate[0] && point[1] === candidate[1]) {
         return [col, row];
+      }
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Get node for global point on canvas (if exists)
+ */
+const pointToGridNode = (point: Point, grid: Grid): Node | null => {
+  for (let col = 0; col < grid.col; col++) {
+    for (let row = 0; row < grid.row; row++) {
+      const candidate = gridNodeFromAddr([col, row], grid);
+      if (
+        candidate &&
+        point[0] === candidate.pos[0] &&
+        point[1] === candidate.pos[1]
+      ) {
+        return candidate;
       }
     }
   }
