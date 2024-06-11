@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState, memo } from "react";
 import { getCommonBounds } from "../../element/bounds";
-import type {
-  ElementsMap,
-  NonDeletedExcalidrawElement,
-} from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
 import type { AppState, ExcalidrawProps } from "../../types";
 import { CloseIcon } from "../icons";
@@ -27,7 +24,7 @@ import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
 import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState } from "../App";
-import { AtomicUnit } from "./utils";
+import type { AtomicUnit } from "./utils";
 
 interface StatsProps {
   scene: Scene;
