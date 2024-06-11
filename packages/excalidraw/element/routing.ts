@@ -1,5 +1,3 @@
-import type { LineSegment } from "../../utils";
-import type { Vector } from "../../utils/geometry/shape";
 import type { Heading } from "../math";
 import {
   HEADING_DOWN,
@@ -28,14 +26,28 @@ import type {
   ExcalidrawElement,
 } from "./types";
 
-export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
-  debugClear();
+type Node = {
+  f: number;
+  g: number;
+  h: number;
+  pos: Point;
+  addr: [number, number];
+};
 
-  const elementsMap = scene.getNonDeletedElementsMap();
+type Grid = {
+  row: number;
+  col: number;
+  data: (Node | null)[];
+};
+
+const OFFSET = 10;
+
+export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
   const [startGlobalPoint, endGlobalPoint] = [
     translatePoint(arrow.points[0], [arrow.x, arrow.y]),
     translatePoint(arrow.points[arrow.points.length - 1], [arrow.x, arrow.y]),
   ];
+  const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
     arrow.startBinding &&
       getBindableElementForId(arrow.startBinding.elementId, elementsMap),
@@ -46,9 +58,10 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
     startElement && aabbForElement(startElement),
     endElement && aabbForElement(endElement),
   ];
-
-  [startAABB, endAABB].forEach((aabb) => aabb && debugDrawBounds(aabb));
-
+  const [startExtendedAABB, endExtendedAABB] = [
+    startElement && aabbForElement(startElement, OFFSET),
+    endElement && aabbForElement(endElement, OFFSET),
+  ];
   const [startHeading, endHeading] = [
     startElement &&
       startAABB &&
@@ -58,15 +71,75 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
       headingForPointOnElement(endElement, endAABB, endGlobalPoint),
   ];
 
-  calculateGrid(
-    // @ts-ignore Already filtered for null (fixed in TS 5.4+)
-    [startAABB, endAABB],
+  // Debug
+  debugClear();
+
+  [startAABB, endAABB, startExtendedAABB, endExtendedAABB].forEach(
+    (aabb) => aabb && debugDrawBounds(aabb),
+  );
+  const grid = calculateGrid(
+    [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
+    [startExtendedAABB, endExtendedAABB] as Bounds[],
     startGlobalPoint,
     startHeading,
     endGlobalPoint,
     endHeading,
-  ).forEach((point) => debugDrawPoint(point));
+  );
+
+  // Debug
+  // grid.data.forEach(
+  //   (node) =>
+  //     node &&
+  //     debugDrawPoint(
+  //       node.pos,
+  //       `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
+  //         node.addr[1] * (240 / grid.col),
+  //       )}, 255)`,
+  //     ),
+  // );
+  for (let col = 0; col < grid.col; col++) {
+    debugDrawSegments(
+      [
+        gridNodeFromAddr(col, 0, grid)!.pos,
+        gridNodeFromAddr(col, grid.row - 1, grid)!.pos,
+      ],
+      "#DDD",
+    );
+  }
+  for (let row = 0; row < grid.row; row++) {
+    debugDrawSegments(
+      [
+        gridNodeFromAddr(0, row, grid)!.pos,
+        gridNodeFromAddr(grid.col - 1, row, grid)!.pos,
+      ],
+      "#DDD",
+    );
+  }
+
+  const startAddress = pointToGridAddress(startGlobalPoint, grid);
+  // startAddress &&
+  //   startHeading &&
+  //   neighbors(startAddress, grid)
+  //     .filter((_, idx) => idx === headingToNeighborIndex(startHeading))
+  //     .forEach((node) => node && debugDrawPoint(node.pos, "red", false));
+  // debugDrawPoint(startGlobalPoint, "red");
+
+  const endAddress = pointToGridAddress(endGlobalPoint, grid);
+  // endAddress &&
+  //   endHeading &&
+  //   neighbors(endAddress, grid)
+  //     .filter((_, idx) => idx === headingToNeighborIndex(endHeading))
+  //     .forEach((node) => node && debugDrawPoint(node.pos, "red", false));
+  // debugDrawPoint(endGlobalPoint, "red");
 };
+
+/**
+ * Routing algorithm.
+ */
+const astar = (start: Node, end: Node, grid: Grid) => {};
+
+const heuristicsManhattan = (start: Point, end: Point) =>
+  Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
 
 /**
  * Calculates the grid from which the node points are placed on
@@ -74,11 +147,12 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
  */
 const calculateGrid = (
   aabbs: Bounds[],
+  additionalAabbs: Bounds[],
   start: Point,
   startHeading: Heading | null,
   end: Point,
   endHeading: Heading | null,
-) => {
+): Grid => {
   const horizontal = new Set<number>();
   const vertical = new Set<number>();
 
@@ -88,55 +162,122 @@ const calculateGrid = (
     vertical.add(aabb[1]);
     vertical.add(aabb[3]);
   });
+  additionalAabbs.forEach((aabb) => {
+    horizontal.add(aabb[0]);
+    horizontal.add(aabb[2]);
+    vertical.add(aabb[1]);
+    vertical.add(aabb[3]);
+  });
 
   // Binding points are also nodes
   if (startHeading) {
-    if (startHeading === HEADING_RIGHT || startHeading === HEADING_LEFT) {
-      vertical.add(start[1]);
-    } else {
-      horizontal.add(start[0]);
-      vertical.add(start[1]);
-    }
+    horizontal.add(start[0]);
+    vertical.add(start[1]);
   }
   if (endHeading) {
-    if (endHeading === HEADING_RIGHT || endHeading === HEADING_LEFT) {
-      vertical.add(end[1]);
-    } else {
-      horizontal.add(end[0]);
-    }
+    vertical.add(end[1]);
+    horizontal.add(end[0]);
   }
 
   // Add halfway points as well
-
   const verticalSorted = Array.from(vertical).sort((a, b) => a - b);
   const horizontalSorted = Array.from(horizontal).sort((a, b) => a - b);
   for (let i = 0; i < verticalSorted.length - 1; i++) {
     const v = verticalSorted[i];
     const v2 = verticalSorted[i + 1] ?? 0;
-    if (v2 - v >= 4) {
+    if (v2 - v > OFFSET) {
       vertical.add((v + v2) / 2);
     }
   }
   for (let i = 0; i < horizontalSorted.length - 1; i++) {
     const h = horizontalSorted[i];
     const h2 = horizontalSorted[i + 1];
-    if (h2 - h >= 4) {
+    if (h2 - h > OFFSET) {
       horizontal.add((h + h2) / 2);
     }
   }
 
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
+  const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
 
-  return Array.from(horizontal)
-    .sort((a, b) => a - b) // TODO: Do we need sorting?
-    .flatMap((x) => _vertical.map((y) => [x, y] as Point))
-    .filter(filterUnique)
-    .filter(
-      (point) =>
+  return {
+    row: _vertical.length,
+    col: _horizontal.length,
+    data: _vertical
+      .flatMap((y, row) =>
+        _horizontal.map((x, col) => ({
+          f: 0,
+          g: 0,
+          h: 0,
+          addr: [col, row] as [number, number],
+          pos: [x, y] as Point,
+        })),
+      )
+      //.filter(filterUnique) // TODO: Do we need unique values?
+      .map((node) =>
         Math.max(
-          ...aabbs.map((aabb) => (pointInsideOrOnBounds(point, aabb) ? 1 : 0)),
-        ) === 0,
-    );
+          ...aabbs.map((aabb) =>
+            pointInsideOrOnBounds(node.pos, aabb) ? 1 : 0,
+          ),
+        ) === 0
+          ? node
+          : null,
+      ),
+  };
+};
+
+/**
+ * Get neighboring points for a gived grid address
+ */
+const getNeighbors = ([col, row]: [number, number], grid: Grid) =>
+  [
+    gridNodeFromAddr(col, row - 1, grid),
+    gridNodeFromAddr(col + 1, row, grid),
+    gridNodeFromAddr(col, row + 1, grid),
+    gridNodeFromAddr(col - 1, row, grid),
+  ] as [Node | null, Node | null, Node | null, Node | null];
+
+const gridNodeFromAddr = (
+  col: number,
+  row: number,
+  grid: Grid,
+): Node | null => {
+  if (col < 0 || col >= grid.col || row < 0 || row >= grid.row) {
+    return null;
+  }
+
+  return grid.data[row * grid.col + col] ?? null;
+};
+
+const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
+  switch (heading) {
+    case HEADING_UP:
+      return 0;
+    case HEADING_RIGHT:
+      return 1;
+    case HEADING_DOWN:
+      return 2;
+  }
+  return 3;
+};
+
+/**
+ * Get grid address for position (if exists)
+ */
+const pointToGridAddress = (
+  point: Point,
+  grid: Grid,
+): [number, number] | null => {
+  for (let col = 0; col < grid.col; col++) {
+    for (let row = 0; row < grid.row; row++) {
+      const candidate = gridNodeFromAddr(col, row, grid)?.pos;
+      if (candidate && point[0] === candidate[0] && point[1] === candidate[1]) {
+        return [col, row];
+      }
+    }
+  }
+
+  return null;
 };
 
 /**
