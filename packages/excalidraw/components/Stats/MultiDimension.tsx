@@ -158,7 +158,7 @@ const MultiDimension = ({
           ) / 100
         );
       }),
-    [elements, atomicUnits],
+    [elementsMap, atomicUnits, property],
   );
 
   const value =

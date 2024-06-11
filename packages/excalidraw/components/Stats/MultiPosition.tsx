@@ -131,7 +131,7 @@ const MultiPosition = ({
 
         return Math.round((property === "x" ? topLeftX : topLeftY) * 100) / 100;
       }),
-    [atomicUnits, elements],
+    [atomicUnits, elementsMap, property],
   );
 
   const value = new Set(positions).size === 1 ? positions[0] : "Mixed";
