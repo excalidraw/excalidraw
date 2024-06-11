@@ -1262,7 +1262,7 @@ export const actionChangeArrowType = register({
 
         if (value === "elbow") {
           // TODO: Convert to elbow arrow
-          mutateElbowArrow(newElement, app.scene);
+          mutateElbowArrow(newElement, app.scene, newElement.points, [0, 0]);
         }
 
         return newElement;

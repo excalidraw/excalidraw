@@ -5311,7 +5311,12 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isArrowElement(multiElement) && multiElement.elbowed) {
-          mutateElbowArrow(multiElement, this.scene);
+          mutateElbowArrow(
+            multiElement,
+            this.scene,
+            multiElement.points,
+            [0, 0],
+          );
         }
         // update last uncommitted point
         mutateElement(multiElement, {

@@ -6,6 +6,7 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
+  arePointsEqual,
   magnitudeSq,
   pointToVector,
   rotatePoint,
@@ -18,6 +19,7 @@ import type { Point } from "../types";
 import { debugClear, debugDrawPoint, debugDrawSegments } from "../visualdebug";
 import { maxBindingGap } from "./binding";
 import type { Bounds } from "./bounds";
+import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
 import type {
@@ -48,12 +50,14 @@ type Grid = {
 export const mutateElbowArrow = (
   arrow: ExcalidrawArrowElement,
   scene: Scene,
+  nextPoints: readonly Point[],
+  offset: Point,
 ) => {
   debugClear();
 
   const [startGlobalPoint, endGlobalPoint] = [
-    translatePoint(arrow.points[0], [arrow.x, arrow.y]),
-    translatePoint(arrow.points[arrow.points.length - 1], [arrow.x, arrow.y]),
+    translatePoint(nextPoints[0], [arrow.x, arrow.y]),
+    translatePoint(nextPoints[nextPoints.length - 1], [arrow.x, arrow.y]),
   ];
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
@@ -135,11 +139,16 @@ export const mutateElbowArrow = (
     path.forEach((node) => debugDrawPoint(node.pos, "red"));
     endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
 
-    // mutateElement(arrow, {
-    //   ...normalizedArrowElementUpdate(
-    //     path.map((node) => [node.pos[0], node.pos[1]]) as Point[],
-    //   ),
-    // });
+    const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
+    points.unshift(startGlobalPoint);
+    points.push(endGlobalPoint);
+    mutateElement(arrow, {
+      ...normalizedArrowElementUpdate(
+        simplifyElbowArrowPoints(points),
+        offset[0],
+        offset[1],
+      ),
+    });
   }
 
   // Debug
@@ -775,3 +784,20 @@ const normalizedArrowElementUpdate = (
     height: farthestY - offsetY + (externalOffsetY ?? 0),
   };
 };
+
+/// If last and current segments have the same heading, skip the middle point
+const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
+  points
+    .slice(2)
+    .reduce(
+      (result, point) =>
+        arePointsEqual(
+          vectorToHeading(
+            pointToVector(result[result.length - 1], result[result.length - 2]),
+          ),
+          vectorToHeading(pointToVector(point, result[result.length - 1])),
+        )
+          ? [...result.slice(0, -1), point]
+          : [...result, point],
+      [points[0] ?? [0, 0], points[1] ?? [1, 0]],
+    );

@@ -659,14 +659,14 @@ const updateBoundPoint = (
       bindableElement.angle,
     );
 
-    // newEdgePoint = updateBindPointToSnapToElementOutline(
-    //   [rotatedGlobalX, rotatedGlobalY],
-    //   startOrEnd,
-    //   linearElement,
-    //   bindableElement,
-    //   elementsMap,
-    // );
-    newEdgePoint = [rotatedGlobalX, rotatedGlobalY];
+    newEdgePoint = updateBindPointToSnapToElementOutline(
+      [rotatedGlobalX, rotatedGlobalY],
+      startOrEnd,
+      linearElement,
+      bindableElement,
+      elementsMap,
+    );
+    //newEdgePoint = [rotatedGlobalX, rotatedGlobalY];
   } else {
     const adjacentPointIndex = edgePointIndex - direction;
     const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(

@@ -1340,22 +1340,28 @@ export class LinearElementEditor {
     scene: Scene,
     otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
   ) {
-    const nextCoords = getElementPointsCoords(element, nextPoints);
-    const prevCoords = getElementPointsCoords(element, element.points);
-    const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
-    const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
-    const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
-    const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
-    const dX = prevCenterX - nextCenterX;
-    const dY = prevCenterY - nextCenterY;
-    const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
-    mutateElement(element, {
-      ...otherUpdates,
-      points: nextPoints,
-      x: element.x + rotated[0],
-      y: element.y + rotated[1],
-    });
-    mutateElbowArrow(element as ExcalidrawArrowElement, scene);
+    if (isArrowElement(element) && element.elbowed) {
+      mutateElbowArrow(element as ExcalidrawArrowElement, scene, nextPoints, [
+        offsetX,
+        offsetY,
+      ]);
+    } else {
+      const nextCoords = getElementPointsCoords(element, nextPoints);
+      const prevCoords = getElementPointsCoords(element, element.points);
+      const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
+      const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
+      const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
+      const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
+      const dX = prevCenterX - nextCenterX;
+      const dY = prevCenterY - nextCenterY;
+      const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
+      mutateElement(element, {
+        ...otherUpdates,
+        points: nextPoints,
+        x: element.x + rotated[0],
+        y: element.y + rotated[1],
+      });
+    }
   }
 
   private static _getShiftLockedDelta(
