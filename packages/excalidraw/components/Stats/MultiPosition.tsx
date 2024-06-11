@@ -6,18 +6,15 @@ import type { DragInputCallbackType } from "./DragInput";
 import { moveElement } from "./Position";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { getCommonBounds, isTextElement } from "../../element";
-import {
-  getElementsInGroup,
-  getSelectedGroupIds,
-  isInGroup,
-} from "../../groups";
-import type { AppState } from "../../types";
+import { useMemo } from "react";
+import { getElementsInAtomicUnit } from ".";
+import type { AtomicUnit } from ".";
 
 interface MultiPositionProps {
   property: "x" | "y";
   elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
-  appState: AppState;
+  atomicUnits: AtomicUnit[];
 }
 
 const STEP_SIZE = 10;
@@ -113,15 +110,29 @@ const MultiPosition = ({
   property,
   elements,
   elementsMap,
-  appState,
+  atomicUnits,
 }: MultiPositionProps) => {
-  const positions = elements.map((el) => {
-    const [cx, cy] = [el.x + el.width / 2, el.y + el.height / 2];
+  const positions = useMemo(
+    () =>
+      atomicUnits.map((atomicUnit) => {
+        const elementsInUnit = Object.keys(atomicUnit)
+          .map((id) => elementsMap.get(id))
+          .filter((el) => el !== undefined) as ExcalidrawElement[];
 
-    const [topLeftX, topLeftY] = rotate(el.x, el.y, cx, cy, el.angle);
+        // we're dealing with a group
+        if (elementsInUnit.length > 1) {
+          const [x1, y1] = getCommonBounds(elementsInUnit);
+          return Math.round((property === "x" ? x1 : y1) * 100) / 100;
+        }
+        const [el] = elementsInUnit;
+        const [cx, cy] = [el.x + el.width / 2, el.y + el.height / 2];
 
-    return Math.round((property === "x" ? topLeftX : topLeftY) * 100) / 100;
-  });
+        const [topLeftX, topLeftY] = rotate(el.x, el.y, cx, cy, el.angle);
+
+        return Math.round((property === "x" ? topLeftX : topLeftY) * 100) / 100;
+      }),
+    [atomicUnits, elements],
+  );
 
   const value = new Set(positions).size === 1 ? positions[0] : "Mixed";
 
@@ -133,61 +144,61 @@ const MultiPosition = ({
     nextValue,
   }) => {
     if (nextValue !== undefined) {
-      const selectedGroupIds = getSelectedGroupIds(appState);
-
-      const elementsInGroups = selectedGroupIds.map((gid) => ({
-        groupId: gid,
-        latestElements: getElementsInGroup(elements, gid),
-        originalElements: getElementsInGroup(originalElements, gid),
-      }));
-      const editableLatestIndividualElements = elements.filter(
-        (el) => isPropertyEditable(el, property) && !isInGroup(el),
-      );
-      const editableOriginalIndividualElements = originalElements.filter(
-        (el) => isPropertyEditable(el, property) && !isInGroup(el),
-      );
-
-      for (const elementsInGroup of elementsInGroups) {
-        const [x1, y1, ,] = getCommonBounds(elementsInGroup.latestElements);
-        const newTopLeftX = property === "x" ? nextValue : x1;
-        const newTopLeftY = property === "y" ? nextValue : y1;
-
-        moveGroupTo(
-          newTopLeftX,
-          newTopLeftY,
-          elementsInGroup.latestElements,
-          elementsInGroup.originalElements,
+      for (const atomicUnit of atomicUnits) {
+        const elementsInUnit = getElementsInAtomicUnit(
+          atomicUnit,
           elementsMap,
           originalElementsMap,
         );
-      }
 
-      for (let i = 0; i < editableLatestIndividualElements.length; i++) {
-        const origElement = editableOriginalIndividualElements[i];
-        const latestElement = editableLatestIndividualElements[i];
-        const [cx, cy] = [
-          origElement.x + origElement.width / 2,
-          origElement.y + origElement.height / 2,
-        ];
-        const [topLeftX, topLeftY] = rotate(
-          origElement.x,
-          origElement.y,
-          cx,
-          cy,
-          origElement.angle,
-        );
+        if (elementsInUnit.length > 1) {
+          const [x1, y1, ,] = getCommonBounds(
+            elementsInUnit.map((el) => el.latest!),
+          );
+          const newTopLeftX = property === "x" ? nextValue : x1;
+          const newTopLeftY = property === "y" ? nextValue : y1;
 
-        const newTopLeftX = property === "x" ? nextValue : topLeftX;
-        const newTopLeftY = property === "y" ? nextValue : topLeftY;
-        moveElement(
-          newTopLeftX,
-          newTopLeftY,
-          latestElement,
-          origElement,
-          elementsMap,
-          originalElementsMap,
-          false,
-        );
+          moveGroupTo(
+            newTopLeftX,
+            newTopLeftY,
+            elementsInUnit.map((el) => el.latest),
+            elementsInUnit.map((el) => el.original),
+            elementsMap,
+            originalElementsMap,
+          );
+        } else {
+          const origElement = elementsInUnit[0]?.original;
+          const latestElement = elementsInUnit[0]?.latest;
+          if (
+            origElement &&
+            latestElement &&
+            isPropertyEditable(latestElement, property)
+          ) {
+            const [cx, cy] = [
+              origElement.x + origElement.width / 2,
+              origElement.y + origElement.height / 2,
+            ];
+            const [topLeftX, topLeftY] = rotate(
+              origElement.x,
+              origElement.y,
+              cx,
+              cy,
+              origElement.angle,
+            );
+
+            const newTopLeftX = property === "x" ? nextValue : topLeftX;
+            const newTopLeftY = property === "y" ? nextValue : topLeftY;
+            moveElement(
+              newTopLeftX,
+              newTopLeftY,
+              latestElement,
+              origElement,
+              elementsMap,
+              originalElementsMap,
+              false,
+            );
+          }
+        }
       }
 
       Scene.getScene(elements[0])?.triggerUpdate();

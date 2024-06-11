@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState, memo } from "react";
 import { getCommonBounds } from "../../element/bounds";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  ElementsMap,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
 import { t } from "../../i18n";
 import type { AppState, ExcalidrawProps } from "../../types";
 import { CloseIcon } from "../icons";
@@ -11,7 +14,12 @@ import Angle from "./Angle";
 
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
-import { elementsAreInSameGroup } from "../../groups";
+import {
+  elementsAreInSameGroup,
+  getElementsInGroup,
+  getSelectedGroupIds,
+  isInGroup,
+} from "../../groups";
 import MultiAngle from "./MultiAngle";
 import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
@@ -25,6 +33,24 @@ interface StatsProps {
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
+
+export type AtomicUnit = Record<string, true>;
+export const getElementsInAtomicUnit = (
+  atomicUnit: AtomicUnit,
+  elementsMap: ElementsMap,
+  originalElementsMap?: ElementsMap,
+) => {
+  return Object.keys(atomicUnit)
+    .map((id) => ({
+      original: (originalElementsMap ?? elementsMap).get(id),
+      latest: elementsMap.get(id),
+    }))
+    .filter((el) => el.original !== undefined && el.latest !== undefined) as {
+    original: NonDeletedExcalidrawElement;
+    latest: NonDeletedExcalidrawElement;
+  }[];
+};
+
 const STATS_TIMEOUT = 50;
 
 export const Stats = (props: StatsProps) => {
@@ -98,6 +124,24 @@ export const StatsInner = memo(
 
     const [generalStatsOpen, setGeneralStatsOpen] = useState(true);
     const [elementPropertiesOpen, setElementPropertiesOpen] = useState(true);
+
+    const atomicUnits = useMemo(() => {
+      const selectedGroupIds = getSelectedGroupIds(appState);
+      const _atomicUnits = selectedGroupIds.map((gid) => {
+        return getElementsInGroup(selectedElements, gid).reduce((acc, el) => {
+          acc[el.id] = true;
+          return acc;
+        }, {} as AtomicUnit);
+      });
+      selectedElements
+        .filter((el) => !isInGroup(el))
+        .forEach((el) => {
+          _atomicUnits.push({
+            [el.id]: true,
+          });
+        });
+      return _atomicUnits;
+    }, [selectedElements, appState]);
 
     return (
       <div className="Stats">
@@ -205,25 +249,25 @@ export const StatsInner = memo(
                         property="x"
                         elements={multipleElements}
                         elementsMap={elementsMap}
-                        appState={appState}
+                        atomicUnits={atomicUnits}
                       />
                       <MultiPosition
                         property="y"
                         elements={multipleElements}
                         elementsMap={elementsMap}
-                        appState={appState}
+                        atomicUnits={atomicUnits}
                       />
                       <MultiDimension
                         property="width"
                         elements={multipleElements}
                         elementsMap={elementsMap}
-                        appState={appState}
+                        atomicUnits={atomicUnits}
                       />
                       <MultiDimension
                         property="height"
                         elements={multipleElements}
                         elementsMap={elementsMap}
-                        appState={appState}
+                        atomicUnits={atomicUnits}
                       />
                       <MultiAngle
                         elements={multipleElements}

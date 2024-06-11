@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { getCommonBounds, isTextElement } from "../../element";
 import { updateBoundElements } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
@@ -7,23 +8,20 @@ import {
   handleBindTextResize,
 } from "../../element/textElement";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import {
-  getElementsInGroup,
-  getSelectedGroupIds,
-  isInGroup,
-} from "../../groups";
 import Scene from "../../scene/Scene";
-import type { AppState, Point } from "../../types";
+import type { Point } from "../../types";
 import { resizeElement } from "./Dimension";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
+import { getElementsInAtomicUnit } from ".";
+import type { AtomicUnit } from ".";
 
 interface MultiDimensionProps {
   property: "width" | "height";
   elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
-  appState: AppState;
+  atomicUnits: AtomicUnit[];
 }
 
 const STEP_SIZE = 10;
@@ -136,21 +134,32 @@ const MultiDimension = ({
   property,
   elements,
   elementsMap,
-  appState,
+  atomicUnits,
 }: MultiDimensionProps) => {
-  const selectedGroupIds = getSelectedGroupIds(appState);
-  const groupSizes = selectedGroupIds.map((gid) => {
-    const elementsInGroup = getElementsInGroup(elements, gid);
-    const [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
+  // const sizes = [...individualSizes, ...groupSizes];
+  const sizes = useMemo(
+    () =>
+      atomicUnits.map((atomicUnit) => {
+        const elementsInUnit = getElementsInAtomicUnit(atomicUnit, elementsMap);
 
-    return Math.round((property === "width" ? x2 - x1 : y2 - y1) * 10) / 10;
-  });
+        if (elementsInUnit.length > 1) {
+          const [x1, y1, x2, y2] = getCommonBounds(
+            elementsInUnit.map((el) => el.latest),
+          );
+          return (
+            Math.round((property === "width" ? x2 - x1 : y2 - y1) * 100) / 100
+          );
+        }
+        const [el] = elementsInUnit;
 
-  const individualSizes = elements
-    .filter((el) => !isInGroup(el) && isPropertyEditable(el, property))
-    .map((el) => Math.round(el[property] * 10) / 10);
-
-  const sizes = [...individualSizes, ...groupSizes];
+        return (
+          Math.round(
+            (property === "width" ? el.latest.width : el.latest.height) * 100,
+          ) / 100
+        );
+      }),
+    [elements, atomicUnits],
+  );
 
   const value =
     new Set(sizes).size === 1 ? Math.round(sizes[0] * 100) / 100 : "Mixed";
@@ -164,31 +173,126 @@ const MultiDimension = ({
     shouldChangeByStepSize,
     nextValue,
   }) => {
-    const elementsInGroups = selectedGroupIds.map((gid) => ({
-      groupId: gid,
-      latestElements: getElementsInGroup(elements, gid),
-      originalElements: getElementsInGroup(originalElements, gid),
-    }));
-
-    const editableLatestIndividualElements = elements.filter(
-      (el) => isPropertyEditable(el, property) && !isInGroup(el),
-    );
-
-    const editableOriginalIndividualElements = originalElements.filter(
-      (el) => isPropertyEditable(el, property) && !isInGroup(el),
-    );
-
     if (nextValue !== undefined) {
-      for (const elementsInGroup of elementsInGroups) {
-        const { latestElements, originalElements } = elementsInGroup;
+      for (const atomicUnit of atomicUnits) {
+        const elementsInUnit = getElementsInAtomicUnit(
+          atomicUnit,
+          elementsMap,
+          originalElementsMap,
+        );
+
+        if (elementsInUnit.length > 1) {
+          const latestElements = elementsInUnit.map((el) => el.latest!);
+          const originalElements = elementsInUnit.map((el) => el.original!);
+          const [x1, y1, x2, y2] = getCommonBounds(originalElements);
+          const initialWidth = x2 - x1;
+          const initialHeight = y2 - y1;
+          const aspectRatio = initialWidth / initialHeight;
+          const nextWidth =
+            property === "width" ? Math.max(0, nextValue) : initialWidth;
+          const nextHeight =
+            property === "height" ? Math.max(0, nextValue) : initialHeight;
+
+          resizeGroup(
+            nextWidth,
+            nextHeight,
+            initialHeight,
+            aspectRatio,
+            [x1, y1],
+            property,
+            latestElements,
+            originalElements,
+            elementsMap,
+            originalElementsMap,
+          );
+        } else {
+          const [el] = elementsInUnit;
+          const latestElement = el?.latest;
+          const origElement = el?.original;
+
+          if (
+            latestElement &&
+            origElement &&
+            isPropertyEditable(latestElement, property)
+          ) {
+            let nextWidth =
+              property === "width"
+                ? Math.max(0, nextValue)
+                : latestElement.width;
+            if (property === "width") {
+              if (shouldChangeByStepSize) {
+                nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
+              } else {
+                nextWidth = Math.round(nextWidth);
+              }
+            }
+
+            let nextHeight =
+              property === "height"
+                ? Math.max(0, nextValue)
+                : latestElement.height;
+            if (property === "height") {
+              if (shouldChangeByStepSize) {
+                nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
+              } else {
+                nextHeight = Math.round(nextHeight);
+              }
+            }
+
+            resizeElement(
+              nextWidth,
+              nextHeight,
+              false,
+              latestElement,
+              origElement,
+              elementsMap,
+              originalElementsMap,
+              false,
+            );
+          }
+        }
+      }
+
+      Scene.getScene(elements[0])?.triggerUpdate();
+
+      return;
+    }
+
+    const changeInWidth = property === "width" ? accumulatedChange : 0;
+    const changeInHeight = property === "height" ? accumulatedChange : 0;
+
+    for (const atomicUnit of atomicUnits) {
+      const elementsInUnit = getElementsInAtomicUnit(
+        atomicUnit,
+        elementsMap,
+        originalElementsMap,
+      );
+
+      if (elementsInUnit.length > 1) {
+        const latestElements = elementsInUnit.map((el) => el.latest!);
+        const originalElements = elementsInUnit.map((el) => el.original!);
+
         const [x1, y1, x2, y2] = getCommonBounds(originalElements);
         const initialWidth = x2 - x1;
         const initialHeight = y2 - y1;
         const aspectRatio = initialWidth / initialHeight;
-        const nextWidth =
-          property === "width" ? Math.max(0, nextValue) : initialWidth;
-        const nextHeight =
-          property === "height" ? Math.max(0, nextValue) : initialHeight;
+        let nextWidth = Math.max(0, initialWidth + changeInWidth);
+        if (property === "width") {
+          if (shouldChangeByStepSize) {
+            nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
+          } else {
+            nextWidth = Math.round(nextWidth);
+          }
+        }
+
+        let nextHeight = Math.max(0, initialHeight + changeInHeight);
+        if (property === "height") {
+          if (shouldChangeByStepSize) {
+            nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
+          } else {
+            nextHeight = Math.round(nextHeight);
+          }
+        }
 
         resizeGroup(
           nextWidth,
@@ -202,122 +306,45 @@ const MultiDimension = ({
           elementsMap,
           originalElementsMap,
         );
-      }
+      } else {
+        const [el] = elementsInUnit;
+        const latestElement = el?.latest;
+        const origElement = el?.original;
 
-      for (let i = 0; i < editableLatestIndividualElements.length; i++) {
-        const latestElement = editableLatestIndividualElements[i];
-        const origElement = editableOriginalIndividualElements[i];
-
-        let nextWidth =
-          property === "width" ? Math.max(0, nextValue) : latestElement.width;
-        if (property === "width") {
-          if (shouldChangeByStepSize) {
-            nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
-          } else {
-            nextWidth = Math.round(nextWidth);
+        if (
+          latestElement &&
+          origElement &&
+          isPropertyEditable(latestElement, property)
+        ) {
+          let nextWidth = Math.max(0, origElement.width + changeInWidth);
+          if (property === "width") {
+            if (shouldChangeByStepSize) {
+              nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
+            } else {
+              nextWidth = Math.round(nextWidth);
+            }
           }
-        }
 
-        let nextHeight =
-          property === "height" ? Math.max(0, nextValue) : latestElement.height;
-        if (property === "height") {
-          if (shouldChangeByStepSize) {
-            nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
-          } else {
-            nextHeight = Math.round(nextHeight);
+          let nextHeight = Math.max(0, origElement.height + changeInHeight);
+          if (property === "height") {
+            if (shouldChangeByStepSize) {
+              nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
+            } else {
+              nextHeight = Math.round(nextHeight);
+            }
           }
-        }
 
-        resizeElement(
-          nextWidth,
-          nextHeight,
-          false,
-          latestElement,
-          origElement,
-          elementsMap,
-          originalElementsMap,
-          false,
-        );
-      }
-
-      Scene.getScene(elements[0])?.triggerUpdate();
-
-      return;
-    }
-
-    const changeInWidth = property === "width" ? accumulatedChange : 0;
-    const changeInHeight = property === "height" ? accumulatedChange : 0;
-
-    for (const elementsInGroup of elementsInGroups) {
-      const { latestElements, originalElements } = elementsInGroup;
-
-      const [x1, y1, x2, y2] = getCommonBounds(originalElements);
-      const initialWidth = x2 - x1;
-      const initialHeight = y2 - y1;
-      const aspectRatio = initialWidth / initialHeight;
-      let nextWidth = Math.max(0, initialWidth + changeInWidth);
-      if (property === "width") {
-        if (shouldChangeByStepSize) {
-          nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
-        } else {
-          nextWidth = Math.round(nextWidth);
+          resizeElement(
+            nextWidth,
+            nextHeight,
+            false,
+            latestElement,
+            origElement,
+            elementsMap,
+            originalElementsMap,
+          );
         }
       }
-
-      let nextHeight = Math.max(0, initialHeight + changeInHeight);
-      if (property === "height") {
-        if (shouldChangeByStepSize) {
-          nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
-        } else {
-          nextHeight = Math.round(nextHeight);
-        }
-      }
-
-      resizeGroup(
-        nextWidth,
-        nextHeight,
-        initialHeight,
-        aspectRatio,
-        [x1, y1],
-        property,
-        latestElements,
-        originalElements,
-        elementsMap,
-        originalElementsMap,
-      );
-    }
-
-    for (let i = 0; i < editableLatestIndividualElements.length; i++) {
-      const latestElement = editableLatestIndividualElements[i];
-      const origElement = editableOriginalIndividualElements[i];
-
-      let nextWidth = Math.max(0, origElement.width + changeInWidth);
-      if (property === "width") {
-        if (shouldChangeByStepSize) {
-          nextWidth = getStepSizedValue(nextWidth, STEP_SIZE);
-        } else {
-          nextWidth = Math.round(nextWidth);
-        }
-      }
-
-      let nextHeight = Math.max(0, origElement.height + changeInHeight);
-      if (property === "height") {
-        if (shouldChangeByStepSize) {
-          nextHeight = getStepSizedValue(nextHeight, STEP_SIZE);
-        } else {
-          nextHeight = Math.round(nextHeight);
-        }
-      }
-
-      resizeElement(
-        nextWidth,
-        nextHeight,
-        false,
-        latestElement,
-        origElement,
-        elementsMap,
-        originalElementsMap,
-      );
     }
 
     Scene.getScene(elements[0])?.triggerUpdate();
