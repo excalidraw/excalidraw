@@ -1,34 +1,23 @@
-import {
-  compressData,
-  decompressData,
-} from "../../packages/excalidraw/data/encode";
+import { compressData, decompressData } from "../../src/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
-import { restore } from "../../packages/excalidraw/data/restore";
-import type { ImportedDataState } from "../../packages/excalidraw/data/types";
-import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
-import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import type {
-  ExcalidrawElement,
-  FileId,
-  OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
-import type {
+} from "../../src/data/encryption";
+import { serializeAsJSON } from "../../src/data/json";
+import { restore } from "../../src/data/restore";
+import { ImportedDataState } from "../../src/data/types";
+import { isInvisiblySmallElement } from "../../src/element/sizeHelpers";
+import { isInitializedImageElement } from "../../src/element/typeChecks";
+import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { t } from "../../src/i18n";
+import {
   AppState,
   BinaryFileData,
   BinaryFiles,
-  SocketId,
   UserIdleState,
-} from "../../packages/excalidraw/types";
-import type { MakeBrand } from "../../packages/excalidraw/utility-types";
-import { bytesToHexString } from "../../packages/excalidraw/utils";
-import type { WS_SUBTYPES } from "../app_constants";
+} from "../../src/types";
+import { bytesToHexString } from "../../src/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
@@ -37,11 +26,12 @@ import {
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
 
-export type SyncableExcalidrawElement = OrderedExcalidrawElement &
-  MakeBrand<"SyncableExcalidrawElement">;
+export type SyncableExcalidrawElement = ExcalidrawElement & {
+  _brand: "SyncableExcalidrawElement";
+};
 
 export const isSyncableElement = (
-  element: OrderedExcalidrawElement,
+  element: ExcalidrawElement,
 ): element is SyncableExcalidrawElement => {
   if (element.isDeleted) {
     if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
@@ -52,9 +42,7 @@ export const isSyncableElement = (
   return !isInvisiblySmallElement(element);
 };
 
-export const getSyncableElements = (
-  elements: readonly OrderedExcalidrawElement[],
-) =>
+export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
   elements.filter((element) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
@@ -68,49 +56,67 @@ const generateRoomId = async () => {
   return bytesToHexString(buffer);
 };
 
+/**
+ * Right now the reason why we resolve connection params (url, polling...)
+ * from upstream is to allow changing the params immediately when needed without
+ * having to wait for clients to update the SW.
+ *
+ * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
+ */
+export const getCollabServer = async (): Promise<{
+  url: string;
+  polling: boolean;
+}> => {
+  if (import.meta.env.VITE_APP_WS_SERVER_URL) {
+    return {
+      url: import.meta.env.VITE_APP_WS_SERVER_URL,
+      polling: true,
+    };
+  }
+
+  try {
+    const resp = await fetch(
+      `${import.meta.env.VITE_APP_PORTAL_URL}/collab-server`,
+    );
+    return await resp.json();
+  } catch (error) {
+    console.error(error);
+    throw new Error(t("errors.cannotResolveCollabServer"));
+  }
+};
+
 export type EncryptedData = {
   data: ArrayBuffer;
   iv: Uint8Array;
 };
 
 export type SocketUpdateDataSource = {
-  INVALID_RESPONSE: {
-    type: WS_SUBTYPES.INVALID_RESPONSE;
-  };
   SCENE_INIT: {
-    type: WS_SUBTYPES.INIT;
+    type: "SCENE_INIT";
     payload: {
       elements: readonly ExcalidrawElement[];
     };
   };
   SCENE_UPDATE: {
-    type: WS_SUBTYPES.UPDATE;
+    type: "SCENE_UPDATE";
     payload: {
       elements: readonly ExcalidrawElement[];
     };
   };
   MOUSE_LOCATION: {
-    type: WS_SUBTYPES.MOUSE_LOCATION;
+    type: "MOUSE_LOCATION";
     payload: {
-      socketId: SocketId;
+      socketId: string;
       pointer: { x: number; y: number; tool: "pointer" | "laser" };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
       username: string;
     };
   };
-  USER_VISIBLE_SCENE_BOUNDS: {
-    type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS;
-    payload: {
-      socketId: SocketId;
-      username: string;
-      sceneBounds: SceneBounds;
-    };
-  };
   IDLE_STATUS: {
-    type: WS_SUBTYPES.IDLE_STATUS;
+    type: "IDLE_STATUS";
     payload: {
-      socketId: SocketId;
+      socketId: string;
       userState: UserIdleState;
       username: string;
     };
@@ -118,7 +124,10 @@ export type SocketUpdateDataSource = {
 };
 
 export type SocketUpdateDataIncoming =
-  SocketUpdateDataSource[keyof SocketUpdateDataSource];
+  | SocketUpdateDataSource[keyof SocketUpdateDataSource]
+  | {
+      type: "INVALID_RESPONSE";
+    };
 
 export type SocketUpdateData =
   SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
@@ -269,6 +278,7 @@ export const loadScene = async (
     // in the scene database/localStorage, and instead fetch them async
     // from a different database
     files: data.files,
+    commitToHistory: false,
   };
 };
 

@@ -1,30 +1,20 @@
-import { reconcileElements } from "../../packages/excalidraw";
-import type {
-  ExcalidrawElement,
-  FileId,
-  OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import { getSceneVersion } from "../../packages/excalidraw/element";
-import type Portal from "../collab/Portal";
-import { restoreElements } from "../../packages/excalidraw/data/restore";
-import type {
+import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { getSceneVersion } from "../../src/element";
+import Portal from "../collab/Portal";
+import { restoreElements } from "../../src/data/restore";
+import {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
-} from "../../packages/excalidraw/types";
+} from "../../src/types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
-import { decompressData } from "../../packages/excalidraw/data/encode";
-import {
-  encryptData,
-  decryptData,
-} from "../../packages/excalidraw/data/encryption";
-import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import type { SyncableExcalidrawElement } from ".";
-import { getSyncableElements } from ".";
-import type { ResolutionType } from "../../packages/excalidraw/utility-types";
-import type { Socket } from "socket.io-client";
-import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
+import { decompressData } from "../../src/data/encode";
+import { encryptData, decryptData } from "../../src/data/encryption";
+import { MIME_TYPES } from "../../src/constants";
+import { reconcileElements } from "../collab/reconciliation";
+import { getSyncableElements, SyncableExcalidrawElement } from ".";
+import { ResolutionType } from "../../src/utility-types";
 
 // private
 // -----------------------------------------------------------------------------
@@ -142,12 +132,12 @@ const decryptElements = async (
 };
 
 class FirebaseSceneVersionCache {
-  private static cache = new WeakMap<Socket, number>();
-  static get = (socket: Socket) => {
+  private static cache = new WeakMap<SocketIOClient.Socket, number>();
+  static get = (socket: SocketIOClient.Socket) => {
     return FirebaseSceneVersionCache.cache.get(socket);
   };
   static set = (
-    socket: Socket,
+    socket: SocketIOClient.Socket,
     elements: readonly SyncableExcalidrawElement[],
   ) => {
     FirebaseSceneVersionCache.cache.set(socket, getSceneVersion(elements));
@@ -233,7 +223,7 @@ export const saveToFirebase = async (
     !socket ||
     isSavedToFirebase(portal, elements)
   ) {
-    return null;
+    return false;
   }
 
   const firebase = await loadFirestore();
@@ -241,59 +231,56 @@ export const saveToFirebase = async (
 
   const docRef = firestore.collection("scenes").doc(roomId);
 
-  const storedScene = await firestore.runTransaction(async (transaction) => {
+  const savedData = await firestore.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(docRef);
 
     if (!snapshot.exists) {
-      const storedScene = await createFirebaseSceneDocument(
+      const sceneDocument = await createFirebaseSceneDocument(
         firebase,
         elements,
         roomKey,
       );
 
-      transaction.set(docRef, storedScene);
+      transaction.set(docRef, sceneDocument);
 
-      return storedScene;
+      return {
+        elements,
+        reconciledElements: null,
+      };
     }
 
-    const prevStoredScene = snapshot.data() as FirebaseStoredScene;
-    const prevStoredElements = getSyncableElements(
-      restoreElements(await decryptElements(prevStoredScene, roomKey), null),
-    );
-    const reconciledElements = getSyncableElements(
-      reconcileElements(
-        elements,
-        prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
-        appState,
-      ),
+    const prevDocData = snapshot.data() as FirebaseStoredScene;
+    const prevElements = getSyncableElements(
+      await decryptElements(prevDocData, roomKey),
     );
 
-    const storedScene = await createFirebaseSceneDocument(
+    const reconciledElements = getSyncableElements(
+      reconcileElements(elements, prevElements, appState),
+    );
+
+    const sceneDocument = await createFirebaseSceneDocument(
       firebase,
       reconciledElements,
       roomKey,
     );
 
-    transaction.update(docRef, storedScene);
-
-    // Return the stored elements as the in memory `reconciledElements` could have mutated in the meantime
-    return storedScene;
+    transaction.update(docRef, sceneDocument);
+    return {
+      elements,
+      reconciledElements,
+    };
   });
 
-  const storedElements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
-  );
+  FirebaseSceneVersionCache.set(socket, savedData.elements);
 
-  FirebaseSceneVersionCache.set(socket, storedElements);
-
-  return storedElements;
+  return { reconciledElements: savedData.reconciledElements };
 };
 
 export const loadFromFirebase = async (
   roomId: string,
   roomKey: string,
-  socket: Socket | null,
-): Promise<readonly SyncableExcalidrawElement[] | null> => {
+  socket: SocketIOClient.Socket | null,
+): Promise<readonly ExcalidrawElement[] | null> => {
   const firebase = await loadFirestore();
   const db = firebase.firestore();
 
@@ -304,14 +291,14 @@ export const loadFromFirebase = async (
   }
   const storedScene = doc.data() as FirebaseStoredScene;
   const elements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
+    await decryptElements(storedScene, roomKey),
   );
 
   if (socket) {
     FirebaseSceneVersionCache.set(socket, elements);
   }
 
-  return elements;
+  return restoreElements(elements, null);
 };
 
 export const loadFilesFromFirebase = async (

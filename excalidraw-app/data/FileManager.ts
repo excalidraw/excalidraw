@@ -1,20 +1,19 @@
-import { StoreAction } from "../../packages/excalidraw";
-import { compressData } from "../../packages/excalidraw/data/encode";
-import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import type {
+import { compressData } from "../../src/data/encode";
+import { newElementWith } from "../../src/element/mutateElement";
+import { isInitializedImageElement } from "../../src/element/typeChecks";
+import {
   ExcalidrawElement,
   ExcalidrawImageElement,
   FileId,
   InitializedExcalidrawImageElement,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
-import type {
+} from "../../src/element/types";
+import { t } from "../../src/i18n";
+import {
   BinaryFileData,
   BinaryFileMetadata,
   ExcalidrawImperativeAPI,
   BinaryFiles,
-} from "../../packages/excalidraw/types";
+} from "../../src/types";
 
 export class FileManager {
   /** files being fetched */
@@ -239,6 +238,5 @@ export const updateStaleImageStatuses = (params: {
         }
         return element;
       }),
-    storeAction: StoreAction.UPDATE,
   });
 };

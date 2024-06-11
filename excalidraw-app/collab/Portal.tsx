@@ -1,29 +1,28 @@
-import type {
+import {
+  isSyncableElement,
   SocketUpdateData,
   SocketUpdateDataSource,
-  SyncableExcalidrawElement,
 } from "../data";
-import { isSyncableElement } from "../data";
 
-import type { TCollabClass } from "./Collab";
+import { TCollabClass } from "./Collab";
 
-import type { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
-import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
-import type {
-  OnUserFollowedPayload,
-  SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
-import { trackEvent } from "../../packages/excalidraw/analytics";
+import { ExcalidrawElement } from "../../src/element/types";
+import {
+  WS_EVENTS,
+  FILE_UPLOAD_TIMEOUT,
+  WS_SCENE_EVENT_TYPES,
+} from "../app_constants";
+import { UserIdleState } from "../../src/types";
+import { trackEvent } from "../../src/analytics";
 import throttle from "lodash.throttle";
-import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
-import { encryptData } from "../../packages/excalidraw/data/encryption";
-import type { Socket } from "socket.io-client";
-import { StoreAction } from "../../packages/excalidraw";
+import { newElementWith } from "../../src/element/mutateElement";
+import { BroadcastedExcalidrawElement } from "./reconciliation";
+import { encryptData } from "../../src/data/encryption";
+import { PRECEDING_ELEMENT_KEY } from "../../src/constants";
 
 class Portal {
   collab: TCollabClass;
-  socket: Socket | null = null;
+  socket: SocketIOClient.Socket | null = null;
   socketInitialized: boolean = false; // we don't want the socket to emit any updates until it is fully initialized
   roomId: string | null = null;
   roomKey: string | null = null;
@@ -33,7 +32,7 @@ class Portal {
     this.collab = collab;
   }
 
-  open(socket: Socket, id: string, key: string) {
+  open(socket: SocketIOClient.Socket, id: string, key: string) {
     this.socket = socket;
     this.roomId = id;
     this.roomKey = key;
@@ -47,12 +46,12 @@ class Portal {
     });
     this.socket.on("new-user", async (_socketId: string) => {
       this.broadcastScene(
-        WS_SUBTYPES.INIT,
+        WS_SCENE_EVENT_TYPES.INIT,
         this.collab.getSceneElementsIncludingDeleted(),
         /* syncAll */ true,
       );
     });
-    this.socket.on("room-user-change", (clients: SocketId[]) => {
+    this.socket.on("room-user-change", (clients: string[]) => {
       this.collab.setCollaborators(clients);
     });
 
@@ -84,7 +83,6 @@ class Portal {
   async _broadcastSocketData(
     data: SocketUpdateData,
     volatile: boolean = false,
-    roomId?: string,
   ) {
     if (this.isOpen()) {
       const json = JSON.stringify(data);
@@ -93,7 +91,7 @@ class Portal {
 
       this.socket?.emit(
         volatile ? WS_EVENTS.SERVER_VOLATILE : WS_EVENTS.SERVER,
-        roomId ?? this.roomId,
+        this.roomId,
         encryptedBuffer,
         iv,
       );
@@ -128,33 +126,40 @@ class Portal {
           }
           return element;
         }),
-      storeAction: StoreAction.UPDATE,
     });
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (
-    updateType: WS_SUBTYPES.INIT | WS_SUBTYPES.UPDATE,
-    elements: readonly OrderedExcalidrawElement[],
+    updateType: WS_SCENE_EVENT_TYPES.INIT | WS_SCENE_EVENT_TYPES.UPDATE,
+    allElements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
-    if (updateType === WS_SUBTYPES.INIT && !syncAll) {
+    if (updateType === WS_SCENE_EVENT_TYPES.INIT && !syncAll) {
       throw new Error("syncAll must be true when sending SCENE.INIT");
     }
 
     // sync out only the elements we think we need to to save bandwidth.
     // periodically we'll resync the whole thing to make sure no one diverges
     // due to a dropped message (server goes down etc).
-    const syncableElements = elements.reduce((acc, element) => {
-      if (
-        (syncAll ||
-          !this.broadcastedElementVersions.has(element.id) ||
-          element.version > this.broadcastedElementVersions.get(element.id)!) &&
-        isSyncableElement(element)
-      ) {
-        acc.push(element);
-      }
-      return acc;
-    }, [] as SyncableExcalidrawElement[]);
+    const syncableElements = allElements.reduce(
+      (acc, element: BroadcastedExcalidrawElement, idx, elements) => {
+        if (
+          (syncAll ||
+            !this.broadcastedElementVersions.has(element.id) ||
+            element.version >
+              this.broadcastedElementVersions.get(element.id)!) &&
+          isSyncableElement(element)
+        ) {
+          acc.push({
+            ...element,
+            // z-index info for the reconciler
+            [PRECEDING_ELEMENT_KEY]: idx === 0 ? "^" : elements[idx - 1]?.id,
+          });
+        }
+        return acc;
+      },
+      [] as BroadcastedExcalidrawElement[],
+    );
 
     const data: SocketUpdateDataSource[typeof updateType] = {
       type: updateType,
@@ -178,9 +183,9 @@ class Portal {
   broadcastIdleChange = (userState: UserIdleState) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["IDLE_STATUS"] = {
-        type: WS_SUBTYPES.IDLE_STATUS,
+        type: "IDLE_STATUS",
         payload: {
-          socketId: this.socket.id as SocketId,
+          socketId: this.socket.id,
           userState,
           username: this.collab.state.username,
         },
@@ -198,9 +203,9 @@ class Portal {
   }) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
-        type: WS_SUBTYPES.MOUSE_LOCATION,
+        type: "MOUSE_LOCATION",
         payload: {
-          socketId: this.socket.id as SocketId,
+          socketId: this.socket.id,
           pointer: payload.pointer,
           button: payload.button || "up",
           selectedElementIds:
@@ -208,41 +213,10 @@ class Portal {
           username: this.collab.state.username,
         },
       };
-
       return this._broadcastSocketData(
         data as SocketUpdateData,
         true, // volatile
       );
-    }
-  };
-
-  broadcastVisibleSceneBounds = (
-    payload: {
-      sceneBounds: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"]["payload"]["sceneBounds"];
-    },
-    roomId: string,
-  ) => {
-    if (this.socket?.id) {
-      const data: SocketUpdateDataSource["USER_VISIBLE_SCENE_BOUNDS"] = {
-        type: WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS,
-        payload: {
-          socketId: this.socket.id as SocketId,
-          username: this.collab.state.username,
-          sceneBounds: payload.sceneBounds,
-        },
-      };
-
-      return this._broadcastSocketData(
-        data as SocketUpdateData,
-        true, // volatile
-        roomId,
-      );
-    }
-  };
-
-  broadcastUserFollowed = (payload: OnUserFollowedPayload) => {
-    if (this.socket?.id) {
-      this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
   };
 }

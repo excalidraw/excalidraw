@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
-import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
-import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getFrame } from "../../packages/excalidraw/utils";
-import { useI18n } from "../../packages/excalidraw/i18n";
-import { KEYS } from "../../packages/excalidraw/keys";
+import { copyTextToSystemClipboard } from "../../src/clipboard";
+import { trackEvent } from "../../src/analytics";
+import { getFrame } from "../../src/utils";
+import { useI18n } from "../../src/i18n";
+import { KEYS } from "../../src/keys";
 
-import { Dialog } from "../../packages/excalidraw/components/Dialog";
+import { Dialog } from "../../src/components/Dialog";
 import {
   copyIcon,
   playerPlayIcon,
@@ -16,11 +16,11 @@ import {
   shareIOS,
   shareWindows,
   tablerCheckIcon,
-} from "../../packages/excalidraw/components/icons";
-import { TextField } from "../../packages/excalidraw/components/TextField";
-import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
+} from "../../src/components/icons";
+import { TextField } from "../../src/components/TextField";
+import { FilledButton } from "../../src/components/FilledButton";
 
-import { ReactComponent as CollabImage } from "../../packages/excalidraw/assets/lock.svg";
+import { ReactComponent as CollabImage } from "../../src/assets/lock.svg";
 import "./RoomDialog.scss";
 
 const getShareIcon = () => {
@@ -65,18 +65,19 @@ export const RoomModal = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
-    } catch (e) {
-      setErrorMessage(t("errors.copyToSystemClipboardFailed"));
-    }
-    setJustCopied(true);
 
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current);
-    }
+      setJustCopied(true);
 
-    timerRef.current = window.setTimeout(() => {
-      setJustCopied(false);
-    }, 3000);
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+      }
+
+      timerRef.current = window.setTimeout(() => {
+        setJustCopied(false);
+      }, 3000);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+    }
 
     ref.current?.select();
   };
@@ -119,7 +120,7 @@ export const RoomModal = ({
               size="large"
               variant="icon"
               label="Share"
-              icon={getShareIcon()}
+              startIcon={getShareIcon()}
               className="RoomDialog__active__share"
               onClick={shareRoomLink}
             />
@@ -129,7 +130,7 @@ export const RoomModal = ({
               <FilledButton
                 size="large"
                 label="Copy link"
-                icon={copyIcon}
+                startIcon={copyIcon}
                 onClick={copyRoomLink}
               />
             </Popover.Trigger>
@@ -165,7 +166,7 @@ export const RoomModal = ({
             variant="outlined"
             color="danger"
             label={t("roomDialog.button_stopSession")}
-            icon={playerStopFilledIcon}
+            startIcon={playerStopFilledIcon}
             onClick={() => {
               trackEvent("share", "room closed");
               onRoomDestroy();
@@ -194,7 +195,7 @@ export const RoomModal = ({
         <FilledButton
           size="large"
           label={t("roomDialog.button_startSession")}
-          icon={playerPlayIcon}
+          startIcon={playerPlayIcon}
           onClick={() => {
             trackEvent("share", "room creation", `ui (${getFrame()})`);
             onRoomCreate();

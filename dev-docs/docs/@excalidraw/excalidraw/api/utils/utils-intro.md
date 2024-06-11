@@ -8,7 +8,7 @@ These are pure Javascript functions exported from the @excalidraw/excalidraw [`@
 
 ### serializeAsJSON
 
-Takes the scene elements and state and returns a JSON string. `Deleted` elements as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/json.ts#L42) source for details).
+Takes the scene elements and state and returns a JSON string. `Deleted` elements as well as most properties from `AppState` are removed from the resulting JSON. (see [`serializeAsJSON()`](https://github.com/excalidraw/excalidraw/blob/master/src/data/json.ts#L42) source for details).
 
 If you want to overwrite the `source` field in the `JSON` string, you can set `window.EXCALIDRAW_EXPORT_SOURCE` to the desired value.
 
@@ -16,8 +16,8 @@ If you want to overwrite the `source` field in the `JSON` string, you can set `w
 
 <pre>
 serializeAsJSON(&#123;<br/>&nbsp;
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>,<br/>
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a>,<br/>
 }): string
 </pre>
 
@@ -37,7 +37,7 @@ If you want to overwrite the source field in the JSON string, you can set `windo
 
 <pre>
 serializeLibraryAsJSON(
-  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L200">LibraryItems[]</a>)
+  libraryItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems[]</a>)
 </pre>
 
 **How to use**
@@ -53,7 +53,7 @@ Returns `true` if element is invisibly small (e.g. width & height are zero).
 **_Signature_**
 
 <pre>
-isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement</a>): boolean
+isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement</a>): boolean
 </pre>
 
 **How to use**
@@ -80,10 +80,10 @@ excalidrawAPI.updateScene(scene);
 <pre>
 loadFromBlob(<br/>&nbsp;
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,<br/>&nbsp;
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a> | null,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
   fileHandle?: FileSystemHandle | null <br/>
-) => Promise&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/restore.ts#L61">RestoredDataState</a>>
+) => Promise&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L61">RestoredDataState</a>>
 </pre>
 
 ### loadLibraryFromBlob
@@ -130,10 +130,10 @@ if (contents.type === MIME_TYPES.excalidraw) {
 <pre>
 loadSceneOrLibraryFromBlob(<br/>&nbsp;
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,<br/>&nbsp;
-  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a> | null,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
+  localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a> | null,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
   fileHandle?: FileSystemHandle | null<br/>
-) => Promise&lt;&#123; type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L33">ImportedLibraryState</a>}>
+) => Promise&lt;&#123; type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/src/data/types.ts#L33">ImportedLibraryState</a>}>
 </pre>
 
 ### getFreeDrawSvgPath
@@ -149,7 +149,7 @@ import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L182">ExcalidrawFreeDrawElement</a>)
+getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L182">ExcalidrawFreeDrawElement</a>)
 </pre>
 
 ### isLinearElement
@@ -165,7 +165,7 @@ import { isLinearElement } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L80">ExcalidrawElement</a>): boolean
+isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L80">ExcalidrawElement</a>): boolean
 </pre>
 
 ### getNonDeletedElements
@@ -181,7 +181,7 @@ import { getNonDeletedElements } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-getNonDeletedElements(elements:<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L125">NonDeletedExcalidrawElement[]</a>
+getNonDeletedElements(elements:<a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L125">NonDeletedExcalidrawElement[]</a>
 </pre>
 
 ### mergeLibraryItems
@@ -196,9 +196,9 @@ import { mergeLibraryItems } from "@excalidraw/excalidraw";
 
 <pre>
 mergeLibraryItems(<br/>&nbsp;
-  localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L250">LibraryItems</a>,<br/>&nbsp;
-  otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L200">LibraryItems</a><br/>
-): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L250">LibraryItems</a>
+  localItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>,<br/>&nbsp;
+  otherItems: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L200">LibraryItems</a><br/>
+): <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L250">LibraryItems</a>
 </pre>
 
 ### parseLibraryTokensFromUrl
@@ -239,8 +239,8 @@ export const App = () => {
 
 <pre>
 useHandleLibrary(opts: &#123;<br/>&nbsp;
-  excalidrawAPI: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L494">ExcalidrawAPI</a>,<br/>&nbsp;
-  getInitialLibraryItems?: () => <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L253">LibraryItemsSource</a><br/>
+  excalidrawAPI: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L494">ExcalidrawAPI</a>,<br/>&nbsp;
+  getInitialLibraryItems?: () => <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L253">LibraryItemsSource</a><br/>
 });
 </pre>
 
@@ -253,7 +253,7 @@ This function returns the current `scene` version.
 **_Signature_**
 
 <pre>
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>)
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/src/element/types.ts#L114">ExcalidrawElement[]</a>)
 </pre>
 
 **How to use**
@@ -274,7 +274,7 @@ import { sceneCoordsToViewportCoords } from "@excalidraw/excalidraw";
 
 <pre>
 sceneCoordsToViewportCoords(&#123; sceneX: number, sceneY: number },<br/>&nbsp;
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a><br/>): &#123; x: number, y: number }
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a><br/>): &#123; x: number, y: number }
 </pre>
 
 ### viewportCoordsToSceneCoords
@@ -289,7 +289,7 @@ import { viewportCoordsToSceneCoords } from "@excalidraw/excalidraw";
 
 <pre>
 viewportCoordsToSceneCoords(&#123; clientX: number, clientY: number },<br/>&nbsp;
-  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a><br/>): &#123;x: number, y: number}
+  appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/src/types.ts#L95">AppState</a><br/>): &#123;x: number, y: number}
 </pre>
 
 ### useDevice
@@ -350,8 +350,8 @@ To help with localization, we export the following.
 | name | type |
 | --- | --- |
 | `defaultLang` | `string` |
-| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/i18n.ts#L15) |
-| `useI18n` | [`() => { langCode, t }`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/i18n.ts#L15) |
+| `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
+| `useI18n` | [`() => { langCode, t }`](https://github.com/excalidraw/excalidraw/blob/master/src/i18n.ts#L15) |
 
 ```js
 import { defaultLang, languages, useI18n } from "@excalidraw/excalidraw";

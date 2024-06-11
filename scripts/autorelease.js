@@ -2,7 +2,7 @@ const fs = require("fs");
 const { exec, execSync } = require("child_process");
 const core = require("@actions/core");
 
-const excalidrawDir = `${__dirname}/../packages/excalidraw`;
+const excalidrawDir = `${__dirname}/../src/packages/excalidraw`;
 const excalidrawPackage = `${excalidrawDir}/package.json`;
 const pkg = require(excalidrawPackage);
 const isPreview = process.argv.slice(2)[0] === "preview";
@@ -16,7 +16,8 @@ const publish = () => {
 
   try {
     execSync(`yarn  --frozen-lockfile`);
-    execSync(`yarn run build:esm`, { cwd: excalidrawDir });
+    execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
+    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
     execSync(`yarn --cwd ${excalidrawDir} publish --tag ${tag}`);
     console.info(`Published ${pkg.name}@${tag}🎉`);
     core.setOutput(
@@ -38,11 +39,12 @@ exec(`git diff --name-only HEAD^ HEAD`, async (error, stdout, stderr) => {
     process.exit(1);
   }
   const changedFiles = stdout.trim().split("\n");
+  const filesToIgnoreRegex = /src\/excalidraw-app|packages\/utils/;
 
   const excalidrawPackageFiles = changedFiles.filter((file) => {
     return (
-      file.indexOf("packages/excalidraw") >= 0 ||
-      file.indexOf("buildPackage.js") > 0
+      (file.indexOf("src") >= 0 || file.indexOf("package.json")) >= 0 &&
+      !filesToIgnoreRegex.test(file)
     );
   });
   if (!excalidrawPackageFiles.length) {

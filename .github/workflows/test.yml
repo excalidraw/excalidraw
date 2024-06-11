@@ -1,9 +1,6 @@
 name: Tests
 
-on:
-  pull_request:
-  push:
-    branches: master
+on: pull_request
 
 jobs:
   test:
@@ -16,5 +13,5 @@ jobs:
           node-version: 18.x
       - name: Install and test
         run: |
-          yarn install
+          yarn --frozen-lockfile
           yarn test:app

@@ -224,14 +224,24 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
               fill="none"
               stroke="none"
             />
-            <path
-              d="M15 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"
+            <rect
+              height="4"
+              rx="1"
+              width="18"
+              x="3"
+              y="8"
+            />
+            <line
+              x1="12"
+              x2="12"
+              y1="8"
+              y2="21"
             />
             <path
-              d="M21 12h-13l3 -3"
+              d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7"
             />
             <path
-              d="M11 15l-3 -3"
+              d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"
             />
           </g>
         </svg>
@@ -239,7 +249,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
       <div
         class="welcome-screen-menu-item__text"
       >
-        Sign up
+        Try Excalidraw Plus!
       </div>
     </a>
   </div>

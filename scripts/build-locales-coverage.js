@@ -1,5 +1,5 @@
 const { readdirSync, writeFileSync } = require("fs");
-const files = readdirSync(`${__dirname}/../packages/excalidraw/locales`);
+const files = readdirSync(`${__dirname}/../src/locales`);
 
 const flatten = (object = {}, result = {}, extraKey = "") => {
   for (const key in object) {
@@ -20,9 +20,7 @@ const percentages = {};
 
 for (let index = 0; index < locales.length; index++) {
   const currentLocale = locales[index];
-  const data = flatten(
-    require(`${__dirname}/../packages/excalidraw/locales/${currentLocale}`),
-  );
+  const data = flatten(require(`${__dirname}/../src/locales/${currentLocale}`));
 
   const allKeys = Object.keys(data);
   const translatedKeys = allKeys.filter((item) => data[item] !== "");
@@ -31,7 +29,7 @@ for (let index = 0; index < locales.length; index++) {
 }
 
 writeFileSync(
-  `${__dirname}/../packages/excalidraw/locales/percentages.json`,
+  `${__dirname}/../src/locales/percentages.json`,
   `${JSON.stringify(percentages, null, 2)}\n`,
   "utf8",
 );

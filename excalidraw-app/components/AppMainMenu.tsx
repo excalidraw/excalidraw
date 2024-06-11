@@ -1,61 +1,41 @@
 import React from "react";
-import {
-  loginIcon,
-  ExcalLogo,
-} from "../../packages/excalidraw/components/icons";
-import type { Theme } from "../../packages/excalidraw/element/types";
-import { MainMenu } from "../../packages/excalidraw/index";
-import { isExcalidrawPlusSignedUser } from "../app_constants";
+// import { PlusPromoIcon } from "../../src/components/icons";
+import { MainMenu } from "../../src/packages/excalidraw/index";
 import { LanguageList } from "./LanguageList";
 
 export const AppMainMenu: React.FC<{
-  onCollabDialogOpen: () => any;
+  setCollabDialogShown: (toggle: boolean) => any;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
-  theme: Theme | "system";
-  setTheme: (theme: Theme | "system") => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
-      <MainMenu.DefaultItems.Export />
+      {/* <MainMenu.DefaultItems.Export /> */}
       <MainMenu.DefaultItems.SaveAsImage />
-      {props.isCollabEnabled && (
+      {/* {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}
-          onSelect={() => props.onCollabDialogOpen()}
+          onSelect={() => props.setCollabDialogShown(true)}
         />
-      )}
-      <MainMenu.DefaultItems.CommandPalette className="highlighted" />
+      )} */}
+
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.ItemLink
-        icon={ExcalLogo}
+      {/* <MainMenu.ItemLink
+        icon={PlusPromoIcon}
         href={`${
           import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
-        className=""
+        className="ExcalidrawPlus"
       >
         Excalidraw+
-      </MainMenu.ItemLink>
+      </MainMenu.ItemLink> */}
       <MainMenu.DefaultItems.Socials />
-      <MainMenu.ItemLink
-        icon={loginIcon}
-        href={`${import.meta.env.VITE_APP_PLUS_APP}${
-          isExcalidrawPlusSignedUser ? "" : "/sign-up"
-        }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
-        className="highlighted"
-      >
-        {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
-      </MainMenu.ItemLink>
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme
-        allowSystemTheme
-        theme={props.theme}
-        onSelect={props.setTheme}
-      />
+      <MainMenu.DefaultItems.ToggleTheme />
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>

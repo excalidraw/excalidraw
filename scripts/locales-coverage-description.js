@@ -165,7 +165,7 @@ const languages = {
 };
 
 const percentages = fs.readFileSync(
-  `${__dirname}/../packages/excalidraw/locales/percentages.json`,
+  `${__dirname}/../src/locales/percentages.json`,
 );
 const rowData = JSON.parse(percentages);
 

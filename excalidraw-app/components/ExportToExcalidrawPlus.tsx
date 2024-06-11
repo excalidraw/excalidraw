@@ -1,36 +1,25 @@
 import React from "react";
-import { Card } from "../../packages/excalidraw/components/Card";
-import { ToolButton } from "../../packages/excalidraw/components/ToolButton";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
+import { Card } from "../../src/components/Card";
+import { ToolButton } from "../../src/components/ToolButton";
+import { serializeAsJSON } from "../../src/data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
-import type {
-  FileId,
-  NonDeletedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import type {
-  AppState,
-  BinaryFileData,
-  BinaryFiles,
-} from "../../packages/excalidraw/types";
+import { FileId, NonDeletedExcalidrawElement } from "../../src/element/types";
+import { AppState, BinaryFileData, BinaryFiles } from "../../src/types";
 import { nanoid } from "nanoid";
-import { useI18n } from "../../packages/excalidraw/i18n";
-import {
-  encryptData,
-  generateEncryptionKey,
-} from "../../packages/excalidraw/data/encryption";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
+import { useI18n } from "../../src/i18n";
+import { encryptData, generateEncryptionKey } from "../../src/data/encryption";
+import { isInitializedImageElement } from "../../src/element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
-import { MIME_TYPES } from "../../packages/excalidraw/constants";
-import { trackEvent } from "../../packages/excalidraw/analytics";
-import { getFrame } from "../../packages/excalidraw/utils";
-import { ExcalidrawLogo } from "../../packages/excalidraw/components/ExcalidrawLogo";
+import { MIME_TYPES } from "../../src/constants";
+import { trackEvent } from "../../src/analytics";
+import { getFrame } from "../../src/utils";
+import { ExcalidrawLogo } from "../../src/components/ExcalidrawLogo";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
-  name: string,
 ) => {
   const firebase = await loadFirebaseStorage();
 
@@ -54,7 +43,7 @@ export const exportToExcalidrawPlus = async (
     .ref(`/migrations/scenes/${id}`)
     .put(blob, {
       customMetadata: {
-        data: JSON.stringify({ version: 2, name }),
+        data: JSON.stringify({ version: 2, name: appState.name }),
         created: Date.now().toString(),
       },
     });
@@ -90,10 +79,9 @@ export const ExportToExcalidrawPlus: React.FC<{
   elements: readonly NonDeletedExcalidrawElement[];
   appState: Partial<AppState>;
   files: BinaryFiles;
-  name: string;
   onError: (error: Error) => void;
   onSuccess: () => void;
-}> = ({ elements, appState, files, name, onError, onSuccess }) => {
+}> = ({ elements, appState, files, onError, onSuccess }) => {
   const { t } = useI18n();
   return (
     <Card color="primary">
@@ -119,7 +107,7 @@ export const ExportToExcalidrawPlus: React.FC<{
         onClick={async () => {
           try {
             trackEvent("export", "eplus", `ui (${getFrame()})`);
-            await exportToExcalidrawPlus(elements, appState, files, name);
+            await exportToExcalidrawPlus(elements, appState, files);
             onSuccess();
           } catch (error: any) {
             console.error(error);

@@ -85,7 +85,7 @@ We'll be adding these features as drop-in plugins for the npm package in the fut
 
 ## Quick start
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+Install the [Excalidraw npm package](https://www.npmjs.com/package/@excalidraw/excalidraw):
 
 ```
 npm install react react-dom @excalidraw/excalidraw
@@ -97,7 +97,7 @@ or via yarn
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
+Don't forget to check out our [Documentation](https://docs.excalidraw.com)!
 
 ## Contributing
 

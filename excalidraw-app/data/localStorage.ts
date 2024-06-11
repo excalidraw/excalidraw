@@ -1,11 +1,12 @@
-import type { ExcalidrawElement } from "../../packages/excalidraw/element/types";
-import type { AppState } from "../../packages/excalidraw/types";
+import { ExcalidrawElement } from "../../src/element/types";
+import { AppState } from "../../src/types";
 import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
-} from "../../packages/excalidraw/appState";
-import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
+} from "../../src/appState";
+import { clearElementsForLocalStorage } from "../../src/element";
 import { STORAGE_KEYS } from "../app_constants";
+import { ImportedDataState } from "../../src/data/types";
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -87,13 +88,28 @@ export const getTotalStorageSize = () => {
   try {
     const appState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
     const collab = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
+    const library = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY);
 
     const appStateSize = appState?.length || 0;
     const collabSize = collab?.length || 0;
+    const librarySize = library?.length || 0;
 
-    return appStateSize + collabSize + getElementsStorageSize();
+    return appStateSize + collabSize + librarySize + getElementsStorageSize();
   } catch (error: any) {
     console.error(error);
     return 0;
+  }
+};
+
+export const getLibraryItemsFromStorage = () => {
+  try {
+    const libraryItems: ImportedDataState["libraryItems"] = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY) as string,
+    );
+
+    return libraryItems || [];
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };
