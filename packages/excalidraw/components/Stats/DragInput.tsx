@@ -73,6 +73,7 @@ const StatsDragInput = ({
     //    than the smallest delta allowed, which is 0.01
     // reason: idempotent to avoid unnecessary
     if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
+      app.store.shouldCaptureIncrement();
       dragInputCallback({
         accumulatedChange: 0,
         instantChange: 0,
@@ -82,7 +83,6 @@ const StatsDragInput = ({
         shouldChangeByStepSize: false,
         nextValue: rounded,
       });
-      app.store.shouldCaptureIncrement();
     }
   };
 
@@ -184,6 +184,7 @@ const StatsDragInput = ({
                 );
 
                 app.store.shouldCaptureIncrement();
+                app.scene.triggerUpdate();
 
                 lastPointer = null;
                 accumulatedChange = null;
