@@ -7,6 +7,7 @@ import {
   HEADING_UP,
   PointInTriangle,
   magnitude,
+  magnitudeSq,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -92,7 +93,7 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
     startHeading,
     endGlobalPoint,
     endHeading,
-    bias,
+    4,
   );
 
   const startDonglePosition =
@@ -107,18 +108,40 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
     getDonglePosition(endGlobalPoint, endHeading, grid);
   const endDongle =
     endDonglePosition && pointToGridNode(endDonglePosition, grid);
+  // if (endDongle && endHeading) {
+  //   endDongle.parent = {
+  //     f: Infinity,
+  //     g: Infinity,
+  //     h: Infinity,
+  //     direction: endHeading,
+  //     closed: false,
+  //     visited: true,
+  //     parent: null,
+  //     pos: startGlobalPoint,
+  //     addr: [-1, -1],
+  //   };
+  // }
+  if (startDongle && startHeading) {
+    startDongle.parent = {
+      f: Infinity,
+      g: Infinity,
+      h: Infinity,
+      direction: startHeading,
+      closed: false,
+      visited: true,
+      parent: null,
+      pos: endGlobalPoint,
+      addr: [-1, -1],
+    };
+  }
 
   // Create path to end dongle from start dongle
   const path =
     startDongle &&
     endDongle &&
     endHeading &&
-    astar(
-      gridNodeFromAddr(pointToGridAddress(startDongle.pos, grid)!, grid)!,
-      gridNodeFromAddr(pointToGridAddress(endDongle.pos, grid)!, grid)!,
-      grid,
-      endHeading,
-    );
+    astar(startDongle, endDongle, grid, endHeading);
+
   if (path) {
     startGlobalPoint && debugDrawPoint(startGlobalPoint, "red");
     path.forEach((node) => debugDrawPoint(node.pos, "red"));
@@ -166,63 +189,16 @@ export const testElbowArrow = (arrow: ExcalidrawArrowElement, scene: Scene) => {
   }
 };
 
-const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
-  switch (heading) {
-    case HEADING_UP:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] < p[1])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[1] > closest[1] ? node.pos : closest,
-            [p[0], -Infinity] as Point,
-          ) ?? p
-      );
-    case HEADING_DOWN:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] > p[1])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[1] < closest[1] ? node.pos : closest,
-            [p[0], Infinity] as Point,
-          ) ?? p
-      );
-    case HEADING_LEFT:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] < p[0])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[0] > closest[0] ? node.pos : closest,
-            [-Infinity, p[1]] as Point,
-          ) ?? p
-      );
-    case HEADING_RIGHT:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] > p[0])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[0] < closest[0] ? node.pos : closest,
-            [Infinity, p[1]] as Point,
-          ) ?? p
-      );
-  }
-
-  return p;
-};
-
 /**
  * Routing algorithm.
  */
 const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
-  const multiplier = magnitude(pointToVector(end.pos, start.pos));
+  const multiplier = magnitudeSq(pointToVector(end.pos, start.pos));
   const open = new BinaryHeap<Node>((node) => node.f);
 
   let closest = start;
 
-  start.h = heuristicsManhattan(start.pos, end.pos);
+  start.h = magnitudeSq(pointToVector(end.pos, start.pos));
 
   open.push(start);
 
@@ -256,15 +232,12 @@ const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      const neighborDistance = magnitude(
-        pointToVector(
-          current.pos,
-          current.parent?.pos ?? start.pos, // TODO: Check!
-        ),
+      const neighborDistance = magnitudeSq(
+        pointToVector(current.pos, current.parent?.pos ?? start.pos),
       );
       neighbor.direction = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection =
-        neighbor.parent?.direction ?? neighbor.direction; // TODO: Check null case
+        neighbor.parent?.direction ?? neighbor.direction;
       const directionChange = neighbor.direction !== previousDirection;
       const gScore =
         current.g +
@@ -283,20 +256,19 @@ const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
         neighbor.visited = true;
         neighbor.parent = current;
         neighbor.h =
-          magnitude(pointToVector(end.pos, neighbor.pos)) +
-          estBendCount * Math.pow(multiplier, 2); //neighbor.h || heuristicsManhattan(neighbor.pos, end.pos);
+          neighbor.h ||
+          magnitudeSq(pointToVector(end.pos, neighbor.pos)) +
+            estBendCount * Math.pow(multiplier, 2);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
 
-        if (closest) {
-          // If the neighbour is closer than the current closestNode or if it's equally close but has
-          // a cheaper path than the current closest node then it becomes the closest node
-          if (
-            neighbor.h < closest.h ||
-            (neighbor.h === closest.h && neighbor.g < closest.g)
-          ) {
-            closest = neighbor;
-          }
+        // If the neighbour is closer than the current closestNode or if it's equally close but has
+        // a cheaper path than the current closest node then it becomes the closest node
+        if (
+          neighbor.h < closest.h ||
+          (neighbor.h === closest.h && neighbor.g < closest.g)
+        ) {
+          closest = neighbor;
         }
 
         if (!beenVisited) {
@@ -312,9 +284,6 @@ const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
 
   return pathTo(start, closest);
 };
-
-const heuristicsManhattan = (start: Point, end: Point) =>
-  Math.abs(start[0] - end[0]) + Math.abs(start[1] - end[1]);
 
 const pathTo = (start: Node, node: Node) => {
   let curr = node;
@@ -559,6 +528,53 @@ const gridNodeFromAddr = (
   }
 
   return grid.data[row * grid.col + col] ?? null;
+};
+
+const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
+  switch (heading) {
+    case HEADING_UP:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] < p[1])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[1] > closest[1] ? node.pos : closest,
+            [p[0], -Infinity] as Point,
+          ) ?? p
+      );
+    case HEADING_DOWN:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] > p[1])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[1] < closest[1] ? node.pos : closest,
+            [p[0], Infinity] as Point,
+          ) ?? p
+      );
+    case HEADING_LEFT:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] < p[0])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[0] > closest[0] ? node.pos : closest,
+            [-Infinity, p[1]] as Point,
+          ) ?? p
+      );
+    case HEADING_RIGHT:
+      return (
+        grid.data
+          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] > p[0])
+          .reduce(
+            (closest, node) =>
+              node && node.pos[0] < closest[0] ? node.pos : closest,
+            [Infinity, p[1]] as Point,
+          ) ?? p
+      );
+  }
+
+  return p;
 };
 
 const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
