@@ -287,11 +287,13 @@ const astar = (start: Node, end: Node, grid: Grid, endHeading: Heading) => {
 
 const pathTo = (start: Node, node: Node) => {
   let curr = node;
-  const path = [start];
+  const path = [];
   while (curr.parent) {
     path.unshift(curr);
     curr = curr.parent;
   }
+  path.unshift(start);
+
   return path;
 };
 
