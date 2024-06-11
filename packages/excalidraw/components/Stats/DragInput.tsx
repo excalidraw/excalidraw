@@ -9,6 +9,7 @@ import "./DragInput.scss";
 import clsx from "clsx";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
+import { SMALLEST_DELTA } from "./utils";
 
 export type DragInputCallbackType = ({
   accumulatedChange,
@@ -61,22 +62,33 @@ const StatsDragInput = ({
     setInputValue(value.toString());
   }, [value, elements]);
 
-  const handleInputValue = (v: number) => {
-    if (isNaN(v)) {
+  const handleInputValue = (v: string) => {
+    const parsed = Number(v);
+    if (isNaN(parsed)) {
       setInputValue(value.toString());
       return;
     }
-    const roundedV = v.toFixed(2);
-    dragInputCallback({
-      accumulatedChange: 0,
-      instantChange: 0,
-      originalElements: elements,
-      originalElementsMap: app.scene.getNonDeletedElementsMap(),
-      shouldKeepAspectRatio: shouldKeepAspectRatio!!,
-      shouldChangeByStepSize: false,
-      nextValue: Number(roundedV),
-    });
-    app.store.shouldCaptureIncrement();
+
+    const rounded = Number(parsed.toFixed(2));
+    const original = Number(value);
+
+    // only update when
+    // 1. original was "Mixed" and we have a new value
+    // 2. original was not "Mixed" and the difference between a new value and previous value is greater
+    //    than the smallest delta allowed, which is 0.01
+    // reason: idempotent to avoid unnecessary
+    if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
+      dragInputCallback({
+        accumulatedChange: 0,
+        instantChange: 0,
+        originalElements: elements,
+        originalElementsMap: app.scene.getNonDeletedElementsMap(),
+        shouldKeepAspectRatio: shouldKeepAspectRatio!!,
+        shouldChangeByStepSize: false,
+        nextValue: rounded,
+      });
+      app.store.shouldCaptureIncrement();
+    }
   };
 
   return editable ? (
@@ -189,7 +201,7 @@ const StatsDragInput = ({
               eventTarget instanceof HTMLInputElement &&
               event.key === KEYS.ENTER
             ) {
-              handleInputValue(Number(eventTarget.value));
+              handleInputValue(eventTarget.value);
               eventTarget.blur();
             }
           }
@@ -206,9 +218,7 @@ const StatsDragInput = ({
           if (!inputValue) {
             setInputValue(value.toString());
           } else if (editable) {
-            const v = Number(event.target.value);
-            handleInputValue(v);
-            app.store.shouldCaptureIncrement();
+            handleInputValue(event.target.value);
           }
         }}
         disabled={!editable}

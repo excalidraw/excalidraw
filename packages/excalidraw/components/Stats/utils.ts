@@ -20,6 +20,8 @@ import type {
 import { rotate } from "../../math";
 import { getFontString } from "../../utils";
 
+export const SMALLEST_DELTA = 0.01;
+
 export const isPropertyEditable = (
   element: ExcalidrawElement,
   property: keyof ExcalidrawElement,
