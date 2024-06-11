@@ -237,7 +237,7 @@ const StatsDragInput = ({
           }
         }}
         disabled={!editable}
-      ></input>
+      />
     </div>
   ) : (
     <></>
