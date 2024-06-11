@@ -90,7 +90,7 @@ const MultiAngle = ({ elements, elementsMap }: MultiAngleProps) => {
     (el) => !isInGroup(el) && isPropertyEditable(el, "angle"),
   );
   const angles = editableLatestIndividualElements.map(
-    (el) => Math.round(radianToDegree(el.angle) * 100) / 100,
+    (el) => Math.round((radianToDegree(el.angle) % 360) * 100) / 100,
   );
   const value = new Set(angles).size === 1 ? angles[0] : "Mixed";
 

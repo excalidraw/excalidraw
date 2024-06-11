@@ -66,7 +66,7 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
     <DragInput
       label="A"
       icon={angleIcon}
-      value={Math.round(radianToDegree(element.angle) * 100) / 100}
+      value={Math.round((radianToDegree(element.angle) % 360) * 100) / 100}
       elements={[element]}
       dragInputCallback={handleDegreeChange}
       editable={isPropertyEditable(element, "angle")}
