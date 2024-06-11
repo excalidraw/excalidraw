@@ -84,7 +84,10 @@ exports[`exportToSvg > with default arguments 1`] = `
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
+  "showStats": {
+    "open": false,
+    "panels": 3,
+  },
   "showWelcomeScreen": false,
   "snapLines": [],
   "startBoundElement": null,

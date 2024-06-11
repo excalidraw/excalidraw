@@ -14,12 +14,12 @@ export const actionToggleStats = register({
     return {
       appState: {
         ...appState,
-        showStats: !this.checked!(appState),
+        showStats: { ...appState.showStats, open: !this.checked!(appState) },
       },
       storeAction: StoreAction.NONE,
     };
   },
-  checked: (appState) => appState.showStats,
+  checked: (appState) => appState.showStats.open,
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.SLASH,
 });

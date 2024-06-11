@@ -23,8 +23,9 @@ import Position from "./Position";
 import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
 import type Scene from "../../scene/Scene";
-import { useExcalidrawAppState } from "../App";
+import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import type { AtomicUnit } from "./utils";
+import { STATS_PANELS } from "../../constants";
 
 interface StatsProps {
   scene: Scene;
@@ -67,6 +68,7 @@ export const StatsInner = memo(
   }) => {
     const elements = scene.getNonDeletedElements();
     const elementsMap = scene.getNonDeletedElementsMap();
+    const setAppState = useExcalidrawSetAppState();
 
     const singleElement =
       selectedElements.length === 1 ? selectedElements[0] : null;
@@ -103,9 +105,6 @@ export const StatsInner = memo(
       [throttledSetSceneDimension],
     );
 
-    const [generalStatsOpen, setGeneralStatsOpen] = useState(true);
-    const [elementPropertiesOpen, setElementPropertiesOpen] = useState(true);
-
     const atomicUnits = useMemo(() => {
       const selectedGroupIds = getSelectedGroupIds(appState);
       const _atomicUnits = selectedGroupIds.map((gid) => {
@@ -136,8 +135,18 @@ export const StatsInner = memo(
 
           <Collapsible
             label={<h3>{t("stats.generalStats")}</h3>}
-            open={generalStatsOpen}
-            openTrigger={() => setGeneralStatsOpen((open) => !open)}
+            open={!!(appState.showStats.panels & STATS_PANELS.generalStats)}
+            openTrigger={() =>
+              setAppState((state) => {
+                return {
+                  ...state,
+                  showStats: {
+                    open: true,
+                    panels: state.showStats.panels ^ STATS_PANELS.generalStats,
+                  },
+                };
+              })
+            }
           >
             <table>
               <tbody>
@@ -170,8 +179,22 @@ export const StatsInner = memo(
             >
               <Collapsible
                 label={<h3>{t("stats.elementProperties")}</h3>}
-                open={elementPropertiesOpen}
-                openTrigger={() => setElementPropertiesOpen((open) => !open)}
+                open={
+                  !!(appState.showStats.panels & STATS_PANELS.elementProperties)
+                }
+                openTrigger={() =>
+                  setAppState((state) => {
+                    return {
+                      ...state,
+                      showStats: {
+                        open: true,
+                        panels:
+                          state.showStats.panels ^
+                          STATS_PANELS.elementProperties,
+                      },
+                    };
+                  })
+                }
               >
                 {singleElement && (
                   <div className="sectionContent">
@@ -271,7 +294,8 @@ export const StatsInner = memo(
   (prev, next) => {
     return (
       prev.sceneNonce === next.sceneNonce &&
-      prev.selectedElements === next.selectedElements
+      prev.selectedElements === next.selectedElements &&
+      prev.appState.showStats.panels === next.appState.showStats.panels
     );
   },
 );

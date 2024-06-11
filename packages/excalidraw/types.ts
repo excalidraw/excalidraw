@@ -336,7 +336,11 @@ export interface AppState {
 
   fileHandle: FileSystemHandle | null;
   collaborators: Map<SocketId, Collaborator>;
-  showStats: boolean;
+  showStats: {
+    open: boolean;
+    /** bitmap. Use `STATS_PANELS` bit values */
+    panels: number;
+  };
   currentChartType: ChartType;
   pasteDialog:
     | {

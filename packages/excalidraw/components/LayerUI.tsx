@@ -242,7 +242,7 @@ const LayerUI = ({
     );
 
     const shouldShowStats =
-      appState.showStats &&
+      appState.showStats.open &&
       !appState.zenModeEnabled &&
       !appState.viewModeEnabled;
 
