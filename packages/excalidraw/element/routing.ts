@@ -114,14 +114,6 @@ export const mutateElbowArrow = (
       ),
   ];
 
-  console.log(
-    [startElement?.x, startElement?.y],
-    [
-      startElement?.x ?? 0 + (arrow.endBinding?.fixedPoint[0] ?? 0),
-      startElement?.y ?? 0 + (arrow.endBinding?.fixedPoint[1] ?? 0),
-    ],
-  );
-
   const grid = calculateGrid(
     [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
     [common],

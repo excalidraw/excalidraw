@@ -569,6 +569,12 @@ export const updateBoundElements = (
       },
     );
 
+    updateElbowArrowBindPointsToSnapToElementOutline(
+      element,
+      elementsMap,
+      scene,
+    );
+
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
       handleBindTextResize(element, elementsMap, false);
@@ -590,6 +596,78 @@ const getSimultaneouslyUpdatedElementIds = (
   simultaneouslyUpdated: readonly ExcalidrawElement[] | undefined,
 ): Set<ExcalidrawElement["id"]> => {
   return new Set((simultaneouslyUpdated || []).map((element) => element.id));
+};
+
+const updateElbowArrowBindPointsToSnapToElementOutline = (
+  linearElement: ExcalidrawLinearElement,
+  elementsMap: ElementsMap,
+  scene: Scene,
+) => {
+  if (isArrowElement(linearElement) && linearElement.elbowed) {
+    // Need to update elbow arrow snapping separately to avoid jumping
+    if (linearElement.startBinding) {
+      const startElement = elementsMap.get(
+        linearElement.startBinding.elementId,
+      );
+      if (startElement) {
+        const newPoint = updateBindPointToSnapToElementOutline(
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            linearElement,
+            0,
+            elementsMap,
+          ),
+          "startBinding",
+          linearElement,
+          startElement as ExcalidrawBindableElement,
+          elementsMap,
+        );
+        LinearElementEditor.movePoints(
+          linearElement,
+          [
+            {
+              index: 0,
+              point: LinearElementEditor.pointFromAbsoluteCoords(
+                linearElement,
+                newPoint,
+                elementsMap,
+              ),
+            },
+          ],
+          scene,
+        );
+      }
+    }
+    if (linearElement.endBinding) {
+      const endElement = elementsMap.get(linearElement.endBinding.elementId);
+      if (endElement) {
+        const newPoint = updateBindPointToSnapToElementOutline(
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            linearElement,
+            -1,
+            elementsMap,
+          ),
+          "endBinding",
+          linearElement,
+          endElement as ExcalidrawBindableElement,
+          elementsMap,
+        );
+        LinearElementEditor.movePoints(
+          linearElement,
+          [
+            {
+              index: linearElement.points.length - 1,
+              point: LinearElementEditor.pointFromAbsoluteCoords(
+                linearElement,
+                newPoint,
+                elementsMap,
+              ),
+            },
+          ],
+          scene,
+        );
+      }
+    }
+  }
 };
 
 const updateBindPointToSnapToElementOutline = (
@@ -645,25 +723,18 @@ const updateBoundPoint = (
           startOrEnd === "startBinding" ? "start" : "end",
           elementsMap,
         );
-
-    const globalX = bindableElement.x + fixedPoint[0];
-    const globalY = bindableElement.y + fixedPoint[1];
+    const [globalX, globalY] = [
+      bindableElement.x + fixedPoint[0],
+      bindableElement.y + fixedPoint[1],
+    ];
     const globalMidPoint = [
       bindableElement.x + (bindableElement.width - bindableElement.x) / 2,
       bindableElement.y + (bindableElement.height - bindableElement.y) / 2,
     ] as Point;
-    const [rotatedGlobalX, rotatedGlobalY] = rotatePoint(
+    newEdgePoint = rotatePoint(
       [globalX, globalY],
       globalMidPoint,
       bindableElement.angle,
-    );
-
-    newEdgePoint = updateBindPointToSnapToElementOutline(
-      [rotatedGlobalX, rotatedGlobalY],
-      startOrEnd,
-      linearElement,
-      bindableElement,
-      elementsMap,
     );
   } else {
     const adjacentPointIndex = edgePointIndex - direction;
