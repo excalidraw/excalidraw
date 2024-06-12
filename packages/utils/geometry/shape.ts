@@ -311,6 +311,7 @@ export const getClosedCurveShape = (
   }
 
   const polygonPoints = pointsOnBezierCurves(points, 10, 5).map((p) =>
+    // @ts-ignore
     transform(p),
   );
 
