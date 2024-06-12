@@ -1,4 +1,4 @@
-import { fireEvent, queryByTestId, queryByText } from "@testing-library/react";
+import { fireEvent, queryByTestId } from "@testing-library/react";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getStepSizedValue } from "./utils";
 import {
