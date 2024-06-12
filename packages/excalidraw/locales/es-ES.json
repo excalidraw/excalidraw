@@ -271,14 +271,14 @@
     "magicSettings": "Ajustes IA"
   },
   "element": {
-    "rectangle": "",
+    "rectangle": "Rectángulo",
     "diamond": "",
-    "ellipse": "",
+    "ellipse": "Elipse",
     "arrow": "",
-    "line": "",
+    "line": "Línea",
     "freedraw": "",
-    "text": "",
-    "image": "",
+    "text": "Texto",
+    "image": "Imagen",
     "group": "",
     "frame": "",
     "magicframe": "",
@@ -460,8 +460,8 @@
     "selected": "Seleccionado",
     "storage": "Almacenamiento",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
+    "title": "Estadísticas",
+    "generalStats": "Estadísticas generales",
     "elementProperties": "",
     "total": "Total",
     "version": "Versión",
@@ -573,9 +573,9 @@
   "commandPalette": {
     "title": "",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Seleccionar",
+      "confirm": "Confirmar",
+      "close": "Cerrar"
     },
     "recents": "",
     "search": {
