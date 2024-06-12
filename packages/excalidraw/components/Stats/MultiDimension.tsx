@@ -15,6 +15,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit, resizeElement } from "./utils";
 import type { AtomicUnit } from "./utils";
+import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
 
 interface MultiDimensionProps {
   property: "width" | "height";
@@ -187,10 +188,14 @@ const MultiDimension = ({
           const initialWidth = x2 - x1;
           const initialHeight = y2 - y1;
           const aspectRatio = initialWidth / initialHeight;
-          const nextWidth =
-            property === "width" ? Math.max(0, nextValue) : initialWidth;
-          const nextHeight =
-            property === "height" ? Math.max(0, nextValue) : initialHeight;
+          const nextWidth = Math.max(
+            MIN_WIDTH_OR_HEIGHT,
+            property === "width" ? Math.max(0, nextValue) : initialWidth,
+          );
+          const nextHeight = Math.max(
+            MIN_WIDTH_OR_HEIGHT,
+            property === "height" ? Math.max(0, nextValue) : initialHeight,
+          );
 
           resizeGroup(
             nextWidth,
@@ -237,6 +242,9 @@ const MultiDimension = ({
                 nextHeight = Math.round(nextHeight);
               }
             }
+
+            nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
+            nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
             resizeElement(
               nextWidth,
@@ -293,6 +301,9 @@ const MultiDimension = ({
           }
         }
 
+        nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
+        nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
+
         resizeGroup(
           nextWidth,
           nextHeight,
@@ -332,6 +343,9 @@ const MultiDimension = ({
               nextHeight = Math.round(nextHeight);
             }
           }
+
+          nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
+          nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
           resizeElement(
             nextWidth,
