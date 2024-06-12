@@ -33,6 +33,9 @@ import type {
   ExcalidrawElement,
 } from "./types";
 
+const GAP = 50;
+const SNAP_DIST = 5;
+
 type Node = {
   f: number;
   g: number;
@@ -71,29 +74,6 @@ export const mutateElbowArrow = (
       getBindableElementForId(arrow.endBinding.elementId, elementsMap),
   ];
 
-  const [startAABB, endAABB] = [
-    // TODO: Memoize
-    startElement && aabbForElement(startElement, 5),
-    endElement && aabbForElement(endElement, 5),
-  ];
-
-  const bias = Math.max(
-    // TODO: Memoize
-    startElement
-      ? maxBindingGap(startElement, startElement.width, startElement.height)
-      : 0,
-    endElement
-      ? maxBindingGap(endElement, endElement.width, endElement.height)
-      : 0,
-  );
-
-  const common = commonAABB(
-    [
-      startElement && aabbForElement(startElement, bias),
-      endElement && aabbForElement(endElement, bias),
-    ].filter((x) => x !== null) as Bounds[],
-  );
-
   const [startHeading, endHeading] = [
     startElement &&
       headingForPointOnElement(
@@ -119,20 +99,52 @@ export const mutateElbowArrow = (
       ),
   ];
 
-  const startAABBZeroOffset = startElement && aabbForElement(startElement, 5);
-  const endAABBZeroOffset = endElement && aabbForElement(endElement, 5);
+  const bias = Math.max(
+    // TODO: Memoize
+    startElement
+      ? maxBindingGap(startElement, startElement.width, startElement.height)
+      : 0,
+    endElement
+      ? maxBindingGap(endElement, endElement.width, endElement.height)
+      : 0,
+  );
+  const common = commonAABB(
+    [
+      startElement && aabbForElement(startElement, bias),
+      endElement && aabbForElement(endElement, bias),
+    ].filter((x) => x !== null) as Bounds[],
+  );
+  const [startAABB, endAABB] = [
+    // TODO: Memoize
+    startElement && aabbForElement(startElement, SNAP_DIST),
+    endElement && aabbForElement(endElement, SNAP_DIST),
+  ];
+  const [extendedPaddedStartAABB, extendedPaddedEndAABB] = [
+    startHeading &&
+      startAABB &&
+      endAABB &&
+      extendedAABB(startAABB, startHeading, [endAABB], GAP - 2 * SNAP_DIST),
+    endHeading &&
+      startAABB &&
+      endAABB &&
+      extendedAABB(endAABB, endHeading, [startAABB], GAP - 2 * SNAP_DIST),
+  ];
+  const startAABBZeroOffset = startElement && aabbForElement(startElement, 0);
+  const endAABBZeroOffset = endElement && aabbForElement(endElement, 0);
   const extendedStartAABB =
     startHeading &&
     startAABBZeroOffset &&
     endAABBZeroOffset &&
-    extendedAABB(startAABBZeroOffset, startHeading, [endAABBZeroOffset]);
+    extendedAABB(startAABBZeroOffset, startHeading, [endAABBZeroOffset], GAP);
   extendedStartAABB && debugDrawBounds(extendedStartAABB, "red");
+  extendedPaddedStartAABB && debugDrawBounds(extendedPaddedStartAABB, "green");
   const extendedEndAABB =
     endHeading &&
     startAABBZeroOffset &&
     endAABBZeroOffset &&
-    extendedAABB(endAABBZeroOffset, endHeading, [startAABBZeroOffset]);
+    extendedAABB(endAABBZeroOffset, endHeading, [startAABBZeroOffset], GAP);
   extendedEndAABB && debugDrawBounds(extendedEndAABB, "red");
+  extendedPaddedEndAABB && debugDrawBounds(extendedPaddedEndAABB, "green");
 
   const grid = calculateGrid(
     [extendedStartAABB, extendedEndAABB].filter(
@@ -144,7 +156,9 @@ export const mutateElbowArrow = (
     endGlobalPoint,
     endHeading,
     1, // TODO: Is this even needed?
-    //[startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
+    [extendedPaddedStartAABB, extendedPaddedEndAABB].filter(
+      (aabb) => aabb !== null,
+    ) as Bounds[],
   );
 
   const startDonglePosition =
@@ -195,28 +209,28 @@ export const mutateElbowArrow = (
   }
 
   // Debug
-  // grid.data.forEach(
-  //   (node) =>
-  //     node &&
-  //     debugDrawPoint(
-  //       node.pos,
-  //       `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
-  //         node.addr[1] * (240 / grid.col),
-  //       )}, 255)`,
-  //     ),
-  // );
+  grid.data.forEach(
+    (node) =>
+      node &&
+      debugDrawPoint(
+        node.pos,
+        `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
+          node.addr[1] * (240 / grid.col),
+        )}, 255)`,
+      ),
+  );
 
   // Debug: Grid visualization
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -479,22 +493,22 @@ const calculateGrid = (
 
   // Binding points are also nodes
   if (startHeading) {
-    // if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
-    //   vertical.add(start[1]);
-    // } else {
-    //   horizontal.add(start[0]);
-    // }
-    vertical.add(start[1]);
-    horizontal.add(start[0]);
+    if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
+      vertical.add(start[1]);
+    } else {
+      horizontal.add(start[0]);
+    }
+    // vertical.add(start[1]);
+    // horizontal.add(start[0]);
   }
   if (endHeading) {
-    vertical.add(end[1]);
-    horizontal.add(end[0]);
-    // if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
-    //   vertical.add(end[1]);
-    // } else {
-    //   horizontal.add(end[0]);
-    // }
+    // vertical.add(end[1]);
+    // horizontal.add(end[0]);
+    if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
+      vertical.add(end[1]);
+    } else {
+      horizontal.add(end[0]);
+    }
   }
 
   // Add halfway points as well
@@ -528,7 +542,6 @@ const calculateGrid = (
             f: 0,
             g: 0,
             h: 0,
-            //direction: null,
             closed: false,
             visited: false,
             parent: null,
@@ -537,11 +550,22 @@ const calculateGrid = (
           }),
         ),
       )
-      //.filter(filterUnique) // TODO: Do we need unique values?
+      // .map((node) =>
+      //   Math.max(
+      //     ...aabbs.map((aabb) =>
+      //       //pointInsideBounds(node.pos, aabb) ? 1 : 0
+      //       pointInsideBounds(node.pos, aabb) ? 1 : 0,
+      //     ),
+      //   ) === 0
+      //     ? node
+      //     : null,
+      // )
       .map((node) =>
+        node &&
         Math.max(
-          ...[...aabbs, ...additionalExclusionAABBs].map((aabb) =>
-            pointInsideOrOnBounds(node.pos, aabb) ? 1 : 0,
+          ...additionalExclusionAABBs.map(
+            (aabb) => (pointInsideBounds(node.pos, aabb) ? 1 : 0),
+            //(aabb) => (pointInsideOrOnBounds(node.pos, aabb) ? 1 : 0),
           ),
         ) === 0
           ? node
@@ -558,7 +582,7 @@ const extendedAABB = (
   heading: Heading,
   avoidBounds: Bounds[],
   maxOffset: number = 50,
-) => {
+): Bounds | null => {
   switch (heading) {
     case HEADING_UP:
       const extendedY0 = [
@@ -932,6 +956,9 @@ const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] <= bounds[2] &&
   p[1] >= bounds[1] &&
   p[1] <= bounds[3];
+
+const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
+  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
 const normalizedArrowElementUpdate = (
   points: Point[],
