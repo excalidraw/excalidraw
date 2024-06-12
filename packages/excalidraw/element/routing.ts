@@ -17,9 +17,8 @@ import {
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { debugClear, debugDrawPoint, debugDrawSegments } from "../visualdebug";
-import { maxBindingGap } from "./binding";
+import { distanceToBindableElement, maxBindingGap } from "./binding";
 import type { Bounds } from "./bounds";
-import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
 import type {
@@ -33,7 +32,6 @@ type Node = {
   f: number;
   g: number;
   h: number;
-  //direction: Heading | null;
   closed: boolean;
   visited: boolean;
   parent: Node | null;
@@ -61,6 +59,7 @@ export const mutateElbowArrow = (
   ];
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
+    // TODO: Memoize
     arrow.startBinding &&
       getBindableElementForId(arrow.startBinding.elementId, elementsMap),
     arrow.endBinding &&
@@ -68,16 +67,21 @@ export const mutateElbowArrow = (
   ];
 
   const [startAABB, endAABB] = [
+    // TODO: Memoize
     startElement && aabbForElement(startElement),
     endElement && aabbForElement(endElement),
   ];
-  const startBias = startElement
-    ? maxBindingGap(startElement, startElement.width, startElement.height)
-    : 0;
-  const endBias = endElement
-    ? maxBindingGap(endElement, endElement.width, endElement.height)
-    : 0;
-  const bias = Math.max(startBias, endBias);
+
+  const bias = Math.max(
+    // TODO: Memoize
+    startElement
+      ? maxBindingGap(startElement, startElement.width, startElement.height)
+      : 0,
+    endElement
+      ? maxBindingGap(endElement, endElement.width, endElement.height)
+      : 0,
+  );
+
   const common = commonAABB(
     [
       startElement && aabbForElement(startElement, bias),
@@ -87,12 +91,36 @@ export const mutateElbowArrow = (
 
   const [startHeading, endHeading] = [
     startElement &&
-      startAABB &&
-      headingForPointOnElement(startElement, startAABB, startGlobalPoint),
+      headingForPointOnElement(
+        startElement,
+        aabbForElement(
+          startElement,
+          distanceToBindableElement(
+            startElement,
+            startGlobalPoint,
+            elementsMap,
+          ),
+        ),
+        startGlobalPoint,
+      ),
     endElement &&
-      endAABB &&
-      headingForPointOnElement(endElement, endAABB, endGlobalPoint),
+      headingForPointOnElement(
+        endElement,
+        aabbForElement(
+          endElement,
+          distanceToBindableElement(endElement, endGlobalPoint, elementsMap),
+        ),
+        endGlobalPoint,
+      ),
   ];
+
+  console.log(
+    [startElement?.x, startElement?.y],
+    [
+      startElement?.x ?? 0 + (arrow.endBinding?.fixedPoint[0] ?? 0),
+      startElement?.y ?? 0 + (arrow.endBinding?.fixedPoint[1] ?? 0),
+    ],
+  );
 
   const grid = calculateGrid(
     [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],

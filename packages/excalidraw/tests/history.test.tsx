@@ -4338,7 +4338,7 @@ describe("history", () => {
                 elementId: remoteContainer.id,
                 gap: 1,
                 focus: 0,
-                ratio: [0.5, 1],
+                fixedPoint: [0.5, 1],
               },
             }),
             remoteContainer,
@@ -4419,13 +4419,13 @@ describe("history", () => {
             elementId: rect1.id,
             gap: 1,
             focus: 0,
-            ratio: [1, 0.5],
+            fixedPoint: [1, 0.5],
           },
           endBinding: {
             elementId: rect2.id,
             gap: 1,
             focus: 0,
-            ratio: [0.5, 1],
+            fixedPoint: [0.5, 1],
           },
         });
 
@@ -4518,13 +4518,13 @@ describe("history", () => {
                 elementId: rect1.id,
                 gap: 1,
                 focus: 0,
-                ratio: [0.5, 1],
+                fixedPoint: [0.5, 1],
               },
               endBinding: {
                 elementId: rect2.id,
                 gap: 1,
                 focus: 0,
-                ratio: [1, 0.5],
+                fixedPoint: [1, 0.5],
               },
             }),
             newElementWith(rect1, {

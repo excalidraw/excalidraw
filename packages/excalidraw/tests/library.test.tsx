@@ -99,7 +99,7 @@ describe("library", () => {
         elementId: "rectangle1",
         focus: -1,
         gap: 0,
-        ratio: [0.5, 1],
+        fixedPoint: [0.5, 1],
       },
     });
 

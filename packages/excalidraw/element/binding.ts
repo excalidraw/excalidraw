@@ -377,7 +377,7 @@ export const bindLinearElement = (
         startOrEnd,
         elementsMap,
       ),
-      ...calculateRatioForElbowArrowBinding(
+      ...calculateFixedPointForElbowArrowBinding(
         linearElement,
         hoveredElement,
         startOrEnd,
@@ -522,16 +522,23 @@ export const updateBoundElements = (
     if (!doesNeedUpdate(element, changedElement)) {
       return;
     }
+
     const bindings = {
       startBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
+        element,
+        "start",
         element.startBinding,
         newSize,
+        elementsMap,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
+        element,
+        "end",
         element.endBinding,
         newSize,
+        elementsMap,
       ),
     };
 
@@ -630,28 +637,20 @@ const updateBoundPoint = (
   let newEdgePoint: Point;
 
   if (isArrowElement(linearElement) && linearElement.elbowed) {
-    const ratio = binding.ratio
-      ? binding.ratio
-      : calculateRatioForElbowArrowBinding(
+    const { fixedPoint } = binding
+      ? binding
+      : calculateFixedPointForElbowArrowBinding(
           linearElement,
           bindableElement,
           startOrEnd === "startBinding" ? "start" : "end",
           elementsMap,
-        ).ratio;
+        );
 
-    const unrotatedBounds = [
-      bindableElement.x,
-      bindableElement.y,
-      bindableElement.x + bindableElement.width,
-      bindableElement.y + bindableElement.height,
-    ];
-    const localX = (unrotatedBounds[2] - unrotatedBounds[0]) * ratio[0];
-    const localY = (unrotatedBounds[3] - unrotatedBounds[1]) * ratio[1];
-    const globalX = unrotatedBounds[0] + localX;
-    const globalY = unrotatedBounds[1] + localY;
+    const globalX = bindableElement.x + fixedPoint[0];
+    const globalY = bindableElement.y + fixedPoint[1];
     const globalMidPoint = [
-      unrotatedBounds[0] + (unrotatedBounds[2] - unrotatedBounds[0]) / 2,
-      unrotatedBounds[1] + (unrotatedBounds[3] - unrotatedBounds[1]) / 2,
+      bindableElement.x + (bindableElement.width - bindableElement.x) / 2,
+      bindableElement.y + (bindableElement.height - bindableElement.y) / 2,
     ] as Point;
     const [rotatedGlobalX, rotatedGlobalY] = rotatePoint(
       [globalX, globalY],
@@ -666,7 +665,6 @@ const updateBoundPoint = (
       bindableElement,
       elementsMap,
     );
-    //newEdgePoint = [rotatedGlobalX, rotatedGlobalY];
   } else {
     const adjacentPointIndex = edgePointIndex - direction;
     const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -721,7 +719,7 @@ const updateBoundPoint = (
   );
 };
 
-const calculateRatioForElbowArrowBinding = (
+const calculateFixedPointForElbowArrowBinding = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
@@ -745,28 +743,26 @@ const calculateRatioForElbowArrowBinding = (
     globalMidPoint,
     -hoveredElement.angle,
   );
-  const localPoint = [
+  const fixedPoint = [
     nonRotatedGlobalPoint[0] - bounds[0],
     nonRotatedGlobalPoint[1] - bounds[1],
   ] as Point;
 
-  const ratio = [
-    localPoint[0] / (bounds[2] - bounds[0]),
-    localPoint[1] / (bounds[3] - bounds[1]),
-  ];
-
-  return { ratio };
+  return { fixedPoint };
 };
 
 const maybeCalculateNewGapWhenScaling = (
   changedElement: ExcalidrawBindableElement,
+  arrowElement: ExcalidrawLinearElement,
+  startOrEnd: "start" | "end",
   currentBinding: PointBinding | null | undefined,
   newSize: { width: number; height: number } | undefined,
+  elementsMap: ElementsMap,
 ): PointBinding | null | undefined => {
   if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
-  const { gap, focus, ratio, elementId } = currentBinding;
+  const { gap, focus, elementId } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
   const newGap = Math.max(
@@ -776,7 +772,14 @@ const maybeCalculateNewGapWhenScaling = (
       gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
     ),
   );
-  return { elementId, gap: newGap, focus, ratio };
+  const newFixedPointUpdate = calculateFixedPointForElbowArrowBinding(
+    arrowElement,
+    changedElement,
+    startOrEnd,
+    elementsMap,
+  );
+
+  return { elementId, gap: newGap, focus, ...newFixedPointUpdate };
 };
 
 const getElligibleElementForBindingElement = (
@@ -899,11 +902,11 @@ const newBindingAfterDuplication = (
   if (binding == null) {
     return null;
   }
-  const { elementId, focus, gap, ratio } = binding;
+  const { elementId, focus, gap, fixedPoint } = binding;
   return {
     focus,
     gap,
-    ratio,
+    fixedPoint,
     elementId: oldIdToDuplicatedId.get(elementId) ?? elementId,
   };
 };
@@ -967,7 +970,7 @@ export const maxBindingGap = (
   return Math.max(16, Math.min(0.25 * smallerDimension, 32));
 };
 
-const distanceToBindableElement = (
+export const distanceToBindableElement = (
   element: ExcalidrawBindableElement,
   point: Point,
   elementsMap: ElementsMap,
