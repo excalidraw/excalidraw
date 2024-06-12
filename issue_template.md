@@ -1,6 +1,7 @@
 ## Open Issue
 Before submitting confirm: 
 The issue has not already been reported.
+The issue cannot be broken into multiple reports. 
 This bug exists on the latest version.
 This bug exists on the main branch.  
 
