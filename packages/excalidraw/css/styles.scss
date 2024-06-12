@@ -22,6 +22,12 @@
   --sat: env(safe-area-inset-top);
 }
 
+body.excalidraw-cursor-resize,
+body.excalidraw-cursor-resize a:hover,
+body.excalidraw-cursor-resize * {
+  cursor: ew-resize;
+}
+
 .excalidraw {
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;

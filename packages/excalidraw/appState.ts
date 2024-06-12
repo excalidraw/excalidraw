@@ -5,6 +5,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   EXPORT_SCALES,
+  STATS_PANELS,
   THEME,
 } from "./constants";
 import type { AppState, NormalizedZoomValue } from "./types";
@@ -80,7 +81,10 @@ export const getDefaultAppState = (): Omit<
     selectedElementsAreBeingDragged: false,
     selectionElement: null,
     shouldCacheIgnoreZoom: false,
-    showStats: false,
+    stats: {
+      open: false,
+      panels: STATS_PANELS.generalStats | STATS_PANELS.elementProperties,
+    },
     startBoundElement: null,
     suggestedBindings: [],
     frameRendering: { enabled: true, clip: true, name: true, outline: true },
@@ -196,7 +200,7 @@ const APP_STATE_STORAGE_CONF = (<
   },
   selectionElement: { browser: false, export: false, server: false },
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
-  showStats: { browser: true, export: false, server: false },
+  stats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },
   suggestedBindings: { browser: false, export: false, server: false },
   frameRendering: { browser: false, export: false, server: false },
