@@ -270,6 +270,22 @@
     "mermaidToExcalidraw": "",
     "magicSettings": ""
   },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
+  },
   "headings": {
     "canvasActions": "",
     "selectedShapeActions": "",
@@ -443,7 +459,10 @@
     "scene": "",
     "selected": "",
     "storage": "",
+    "fullTitle": "",
     "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "",
     "version": "",
     "versionCopy": "",
