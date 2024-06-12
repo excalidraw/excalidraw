@@ -119,8 +119,8 @@ export const mutateElbowArrow = (
       ),
   ];
 
-  const startAABBZeroOffset = startElement && aabbForElement(startElement, 0);
-  const endAABBZeroOffset = endElement && aabbForElement(endElement, 0);
+  const startAABBZeroOffset = startElement && aabbForElement(startElement, 5);
+  const endAABBZeroOffset = endElement && aabbForElement(endElement, 5);
   const extendedStartAABB =
     startHeading &&
     startAABBZeroOffset &&
@@ -143,8 +143,8 @@ export const mutateElbowArrow = (
     startHeading,
     endGlobalPoint,
     endHeading,
-    0.001, // TODO: Is this even needed?
-    [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
+    1, // TODO: Is this even needed?
+    //[startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
   );
 
   const startDonglePosition =
@@ -229,12 +229,10 @@ const astar = (
   startHeading: Heading,
   endHeading: Heading,
 ) => {
-  const multiplier = magnitudeSq(pointToVector(end.pos, start.pos));
+  const multiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
   let closest = start;
-
-  start.h = magnitudeSq(pointToVector(end.pos, start.pos));
 
   open.push(start);
 
@@ -275,9 +273,9 @@ const astar = (
       const directionChange = previousDirection !== neighborDirection;
       const gScore =
         current.g +
-        magnitudeSq(pointToVector(neighbor.pos, current.pos)) + // Right triangle a^2 + b^2 = hypot^2
-        (directionChange ? multiplier * multiplier * 10000 : 0); // TODO: 10000 here is just an approx!
-      //console.log(gScore, multiplier * multiplier);
+        m_dist(neighbor.pos, current.pos) +
+        (directionChange ? Math.pow(multiplier, 3) : 0);
+
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
@@ -291,9 +289,8 @@ const astar = (
         neighbor.visited = true;
         neighbor.parent = current;
         neighbor.h =
-          neighbor.h ||
-          magnitudeSq(pointToVector(end.pos, neighbor.pos)) +
-            estBendCount * multiplier * multiplier;
+          m_dist(end.pos, neighbor.pos) +
+          estBendCount * Math.pow(multiplier, 2);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
 
@@ -331,6 +328,9 @@ const pathTo = (start: Node, node: Node) => {
 
   return path;
 };
+
+const m_dist = (a: Point, b: Point) =>
+  Math.abs(a[0] - b[0]) + Math.abs(a[0] - b[0]);
 
 const estimateSegmentCount = (
   start: Node,
@@ -550,6 +550,9 @@ const calculateGrid = (
   };
 };
 
+/**
+ * Create a dynamically resizing bounding box for the given heading
+ */
 const extendedAABB = (
   aabb: Bounds,
   heading: Heading,
