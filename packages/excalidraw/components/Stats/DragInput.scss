@@ -1,0 +1,75 @@
+.excalidraw {
+  .drag-input-container {
+    display: flex;
+    width: 100%;
+
+    &:focus-within {
+      box-shadow: 0 0 0 1px var(--color-primary-darkest);
+      border-radius: var(--border-radius-lg);
+    }
+  }
+
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .drag-input-label {
+    flex-shrink: 0;
+    border: 1px solid var(--default-border-color);
+    border-right: 0;
+    width: 2rem;
+    height: 2rem;
+    box-sizing: border-box;
+    color: var(--popup-text-color);
+
+    :root[dir="ltr"] & {
+      border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+    }
+
+    :root[dir="rtl"] & {
+      border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+      border-right: 1px solid var(--default-border-color);
+      border-left: 0;
+    }
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .drag-input {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    font-size: 0.875rem;
+    font-family: inherit;
+    background-color: transparent;
+    color: var(--text-primary-color);
+    border: 0;
+    outline: none;
+    height: 2rem;
+    border: 1px solid var(--default-border-color);
+    border-left: 0;
+    letter-spacing: 0.4px;
+
+    :root[dir="ltr"] & {
+      border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) 0;
+    }
+
+    :root[dir="rtl"] & {
+      border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+      border-left: 1px solid var(--default-border-color);
+      border-right: 0;
+    }
+
+    padding: 0.5rem;
+    padding-left: 0.25rem;
+    appearance: none;
+
+    &:focus-visible {
+      box-shadow: none;
+    }
+  }
+}
