@@ -119,14 +119,32 @@ export const mutateElbowArrow = (
       ),
   ];
 
+  const startAABBZeroOffset = startElement && aabbForElement(startElement, 0);
+  const endAABBZeroOffset = endElement && aabbForElement(endElement, 0);
+  const extendedStartAABB =
+    startHeading &&
+    startAABBZeroOffset &&
+    endAABBZeroOffset &&
+    extendedAABB(startAABBZeroOffset, startHeading, [endAABBZeroOffset]);
+  extendedStartAABB && debugDrawBounds(extendedStartAABB, "red");
+  const extendedEndAABB =
+    endHeading &&
+    startAABBZeroOffset &&
+    endAABBZeroOffset &&
+    extendedAABB(endAABBZeroOffset, endHeading, [startAABBZeroOffset]);
+  extendedEndAABB && debugDrawBounds(extendedEndAABB, "red");
+
   const grid = calculateGrid(
-    [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
+    [extendedStartAABB, extendedEndAABB].filter(
+      (aabb) => aabb !== null,
+    ) as Bounds[],
     [common],
     startGlobalPoint,
     startHeading,
     endGlobalPoint,
     endHeading,
     0.001, // TODO: Is this even needed?
+    [startAABB, endAABB].filter((aabb) => aabb !== null) as Bounds[],
   );
 
   const startDonglePosition =
@@ -151,19 +169,6 @@ export const mutateElbowArrow = (
   if (startNode) {
     startNode.closed = true;
   }
-
-  const extendedStart =
-    startAABB &&
-    endAABB &&
-    startHeading &&
-    extendedAABB(startAABB, startHeading, [endAABB]);
-  extendedStart && debugDrawBounds(extendedStart);
-  const extendedEnd =
-    startAABB &&
-    endAABB &&
-    endHeading &&
-    extendedAABB(endAABB, endHeading, [startAABB]);
-  extendedEnd && debugDrawBounds(extendedEnd);
 
   // Create path to end dongle from start dongle
   const path =
@@ -202,16 +207,16 @@ export const mutateElbowArrow = (
   // );
 
   // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
+  for (let col = 0; col < grid.col; col++) {
+    const a = gridNodeFromAddr([col, 0], grid)?.pos;
+    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
+  for (let row = 0; row < grid.row; row++) {
+    const a = gridNodeFromAddr([0, row], grid)?.pos;
+    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
 };
 
 /**
@@ -454,6 +459,7 @@ const calculateGrid = (
   end: Point,
   endHeading: Heading | null,
   offset: number,
+  additionalExclusionAABBs: Bounds[] = [],
 ): Grid => {
   const horizontal = new Set<number>();
   const vertical = new Set<number>();
@@ -534,7 +540,7 @@ const calculateGrid = (
       //.filter(filterUnique) // TODO: Do we need unique values?
       .map((node) =>
         Math.max(
-          ...aabbs.map((aabb) =>
+          ...[...aabbs, ...additionalExclusionAABBs].map((aabb) =>
             pointInsideOrOnBounds(node.pos, aabb) ? 1 : 0,
           ),
         ) === 0
