@@ -271,19 +271,19 @@
     "magicSettings": "Paramètres IA"
   },
   "element": {
-    "rectangle": "",
+    "rectangle": "Rectangle",
     "diamond": "",
     "ellipse": "",
-    "arrow": "",
-    "line": "",
+    "arrow": "Sageta",
+    "line": "Linha",
     "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
+    "text": "Tèxt",
+    "image": "Imatge",
+    "group": "Grop",
     "frame": "",
     "magicframe": "",
     "embeddable": "",
-    "selection": "",
+    "selection": "Seleccion",
     "iframe": ""
   },
   "headings": {
