@@ -16,7 +16,12 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugClear, debugDrawPoint, debugDrawSegments } from "../visualdebug";
+import {
+  debugClear,
+  debugDrawBounds,
+  debugDrawPoint,
+  debugDrawSegments,
+} from "../visualdebug";
 import { distanceToBindableElement, maxBindingGap } from "./binding";
 import type { Bounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
@@ -68,8 +73,8 @@ export const mutateElbowArrow = (
 
   const [startAABB, endAABB] = [
     // TODO: Memoize
-    startElement && aabbForElement(startElement),
-    endElement && aabbForElement(endElement),
+    startElement && aabbForElement(startElement, 5),
+    endElement && aabbForElement(endElement, 5),
   ];
 
   const bias = Math.max(
@@ -147,6 +152,19 @@ export const mutateElbowArrow = (
     startNode.closed = true;
   }
 
+  const extendedStart =
+    startAABB &&
+    endAABB &&
+    startHeading &&
+    extendedAABB(startAABB, startHeading, [endAABB]);
+  extendedStart && debugDrawBounds(extendedStart);
+  const extendedEnd =
+    startAABB &&
+    endAABB &&
+    endHeading &&
+    extendedAABB(endAABB, endHeading, [startAABB]);
+  extendedEnd && debugDrawBounds(extendedEnd);
+
   // Create path to end dongle from start dongle
   const path =
     startDongle &&
@@ -182,16 +200,18 @@ export const mutateElbowArrow = (
   //       )}, 255)`,
   //     ),
   // );
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+
+  // Debug: Grid visualization
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -524,6 +544,146 @@ const calculateGrid = (
   };
 };
 
+const extendedAABB = (
+  aabb: Bounds,
+  heading: Heading,
+  avoidBounds: Bounds[],
+  maxOffset: number = 50,
+) => {
+  switch (heading) {
+    case HEADING_UP:
+      const extendedY0 = [
+        aabb[0],
+        aabb[1] - maxOffset,
+        aabb[2],
+        aabb[1],
+      ] as Bounds;
+      const y0 = Math.max(
+        ...avoidBounds.map((bounds) => {
+          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+          const avoidTopRight = [bounds[2], bounds[1]] as Point;
+          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+          return Math.max(
+            pointInsideOrOnBounds(avoidTopLeft, extendedY0)
+              ? avoidTopLeft[1]
+              : extendedY0[1],
+            pointInsideOrOnBounds(avoidTopRight, extendedY0)
+              ? avoidTopRight[1]
+              : extendedY0[1],
+            pointInsideOrOnBounds(avoidBottomRight, extendedY0)
+              ? avoidBottomRight[1]
+              : extendedY0[1],
+            pointInsideOrOnBounds(avoidBottomLeft, extendedY0)
+              ? avoidBottomLeft[1]
+              : extendedY0[1],
+          );
+        }),
+      );
+
+      return [aabb[0], (aabb[1] + y0) / 2 + 1, aabb[2], aabb[3]] as Bounds;
+    case HEADING_RIGHT:
+      const extendedX1 = [
+        aabb[2],
+        aabb[1],
+        aabb[2] + maxOffset,
+        aabb[3],
+      ] as Bounds;
+      const x1 = Math.min(
+        ...avoidBounds.map((bounds) => {
+          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+          const avoidTopRight = [bounds[2], bounds[1]] as Point;
+          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+          return Math.min(
+            pointInsideOrOnBounds(avoidTopLeft, extendedX1)
+              ? avoidTopLeft[0]
+              : extendedX1[2],
+            pointInsideOrOnBounds(avoidTopRight, extendedX1)
+              ? avoidTopRight[0]
+              : extendedX1[2],
+            pointInsideOrOnBounds(avoidBottomRight, extendedX1)
+              ? avoidBottomRight[0]
+              : extendedX1[2],
+            pointInsideOrOnBounds(avoidBottomLeft, extendedX1)
+              ? avoidBottomLeft[0]
+              : extendedX1[2],
+          );
+        }),
+      );
+
+      return [aabb[0], aabb[1], (x1 + aabb[2]) / 2 - 1, aabb[3]] as Bounds;
+    case HEADING_DOWN:
+      const extendedY1 = [
+        aabb[0],
+        aabb[3],
+        aabb[2],
+        aabb[3] + maxOffset,
+      ] as Bounds;
+      const y1 = Math.min(
+        ...avoidBounds.map((bounds) => {
+          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+          const avoidTopRight = [bounds[2], bounds[1]] as Point;
+          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+          return Math.min(
+            pointInsideOrOnBounds(avoidTopLeft, extendedY1)
+              ? avoidTopLeft[1]
+              : extendedY1[3],
+            pointInsideOrOnBounds(avoidTopRight, extendedY1)
+              ? avoidTopRight[1]
+              : extendedY1[3],
+            pointInsideOrOnBounds(avoidBottomRight, extendedY1)
+              ? avoidBottomRight[1]
+              : extendedY1[3],
+            pointInsideOrOnBounds(avoidBottomLeft, extendedY1)
+              ? avoidBottomLeft[1]
+              : extendedY1[3],
+          );
+        }),
+      );
+
+      return [aabb[0], aabb[1], aabb[2], (y1 + aabb[3]) / 2 - 1] as Bounds;
+    case HEADING_LEFT:
+      const extendedX0 = [
+        aabb[0] - maxOffset,
+        aabb[1],
+        aabb[0],
+        aabb[3],
+      ] as Bounds;
+      const x0 = Math.max(
+        ...avoidBounds.map((bounds) => {
+          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+          const avoidTopRight = [bounds[2], bounds[1]] as Point;
+          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+          return Math.max(
+            pointInsideOrOnBounds(avoidTopLeft, extendedX0)
+              ? avoidTopLeft[0]
+              : extendedX0[0],
+            pointInsideOrOnBounds(avoidTopRight, extendedX0)
+              ? avoidTopRight[0]
+              : extendedX0[0],
+            pointInsideOrOnBounds(avoidBottomRight, extendedX0)
+              ? avoidBottomRight[0]
+              : extendedX0[0],
+            pointInsideOrOnBounds(avoidBottomLeft, extendedX0)
+              ? avoidBottomLeft[0]
+              : extendedX0[0],
+          );
+        }),
+      );
+
+      return [(x0 + aabb[0]) / 2 + 1, aabb[1], aabb[2], aabb[3]] as Bounds;
+  }
+
+  return null;
+};
+
 /**
  * Get neighboring points for a gived grid address
  */
@@ -591,18 +751,6 @@ const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
   }
 
   return p;
-};
-
-const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
-  switch (heading) {
-    case HEADING_UP:
-      return 0;
-    case HEADING_RIGHT:
-      return 1;
-    case HEADING_DOWN:
-      return 2;
-  }
-  return 3;
 };
 
 const neighborIndexToHeading = (index: 0 | 1 | 2 | 3): Heading => {
@@ -769,9 +917,6 @@ const getBindableElementForId = (
 
   return null;
 };
-
-const filterUnique = <T>(item: T, idx: number, coords: T[]) =>
-  coords.indexOf(item) === idx;
 
 const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] >= bounds[0] &&
