@@ -7,7 +7,7 @@ import type {
   ExcalidrawTextElement,
 } from "../../element/types";
 import { isInGroup } from "../../groups";
-import Scene from "../../scene/Scene";
+import type Scene from "../../scene/Scene";
 import { fontSizeIcon } from "../icons";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -16,12 +16,17 @@ import { getStepSizedValue } from "./utils";
 interface MultiFontSizeProps {
   elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
+  scene: Scene;
 }
 
 const MIN_FONT_SIZE = 4;
 const STEP_SIZE = 4;
 
-const MultiFontSize = ({ elements, elementsMap }: MultiFontSizeProps) => {
+const MultiFontSize = ({
+  elements,
+  elementsMap,
+  scene,
+}: MultiFontSizeProps) => {
   const latestTextElements = elements.filter(
     (el) => !isInGroup(el) && isTextElement(el) && !isBoundToContainer(el),
   ) as ExcalidrawTextElement[];
@@ -56,7 +61,7 @@ const MultiFontSize = ({ elements, elementsMap }: MultiFontSizeProps) => {
         );
       }
 
-      Scene.getScene(latestTextElements[0])?.triggerUpdate();
+      scene.triggerUpdate();
       return;
     }
 
@@ -92,7 +97,7 @@ const MultiFontSize = ({ elements, elementsMap }: MultiFontSizeProps) => {
       );
     }
 
-    Scene.getScene(latestTextElements[0])?.triggerUpdate();
+    scene.triggerUpdate();
   };
 
   return (

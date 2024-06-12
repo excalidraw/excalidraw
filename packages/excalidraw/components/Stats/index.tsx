@@ -254,32 +254,38 @@ export const StatsInner = memo(
                         elements={multipleElements}
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
+                        scene={scene}
                       />
                       <MultiPosition
                         property="y"
                         elements={multipleElements}
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
+                        scene={scene}
                       />
                       <MultiDimension
                         property="width"
                         elements={multipleElements}
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
+                        scene={scene}
                       />
                       <MultiDimension
                         property="height"
                         elements={multipleElements}
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
+                        scene={scene}
                       />
                       <MultiAngle
                         elements={multipleElements}
                         elementsMap={elementsMap}
+                        scene={scene}
                       />
                       <MultiFontSize
                         elements={multipleElements}
                         elementsMap={elementsMap}
+                        scene={scene}
                       />
                     </div>
                   </div>

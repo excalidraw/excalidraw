@@ -1,6 +1,6 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { rotate } from "../../math";
-import Scene from "../../scene/Scene";
+import type Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
@@ -14,6 +14,7 @@ interface MultiPositionProps {
   elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
   atomicUnits: AtomicUnit[];
+  scene: Scene;
 }
 
 const STEP_SIZE = 10;
@@ -110,6 +111,7 @@ const MultiPosition = ({
   elements,
   elementsMap,
   atomicUnits,
+  scene,
 }: MultiPositionProps) => {
   const positions = useMemo(
     () =>
@@ -200,7 +202,7 @@ const MultiPosition = ({
         }
       }
 
-      Scene.getScene(elements[0])?.triggerUpdate();
+      scene.triggerUpdate();
       return;
     }
 
@@ -221,7 +223,7 @@ const MultiPosition = ({
       originalElementsMap,
     );
 
-    Scene.getScene(elements[0])?.triggerUpdate();
+    scene.triggerUpdate();
   };
 
   return (

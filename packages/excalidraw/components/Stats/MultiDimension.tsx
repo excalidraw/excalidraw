@@ -8,7 +8,7 @@ import {
   handleBindTextResize,
 } from "../../element/textElement";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import Scene from "../../scene/Scene";
+import type Scene from "../../scene/Scene";
 import type { Point } from "../../types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -21,6 +21,7 @@ interface MultiDimensionProps {
   elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
   atomicUnits: AtomicUnit[];
+  scene: Scene;
 }
 
 const STEP_SIZE = 10;
@@ -134,8 +135,8 @@ const MultiDimension = ({
   elements,
   elementsMap,
   atomicUnits,
+  scene,
 }: MultiDimensionProps) => {
-  // const sizes = [...individualSizes, ...groupSizes];
   const sizes = useMemo(
     () =>
       atomicUnits.map((atomicUnit) => {
@@ -251,7 +252,7 @@ const MultiDimension = ({
         }
       }
 
-      Scene.getScene(elements[0])?.triggerUpdate();
+      scene.triggerUpdate();
 
       return;
     }
@@ -345,7 +346,7 @@ const MultiDimension = ({
       }
     }
 
-    Scene.getScene(elements[0])?.triggerUpdate();
+    scene.triggerUpdate();
   };
 
   return (

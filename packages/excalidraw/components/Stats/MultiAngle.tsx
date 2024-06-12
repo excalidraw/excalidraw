@@ -4,7 +4,7 @@ import { isArrowElement } from "../../element/typeChecks";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { isInGroup } from "../../groups";
 import { degreeToRadian, radianToDegree } from "../../math";
-import Scene from "../../scene/Scene";
+import type Scene from "../../scene/Scene";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -13,11 +13,12 @@ import { getStepSizedValue, isPropertyEditable } from "./utils";
 interface MultiAngleProps {
   elements: readonly ExcalidrawElement[];
   elementsMap: ElementsMap;
+  scene: Scene;
 }
 
 const STEP_SIZE = 15;
 
-const MultiAngle = ({ elements, elementsMap }: MultiAngleProps) => {
+const MultiAngle = ({ elements, elementsMap, scene }: MultiAngleProps) => {
   const handleDegreeChange: DragInputCallbackType = ({
     accumulatedChange,
     originalElements,
@@ -49,7 +50,7 @@ const MultiAngle = ({ elements, elementsMap }: MultiAngleProps) => {
         }
       }
 
-      Scene.getScene(editableLatestIndividualElements[0])?.triggerUpdate();
+      scene.triggerUpdate();
 
       return;
     }
@@ -83,7 +84,7 @@ const MultiAngle = ({ elements, elementsMap }: MultiAngleProps) => {
         mutateElement(boundTextElement, { angle: nextAngle }, false);
       }
     }
-    Scene.getScene(editableLatestIndividualElements[0])?.triggerUpdate();
+    scene.triggerUpdate();
   };
 
   const editableLatestIndividualElements = elements.filter(
