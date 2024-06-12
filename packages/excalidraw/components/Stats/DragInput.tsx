@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 import { SMALLEST_DELTA } from "./utils";
+import { StoreAction } from "../../store";
 
 export type DragInputCallbackType = ({
   accumulatedChange,
@@ -73,7 +74,6 @@ const StatsDragInput = ({
     //    than the smallest delta allowed, which is 0.01
     // reason: idempotent to avoid unnecessary
     if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
-      app.store.shouldCaptureIncrement();
       dragInputCallback({
         accumulatedChange: 0,
         instantChange: 0,
@@ -83,6 +83,7 @@ const StatsDragInput = ({
         shouldChangeByStepSize: false,
         nextValue: rounded,
       });
+      app.syncActionResult({ storeAction: StoreAction.CAPTURE });
     }
   };
 
@@ -183,8 +184,7 @@ const StatsDragInput = ({
                   false,
                 );
 
-                app.store.shouldCaptureIncrement();
-                app.scene.triggerUpdate();
+                app.syncActionResult({ storeAction: StoreAction.CAPTURE });
 
                 lastPointer = null;
                 accumulatedChange = null;
