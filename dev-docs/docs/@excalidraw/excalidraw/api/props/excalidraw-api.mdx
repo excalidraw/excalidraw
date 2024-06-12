@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={{(api)=> setExcalidrawAPI(api)}} />;
+  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
 }
 ```
 

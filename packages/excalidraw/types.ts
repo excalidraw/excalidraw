@@ -343,7 +343,11 @@ export interface AppState {
 
   fileHandle: FileSystemHandle | null;
   collaborators: Map<SocketId, Collaborator>;
-  showStats: boolean;
+  stats: {
+    open: boolean;
+    /** bitmap. Use `STATS_PANELS` bit values */
+    panels: number;
+  };
   currentChartType: ChartType;
   pasteDialog:
     | {
@@ -652,6 +656,7 @@ export type AppClassProperties = {
   files: BinaryFiles;
   device: App["device"];
   scene: App["scene"];
+  syncActionResult: App["syncActionResult"];
   pasteFromClipboard: App["pasteFromClipboard"];
   id: App["id"];
   onInsertElements: App["onInsertElements"];
