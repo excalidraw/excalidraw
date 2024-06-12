@@ -24,6 +24,9 @@ import { PenModeButton } from "./PenModeButton";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
+import clsx from "clsx";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions";
 
 type MobileMenuProps = {
   appState: UIAppState;
@@ -71,6 +74,11 @@ export const MobileMenu = ({
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
   const renderToolbar = () => {
+    const shouldShowStats = //zsviczian
+      appState.stats.open &&
+      !appState.zenModeEnabled &&
+      !appState.viewModeEnabled;
+
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
@@ -130,6 +138,27 @@ export const MobileMenu = ({
           device={device}
           app={app}
         />
+        <div //zsviczian
+          className={clsx(
+            "layer-ui__wrapper__top-right zen-mode-transition",
+            {
+              "transition-right": appState.zenModeEnabled,
+            },
+          )}
+          style={{
+            marginRight: "4rem"
+          }}
+        >
+          {shouldShowStats && ( //zsviczian
+            <Stats
+              scene={app.scene}
+              onClose={() => {
+                actionManager.executeAction(actionToggleStats);
+              }}
+              renderCustomStats={renderCustomStats}
+            />
+          )}          
+        </div>
       </FixedSideContainer>
     );
   };

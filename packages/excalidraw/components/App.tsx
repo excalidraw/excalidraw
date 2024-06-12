@@ -3131,7 +3131,7 @@ class App extends React.Component<AppProps, AppState> {
         });
       } else if (data.text) {
         if (data.text && isMaybeMermaidDefinition(data.text)) {
-          const api = await import("@excalidraw/mermaid-to-excalidraw");
+          const api = await import("@zsviczian/mermaid-to-excalidraw"); //zsviczian
 
           try {
             const { elements: skeletonElements, files } =
