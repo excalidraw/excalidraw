@@ -22,9 +22,9 @@
   --sat: env(safe-area-inset-top);
 }
 
-body.dragResize,
-body.dragResize a:hover,
-body.dragResize * {
+body.excalidraw-cursor-resize,
+body.excalidraw-cursor-resize a:hover,
+body.excalidraw-cursor-resize * {
   cursor: ew-resize;
 }
 

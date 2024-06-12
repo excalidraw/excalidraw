@@ -128,7 +128,7 @@ const StatsDragInput = ({
 
             let accumulatedChange: number | null = null;
 
-            document.body.classList.add("dragResize");
+            document.body.classList.add("excalidraw-cursor-resize");
 
             const onPointerMove = (event: PointerEvent) => {
               if (!originalElementsMap) {
@@ -191,7 +191,7 @@ const StatsDragInput = ({
                 originalElements = null;
                 originalElementsMap = null;
 
-                document.body.classList.remove("dragResize");
+                document.body.classList.remove("excalidraw-cursor-resize");
               },
               false,
             );
