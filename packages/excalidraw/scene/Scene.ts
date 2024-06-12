@@ -105,6 +105,9 @@ class Scene {
     }
   }
 
+  /**
+   * @deprecated pass down `app.scene` and use it directly
+   */
   static getScene(elementKey: ElementKey): Scene | null {
     if (isIdKey(elementKey)) {
       return this.sceneMapById.get(elementKey) || null;

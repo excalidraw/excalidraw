@@ -178,7 +178,7 @@ const rotateSingleElement = (
   }
 };
 
-const rescalePointsInElement = (
+export const rescalePointsInElement = (
   element: NonDeletedExcalidrawElement,
   width: number,
   height: number,
@@ -195,7 +195,7 @@ const rescalePointsInElement = (
       }
     : {};
 
-const measureFontSizeFromWidth = (
+export const measureFontSizeFromWidth = (
   element: NonDeleted<ExcalidrawTextElement>,
   elementsMap: ElementsMap,
   nextWidth: number,

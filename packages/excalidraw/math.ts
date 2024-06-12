@@ -475,6 +475,14 @@ export const isRightAngle = (angle: number) => {
   return Math.round((angle / Math.PI) * 10000) % 5000 === 0;
 };
 
+export const radianToDegree = (r: number) => {
+  return (r * 180) / Math.PI;
+};
+
+export const degreeToRadian = (d: number) => {
+  return (d / 180) * Math.PI;
+};
+
 // Given two ranges, return if the two ranges overlap with each other
 // e.g. [1, 3] overlaps with [2, 4] while [1, 3] does not overlap with [4, 5]
 export const rangesOverlap = (

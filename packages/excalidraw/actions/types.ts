@@ -135,7 +135,8 @@ export type ActionName =
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"
-  | "autoResize";
+  | "autoResize"
+  | "elementStats";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

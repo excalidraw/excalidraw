@@ -559,4 +559,10 @@ export class UI {
       ".context-menu",
     ) as HTMLElement | null;
   };
+
+  static queryStats = () => {
+    return GlobalTestState.renderResult.container.querySelector(
+      ".Stats",
+    ) as HTMLElement | null;
+  };
 }
