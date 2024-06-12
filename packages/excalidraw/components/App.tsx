@@ -3890,6 +3890,7 @@ class App extends React.Component<AppProps, AppState> {
         }, {} as any),
       },
       storeAction: StoreAction.NONE,
+      forceFlushSync: true,
     });
   };
 
@@ -3945,6 +3946,7 @@ class App extends React.Component<AppProps, AppState> {
       collaborators?: SceneData["collaborators"];
       /** @default StoreAction.NONE */
       storeAction?: SceneData["storeAction"];
+      forceFlushSync?: boolean;
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
@@ -3978,8 +3980,18 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (sceneData.appState) {
-        this.setState(sceneData.appState);
+      //zsviczian forceFlushSync is set to true in ExcalidrawView.updateScene.
+      //without this e.g. text search did not select the elements
+      if(sceneData.forceFlushSync === true) {
+        flushSync(() => {
+          if (sceneData.appState) {
+            this.setState(sceneData.appState);
+          }
+        });
+      } else {
+        if (sceneData.appState) {
+          this.setState(sceneData.appState);
+        }
       }
 
       if (sceneData.elements) {
