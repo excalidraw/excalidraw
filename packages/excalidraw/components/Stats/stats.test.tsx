@@ -1,4 +1,4 @@
-import { fireEvent, queryByText } from "@testing-library/react";
+import { fireEvent, queryByTestId, queryByText } from "@testing-library/react";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getStepSizedValue } from "./utils";
 import {
@@ -109,7 +109,7 @@ describe("stats for a generic element", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Stats")!);
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
     stats = UI.queryStats();
 
     UI.clickTool("rectangle");
@@ -303,7 +303,7 @@ describe("stats for a non-generic element", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Stats")!);
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
     stats = UI.queryStats();
   });
 
@@ -424,7 +424,7 @@ describe("stats for multiple elements", () => {
       clientY: 1,
     });
     const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByText(contextMenu!, "Stats")!);
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
     stats = UI.queryStats();
   });
 

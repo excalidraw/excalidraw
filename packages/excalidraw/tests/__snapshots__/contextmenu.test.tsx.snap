@@ -7285,7 +7285,12 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           </g>
         </svg>,
         "keyTest": [Function],
-        "label": "stats.title",
+        "keywords": [
+          "edit",
+          "attributes",
+          "customize",
+        ],
+        "label": "stats.fullTitle",
         "name": "stats",
         "paletteName": "Toggle stats",
         "perform": [Function],
