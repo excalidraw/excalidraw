@@ -136,7 +136,8 @@ export type ActionName =
   | "wrapTextInContainer"
   | "toggleLaserPointerTool" //zsviczian
   | "commandPalette"
-  | "autoResize";
+  | "autoResize"
+  | "elementStats";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
