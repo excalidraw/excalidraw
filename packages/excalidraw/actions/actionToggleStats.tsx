@@ -5,11 +5,12 @@ import { StoreAction } from "../store";
 
 export const actionToggleStats = register({
   name: "stats",
-  label: "stats.title",
+  label: "stats.fullTitle",
   icon: abacusIcon,
   paletteName: "Toggle stats",
   viewMode: true,
   trackEvent: { category: "menu" },
+  keywords: ["edit", "attributes", "customize"],
   perform(elements, appState) {
     return {
       appState: {
