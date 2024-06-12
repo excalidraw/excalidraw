@@ -336,7 +336,7 @@ export interface AppState {
 
   fileHandle: FileSystemHandle | null;
   collaborators: Map<SocketId, Collaborator>;
-  showStats: {
+  stats: {
     open: boolean;
     /** bitmap. Use `STATS_PANELS` bit values */
     panels: number;

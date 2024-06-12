@@ -135,14 +135,14 @@ export const StatsInner = memo(
 
           <Collapsible
             label={<h3>{t("stats.generalStats")}</h3>}
-            open={!!(appState.showStats.panels & STATS_PANELS.generalStats)}
+            open={!!(appState.stats.panels & STATS_PANELS.generalStats)}
             openTrigger={() =>
               setAppState((state) => {
                 return {
                   ...state,
-                  showStats: {
+                  stats: {
                     open: true,
-                    panels: state.showStats.panels ^ STATS_PANELS.generalStats,
+                    panels: state.stats.panels ^ STATS_PANELS.generalStats,
                   },
                 };
               })
@@ -180,17 +180,16 @@ export const StatsInner = memo(
               <Collapsible
                 label={<h3>{t("stats.elementProperties")}</h3>}
                 open={
-                  !!(appState.showStats.panels & STATS_PANELS.elementProperties)
+                  !!(appState.stats.panels & STATS_PANELS.elementProperties)
                 }
                 openTrigger={() =>
                   setAppState((state) => {
                     return {
                       ...state,
-                      showStats: {
+                      stats: {
                         open: true,
                         panels:
-                          state.showStats.panels ^
-                          STATS_PANELS.elementProperties,
+                          state.stats.panels ^ STATS_PANELS.elementProperties,
                       },
                     };
                   })
@@ -301,7 +300,7 @@ export const StatsInner = memo(
     return (
       prev.sceneNonce === next.sceneNonce &&
       prev.selectedElements === next.selectedElements &&
-      prev.appState.showStats.panels === next.appState.showStats.panels
+      prev.appState.stats.panels === next.appState.stats.panels
     );
   },
 );
