@@ -179,7 +179,7 @@ export const mutateElbowArrow = (
     startHeading,
     endGlobalPoint,
     endHeading,
-    1, // TODO: Is this even needed?
+    100, // TODO: Is this even needed?
     [...(extendedZeroOffsetAABB ?? [])]
       .filter((aabb) => aabb !== null)
       .map((x) => {
@@ -487,16 +487,16 @@ const generateDynamicAABBs = (
 ): Bounds[] => {
   return [
     [
-      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] : common[0],
-      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] : common[1],
-      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] : common[2],
-      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] : common[3],
+      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] - 50 : common[0],
+      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] - 50 : common[1],
+      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] + 50 : common[2],
+      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] + 50 : common[3],
     ] as Bounds,
     [
-      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] : common[0],
-      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] : common[1],
-      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] : common[2],
-      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] : common[3],
+      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] - 50 : common[0],
+      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] - 50 : common[1],
+      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] + 50 : common[2],
+      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] + 50 : common[3],
     ] as Bounds,
   ];
 };
