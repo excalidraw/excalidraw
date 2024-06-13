@@ -828,7 +828,7 @@ const bindingBorderTest = (
   { x, y }: { x: number; y: number },
   app: AppClassProperties,
 ): boolean => {
-  if(!element || !element.width || !element.height) {
+  if (!element || !element.width || !element.height) {
     return false;
   }
   const threshold = maxBindingGap(element, element.width, element.height);
