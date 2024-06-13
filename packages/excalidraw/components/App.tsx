@@ -2292,7 +2292,7 @@ class App extends React.Component<AppProps, AppState> {
     let initialData = null;
     try {
       if (typeof this.props.initialData === "function") {
-        initialData = await this.props.initialData();
+        initialData = (await this.props.initialData()) || null;
       } else {
         initialData = (await this.props.initialData) || null;
       }
