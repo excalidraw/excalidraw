@@ -284,7 +284,7 @@
     "magicframe": "Žični okvir v kodo",
     "embeddable": "Spletna vdelava",
     "selection": "Izbor",
-    "iframe": ""
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -459,10 +459,10 @@
     "scene": "Scena",
     "selected": "Izbrano",
     "storage": "Shramba",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Statistika in lastnosti elementov",
+    "title": "Statistika",
+    "generalStats": "Splošna statistika",
+    "elementProperties": "Lastnosti elementov",
     "total": "Skupaj",
     "version": "Različica",
     "versionCopy": "Kliknite za kopiranje",
