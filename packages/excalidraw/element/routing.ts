@@ -155,11 +155,6 @@ export const mutateElbowArrow = (
       aabbZeroOffset[1] &&
       extendedAABB(aabbZeroOffset[1], endHeading, [aabbZeroOffset[0]], GAP),
   ];
-  // ============================
-  //extendedStartAABB && debugDrawBounds(extendedStartAABB, "red");
-  //extendedPaddedStartAABB && debugDrawBounds(extendedPaddedStartAABB, "green");
-  //extendedEndAABB && debugDrawBounds(extendedEndAABB, "red");
-  //extendedPaddedEndAABB && debugDrawBounds(extendedPaddedEndAABB, "green");
 
   const dynamicAABBs =
     aabbZeroOffset[0] &&
@@ -253,16 +248,16 @@ export const mutateElbowArrow = (
   );
 
   // Debug: Grid visualization
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -492,16 +487,16 @@ const generateDynamicAABBs = (
 ): Bounds[] => {
   return [
     [
-      a[0] > b[2] ? (a[0] + b[2]) / 2 : common[0],
-      a[1] > b[3] ? (a[1] + b[3]) / 2 : common[1],
-      a[2] < b[0] ? (a[2] + b[0]) / 2 : common[2],
-      a[3] < b[1] ? (a[3] + b[1]) / 2 : common[3],
+      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] : common[0],
+      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] : common[1],
+      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] : common[2],
+      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] : common[3],
     ] as Bounds,
     [
-      b[0] > a[2] ? (b[0] + a[2]) / 2 : common[0],
-      b[1] > a[3] ? (b[1] + a[3]) / 2 : common[1],
-      b[2] < a[0] ? (b[2] + a[0]) / 2 : common[2],
-      b[3] < a[1] ? (b[3] + a[1]) / 2 : common[3],
+      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] : common[0],
+      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] : common[1],
+      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] : common[2],
+      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] : common[3],
     ] as Bounds,
   ];
 };
