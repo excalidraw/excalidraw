@@ -109,8 +109,22 @@ export const mutateElbowArrow = (
   );
   const common = commonAABB(
     [
-      startElement && aabbForElement(startElement, bias),
-      endElement && aabbForElement(endElement, bias),
+      startElement
+        ? aabbForElement(startElement, bias)
+        : [
+            startGlobalPoint[0],
+            startGlobalPoint[1],
+            startGlobalPoint[0],
+            startGlobalPoint[1],
+          ],
+      endElement
+        ? aabbForElement(endElement, bias)
+        : [
+            endGlobalPoint[0],
+            endGlobalPoint[1],
+            endGlobalPoint[0],
+            endGlobalPoint[1],
+          ],
     ].filter((x) => x !== null) as Bounds[],
   );
   const aabbZeroOffset = [
@@ -121,52 +135,72 @@ export const mutateElbowArrow = (
     startElement && aabbForElement(startElement, 5 + 20),
     endElement && aabbForElement(endElement, 5 + 20),
   ];
-  const gapDistanceAABB = [
-    startElement && aabbForElement(startElement, GAP),
-    endElement && aabbForElement(endElement, GAP),
-  ];
-  const extendedPaddedAABB = [
-    startHeading &&
-      snapDistanceAABB[0] &&
-      snapDistanceAABB[1] &&
-      extendedAABB(
-        snapDistanceAABB[0],
-        startHeading,
-        [snapDistanceAABB[1]],
-        GAP - 2 * SNAP_DIST,
-      ),
-    endHeading &&
-      snapDistanceAABB[0] &&
-      snapDistanceAABB[1] &&
-      extendedAABB(
-        snapDistanceAABB[1],
-        endHeading,
-        [snapDistanceAABB[0]],
-        GAP - 2 * SNAP_DIST,
-      ),
-  ];
+  // const gapDistanceAABB = [
+  //   startElement && aabbForElement(startElement, GAP),
+  //   endElement && aabbForElement(endElement, GAP),
+  // ];
+  // const extendedPaddedAABB = [
+  //   startHeading &&
+  //     snapDistanceAABB[0] &&
+  //     snapDistanceAABB[1] &&
+  //     extendedAABB(
+  //       snapDistanceAABB[0],
+  //       startHeading,
+  //       [snapDistanceAABB[1]],
+  //       GAP - 2 * SNAP_DIST,
+  //     ),
+  //   endHeading &&
+  //     snapDistanceAABB[0] &&
+  //     snapDistanceAABB[1] &&
+  //     extendedAABB(
+  //       snapDistanceAABB[1],
+  //       endHeading,
+  //       [snapDistanceAABB[0]],
+  //       GAP - 2 * SNAP_DIST,
+  //     ),
+  // ];
   const extendedZeroOffsetAABB = [
     startHeading &&
       aabbZeroOffset[0] &&
       aabbZeroOffset[1] &&
-      extendedAABB(aabbZeroOffset[0], startHeading, [aabbZeroOffset[1]], GAP),
+      extendedAABB(aabbZeroOffset[0], startHeading, [aabbZeroOffset[1]], 50),
     endHeading &&
       aabbZeroOffset[0] &&
       aabbZeroOffset[1] &&
-      extendedAABB(aabbZeroOffset[1], endHeading, [aabbZeroOffset[0]], GAP),
+      extendedAABB(aabbZeroOffset[1], endHeading, [aabbZeroOffset[0]], 50),
   ];
 
   const dynamicAABBs =
-    aabbZeroOffset[0] &&
-    aabbZeroOffset[1] &&
+    extendedZeroOffsetAABB[0] &&
+    extendedZeroOffsetAABB[1] &&
     snapDistanceAABB[0] &&
     snapDistanceAABB[1] &&
     generateDynamicAABBs(
-      aabbZeroOffset[0],
-      aabbZeroOffset[1],
-      commonAABB([snapDistanceAABB[0], snapDistanceAABB[1]]),
+      extendedZeroOffsetAABB[0]
+        ? extendedZeroOffsetAABB[0]
+        : [
+            startGlobalPoint[0],
+            startGlobalPoint[1],
+            startGlobalPoint[0],
+            startGlobalPoint[1],
+          ],
+      extendedZeroOffsetAABB[1]
+        ? extendedZeroOffsetAABB[1]
+        : [
+            endGlobalPoint[0],
+            endGlobalPoint[1],
+            endGlobalPoint[0],
+            endGlobalPoint[1],
+          ],
+      commonAABB([
+        snapDistanceAABB[0],
+        snapDistanceAABB[1],
+        extendedZeroOffsetAABB[0],
+        extendedZeroOffsetAABB[1],
+      ]),
     );
 
+  // Canculate Grid positions
   const grid = calculateGrid(
     [...(dynamicAABBs ?? [])]
       .filter((aabb) => aabb !== null)
@@ -176,9 +210,9 @@ export const mutateElbowArrow = (
       }) as Bounds[],
     [common],
     startGlobalPoint,
-    startHeading,
+    startHeading ? startHeading : HEADING_RIGHT,
     endGlobalPoint,
-    endHeading,
+    endHeading ? endHeading : HEADING_RIGHT,
     100, // TODO: Is this even needed?
     [...(extendedZeroOffsetAABB ?? [])]
       .filter((aabb) => aabb !== null)
@@ -203,20 +237,22 @@ export const mutateElbowArrow = (
 
   // Do not allow stepping on the true end or true start points
   const endNode = pointToGridNode(endGlobalPoint, grid);
-  if (endNode) {
+  if (endNode && arrow.endBinding) {
     endNode.closed = true;
   }
   const startNode = pointToGridNode(startGlobalPoint, grid);
-  if (startNode) {
+  if (startNode && arrow.startBinding) {
     startNode.closed = true;
   }
 
   // Create path to end dongle from start dongle
-  const path =
-    startDongle &&
-    endDongle &&
-    endHeading &&
-    astar(startDongle, endDongle, grid, startHeading, endHeading);
+  const path = astar(
+    startDongle ? startDongle : startNode!,
+    endDongle ? endDongle : endNode!,
+    grid,
+    startHeading ? startHeading : HEADING_RIGHT,
+    endHeading ? endHeading : HEADING_RIGHT,
+  );
 
   if (path) {
     // startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
@@ -248,16 +284,16 @@ export const mutateElbowArrow = (
   );
 
   // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
+  for (let col = 0; col < grid.col; col++) {
+    const a = gridNodeFromAddr([col, 0], grid)?.pos;
+    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
+  for (let row = 0; row < grid.row; row++) {
+    const a = gridNodeFromAddr([0, row], grid)?.pos;
+    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
 };
 
 /**
@@ -487,16 +523,16 @@ const generateDynamicAABBs = (
 ): Bounds[] => {
   return [
     [
-      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] - 50 : common[0],
-      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] - 50 : common[1],
-      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] + 50 : common[2],
-      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] + 50 : common[3],
+      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] - 5 : common[0],
+      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] - 5 : common[1],
+      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] + 5 : common[2],
+      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] + 5 : common[3],
     ] as Bounds,
     [
-      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] - 50 : common[0],
-      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] - 50 : common[1],
-      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] + 50 : common[2],
-      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] + 50 : common[3],
+      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] - 5 : common[0],
+      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] - 5 : common[1],
+      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] + 5 : common[2],
+      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] + 5 : common[3],
     ] as Bounds,
   ];
 };
@@ -527,22 +563,22 @@ const calculateGrid = (
 
   // Binding points are also nodes
   if (startHeading) {
-    if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
-      vertical.add(start[1]);
-    } else {
-      horizontal.add(start[0]);
-    }
-    // vertical.add(start[1]);
-    // horizontal.add(start[0]);
+    // if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
+    //   horizontal.add(start[0]);
+    // } else {
+    //   vertical.add(start[1]);
+    // }
+    vertical.add(start[1]);
+    horizontal.add(start[0]);
   }
   if (endHeading) {
-    // vertical.add(end[1]);
-    // horizontal.add(end[0]);
-    if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
-      vertical.add(end[1]);
-    } else {
-      horizontal.add(end[0]);
-    }
+    vertical.add(end[1]);
+    horizontal.add(end[0]);
+    // if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
+    //   horizontal.add(end[0]);
+    // } else {
+    //   vertical.add(end[1]);
+    // }
   }
 
   // Add halfway points as well
@@ -825,18 +861,6 @@ const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
   }
 
   return p;
-};
-
-const neighborIndexToHeading = (index: 0 | 1 | 2 | 3): Heading => {
-  switch (index) {
-    case 0:
-      return HEADING_UP;
-    case 1:
-      return HEADING_RIGHT;
-    case 2:
-      return HEADING_DOWN;
-  }
-  return HEADING_LEFT;
 };
 
 /**
