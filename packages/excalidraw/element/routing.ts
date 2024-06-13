@@ -320,7 +320,7 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(multiplier, 2) : 0);
+        (directionChange ? Math.pow(multiplier, 3) : 0);
 
       const beenVisited = neighbor.visited;
 
@@ -484,33 +484,6 @@ const estimateSegmentCount = (
   }
   return 0;
 };
-
-// const generateExclusionAABBs = (
-//   aabbs: [Bounds, Bounds],
-//   common: Bounds,
-// ): Bounds[] => {
-//   const commonMidPoint = [
-//     (common[0] + common[2]) / 2,
-//     (common[1] + common[3]) / 2,
-//   ];
-
-//   return aabbs.map((current) => {
-//     return [
-//       current[0] < commonMidPoint[0]
-//         ? common[0] + (current[0] - common[0]) / 2
-//         : (commonMidPoint[0] + current[0]) / 2,
-//       current[1] < commonMidPoint[1]
-//         ? common[1] + (current[1] - common[1]) / 2
-//         : (commonMidPoint[1] + current[1]) / 2,
-//       current[2] > commonMidPoint[0]
-//         ? current[2] + (common[2] - current[2]) / 2
-//         : (commonMidPoint[0] + current[2]) / 2,
-//       current[3] > commonMidPoint[1]
-//         ? current[3] + (common[3] - current[3]) / 2
-//         : (commonMidPoint[1] + current[3]) / 2,
-//     ] as Bounds;
-//   });
-// };
 
 const generateDynamicAABBs = (
   a: Bounds,
