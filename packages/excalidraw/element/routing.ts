@@ -7,7 +7,6 @@ import {
   HEADING_UP,
   PointInTriangle,
   arePointsEqual,
-  magnitudeSq,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -114,51 +113,81 @@ export const mutateElbowArrow = (
       endElement && aabbForElement(endElement, bias),
     ].filter((x) => x !== null) as Bounds[],
   );
-  const [startAABB, endAABB] = [
-    // TODO: Memoize
+  const aabbZeroOffset = [
+    startElement && aabbForElement(startElement, 0),
+    endElement && aabbForElement(endElement, 0),
+  ];
+  const snapDistanceAABB = [
     startElement && aabbForElement(startElement, SNAP_DIST),
     endElement && aabbForElement(endElement, SNAP_DIST),
   ];
-  const [extendedPaddedStartAABB, extendedPaddedEndAABB] = [
+  const extendedPaddedAABB = [
     startHeading &&
-      startAABB &&
-      endAABB &&
-      extendedAABB(startAABB, startHeading, [endAABB], GAP - 2 * SNAP_DIST),
+      snapDistanceAABB[0] &&
+      snapDistanceAABB[1] &&
+      extendedAABB(
+        snapDistanceAABB[0],
+        startHeading,
+        [snapDistanceAABB[1]],
+        GAP - 2 * SNAP_DIST,
+      ),
     endHeading &&
-      startAABB &&
-      endAABB &&
-      extendedAABB(endAABB, endHeading, [startAABB], GAP - 2 * SNAP_DIST),
+      snapDistanceAABB[0] &&
+      snapDistanceAABB[1] &&
+      extendedAABB(
+        snapDistanceAABB[1],
+        endHeading,
+        [snapDistanceAABB[0]],
+        GAP - 2 * SNAP_DIST,
+      ),
   ];
-  const startAABBZeroOffset = startElement && aabbForElement(startElement, 0);
-  const endAABBZeroOffset = endElement && aabbForElement(endElement, 0);
-  const extendedStartAABB =
+  const extendedZeroOffsetAABB = [
     startHeading &&
-    startAABBZeroOffset &&
-    endAABBZeroOffset &&
-    extendedAABB(startAABBZeroOffset, startHeading, [endAABBZeroOffset], GAP);
-  extendedStartAABB && debugDrawBounds(extendedStartAABB, "red");
-  extendedPaddedStartAABB && debugDrawBounds(extendedPaddedStartAABB, "green");
-  const extendedEndAABB =
+      aabbZeroOffset[0] &&
+      aabbZeroOffset[1] &&
+      extendedAABB(aabbZeroOffset[0], startHeading, [aabbZeroOffset[1]], GAP),
     endHeading &&
-    startAABBZeroOffset &&
-    endAABBZeroOffset &&
-    extendedAABB(endAABBZeroOffset, endHeading, [startAABBZeroOffset], GAP);
-  extendedEndAABB && debugDrawBounds(extendedEndAABB, "red");
-  extendedPaddedEndAABB && debugDrawBounds(extendedPaddedEndAABB, "green");
+      aabbZeroOffset[0] &&
+      aabbZeroOffset[1] &&
+      extendedAABB(aabbZeroOffset[1], endHeading, [aabbZeroOffset[0]], GAP),
+  ];
+  // ============================
+  //extendedStartAABB && debugDrawBounds(extendedStartAABB, "red");
+  //extendedPaddedStartAABB && debugDrawBounds(extendedPaddedStartAABB, "green");
+  //extendedEndAABB && debugDrawBounds(extendedEndAABB, "red");
+  //extendedPaddedEndAABB && debugDrawBounds(extendedPaddedEndAABB, "green");
+
+  const avoidAABBs =
+    snapDistanceAABB[0] &&
+    snapDistanceAABB[1] &&
+    generateExclusionAABBs(
+      snapDistanceAABB.filter((aabb) => aabb !== null) as [Bounds, Bounds],
+      common,
+    );
 
   const grid = calculateGrid(
-    [extendedStartAABB, extendedEndAABB].filter(
-      (aabb) => aabb !== null,
-    ) as Bounds[],
+    extendedZeroOffsetAABB
+      .filter((aabb) => aabb !== null)
+      .map((x) => {
+        debugDrawBounds(x!, "green");
+        return x;
+      }) as Bounds[],
+    //[...(avoidAABBs ?? [])].filter((aabb) => aabb !== null) as Bounds[],
     [common],
     startGlobalPoint,
     startHeading,
     endGlobalPoint,
     endHeading,
     1, // TODO: Is this even needed?
-    [extendedPaddedStartAABB, extendedPaddedEndAABB].filter(
-      (aabb) => aabb !== null,
-    ) as Bounds[],
+    [...(avoidAABBs ?? [])]
+      .filter((aabb) => aabb !== null)
+      .map((x) => {
+        debugDrawBounds(x!, "red");
+        return x;
+      }) as Bounds[],
+    // [extendedPaddedStartAABB, extendedPaddedEndAABB, ...(bboxes ?? [])].filter(
+    //   (aabb) => aabb !== null,
+    // ) as Bounds[],
   );
 
   const startDonglePosition =
@@ -192,9 +221,9 @@ export const mutateElbowArrow = (
     astar(startDongle, endDongle, grid, startHeading, endHeading);
 
   if (path) {
-    startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
-    path.forEach((node) => debugDrawPoint(node.pos, "red"));
-    endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
+    // startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
+    // path.forEach((node) => debugDrawPoint(node.pos, "red"));
+    // endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
 
     const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
     points.unshift(startGlobalPoint);
@@ -221,16 +250,16 @@ export const mutateElbowArrow = (
   );
 
   // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
+  for (let col = 0; col < grid.col; col++) {
+    const a = gridNodeFromAddr([col, 0], grid)?.pos;
+    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
+  for (let row = 0; row < grid.row; row++) {
+    const a = gridNodeFromAddr([0, row], grid)?.pos;
+    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
 };
 
 /**
@@ -246,15 +275,13 @@ const astar = (
   const multiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
-  let closest = start;
-
   open.push(start);
 
   while (open.size() > 0) {
     // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
     const current = open.pop();
 
-    if (!current) {
+    if (!current || current.closed) {
       // Current is not passable, continue with next element
       continue;
     }
@@ -264,7 +291,7 @@ const astar = (
       return pathTo(start, current);
     }
 
-    // Normal case -- move currentNode from open to closed, process each of its neighbors.
+    // Normal case -- move current from open to closed, process each of its neighbors.
     current.closed = true;
 
     // Find all neighbors for the current node.
@@ -280,7 +307,9 @@ const astar = (
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
+      const neighborDirection = vectorToHeading(
+        pointToVector(neighbor.pos, current.pos),
+      ); //neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
@@ -299,6 +328,16 @@ const astar = (
           neighborDirection,
           endHeading,
         );
+        // debugDrawPoint(
+        //   neighbor.pos,
+        //   estBendCount === 4
+        //     ? "black"
+        //     : estBendCount === 3
+        //     ? "red"
+        //     : estBendCount === 2
+        //     ? "orange"
+        //     : "green",
+        // );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
@@ -307,15 +346,6 @@ const astar = (
           estBendCount * Math.pow(multiplier, 2);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
-
-        // If the neighbour is closer than the current closest node or if it's equally close but has
-        // a cheaper path than the current closest node then it becomes the closest node
-        if (
-          neighbor.h < closest.h ||
-          (neighbor.h === closest.h && neighbor.g < closest.g)
-        ) {
-          closest = neighbor;
-        }
 
         if (!beenVisited) {
           // Pushing to heap will put it in proper place based on the 'f' value.
@@ -328,7 +358,7 @@ const astar = (
     }
   }
 
-  return pathTo(start, closest);
+  return null;
 };
 
 const pathTo = (start: Node, node: Node) => {
@@ -461,6 +491,37 @@ const estimateSegmentCount = (
   return 0;
 };
 
+const generateExclusionAABBs = (
+  aabbs: [Bounds, Bounds],
+  common: Bounds,
+): Bounds[] => {
+  const commonMidPoint = [
+    (common[0] + common[2]) / 2,
+    (common[1] + common[3]) / 2,
+  ];
+
+  const result = aabbs.map((current) => {
+    return [
+      current[0] < commonMidPoint[0]
+        ? common[0] + (current[0] - common[0]) / 2
+        : (commonMidPoint[0] + current[0]) / 2,
+      current[1] < commonMidPoint[1]
+        ? common[1] + (current[1] - common[1]) / 2
+        : (commonMidPoint[1] + current[1]) / 2,
+      current[2] > commonMidPoint[0]
+        ? current[2] + (common[2] - current[2]) / 2
+        : (commonMidPoint[0] + current[2]) / 2,
+      current[3] > commonMidPoint[1]
+        ? current[3] + (common[3] - current[3]) / 2
+        : (commonMidPoint[1] + current[3]) / 2,
+    ] as Bounds;
+  });
+
+  result.forEach((aabb) => debugDrawBounds(aabb));
+
+  return result;
+};
+
 /**
  * Calculates the grid from which the node points are placed on
  * based on the axis-aligned bounding boxes.
@@ -479,12 +540,6 @@ const calculateGrid = (
   const vertical = new Set<number>();
 
   aabbs.forEach((aabb) => {
-    horizontal.add(aabb[0]);
-    horizontal.add(aabb[2]);
-    vertical.add(aabb[1]);
-    vertical.add(aabb[3]);
-  });
-  additionalAabbs.forEach((aabb) => {
     horizontal.add(aabb[0]);
     horizontal.add(aabb[2]);
     vertical.add(aabb[1]);
@@ -528,6 +583,13 @@ const calculateGrid = (
       horizontal.add((h + h2) / 2);
     }
   }
+
+  additionalAabbs.forEach((aabb) => {
+    horizontal.add(aabb[0]);
+    horizontal.add(aabb[2]);
+    vertical.add(aabb[1]);
+    vertical.add(aabb[3]);
+  });
 
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
