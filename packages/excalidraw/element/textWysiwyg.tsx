@@ -562,7 +562,7 @@ export const textWysiwyg = ({
 
     window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
-    window.removeEventListener("pointerdown", onPointerDown);
+    window.removeEventListener("pointerdown", onPointerDown, { capture: true });
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
@@ -644,7 +644,7 @@ export const textWysiwyg = ({
       window.addEventListener("blur", handleSubmit);
     } else if (
       event.target instanceof HTMLElement &&
-      !event.target.contains(editable) &&
+      event.target.nodeName === "CANVAS" &&
       // Vitest simply ignores stopPropagation, capture-mode, or rAF
       // so without introducing crazier hacks, nothing we can do
       !isTestEnv()
