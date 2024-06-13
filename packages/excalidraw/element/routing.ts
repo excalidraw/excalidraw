@@ -118,8 +118,12 @@ export const mutateElbowArrow = (
     endElement && aabbForElement(endElement, 0),
   ];
   const snapDistanceAABB = [
-    startElement && aabbForElement(startElement, SNAP_DIST),
-    endElement && aabbForElement(endElement, SNAP_DIST),
+    startElement && aabbForElement(startElement, 5 + 20),
+    endElement && aabbForElement(endElement, 5 + 20),
+  ];
+  const gapDistanceAABB = [
+    startElement && aabbForElement(startElement, GAP),
+    endElement && aabbForElement(endElement, GAP),
   ];
   const extendedPaddedAABB = [
     startHeading &&
@@ -157,37 +161,36 @@ export const mutateElbowArrow = (
   //extendedEndAABB && debugDrawBounds(extendedEndAABB, "red");
   //extendedPaddedEndAABB && debugDrawBounds(extendedPaddedEndAABB, "green");
 
-  const avoidAABBs =
+  const dynamicAABBs =
+    aabbZeroOffset[0] &&
+    aabbZeroOffset[1] &&
     snapDistanceAABB[0] &&
     snapDistanceAABB[1] &&
-    generateExclusionAABBs(
-      snapDistanceAABB.filter((aabb) => aabb !== null) as [Bounds, Bounds],
-      common,
+    generateDynamicAABBs(
+      aabbZeroOffset[0],
+      aabbZeroOffset[1],
+      commonAABB([snapDistanceAABB[0], snapDistanceAABB[1]]),
     );
 
   const grid = calculateGrid(
-    extendedZeroOffsetAABB
+    [...(dynamicAABBs ?? [])]
       .filter((aabb) => aabb !== null)
       .map((x) => {
         debugDrawBounds(x!, "green");
         return x;
       }) as Bounds[],
-    //[...(avoidAABBs ?? [])].filter((aabb) => aabb !== null) as Bounds[],
     [common],
     startGlobalPoint,
     startHeading,
     endGlobalPoint,
     endHeading,
     1, // TODO: Is this even needed?
-    [...(avoidAABBs ?? [])]
+    [...(extendedZeroOffsetAABB ?? [])]
       .filter((aabb) => aabb !== null)
       .map((x) => {
         debugDrawBounds(x!, "red");
         return x;
       }) as Bounds[],
-    // [extendedPaddedStartAABB, extendedPaddedEndAABB, ...(bboxes ?? [])].filter(
-    //   (aabb) => aabb !== null,
-    // ) as Bounds[],
   );
 
   const startDonglePosition =
@@ -317,7 +320,7 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(multiplier, 3) : 0);
+        (directionChange ? Math.pow(multiplier, 2) : 0);
 
       const beenVisited = neighbor.visited;
 
@@ -328,21 +331,12 @@ const astar = (
           neighborDirection,
           endHeading,
         );
-        // debugDrawPoint(
-        //   neighbor.pos,
-        //   estBendCount === 4
-        //     ? "black"
-        //     : estBendCount === 3
-        //     ? "red"
-        //     : estBendCount === 2
-        //     ? "orange"
-        //     : "green",
-        // );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
         neighbor.h =
           m_dist(end.pos, neighbor.pos) +
+          Math.pow(m_dist(neighbor.pos, end.pos), 3) +
           estBendCount * Math.pow(multiplier, 2);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
@@ -491,35 +485,52 @@ const estimateSegmentCount = (
   return 0;
 };
 
-const generateExclusionAABBs = (
-  aabbs: [Bounds, Bounds],
+// const generateExclusionAABBs = (
+//   aabbs: [Bounds, Bounds],
+//   common: Bounds,
+// ): Bounds[] => {
+//   const commonMidPoint = [
+//     (common[0] + common[2]) / 2,
+//     (common[1] + common[3]) / 2,
+//   ];
+
+//   return aabbs.map((current) => {
+//     return [
+//       current[0] < commonMidPoint[0]
+//         ? common[0] + (current[0] - common[0]) / 2
+//         : (commonMidPoint[0] + current[0]) / 2,
+//       current[1] < commonMidPoint[1]
+//         ? common[1] + (current[1] - common[1]) / 2
+//         : (commonMidPoint[1] + current[1]) / 2,
+//       current[2] > commonMidPoint[0]
+//         ? current[2] + (common[2] - current[2]) / 2
+//         : (commonMidPoint[0] + current[2]) / 2,
+//       current[3] > commonMidPoint[1]
+//         ? current[3] + (common[3] - current[3]) / 2
+//         : (commonMidPoint[1] + current[3]) / 2,
+//     ] as Bounds;
+//   });
+// };
+
+const generateDynamicAABBs = (
+  a: Bounds,
+  b: Bounds,
   common: Bounds,
 ): Bounds[] => {
-  const commonMidPoint = [
-    (common[0] + common[2]) / 2,
-    (common[1] + common[3]) / 2,
+  return [
+    [
+      a[0] > b[2] ? (a[0] + b[2]) / 2 : common[0],
+      a[1] > b[3] ? (a[1] + b[3]) / 2 : common[1],
+      a[2] < b[0] ? (a[2] + b[0]) / 2 : common[2],
+      a[3] < b[1] ? (a[3] + b[1]) / 2 : common[3],
+    ] as Bounds,
+    [
+      b[0] > a[2] ? (b[0] + a[2]) / 2 : common[0],
+      b[1] > a[3] ? (b[1] + a[3]) / 2 : common[1],
+      b[2] < a[0] ? (b[2] + a[0]) / 2 : common[2],
+      b[3] < a[1] ? (b[3] + a[1]) / 2 : common[3],
+    ] as Bounds,
   ];
-
-  const result = aabbs.map((current) => {
-    return [
-      current[0] < commonMidPoint[0]
-        ? common[0] + (current[0] - common[0]) / 2
-        : (commonMidPoint[0] + current[0]) / 2,
-      current[1] < commonMidPoint[1]
-        ? common[1] + (current[1] - common[1]) / 2
-        : (commonMidPoint[1] + current[1]) / 2,
-      current[2] > commonMidPoint[0]
-        ? current[2] + (common[2] - current[2]) / 2
-        : (commonMidPoint[0] + current[2]) / 2,
-      current[3] > commonMidPoint[1]
-        ? current[3] + (common[3] - current[3]) / 2
-        : (commonMidPoint[1] + current[3]) / 2,
-    ] as Bounds;
-  });
-
-  result.forEach((aabb) => debugDrawBounds(aabb));
-
-  return result;
 };
 
 /**
@@ -612,16 +623,16 @@ const calculateGrid = (
           }),
         ),
       )
-      // .map((node) =>
-      //   Math.max(
-      //     ...aabbs.map((aabb) =>
-      //       //pointInsideBounds(node.pos, aabb) ? 1 : 0
-      //       pointInsideBounds(node.pos, aabb) ? 1 : 0,
-      //     ),
-      //   ) === 0
-      //     ? node
-      //     : null,
-      // )
+      .map((node) =>
+        Math.max(
+          ...aabbs.map((aabb) =>
+            //pointInsideBounds(node.pos, aabb) ? 1 : 0
+            pointInsideBounds(node.pos, aabb) ? 1 : 0,
+          ),
+        ) <= 0
+          ? node
+          : null,
+      )
       .map((node) =>
         node &&
         Math.max(
@@ -629,7 +640,7 @@ const calculateGrid = (
             (aabb) => (pointInsideBounds(node.pos, aabb) ? 1 : 0),
             //(aabb) => (pointInsideOrOnBounds(node.pos, aabb) ? 1 : 0),
           ),
-        ) === 0
+        ) <= 0
           ? node
           : null,
       ),
