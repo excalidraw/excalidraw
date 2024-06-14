@@ -341,9 +341,7 @@ const astar = (
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      const neighborDirection = vectorToHeading(
-        pointToVector(neighbor.pos, current.pos),
-      ); //neighborIndexToHeading(i as 0 | 1 | 2 | 3);
+      const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
@@ -351,24 +349,18 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(multiplier, 3) : 0);
+        (directionChange ? Math.pow(multiplier, 1) : 0);
 
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
-        const estBendCount = estimateSegmentCount(
-          neighbor,
-          end,
-          neighborDirection,
-          endHeading,
-        );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
         neighbor.h =
           m_dist(end.pos, neighbor.pos) +
-          Math.pow(m_dist(neighbor.pos, end.pos), 3) +
-          estBendCount * Math.pow(multiplier, 2);
+          Math.pow(m_dist(neighbor.pos, end.pos), 1);
+        // + estBendCount * Math.pow(multiplier, 3);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
 
@@ -1067,3 +1059,15 @@ const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
           : [...result, point],
       [points[0] ?? [0, 0], points[1] ?? [1, 0]],
     );
+
+const neighborIndexToHeading = (idx: number): Heading => {
+  switch (idx) {
+    case 0:
+      return HEADING_UP;
+    case 1:
+      return HEADING_RIGHT;
+    case 2:
+      return HEADING_DOWN;
+  }
+  return HEADING_LEFT;
+};
