@@ -6,9 +6,11 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
+  arePointsEqual,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
+  scaleVector,
   translatePoint,
   vectorToHeading,
 } from "../math";
@@ -71,28 +73,30 @@ export const mutateElbowArrow = (
   ];
 
   const [startHeading, endHeading] = [
-    startElement &&
-      headingForPointOnElement(
-        startElement,
-        aabbForElement(
+    startElement
+      ? headingForPointOnElement(
           startElement,
-          distanceToBindableElement(
+          aabbForElement(
             startElement,
-            startGlobalPoint,
-            elementsMap,
+            distanceToBindableElement(
+              startElement,
+              startGlobalPoint,
+              elementsMap,
+            ),
           ),
-        ),
-        startGlobalPoint,
-      ),
-    endElement &&
-      headingForPointOnElement(
-        endElement,
-        aabbForElement(
+          startGlobalPoint,
+        )
+      : vectorToHeading(pointToVector(startGlobalPoint, endGlobalPoint)),
+    endElement
+      ? headingForPointOnElement(
           endElement,
-          distanceToBindableElement(endElement, endGlobalPoint, elementsMap),
-        ),
-        endGlobalPoint,
-      ),
+          aabbForElement(
+            endElement,
+            distanceToBindableElement(endElement, endGlobalPoint, elementsMap),
+          ),
+          endGlobalPoint,
+        )
+      : vectorToHeading(pointToVector(endGlobalPoint, startGlobalPoint)),
   ];
 
   const bias = Math.max(
@@ -123,12 +127,14 @@ export const mutateElbowArrow = (
             endGlobalPoint[1],
           ],
       [
+        // Start point
         startGlobalPoint[0] - 1,
         startGlobalPoint[1] - 1,
         startGlobalPoint[0] + 1,
         startGlobalPoint[1] + 1,
       ],
       [
+        // End point
         endGlobalPoint[0] - 1,
         endGlobalPoint[1] - 1,
         endGlobalPoint[0] + 1,
@@ -136,7 +142,7 @@ export const mutateElbowArrow = (
       ],
     ].filter((x) => x !== null) as Bounds[],
   );
-  debugDrawBounds(common, "black");
+
   const aabbZeroOffset = [
     startElement && aabbForElement(startElement, 0),
     endElement && aabbForElement(endElement, 0),
@@ -165,6 +171,7 @@ export const mutateElbowArrow = (
       extendedZeroOffsetAABB[0]
         ? extendedZeroOffsetAABB[0]
         : [
+            // Start point
             startGlobalPoint[0],
             startGlobalPoint[1],
             startGlobalPoint[0],
@@ -173,6 +180,7 @@ export const mutateElbowArrow = (
       extendedZeroOffsetAABB[1]
         ? extendedZeroOffsetAABB[1]
         : [
+            // End point
             endGlobalPoint[0],
             endGlobalPoint[1],
             endGlobalPoint[0],
@@ -209,15 +217,17 @@ export const mutateElbowArrow = (
   );
 
   const startDonglePosition =
-    startGlobalPoint &&
     startHeading &&
-    getDonglePosition(startGlobalPoint, startHeading, grid);
+    (arrow.startBinding
+      ? getDonglePosition(startGlobalPoint, startHeading, grid)
+      : scaleVector(startHeading, -20));
   const startDongle =
     startDonglePosition && pointToGridNode(startDonglePosition, grid);
   const endDonglePosition =
-    endGlobalPoint &&
     endHeading &&
-    getDonglePosition(endGlobalPoint, endHeading, grid);
+    (arrow.endBinding
+      ? getDonglePosition(endGlobalPoint, endHeading, grid)
+      : scaleVector(endHeading, -20));
   const endDongle =
     endDonglePosition && pointToGridNode(endDonglePosition, grid);
 
@@ -246,8 +256,12 @@ export const mutateElbowArrow = (
     // endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
 
     const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
-    points.unshift(startGlobalPoint);
-    points.push(endGlobalPoint);
+    startDongle && points.unshift(startGlobalPoint);
+    endDongle && points.push(endGlobalPoint);
+    points.forEach((x) => debugDrawPoint(x));
+    simplifyElbowArrowPoints(points).forEach((x) =>
+      debugDrawPoint(x, "green", true),
+    );
     mutateElement(arrow, {
       ...normalizedArrowElementUpdate(
         simplifyElbowArrowPoints(points),
@@ -258,16 +272,16 @@ export const mutateElbowArrow = (
   }
 
   // Debug
-  grid.data.forEach(
-    (node) =>
-      node &&
-      debugDrawPoint(
-        node.pos,
-        `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
-          node.addr[1] * (240 / grid.col),
-        )}, 255)`,
-      ),
-  );
+  // grid.data.forEach(
+  //   (node) =>
+  //     node &&
+  //     debugDrawPoint(
+  //       node.pos,
+  //       `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
+  //         node.addr[1] * (240 / grid.col),
+  //       )}, 255)`,
+  //     ),
+  // );
 
   // Debug: Grid visualization
   for (let col = 0; col < grid.col; col++) {
@@ -922,6 +936,7 @@ const aabbForElement = (element: ExcalidrawElement, offset?: number) => {
 
   return bounds;
 };
+
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
@@ -1043,7 +1058,7 @@ const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
     .slice(2)
     .reduce(
       (result, point) =>
-        pointsCloseEnough(
+        arePointsEqual(
           vectorToHeading(
             pointToVector(result[result.length - 1], result[result.length - 2]),
           ),
@@ -1065,6 +1080,3 @@ const neighborIndexToHeading = (idx: number): Heading => {
   }
   return HEADING_LEFT;
 };
-
-const pointsCloseEnough = (p1: Point, p2: Point): boolean =>
-  p1[0] - p2[0] < 0.000001 && p1[1] - p2[1] < 0.000001;
