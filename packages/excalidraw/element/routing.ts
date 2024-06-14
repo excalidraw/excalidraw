@@ -39,6 +39,7 @@ type Node = {
   f: number;
   g: number;
   h: number;
+  e: number;
   closed: boolean;
   visited: boolean;
   parent: Node | null;
@@ -284,16 +285,16 @@ export const mutateElbowArrow = (
   );
 
   // Debug: Grid visualization
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -306,6 +307,12 @@ const astar = (
   startHeading: Heading,
   endHeading: Heading,
 ) => {
+  const targetElbowCount = estimateSegmentCount(
+    start,
+    end,
+    startHeading,
+    endHeading,
+  );
   const multiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
@@ -341,13 +348,15 @@ const astar = (
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      const neighborDirection = vectorToHeading(
-        pointToVector(neighbor.pos, current.pos),
-      ); //neighborIndexToHeading(i as 0 | 1 | 2 | 3);
+      // const neighborDirection = vectorToHeading(
+      //   pointToVector(neighbor.pos, current.pos),
+      // );
+      const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
       const directionChange = previousDirection !== neighborDirection;
+      const elbowCount = current.e + (directionChange ? 1 : 0);
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
@@ -356,22 +365,17 @@ const astar = (
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
-        const estBendCount = estimateSegmentCount(
-          neighbor,
-          end,
-          neighborDirection,
-          endHeading,
-        );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
+        neighbor.e = elbowCount;
         neighbor.h =
           m_dist(end.pos, neighbor.pos) +
           Math.pow(m_dist(neighbor.pos, end.pos), 3) +
-          estBendCount * Math.pow(multiplier, 2);
+          (elbowCount > targetElbowCount ? Infinity : 0);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
-
+        //console.log(neighbor.addr, neighbor.f, neighbor.e);
         if (!beenVisited) {
           // Pushing to heap will put it in proper place based on the 'f' value.
           open.push(neighbor);
@@ -400,6 +404,19 @@ const pathTo = (start: Node, node: Node) => {
 
 const m_dist = (a: Point, b: Point) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[0] - b[0]);
+
+const neighborIndexToHeading = (idx: number): Heading => {
+  switch (idx) {
+    case 0:
+      return HEADING_UP;
+    case 1:
+      return HEADING_RIGHT;
+    case 2:
+      return HEADING_DOWN;
+  }
+
+  return HEADING_LEFT;
+};
 
 const estimateSegmentCount = (
   start: Node,
@@ -619,6 +636,7 @@ const calculateGrid = (
             f: 0,
             g: 0,
             h: 0,
+            e: 0,
             closed: false,
             visited: false,
             parent: null,
