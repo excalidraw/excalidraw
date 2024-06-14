@@ -362,9 +362,9 @@ export class LinearElementEditor {
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
     appState: AppState,
-    app: AppClassProperties,
+    scene: Scene,
   ): LinearElementEditor {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const elementsMap = scene.getNonDeletedElementsMap();
 
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -400,7 +400,7 @@ export class LinearElementEditor {
                       : element.points[0],
                 },
               ],
-              app.scene,
+              scene,
             );
           }
 
@@ -413,7 +413,7 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                app,
+                scene,
               )
             : null;
 
@@ -677,13 +677,13 @@ export class LinearElementEditor {
     store: Store,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
-    app: AppClassProperties,
+    scene: Scene,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const elementsMap = scene.getNonDeletedElementsMap();
 
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
@@ -751,7 +751,7 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(scenePointer, app),
+        endBindingElement: getHoveredElementForBinding(scenePointer, scene),
       };
 
       ret.didAddPoint = true;

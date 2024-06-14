@@ -2806,7 +2806,7 @@ class App extends React.Component<AppProps, AppState> {
             nonDeletedElementsMap,
           ),
         ),
-        this,
+        this.scene,
       );
     }
 
@@ -3973,7 +3973,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           suggestedBindings: getSuggestedBindingsForArrows(
             selectedElements,
-            this,
+            this.scene,
           ),
         });
 
@@ -4144,7 +4144,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isArrowKey(event.key)) {
       bindOrUnbindLinearElements(
         this.scene.getSelectedElements(this.state).filter(isLinearElement),
-        this,
+        this.scene,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
       );
@@ -6414,7 +6414,7 @@ class App extends React.Component<AppProps, AppState> {
             this.store,
             pointerDownState.origin,
             linearElementEditor,
-            this,
+            this.scene,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
@@ -6746,7 +6746,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
-      this,
+      this.scene,
     );
     this.scene.insertElement(element);
     this.setState({
@@ -7044,7 +7044,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
-        this,
+        this.scene,
       );
 
       this.scene.insertElement(element);
@@ -7514,7 +7514,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             suggestedBindings: getSuggestedBindingsForArrows(
               selectedElements,
-              this,
+              this.scene,
             ),
           });
 
@@ -7861,7 +7861,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.editingLinearElement,
             this.state,
-            this,
+            this.scene,
           );
           if (editingLinearElement !== this.state.editingLinearElement) {
             this.setState({
@@ -7885,7 +7885,7 @@ class App extends React.Component<AppProps, AppState> {
             childEvent,
             this.state.selectedLinearElement,
             this.state,
-            this,
+            this.scene,
           );
 
           const { startBindingElement, endBindingElement } =
@@ -8035,7 +8035,7 @@ class App extends React.Component<AppProps, AppState> {
               draggingElement,
               this.state,
               pointerCoords,
-              this,
+              this.scene,
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -8596,7 +8596,7 @@ class App extends React.Component<AppProps, AppState> {
 
         bindOrUnbindLinearElements(
           linearElements,
-          this,
+          this.scene,
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
         );
@@ -9084,7 +9084,7 @@ class App extends React.Component<AppProps, AppState> {
   }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
-      this,
+      this.scene,
     );
     this.setState({
       suggestedBindings:
@@ -9111,7 +9111,7 @@ class App extends React.Component<AppProps, AppState> {
       (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
-          this,
+          this.scene,
         );
         if (
           hoveredBindableElement != null &&
@@ -9644,7 +9644,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
-        this,
+        this.scene,
       );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();

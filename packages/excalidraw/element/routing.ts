@@ -22,7 +22,11 @@ import {
   debugDrawPoint,
   debugDrawSegments,
 } from "../visualdebug";
-import { distanceToBindableElement, maxBindingGap } from "./binding";
+import {
+  distanceToBindableElement,
+  getHoveredElementForBinding,
+  maxBindingGap,
+} from "./binding";
 import type { Bounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
@@ -66,10 +70,18 @@ export const mutateElbowArrow = (
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
     // TODO: Memoize
-    arrow.startBinding &&
-      getBindableElementForId(arrow.startBinding.elementId, elementsMap),
-    arrow.endBinding &&
-      getBindableElementForId(arrow.endBinding.elementId, elementsMap),
+    arrow.startBinding
+      ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
+      : getHoveredElementForBinding(
+          { x: startGlobalPoint[0], y: startGlobalPoint[1] },
+          scene,
+        ),
+    arrow.endBinding
+      ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
+      : getHoveredElementForBinding(
+          { x: endGlobalPoint[0], y: endGlobalPoint[1] },
+          scene,
+        ),
   ];
 
   const [startHeading, endHeading] = [
@@ -218,14 +230,14 @@ export const mutateElbowArrow = (
 
   const startDonglePosition =
     startHeading &&
-    (arrow.startBinding
+    (startElement
       ? getDonglePosition(startGlobalPoint, startHeading, grid)
       : scaleVector(startHeading, -20));
   const startDongle =
     startDonglePosition && pointToGridNode(startDonglePosition, grid);
   const endDonglePosition =
     endHeading &&
-    (arrow.endBinding
+    (endElement
       ? getDonglePosition(endGlobalPoint, endHeading, grid)
       : scaleVector(endHeading, -20));
   const endDongle =
@@ -233,7 +245,7 @@ export const mutateElbowArrow = (
 
   // Do not allow stepping on the true end or true start points
   const endNode = pointToGridNode(endGlobalPoint, grid);
-  if (endNode && arrow.endBinding) {
+  if (endNode && endElement) {
     endNode.closed = true;
   }
   const startNode = pointToGridNode(startGlobalPoint, grid);
