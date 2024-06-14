@@ -126,8 +126,21 @@ export const mutateElbowArrow = (
             endGlobalPoint[0],
             endGlobalPoint[1],
           ],
+      [
+        startGlobalPoint[0] - 1,
+        startGlobalPoint[1] - 1,
+        startGlobalPoint[0] + 1,
+        startGlobalPoint[1] + 1,
+      ],
+      [
+        endGlobalPoint[0] - 1,
+        endGlobalPoint[1] - 1,
+        endGlobalPoint[0] + 1,
+        endGlobalPoint[1] + 1,
+      ],
     ].filter((x) => x !== null) as Bounds[],
   );
+  debugDrawBounds(common, "black");
   const aabbZeroOffset = [
     startElement && aabbForElement(startElement, 0),
     endElement && aabbForElement(endElement, 0),
@@ -136,30 +149,6 @@ export const mutateElbowArrow = (
     startElement && aabbForElement(startElement, 5 + 20),
     endElement && aabbForElement(endElement, 5 + 20),
   ];
-  // const gapDistanceAABB = [
-  //   startElement && aabbForElement(startElement, GAP),
-  //   endElement && aabbForElement(endElement, GAP),
-  // ];
-  // const extendedPaddedAABB = [
-  //   startHeading &&
-  //     snapDistanceAABB[0] &&
-  //     snapDistanceAABB[1] &&
-  //     extendedAABB(
-  //       snapDistanceAABB[0],
-  //       startHeading,
-  //       [snapDistanceAABB[1]],
-  //       GAP - 2 * SNAP_DIST,
-  //     ),
-  //   endHeading &&
-  //     snapDistanceAABB[0] &&
-  //     snapDistanceAABB[1] &&
-  //     extendedAABB(
-  //       snapDistanceAABB[1],
-  //       endHeading,
-  //       [snapDistanceAABB[0]],
-  //       GAP - 2 * SNAP_DIST,
-  //     ),
-  // ];
   const extendedZeroOffsetAABB = [
     startHeading &&
       aabbZeroOffset[0] &&
@@ -200,7 +189,7 @@ export const mutateElbowArrow = (
         extendedZeroOffsetAABB[1],
       ]),
     );
-
+  console.log(endGlobalPoint);
   // Canculate Grid positions
   const grid = calculateGrid(
     [...(dynamicAABBs ?? [])]
@@ -285,16 +274,16 @@ export const mutateElbowArrow = (
   );
 
   // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
+  for (let col = 0; col < grid.col; col++) {
+    const a = gridNodeFromAddr([col, 0], grid)?.pos;
+    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
+  for (let row = 0; row < grid.row; row++) {
+    const a = gridNodeFromAddr([0, row], grid)?.pos;
+    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
 };
 
 /**
@@ -348,9 +337,6 @@ const astar = (
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      // const neighborDirection = vectorToHeading(
-      //   pointToVector(neighbor.pos, current.pos),
-      // );
       const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
@@ -360,7 +346,7 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(multiplier, 3) : 0);
+        (directionChange ? multiplier : 0);
 
       const beenVisited = neighbor.visited;
 
@@ -370,9 +356,7 @@ const astar = (
         neighbor.parent = current;
         neighbor.e = elbowCount;
         neighbor.h =
-          m_dist(end.pos, neighbor.pos) +
-          Math.pow(m_dist(neighbor.pos, end.pos), 3) +
-          (elbowCount > targetElbowCount ? Infinity : 0);
+          m_dist(end.pos, neighbor.pos) + m_dist(neighbor.pos, end.pos);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         //console.log(neighbor.addr, neighbor.f, neighbor.e);
@@ -404,19 +388,6 @@ const pathTo = (start: Node, node: Node) => {
 
 const m_dist = (a: Point, b: Point) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[0] - b[0]);
-
-const neighborIndexToHeading = (idx: number): Heading => {
-  switch (idx) {
-    case 0:
-      return HEADING_UP;
-    case 1:
-      return HEADING_RIGHT;
-    case 2:
-      return HEADING_DOWN;
-  }
-
-  return HEADING_LEFT;
-};
 
 const estimateSegmentCount = (
   start: Node,
@@ -1085,3 +1056,15 @@ const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
           : [...result, point],
       [points[0] ?? [0, 0], points[1] ?? [1, 0]],
     );
+
+const neighborIndexToHeading = (idx: number): Heading => {
+  switch (idx) {
+    case 0:
+      return HEADING_UP;
+    case 1:
+      return HEADING_RIGHT;
+    case 2:
+      return HEADING_DOWN;
+  }
+  return HEADING_LEFT;
+};

@@ -208,17 +208,41 @@ export class LinearElementEditor {
     if (!linearElementEditor) {
       return false;
     }
-    const { selectedPointsIndices, elementId } = linearElementEditor;
+    const { elementId } = linearElementEditor;
     const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return false;
     }
 
+    const selectedPointsIndices =
+      isArrowElement(element) && element.elbowed
+        ? linearElementEditor.selectedPointsIndices
+            ?.reduce(
+              (startEnd, index) =>
+                (index === 0
+                  ? [0, startEnd[1]]
+                  : [startEnd[0], element.points.length - 1]) as [
+                  boolean | number,
+                  boolean | number,
+                ],
+              [false, false] as [number | boolean, number | boolean],
+            )
+            .filter(
+              (idx: number | boolean): idx is number => typeof idx === "number",
+            )
+        : linearElementEditor.selectedPointsIndices;
+    const lastClickedPoint =
+      isArrowElement(element) && element.elbowed
+        ? linearElementEditor.pointerDownState.lastClickedPoint > 0
+          ? element.points.length - 1
+          : 0
+        : linearElementEditor.pointerDownState.lastClickedPoint;
+
     // point that's being dragged (out of all selected points)
-    const draggingPoint = element.points[
-      linearElementEditor.pointerDownState.lastClickedPoint
-    ] as [number, number] | undefined;
+    const draggingPoint = element.points[lastClickedPoint] as
+      | [number, number]
+      | undefined;
 
     if (selectedPointsIndices && draggingPoint) {
       if (
@@ -244,9 +268,7 @@ export class LinearElementEditor {
             {
               index: selectedIndex,
               point: [width + referencePoint[0], height + referencePoint[1]],
-              isDragging:
-                selectedIndex ===
-                linearElementEditor.pointerDownState.lastClickedPoint,
+              isDragging: selectedIndex === lastClickedPoint,
             },
           ],
           scene,
@@ -267,8 +289,7 @@ export class LinearElementEditor {
           element,
           selectedPointsIndices.map((pointIndex) => {
             const newPointPosition =
-              pointIndex ===
-              linearElementEditor.pointerDownState.lastClickedPoint
+              pointIndex === lastClickedPoint
                 ? LinearElementEditor.createPointAt(
                     element,
                     elementsMap,
@@ -283,9 +304,7 @@ export class LinearElementEditor {
             return {
               index: pointIndex,
               point: newPointPosition,
-              isDragging:
-                pointIndex ===
-                linearElementEditor.pointerDownState.lastClickedPoint,
+              isDragging: pointIndex === lastClickedPoint,
             };
           }),
           scene,
@@ -698,7 +717,11 @@ export class LinearElementEditor {
       );
     }
     if (event.altKey && appState.editingLinearElement) {
-      if (linearElementEditor.lastUncommittedPoint == null) {
+      if (
+        linearElementEditor.lastUncommittedPoint == null ||
+        !isArrowElement(element) ||
+        !element.elbowed
+      ) {
         mutateElement(element, {
           points: [
             ...element.points,
@@ -958,6 +981,11 @@ export class LinearElementEditor {
     absoluteCoords: Point,
     elementsMap: ElementsMap,
   ): Point {
+    if (isArrowElement(element) && element.elbowed) {
+      // No rotation for elbow arrows
+      return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
+    }
+
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
