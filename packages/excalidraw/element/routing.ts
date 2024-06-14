@@ -6,7 +6,6 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
-  arePointsEqual,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -31,9 +30,6 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
 } from "./types";
-
-const GAP = 50;
-const SNAP_DIST = 5;
 
 type Node = {
   f: number;
@@ -189,7 +185,7 @@ export const mutateElbowArrow = (
         extendedZeroOffsetAABB[1],
       ]),
     );
-  console.log(endGlobalPoint);
+
   // Canculate Grid positions
   const grid = calculateGrid(
     [...(dynamicAABBs ?? [])]
@@ -356,10 +352,11 @@ const astar = (
         neighbor.parent = current;
         neighbor.e = elbowCount;
         neighbor.h =
-          m_dist(end.pos, neighbor.pos) + m_dist(neighbor.pos, end.pos);
+          m_dist(end.pos, neighbor.pos) +
+          m_dist(neighbor.pos, end.pos) +
+          (targetElbowCount >= elbowCount ? elbowCount * multiplier : Infinity);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
-        //console.log(neighbor.addr, neighbor.f, neighbor.e);
         if (!beenVisited) {
           // Pushing to heap will put it in proper place based on the 'f' value.
           open.push(neighbor);
@@ -1046,7 +1043,7 @@ const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
     .slice(2)
     .reduce(
       (result, point) =>
-        arePointsEqual(
+        pointsCloseEnough(
           vectorToHeading(
             pointToVector(result[result.length - 1], result[result.length - 2]),
           ),
@@ -1068,3 +1065,6 @@ const neighborIndexToHeading = (idx: number): Heading => {
   }
   return HEADING_LEFT;
 };
+
+const pointsCloseEnough = (p1: Point, p2: Point): boolean =>
+  p1[0] - p2[0] < 0.000001 && p1[1] - p2[1] < 0.000001;
