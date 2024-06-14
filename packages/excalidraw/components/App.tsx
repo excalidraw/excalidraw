@@ -5314,20 +5314,27 @@ class App extends React.Component<AppProps, AppState> {
           mutateElbowArrow(
             multiElement,
             this.scene,
-            multiElement.points,
+            [
+              ...points.slice(0, -1),
+              [
+                lastCommittedX + dxFromLastCommitted,
+                lastCommittedY + dyFromLastCommitted,
+              ],
+            ],
             [0, 0],
           );
-        }
-        // update last uncommitted point
-        mutateElement(multiElement, {
-          points: [
-            ...points.slice(0, -1),
-            [
-              lastCommittedX + dxFromLastCommitted,
-              lastCommittedY + dyFromLastCommitted,
+        } else {
+          // update last uncommitted point
+          mutateElement(multiElement, {
+            points: [
+              ...points.slice(0, -1),
+              [
+                lastCommittedX + dxFromLastCommitted,
+                lastCommittedY + dyFromLastCommitted,
+              ],
             ],
-          ],
-        });
+          });
+        }
       }
 
       return;
