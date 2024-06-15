@@ -74,7 +74,7 @@
     "canvasColors": "Utilizada suls canabassses",
     "canvasBackground": "Rèireplan del canabàs",
     "drawingCanvas": "Zòna de dessenh",
-    "clearCanvas": "",
+    "clearCanvas": "Escafar canabàs",
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
@@ -110,7 +110,7 @@
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
     "toggleTheme": "",
-    "theme": "",
+    "theme": "Tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
     "decreaseFontSize": "Reduire talha polissa",
@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Modificar la linha",
-      "editArrow": ""
+      "editArrow": "Modificar sageta"
     },
     "elementLock": {
       "lock": "Verrolhar",
@@ -183,7 +183,7 @@
     "fullScreen": "Ecran complèt",
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
-    "systemMode": "",
+    "systemMode": "Mòde sistèma",
     "zenMode": "Mòde escur",
     "objectsSnapMode": "Ancorar als objèctes",
     "exitZenMode": "Sortir del mòde zen",
@@ -582,7 +582,7 @@
       "placeholder": "",
       "noMatch": ""
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "La comanda es pas disponibla...",
+    "shortcutHint": "Per contrarotlar la paleta, utilizatz {{shortcut}}"
   }
 }
