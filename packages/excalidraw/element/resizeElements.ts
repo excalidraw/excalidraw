@@ -186,13 +186,13 @@ const rescalePointsInElement = (
 ) =>
   isLinearElement(element) || isFreeDrawElement(element)
     ? {
-        points: rescalePoints(
-          0,
-          width,
-          rescalePoints(1, height, element.points, normalizePoints),
-          normalizePoints,
-        ),
-      }
+      points: rescalePoints(
+        0,
+        width,
+        rescalePoints(1, height, element.points, normalizePoints),
+        normalizePoints,
+      ),
+    }
     : {};
 
 const measureFontSizeFromWidth = (
@@ -423,17 +423,17 @@ const resizeSingleTextElement = (
 };
 
 function rescalePointsAndTranslateOffset(dimension: 0 | 1, newSize: number, points: readonly Point[]): [translation: number, points: Point[]] {
-    const getPointsMinMax = (points: readonly Point[], dimension: 0 | 1) => {
-      const projectedPoints = points.map(point => point[dimension])
-      const min = Math.min(...projectedPoints);
-      const max = Math.max(...projectedPoints);
-      return {min, max}
-    }
+  const getPointsMinMax = (points: readonly Point[], dimension: 0 | 1) => {
+    const projectedPoints = points.map(point => point[dimension])
+    const min = Math.min(...projectedPoints);
+    const max = Math.max(...projectedPoints);
+    return { min, max }
+  }
 
-    const origin = getPointsMinMax(points, dimension)
-    const newPoints = rescalePoints(dimension, newSize, points, false)
-    const { min } = getPointsMinMax(newPoints, dimension)
-    return [origin.min - min, newPoints]
+  const origin = getPointsMinMax(points, dimension)
+  const newPoints = rescalePoints(dimension, newSize, points, false)
+  const { min } = getPointsMinMax(newPoints, dimension)
+  return [origin.min - min, newPoints]
 }
 
 export const resizeSingleElement = (
