@@ -154,6 +154,12 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   return Math.hypot(xd, yd);
 };
 
+export const distanceSq2d = (p1: Point, p2: Point) => {
+  const xd = p2[0] - p1[0];
+  const yd = p2[1] - p1[1];
+  return xd * xd + yd * yd;
+};
+
 export const centerPoint = (a: Point, b: Point): Point => {
   return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 };
@@ -578,3 +584,13 @@ export const normalize = (vector: Vector): Vector => {
 
   return [vector[0] / m, vector[1] / m];
 };
+
+export const addVectors = (
+  vec1: Readonly<Vector>,
+  vec2: Readonly<Vector>,
+): Vector => [vec1[0] + vec2[0], vec1[1] + vec2[1]];
+
+export const subtractVectors = (
+  vec1: Readonly<Vector>,
+  vec2: Readonly<Vector>,
+): Vector => [vec1[0] - vec2[0], vec1[1] - vec2[1]];

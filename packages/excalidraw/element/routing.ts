@@ -1,3 +1,4 @@
+import { isPointOnLine, type LineSegment } from "../../utils";
 import BinaryHeap from "../binaryheap";
 import type { Heading } from "../math";
 import {
@@ -6,11 +7,13 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
+  addVectors,
   arePointsEqual,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
   scaleVector,
+  subtractVectors,
   translatePoint,
   vectorToHeading,
 } from "../math";
@@ -69,7 +72,6 @@ export const mutateElbowArrow = (
   ];
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
-    // TODO: Memoize
     arrow.startBinding
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
       : getHoveredElementForBinding(
@@ -83,10 +85,9 @@ export const mutateElbowArrow = (
           scene,
         ),
   ];
-
   const [startHeading, endHeading] = [
     startElement
-      ? headingForPointOnElement(
+      ? headingForPointFromElement(
           startElement,
           aabbForElement(
             startElement,
@@ -100,7 +101,7 @@ export const mutateElbowArrow = (
         )
       : vectorToHeading(pointToVector(startGlobalPoint, endGlobalPoint)),
     endElement
-      ? headingForPointOnElement(
+      ? headingForPointFromElement(
           endElement,
           aabbForElement(
             endElement,
@@ -110,136 +111,86 @@ export const mutateElbowArrow = (
         )
       : vectorToHeading(pointToVector(endGlobalPoint, startGlobalPoint)),
   ];
-
   const bias = Math.max(
-    // TODO: Memoize
-    startElement
-      ? maxBindingGap(startElement, startElement.width, startElement.height)
-      : 0,
-    endElement
-      ? maxBindingGap(endElement, endElement.width, endElement.height)
-      : 0,
+    (startElement &&
+      maxBindingGap(startElement, startElement.width, startElement.height)) ??
+      0,
+    (endElement &&
+      maxBindingGap(endElement, endElement.width, endElement.height)) ??
+      0,
   );
+  const [startBounds, endBounds] = [
+    startElement && aabbForElement(startElement, bias),
+    endElement && aabbForElement(endElement, bias),
+  ];
   const common = commonAABB(
     [
-      startElement
-        ? aabbForElement(startElement, bias)
-        : [
-            startGlobalPoint[0],
-            startGlobalPoint[1],
-            startGlobalPoint[0],
-            startGlobalPoint[1],
-          ],
-      endElement
-        ? aabbForElement(endElement, bias)
-        : [
-            endGlobalPoint[0],
-            endGlobalPoint[1],
-            endGlobalPoint[0],
-            endGlobalPoint[1],
-          ],
+      startBounds,
+      endBounds,
       [
         // Start point
-        startGlobalPoint[0] - 1,
-        startGlobalPoint[1] - 1,
-        startGlobalPoint[0] + 1,
-        startGlobalPoint[1] + 1,
+        startGlobalPoint[0],
+        startGlobalPoint[1],
+        startGlobalPoint[0],
+        startGlobalPoint[1],
       ],
       [
         // End point
-        endGlobalPoint[0] - 1,
-        endGlobalPoint[1] - 1,
-        endGlobalPoint[0] + 1,
-        endGlobalPoint[1] + 1,
+        endGlobalPoint[0],
+        endGlobalPoint[1],
+        endGlobalPoint[0],
+        endGlobalPoint[1],
       ],
     ].filter((x) => x !== null) as Bounds[],
   );
-
-  const aabbZeroOffset = [
-    startElement && aabbForElement(startElement, 0),
-    endElement && aabbForElement(endElement, 0),
-  ];
-  const snapDistanceAABB = [
-    startElement && aabbForElement(startElement, 5 + 20),
-    endElement && aabbForElement(endElement, 5 + 20),
-  ];
-  const extendedZeroOffsetAABB = [
-    startHeading &&
-      aabbZeroOffset[0] &&
-      aabbZeroOffset[1] &&
-      extendedAABB(aabbZeroOffset[0], startHeading, [aabbZeroOffset[1]], 50),
-    endHeading &&
-      aabbZeroOffset[0] &&
-      aabbZeroOffset[1] &&
-      extendedAABB(aabbZeroOffset[1], endHeading, [aabbZeroOffset[0]], 50),
-  ];
-
-  const dynamicAABBs =
-    extendedZeroOffsetAABB[0] &&
-    extendedZeroOffsetAABB[1] &&
-    snapDistanceAABB[0] &&
-    snapDistanceAABB[1] &&
-    generateDynamicAABBs(
-      extendedZeroOffsetAABB[0]
-        ? extendedZeroOffsetAABB[0]
-        : [
-            // Start point
-            startGlobalPoint[0],
-            startGlobalPoint[1],
-            startGlobalPoint[0],
-            startGlobalPoint[1],
-          ],
-      extendedZeroOffsetAABB[1]
-        ? extendedZeroOffsetAABB[1]
-        : [
-            // End point
-            endGlobalPoint[0],
-            endGlobalPoint[1],
-            endGlobalPoint[0],
-            endGlobalPoint[1],
-          ],
-      commonAABB([
-        snapDistanceAABB[0],
-        snapDistanceAABB[1],
-        extendedZeroOffsetAABB[0],
-        extendedZeroOffsetAABB[1],
-      ]),
-    );
-
-  // Canculate Grid positions
-  const grid = calculateGrid(
-    [...(dynamicAABBs ?? [])]
-      .filter((aabb) => aabb !== null)
-      .map((x) => {
-        debugDrawBounds(x!, "green");
-        return x;
-      }) as Bounds[],
-    [common],
-    startGlobalPoint,
-    startHeading ? startHeading : HEADING_RIGHT,
-    endGlobalPoint,
-    endHeading ? endHeading : HEADING_RIGHT,
-    100, // TODO: Is this even needed?
-    [...(extendedZeroOffsetAABB ?? [])]
-      .filter((aabb) => aabb !== null)
-      .map((x) => {
-        debugDrawBounds(x!, "red");
-        return x;
-      }) as Bounds[],
+  const dynamicAABBs = generateDynamicAABBs(
+    startBounds
+      ? startBounds
+      : [
+          // Start point
+          startGlobalPoint[0],
+          startGlobalPoint[1],
+          startGlobalPoint[0],
+          startGlobalPoint[1],
+        ],
+    endBounds
+      ? endBounds
+      : [
+          // End point
+          endGlobalPoint[0],
+          endGlobalPoint[1],
+          endGlobalPoint[0],
+          endGlobalPoint[1],
+        ],
+    common,
   );
-
   const startDonglePosition =
     startHeading &&
     (startElement
-      ? getDonglePosition(startGlobalPoint, startHeading, grid)
+      ? getDonglePosition(dynamicAABBs[0], startHeading, startGlobalPoint)
       : scaleVector(startHeading, -20));
-  const startDongle =
-    startDonglePosition && pointToGridNode(startDonglePosition, grid);
+
   const endDonglePosition =
     endHeading &&
     (endElement
-      ? getDonglePosition(endGlobalPoint, endHeading, grid)
+      ? getDonglePosition(dynamicAABBs[1], endHeading, endGlobalPoint)
       : scaleVector(endHeading, -20));
+
+  const boundingBoxes = [...(dynamicAABBs ?? [])]
+    .filter((aabb) => aabb !== null)
+    .map((x) => {
+      debugDrawBounds(x!, "green");
+      return x;
+    }) as Bounds[];
+  // Canculate Grid positions
+  const grid = calculateGrid(
+    boundingBoxes,
+    startDonglePosition ? startDonglePosition : startGlobalPoint,
+    endDonglePosition ? endDonglePosition : endGlobalPoint,
+    common,
+  );
+  const startDongle =
+    startDonglePosition && pointToGridNode(startDonglePosition, grid);
   const endDongle =
     endDonglePosition && pointToGridNode(endDonglePosition, grid);
 
@@ -260,6 +211,10 @@ export const mutateElbowArrow = (
     grid,
     startHeading ? startHeading : HEADING_RIGHT,
     endHeading ? endHeading : HEADING_RIGHT,
+    [
+      startElement && aabbForElement(startElement),
+      endElement && aabbForElement(endElement),
+    ].filter((aabb) => aabb !== null) as Bounds[],
   );
 
   if (path) {
@@ -270,10 +225,7 @@ export const mutateElbowArrow = (
     const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
     startDongle && points.unshift(startGlobalPoint);
     endDongle && points.push(endGlobalPoint);
-    points.forEach((x) => debugDrawPoint(x));
-    simplifyElbowArrowPoints(points).forEach((x) =>
-      debugDrawPoint(x, "green", true),
-    );
+
     mutateElement(arrow, {
       ...normalizedArrowElementUpdate(
         simplifyElbowArrowPoints(points),
@@ -287,25 +239,27 @@ export const mutateElbowArrow = (
   // grid.data.forEach(
   //   (node) =>
   //     node &&
-  //     debugDrawPoint(
-  //       node.pos,
-  //       `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
-  //         node.addr[1] * (240 / grid.col),
-  //       )}, 255)`,
-  //     ),
+  //     (node.closed
+  //       ? debugDrawPoint(node.pos, "red")
+  //       : debugDrawPoint(
+  //           node.pos,
+  //           `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
+  //             node.addr[1] * (240 / grid.col),
+  //           )}, 255)`,
+  //         )),
   // );
 
   // Debug: Grid visualization
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -317,13 +271,9 @@ const astar = (
   grid: Grid,
   startHeading: Heading,
   endHeading: Heading,
+  aabbs: Bounds[],
 ) => {
-  const targetElbowCount = estimateSegmentCount(
-    start,
-    end,
-    startHeading,
-    endHeading,
-  );
+  const avoidSegments = aabbs.flatMap((aabb) => boundsToLineSegments(aabb));
   const multiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
@@ -368,19 +318,24 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? multiplier : 0);
+        (directionChange ? Math.pow(multiplier, 2) : 0);
 
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
+        const neighborSegment = [current.pos, neighbor.pos] as LineSegment;
+        const intersecting = isAnyTrue(
+          ...avoidSegments.map(
+            (segment) => segmentsIntersectAt(segment, neighborSegment) !== null,
+          ),
+        );
+        intersecting && debugDrawSegments([neighborSegment]);
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
         neighbor.e = elbowCount;
         neighbor.h =
-          m_dist(end.pos, neighbor.pos) +
-          m_dist(neighbor.pos, end.pos) +
-          (targetElbowCount >= elbowCount ? elbowCount * multiplier : Infinity);
+          m_dist(end.addr, neighbor.addr) + (intersecting ? Infinity : 0);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -412,121 +367,6 @@ const pathTo = (start: Node, node: Node) => {
 const m_dist = (a: Point, b: Point) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[0] - b[0]);
 
-const estimateSegmentCount = (
-  start: Node,
-  end: Node,
-  startHeading: Heading,
-  endHeading: Heading,
-) => {
-  if (endHeading === HEADING_RIGHT) {
-    switch (startHeading) {
-      case HEADING_RIGHT: {
-        if (start.pos[0] >= end.pos[0]) {
-          return 4;
-        }
-        if (start.pos[1] === end.pos[1]) {
-          return 0;
-        }
-        return 2;
-      }
-      case HEADING_UP:
-        if (start.pos[1] > end.pos[1] && start.pos[0] < end.pos[0]) {
-          return 1;
-        }
-        return 3;
-      case HEADING_DOWN:
-        if (start.pos[1] < end.pos[1] && start.pos[0] < end.pos[0]) {
-          return 1;
-        }
-        return 3;
-      case HEADING_LEFT:
-        if (start.pos[1] === end.pos[1]) {
-          return 4;
-        }
-        return 2;
-    }
-  } else if (endHeading === HEADING_LEFT) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        if (start.pos[1] === end.pos[1]) {
-          return 4;
-        }
-        return 2;
-      case HEADING_UP:
-        if (start.pos[1] > end.pos[1] && start.pos[0] > end.pos[0]) {
-          return 1;
-        }
-        return 3;
-      case HEADING_DOWN:
-        if (start.pos[1] < end.pos[1] && start.pos[0] > end.pos[0]) {
-          return 1;
-        }
-        return 3;
-      case HEADING_LEFT:
-        if (start.pos[0] <= end.pos[0]) {
-          return 4;
-        }
-        if (start.pos[1] === end.pos[1]) {
-          return 0;
-        }
-        return 2;
-    }
-  } else if (endHeading === HEADING_UP) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        if (start.pos[1] > end.pos[1] && start.pos[0] < end.pos[0]) {
-          return 1;
-        }
-        return 3;
-      case HEADING_UP:
-        if (start.pos[1] >= end.pos[1]) {
-          return 4;
-        }
-        if (start.pos[0] === end.pos[0]) {
-          return 0;
-        }
-        return 2;
-      case HEADING_DOWN:
-        if (start.pos[0] === end.pos[0]) {
-          return 4;
-        }
-        return 2;
-      case HEADING_LEFT:
-        if (start.pos[1] > end.pos[1] && start.pos[0] > end.pos[0]) {
-          return 1;
-        }
-        return 3;
-    }
-  } else if (endHeading === HEADING_DOWN) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        if (start.pos[1] < end.pos[1] && start.pos[0] < end.pos[0]) {
-          return 1;
-        }
-        return 3;
-      case HEADING_UP:
-        if (start.pos[0] === end.pos[0]) {
-          return 4;
-        }
-        return 2;
-      case HEADING_DOWN:
-        if (start.pos[1] <= end.pos[1]) {
-          return 4;
-        }
-        if (start.pos[0] === end.pos[0]) {
-          return 0;
-        }
-        return 2;
-      case HEADING_LEFT:
-        if (start.pos[1] < end.pos[1] && start.pos[0] > end.pos[0]) {
-          return 1;
-        }
-        return 3;
-    }
-  }
-  return 0;
-};
-
 const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
@@ -554,68 +394,33 @@ const generateDynamicAABBs = (
  */
 const calculateGrid = (
   aabbs: Bounds[],
-  additionalAabbs: Bounds[],
   start: Point,
-  startHeading: Heading | null,
   end: Point,
-  endHeading: Heading | null,
-  offset: number,
-  additionalExclusionAABBs: Bounds[] = [],
+  common: Bounds,
 ): Grid => {
   const horizontal = new Set<number>();
   const vertical = new Set<number>();
+
+  horizontal.add(start[0]);
+  vertical.add(start[1]);
+  horizontal.add(end[0]);
+  vertical.add(end[1]);
 
   aabbs.forEach((aabb) => {
     horizontal.add(aabb[0]);
     horizontal.add(aabb[2]);
     vertical.add(aabb[1]);
     vertical.add(aabb[3]);
+    // horizontal.add((aabb[2] + aabb[0]) / 2);
+    // vertical.add((aabb[1] + aabb[3]) / 2);
   });
 
-  // Binding points are also nodes
-  if (startHeading) {
-    // if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
-    //   horizontal.add(start[0]);
-    // } else {
-    //   vertical.add(start[1]);
-    // }
-    vertical.add(start[1]);
-    horizontal.add(start[0]);
-  }
-  if (endHeading) {
-    vertical.add(end[1]);
-    horizontal.add(end[0]);
-    // if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
-    //   horizontal.add(end[0]);
-    // } else {
-    //   vertical.add(end[1]);
-    // }
-  }
-
-  // Add halfway points as well
-  const verticalSorted = Array.from(vertical).sort((a, b) => a - b);
-  const horizontalSorted = Array.from(horizontal).sort((a, b) => a - b);
-  for (let i = 0; i < verticalSorted.length - 1; i++) {
-    const v = verticalSorted[i];
-    const v2 = verticalSorted[i + 1] ?? 0;
-    if (v2 - v > offset) {
-      vertical.add((v + v2) / 2);
-    }
-  }
-  for (let i = 0; i < horizontalSorted.length - 1; i++) {
-    const h = horizontalSorted[i];
-    const h2 = horizontalSorted[i + 1];
-    if (h2 - h > offset) {
-      horizontal.add((h + h2) / 2);
-    }
-  }
-
-  additionalAabbs.forEach((aabb) => {
-    horizontal.add(aabb[0]);
-    horizontal.add(aabb[2]);
-    vertical.add(aabb[1]);
-    vertical.add(aabb[3]);
-  });
+  horizontal.add(common[0]);
+  horizontal.add(common[2]);
+  vertical.add(common[1]);
+  vertical.add(common[3]);
+  horizontal.add((common[2] + common[0]) / 2);
+  vertical.add((common[3] + common[1]) / 2);
 
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
@@ -639,172 +444,269 @@ const calculateGrid = (
           }),
         ),
       )
-      .map((node) =>
-        Math.max(
-          ...aabbs.map((aabb) =>
-            //pointInsideBounds(node.pos, aabb) ? 1 : 0
-            pointInsideBounds(node.pos, aabb) ? 1 : 0,
-          ),
-        ) <= 0
-          ? node
-          : null,
-      )
-      .map((node) =>
-        node &&
-        Math.max(
-          ...additionalExclusionAABBs.map(
-            (aabb) => (pointInsideBounds(node.pos, aabb) ? 1 : 0),
-            //(aabb) => (pointInsideOrOnBounds(node.pos, aabb) ? 1 : 0),
-          ),
-        ) <= 0
-          ? node
-          : null,
-      ),
+      // .map((node) => {
+      //   const valid = isAnyTrue(
+      //     ...aabbs.map((aabb) => {
+      //       const corner =
+      //         (aabb[0] === node.pos[0] && aabb[1] === node.pos[1]) ||
+      //         (aabb[2] === node.pos[0] && aabb[1] === node.pos[1]) ||
+      //         (aabb[2] === node.pos[0] && aabb[3] === node.pos[1]) ||
+      //         (aabb[0] === node.pos[0] && aabb[3] === node.pos[1]);
+      //       const startPoint =
+      //         start[0] === node.pos[0] && start[1] === node.pos[1];
+      //       const endPoint = end[0] === node.pos[0] && end[1] === node.pos[1];
+
+      //       return corner || startPoint || endPoint;
+      //     }),
+      //   );
+      //   node.closed = !valid;
+      //   return node;
+      // })
+      .map((node) => {
+        const valid =
+          start[0] === node.pos[0] ||
+          start[1] === node.pos[1] ||
+          end[0] === node.pos[0] ||
+          end[1] === node.pos[1] ||
+          isAnyTrue(
+            ...aabbs
+              .map(boundsToLineSegments)
+              .flatMap((segments) =>
+                segments.map((segment) => isPointOnLine(segment, node.pos)),
+              ),
+          );
+        node.closed = !valid;
+        return node;
+      })
+      .map((node) => {
+        const invalid = isAnyTrue(
+          ...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)),
+        );
+
+        node.closed = invalid;
+        return node;
+      })
+      .map((node) => {
+        node.closed
+          ? debugDrawPoint(node.pos, "red")
+          : debugDrawPoint(node.pos, "green");
+        return node;
+      }),
   };
 };
 
-/**
- * Create a dynamically resizing bounding box for the given heading
- */
-const extendedAABB = (
-  aabb: Bounds,
+const isAnyTrue = (...args: boolean[]): boolean =>
+  Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
+
+const boundsToLineSegments = (bounds: Bounds): LineSegment[] => [
+  [
+    [bounds[0], bounds[1]],
+    [bounds[2], bounds[1]],
+  ],
+  [
+    [bounds[2], bounds[1]],
+    [bounds[2], bounds[3]],
+  ],
+  [
+    [bounds[2], bounds[3]],
+    [bounds[0], bounds[3]],
+  ],
+  [
+    [bounds[0], bounds[3]],
+    [bounds[0], bounds[1]],
+  ],
+];
+
+const getDonglePosition = (
+  bounds: Bounds,
   heading: Heading,
-  avoidBounds: Bounds[],
-  maxOffset: number = 50,
-): Bounds | null => {
+  point: Point,
+): Point => {
   switch (heading) {
     case HEADING_UP:
-      const extendedY0 = [
-        aabb[0],
-        aabb[1] - maxOffset,
-        aabb[2],
-        aabb[1],
-      ] as Bounds;
-      const y0 = Math.max(
-        ...avoidBounds.map((bounds) => {
-          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-          const avoidTopRight = [bounds[2], bounds[1]] as Point;
-          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
-
-          return Math.max(
-            pointInsideOrOnBounds(avoidTopLeft, extendedY0)
-              ? avoidTopLeft[1]
-              : extendedY0[1],
-            pointInsideOrOnBounds(avoidTopRight, extendedY0)
-              ? avoidTopRight[1]
-              : extendedY0[1],
-            pointInsideOrOnBounds(avoidBottomRight, extendedY0)
-              ? avoidBottomRight[1]
-              : extendedY0[1],
-            pointInsideOrOnBounds(avoidBottomLeft, extendedY0)
-              ? avoidBottomLeft[1]
-              : extendedY0[1],
-          );
-        }),
-      );
-
-      return [aabb[0], (aabb[1] + y0) / 2 + 1, aabb[2], aabb[3]] as Bounds;
+      return [point[0], bounds[1]];
     case HEADING_RIGHT:
-      const extendedX1 = [
-        aabb[2],
-        aabb[1],
-        aabb[2] + maxOffset,
-        aabb[3],
-      ] as Bounds;
-      const x1 = Math.min(
-        ...avoidBounds.map((bounds) => {
-          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-          const avoidTopRight = [bounds[2], bounds[1]] as Point;
-          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
-
-          return Math.min(
-            pointInsideOrOnBounds(avoidTopLeft, extendedX1)
-              ? avoidTopLeft[0]
-              : extendedX1[2],
-            pointInsideOrOnBounds(avoidTopRight, extendedX1)
-              ? avoidTopRight[0]
-              : extendedX1[2],
-            pointInsideOrOnBounds(avoidBottomRight, extendedX1)
-              ? avoidBottomRight[0]
-              : extendedX1[2],
-            pointInsideOrOnBounds(avoidBottomLeft, extendedX1)
-              ? avoidBottomLeft[0]
-              : extendedX1[2],
-          );
-        }),
-      );
-
-      return [aabb[0], aabb[1], (x1 + aabb[2]) / 2 - 1, aabb[3]] as Bounds;
+      return [bounds[2], point[1]];
     case HEADING_DOWN:
-      const extendedY1 = [
-        aabb[0],
-        aabb[3],
-        aabb[2],
-        aabb[3] + maxOffset,
-      ] as Bounds;
-      const y1 = Math.min(
-        ...avoidBounds.map((bounds) => {
-          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-          const avoidTopRight = [bounds[2], bounds[1]] as Point;
-          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+      return [point[0], bounds[3]];
+  }
+  return [bounds[0], point[1]];
+};
 
-          return Math.min(
-            pointInsideOrOnBounds(avoidTopLeft, extendedY1)
-              ? avoidTopLeft[1]
-              : extendedY1[3],
-            pointInsideOrOnBounds(avoidTopRight, extendedY1)
-              ? avoidTopRight[1]
-              : extendedY1[3],
-            pointInsideOrOnBounds(avoidBottomRight, extendedY1)
-              ? avoidBottomRight[1]
-              : extendedY1[3],
-            pointInsideOrOnBounds(avoidBottomLeft, extendedY1)
-              ? avoidBottomLeft[1]
-              : extendedY1[3],
-          );
-        }),
-      );
+export const segmentsIntersectAt = (
+  a: Readonly<LineSegment>,
+  b: Readonly<LineSegment>,
+): Point | null => {
+  const r = subtractVectors(a[1], a[0]);
+  const s = subtractVectors(b[1], b[0]);
+  const denominator = crossProduct(r, s);
 
-      return [aabb[0], aabb[1], aabb[2], (y1 + aabb[3]) / 2 - 1] as Bounds;
-    case HEADING_LEFT:
-      const extendedX0 = [
-        aabb[0] - maxOffset,
-        aabb[1],
-        aabb[0],
-        aabb[3],
-      ] as Bounds;
-      const x0 = Math.max(
-        ...avoidBounds.map((bounds) => {
-          const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-          const avoidTopRight = [bounds[2], bounds[1]] as Point;
-          const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-          const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+  if (denominator === 0) {
+    return null;
+  }
 
-          return Math.max(
-            pointInsideOrOnBounds(avoidTopLeft, extendedX0)
-              ? avoidTopLeft[0]
-              : extendedX0[0],
-            pointInsideOrOnBounds(avoidTopRight, extendedX0)
-              ? avoidTopRight[0]
-              : extendedX0[0],
-            pointInsideOrOnBounds(avoidBottomRight, extendedX0)
-              ? avoidBottomRight[0]
-              : extendedX0[0],
-            pointInsideOrOnBounds(avoidBottomLeft, extendedX0)
-              ? avoidBottomLeft[0]
-              : extendedX0[0],
-          );
-        }),
-      );
+  const i = subtractVectors(b[0], a[0]);
+  const u = crossProduct(i, r) / denominator;
+  const t = crossProduct(i, s) / denominator;
 
-      return [(x0 + aabb[0]) / 2 + 1, aabb[1], aabb[2], aabb[3]] as Bounds;
+  if (u === 0) {
+    return null;
+  }
+
+  const p = addVectors(a[0], scaleVector(r, t));
+
+  if (t > 0 && t < 1 && u > 0 && u < 1) {
+    return p;
   }
 
   return null;
 };
+
+export const crossProduct = (a: Point, b: Point): number =>
+  a[0] * b[1] - a[1] * b[0];
+
+/**
+ * Create a dynamically resizing bounding box for the given heading
+ */
+// const extendedAABB = (
+//   aabb: Bounds,
+//   heading: Heading,
+//   avoidBounds: Bounds[],
+//   maxOffset: number = 50,
+// ): Bounds | null => {
+//   switch (heading) {
+//     case HEADING_UP:
+//       const extendedY0 = [
+//         aabb[0],
+//         aabb[1] - maxOffset,
+//         aabb[2],
+//         aabb[1],
+//       ] as Bounds;
+//       const y0 = Math.max(
+//         ...avoidBounds.map((bounds) => {
+//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
+//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+//           return Math.max(
+//             pointInsideOrOnBounds(avoidTopLeft, extendedY0)
+//               ? avoidTopLeft[1]
+//               : extendedY0[1],
+//             pointInsideOrOnBounds(avoidTopRight, extendedY0)
+//               ? avoidTopRight[1]
+//               : extendedY0[1],
+//             pointInsideOrOnBounds(avoidBottomRight, extendedY0)
+//               ? avoidBottomRight[1]
+//               : extendedY0[1],
+//             pointInsideOrOnBounds(avoidBottomLeft, extendedY0)
+//               ? avoidBottomLeft[1]
+//               : extendedY0[1],
+//           );
+//         }),
+//       );
+
+//       return [aabb[0], (aabb[1] + y0) / 2 + 1, aabb[2], aabb[3]] as Bounds;
+//     case HEADING_RIGHT:
+//       const extendedX1 = [
+//         aabb[2],
+//         aabb[1],
+//         aabb[2] + maxOffset,
+//         aabb[3],
+//       ] as Bounds;
+//       const x1 = Math.min(
+//         ...avoidBounds.map((bounds) => {
+//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
+//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+//           return Math.min(
+//             pointInsideOrOnBounds(avoidTopLeft, extendedX1)
+//               ? avoidTopLeft[0]
+//               : extendedX1[2],
+//             pointInsideOrOnBounds(avoidTopRight, extendedX1)
+//               ? avoidTopRight[0]
+//               : extendedX1[2],
+//             pointInsideOrOnBounds(avoidBottomRight, extendedX1)
+//               ? avoidBottomRight[0]
+//               : extendedX1[2],
+//             pointInsideOrOnBounds(avoidBottomLeft, extendedX1)
+//               ? avoidBottomLeft[0]
+//               : extendedX1[2],
+//           );
+//         }),
+//       );
+
+//       return [aabb[0], aabb[1], (x1 + aabb[2]) / 2 - 1, aabb[3]] as Bounds;
+//     case HEADING_DOWN:
+//       const extendedY1 = [
+//         aabb[0],
+//         aabb[3],
+//         aabb[2],
+//         aabb[3] + maxOffset,
+//       ] as Bounds;
+//       const y1 = Math.min(
+//         ...avoidBounds.map((bounds) => {
+//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
+//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+//           return Math.min(
+//             pointInsideOrOnBounds(avoidTopLeft, extendedY1)
+//               ? avoidTopLeft[1]
+//               : extendedY1[3],
+//             pointInsideOrOnBounds(avoidTopRight, extendedY1)
+//               ? avoidTopRight[1]
+//               : extendedY1[3],
+//             pointInsideOrOnBounds(avoidBottomRight, extendedY1)
+//               ? avoidBottomRight[1]
+//               : extendedY1[3],
+//             pointInsideOrOnBounds(avoidBottomLeft, extendedY1)
+//               ? avoidBottomLeft[1]
+//               : extendedY1[3],
+//           );
+//         }),
+//       );
+
+//       return [aabb[0], aabb[1], aabb[2], (y1 + aabb[3]) / 2 - 1] as Bounds;
+//     case HEADING_LEFT:
+//       const extendedX0 = [
+//         aabb[0] - maxOffset,
+//         aabb[1],
+//         aabb[0],
+//         aabb[3],
+//       ] as Bounds;
+//       const x0 = Math.max(
+//         ...avoidBounds.map((bounds) => {
+//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
+//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
+//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
+//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
+
+//           return Math.max(
+//             pointInsideOrOnBounds(avoidTopLeft, extendedX0)
+//               ? avoidTopLeft[0]
+//               : extendedX0[0],
+//             pointInsideOrOnBounds(avoidTopRight, extendedX0)
+//               ? avoidTopRight[0]
+//               : extendedX0[0],
+//             pointInsideOrOnBounds(avoidBottomRight, extendedX0)
+//               ? avoidBottomRight[0]
+//               : extendedX0[0],
+//             pointInsideOrOnBounds(avoidBottomLeft, extendedX0)
+//               ? avoidBottomLeft[0]
+//               : extendedX0[0],
+//           );
+//         }),
+//       );
+
+//       return [(x0 + aabb[0]) / 2 + 1, aabb[1], aabb[2], aabb[3]] as Bounds;
+//   }
+
+//   return null;
+// };
 
 /**
  * Get neighboring points for a gived grid address
@@ -828,52 +730,52 @@ const gridNodeFromAddr = (
   return grid.data[row * grid.col + col] ?? null;
 };
 
-const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
-  switch (heading) {
-    case HEADING_UP:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] < p[1])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[1] > closest[1] ? node.pos : closest,
-            [p[0], -Infinity] as Point,
-          ) ?? p
-      );
-    case HEADING_DOWN:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[0] === p[0] && node.pos[1] > p[1])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[1] < closest[1] ? node.pos : closest,
-            [p[0], Infinity] as Point,
-          ) ?? p
-      );
-    case HEADING_LEFT:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] < p[0])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[0] > closest[0] ? node.pos : closest,
-            [-Infinity, p[1]] as Point,
-          ) ?? p
-      );
-    case HEADING_RIGHT:
-      return (
-        grid.data
-          .filter((node) => node && node.pos[1] === p[1] && node.pos[0] > p[0])
-          .reduce(
-            (closest, node) =>
-              node && node.pos[0] < closest[0] ? node.pos : closest,
-            [Infinity, p[1]] as Point,
-          ) ?? p
-      );
-  }
+// const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
+//   switch (heading) {
+//     case HEADING_UP:
+//       return (
+//         grid.data
+//           .filter((node) => node && node.pos[0] === p[0] && node.pos[1] < p[1])
+//           .reduce(
+//             (closest, node) =>
+//               node && node.pos[1] > closest[1] ? node.pos : closest,
+//             [p[0], -Infinity] as Point,
+//           ) ?? p
+//       );
+//     case HEADING_DOWN:
+//       return (
+//         grid.data
+//           .filter((node) => node && node.pos[0] === p[0] && node.pos[1] > p[1])
+//           .reduce(
+//             (closest, node) =>
+//               node && node.pos[1] < closest[1] ? node.pos : closest,
+//             [p[0], Infinity] as Point,
+//           ) ?? p
+//       );
+//     case HEADING_LEFT:
+//       return (
+//         grid.data
+//           .filter((node) => node && node.pos[1] === p[1] && node.pos[0] < p[0])
+//           .reduce(
+//             (closest, node) =>
+//               node && node.pos[0] > closest[0] ? node.pos : closest,
+//             [-Infinity, p[1]] as Point,
+//           ) ?? p
+//       );
+//     case HEADING_RIGHT:
+//       return (
+//         grid.data
+//           .filter((node) => node && node.pos[1] === p[1] && node.pos[0] > p[0])
+//           .reduce(
+//             (closest, node) =>
+//               node && node.pos[0] < closest[0] ? node.pos : closest,
+//             [Infinity, p[1]] as Point,
+//           ) ?? p
+//       );
+//   }
 
-  return p;
-};
+//   return p;
+// };
 
 /**
  * Get node for global point on canvas (if exists)
@@ -952,11 +854,11 @@ const aabbForElement = (element: ExcalidrawElement, offset?: number) => {
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
-const headingForPointOnElement = (
+const headingForPointFromElement = (
   element: ExcalidrawBindableElement,
   aabb: Bounds,
   point: Point,
-): Heading | null => {
+): Heading => {
   const SEARCH_CONE_MULTIPLIER = 2;
 
   const midPoint = getCenterForBounds(aabb);

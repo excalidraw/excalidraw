@@ -16,8 +16,20 @@ const DEFAULT_THRESHOLD = 10e-5;
  */
 
 // the two vectors are ao and bo
-export const cross = (a: Point, b: Point, o: Point) => {
+export const cross = (
+  a: Readonly<Point>,
+  b: Readonly<Point>,
+  o: Readonly<Point>,
+) => {
   return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+};
+
+export const dot = (
+  a: Readonly<Point>,
+  b: Readonly<Point>,
+  o: Readonly<Point>,
+) => {
+  return (a[0] - o[0]) * (b[0] - o[0]) + (a[1] - o[1]) * (b[1] - o[1]);
 };
 
 export const isClosed = (polygon: Polygon) => {
