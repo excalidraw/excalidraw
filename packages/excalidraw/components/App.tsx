@@ -7518,12 +7518,19 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          this.setState({
-            suggestedBindings: getSuggestedBindingsForArrows(
-              selectedElements,
-              this.scene,
-            ),
-          });
+          if (
+            selectedElements.length !== 1 ||
+            !isArrowElement(selectedElements[0]) ||
+            !pointerDownState.drag.hasOccurred ||
+            !!this.state.editingLinearElement
+          ) {
+            this.setState({
+              suggestedBindings: getSuggestedBindingsForArrows(
+                selectedElements,
+                this.scene,
+              ),
+            });
+          }
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {

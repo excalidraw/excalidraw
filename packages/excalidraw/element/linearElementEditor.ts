@@ -70,6 +70,7 @@ export class LinearElementEditor {
     prevSelectedPointsIndices: readonly number[] | null;
     /** index */
     lastClickedPoint: number;
+    lastClickedIsEndPoint: boolean;
     origin: Readonly<{ x: number; y: number }> | null;
     segmentMidpoint: {
       value: Point | null;
@@ -105,6 +106,7 @@ export class LinearElementEditor {
     this.pointerDownState = {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
+      lastClickedIsEndPoint: false,
       origin: null,
 
       segmentMidpoint: {
@@ -165,8 +167,8 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    const nextSelectedPoints = pointsSceneCoords.reduce(
-      (acc: number[], point, index) => {
+    const nextSelectedPoints = pointsSceneCoords
+      .reduce((acc: number[], point, index) => {
         if (
           (point[0] >= selectionX1 &&
             point[0] <= selectionX2 &&
@@ -178,9 +180,18 @@ export class LinearElementEditor {
         }
 
         return acc;
-      },
-      [],
-    );
+      }, [])
+      .filter((index) => {
+        if (
+          isArrowElement(element) &&
+          element.elbowed &&
+          index !== 0 &&
+          index !== element.points.length - 1
+        ) {
+          return false;
+        }
+        return true;
+      });
 
     setState({
       editingLinearElement: {
@@ -212,6 +223,15 @@ export class LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
+      return false;
+    }
+
+    if (
+      isArrowElement(element) &&
+      element.elbowed &&
+      !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
+      linearElementEditor.pointerDownState.lastClickedPoint !== 0
+    ) {
       return false;
     }
 
@@ -742,6 +762,7 @@ export class LinearElementEditor {
         pointerDownState: {
           prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
+          lastClickedIsEndPoint: false,
           origin: { x: scenePointer.x, y: scenePointer.y },
           segmentMidpoint: {
             value: segmentMidpoint,
@@ -814,6 +835,7 @@ export class LinearElementEditor {
       pointerDownState: {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
+        lastClickedIsEndPoint: clickedPointIndex === element.points.length - 1,
         origin: { x: scenePointer.x, y: scenePointer.y },
         segmentMidpoint: {
           value: segmentMidpoint,

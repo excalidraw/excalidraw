@@ -230,8 +230,7 @@ export const mutateElbowArrow = (
 
     mutateElement(arrow, {
       ...normalizedArrowElementUpdate(
-        //simplifyElbowArrowPoints(points),
-        points,
+        simplifyElbowArrowPoints(points),
         offset[0],
         offset[1],
       ),
@@ -338,7 +337,7 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? directionCost : 0);
+        (directionChange ? directionCost * 0.2 : 0);
 
       const beenVisited = neighbor.visited;
 

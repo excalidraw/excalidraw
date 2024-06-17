@@ -476,6 +476,16 @@ const renderLinearPointHandles = (
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
   points.forEach((point, idx) => {
+    if (
+      isArrowElement(element) &&
+      element.elbowed &&
+      (element.startBinding || element.endBinding) &&
+      idx !== 0 &&
+      idx !== points.length - 1
+    ) {
+      return;
+    }
+
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
@@ -729,7 +739,8 @@ const _renderInteractiveScene = ({
 
   if (
     appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0
+    appState.selectedLinearElement.hoverPointIndex >= 0 &&
+    (!isArrowElement(selectedElements[0]) || !selectedElements[0].elbowed)
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
   }
