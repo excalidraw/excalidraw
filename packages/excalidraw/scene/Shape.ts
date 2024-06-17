@@ -22,6 +22,7 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
+import { getTrianglePoints } from "../element/bounds";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -337,8 +338,10 @@ export const _generateElementShape = (
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 
-      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-        getDiamondPoints(element);
+      // const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+      //   getDiamondPoints(element);
+      const [topX, topY, rightX, rightY, leftX, leftY] =
+        getTrianglePoints(element);
       if (element.roundness) {
         const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
 
@@ -348,32 +351,36 @@ export const _generateElementShape = (
         );
 
         shape = generator.path(
-          `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
-            rightX - verticalRadius
-          } ${rightY - horizontalRadius}
-            C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
-            rightX - verticalRadius
-          } ${rightY + horizontalRadius}
-            L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
-            C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
-            bottomX - verticalRadius
-          } ${bottomY - horizontalRadius}
-            L ${leftX + verticalRadius} ${leftY + horizontalRadius}
-            C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
-            leftY - horizontalRadius
-          }
-            L ${topX - verticalRadius} ${topY + horizontalRadius}
-            C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
-            topY + horizontalRadius
-          }`,
+          `M ${topX} ${topY} L ${rightX} ${rightY} L ${leftX} ${leftY} Z`,
           generateRoughOptions(element, true),
         );
+        // shape = generator.path(
+        //   `M ${topX + verticalRadius} ${topY + horizontalRadius} L ${
+        //     rightX - verticalRadius
+        //   } ${rightY - horizontalRadius}
+        //     C ${rightX} ${rightY}, ${rightX} ${rightY}, ${
+        //     rightX - verticalRadius
+        //   } ${rightY + horizontalRadius}
+        //     L ${bottomX + verticalRadius} ${bottomY - horizontalRadius}
+        //     C ${bottomX} ${bottomY}, ${bottomX} ${bottomY}, ${
+        //     bottomX - verticalRadius
+        //   } ${bottomY - horizontalRadius}
+        //     L ${leftX + verticalRadius} ${leftY + horizontalRadius}
+        //     C ${leftX} ${leftY}, ${leftX} ${leftY}, ${leftX + verticalRadius} ${
+        //     leftY - horizontalRadius
+        //   }
+        //     L ${topX - verticalRadius} ${topY + horizontalRadius}
+        //     C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
+        //     topY + horizontalRadius
+        //   }`,
+        //   generateRoughOptions(element, true),
+        // );
       } else {
         shape = generator.polygon(
           [
             [topX, topY],
             [rightX, rightY],
-            [bottomX, bottomY],
+            // [bottomX, bottomY],
             [leftX, leftY],
           ],
           generateRoughOptions(element),

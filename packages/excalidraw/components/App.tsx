@@ -687,6 +687,8 @@ class App extends React.Component<AppProps, AppState> {
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
           clear: this.resetHistory,
+          isRedoStackEmpty: this.history.isRedoStackEmpty,
+          isUndoStackEmpty: this.history.isUndoStackEmpty,
         },
         scrollToContent: this.scrollToContent,
         getSceneElements: this.getSceneElements,
@@ -4126,7 +4128,7 @@ class App extends React.Component<AppProps, AppState> {
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
       ) {
-        jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+        // jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
       }
 
       // eye dropper

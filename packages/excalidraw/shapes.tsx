@@ -9,6 +9,7 @@ import {
   RectangleIcon,
   SelectionIcon,
   TextIcon,
+  TriangleIcon,
 } from "./components/icons";
 import { KEYS } from "./keys";
 
@@ -28,7 +29,7 @@ export const SHAPES = [
     fillable: true,
   },
   {
-    icon: DiamondIcon,
+    icon: TriangleIcon,
     value: "diamond",
     key: KEYS.D,
     numericKey: KEYS["3"],

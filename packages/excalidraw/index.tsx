@@ -17,7 +17,6 @@ import Footer from "./components/footer/FooterCenter";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
-
 polyfill();
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
@@ -284,3 +283,10 @@ export {
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
 } from "../utils/withinBounds";
+export type {
+  ActiveTool,
+  AppState,
+  ExcalidrawImperativeAPI,
+  ExcalidrawInitialDataState,
+} from "./types";
+export type { ExcalidrawElement } from "./element/types";

@@ -298,6 +298,15 @@ export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
     boxSceneCoords.y + boxSceneCoords.height / 2,
   ];
 };
+export const getTrianglePoints = (element: ExcalidrawElement) => {
+  const topX = 0;
+  const topY = 0;
+  const rightX = element.width;
+  const rightY = element.height;
+  const leftX = 0;
+  const leftY = element.height;
+  return [topX, topY, rightX, rightY, leftX, leftY];
+};
 
 export const getDiamondPoints = (element: ExcalidrawElement) => {
   // Here we add +1 to avoid these numbers to be 0
@@ -310,7 +319,6 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   const bottomY = element.height;
   const leftX = 0;
   const leftY = rightY;
-
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 };
 

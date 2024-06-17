@@ -122,9 +122,9 @@ import {
 } from "../packages/excalidraw/components/icons";
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 
-polyfill();
+// polyfill();
 
-window.EXCALIDRAW_THROTTLE_RENDER = true;
+// window.EXCALIDRAW_THROTTLE_RENDER = true;
 
 declare global {
   interface BeforeInstallPromptEventChoiceResult {
@@ -148,15 +148,15 @@ let pwaEvent: BeforeInstallPromptEvent | null = null;
 //
 // Also note that it will fire only if certain heuristics are met (user has
 // used the app for some time, etc.)
-window.addEventListener(
-  "beforeinstallprompt",
-  (event: BeforeInstallPromptEvent) => {
-    // prevent Chrome <= 67 from automatically showing the prompt
-    event.preventDefault();
-    // cache for later use
-    pwaEvent = event;
-  },
-);
+// window.addEventListener(
+//   "beforeinstallprompt",
+//   (event: BeforeInstallPromptEvent) => {
+//     // prevent Chrome <= 67 from automatically showing the prompt
+//     event.preventDefault();
+//     // cache for later use
+//     pwaEvent = event;
+//   },
+// );
 
 let isSelfEmbedding = false;
 
@@ -375,7 +375,6 @@ const ExcalidrawWrapper = () => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
     }
-
     const loadImages = (
       data: ResolutionType<typeof initializeScene>,
       isInitialLoad = false,
@@ -444,7 +443,8 @@ const ExcalidrawWrapper = () => {
     };
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
-      loadImages(data, /* isInitialLoad */ true);
+      // loadImages(data, /* isInitialLoad */ true);
+      console.log(data);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
@@ -459,7 +459,7 @@ const ExcalidrawWrapper = () => {
           collabAPI.stopCollaboration(false);
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
-
+        console.log("Đasa");
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
@@ -771,9 +771,9 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        excalidrawAPI={excalidrawRefCallback}
-        onChange={onChange}
-        initialData={initialStatePromiseRef.current.promise}
+        // excalidrawAPI={excalidrawRefCallback}
+        // onChange={onChange}
+        // initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
@@ -809,7 +809,7 @@ const ExcalidrawWrapper = () => {
           },
         }}
         langCode={langCode}
-        renderCustomStats={renderCustomStats}
+        // renderCustomStats={renderCustomStats}
         detectScroll={false}
         handleKeyboardGlobally={true}
         autoFocus={true}
@@ -1157,9 +1157,10 @@ const ExcalidrawWrapper = () => {
 const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
-      <Provider unstable_createStore={() => appJotaiStore}>
-        <ExcalidrawWrapper />
-      </Provider>
+      {/* <Provider unstable_createStore={() => appJotaiStore}> */}
+      {/* <ExcalidrawWrapper /> */}
+      {/* </Provider> */}
+      <Excalidraw />
     </TopErrorBoundary>
   );
 };

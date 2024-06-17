@@ -22,7 +22,7 @@ export const ActiveConfirmDialog = () => {
     return (
       <ConfirmDialog
         onConfirm={() => {
-          actionManager.executeAction(actionClearCanvas);
+          // actionManager.executeAction(actionClearCanvas);
           setActiveConfirmDialog(null);
         }}
         onCancel={() => setActiveConfirmDialog(null)}

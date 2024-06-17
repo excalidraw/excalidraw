@@ -43,7 +43,7 @@ import { InlineIcon } from "../InlineIcon";
 import { SHAPES } from "../../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
-import { actionClearCanvas, actionLink } from "../../actions";
+import { actionLink } from "../../actions";
 import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import type { CommandPaletteItem } from "./types";
@@ -327,19 +327,19 @@ function CommandPaletteInner({
       commandsFromActions = [
         ...elementsCommands,
         ...editorCommands,
-        {
-          label: getActionLabel(actionClearCanvas),
-          icon: getActionIcon(actionClearCanvas),
-          shortcut: getShortcutFromShortcutName(
-            actionClearCanvas.name as ShortcutName,
-          ),
-          category: DEFAULT_CATEGORIES.editor,
-          keywords: ["delete", "destroy"],
-          viewMode: false,
-          perform: () => {
-            jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
-          },
-        },
+        // {
+        //   label: getActionLabel(actionClearCanvas),
+        //   icon: getActionIcon(actionClearCanvas),
+        //   shortcut: getShortcutFromShortcutName(
+        //     actionClearCanvas.name as ShortcutName,
+        //   ),
+        //   category: DEFAULT_CATEGORIES.editor,
+        //   keywords: ["delete", "destroy"],
+        //   viewMode: false,
+        //   perform: () => {
+        //     jotaiStore.set(activeConfirmDialogAtom, "clearCanvas");
+        //   },
+        // },
         {
           label: t("buttons.exportImage"),
           category: DEFAULT_CATEGORIES.export,
