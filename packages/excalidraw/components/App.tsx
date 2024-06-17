@@ -2135,95 +2135,96 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private syncActionResult = withBatchedUpdates(
-    (actionResult: ActionResult) => {
-      if (this.unmounted || actionResult === false) {
-        return;
+  public syncActionResult = withBatchedUpdates((actionResult: ActionResult) => {
+    if (this.unmounted || actionResult === false) {
+      return;
+    }
+
+    if (actionResult.storeAction === StoreAction.UPDATE) {
+      this.store.shouldUpdateSnapshot();
+    } else if (actionResult.storeAction === StoreAction.CAPTURE) {
+      this.store.shouldCaptureIncrement();
+    }
+
+    let didUpdate = false;
+
+    let editingElement: AppState["editingElement"] | null = null;
+    if (actionResult.elements) {
+      actionResult.elements.forEach((element) => {
+        if (
+          this.state.editingElement?.id === element.id &&
+          this.state.editingElement !== element &&
+          isNonDeletedElement(element)
+        ) {
+          editingElement = element;
+        }
+      });
+
+      this.scene.replaceAllElements(actionResult.elements);
+      didUpdate = true;
+    }
+
+    if (actionResult.files) {
+      this.files = actionResult.replaceFiles
+        ? actionResult.files
+        : { ...this.files, ...actionResult.files };
+      this.addNewImagesToImageCache();
+    }
+
+    if (actionResult.appState || editingElement || this.state.contextMenu) {
+      let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
+      let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
+      let gridSize = actionResult?.appState?.gridSize || null;
+      const theme =
+        actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
+      const name = actionResult?.appState?.name ?? this.state.name;
+      const errorMessage =
+        actionResult?.appState?.errorMessage ?? this.state.errorMessage;
+      if (typeof this.props.viewModeEnabled !== "undefined") {
+        viewModeEnabled = this.props.viewModeEnabled;
       }
 
-      let editingElement: AppState["editingElement"] | null = null;
-      if (actionResult.elements) {
-        actionResult.elements.forEach((element) => {
-          if (
-            this.state.editingElement?.id === element.id &&
-            this.state.editingElement !== element &&
-            isNonDeletedElement(element)
-          ) {
-            editingElement = element;
-          }
+      if (typeof this.props.zenModeEnabled !== "undefined") {
+        zenModeEnabled = this.props.zenModeEnabled;
+      }
+
+      if (typeof this.props.gridModeEnabled !== "undefined") {
+        gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+      }
+
+      editingElement =
+        editingElement || actionResult.appState?.editingElement || null;
+
+      if (editingElement?.isDeleted) {
+        editingElement = null;
+      }
+
+      this.setState((state) => {
+        // using Object.assign instead of spread to fool TS 4.2.2+ into
+        // regarding the resulting type as not containing undefined
+        // (which the following expression will never contain)
+        return Object.assign(actionResult.appState || {}, {
+          // NOTE this will prevent opening context menu using an action
+          // or programmatically from the host, so it will need to be
+          // rewritten later
+          contextMenu: null,
+          editingElement,
+          viewModeEnabled,
+          zenModeEnabled,
+          gridSize,
+          theme,
+          name,
+          errorMessage,
         });
+      });
 
-        if (actionResult.storeAction === StoreAction.UPDATE) {
-          this.store.shouldUpdateSnapshot();
-        } else if (actionResult.storeAction === StoreAction.CAPTURE) {
-          this.store.shouldCaptureIncrement();
-        }
+      didUpdate = true;
+    }
 
-        this.scene.replaceAllElements(actionResult.elements);
-      }
-
-      if (actionResult.files) {
-        this.files = actionResult.replaceFiles
-          ? actionResult.files
-          : { ...this.files, ...actionResult.files };
-        this.addNewImagesToImageCache();
-      }
-
-      if (actionResult.appState || editingElement || this.state.contextMenu) {
-        if (actionResult.storeAction === StoreAction.UPDATE) {
-          this.store.shouldUpdateSnapshot();
-        } else if (actionResult.storeAction === StoreAction.CAPTURE) {
-          this.store.shouldCaptureIncrement();
-        }
-
-        let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
-        let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
-        let gridSize = actionResult?.appState?.gridSize || null;
-        const theme =
-          actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
-        const name = actionResult?.appState?.name ?? this.state.name;
-        const errorMessage =
-          actionResult?.appState?.errorMessage ?? this.state.errorMessage;
-        if (typeof this.props.viewModeEnabled !== "undefined") {
-          viewModeEnabled = this.props.viewModeEnabled;
-        }
-
-        if (typeof this.props.zenModeEnabled !== "undefined") {
-          zenModeEnabled = this.props.zenModeEnabled;
-        }
-
-        if (typeof this.props.gridModeEnabled !== "undefined") {
-          gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        editingElement =
-          editingElement || actionResult.appState?.editingElement || null;
-
-        if (editingElement?.isDeleted) {
-          editingElement = null;
-        }
-
-        this.setState((state) => {
-          // using Object.assign instead of spread to fool TS 4.2.2+ into
-          // regarding the resulting type as not containing undefined
-          // (which the following expression will never contain)
-          return Object.assign(actionResult.appState || {}, {
-            // NOTE this will prevent opening context menu using an action
-            // or programmatically from the host, so it will need to be
-            // rewritten later
-            contextMenu: null,
-            editingElement,
-            viewModeEnabled,
-            zenModeEnabled,
-            gridSize,
-            theme,
-            name,
-            errorMessage,
-          });
-        });
-      }
-    },
-  );
+    if (!didUpdate && actionResult.storeAction !== StoreAction.NONE) {
+      this.scene.triggerUpdate();
+    }
+  });
 
   // Lifecycle
 

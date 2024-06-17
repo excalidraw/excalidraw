@@ -405,3 +405,7 @@ export const EDITOR_LS_KEYS = {
  * where filename is optional and we can't retrieve name from app state
  */
 export const DEFAULT_FILENAME = "Untitled";
+
+export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
+
+export const MIN_WIDTH_OR_HEIGHT = 1;
