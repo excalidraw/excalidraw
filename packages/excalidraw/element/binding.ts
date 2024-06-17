@@ -603,71 +603,71 @@ const updateElbowArrowBindPointsToSnapToElementOutline = (
   elementsMap: ElementsMap,
   scene: Scene,
 ) => {
-  if (isArrowElement(linearElement) && linearElement.elbowed) {
-    // Need to update elbow arrow snapping separately to avoid jumping
-    if (linearElement.startBinding) {
-      const startElement = elementsMap.get(
-        linearElement.startBinding.elementId,
-      );
-      if (startElement) {
-        const newPoint = updateBindPointToSnapToElementOutline(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            linearElement,
-            0,
-            elementsMap,
-          ),
-          "startBinding",
-          linearElement,
-          startElement as ExcalidrawBindableElement,
-          elementsMap,
-        );
-        LinearElementEditor.movePoints(
-          linearElement,
-          [
-            {
-              index: 0,
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                linearElement,
-                newPoint,
-                elementsMap,
-              ),
-            },
-          ],
-          scene,
-        );
-      }
-    }
-    if (linearElement.endBinding) {
-      const endElement = elementsMap.get(linearElement.endBinding.elementId);
-      if (endElement) {
-        const newPoint = updateBindPointToSnapToElementOutline(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            linearElement,
-            -1,
-            elementsMap,
-          ),
-          "endBinding",
-          linearElement,
-          endElement as ExcalidrawBindableElement,
-          elementsMap,
-        );
-        LinearElementEditor.movePoints(
-          linearElement,
-          [
-            {
-              index: linearElement.points.length - 1,
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                linearElement,
-                newPoint,
-                elementsMap,
-              ),
-            },
-          ],
-          scene,
-        );
-      }
-    }
-  }
+  // if (isArrowElement(linearElement) && linearElement.elbowed) {
+  //   // Need to update elbow arrow snapping separately to avoid jumping
+  //   if (linearElement.startBinding) {
+  //     const startElement = elementsMap.get(
+  //       linearElement.startBinding.elementId,
+  //     );
+  //     if (startElement) {
+  //       const newPoint = updateBindPointToSnapToElementOutline(
+  //         LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  //           linearElement,
+  //           0,
+  //           elementsMap,
+  //         ),
+  //         "startBinding",
+  //         linearElement,
+  //         startElement as ExcalidrawBindableElement,
+  //         elementsMap,
+  //       );
+  //       LinearElementEditor.movePoints(
+  //         linearElement,
+  //         [
+  //           {
+  //             index: 0,
+  //             point: LinearElementEditor.pointFromAbsoluteCoords(
+  //               linearElement,
+  //               newPoint,
+  //               elementsMap,
+  //             ),
+  //           },
+  //         ],
+  //         scene,
+  //       );
+  //     }
+  //   }
+  //   if (linearElement.endBinding) {
+  //     const endElement = elementsMap.get(linearElement.endBinding.elementId);
+  //     if (endElement) {
+  //       const newPoint = updateBindPointToSnapToElementOutline(
+  //         LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  //           linearElement,
+  //           -1,
+  //           elementsMap,
+  //         ),
+  //         "endBinding",
+  //         linearElement,
+  //         endElement as ExcalidrawBindableElement,
+  //         elementsMap,
+  //       );
+  //       LinearElementEditor.movePoints(
+  //         linearElement,
+  //         [
+  //           {
+  //             index: linearElement.points.length - 1,
+  //             point: LinearElementEditor.pointFromAbsoluteCoords(
+  //               linearElement,
+  //               newPoint,
+  //               elementsMap,
+  //             ),
+  //           },
+  //         ],
+  //         scene,
+  //       );
+  //     }
+  //   }
+  // }
 };
 
 const updateBindPointToSnapToElementOutline = (

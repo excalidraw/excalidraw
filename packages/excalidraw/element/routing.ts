@@ -63,6 +63,12 @@ export const mutateElbowArrow = (
 ) => {
   debugClear();
 
+  if (arrow.width > 10000 || arrow.height > 10000) {
+    console.trace();
+    console.log(arrow.height, arrow.width);
+    console.log(arrow);
+  }
+
   const [startGlobalPoint, endGlobalPoint] = [
     translatePoint(nextPoints[0], [arrow.x, arrow.y]),
     translatePoint(nextPoints[nextPoints.length - 1], [arrow.x, arrow.y]),
@@ -224,7 +230,8 @@ export const mutateElbowArrow = (
 
     mutateElement(arrow, {
       ...normalizedArrowElementUpdate(
-        simplifyElbowArrowPoints(points),
+        //simplifyElbowArrowPoints(points),
+        points,
         offset[0],
         offset[1],
       ),
@@ -317,11 +324,11 @@ const astar = (
 
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-      const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
+      const neighborHeading = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
-      const directionChange = previousDirection !== neighborDirection;
+      const directionChange = previousDirection !== neighborHeading;
       //const elbowCount = current.e + (directionChange ? 1 : 0);
       const directionCost = Math.max(
         ...neighbors
@@ -345,7 +352,8 @@ const astar = (
           (distanceSq2d(start.pos, neighbor.pos) >
           distanceSq2d(start.pos, current.pos)
             ? directionCost
-            : 0);
+            : 0) +
+          (neighborHeading === endHeading ? directionCost : 0);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -501,7 +509,7 @@ const calculateGrid = (
       })
       .map((node) => {
         if (
-          (pointOnBounds(node.pos, common) || false) &&
+          pointOnBounds(node.pos, common) &&
           (arePointsClose(oppositeStartDongle, node.pos) ||
             arePointsClose(oppositeEndDongle, node.pos))
         ) {
