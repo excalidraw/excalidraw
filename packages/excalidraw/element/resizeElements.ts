@@ -87,6 +87,7 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
       );
       updateBoundElements(element, elementsMap);
+      return true;
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         originalElements,
@@ -98,20 +99,42 @@ export const transformElements = (
         pointerY,
       );
       updateBoundElements(element, elementsMap);
+      return true;
     } else if (transformHandleType) {
-      resizeSingleElement(
-        originalElements,
-        shouldMaintainAspectRatio,
-        element,
-        elementsMap,
-        transformHandleType,
-        shouldResizeFromCenter,
-        pointerX,
-        pointerY,
-      );
-    }
+      const elementId = selectedElements[0].id;
+      const latestElement = elementsMap.get(elementId);
+      const origElement = originalElements.get(elementId);
 
-    return true;
+      if (latestElement && origElement) {
+        const { nextWidth, nextHeight } = getNextWidthAndHeightFromPointer(
+          latestElement,
+          origElement,
+          transformHandleType,
+          pointerX,
+          pointerY,
+          {
+            shouldMaintainAspectRatio,
+            shouldResizeFromCenter,
+          },
+        );
+
+        resizeSingleElement(
+          nextWidth,
+          nextHeight,
+          latestElement,
+          origElement,
+          elementsMap,
+          originalElements,
+          transformHandleType,
+          {
+            shouldMaintainAspectRatio,
+            shouldResizeFromCenter,
+          },
+        );
+
+        return true;
+      }
+    }
   } else if (selectedElements.length > 1) {
     if (transformHandleType === "rotation") {
       rotateMultipleElements(
@@ -419,303 +442,6 @@ const resizeSingleTextElement = (
     };
 
     mutateElement(element, resizedElement);
-  }
-};
-
-export const resizeSingleElement = (
-  originalElements: PointerDownState["originalElements"],
-  shouldMaintainAspectRatio: boolean,
-  element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-  transformHandleDirection: TransformHandleDirection,
-  shouldResizeFromCenter: boolean,
-  pointerX: number,
-  pointerY: number,
-) => {
-  const stateAtResizeStart = originalElements.get(element.id)!;
-  // Gets bounds corners
-  const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
-    stateAtResizeStart,
-    stateAtResizeStart.width,
-    stateAtResizeStart.height,
-    true,
-  );
-  const startTopLeft: Point = [x1, y1];
-  const startBottomRight: Point = [x2, y2];
-  const startCenter: Point = centerPoint(startTopLeft, startBottomRight);
-
-  // Calculate new dimensions based on cursor position
-  const rotatedPointer = rotatePoint(
-    [pointerX, pointerY],
-    startCenter,
-    -stateAtResizeStart.angle,
-  );
-
-  // Get bounds corners rendered on screen
-  const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
-    element,
-    element.width,
-    element.height,
-    true,
-  );
-
-  const boundsCurrentWidth = esx2 - esx1;
-  const boundsCurrentHeight = esy2 - esy1;
-
-  // It's important we set the initial scale value based on the width and height at resize start,
-  // otherwise previous dimensions affected by modifiers will be taken into account.
-  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
-  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
-  let scaleX = atStartBoundsWidth / boundsCurrentWidth;
-  let scaleY = atStartBoundsHeight / boundsCurrentHeight;
-
-  let boundTextFont: { fontSize?: number } = {};
-  const boundTextElement = getBoundTextElement(element, elementsMap);
-
-  if (transformHandleDirection.includes("e")) {
-    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
-  }
-  if (transformHandleDirection.includes("s")) {
-    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsCurrentHeight;
-  }
-  if (transformHandleDirection.includes("w")) {
-    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrentWidth;
-  }
-  if (transformHandleDirection.includes("n")) {
-    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
-  }
-
-  // Linear elements dimensions differ from bounds dimensions
-  const eleInitialWidth = stateAtResizeStart.width;
-  const eleInitialHeight = stateAtResizeStart.height;
-  // We have to use dimensions of element on screen, otherwise the scaling of the
-  // dimensions won't match the cursor for linear elements.
-  let eleNewWidth = element.width * scaleX;
-  let eleNewHeight = element.height * scaleY;
-
-  // adjust dimensions for resizing from center
-  if (shouldResizeFromCenter) {
-    eleNewWidth = 2 * eleNewWidth - eleInitialWidth;
-    eleNewHeight = 2 * eleNewHeight - eleInitialHeight;
-  }
-
-  // adjust dimensions to keep sides ratio
-  if (shouldMaintainAspectRatio) {
-    const widthRatio = Math.abs(eleNewWidth) / eleInitialWidth;
-    const heightRatio = Math.abs(eleNewHeight) / eleInitialHeight;
-    if (transformHandleDirection.length === 1) {
-      eleNewHeight *= widthRatio;
-      eleNewWidth *= heightRatio;
-    }
-    if (transformHandleDirection.length === 2) {
-      const ratio = Math.max(widthRatio, heightRatio);
-      eleNewWidth = eleInitialWidth * ratio * Math.sign(eleNewWidth);
-      eleNewHeight = eleInitialHeight * ratio * Math.sign(eleNewHeight);
-    }
-  }
-
-  if (boundTextElement) {
-    const stateOfBoundTextElementAtResize = originalElements.get(
-      boundTextElement.id,
-    ) as typeof boundTextElement | undefined;
-    if (stateOfBoundTextElementAtResize) {
-      boundTextFont = {
-        fontSize: stateOfBoundTextElementAtResize.fontSize,
-      };
-    }
-    if (shouldMaintainAspectRatio) {
-      const updatedElement = {
-        ...element,
-        width: eleNewWidth,
-        height: eleNewHeight,
-      };
-
-      const nextFont = measureFontSizeFromWidth(
-        boundTextElement,
-        elementsMap,
-        getBoundTextMaxWidth(updatedElement, boundTextElement),
-      );
-      if (nextFont === null) {
-        return;
-      }
-      boundTextFont = {
-        fontSize: nextFont.size,
-      };
-    } else {
-      const minWidth = getApproxMinLineWidth(
-        getFontString(boundTextElement),
-        boundTextElement.lineHeight,
-      );
-      const minHeight = getApproxMinLineHeight(
-        boundTextElement.fontSize,
-        boundTextElement.lineHeight,
-      );
-      eleNewWidth = Math.max(eleNewWidth, minWidth);
-      eleNewHeight = Math.max(eleNewHeight, minHeight);
-    }
-  }
-
-  const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
-    getResizedElementAbsoluteCoords(
-      stateAtResizeStart,
-      eleNewWidth,
-      eleNewHeight,
-      true,
-    );
-  const newBoundsWidth = newBoundsX2 - newBoundsX1;
-  const newBoundsHeight = newBoundsY2 - newBoundsY1;
-
-  // Calculate new topLeft based on fixed corner during resize
-  let newTopLeft = [...startTopLeft] as [number, number];
-  if (["n", "w", "nw"].includes(transformHandleDirection)) {
-    newTopLeft = [
-      startBottomRight[0] - Math.abs(newBoundsWidth),
-      startBottomRight[1] - Math.abs(newBoundsHeight),
-    ];
-  }
-  if (transformHandleDirection === "ne") {
-    const bottomLeft = [startTopLeft[0], startBottomRight[1]];
-    newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(newBoundsHeight)];
-  }
-  if (transformHandleDirection === "sw") {
-    const topRight = [startBottomRight[0], startTopLeft[1]];
-    newTopLeft = [topRight[0] - Math.abs(newBoundsWidth), topRight[1]];
-  }
-
-  // Keeps opposite handle fixed during resize
-  if (shouldMaintainAspectRatio) {
-    if (["s", "n"].includes(transformHandleDirection)) {
-      newTopLeft[0] = startCenter[0] - newBoundsWidth / 2;
-    }
-    if (["e", "w"].includes(transformHandleDirection)) {
-      newTopLeft[1] = startCenter[1] - newBoundsHeight / 2;
-    }
-  }
-
-  const flipX = eleNewWidth < 0;
-  const flipY = eleNewHeight < 0;
-
-  // Flip horizontally
-  if (flipX) {
-    if (transformHandleDirection.includes("e")) {
-      newTopLeft[0] -= Math.abs(newBoundsWidth);
-    }
-    if (transformHandleDirection.includes("w")) {
-      newTopLeft[0] += Math.abs(newBoundsWidth);
-    }
-  }
-
-  // Flip vertically
-  if (flipY) {
-    if (transformHandleDirection.includes("s")) {
-      newTopLeft[1] -= Math.abs(newBoundsHeight);
-    }
-    if (transformHandleDirection.includes("n")) {
-      newTopLeft[1] += Math.abs(newBoundsHeight);
-    }
-  }
-
-  if (shouldResizeFromCenter) {
-    newTopLeft[0] = startCenter[0] - Math.abs(newBoundsWidth) / 2;
-    newTopLeft[1] = startCenter[1] - Math.abs(newBoundsHeight) / 2;
-  }
-
-  // adjust topLeft to new rotation point
-  const angle = stateAtResizeStart.angle;
-  const rotatedTopLeft = rotatePoint(newTopLeft, startCenter, angle);
-  const newCenter: Point = [
-    newTopLeft[0] + Math.abs(newBoundsWidth) / 2,
-    newTopLeft[1] + Math.abs(newBoundsHeight) / 2,
-  ];
-  const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
-  newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
-
-  // For linear elements (x,y) are the coordinates of the first drawn point not the top-left corner
-  // So we need to readjust (x,y) to be where the first point should be
-  const newOrigin = [...newTopLeft];
-  const linearElementXOffset = stateAtResizeStart.x - newBoundsX1;
-  const linearElementYOffset = stateAtResizeStart.y - newBoundsY1;
-  newOrigin[0] += linearElementXOffset;
-  newOrigin[1] += linearElementYOffset;
-
-  const nextX = newOrigin[0];
-  const nextY = newOrigin[1];
-
-  // Readjust points for linear elements
-  let rescaledElementPointsY;
-  let rescaledPoints;
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
-    rescaledElementPointsY = rescalePoints(
-      1,
-      eleNewHeight,
-      (stateAtResizeStart as ExcalidrawLinearElement).points,
-      true,
-    );
-
-    rescaledPoints = rescalePoints(
-      0,
-      eleNewWidth,
-      rescaledElementPointsY,
-      true,
-    );
-  }
-
-  const resizedElement = {
-    width: Math.abs(eleNewWidth),
-    height: Math.abs(eleNewHeight),
-    x: nextX,
-    y: nextY,
-    points: rescaledPoints,
-  };
-
-  if ("scale" in element && "scale" in stateAtResizeStart) {
-    mutateElement(element, {
-      scale: [
-        // defaulting because scaleX/Y can be 0/-0
-        (Math.sign(newBoundsX2 - stateAtResizeStart.x) ||
-          stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
-        (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
-          stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
-      ],
-    });
-  }
-
-  if (
-    isArrowElement(element) &&
-    boundTextElement &&
-    shouldMaintainAspectRatio
-  ) {
-    const fontSize =
-      (resizedElement.width / element.width) * boundTextElement.fontSize;
-    if (fontSize < MIN_FONT_SIZE) {
-      return;
-    }
-    boundTextFont.fontSize = fontSize;
-  }
-
-  if (
-    resizedElement.width !== 0 &&
-    resizedElement.height !== 0 &&
-    Number.isFinite(resizedElement.x) &&
-    Number.isFinite(resizedElement.y)
-  ) {
-    mutateElement(element, resizedElement);
-
-    updateBoundElements(element, elementsMap, {
-      newSize: { width: resizedElement.width, height: resizedElement.height },
-    });
-
-    if (boundTextElement && boundTextFont != null) {
-      mutateElement(boundTextElement, {
-        fontSize: boundTextFont.fontSize,
-      });
-    }
-    handleBindTextResize(
-      element,
-      elementsMap,
-      transformHandleDirection,
-      shouldMaintainAspectRatio,
-    );
   }
 };
 
@@ -1091,4 +817,425 @@ export const getResizeArrowDirection = (
     (transformHandleType === "sw" && px <= 0) ||
     (transformHandleType === "se" && (px > 0 || py > 0));
   return isResizeEnd ? "end" : "origin";
+};
+
+type ResizeAnchor =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right"
+  | "west-side"
+  | "north-side"
+  | "east-side"
+  | "south-side"
+  | "center";
+
+const getResizeAnchor = (
+  handleDirection: TransformHandleDirection,
+  shouldMaintainAspectRatio: boolean,
+  shouldResizeFromCenter: boolean,
+): ResizeAnchor => {
+  if (shouldResizeFromCenter) {
+    return "center";
+  }
+
+  if (shouldMaintainAspectRatio) {
+    switch (handleDirection) {
+      case "n":
+        return "south-side";
+      case "e": {
+        console.log("this should be called");
+        return "west-side";
+      }
+      case "s":
+        return "north-side";
+      case "w":
+        return "east-side";
+      case "ne":
+        return "bottom-left";
+      case "nw":
+        return "bottom-right";
+      case "se":
+        return "top-left";
+      case "sw":
+        return "top-right";
+    }
+  }
+
+  if (["e", "se", "s"].includes(handleDirection)) {
+    return "top-left";
+  } else if (["n", "nw", "w"].includes(handleDirection)) {
+    return "bottom-right";
+  } else if (handleDirection === "ne") {
+    return "bottom-left";
+  } else {
+    return "top-right";
+  }
+};
+
+const getResizedOrigin = (
+  prevOrigin: Point,
+  prevWidth: number,
+  prevHeight: number,
+  newWidth: number,
+  newHeight: number,
+  angle: number,
+  handleDirection: TransformHandleDirection,
+  shouldMaintainAspectRatio: boolean,
+  shouldResizeFromCenter: boolean,
+): { x: number; y: number } => {
+  const anchor = getResizeAnchor(
+    handleDirection,
+    shouldMaintainAspectRatio,
+    shouldResizeFromCenter,
+  );
+
+  const [x, y] = prevOrigin;
+
+  switch (anchor) {
+    case "top-left":
+      return {
+        x:
+          x +
+          (prevWidth - newWidth) / 2 +
+          ((newWidth - prevWidth) / 2) * Math.cos(angle) +
+          ((prevHeight - newHeight) / 2) * Math.sin(angle),
+        y:
+          y +
+          (prevHeight - newHeight) / 2 +
+          ((newWidth - prevWidth) / 2) * Math.sin(angle) +
+          ((newHeight - prevHeight) / 2) * Math.cos(angle),
+      };
+    case "top-right":
+      return {
+        x:
+          x +
+          ((prevWidth - newWidth) / 2) * (Math.cos(angle) + 1) +
+          ((prevHeight - newHeight) / 2) * Math.sin(angle),
+        y:
+          y +
+          (prevHeight - newHeight) / 2 +
+          ((prevWidth - newWidth) / 2) * Math.sin(angle) +
+          ((newHeight - prevHeight) / 2) * Math.cos(angle),
+      };
+
+    case "bottom-left":
+      return {
+        x:
+          x +
+          ((prevWidth - newWidth) / 2) * (1 - Math.cos(angle)) +
+          ((newHeight - prevHeight) / 2) * Math.sin(angle),
+        y:
+          y +
+          ((prevHeight - newHeight) / 2) * (Math.cos(angle) + 1) +
+          ((newWidth - prevWidth) / 2) * Math.sin(angle),
+      };
+    case "bottom-right":
+      return {
+        x:
+          x +
+          ((prevWidth - newWidth) / 2) * (Math.cos(angle) + 1) +
+          ((newHeight - prevHeight) / 2) * Math.sin(angle),
+        y:
+          y +
+          ((prevHeight - newHeight) / 2) * (Math.cos(angle) + 1) +
+          ((prevWidth - newWidth) / 2) * Math.sin(angle),
+      };
+    case "center":
+      return {
+        x: x - (newWidth - prevWidth) / 2,
+        y: y - (newHeight - prevHeight) / 2,
+      };
+    case "east-side":
+      return {
+        x: x + ((prevWidth - newWidth) / 2) * (Math.cos(angle) + 1),
+        y:
+          y +
+          (newHeight - prevHeight) / 2 +
+          ((prevWidth - newWidth) / 2) * Math.sin(angle),
+      };
+    case "west-side":
+      return {
+        x: x + ((prevWidth - newWidth) / 2) * (1 - Math.cos(angle)),
+        y:
+          y +
+          ((newWidth - prevWidth) / 2) * Math.sin(angle) +
+          (prevHeight - newHeight) / 2,
+      };
+    case "north-side":
+      return {
+        x:
+          x +
+          (prevWidth - newWidth) / 2 +
+          ((prevHeight - newHeight) / 2) * Math.sin(angle),
+        y: y + ((newHeight - prevHeight) / 2) * (Math.cos(angle) - 1),
+      };
+    case "south-side":
+      return {
+        x:
+          x +
+          (prevWidth - newWidth) / 2 +
+          ((newHeight - prevHeight) / 2) * Math.sin(angle),
+        y: y + ((prevHeight - newHeight) / 2) * (Math.cos(angle) + 1),
+      };
+  }
+};
+
+export const resizeSingleElement = (
+  nextWidth: number,
+  nextHeight: number,
+  latestElement: ExcalidrawElement,
+  origElement: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  originalElementsMap: ElementsMap,
+  handleDirection: TransformHandleDirection,
+  {
+    shouldInformMutation = true,
+    shouldMaintainAspectRatio = false,
+    shouldResizeFromCenter = false,
+  }: {
+    shouldMaintainAspectRatio?: boolean;
+    shouldResizeFromCenter?: boolean;
+    shouldInformMutation?: boolean;
+  } = {},
+) => {
+  let boundTextFont: { fontSize?: number } = {};
+  const boundTextElement = getBoundTextElement(latestElement, elementsMap);
+
+  if (boundTextElement) {
+    const stateOfBoundTextElementAtResize = originalElementsMap.get(
+      boundTextElement.id,
+    ) as typeof boundTextElement | undefined;
+    if (stateOfBoundTextElementAtResize) {
+      boundTextFont = {
+        fontSize: stateOfBoundTextElementAtResize.fontSize,
+      };
+    }
+    if (shouldMaintainAspectRatio) {
+      const updatedElement = {
+        ...latestElement,
+        width: nextWidth,
+        height: nextHeight,
+      };
+
+      const nextFont = measureFontSizeFromWidth(
+        boundTextElement,
+        elementsMap,
+        getBoundTextMaxWidth(updatedElement, boundTextElement),
+      );
+      if (nextFont === null) {
+        return;
+      }
+      boundTextFont = {
+        fontSize: nextFont.size,
+      };
+    } else {
+      const minWidth = getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      );
+      const minHeight = getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      );
+      nextWidth = Math.max(nextWidth, minWidth);
+      nextHeight = Math.max(nextHeight, minHeight);
+    }
+  }
+
+  let previousOrigin: Point = [origElement.x, origElement.y];
+  if (isLinearElement(origElement)) {
+    // we should set the top left to be the origin
+    const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
+      origElement,
+      origElement.width,
+      origElement.height,
+      true,
+    );
+
+    previousOrigin = [x1, y1];
+  }
+
+  const newOrigin = getResizedOrigin(
+    previousOrigin,
+    origElement.width,
+    origElement.height,
+    nextWidth,
+    nextHeight,
+    origElement.angle,
+    handleDirection,
+    shouldMaintainAspectRatio!!,
+    shouldResizeFromCenter!!,
+  );
+
+  if (nextWidth < 0) {
+    newOrigin.x = newOrigin.x + nextWidth;
+  }
+  if (nextHeight < 0) {
+    newOrigin.y = newOrigin.y + nextHeight;
+  }
+
+  if (isLinearElement(origElement)) {
+    const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
+      getResizedElementAbsoluteCoords(origElement, nextWidth, nextHeight, true);
+    const linearElementXOffset = origElement.x - newBoundsX1;
+    const linearElementYOffset = origElement.y - newBoundsY1;
+    newOrigin.x += linearElementXOffset;
+    newOrigin.y += linearElementYOffset;
+  }
+
+  const rescaledPoints = rescalePointsInElement(
+    origElement,
+    nextWidth,
+    nextHeight,
+    true,
+  );
+
+  if ("scale" in latestElement && "scale" in origElement) {
+    mutateElement(latestElement, {
+      scale: [
+        // defaulting because scaleX/Y can be 0/-0
+        (Math.sign(nextWidth) || origElement.scale[0]) * origElement.scale[0],
+        (Math.sign(nextHeight) || origElement.scale[1]) * origElement.scale[1],
+      ],
+    });
+  }
+
+  if (
+    isArrowElement(latestElement) &&
+    boundTextElement &&
+    shouldMaintainAspectRatio
+  ) {
+    const fontSize =
+      (nextWidth / latestElement.width) * boundTextElement.fontSize;
+    if (fontSize < MIN_FONT_SIZE) {
+      return;
+    }
+    boundTextFont.fontSize = fontSize;
+  }
+
+  if (
+    nextWidth !== 0 &&
+    nextHeight !== 0 &&
+    Number.isFinite(newOrigin.x) &&
+    Number.isFinite(newOrigin.y)
+  ) {
+    const updates = {
+      ...newOrigin,
+      width: Math.abs(nextWidth),
+      height: Math.abs(nextHeight),
+      ...rescaledPoints,
+    };
+
+    mutateElement(latestElement, updates, shouldInformMutation);
+
+    updateBoundElements(latestElement, elementsMap, {
+      newSize: { width: nextWidth, height: nextHeight },
+    });
+
+    if (boundTextElement && boundTextFont != null) {
+      mutateElement(boundTextElement, {
+        fontSize: boundTextFont.fontSize,
+      });
+    }
+    handleBindTextResize(
+      latestElement,
+      elementsMap,
+      handleDirection,
+      shouldMaintainAspectRatio,
+    );
+  }
+};
+
+const getNextWidthAndHeightFromPointer = (
+  latestElement: ExcalidrawElement,
+  origElement: ExcalidrawElement,
+  handleDirection: TransformHandleDirection,
+  pointerX: number,
+  pointerY: number,
+  {
+    shouldMaintainAspectRatio = false,
+    shouldResizeFromCenter = false,
+  }: {
+    shouldMaintainAspectRatio?: boolean;
+    shouldResizeFromCenter?: boolean;
+  } = {},
+) => {
+  // Gets bounds corners
+  const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
+    origElement,
+    origElement.width,
+    origElement.height,
+    true,
+  );
+  const startTopLeft: Point = [x1, y1];
+  const startBottomRight: Point = [x2, y2];
+  const startCenter: Point = centerPoint(startTopLeft, startBottomRight);
+
+  const eleInitialWidth = origElement.width;
+  const eleInitialHeight = origElement.height;
+
+  // Calculate new dimensions based on cursor position
+  const rotatedPointer = rotatePoint(
+    [pointerX, pointerY],
+    startCenter,
+    -origElement.angle,
+  );
+
+  // Get bounds corners rendered on screen
+  const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
+    latestElement,
+    latestElement.width,
+    latestElement.height,
+    true,
+  );
+
+  const boundsCurrentWidth = esx2 - esx1;
+  const boundsCurrentHeight = esy2 - esy1;
+
+  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
+  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
+  let scaleX = atStartBoundsWidth / boundsCurrentWidth;
+  let scaleY = atStartBoundsHeight / boundsCurrentHeight;
+
+  if (handleDirection.includes("e")) {
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
+  }
+  if (handleDirection.includes("s")) {
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsCurrentHeight;
+  }
+  if (handleDirection.includes("w")) {
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrentWidth;
+  }
+  if (handleDirection.includes("n")) {
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
+  }
+
+  let nextWidth = latestElement.width * scaleX;
+  let nextHeight = latestElement.height * scaleY;
+
+  if (shouldResizeFromCenter) {
+    nextWidth = 2 * nextWidth - eleInitialWidth;
+    nextHeight = 2 * nextHeight - eleInitialHeight;
+  }
+
+  // adjust dimensions to keep sides ratio
+  if (shouldMaintainAspectRatio) {
+    const widthRatio = Math.abs(nextWidth) / eleInitialWidth;
+    const heightRatio = Math.abs(nextHeight) / eleInitialHeight;
+    if (handleDirection.length === 1) {
+      nextHeight *= widthRatio;
+      nextWidth *= heightRatio;
+    }
+    if (handleDirection.length === 2) {
+      const ratio = Math.max(widthRatio, heightRatio);
+      nextWidth = eleInitialWidth * ratio * Math.sign(nextWidth);
+      nextHeight = eleInitialHeight * ratio * Math.sign(nextHeight);
+    }
+  }
+
+  return {
+    nextWidth,
+    nextHeight,
+  };
 };
