@@ -149,8 +149,8 @@
     "zoomToFitViewport": "पूर्ण दृश्यरूप आकार",
     "zoomToFitSelection": "निवडी प्रयंत दृश्यरूप आकार करा",
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
-    "installPWA": "",
-    "autoResize": ""
+    "installPWA": "एक्षकाली ड्रॉ स्थानीय स्वरूपात इंस्टॉल करावे (PWA)",
+    "autoResize": "स्वयं आकार पुनः निर्धारण"
   },
   "library": {
     "noItems": "अजून कोणतेही आइटम जोडलेले नाही...",
@@ -276,15 +276,15 @@
     "ellipse": "लंबवर्तुळाकार",
     "arrow": "बाण",
     "line": "रेषा",
-    "freedraw": "",
+    "freedraw": "मुक्त चित्रांकन",
     "text": "पाठ्य",
     "image": "प्रतिमा",
     "group": "गट",
     "frame": "चौकट",
     "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
-    "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "embeddable": "वेब रुतवा",
+    "selection": "निवड",
+    "iframe": "आयफ़्रेम"
   },
   "headings": {
     "canvasActions": "पटल क्रिया",
@@ -459,10 +459,10 @@
     "scene": "दृश्य",
     "selected": "निवडलेले",
     "storage": "साठवण",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "आंकडे आणि तत्वाचें गुणधर्म",
+    "title": "आंकड़े",
+    "generalStats": "सामान्य आंकड़े",
+    "elementProperties": "मूलतत्वा चें गुणधर्म",
     "total": "योग",
     "version": "आवृत्ती",
     "versionCopy": "कॉपी करायला क्लिक करा",
