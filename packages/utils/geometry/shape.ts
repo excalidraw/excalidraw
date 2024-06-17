@@ -114,21 +114,28 @@ export const getPolygonShape = (
 
   let data: Polygon = [];
 
-  if (element.type === "diamond") {
-    data = [
-      pointRotate([cx, y], angleInDegrees, center),
-      pointRotate([x + width, cy], angleInDegrees, center),
-      pointRotate([cx, y + height], angleInDegrees, center),
-      pointRotate([x, cy], angleInDegrees, center),
-    ] as Polygon;
-  } else {
-    data = [
-      pointRotate([x, y], angleInDegrees, center),
-      pointRotate([x + width, y], angleInDegrees, center),
-      pointRotate([x + width, y + height], angleInDegrees, center),
-      pointRotate([x, y + height], angleInDegrees, center),
-    ] as Polygon;
-  }
+  // if (element.type === "diamond") {
+  //   data = [
+  //     pointRotate([cx, y], angleInDegrees, center),
+  //     pointRotate([x + width, cy], angleInDegrees, center),
+  //     pointRotate([cx, y + height], angleInDegrees, center),
+  //     pointRotate([x, cy], angleInDegrees, center),
+  //   ] as Polygon;
+  // } else {
+  //   data = [
+  //     pointRotate([x, y], angleInDegrees, center),
+  //     pointRotate([x + width, y], angleInDegrees, center),
+  //     pointRotate([x + width, y + height], angleInDegrees, center),
+  //     pointRotate([x, y + height], angleInDegrees, center),
+  //   ] as Polygon;
+  // }
+
+  data = [
+    pointRotate([x, y], angleInDegrees, center),
+    pointRotate([x + width, y], angleInDegrees, center),
+    pointRotate([x + width, y + height], angleInDegrees, center),
+    pointRotate([x, y + height], angleInDegrees, center),
+  ] as Polygon;
 
   return {
     type: "polygon",
