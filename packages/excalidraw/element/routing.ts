@@ -439,6 +439,23 @@ const calculateGrid = (
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
 
+  const oppositeStartDongle: Point =
+    startHeading === HEADING_UP
+      ? [start[0], aabbs[0][3]]
+      : startHeading === HEADING_RIGHT
+      ? [aabbs[0][0], start[1]]
+      : startHeading === HEADING_DOWN
+      ? [start[0], aabbs[0][1]]
+      : [aabbs[0][2], start[1]];
+  const oppositeEndDongle: Point =
+    endHeading === HEADING_UP
+      ? [end[0], aabbs[1][3]]
+      : endHeading === HEADING_RIGHT
+      ? [aabbs[1][0], end[1]]
+      : endHeading === HEADING_DOWN
+      ? [end[0], aabbs[1][1]]
+      : [aabbs[1][2], end[1]];
+
   return {
     row: _vertical.length,
     col: _horizontal.length,
@@ -458,24 +475,6 @@ const calculateGrid = (
           }),
         ),
       )
-      // .map((node) => {
-      //   const valid = isAnyTrue(
-      //     ...aabbs.map((aabb) => {
-      //       const corner =
-      //         (aabb[0] === node.pos[0] && aabb[1] === node.pos[1]) ||
-      //         (aabb[2] === node.pos[0] && aabb[1] === node.pos[1]) ||
-      //         (aabb[2] === node.pos[0] && aabb[3] === node.pos[1]) ||
-      //         (aabb[0] === node.pos[0] && aabb[3] === node.pos[1]);
-      //       const startPoint =
-      //         start[0] === node.pos[0] && start[1] === node.pos[1];
-      //       const endPoint = end[0] === node.pos[0] && end[1] === node.pos[1];
-
-      //       return corner || startPoint || endPoint;
-      //     }),
-      //   );
-      //   node.closed = !valid;
-      //   return node;
-      // })
       .map((node) => {
         const valid =
           start[0] === node.pos[0] ||
@@ -501,6 +500,17 @@ const calculateGrid = (
         return node;
       })
       .map((node) => {
+        if (
+          (pointOnBounds(node.pos, common) || false) &&
+          (arePointsClose(oppositeStartDongle, node.pos) ||
+            arePointsClose(oppositeEndDongle, node.pos))
+        ) {
+          node.closed = true;
+        }
+
+        return node;
+      })
+      .map((node) => {
         node.closed
           ? debugDrawPoint(node.pos, "red")
           : debugDrawPoint(node.pos, "green");
@@ -508,6 +518,9 @@ const calculateGrid = (
       }),
   };
 };
+
+const arePointsClose = (p: Point, o: Point) =>
+  Math.abs(p[0] - o[0]) < 0.00005 && Math.abs(p[1] - o[1]) < 0.00005;
 
 const isAnyTrue = (...args: boolean[]): boolean =>
   Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
@@ -1065,6 +1078,11 @@ const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] <= bounds[2] &&
   p[1] >= bounds[1] &&
   p[1] <= bounds[3];
+
+const pointOnBounds = (p: Point, bounds: Bounds): boolean =>
+  isAnyTrue(
+    ...boundsToLineSegments(bounds).map((segment) => isPointOnLine(segment, p)),
+  );
 
 const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
