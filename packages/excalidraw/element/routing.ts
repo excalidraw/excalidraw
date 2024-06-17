@@ -340,7 +340,12 @@ const astar = (
         neighbor.visited = true;
         neighbor.parent = current;
         //neighbor.e = elbowCount;
-        neighbor.h = m_dist(end.pos, neighbor.pos);
+        neighbor.h =
+          m_dist(end.pos, neighbor.pos) +
+          (distanceSq2d(start.pos, neighbor.pos) >
+          distanceSq2d(start.pos, current.pos)
+            ? directionCost
+            : 0);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -494,13 +499,13 @@ const calculateGrid = (
 
         node.closed = invalid;
         return node;
+      })
+      .map((node) => {
+        node.closed
+          ? debugDrawPoint(node.pos, "red")
+          : debugDrawPoint(node.pos, "green");
+        return node;
       }),
-    // .map((node) => {
-    //   node.closed
-    //     ? debugDrawPoint(node.pos, "red")
-    //     : debugDrawPoint(node.pos, "green");
-    //   return node;
-    // }),
   };
 };
 
