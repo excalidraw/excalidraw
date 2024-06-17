@@ -48,6 +48,7 @@ import {
 } from "./helpers";
 import oc from "open-color";
 import {
+  isArrowElement,
   isFrameLikeElement,
   isLinearElement,
   isTextElement,
@@ -772,27 +773,39 @@ const _renderInteractiveScene = ({
 
       for (const element of elementsMap.values()) {
         const selectionColors = [];
-        // local user
-        if (
-          locallySelectedIds.has(element.id) &&
-          !isSelectedViaGroup(appState, element)
-        ) {
-          selectionColors.push(selectionColor);
-        }
-        // remote users
         const remoteClients = renderConfig.remoteSelectedElementIds.get(
           element.id,
         );
-        if (remoteClients) {
-          selectionColors.push(
-            ...remoteClients.map((socketId) => {
-              const background = getClientColor(
-                socketId,
-                appState.collaborators.get(socketId),
-              );
-              return background;
-            }),
-          );
+        if (
+          !(
+            // Elbow arrow elements cannot be selected when bound on either end
+            (
+              isSingleLinearElementSelected &&
+              isArrowElement(element) &&
+              element.elbowed &&
+              (element.startBinding || element.endBinding)
+            )
+          )
+        ) {
+          // local user
+          if (
+            locallySelectedIds.has(element.id) &&
+            !isSelectedViaGroup(appState, element)
+          ) {
+            selectionColors.push(selectionColor);
+          }
+          // remote users
+          if (remoteClients) {
+            selectionColors.push(
+              ...remoteClients.map((socketId) => {
+                const background = getClientColor(
+                  socketId,
+                  appState.collaborators.get(socketId),
+                );
+                return background;
+              }),
+            );
+          }
         }
 
         if (selectionColors.length) {
