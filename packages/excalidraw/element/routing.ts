@@ -19,12 +19,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import {
-  debugClear,
-  debugDrawBounds,
-  debugDrawPoint,
-  debugDrawSegments,
-} from "../visualdebug";
+import { debugClear, debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -44,7 +39,7 @@ type Node = {
   f: number;
   g: number;
   h: number;
-  e: number;
+  //e: number;
   closed: boolean;
   visited: boolean;
   parent: Node | null;
@@ -186,7 +181,9 @@ export const mutateElbowArrow = (
   const grid = calculateGrid(
     boundingBoxes,
     startDonglePosition ? startDonglePosition : startGlobalPoint,
+    startHeading,
     endDonglePosition ? endDonglePosition : endGlobalPoint,
+    endHeading,
     common,
   );
   const startDongle =
@@ -211,10 +208,7 @@ export const mutateElbowArrow = (
     grid,
     startHeading ? startHeading : HEADING_RIGHT,
     endHeading ? endHeading : HEADING_RIGHT,
-    [
-      startElement && aabbForElement(startElement),
-      endElement && aabbForElement(endElement),
-    ].filter((aabb) => aabb !== null) as Bounds[],
+    boundingBoxes,
   );
 
   if (path) {
@@ -273,8 +267,6 @@ const astar = (
   endHeading: Heading,
   aabbs: Bounds[],
 ) => {
-  const avoidSegments = aabbs.flatMap((aabb) => boundsToLineSegments(aabb));
-  const multiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
   open.push(start);
@@ -307,6 +299,20 @@ const astar = (
         continue;
       }
 
+      // Intersect
+      const neighborHalfPoint = scalePointFromOrigin(
+        neighbor.pos,
+        current.pos,
+        0.5,
+      );
+      if (
+        isAnyTrue(
+          ...aabbs.map((aabb) => pointInsideBounds(neighborHalfPoint, aabb)),
+        )
+      ) {
+        continue;
+      }
+
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
       const neighborDirection = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
@@ -314,28 +320,19 @@ const astar = (
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
       const directionChange = previousDirection !== neighborDirection;
-      const elbowCount = current.e + (directionChange ? 1 : 0);
-      const gScore =
-        current.g +
-        m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(multiplier, 2) : 0);
+      //const elbowCount = current.e + (directionChange ? 1 : 0);
+      const gScore = current.g + m_dist(neighbor.addr, current.addr);
 
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
         const neighborSegment = [current.pos, neighbor.pos] as LineSegment;
-        const intersecting = isAnyTrue(
-          ...avoidSegments.map(
-            (segment) => segmentsIntersectAt(segment, neighborSegment) !== null,
-          ),
-        );
-        intersecting && debugDrawSegments([neighborSegment]);
+
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
-        neighbor.e = elbowCount;
-        neighbor.h =
-          m_dist(end.addr, neighbor.addr) + (intersecting ? Infinity : 0);
+        //neighbor.e = elbowCount;
+        neighbor.h = m_dist(end.addr, neighbor.addr);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -395,32 +392,36 @@ const generateDynamicAABBs = (
 const calculateGrid = (
   aabbs: Bounds[],
   start: Point,
+  startHeading: Heading,
   end: Point,
+  endHeading: Heading,
   common: Bounds,
 ): Grid => {
   const horizontal = new Set<number>();
   const vertical = new Set<number>();
 
-  horizontal.add(start[0]);
-  vertical.add(start[1]);
-  horizontal.add(end[0]);
-  vertical.add(end[1]);
+  if (startHeading === HEADING_LEFT || startHeading === HEADING_RIGHT) {
+    vertical.add(start[1]);
+  } else {
+    horizontal.add(start[0]);
+  }
+  if (endHeading === HEADING_LEFT || endHeading === HEADING_RIGHT) {
+    vertical.add(end[1]);
+  } else {
+    horizontal.add(end[0]);
+  }
 
   aabbs.forEach((aabb) => {
     horizontal.add(aabb[0]);
     horizontal.add(aabb[2]);
     vertical.add(aabb[1]);
     vertical.add(aabb[3]);
-    // horizontal.add((aabb[2] + aabb[0]) / 2);
-    // vertical.add((aabb[1] + aabb[3]) / 2);
   });
 
   horizontal.add(common[0]);
   horizontal.add(common[2]);
   vertical.add(common[1]);
   vertical.add(common[3]);
-  horizontal.add((common[2] + common[0]) / 2);
-  vertical.add((common[3] + common[1]) / 2);
 
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
@@ -435,7 +436,7 @@ const calculateGrid = (
             f: 0,
             g: 0,
             h: 0,
-            e: 0,
+            //e: 0,
             closed: false,
             visited: false,
             parent: null,
@@ -564,6 +565,121 @@ export const segmentsIntersectAt = (
 
 export const crossProduct = (a: Point, b: Point): number =>
   a[0] * b[1] - a[1] * b[0];
+
+const estimateSegmentCount = (
+  start: Node,
+  end: Node,
+  startHeading: Heading,
+  endHeading: Heading,
+) => {
+  if (endHeading === HEADING_RIGHT) {
+    switch (startHeading) {
+      case HEADING_RIGHT: {
+        if (start.pos[0] >= end.pos[0]) {
+          return 4;
+        }
+        if (start.pos[1] === end.pos[1]) {
+          return 0;
+        }
+        return 2;
+      }
+      case HEADING_UP:
+        if (start.pos[1] > end.pos[1] && start.pos[0] < end.pos[0]) {
+          return 1;
+        }
+        return 3;
+      case HEADING_DOWN:
+        if (start.pos[1] < end.pos[1] && start.pos[0] < end.pos[0]) {
+          return 1;
+        }
+        return 3;
+      case HEADING_LEFT:
+        if (start.pos[1] === end.pos[1]) {
+          return 4;
+        }
+        return 2;
+    }
+  } else if (endHeading === HEADING_LEFT) {
+    switch (startHeading) {
+      case HEADING_RIGHT:
+        if (start.pos[1] === end.pos[1]) {
+          return 4;
+        }
+        return 2;
+      case HEADING_UP:
+        if (start.pos[1] > end.pos[1] && start.pos[0] > end.pos[0]) {
+          return 1;
+        }
+        return 3;
+      case HEADING_DOWN:
+        if (start.pos[1] < end.pos[1] && start.pos[0] > end.pos[0]) {
+          return 1;
+        }
+        return 3;
+      case HEADING_LEFT:
+        if (start.pos[0] <= end.pos[0]) {
+          return 4;
+        }
+        if (start.pos[1] === end.pos[1]) {
+          return 0;
+        }
+        return 2;
+    }
+  } else if (endHeading === HEADING_UP) {
+    switch (startHeading) {
+      case HEADING_RIGHT:
+        if (start.pos[1] > end.pos[1] && start.pos[0] < end.pos[0]) {
+          return 1;
+        }
+        return 3;
+      case HEADING_UP:
+        if (start.pos[1] >= end.pos[1]) {
+          return 4;
+        }
+        if (start.pos[0] === end.pos[0]) {
+          return 0;
+        }
+        return 2;
+      case HEADING_DOWN:
+        if (start.pos[0] === end.pos[0]) {
+          return 4;
+        }
+        return 2;
+      case HEADING_LEFT:
+        if (start.pos[1] > end.pos[1] && start.pos[0] > end.pos[0]) {
+          return 1;
+        }
+        return 3;
+    }
+  } else if (endHeading === HEADING_DOWN) {
+    switch (startHeading) {
+      case HEADING_RIGHT:
+        if (start.pos[1] < end.pos[1] && start.pos[0] < end.pos[0]) {
+          return 1;
+        }
+        return 3;
+      case HEADING_UP:
+        if (start.pos[0] === end.pos[0]) {
+          return 4;
+        }
+        return 2;
+      case HEADING_DOWN:
+        if (start.pos[1] <= end.pos[1]) {
+          return 4;
+        }
+        if (start.pos[0] === end.pos[0]) {
+          return 0;
+        }
+        return 2;
+      case HEADING_LEFT:
+        if (start.pos[1] < end.pos[1] && start.pos[0] > end.pos[0]) {
+          return 1;
+        }
+        return 3;
+    }
+  }
+  return 0;
+};
 
 /**
  * Create a dynamically resizing bounding box for the given heading
