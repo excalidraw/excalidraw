@@ -9,6 +9,8 @@ import {
   PointInTriangle,
   addVectors,
   arePointsEqual,
+  distance2d,
+  distanceSq2d,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -321,18 +323,24 @@ const astar = (
         : startHeading;
       const directionChange = previousDirection !== neighborDirection;
       //const elbowCount = current.e + (directionChange ? 1 : 0);
-      const gScore = current.g + m_dist(neighbor.addr, current.addr);
+      const directionCost = Math.max(
+        ...neighbors
+          .filter((n) => n !== null)
+          .map((n) => m_dist(n!.pos, current.pos)),
+      );
+      const gScore =
+        current.g +
+        m_dist(neighbor.pos, current.pos) +
+        (directionChange ? directionCost : 0);
 
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
-        const neighborSegment = [current.pos, neighbor.pos] as LineSegment;
-
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
         //neighbor.e = elbowCount;
-        neighbor.h = m_dist(end.addr, neighbor.addr);
+        neighbor.h = m_dist(end.pos, neighbor.pos);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -371,16 +379,16 @@ const generateDynamicAABBs = (
 ): Bounds[] => {
   return [
     [
-      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] - 5 : common[0],
-      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] - 5 : common[1],
-      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] + 5 : common[2],
-      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] + 5 : common[3],
+      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] : common[0],
+      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] : common[1],
+      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] : common[2],
+      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] : common[3],
     ] as Bounds,
     [
-      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] - 5 : common[0],
-      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] - 5 : common[1],
-      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] + 5 : common[2],
-      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] + 5 : common[3],
+      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] : common[0],
+      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] : common[1],
+      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] : common[2],
+      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] : common[3],
     ] as Bounds,
   ];
 };
@@ -486,13 +494,13 @@ const calculateGrid = (
 
         node.closed = invalid;
         return node;
-      })
-      .map((node) => {
-        node.closed
-          ? debugDrawPoint(node.pos, "red")
-          : debugDrawPoint(node.pos, "green");
-        return node;
       }),
+    // .map((node) => {
+    //   node.closed
+    //     ? debugDrawPoint(node.pos, "red")
+    //     : debugDrawPoint(node.pos, "green");
+    //   return node;
+    // }),
   };
 };
 
