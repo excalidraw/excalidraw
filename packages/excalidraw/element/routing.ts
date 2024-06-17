@@ -68,11 +68,11 @@ export const mutateElbowArrow = (
     console.log(arrow.height, arrow.width);
     console.log(arrow);
   }
-
   const [startGlobalPoint, endGlobalPoint] = [
     translatePoint(nextPoints[0], [arrow.x, arrow.y]),
     translatePoint(nextPoints[nextPoints.length - 1], [arrow.x, arrow.y]),
   ];
+
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
     arrow.startBinding
@@ -275,6 +275,7 @@ const astar = (
   endHeading: Heading,
   aabbs: Bounds[],
 ) => {
+  const bendMultiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
   open.push(start);
@@ -328,31 +329,26 @@ const astar = (
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
       const directionChange = previousDirection !== neighborHeading;
-      //const elbowCount = current.e + (directionChange ? 1 : 0);
-      const directionCost = Math.max(
-        ...neighbors
-          .filter((n) => n !== null)
-          .map((n) => m_dist(n!.pos, current.pos)),
-      );
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? directionCost * 0.2 : 0);
+        (directionChange ? Math.pow(bendMultiplier, 3) : 0);
 
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
+        const estBendCount = estimateSegmentCount(
+          neighbor,
+          end,
+          neighborHeading,
+          endHeading,
+        );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
         neighbor.parent = current;
-        //neighbor.e = elbowCount;
         neighbor.h =
           m_dist(end.pos, neighbor.pos) +
-          (distanceSq2d(start.pos, neighbor.pos) >
-          distanceSq2d(start.pos, current.pos)
-            ? directionCost
-            : 0) +
-          (neighborHeading === endHeading ? directionCost : 0);
+          estBendCount * Math.pow(bendMultiplier, 2);
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -370,11 +366,15 @@ const astar = (
 };
 
 const pathTo = (start: Node, node: Node) => {
+  console.log(".....");
   let curr = node;
   const path = [];
   while (curr.parent) {
     path.unshift(curr);
     curr = curr.parent;
+    // curr.parent
+    //   ? console.log(curr.g, curr.h) //console.log(m_dist(curr.pos, curr.parent!.pos))
+    //   : console.log("|");
   }
   path.unshift(start);
 
@@ -1147,4 +1147,16 @@ const neighborIndexToHeading = (idx: number): Heading => {
       return HEADING_DOWN;
   }
   return HEADING_LEFT;
+};
+
+const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
+  switch (heading) {
+    case HEADING_UP:
+      return 0;
+    case HEADING_RIGHT:
+      return 1;
+    case HEADING_DOWN:
+      return 2;
+  }
+  return 3;
 };
