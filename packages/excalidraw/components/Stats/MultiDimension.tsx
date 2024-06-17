@@ -2,7 +2,10 @@ import { useMemo } from "react";
 import { getCommonBounds, isTextElement } from "../../element";
 import { updateBoundElements } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
-import { rescalePointsInElement } from "../../element/resizeElements";
+import {
+  rescalePointsInElement,
+  resizeSingleElement,
+} from "../../element/resizeElements";
 import {
   getBoundTextElement,
   handleBindTextResize,
@@ -13,7 +16,7 @@ import type { Point } from "../../types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
-import { getElementsInAtomicUnit, resizeElement } from "./utils";
+import { getElementsInAtomicUnit } from "./utils";
 import type { AtomicUnit } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
 
@@ -246,15 +249,17 @@ const MultiDimension = ({
             nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
             nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
-            resizeElement(
+            resizeSingleElement(
               nextWidth,
               nextHeight,
-              false,
               latestElement,
               origElement,
               elementsMap,
               originalElementsMap,
-              false,
+              property === "width" ? "e" : "s",
+              {
+                shouldInformMutation: false,
+              },
             );
           }
         }
@@ -347,14 +352,17 @@ const MultiDimension = ({
           nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
           nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
-          resizeElement(
+          resizeSingleElement(
             nextWidth,
             nextHeight,
-            false,
             latestElement,
             origElement,
             elementsMap,
             originalElementsMap,
+            property === "width" ? "e" : "s",
+            {
+              shouldInformMutation: false,
+            },
           );
         }
       }

@@ -1,8 +1,9 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable, resizeElement } from "./utils";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
+import { resizeSingleElement } from "../../element/resizeElements";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
@@ -52,14 +53,17 @@ const DimensionDragInput = ({
           MIN_WIDTH_OR_HEIGHT,
         );
 
-        resizeElement(
+        resizeSingleElement(
           nextWidth,
           nextHeight,
-          keepAspectRatio,
           element,
           origElement,
           elementsMap,
           originalElementsMap,
+          property === "width" ? "e" : "s",
+          {
+            shouldMaintainAspectRatio: keepAspectRatio,
+          },
         );
 
         return;
@@ -96,14 +100,17 @@ const DimensionDragInput = ({
       nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
       nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
 
-      resizeElement(
+      resizeSingleElement(
         nextWidth,
         nextHeight,
-        keepAspectRatio,
         element,
         origElement,
         elementsMap,
         originalElementsMap,
+        property === "width" ? "e" : "s",
+        {
+          shouldMaintainAspectRatio: keepAspectRatio,
+        },
       );
     }
   };
