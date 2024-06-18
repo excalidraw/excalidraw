@@ -549,7 +549,7 @@ export const updateBoundElements = (
       return;
     }
 
-    bindableElementsVisitor(
+    const updates = bindableElementsVisitor(
       elementsMap,
       element,
       (bindableElement, bindingProp) => {
@@ -558,7 +558,7 @@ export const updateBoundElements = (
           isBindableElement(bindableElement) &&
           (bindingProp === "startBinding" || bindingProp === "endBinding")
         ) {
-          updateBoundPoint(
+          const point = updateBoundPoint(
             element,
             bindingProp,
             bindings[bindingProp],
@@ -566,9 +566,31 @@ export const updateBoundElements = (
             elementsMap,
             scene,
           );
+          if (point) {
+            return {
+              index:
+                bindingProp === "startBinding" ? 0 : element.points.length - 1,
+              point,
+            };
+          }
         }
+
+        return null;
       },
+    ).filter(
+      (
+        update,
+      ): update is NonNullable<{
+        index: number;
+        point: Point;
+        isDragging?: boolean;
+      }> => update !== null,
     );
+
+    LinearElementEditor.movePoints(element, updates, scene, {
+      startBinding: bindings.startBinding,
+      endBinding: bindings.endBinding,
+    });
 
     // updateElbowArrowBindPointsToSnapToElementOutline(
     //   element,
@@ -702,19 +724,18 @@ const updateBoundPoint = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   scene: Scene,
-): void => {
+): Point | null | undefined => {
   if (
     binding == null ||
     // We only need to update the other end if this is a 2 point line element
     (binding.elementId !== bindableElement.id &&
       linearElement.points.length > 2)
   ) {
-    return;
+    return null;
   }
 
   const direction = startOrEnd === "startBinding" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
-  let newEdgePoint: Point;
 
   if (isArrowElement(linearElement) && linearElement.elbowed) {
     const { fixedPoint } = binding
@@ -733,45 +754,46 @@ const updateBoundPoint = (
       bindableElement.x + (bindableElement.width - bindableElement.x) / 2,
       bindableElement.y + (bindableElement.height - bindableElement.y) / 2,
     ] as Point;
-    newEdgePoint = rotatePoint(
-      [globalX, globalY],
-      globalMidPoint,
-      bindableElement.angle,
-    );
-  } else {
-    const adjacentPointIndex = edgePointIndex - direction;
-    const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    return LinearElementEditor.pointFromAbsoluteCoords(
       linearElement,
-      adjacentPointIndex,
+      rotatePoint([globalX, globalY], globalMidPoint, bindableElement.angle),
       elementsMap,
     );
-    const focusPointAbsolute = determineFocusPoint(
-      bindableElement,
-      binding.focus,
-      adjacentPoint,
-      elementsMap,
-    );
+  }
+  const adjacentPointIndex = edgePointIndex - direction;
+  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    adjacentPointIndex,
+    elementsMap,
+  );
+  const focusPointAbsolute = determineFocusPoint(
+    bindableElement,
+    binding.focus,
+    adjacentPoint,
+    elementsMap,
+  );
 
-    // The linear element was not originally pointing inside the bound shape,
-    // we can point directly at the focus point
-    if (binding.gap === 0) {
+  let newEdgePoint: Point;
+
+  // The linear element was not originally pointing inside the bound shape,
+  // we can point directly at the focus point
+  if (binding.gap === 0) {
+    newEdgePoint = focusPointAbsolute;
+  } else {
+    const intersections = intersectElementWithLine(
+      bindableElement,
+      adjacentPoint,
+      focusPointAbsolute,
+      binding.gap,
+      elementsMap,
+    );
+    if (intersections.length === 0) {
+      // This should never happen, since focusPoint should always be
+      // inside the element, but just in case, bail out
       newEdgePoint = focusPointAbsolute;
     } else {
-      const intersections = intersectElementWithLine(
-        bindableElement,
-        adjacentPoint,
-        focusPointAbsolute,
-        binding.gap,
-        elementsMap,
-      );
-      if (intersections.length === 0) {
-        // This should never happen, since focusPoint should always be
-        // inside the element, but just in case, bail out
-        newEdgePoint = focusPointAbsolute;
-      } else {
-        // Guaranteed to intersect because focusPoint is always inside the shape
-        newEdgePoint = intersections[0];
-      }
+      // Guaranteed to intersect because focusPoint is always inside the shape
+      newEdgePoint = intersections[0];
     }
   }
 
@@ -1586,11 +1608,11 @@ type BoundElementsVisitingFunc = (
   bindingId: string,
 ) => void;
 
-type BindableElementVisitingFunc = (
+type BindableElementVisitingFunc<T> = (
   bindableElement: ExcalidrawElement | undefined,
   bindingProp: BindingProp,
   bindingId: string,
-) => void;
+) => T;
 
 /**
  * Tries to visit each bound element (does not have to be found).
@@ -1614,32 +1636,36 @@ const boundElementsVisitor = (
 /**
  * Tries to visit each bindable element (does not have to be found).
  */
-const bindableElementsVisitor = (
+const bindableElementsVisitor = <T>(
   elements: ElementsMap,
   element: ExcalidrawElement,
-  visit: BindableElementVisitingFunc,
-) => {
+  visit: BindableElementVisitingFunc<T>,
+): T[] => {
+  const result: T[] = [];
+
   if (element.frameId) {
     const id = element.frameId;
-    visit(elements.get(id), "frameId", id);
+    result.push(visit(elements.get(id), "frameId", id));
   }
 
   if (isBoundToContainer(element)) {
     const id = element.containerId;
-    visit(elements.get(id), "containerId", id);
+    result.push(visit(elements.get(id), "containerId", id));
   }
 
   if (isArrowElement(element)) {
     if (element.startBinding) {
       const id = element.startBinding.elementId;
-      visit(elements.get(id), "startBinding", id);
+      result.push(visit(elements.get(id), "startBinding", id));
     }
 
     if (element.endBinding) {
       const id = element.endBinding.elementId;
-      visit(elements.get(id), "endBinding", id);
+      result.push(visit(elements.get(id), "endBinding", id));
     }
   }
+
+  return result;
 };
 
 /**

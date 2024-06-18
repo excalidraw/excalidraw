@@ -1233,7 +1233,10 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     targetPoints: { index: number; point: Point; isDragging?: boolean }[],
     scene: Scene,
-    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
+    otherUpdates?: {
+      startBinding?: PointBinding | null;
+      endBinding?: PointBinding | null;
+    },
   ) {
     const { points } = element;
 
@@ -1280,6 +1283,11 @@ export class LinearElementEditor {
       offsetY,
       scene,
       otherUpdates,
+      targetPoints.reduce(
+        (dragging, targetPoint): boolean =>
+          dragging || targetPoint.isDragging === true,
+        false,
+      ),
     );
   }
 
@@ -1388,13 +1396,21 @@ export class LinearElementEditor {
     offsetX: number,
     offsetY: number,
     scene: Scene,
-    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
+    otherUpdates?: {
+      startBinding?: PointBinding | null;
+      endBinding?: PointBinding | null;
+    },
+    isDragging?: boolean,
   ) {
     if (isArrowElement(element) && element.elbowed) {
-      mutateElbowArrow(element as ExcalidrawArrowElement, scene, nextPoints, [
-        offsetX,
-        offsetY,
-      ]);
+      mutateElbowArrow(
+        element as ExcalidrawArrowElement,
+        scene,
+        nextPoints,
+        [offsetX, offsetY],
+        otherUpdates,
+        isDragging,
+      );
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
       const prevCoords = getElementPointsCoords(element, element.points);

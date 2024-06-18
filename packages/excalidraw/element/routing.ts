@@ -9,8 +9,6 @@ import {
   PointInTriangle,
   addVectors,
   arePointsEqual,
-  distance2d,
-  distanceSq2d,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -40,6 +38,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  PointBinding,
 } from "./types";
 
 type Node = {
@@ -65,6 +64,11 @@ export const mutateElbowArrow = (
   scene: Scene,
   nextPoints: readonly Point[],
   offset: Point,
+  otherUpdates?: {
+    startBinding?: PointBinding | null;
+    endBinding?: PointBinding | null;
+  },
+  isDragging?: boolean,
 ) => {
   debugClear();
 
@@ -80,16 +84,15 @@ export const mutateElbowArrow = (
       arrow.y + offset[1],
     ]),
   ];
-
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
-    arrow.startBinding
+    arrow.startBinding && !isDragging
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
       : getHoveredElementForBinding(
           { x: startGlobalPoint[0], y: startGlobalPoint[1] },
           scene,
         ),
-    arrow.endBinding
+    arrow.endBinding && !isDragging
       ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
       : getHoveredElementForBinding(
           { x: endGlobalPoint[0], y: endGlobalPoint[1] },
@@ -228,15 +231,16 @@ export const mutateElbowArrow = (
   );
 
   if (path) {
-    // startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
-    // path.forEach((node) => debugDrawPoint(node.pos, "red"));
-    // endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
+    startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
+    path.forEach((node) => debugDrawPoint(node.pos, "red"));
+    endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
 
     const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
     startDongle && points.unshift(startGlobalPoint);
     endDongle && points.push(endGlobalPoint);
 
     mutateElement(arrow, {
+      ...otherUpdates,
       ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
     });
   }
