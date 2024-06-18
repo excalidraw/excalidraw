@@ -20,6 +20,7 @@ import {
   FONT_FAMILY,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
+  isSafari,
 } from "../constants";
 import type { MaybeTransformHandleType } from "./transformHandles";
 import { isTextElement } from ".";
@@ -31,6 +32,7 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import type { ExtractSetType, MakeBrand } from "../utility-types";
+import { hostPlugin } from "../components/App";
 
 export const normalizeText = (text: string) => {
   return (
@@ -298,7 +300,63 @@ export const measureText = (
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
   const width = getTextWidth(text, font);
-  return { width, height };
+  const baseline = measureBaseline(text, font, lineHeight);
+
+  return { width, height, baseline };
+};
+
+export const measureBaseline = (
+  text: string,
+  font: FontString,
+  lineHeight: ExcalidrawTextElement["lineHeight"],
+  wrapInContainer?: boolean,
+) => {
+  //zsviczian - avoiding frequent dom event at the top level of the document
+  //addressess slow performance when scaling sticky notes in Obsidian popout windows
+  const textMeasureDiv = hostPlugin?.textMeasureDiv ?? document.body; //zsviczian
+  const container = document.createElement("div");
+  container.style.position = "absolute";
+  container.style.whiteSpace = "pre";
+  container.style.font = font;
+  container.style.minHeight = "1em";
+  if (wrapInContainer) {
+    container.style.overflow = "hidden";
+    container.style.wordBreak = "break-word";
+    container.style.whiteSpace = "pre-wrap";
+  }
+
+  container.style.lineHeight = String(lineHeight);
+
+  container.innerText = text;
+
+  // Baseline is important for positioning text on canvas
+  textMeasureDiv.appendChild(container); //zsviczian
+
+  const span = document.createElement("span");
+  span.style.display = "inline-block";
+  span.style.overflow = "hidden";
+  span.style.width = "1px";
+  span.style.height = "1px";
+  container.appendChild(span);
+  let baseline = span.offsetTop + span.offsetHeight;
+  const height = container.offsetHeight;
+
+  if (isSafari) {
+    const canvasHeight = getTextHeight(text, parseFloat(font), lineHeight);
+    const fontSize = parseFloat(font);
+    // In Safari the font size gets rounded off when rendering hence calculating the safari height and shifting the baseline if it differs
+    // from the actual canvas height
+    const domHeight = getTextHeight(text, Math.round(fontSize), lineHeight);
+    if (canvasHeight > height) {
+      baseline += canvasHeight - domHeight;
+    }
+
+    if (height > canvasHeight) {
+      baseline -= domHeight - canvasHeight;
+    }
+  }
+  textMeasureDiv.removeChild(container); //zsviczian
+  return baseline;
 };
 
 /**
