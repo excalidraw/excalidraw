@@ -48,8 +48,7 @@ export async function diagramToHTML({
   theme?: Theme;
 }) {
   const body: OpenAIInput.ChatCompletionCreateParamsBase = {
-    model: "gpt-4-vision-preview",
-    // 4096 are max output tokens allowed for `gpt-4-vision-preview` currently
+    model: "gpt-4o",
     max_tokens: 4096,
     temperature: 0.1,
     messages: [
