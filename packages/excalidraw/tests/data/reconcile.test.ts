@@ -1,5 +1,5 @@
 import type { RemoteExcalidrawElement } from "../../data/reconcile";
-import { reconcileElements,shouldDiscardRemoteElement, globalCoverageData } from "../../data/reconcile";
+import { reconcileElements, shouldDiscardRemoteElement, globalCoverageData } from "../../data/reconcile";
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
@@ -8,7 +8,6 @@ import { syncInvalidIndices } from "../../fractionalIndex";
 import { randomInteger } from "../../random";
 import type { AppState } from "../../types";
 import { cloneJSON } from "../../utils";
-
 type Id = string;
 type ElementLike = {
   id: string;
@@ -369,10 +368,84 @@ describe("elements reconciliation", () => {
     };
     testIdentical([el1, el2], [el2, el1], ["A", "B"]);
   });
+
   afterAll(() => {
     const total = 7;
     const taken = Object.values(globalCoverageData).filter(val => val === true).length;
     console.log("Coverage of the function:", globalCoverageData);
     console.log("Branch coverage percentage:", `${(taken / total * 100).toFixed(2)}%`);
   });
+
 });
+
+describe("shouldDiscardRemoteElement", () => {
+  let mockAppState: AppState;
+  let e1:any;
+  let e2:any; 
+
+  beforeEach(() => {
+    mockAppState = {
+      editingElement: null,
+      resizingElement: null,
+      draggingElement: null,
+    } as AppState;
+
+    e1 = {
+      id: "A",
+      version: 1,
+      versionNonce: 1,
+      index: "a0",
+    };
+    e2 = {
+      id: "B",
+      version: 1,
+      versionNonce: 1,
+      index: "a0",
+    };
+  });
+
+  it("should return true if the local element is being edited", () => {
+    mockAppState.editingElement = { id: e1.id } as any;
+    expect(shouldDiscardRemoteElement(mockAppState, e1, e2)).toBe(true);
+  });
+
+  it("should return true if the local element is being resized", () => {
+    mockAppState.resizingElement = { id: e1.id } as any;
+    expect(shouldDiscardRemoteElement(mockAppState, e1, e2)).toBe(true);
+  });
+
+  it("should return true if the local element is being dragged", () => {
+    mockAppState.draggingElement = { id: e1.id } as any;
+    expect(shouldDiscardRemoteElement(mockAppState, e1, e2)).toBe(true);
+  });
+
+  it("should return true if the local element is newer", () => {
+    e1.version = 2;
+    e2.version = 1;
+    expect(shouldDiscardRemoteElement(mockAppState, e1, e2)).toBe(true);
+  });
+  it("should return false if the remote element is newer", () => {
+    e1.version = 1;
+    e2.version = 2;
+    expect(shouldDiscardRemoteElement(mockAppState, e1, e2)).toBe(false);
+  });
+
+  it("should return true as remote object has newer versionNonce and both versions are same", () => {
+    e2.versionNonce = 2;
+    expect(shouldDiscardRemoteElement(mockAppState, e1, e2)).toBe(true);
+  });
+
+  it("should return false if there is no local element", () => {
+    expect(shouldDiscardRemoteElement(mockAppState, undefined, e2)).toBe(false);
+  });
+
+  afterAll(() => {
+    const total = 7;
+    const taken = Object.values(globalCoverageData).filter(val => val === true).length;
+    console.log("Coverage of the function:", globalCoverageData);
+    console.log("Branch coverage percentage:", `${(taken / total * 100).toFixed(2)}%`);
+  });
+
+});
+
+

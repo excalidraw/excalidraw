@@ -10,7 +10,7 @@ export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
 export type RemoteExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"RemoteExcalidrawElement">;
 
-  export let globalCoverageData = {
+  export const globalCoverageData = {
     localDef: false,
     editing: false,
     resizing: false,

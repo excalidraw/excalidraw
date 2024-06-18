@@ -9,12 +9,11 @@ import * as sizeHelpers from "../../element/sizeHelpers";
 import { API } from "../helpers/api";
 import { getDefaultAppState } from "../../appState";
 import type { ImportedDataState } from "../../data/types";
-import type { NormalizedZoomValue } from "../../types";
+import type { NormalizedZoomValue, LibraryItem } from "../../types";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 import { vi } from "vitest";
 import { restoreLibraryItem, restoreLibraryItems, globalCoverageData } from "../../data/restore";
-
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
@@ -810,6 +809,112 @@ describe("repairing bindings", () => {
         containerId: null,
       }),
     ]);
+  });
+});
+
+describe("restoreLibraryItem", ()=> {
+    it("should restore a valid LibraryItem", () => {
+      const element1 = API.createElement({
+        id: "1",
+        type: "text",
+        isDeleted: false,
+      });
+      const element2 = API.createElement({
+        id: "2",
+        type: "text",
+        isDeleted: false,
+      });
+      const libraryItem: LibraryItem = {
+        id: "item1",
+        elements: [element1, element2],
+        status: "published",
+        created: 1620000000000,
+      };
+      const restoredItem = restoreLibraryItem(libraryItem);
+      expect(restoredItem).not.toBeNull();
+      expect(restoredItem?.elements.length).toBe(2);
+      expect(restoredItem?.elements[0].id).toBe("1");
+      expect(restoredItem?.elements[1].id).toBe("2");
+    });
+    it("not-valid library item",()=> {
+      const libraryItem: LibraryItem = {
+        id: "item1",
+        elements: [],
+        status: "published",
+        created: 1620000000000,
+      };
+      const restoredItem = restoreLibraryItem(libraryItem);
+      expect(restoredItem).toBeNull();
+    });
+});
+
+describe("restoreLibraryItems", () => {
+  const defaultStatus: LibraryItem["status"] = "published";
+  const element1 = API.createElement({
+    id: "1",
+    type: "text",
+    isDeleted: false,
+  });
+  
+  it("simple library items test without removal", () => {
+    const element2 = API.createElement({
+      id: "2",
+      type: "text",
+      isDeleted: false,
+    });
+  
+    const libraryItem: LibraryItem = {
+      id: "item1",
+      elements: [element1, element2],
+      status: "published",
+      created: 1620000000000,
+    };
+    const libraryItems: ImportedDataState["libraryItems"] = [libraryItem];
+    const restoredItems = restoreLibraryItems(libraryItems, defaultStatus);
+    expect(restoredItems).toHaveLength(1);
+  })
+
+  it("simple library items test with removal", () => {
+    const element2 = API.createElement({
+      id: "2",
+      type: "text",
+      isDeleted: true,
+    });
+  
+    const libraryItem: LibraryItem = {
+      id: "item1",
+      elements: [element1, element2],
+      status: "published",
+      created: 1620000000000,
+    };
+    const libraryItems: ImportedDataState["libraryItems"] = [libraryItem];
+    const restoredItems = restoreLibraryItems(libraryItems, defaultStatus);
+    expect(restoredItems).toHaveLength(1);
+
+  });
+  it("handling empty arrays should return empty", () => {
+    const restoredItems = restoreLibraryItems([], defaultStatus);
+    expect(restoredItems).toEqual([]);
+  });
+  //isArray branch
+  it("handling empty array of an array", () => {
+    const libraryItems: ImportedDataState["libraryItems"] = [[]]; // Array of array
+    const restoredItems = restoreLibraryItems(libraryItems, defaultStatus);
+    expect(restoredItems).toEqual([]);
+  });
+
+  it("handling non-empty array of an array", () => {
+    const element2 = API.createElement({
+      id: "2",
+      type: "text",
+      isDeleted: true,
+    });
+  
+    const libraryItems: ImportedDataState["libraryItems"] = [[element1, element2]]; // Array of array with elements
+    const restoredItems = restoreLibraryItems(libraryItems, defaultStatus);
+    expect(restoredItems.length).toEqual(1);
+    console.log("WOHOOO");
+    
   });
   afterAll(() => {
     const total = 5;

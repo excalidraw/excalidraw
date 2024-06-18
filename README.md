@@ -83,23 +83,51 @@ https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211
 
 ### Individual tests
 
-<The following is supposed to be repeated for each group member>
+Team member name: Kacper Domagała
 
-<Group member name>
+#### Test 1 restoreLibraryElements
 
-<Test 1>
+<table>
+  <tr>
+    <td><img src="./readme-assets/Restore P1.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Restore Tests P1</div>
+    </td>
+    <td><img src="./readme-assets/RestoreP2.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">Restore Tests P2</div>
+    </td>
+  </tr>
+</table>
+<img src= "./readme-assets/Restore P3.png" width="400">
+<div>Restore Tests P3</div>
 
-<Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
+<img src= "./readme-assets/Restore-normal.png">
+<div align="center">Before improvements</div>
 
-<Provide a screenshot of the old coverage results (the same as you already showed above)>
+<img src= "./readme-assets/Restore-improved.png">
+<div align="center">After improvements</div>
 
-<Provide a screenshot of the new coverage results>
+The previous tests for these functions were not existing, so by writing new tests I was able to increase the overall coverage.
 
-<State the coverage improvement with a number and elaborate on why the coverage is improved>
+#### Test 2 shouldDiscardRemoteElement
 
-<Test 2>
+<table>
+  <tr>
+    <td><img src="./readme-assets/Reconcile P1.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Reconcile Tests P1</div>
+    </td>
+    <td><img src="./readme-assets/Reconcile P2.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">Reconcile Tests P2</div>
+    </td>
+  </tr>
+</table>
 
-<Provide the same kind of information provided for Test 1>
+<img src= "./readme-assets/Reconcile-normal.png">
+<div align="center">Before improvements</div>
+
+<img src= "./readme-assets/Reconcile-improved.png">
+<div align="center">After improvements</div>
+
+The previous tests were accounting that the function <i>shouldDiscardRemoteElement</i> was tested with other test cases. Nevertheless as it was visible with the custom coverage some branches of the function were not tested. By creating custom tests for each of the "if statement" conditions I was able to improve the coverage to 100%.
 
 ### Overall
 
