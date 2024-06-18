@@ -7700,6 +7700,19 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(draggingElement, {
             points: [...points, [dx, dy]],
           });
+        } else if (
+          points.length > 1 &&
+          isArrowElement(draggingElement) &&
+          draggingElement.elbowed
+        ) {
+          mutateElbowArrow(
+            draggingElement,
+            this.scene,
+            [...points.slice(0, -1), [dx, dy]],
+            [0, 0],
+            undefined,
+            true,
+          );
         } else if (points.length === 2) {
           mutateElement(draggingElement, {
             points: [...points.slice(0, -1), [dx, dy]],
