@@ -506,9 +506,10 @@ export const updateBoundElements = (
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
+    scale?: { scaleX: number; scaleY: number };
   },
 ) => {
-  const { newSize, simultaneouslyUpdated } = options ?? {};
+  const { newSize, scale, simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -516,7 +517,7 @@ export const updateBoundElements = (
   if (!isBindableElement(changedElement)) {
     return;
   }
-
+  console.log(changedElement.id);
   boundElementsVisitor(elementsMap, changedElement, (element) => {
     if (!isLinearElement(element) || element.isDeleted) {
       return;
@@ -534,6 +535,7 @@ export const updateBoundElements = (
         "start",
         element.startBinding,
         newSize,
+        scale,
         elementsMap,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
@@ -542,6 +544,7 @@ export const updateBoundElements = (
         "end",
         element.endBinding,
         newSize,
+        scale,
         elementsMap,
       ),
     };
@@ -591,8 +594,12 @@ export const updateBoundElements = (
     );
 
     LinearElementEditor.movePoints(element, updates, scene, {
-      startBinding: bindings.startBinding,
-      endBinding: bindings.endBinding,
+      ...(changedElement.id === element.startBinding?.elementId
+        ? { startBinding: bindings.startBinding }
+        : {}),
+      ...(changedElement.id === element.endBinding?.elementId
+        ? { endBinding: bindings.endBinding }
+        : {}),
     });
 
     // updateElbowArrowBindPointsToSnapToElementOutline(
@@ -822,7 +829,22 @@ const calculateFixedPointForElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
+  scale?: { scaleX: number; scaleY: number },
 ) => {
+  let { fixedPoint } =
+    startOrEnd === "start"
+      ? linearElement.startBinding ?? {}
+      : linearElement.endBinding ?? {};
+
+  if (fixedPoint && scale) {
+    return {
+      fixedPoint: [
+        fixedPoint[0] * scale.scaleX,
+        fixedPoint[1] * scale.scaleY,
+      ] as Point,
+    };
+  }
+
   const bounds = getElementBounds(hoveredElement, elementsMap);
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
@@ -841,7 +863,7 @@ const calculateFixedPointForElbowArrowBinding = (
     globalMidPoint,
     -hoveredElement.angle,
   );
-  const fixedPoint = [
+  fixedPoint = [
     nonRotatedGlobalPoint[0] - bounds[0],
     nonRotatedGlobalPoint[1] - bounds[1],
   ] as Point;
@@ -855,6 +877,7 @@ const maybeCalculateNewGapWhenScaling = (
   startOrEnd: "start" | "end",
   currentBinding: PointBinding | null | undefined,
   newSize: { width: number; height: number } | undefined,
+  scale: { scaleX: number; scaleY: number } | undefined,
   elementsMap: ElementsMap,
 ): PointBinding | null | undefined => {
   if (currentBinding == null || newSize == null) {
@@ -870,11 +893,13 @@ const maybeCalculateNewGapWhenScaling = (
       gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
     ),
   );
+
   const newFixedPointUpdate = calculateFixedPointForElbowArrowBinding(
     arrowElement,
     changedElement,
     startOrEnd,
     elementsMap,
+    scale,
   );
 
   return { elementId, gap: newGap, focus, ...newFixedPointUpdate };

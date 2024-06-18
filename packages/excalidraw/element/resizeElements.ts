@@ -717,6 +717,7 @@ export const resizeSingleElement = (
 
     updateBoundElements(element, elementsMap, scene, {
       newSize: { width: resizedElement.width, height: resizedElement.height },
+      scale: { scaleX, scaleY },
     });
 
     if (boundTextElement && boundTextFont != null) {
