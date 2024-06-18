@@ -1165,7 +1165,7 @@ export class LinearElementEditor {
     const nextPoints = points.map((point, idx) => {
       const selectedPointData = targetPoints.find((p) => p.index === idx);
       if (selectedPointData) {
-        if (selectedOriginPoint) {
+        if (idx === 0) {
           return point;
         }
 
