@@ -54,7 +54,6 @@ export const shouldDiscardRemoteElement = (
   return ret;
 };
 
-
 export const reconcileElements = (
   localElements: readonly OrderedExcalidrawElement[],
   remoteElements: readonly RemoteExcalidrawElement[],

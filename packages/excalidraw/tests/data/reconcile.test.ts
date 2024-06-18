@@ -8,7 +8,6 @@ import { syncInvalidIndices } from "../../fractionalIndex";
 import { randomInteger } from "../../random";
 import type { AppState } from "../../types";
 import { cloneJSON } from "../../utils";
-
 type Id = string;
 type ElementLike = {
   id: string;

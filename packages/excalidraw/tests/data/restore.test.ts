@@ -14,7 +14,6 @@ import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 import { vi } from "vitest";
 import { restoreLibraryItem, restoreLibraryItems, globalCoverageData } from "../../data/restore";
-
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");
 
