@@ -84,6 +84,7 @@ export const mutateElbowArrow = (
       arrow.y + offset[1],
     ]),
   ];
+
   const elementsMap = scene.getNonDeletedElementsMap();
   const [startElement, endElement] = [
     arrow.startBinding && !isDragging
