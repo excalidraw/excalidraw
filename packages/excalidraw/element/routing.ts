@@ -196,6 +196,11 @@ export const mutateElbowArrow = (
       debugDrawBounds(x!, "green");
       return x;
     }) as Bounds[];
+
+  const overlap =
+    dynamicAABBs.length === 2 &&
+    boundsOverlap(dynamicAABBs[0], dynamicAABBs[1]);
+
   // Canculate Grid positions
   const grid = calculateGrid(
     boundingBoxes,
@@ -204,6 +209,7 @@ export const mutateElbowArrow = (
     endDonglePosition ? endDonglePosition : endGlobalPoint,
     endHeading,
     common,
+    overlap,
   );
   const startDongle =
     startDonglePosition && pointToGridNode(startDonglePosition, grid);
@@ -227,7 +233,7 @@ export const mutateElbowArrow = (
     grid,
     startHeading ? startHeading : HEADING_RIGHT,
     endHeading ? endHeading : HEADING_RIGHT,
-    boundingBoxes,
+    overlap ? [] : boundingBoxes,
   );
 
   if (path) {
@@ -243,6 +249,8 @@ export const mutateElbowArrow = (
       ...otherUpdates,
       ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
     });
+  } else {
+    console.log("CANNOT ROUTE");
   }
 
   // Debug
@@ -424,6 +432,7 @@ const calculateGrid = (
   end: Point,
   endHeading: Heading,
   common: Bounds,
+  overlap: boolean,
 ): Grid => {
   const horizontal = new Set<number>();
   const vertical = new Set<number>();
@@ -492,6 +501,7 @@ const calculateGrid = (
       )
       .map((node) => {
         const valid =
+          !overlap ||
           start[0] === node.pos[0] ||
           start[1] === node.pos[1] ||
           end[0] === node.pos[0] ||
@@ -503,19 +513,21 @@ const calculateGrid = (
                 segments.map((segment) => isPointOnLine(segment, node.pos)),
               ),
           );
+
         node.closed = !valid;
         return node;
       })
       .map((node) => {
-        const invalid = isAnyTrue(
-          ...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)),
-        );
+        const invalid =
+          !overlap &&
+          isAnyTrue(...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)));
 
         node.closed = invalid;
         return node;
       })
       .map((node) => {
         if (
+          !overlap &&
           pointOnBounds(node.pos, common) &&
           (arePointsClose(oppositeStartDongle, node.pos) ||
             arePointsClose(oppositeEndDongle, node.pos))
@@ -887,53 +899,6 @@ const gridNodeFromAddr = (
   return grid.data[row * grid.col + col] ?? null;
 };
 
-// const getDonglePosition = (p: Point, heading: Heading, grid: Grid) => {
-//   switch (heading) {
-//     case HEADING_UP:
-//       return (
-//         grid.data
-//           .filter((node) => node && node.pos[0] === p[0] && node.pos[1] < p[1])
-//           .reduce(
-//             (closest, node) =>
-//               node && node.pos[1] > closest[1] ? node.pos : closest,
-//             [p[0], -Infinity] as Point,
-//           ) ?? p
-//       );
-//     case HEADING_DOWN:
-//       return (
-//         grid.data
-//           .filter((node) => node && node.pos[0] === p[0] && node.pos[1] > p[1])
-//           .reduce(
-//             (closest, node) =>
-//               node && node.pos[1] < closest[1] ? node.pos : closest,
-//             [p[0], Infinity] as Point,
-//           ) ?? p
-//       );
-//     case HEADING_LEFT:
-//       return (
-//         grid.data
-//           .filter((node) => node && node.pos[1] === p[1] && node.pos[0] < p[0])
-//           .reduce(
-//             (closest, node) =>
-//               node && node.pos[0] > closest[0] ? node.pos : closest,
-//             [-Infinity, p[1]] as Point,
-//           ) ?? p
-//       );
-//     case HEADING_RIGHT:
-//       return (
-//         grid.data
-//           .filter((node) => node && node.pos[1] === p[1] && node.pos[0] > p[0])
-//           .reduce(
-//             (closest, node) =>
-//               node && node.pos[0] < closest[0] ? node.pos : closest,
-//             [Infinity, p[1]] as Point,
-//           ) ?? p
-//       );
-//   }
-
-//   return p;
-// };
-
 /**
  * Get node for global point on canvas (if exists)
  */
@@ -1167,4 +1132,17 @@ const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
       return 2;
   }
   return 3;
+};
+
+const boundsOverlap = (a: Bounds, b: Bounds) => {
+  return isAnyTrue(
+    pointInsideBounds([a[0], a[1]], b),
+    pointInsideBounds([a[2], a[1]], b),
+    pointInsideBounds([a[2], a[3]], b),
+    pointInsideBounds([a[0], a[2]], b),
+    pointInsideBounds([b[0], b[1]], a),
+    pointInsideBounds([b[2], b[1]], a),
+    pointInsideBounds([b[2], b[3]], a),
+    pointInsideBounds([b[0], b[2]], a),
+  );
 };

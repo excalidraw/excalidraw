@@ -517,7 +517,7 @@ export const updateBoundElements = (
   if (!isBindableElement(changedElement)) {
     return;
   }
-  console.log(changedElement.id);
+
   boundElementsVisitor(elementsMap, changedElement, (element) => {
     if (!isLinearElement(element) || element.isDeleted) {
       return;
