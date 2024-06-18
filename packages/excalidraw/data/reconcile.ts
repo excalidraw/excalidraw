@@ -10,28 +10,50 @@ export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
 export type RemoteExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"RemoteExcalidrawElement">;
 
-const shouldDiscardRemoteElement = (
+export let globalCoverageData = {
+  localDef: false,
+  editing: false,
+  resizing: false,
+  dragging: false,
+  version: false,
+  versionNonce: false,
+  falseBranch: false,
+};
+
+export const shouldDiscardRemoteElement = (
   localAppState: AppState,
   local: OrderedExcalidrawElement | undefined,
   remote: RemoteExcalidrawElement,
 ): boolean => {
-  if (
-    local &&
-    // local element is being edited
-    (local.id === localAppState.editingElement?.id ||
-      local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.draggingElement?.id || // TODO: Is this still valid? As draggingElement is selection element, which is never part of the elements array
-      // local element is newer
-      local.version > remote.version ||
-      // resolve conflicting edits deterministically by taking the one with
-      // the lowest versionNonce
-      (local.version === remote.version &&
-        local.versionNonce < remote.versionNonce))
-  ) {
-    return true;
+  let ret = false;
+  if (local) {
+    globalCoverageData.localDef = true;
+    if (local.id === localAppState.editingElement?.id) {
+      globalCoverageData.editing = true;
+      ret = true;
+    }
+    if (local.id === localAppState.resizingElement?.id) {
+      globalCoverageData.resizing = true;
+      ret = true;
+    }
+    if (local.id === localAppState.draggingElement?.id) {
+      globalCoverageData.dragging = true;
+      ret = true;
+    }
+    if (local.version > remote.version) {
+      globalCoverageData.version = true;
+      ret = true;
+    }
+    if (local.version === remote.version && local.versionNonce < remote.versionNonce) {
+      globalCoverageData.versionNonce = true;
+      ret = true;
+    }
+  } else {
+    globalCoverageData.falseBranch = true;
   }
-  return false;
+  return ret;
 };
+
 
 export const reconcileElements = (
   localElements: readonly OrderedExcalidrawElement[],
