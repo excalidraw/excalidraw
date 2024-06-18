@@ -36,7 +36,7 @@ The following is the outcome of running the existing tool on an unchanged versio
 
 ### Your own coverage tool
 
-Team member name: Kacper Domagała
+Team member name: Kacper
 
 #### Function 1: restoreLibraryItems
 
@@ -83,7 +83,7 @@ https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211
 
 ### Individual tests
 
-Team member name: Kacper Domagała
+Team member name: Kacper
 
 #### Test 1 restoreLibraryElements
 
@@ -144,4 +144,5 @@ New coverage results:
 
 ## Statement of individual contributions
 
-<Write what each group member did>
+#### Kacper:
+I was respobsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
