@@ -13,6 +13,7 @@ import type { NormalizedZoomValue } from "../../types";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
 import { vi } from "vitest";
+import { restoreLibraryItem, restoreLibraryItems, globalCoverageData } from "../../data/restore";
 
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");
@@ -809,5 +810,11 @@ describe("repairing bindings", () => {
         containerId: null,
       }),
     ]);
+  });
+  afterAll(() => {
+    const total = 5;
+    const taken = Object.values(globalCoverageData).filter(val => val === true).length;
+    console.log("Coverage of the function:", globalCoverageData);
+    console.log("Branch coverage percentage:", `${(taken / total * 100).toFixed(2)}%`);
   });
 });

@@ -1,5 +1,5 @@
 import type { RemoteExcalidrawElement } from "../../data/reconcile";
-import { reconcileElements } from "../../data/reconcile";
+import { reconcileElements,shouldDiscardRemoteElement, globalCoverageData } from "../../data/reconcile";
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
@@ -368,5 +368,11 @@ describe("elements reconciliation", () => {
       index: "a0",
     };
     testIdentical([el1, el2], [el2, el1], ["A", "B"]);
+  });
+  afterAll(() => {
+    const total = 7;
+    const taken = Object.values(globalCoverageData).filter(val => val === true).length;
+    console.log("Coverage of the function:", globalCoverageData);
+    console.log("Branch coverage percentage:", `${(taken / total * 100).toFixed(2)}%`);
   });
 });
