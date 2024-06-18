@@ -191,17 +191,18 @@ export const mutateElbowArrow = (
       ? getDonglePosition(dynamicAABBs[1], endHeading, endGlobalPoint)
       : scaleVector(endHeading, -20));
 
-  const boundingBoxes = [...(dynamicAABBs ?? [])]
-    .filter((aabb) => aabb !== null)
-    .map((x) => {
-      debugDrawBounds(x!, "green");
-      return x;
-    }) as Bounds[];
+  const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
+    (aabb) => aabb !== null,
+  );
+  // .map((x) => {
+  //   debugDrawBounds(x!, "green");
+  //   return x;
+  // }) as Bounds[];
 
   const overlap =
     dynamicAABBs.length === 2 &&
     boundsOverlap(dynamicAABBs[0], dynamicAABBs[1]);
-
+  overlap && console.log("OVERLAP");
   // Canculate Grid positions
   const grid = calculateGrid(
     boundingBoxes,
@@ -227,6 +228,12 @@ export const mutateElbowArrow = (
     startNode.closed = true;
   }
 
+  const startDirectionPreference = directionPreference(
+    startHeading,
+    startElement,
+    arrow.startBinding?.fixedPoint,
+  );
+
   // Create path to end dongle from start dongle
   const path = astar(
     startDongle ? startDongle : startNode!,
@@ -235,6 +242,8 @@ export const mutateElbowArrow = (
     startHeading ? startHeading : HEADING_RIGHT,
     endHeading ? endHeading : HEADING_RIGHT,
     overlap ? [] : boundingBoxes,
+    bias,
+    startDirectionPreference,
   );
 
   if (path) {
@@ -269,16 +278,16 @@ export const mutateElbowArrow = (
   // );
 
   // Debug: Grid visualization
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -291,7 +300,26 @@ const astar = (
   startHeading: Heading,
   endHeading: Heading,
   aabbs: Bounds[],
+  bias: number,
+  startDirectionPreference: Heading,
 ) => {
+  const startEndCommonAABB = commonAABB([
+    [
+      // Start point
+      start.pos[0] - bias - 1,
+      start.pos[1] - bias - 1,
+      start.pos[0] + bias + 1,
+      start.pos[1] + bias + 1,
+    ],
+    [
+      // End point
+      end.pos[0] - bias + 1,
+      end.pos[1] - bias + 1,
+      end.pos[0] + bias + 1,
+      end.pos[1] + bias + 1,
+    ],
+  ]);
+  debugDrawBounds(startEndCommonAABB, "green");
   const bendMultiplier = m_dist(start.pos, end.pos);
   const open = new BinaryHeap<Node>((node) => node.f);
 
@@ -342,6 +370,15 @@ const astar = (
       // The g score is the shortest distance from start to current node.
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
       const neighborHeading = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
+
+      // Start routing preference
+      const nonPreferredDirectionCost =
+        current.addr[0] === start.addr[0] &&
+        current.addr[1] === start.addr[1] &&
+        i !== headingToNeighborIndex(startDirectionPreference)
+          ? Math.pow(bendMultiplier, 3)
+          : 0;
+
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
@@ -365,7 +402,11 @@ const astar = (
         neighbor.parent = current;
         neighbor.h =
           m_dist(end.pos, neighbor.pos) +
-          estBendCount * Math.pow(bendMultiplier, 2);
+          estBendCount * bendMultiplier +
+          (pointInsideBounds(neighbor.pos, startEndCommonAABB)
+            ? 0
+            : bendMultiplier) +
+          nonPreferredDirectionCost;
         neighbor.g = gScore;
         neighbor.f = neighbor.g + neighbor.h;
         if (!beenVisited) {
@@ -383,15 +424,11 @@ const astar = (
 };
 
 const pathTo = (start: Node, node: Node) => {
-  //console.log(".....");
   let curr = node;
   const path = [];
   while (curr.parent) {
     path.unshift(curr);
     curr = curr.parent;
-    // curr.parent
-    //   ? console.log(curr.g, curr.h) //console.log(m_dist(curr.pos, curr.parent!.pos))
-    //   : console.log("|");
   }
   path.unshift(start);
 
@@ -972,6 +1009,25 @@ const aabbForElement = (element: ExcalidrawElement, offset?: number) => {
   }
 
   return bounds;
+};
+
+const directionPreference = (
+  heading: Heading,
+  bindable: ExcalidrawBindableElement | null,
+  fixedPoint: Point | undefined,
+) => {
+  if (!bindable || !fixedPoint) {
+    return heading;
+  }
+
+  const horizontalMid = bindable.width / 2;
+  const verticalMid = bindable.height / 2;
+
+  if (heading === HEADING_UP || heading === HEADING_DOWN) {
+    return horizontalMid > fixedPoint[0] ? HEADING_LEFT : HEADING_RIGHT;
+  }
+
+  return verticalMid > fixedPoint[1] ? HEADING_UP : HEADING_DOWN;
 };
 
 // Gets the heading for the point by creating a bounding box around the rotated
