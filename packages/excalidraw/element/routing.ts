@@ -21,7 +21,12 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugClear, debugDrawBounds, debugDrawPoint } from "../visualdebug";
+import {
+  debugClear,
+  debugDrawBounds,
+  debugDrawPoint,
+  debugDrawSegments,
+} from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -69,8 +74,11 @@ export const mutateElbowArrow = (
     console.log(arrow);
   }
   const [startGlobalPoint, endGlobalPoint] = [
-    translatePoint(nextPoints[0], [arrow.x, arrow.y]),
-    translatePoint(nextPoints[nextPoints.length - 1], [arrow.x, arrow.y]),
+    translatePoint(nextPoints[0], [arrow.x + offset[0], arrow.y + offset[1]]),
+    translatePoint(nextPoints[nextPoints.length - 1], [
+      arrow.x + offset[0],
+      arrow.y + offset[1],
+    ]),
   ];
 
   const elementsMap = scene.getNonDeletedElementsMap();
@@ -229,11 +237,7 @@ export const mutateElbowArrow = (
     endDongle && points.push(endGlobalPoint);
 
     mutateElement(arrow, {
-      ...normalizedArrowElementUpdate(
-        simplifyElbowArrowPoints(points),
-        offset[0],
-        offset[1],
-      ),
+      ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
     });
   }
 
@@ -252,16 +256,16 @@ export const mutateElbowArrow = (
   // );
 
   // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
+  for (let col = 0; col < grid.col; col++) {
+    const a = gridNodeFromAddr([col, 0], grid)?.pos;
+    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
+  for (let row = 0; row < grid.row; row++) {
+    const a = gridNodeFromAddr([0, row], grid)?.pos;
+    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+    a && b && debugDrawSegments([a, b], "#DDD");
+  }
 };
 
 /**
@@ -366,7 +370,7 @@ const astar = (
 };
 
 const pathTo = (start: Node, node: Node) => {
-  console.log(".....");
+  //console.log(".....");
   let curr = node;
   const path = [];
   while (curr.parent) {
