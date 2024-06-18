@@ -132,7 +132,7 @@ export const isBindingElementType = (
 };
 
 export const isBindableElement = (
-  element: ExcalidrawElement | null,
+  element: ExcalidrawElement | null | undefined,
   includeLocked = true,
 ): element is ExcalidrawBindableElement => {
   return (

@@ -1573,6 +1573,18 @@ export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
   ),
 );
 
+export const angleIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M21 19h-18l9 -15" />
+    <path d="M20.615 15.171h.015" />
+    <path d="M19.515 11.771h.015" />
+    <path d="M17.715 8.671h.015" />
+    <path d="M15.415 5.971h.015" />
+  </g>,
+  tablerIconProps,
+);
+
 export const publishIcon = createIcon(
   <path
     d="M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zM393.4 288H328v112c0 8.8-7.2 16-16 16h-48c-8.8 0-16-7.2-16-16V288h-65.4c-14.3 0-21.4-17.2-11.3-27.3l105.4-105.4c6.2-6.2 16.4-6.2 22.6 0l105.4 105.4c10.1 10.1 2.9 27.3-11.3 27.3z"
@@ -2089,6 +2101,22 @@ export const arrowCurveRight = createIcon(
     <path d="M15.6819 3.18201L18.6819 6.18201L15.6819 9.18201" />
     <path d="M8.24264 18.2426C9.02369 17.4615 9.02369 16.1952 8.24264 15.4142C7.46159 14.6331 6.19526 14.6331 5.41421 15.4142C4.63316 16.1952 4.63316 17.4615 5.41421 18.2426C6.19526 19.0236 7.46159 19.0236 8.24264 18.2426Z" />
     <path d="M7.00011 15.0001C7.00011 15.0001 6.06372 9.82945 8.5 7.5C11.1852 4.93253 18.0001 6.00005 18.0001 6.00005" />
+  </g>,
+  tablerIconProps,
+);
+
+export const collapseDownIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 9l6 6l6 -6" />
+  </g>,
+  tablerIconProps,
+);
+
+export const collapseUpIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 15l6 -6l6 6" />
   </g>,
   tablerIconProps,
 );

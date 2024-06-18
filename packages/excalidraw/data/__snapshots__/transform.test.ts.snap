@@ -84,9 +84,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "ellipse-1",
+    "fixedPoint": [
+      12,
+      139,
+    ],
     "focus": -0.008153707962747813,
     "gap": 1,
   },
@@ -117,6 +121,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id47",
+    "fixedPoint": [
+      300,
+      150,
+    ],
     "focus": -0.08139534883720931,
     "gap": 1,
   },
@@ -139,9 +147,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "ellipse-1",
+    "fixedPoint": [
+      -3,
+      134,
+    ],
     "focus": 0.10666666666666667,
     "gap": 3.834326468444573,
   },
@@ -172,6 +184,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startArrowhead": null,
   "startBinding": {
     "elementId": "diamond-1",
+    "fixedPoint": [
+      131,
+      50,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -328,9 +344,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "text-2",
+    "fixedPoint": [
+      -205,
+      12.5,
+    ],
     "focus": 0,
     "gap": 205,
   },
@@ -361,6 +381,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "startArrowhead": null,
   "startBinding": {
     "elementId": "text-1",
+    "fixedPoint": [
+      70,
+      12.5,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -429,9 +453,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "id40",
+    "fixedPoint": [
+      0,
+      50,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -462,6 +490,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id39",
+    "fixedPoint": [
+      100,
+      50,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -604,9 +636,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "id44",
+    "fixedPoint": [
+      0,
+      12.5,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -637,6 +673,10 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id43",
+    "fixedPoint": [
+      70,
+      12.5,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -824,7 +864,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -871,7 +911,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": "triangle",
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -897,7 +937,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
-  "startArrowhead": "dot",
+  "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1971c2",
   "strokeStyle": "solid",
@@ -1463,9 +1503,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "Alice",
+    "fixedPoint": [
+      -5.299874999999986,
+      22,
+    ],
     "focus": 0,
     "gap": 5.299874999999986,
   },
@@ -1498,6 +1542,10 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startArrowhead": null,
   "startBinding": {
     "elementId": "Bob",
+    "fixedPoint": [
+      56.49246875,
+      22,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -1525,9 +1573,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": {
     "elementId": "B",
+    "fixedPoint": [
+      77.017,
+      79,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -1556,6 +1608,10 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startArrowhead": null,
   "startBinding": {
     "elementId": "Bob",
+    "fixedPoint": [
+      22.247468749999996,
+      44,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -1837,7 +1893,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -1889,7 +1945,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -1941,7 +1997,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -1993,7 +2049,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": "arrow",
+  "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,

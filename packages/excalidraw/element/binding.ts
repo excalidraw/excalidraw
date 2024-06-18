@@ -200,7 +200,10 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
     const element = elementsMap.get(
       elementId,
     ) as NonDeleted<ExcalidrawBindableElement>;
-    if (bindingBorderTest(element, coors, scene)) {
+    if (
+      isBindableElement(element) &&
+      bindingBorderTest(element, coors, scene)
+    ) {
       return element;
     }
   }

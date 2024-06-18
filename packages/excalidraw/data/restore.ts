@@ -2,6 +2,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawElementType,
+  ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -22,7 +23,11 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
+import {
+  isLinearElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -486,6 +491,21 @@ export const restoreElements = (
           restoredElementsMap,
         ),
       );
+    }
+
+    if (isLinearElement(element)) {
+      if (
+        element.startBinding &&
+        !restoredElementsMap.has(element.startBinding.elementId)
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).startBinding = null;
+      }
+      if (
+        element.endBinding &&
+        !restoredElementsMap.has(element.endBinding.elementId)
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
+      }
     }
   }
 
