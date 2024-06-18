@@ -76,6 +76,9 @@ Team member name: Kacper Domagała
   <img src="./readme-assets/Coverage-result-reconcile.png" alt="Pre-coverage restore" title="Result-coverage reconcile" width="300" />
 </div>
 
+#### Link to the files changes: 
+https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211e5ae8b9b535cb26c27c
+
 ## Coverage improvement
 
 ### Individual tests
