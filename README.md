@@ -129,6 +129,9 @@ The previous tests for these functions were not existing, so by writing new test
 
 The previous tests were accounting that the function <i>shouldDiscardRemoteElement</i> was tested with other test cases. Nevertheless as it was visible with the custom coverage some branches of the function were not tested. By creating custom tests for each of the "if statement" conditions I was able to improve the coverage to 100%.
 
+#### Link to the files changes: 
+https://github.com/excalidraw/excalidraw/pull/8150/commits/f42b37c9a2c1418c71b0d81ff039d93983feaae1
+
 ### Overall
 
 Old coverage results:
