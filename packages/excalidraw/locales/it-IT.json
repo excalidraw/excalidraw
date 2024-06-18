@@ -21,9 +21,9 @@
     "copyStyles": "Copia stili",
     "pasteStyles": "Incolla stili",
     "stroke": "Tratto",
-    "changeStroke": "",
+    "changeStroke": "Cambia il colore del tratto",
     "background": "Sfondo",
-    "changeBackground": "",
+    "changeBackground": "Cambia il colore dello sfondo",
     "fill": "Riempimento",
     "strokeWidth": "Spessore del tratto",
     "strokeStyle": "Stile del tratto",
@@ -74,7 +74,7 @@
     "canvasColors": "Usato su tela",
     "canvasBackground": "Sfondo tela",
     "drawingCanvas": "Area di disegno",
-    "clearCanvas": "",
+    "clearCanvas": "Pulisci area di disegno",
     "layers": "Livelli",
     "actions": "Azioni",
     "language": "Lingua",
@@ -87,13 +87,13 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "toggleGrid": "",
+    "toggleGrid": "Attiva/disattiva griglia",
     "addToLibrary": "Aggiungi alla libreria",
     "removeFromLibrary": "Rimuovi dalla libreria",
     "libraryLoadingMessage": "Caricamento libreria…",
     "libraries": "Sfoglia librerie",
     "loadingScene": "Caricamento della scena…",
-    "loadScene": "",
+    "loadScene": "Carica scena da file",
     "align": "Allinea",
     "alignTop": "Allinea in alto",
     "alignBottom": "Allinea in basso",
@@ -109,8 +109,8 @@
     "share": "Condividi",
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
-    "toggleTheme": "",
-    "theme": "",
+    "toggleTheme": "Attiva/Disattiva tema chiaro/scuro",
+    "theme": "Tema",
     "personalLib": "Libreria Personale",
     "excalidrawLib": "Libreria di Excalidraw",
     "decreaseFontSize": "Riduci dimensione dei caratteri",
@@ -129,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Modifica linea",
-      "editArrow": ""
+      "editArrow": "Modifica freccia"
     },
     "elementLock": {
       "lock": "Blocca",
@@ -146,11 +146,11 @@
     "prompt": "Prompt",
     "followUs": "Seguici",
     "discordChat": "Chat di Discord",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
+    "zoomToFitViewport": "Ingrandisci per adattarsi alla vista",
+    "zoomToFitSelection": "Ingrandisci per adattare la selezione",
+    "zoomToFit": "Zoom per adattare tutti gli elementi",
     "installPWA": "Installa Excalidraw localmente (PWA)",
-    "autoResize": ""
+    "autoResize": "Abilita ridimensionamento automatico del testo"
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -183,7 +183,7 @@
     "fullScreen": "Schermo intero",
     "darkMode": "Tema scuro",
     "lightMode": "Tema chiaro",
-    "systemMode": "",
+    "systemMode": "Modalità del sistema",
     "zenMode": "Modalità Zen",
     "objectsSnapMode": "Aggancia agli oggetti",
     "exitZenMode": "Uscire dalla modalità zen",
@@ -227,7 +227,7 @@
     "failedToFetchImage": "Impossibile recuperare l'immagine.",
     "cannotResolveCollabServer": "Impossibile connettersi al server di collab. Ricarica la pagina e riprova.",
     "importLibraryError": "Impossibile caricare la libreria",
-    "saveLibraryError": "",
+    "saveLibraryError": "Impossibile salvare la libreria nell'archiviazione. Si prega di salvare la libreria in un file locale per assicurarsi di non perdere le modifiche.",
     "collabSaveFailed": "Impossibile salvare nel database di backend. Se i problemi persistono, dovresti salvare il tuo file localmente per assicurarti di non perdere il tuo lavoro.",
     "collabSaveFailed_sizeExceeded": "Impossibile salvare nel database di backend, la tela sembra essere troppo grande. Dovresti salvare il file localmente per assicurarti di non perdere il tuo lavoro.",
     "imageToolNotSupported": "Le immagini sono disabilitate.",
@@ -271,20 +271,20 @@
     "magicSettings": "Impostazioni di IA"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "rectangle": "Rettangolo",
+    "diamond": "Diamante",
+    "ellipse": "Ellisse",
+    "arrow": "Freccia",
+    "line": "Linea",
+    "freedraw": "Disegno libero",
+    "text": "Testo",
+    "image": "Immagine",
+    "group": "Gruppo",
+    "frame": "Cornice",
+    "magicframe": "Dal wireframe al codice",
+    "embeddable": "Incorporamento Web",
+    "selection": "Selezione",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Azioni sulla Tela",
@@ -459,10 +459,10 @@
     "scene": "Scena",
     "selected": "Selezionato",
     "storage": "Memoria",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Proprietà statistiche & elementi",
+    "title": "Statistiche",
+    "generalStats": "Statistiche generali",
+    "elementProperties": "Proprietà dell'elemento",
     "total": "Totale",
     "version": "Versione",
     "versionCopy": "Clicca per copiare",
@@ -565,24 +565,24 @@
     "hint": {
       "text": "Clicca sull'utente per seguirlo",
       "followStatus": "Stai attualmente seguendo questo utente",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Utente è in una chiamata vocale",
+      "micMuted": "Il microfono dell'utente è disattivato",
+      "isSpeaking": "L'utente sta parlando"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Comando della tavolozza",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Selezione",
+      "confirm": "Conferma",
+      "close": "Chiudi"
     },
-    "recents": "",
+    "recents": "Usate di recente",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Cerca menu, comandi e scopri gemme nascoste",
+      "noMatch": "Nessun comando corrisponde..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Il comando non è disponibile...",
+    "shortcutHint": "Per i comandi della tavolozza, usa {{shortcut}}"
   }
 }
