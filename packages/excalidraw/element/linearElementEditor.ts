@@ -95,7 +95,9 @@ export class LinearElementEditor {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
-    LinearElementEditor.normalizePoints(element);
+    if (!arePointsEqual(element.points[0], [0, 0])) {
+      console.error("Linear element is not normalized", Error().stack);
+    }
 
     this.selectedPointsIndices = null;
     this.lastUncommittedPoint = null;
