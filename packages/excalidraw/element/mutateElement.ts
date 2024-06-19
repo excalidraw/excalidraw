@@ -27,7 +27,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points, fileId } = updates as any;
 
-  if (typeof points !== "undefined") {
+  if (typeof points !== "undefined" && !updates.height && !updates.width) {
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 
