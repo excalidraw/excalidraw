@@ -46,7 +46,6 @@ type Node = {
   f: number;
   g: number;
   h: number;
-  //e: number;
   closed: boolean;
   visited: boolean;
   parent: Node | null;
@@ -261,16 +260,16 @@ export const mutateElbowArrow = (
   // );
 
   // Debug: Grid visualization
-  for (let col = 0; col < grid.col; col++) {
-    const a = gridNodeFromAddr([col, 0], grid)?.pos;
-    const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
-  for (let row = 0; row < grid.row; row++) {
-    const a = gridNodeFromAddr([0, row], grid)?.pos;
-    const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-    a && b && debugDrawSegments([a, b], "#DDD");
-  }
+  // for (let col = 0; col < grid.col; col++) {
+  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
+  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
+  // for (let row = 0; row < grid.row; row++) {
+  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
+  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
+  //   a && b && debugDrawSegments([a, b], "#DDD");
+  // }
 };
 
 /**
@@ -452,22 +451,22 @@ const calculateGrid = (
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
 
-  const oppositeStartDongle: Point =
-    startHeading === HEADING_UP
-      ? [start[0], aabbs[0][3]]
-      : startHeading === HEADING_RIGHT
-      ? [aabbs[0][0], start[1]]
-      : startHeading === HEADING_DOWN
-      ? [start[0], aabbs[0][1]]
-      : [aabbs[0][2], start[1]];
-  const oppositeEndDongle: Point =
-    endHeading === HEADING_UP
-      ? [end[0], aabbs[1][3]]
-      : endHeading === HEADING_RIGHT
-      ? [aabbs[1][0], end[1]]
-      : endHeading === HEADING_DOWN
-      ? [end[0], aabbs[1][1]]
-      : [aabbs[1][2], end[1]];
+  // const oppositeStartDongle: Point =
+  //   startHeading === HEADING_UP
+  //     ? [start[0], aabbs[0][3]]
+  //     : startHeading === HEADING_RIGHT
+  //     ? [aabbs[0][0], start[1]]
+  //     : startHeading === HEADING_DOWN
+  //     ? [start[0], aabbs[0][1]]
+  //     : [aabbs[0][2], start[1]];
+  // const oppositeEndDongle: Point =
+  //   endHeading === HEADING_UP
+  //     ? [end[0], aabbs[1][3]]
+  //     : endHeading === HEADING_RIGHT
+  //     ? [aabbs[1][0], end[1]]
+  //     : endHeading === HEADING_DOWN
+  //     ? [end[0], aabbs[1][1]]
+  //     : [aabbs[1][2], end[1]];
 
   return {
     row: _vertical.length,
@@ -479,7 +478,6 @@ const calculateGrid = (
             f: 0,
             g: 0,
             h: 0,
-            //e: 0,
             closed: false,
             visited: false,
             parent: null,
@@ -488,77 +486,77 @@ const calculateGrid = (
           }),
         ),
       )
-      .map((node) => {
-        const valid =
-          !overlap ||
-          start[0] === node.pos[0] ||
-          start[1] === node.pos[1] ||
-          end[0] === node.pos[0] ||
-          end[1] === node.pos[1] ||
-          isAnyTrue(
-            ...aabbs
-              .map(boundsToLineSegments)
-              .flatMap((segments) =>
-                segments.map((segment) => isPointOnLine(segment, node.pos)),
-              ),
-          );
+      // .map((node) => {
+      //   const valid =
+      //     !overlap ||
+      //     start[0] === node.pos[0] ||
+      //     start[1] === node.pos[1] ||
+      //     end[0] === node.pos[0] ||
+      //     end[1] === node.pos[1] ||
+      //     isAnyTrue(
+      //       ...aabbs
+      //         .map(boundsToLineSegments)
+      //         .flatMap((segments) =>
+      //           segments.map((segment) => isPointOnLine(segment, node.pos)),
+      //         ),
+      //     );
 
-        node.closed = !valid;
-        return node;
-      })
-      .map((node) => {
-        const invalid =
-          !overlap &&
-          isAnyTrue(...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)));
+      //   node.closed = !valid;
+      //   return node;
+      // })
+      // .map((node) => {
+      //   const invalid =
+      //     !overlap &&
+      //     isAnyTrue(...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)));
 
-        node.closed = invalid;
-        return node;
-      })
-      .map((node) => {
-        if (
-          !overlap &&
-          pointOnBounds(node.pos, common) &&
-          (arePointsClose(oppositeStartDongle, node.pos) ||
-            arePointsClose(oppositeEndDongle, node.pos))
-        ) {
-          node.closed = true;
-        }
+      //   node.closed = invalid;
+      //   return node;
+      // })
+      // .map((node) => {
+      //   if (
+      //     !overlap &&
+      //     pointOnBounds(node.pos, common) &&
+      //     (arePointsClose(oppositeStartDongle, node.pos) ||
+      //       arePointsClose(oppositeEndDongle, node.pos))
+      //   ) {
+      //     node.closed = true;
+      //   }
 
+      //   return node;
+      // })
+      .map((node) => {
+        node.closed
+          ? debugDrawPoint(node.pos, "red")
+          : debugDrawPoint(node.pos, "green");
         return node;
       }),
-    // .map((node) => {
-    //   node.closed
-    //     ? debugDrawPoint(node.pos, "red")
-    //     : debugDrawPoint(node.pos, "green");
-    //   return node;
-    // }),
   };
 };
 
-const arePointsClose = (p: Point, o: Point) =>
-  Math.abs(p[0] - o[0]) < 0.00005 && Math.abs(p[1] - o[1]) < 0.00005;
+// const arePointsClose = (p: Point, o: Point) =>
+//   Math.abs(p[0] - o[0]) < 0.00005 && Math.abs(p[1] - o[1]) < 0.00005;
 
 const isAnyTrue = (...args: boolean[]): boolean =>
   Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
 
-const boundsToLineSegments = (bounds: Bounds): LineSegment[] => [
-  [
-    [bounds[0], bounds[1]],
-    [bounds[2], bounds[1]],
-  ],
-  [
-    [bounds[2], bounds[1]],
-    [bounds[2], bounds[3]],
-  ],
-  [
-    [bounds[2], bounds[3]],
-    [bounds[0], bounds[3]],
-  ],
-  [
-    [bounds[0], bounds[3]],
-    [bounds[0], bounds[1]],
-  ],
-];
+// const boundsToLineSegments = (bounds: Bounds): LineSegment[] => [
+//   [
+//     [bounds[0], bounds[1]],
+//     [bounds[2], bounds[1]],
+//   ],
+//   [
+//     [bounds[2], bounds[1]],
+//     [bounds[2], bounds[3]],
+//   ],
+//   [
+//     [bounds[2], bounds[3]],
+//     [bounds[0], bounds[3]],
+//   ],
+//   [
+//     [bounds[0], bounds[3]],
+//     [bounds[0], bounds[1]],
+//   ],
+// ];
 
 const getDonglePosition = (
   bounds: Bounds,
@@ -962,24 +960,24 @@ const aabbForElement = (element: ExcalidrawElement, offset?: number) => {
   return bounds;
 };
 
-const directionPreference = (
-  heading: Heading,
-  bindable: ExcalidrawBindableElement | null,
-  fixedPoint: Point | undefined,
-) => {
-  if (!bindable || !fixedPoint) {
-    return heading;
-  }
+// const directionPreference = (
+//   heading: Heading,
+//   bindable: ExcalidrawBindableElement | null,
+//   fixedPoint: Point | undefined,
+// ) => {
+//   if (!bindable || !fixedPoint) {
+//     return heading;
+//   }
 
-  const horizontalMid = bindable.width / 2;
-  const verticalMid = bindable.height / 2;
+//   const horizontalMid = bindable.width / 2;
+//   const verticalMid = bindable.height / 2;
 
-  if (heading === HEADING_UP || heading === HEADING_DOWN) {
-    return horizontalMid > fixedPoint[0] ? HEADING_LEFT : HEADING_RIGHT;
-  }
+//   if (heading === HEADING_UP || heading === HEADING_DOWN) {
+//     return horizontalMid > fixedPoint[0] ? HEADING_LEFT : HEADING_RIGHT;
+//   }
 
-  return verticalMid > fixedPoint[1] ? HEADING_UP : HEADING_DOWN;
-};
+//   return verticalMid > fixedPoint[1] ? HEADING_UP : HEADING_DOWN;
+// };
 
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
@@ -1061,16 +1059,16 @@ const getBindableElementForId = (
   return null;
 };
 
-const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
-  p[0] >= bounds[0] &&
-  p[0] <= bounds[2] &&
-  p[1] >= bounds[1] &&
-  p[1] <= bounds[3];
+// const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
+//   p[0] >= bounds[0] &&
+//   p[0] <= bounds[2] &&
+//   p[1] >= bounds[1] &&
+//   p[1] <= bounds[3];
 
-const pointOnBounds = (p: Point, bounds: Bounds): boolean =>
-  isAnyTrue(
-    ...boundsToLineSegments(bounds).map((segment) => isPointOnLine(segment, p)),
-  );
+// const pointOnBounds = (p: Point, bounds: Bounds): boolean =>
+//   isAnyTrue(
+//     ...boundsToLineSegments(bounds).map((segment) => isPointOnLine(segment, p)),
+//   );
 
 const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
@@ -1130,17 +1128,17 @@ const neighborIndexToHeading = (idx: number): Heading => {
   return HEADING_LEFT;
 };
 
-const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
-  switch (heading) {
-    case HEADING_UP:
-      return 0;
-    case HEADING_RIGHT:
-      return 1;
-    case HEADING_DOWN:
-      return 2;
-  }
-  return 3;
-};
+// const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
+//   switch (heading) {
+//     case HEADING_UP:
+//       return 0;
+//     case HEADING_RIGHT:
+//       return 1;
+//     case HEADING_DOWN:
+//       return 2;
+//   }
+//   return 3;
+// };
 
 const boundsOverlap = (a: Bounds, b: Bounds) => {
   return isAnyTrue(
