@@ -18,6 +18,7 @@ import {
   getCommonBounds,
   getResizedElementAbsoluteCoords,
   getCommonBoundingBox,
+  getElementBounds,
 } from "./bounds";
 import {
   isArrowElement,
@@ -109,6 +110,8 @@ export const transformElements = (
         const { nextWidth, nextHeight } = getNextWidthAndHeightFromPointer(
           latestElement,
           origElement,
+          elementsMap,
+          originalElements,
           transformHandleType,
           pointerX,
           pointerY,
@@ -131,10 +134,9 @@ export const transformElements = (
             shouldResizeFromCenter,
           },
         );
-
-        return true;
       }
     }
+    return true;
   } else if (selectedElements.length > 1) {
     if (transformHandleType === "rotation") {
       rotateMultipleElements(
@@ -1043,20 +1045,24 @@ export const resizeSingleElement = (
     }
   }
 
-  let previousOrigin: Point = [origElement.x, origElement.y];
-  if (isLinearElement(origElement)) {
-    // we should set the top left to be the origin
-    const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
-      origElement,
-      origElement.width,
-      origElement.height,
-      true,
-    );
+  const rescaledPoints = rescalePointsInElement(
+    origElement,
+    nextWidth,
+    nextHeight,
+    true,
+  );
 
+  let previousOrigin: Point = [origElement.x, origElement.y];
+
+  if (isLinearElement(origElement)) {
+    const [x1, y1] = getElementBounds(origElement, originalElementsMap);
     previousOrigin = [x1, y1];
   }
 
-  const newOrigin = getResizedOrigin(
+  const newOrigin: {
+    x: number;
+    y: number;
+  } = getResizedOrigin(
     previousOrigin,
     origElement.width,
     origElement.height,
@@ -1068,28 +1074,34 @@ export const resizeSingleElement = (
     shouldResizeFromCenter!!,
   );
 
+  if (isLinearElement(origElement) && rescaledPoints.points) {
+    const offsetX = previousOrigin[0] - origElement.x;
+    const offsetY = previousOrigin[1] - origElement.y;
+
+    newOrigin.x -= offsetX;
+    newOrigin.y -= offsetY;
+
+    const scaledX = rescaledPoints.points[0]?.[0];
+    const scaledY = rescaledPoints.points[0]?.[1];
+
+    if (scaledX && scaledY) {
+      newOrigin.x += scaledX;
+      newOrigin.y += scaledY;
+
+      rescaledPoints.points = rescaledPoints.points.map((p) => [
+        p[0] - scaledX,
+        p[1] - scaledY,
+      ]);
+    }
+  }
+
+  // flipping
   if (nextWidth < 0) {
     newOrigin.x = newOrigin.x + nextWidth;
   }
   if (nextHeight < 0) {
     newOrigin.y = newOrigin.y + nextHeight;
   }
-
-  if (isLinearElement(origElement)) {
-    const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
-      getResizedElementAbsoluteCoords(origElement, nextWidth, nextHeight, true);
-    const linearElementXOffset = origElement.x - newBoundsX1;
-    const linearElementYOffset = origElement.y - newBoundsY1;
-    newOrigin.x += linearElementXOffset;
-    newOrigin.y += linearElementYOffset;
-  }
-
-  const rescaledPoints = rescalePointsInElement(
-    origElement,
-    nextWidth,
-    nextHeight,
-    true,
-  );
 
   if ("scale" in latestElement && "scale" in origElement) {
     mutateElement(latestElement, {
@@ -1150,6 +1162,8 @@ export const resizeSingleElement = (
 const getNextWidthAndHeightFromPointer = (
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  originalElementsMap: ElementsMap,
   handleDirection: TransformHandleDirection,
   pointerX: number,
   pointerY: number,
@@ -1162,18 +1176,13 @@ const getNextWidthAndHeightFromPointer = (
   } = {},
 ) => {
   // Gets bounds corners
-  const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
-    origElement,
-    origElement.width,
-    origElement.height,
-    true,
-  );
+  const [x1, y1, x2, y2] = getElementBounds(origElement, originalElementsMap);
   const startTopLeft: Point = [x1, y1];
   const startBottomRight: Point = [x2, y2];
-  const startCenter: Point = centerPoint(startTopLeft, startBottomRight);
-
-  const eleInitialWidth = origElement.width;
-  const eleInitialHeight = origElement.height;
+  const startCenter: Point = [
+    x1 + origElement.width / 2,
+    y1 + origElement.height / 2,
+  ];
 
   // Calculate new dimensions based on cursor position
   const rotatedPointer = rotatePoint(
@@ -1182,55 +1191,42 @@ const getNextWidthAndHeightFromPointer = (
     -origElement.angle,
   );
 
-  // Get bounds corners rendered on screen
-  const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
-    latestElement,
-    latestElement.width,
-    latestElement.height,
-    true,
-  );
-
-  const boundsCurrentWidth = esx2 - esx1;
-  const boundsCurrentHeight = esy2 - esy1;
-
-  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
-  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
-  let scaleX = atStartBoundsWidth / boundsCurrentWidth;
-  let scaleY = atStartBoundsHeight / boundsCurrentHeight;
+  let scaleX = latestElement.width / origElement.width;
+  let scaleY = latestElement.height / origElement.height;
 
   if (handleDirection.includes("e")) {
-    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / latestElement.width;
   }
   if (handleDirection.includes("s")) {
-    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsCurrentHeight;
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / latestElement.height;
   }
   if (handleDirection.includes("w")) {
-    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrentWidth;
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / latestElement.width;
   }
   if (handleDirection.includes("n")) {
-    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / latestElement.height;
   }
 
   let nextWidth = latestElement.width * scaleX;
   let nextHeight = latestElement.height * scaleY;
 
   if (shouldResizeFromCenter) {
-    nextWidth = 2 * nextWidth - eleInitialWidth;
-    nextHeight = 2 * nextHeight - eleInitialHeight;
+    nextWidth = 2 * nextWidth - origElement.width;
+    nextHeight = 2 * nextHeight - origElement.height;
   }
 
   // adjust dimensions to keep sides ratio
   if (shouldMaintainAspectRatio) {
-    const widthRatio = Math.abs(nextWidth) / eleInitialWidth;
-    const heightRatio = Math.abs(nextHeight) / eleInitialHeight;
+    const widthRatio = Math.abs(nextWidth) / origElement.width;
+    const heightRatio = Math.abs(nextHeight) / origElement.height;
     if (handleDirection.length === 1) {
       nextHeight *= widthRatio;
       nextWidth *= heightRatio;
     }
     if (handleDirection.length === 2) {
       const ratio = Math.max(widthRatio, heightRatio);
-      nextWidth = eleInitialWidth * ratio * Math.sign(nextWidth);
-      nextHeight = eleInitialHeight * ratio * Math.sign(nextHeight);
+      nextWidth = origElement.width * ratio * Math.sign(nextWidth);
+      nextHeight = origElement.height * ratio * Math.sign(nextHeight);
     }
   }
 
