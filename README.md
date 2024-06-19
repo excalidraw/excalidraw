@@ -32,7 +32,7 @@ yarn test:coverage /path/to/tests/*
 
 The following is the outcome of running the existing tool on an unchanged version of excalibur cloned from https://github.com/excalidraw/excalidraw/commit/22b39277f5f4a6b125e170ab14238b084719cb2d, or the most recent commit at time of writing.
 
-![Image](istanbul_main.png "Istanbul")
+![Image](readme-assets/Istanbul-main.png "Istanbul")
 
 ### Your own coverage tool
 
