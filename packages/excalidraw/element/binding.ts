@@ -761,15 +761,17 @@ const updateBoundPoint = (
       bindableElement.y + fixedPoint[1],
     ];
     const globalMidPoint = [
-      bindableElement.x + (bindableElement.width - bindableElement.x) / 2,
-      bindableElement.y + (bindableElement.height - bindableElement.y) / 2,
+      bindableElement.x + bindableElement.width / 2,
+      bindableElement.y + bindableElement.height / 2,
     ] as Point;
+
     return LinearElementEditor.pointFromAbsoluteCoords(
       linearElement,
       rotatePoint([globalX, globalY], globalMidPoint, bindableElement.angle),
       elementsMap,
     );
   }
+
   const adjacentPointIndex = edgePointIndex - direction;
   const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     linearElement,
