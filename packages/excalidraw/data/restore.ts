@@ -23,6 +23,7 @@ import {
   refreshTextDimensions,
 } from "../element";
 import {
+  isArrowElement,
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -469,13 +470,15 @@ export const restoreElements = (
     if (isLinearElement(element)) {
       if (
         element.startBinding &&
-        !restoredElementsMap.has(element.startBinding.elementId)
+        (!restoredElementsMap.has(element.startBinding.elementId) ||
+          !isArrowElement(element))
       ) {
         (element as Mutable<ExcalidrawLinearElement>).startBinding = null;
       }
       if (
         element.endBinding &&
-        !restoredElementsMap.has(element.endBinding.elementId)
+        (!restoredElementsMap.has(element.endBinding.elementId) ||
+          !isArrowElement(element))
       ) {
         (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
       }

@@ -358,6 +358,9 @@ export const bindLinearElement = (
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
 ): void => {
+  if (!isArrowElement(linearElement)) {
+    return;
+  }
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
       elementId: hoveredElement.id,
