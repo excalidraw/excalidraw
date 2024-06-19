@@ -1,0 +1,13 @@
+Coverage Information:
+Function: orderedColinearOrientation
+  Branch colinearBranch: Covered
+  Branch clockwiseBranch: Covered
+  Branch counterclockwiseBranch: Covered
+  Branch Coverage: 100.00%
+Function: doSegmentsIntersect
+  Branch generalCaseBranch: Covered
+  Branch specCase1Branch: Covered
+  Branch notIntersectingBranch: Covered
+  Branch specCase2Branch: Covered
+  Branch specCase3Branch: Covered
+  Branch Coverage: 83.33%
