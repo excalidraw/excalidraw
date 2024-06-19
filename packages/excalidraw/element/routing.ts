@@ -436,7 +436,7 @@ const pathTo = (start: Node, node: Node) => {
 };
 
 const m_dist = (a: Point, b: Point) =>
-  Math.abs(a[0] - b[0]) + Math.abs(a[0] - b[0]);
+  Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
 const generateDynamicAABBs = (
   a: Bounds,
