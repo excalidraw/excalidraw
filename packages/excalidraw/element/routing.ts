@@ -336,6 +336,19 @@ const astar = (
       const previousDirection = current.parent
         ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
         : startHeading;
+
+      // Do not allow going in reverse
+      const reverseHeading = scaleVector(previousDirection, -1);
+      const neighborIsReverseRoute =
+        arePointsEqual(reverseHeading, neighborHeading) ||
+        (arePointsEqual(start.addr, neighbor.addr) &&
+          arePointsEqual(neighborHeading, startHeading)) ||
+        (arePointsEqual(end.addr, neighbor.addr) &&
+          arePointsEqual(neighborHeading, endHeading));
+      if (neighborIsReverseRoute) {
+        continue;
+      }
+
       const directionChange = previousDirection !== neighborHeading;
       const gScore =
         current.g +
