@@ -1,4 +1,5 @@
 import { defaultLang } from "../../packages/excalidraw/i18n";
+import { i18branches } from "../../packages/excalidraw/utils";
 import { UI } from "../../packages/excalidraw/tests/helpers/ui";
 import {
   screen,
@@ -31,4 +32,13 @@ describe("Test LanguageList", () => {
     // switching back to English
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
   });
+});
+
+afterAll(() => {
+  const branchCount = Object.keys(i18branches).length;
+  const takenBranchCount = Object.values(i18branches).filter(branch => branch).length;
+  const branchPercent = (takenBranchCount / branchCount) * 100;
+
+  console.log('Branches taken for i18n.ts: ', i18branches);
+  console.log(`\nBranch percentage: ${branchPercent.toFixed(2)}%`);
 });
