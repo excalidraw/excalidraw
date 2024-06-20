@@ -99,7 +99,8 @@ const repairBinding = (binding: PointBinding | null) => {
   if (!binding) {
     return null;
   }
-  return { ...binding, focus: binding.focus || 0 };
+
+  return { ...binding, focus: binding.focus || 0, focusPoint: [0, 0] };
 };
 
 const restoreElementWithProperties = <
