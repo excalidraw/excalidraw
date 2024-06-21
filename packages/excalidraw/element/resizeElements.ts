@@ -846,7 +846,6 @@ const getResizeAnchor = (
       case "n":
         return "south-side";
       case "e": {
-        console.log("this should be called");
         return "west-side";
       }
       case "s":
@@ -870,9 +869,8 @@ const getResizeAnchor = (
     return "bottom-right";
   } else if (handleDirection === "ne") {
     return "bottom-left";
-  } else {
-    return "top-right";
   }
+  return "top-right";
 };
 
 const getResizedOrigin = (

@@ -1,16 +1,5 @@
-import { updateBoundElements } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
-import {
-  measureFontSizeFromWidth,
-  rescalePointsInElement,
-} from "../../element/resizeElements";
-import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextMaxWidth,
-  handleBindTextResize,
-} from "../../element/textElement";
+import { getBoundTextElement } from "../../element/textElement";
 import { isFrameLikeElement, isTextElement } from "../../element/typeChecks";
 import type {
   ElementsMap,
@@ -18,7 +7,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "../../element/types";
 import { rotate } from "../../math";
-import { getFontString } from "../../utils";
 
 export const SMALLEST_DELTA = 0.01;
 
