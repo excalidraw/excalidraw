@@ -1,5 +1,4 @@
-import { isPointOnLine, type LineSegment } from "../../utils";
-import type { Vector } from "../../utils/geometry/shape";
+import { type LineSegment } from "../../utils";
 import BinaryHeap from "../binaryheap";
 import type { Heading } from "../math";
 import {
@@ -20,12 +19,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import {
-  debugClear,
-  debugDrawBounds,
-  debugDrawPoint,
-  debugDrawSegments,
-} from "../visualdebug";
+import { debugClear, debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -251,6 +245,7 @@ export const mutateElbowArrow = (
     mutateElement(arrow, {
       ...otherUpdates,
       ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
+      angle: 0,
     });
   } else {
     console.error("Elbow arrow cannot find a route");

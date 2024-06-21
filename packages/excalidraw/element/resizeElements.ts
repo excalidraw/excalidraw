@@ -80,14 +80,16 @@ export const transformElements = (
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
-      rotateSingleElement(
-        element,
-        elementsMap,
-        pointerX,
-        pointerY,
-        shouldRotateWithDiscreteAngle,
-      );
-      updateBoundElements(element, elementsMap, scene);
+      if (!isArrowElement(element) || !element.elbowed) {
+        rotateSingleElement(
+          element,
+          elementsMap,
+          pointerX,
+          pointerY,
+          shouldRotateWithDiscreteAngle,
+        );
+        updateBoundElements(element, elementsMap, scene);
+      }
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         originalElements,
@@ -1035,7 +1037,10 @@ const rotateMultipleElements = (
         {
           x: element.x + (rotatedCX - cx),
           y: element.y + (rotatedCY - cy),
-          angle: normalizeAngle(centerAngle + origAngle),
+          angle:
+            !isArrowElement(element) || !element.elbowed
+              ? normalizeAngle(centerAngle + origAngle)
+              : 0,
         },
         false,
       );
