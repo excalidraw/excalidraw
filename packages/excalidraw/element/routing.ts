@@ -195,9 +195,6 @@ export const mutateElbowArrow = (
       debugDrawBounds(x!, "green");
       return x;
     }) as Bounds[];
-  const overlap =
-    dynamicAABBs.length === 2 &&
-    boundsOverlap(dynamicAABBs[0], dynamicAABBs[1]);
   // Canculate Grid positions
   const grid = calculateGrid(
     boundingBoxes,
@@ -206,7 +203,6 @@ export const mutateElbowArrow = (
     endDonglePosition ? endDonglePosition : endGlobalPoint,
     endHeading,
     common,
-    overlap,
   );
   const startDongle =
     startDonglePosition && pointToGridNode(startDonglePosition, grid);
@@ -222,6 +218,12 @@ export const mutateElbowArrow = (
   if (startNode && arrow.startBinding) {
     startNode.closed = true;
   }
+  const overlap =
+    dynamicAABBs.length === 2 &&
+    startDongle &&
+    endDongle &&
+    (pointInsideBounds(startDongle.pos, dynamicAABBs[1]) ||
+      pointInsideBounds(endDongle.pos, dynamicAABBs[0]));
 
   // Create path to end dongle from start dongle
   const path = astar(
@@ -489,7 +491,6 @@ const calculateGrid = (
   end: Point,
   endHeading: Heading,
   common: Bounds,
-  overlap: boolean,
 ): Grid => {
   const horizontal = new Set<number>();
   const vertical = new Set<number>();
