@@ -1187,8 +1187,8 @@ const getNextWidthAndHeightFromPointer = (
     -origElement.angle,
   );
 
-  let scaleX = latestElement.width / origElement.width;
-  let scaleY = latestElement.height / origElement.height;
+  let scaleX = origElement.width / latestElement.width;
+  let scaleY = origElement.height / latestElement.height;
 
   if (handleDirection.includes("e")) {
     scaleX = (rotatedPointer[0] - startTopLeft[0]) / latestElement.width;
