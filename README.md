@@ -13,7 +13,6 @@ Programming language: **TypeScript**
 > *note: The main language core can be seen as either TypeScript (393 KLOC) or JavaScript (5,440 KLOC). We decided to highlight TypeScript, as the unit tests are written in a TypeScript React (.tsx) dialect.*
 
 ## Coverage measurement
----
 
 ### Existing tool
 
@@ -36,7 +35,6 @@ The following is the outcome of running the existing tool on an unchanged versio
 ![Image](istanbul_main.png "Istanbul")
 
 ### Your own coverage tool
----
 
 Team member name: Jakub
 
@@ -128,8 +126,6 @@ https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211
 
 
 ## Coverage improvement
-
----
 
 ### Individual tests
 
