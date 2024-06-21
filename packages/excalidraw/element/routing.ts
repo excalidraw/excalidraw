@@ -101,11 +101,13 @@ export const mutateElbowArrow = (
           startElement,
           aabbForElement(
             startElement,
-            distanceToBindableElement(
-              startElement,
-              startGlobalPoint,
-              elementsMap,
-            ),
+            Array(4).fill(
+              distanceToBindableElement(
+                startElement,
+                startGlobalPoint,
+                elementsMap,
+              ),
+            ) as [number, number, number, number],
           ),
           startGlobalPoint,
         )
@@ -115,7 +117,13 @@ export const mutateElbowArrow = (
           endElement,
           aabbForElement(
             endElement,
-            distanceToBindableElement(endElement, endGlobalPoint, elementsMap),
+            Array(4).fill(
+              distanceToBindableElement(
+                endElement,
+                endGlobalPoint,
+                elementsMap,
+              ),
+            ) as [number, number, number, number],
           ),
           endGlobalPoint,
         )
@@ -130,8 +138,10 @@ export const mutateElbowArrow = (
       0,
   );
   const [startBounds, endBounds] = [
-    startElement && aabbForElement(startElement, bias),
-    endElement && aabbForElement(endElement, bias),
+    startElement &&
+      aabbForElement(startElement, offsetFromHeading(startHeading, bias)),
+    endElement &&
+      aabbForElement(endElement, offsetFromHeading(endHeading, bias)),
   ];
   const common = commonAABB(
     [
@@ -173,6 +183,7 @@ export const mutateElbowArrow = (
           endGlobalPoint[1] + 20,
         ],
     common,
+    10,
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -270,6 +281,23 @@ export const mutateElbowArrow = (
   //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
   //   a && b && debugDrawSegments([a, b], "#DDD");
   // }
+};
+
+const offsetFromHeading = (
+  heading: Heading,
+  head: number,
+): [number, number, number, number] => {
+  const side = 1;
+  switch (heading) {
+    case HEADING_UP:
+      return [head, side, side, side];
+    case HEADING_RIGHT:
+      return [side, head, side, side];
+    case HEADING_DOWN:
+      return [side, side, head, side];
+  }
+
+  return [side, side, side, head];
 };
 
 /**
@@ -405,19 +433,52 @@ const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
   common: Bounds,
+  offset?: number,
 ): Bounds[] => {
   return [
     [
-      a[0] > b[2] ? (a[0] + b[2]) / 2 : a[0] > b[0] ? a[0] : common[0],
-      a[1] > b[3] ? (a[1] + b[3]) / 2 : a[1] > b[1] ? a[1] : common[1],
-      a[2] < b[0] ? (a[2] + b[0]) / 2 : a[2] < b[2] ? a[2] : common[2],
-      a[3] < b[1] ? (a[3] + b[1]) / 2 : a[3] < b[3] ? a[3] : common[3],
+      a[0] > b[2]
+        ? (a[0] + b[2]) / 2
+        : a[0] > b[0]
+        ? a[0]
+        : common[0] - (offset ?? 0),
+      a[1] > b[3]
+        ? (a[1] + b[3]) / 2
+        : a[1] > b[1]
+        ? a[1]
+        : common[1] - (offset ?? 0),
+      a[2] < b[0]
+        ? (a[2] + b[0]) / 2
+        : a[2] < b[2]
+        ? a[2]
+        : common[2] + (offset ?? 0),
+      a[3] < b[1]
+        ? (a[3] + b[1]) / 2
+        : a[3] < b[3]
+        ? a[3]
+        : common[3] + (offset ?? 0),
     ] as Bounds,
     [
-      b[0] > a[2] ? (b[0] + a[2]) / 2 : b[0] > a[0] ? b[0] : common[0],
-      b[1] > a[3] ? (b[1] + a[3]) / 2 : b[1] > a[1] ? b[1] : common[1],
-      b[2] < a[0] ? (b[2] + a[0]) / 2 : b[2] < a[2] ? b[2] : common[2],
-      b[3] < a[1] ? (b[3] + a[1]) / 2 : b[3] < a[3] ? b[3] : common[3],
+      b[0] > a[2]
+        ? (b[0] + a[2]) / 2
+        : b[0] > a[0]
+        ? b[0]
+        : common[0] - (offset ?? 0),
+      b[1] > a[3]
+        ? (b[1] + a[3]) / 2
+        : b[1] > a[1]
+        ? b[1]
+        : common[1] - (offset ?? 0),
+      b[2] < a[0]
+        ? (b[2] + a[0]) / 2
+        : b[2] < a[2]
+        ? b[2]
+        : common[2] + (offset ?? 0),
+      b[3] < a[1]
+        ? (b[3] + a[1]) / 2
+        : b[3] < a[3]
+        ? b[3]
+        : common[3] + (offset ?? 0),
     ] as Bounds,
   ];
 };
@@ -546,30 +607,8 @@ const calculateGrid = (
   };
 };
 
-// const arePointsClose = (p: Point, o: Point) =>
-//   Math.abs(p[0] - o[0]) < 0.00005 && Math.abs(p[1] - o[1]) < 0.00005;
-
 const isAnyTrue = (...args: boolean[]): boolean =>
   Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
-
-// const boundsToLineSegments = (bounds: Bounds): LineSegment[] => [
-//   [
-//     [bounds[0], bounds[1]],
-//     [bounds[2], bounds[1]],
-//   ],
-//   [
-//     [bounds[2], bounds[1]],
-//     [bounds[2], bounds[3]],
-//   ],
-//   [
-//     [bounds[2], bounds[3]],
-//     [bounds[0], bounds[3]],
-//   ],
-//   [
-//     [bounds[0], bounds[3]],
-//     [bounds[0], bounds[1]],
-//   ],
-// ];
 
 const getDonglePosition = (
   bounds: Bounds,
@@ -922,7 +961,10 @@ const pointToGridNode = (point: Point, grid: Grid): Node | null => {
 /**
  * Get the axis-aligned bounding box for a given element
  */
-const aabbForElement = (element: ExcalidrawElement, offset?: number) => {
+const aabbForElement = (
+  element: ExcalidrawElement,
+  offset?: [number, number, number, number],
+) => {
   const bbox = {
     minX: element.x,
     minY: element.y,
@@ -962,35 +1004,17 @@ const aabbForElement = (element: ExcalidrawElement, offset?: number) => {
   ] as Bounds;
 
   if (offset) {
+    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
     return [
-      bounds[0] - (offset ?? 0),
-      bounds[1] - (offset ?? 0),
-      bounds[2] + (offset ?? 0),
-      bounds[3] + (offset ?? 0),
+      bounds[0] - leftOffset,
+      bounds[1] - topOffset,
+      bounds[2] + rightOffset,
+      bounds[3] + downOffset,
     ] as Bounds;
   }
 
   return bounds;
 };
-
-// const directionPreference = (
-//   heading: Heading,
-//   bindable: ExcalidrawBindableElement | null,
-//   fixedPoint: Point | undefined,
-// ) => {
-//   if (!bindable || !fixedPoint) {
-//     return heading;
-//   }
-
-//   const horizontalMid = bindable.width / 2;
-//   const verticalMid = bindable.height / 2;
-
-//   if (heading === HEADING_UP || heading === HEADING_DOWN) {
-//     return horizontalMid > fixedPoint[0] ? HEADING_LEFT : HEADING_RIGHT;
-//   }
-
-//   return verticalMid > fixedPoint[1] ? HEADING_UP : HEADING_DOWN;
-// };
 
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
@@ -1072,17 +1096,6 @@ const getBindableElementForId = (
   return null;
 };
 
-// const pointInsideOrOnBounds = (p: Point, bounds: Bounds): boolean =>
-//   p[0] >= bounds[0] &&
-//   p[0] <= bounds[2] &&
-//   p[1] >= bounds[1] &&
-//   p[1] <= bounds[3];
-
-// const pointOnBounds = (p: Point, bounds: Bounds): boolean =>
-//   isAnyTrue(
-//     ...boundsToLineSegments(bounds).map((segment) => isPointOnLine(segment, p)),
-//   );
-
 const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
@@ -1140,18 +1153,6 @@ const neighborIndexToHeading = (idx: number): Heading => {
   }
   return HEADING_LEFT;
 };
-
-// const headingToNeighborIndex = (heading: Heading): 0 | 1 | 2 | 3 => {
-//   switch (heading) {
-//     case HEADING_UP:
-//       return 0;
-//     case HEADING_RIGHT:
-//       return 1;
-//     case HEADING_DOWN:
-//       return 2;
-//   }
-//   return 3;
-// };
 
 const boundsOverlap = (a: Bounds, b: Bounds) => {
   return isAnyTrue(
