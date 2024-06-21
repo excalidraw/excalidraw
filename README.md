@@ -66,9 +66,19 @@ Team member name: Jakub
 
 The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/ace05b9685e53ef6df59aaabdbbfac0472bcc14f).
 
-#### Function 2:
+#### Function 2: polygonBounds
 
-TODO
+> path: **packages/utils/geometry/geometry.ts::polygonBounds**
+
+![polyBounds](./readme-assets/polygonBounds.png "polygonBounds function with instrumented code")
+
+#### Tool results
+
+<p align="center">
+	<img src="./readme-assets/branchgeo-pre.png" alt="utils2" width="500"/>
+</p>
+
+The link to the coverage test commit that generated these results can be found [here]().
 
 #### Tool results
 
