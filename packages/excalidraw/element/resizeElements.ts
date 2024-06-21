@@ -1073,24 +1073,22 @@ export const resizeSingleElement = (
   );
 
   if (isLinearElement(origElement) && rescaledPoints.points) {
-    const offsetX = previousOrigin[0] - origElement.x;
-    const offsetY = previousOrigin[1] - origElement.y;
+    const offsetX = origElement.x - previousOrigin[0];
+    const offsetY = origElement.y - previousOrigin[1];
 
-    newOrigin.x -= offsetX;
-    newOrigin.y -= offsetY;
+    newOrigin.x += offsetX;
+    newOrigin.y += offsetY;
 
-    const scaledX = rescaledPoints.points[0]?.[0];
-    const scaledY = rescaledPoints.points[0]?.[1];
+    const scaledX = rescaledPoints.points[0][0];
+    const scaledY = rescaledPoints.points[0][1];
 
-    if (scaledX && scaledY) {
-      newOrigin.x += scaledX;
-      newOrigin.y += scaledY;
+    newOrigin.x += scaledX;
+    newOrigin.y += scaledY;
 
-      rescaledPoints.points = rescaledPoints.points.map((p) => [
-        p[0] - scaledX,
-        p[1] - scaledY,
-      ]);
-    }
+    rescaledPoints.points = rescaledPoints.points.map((p) => [
+      p[0] - scaledX,
+      p[1] - scaledY,
+    ]);
   }
 
   // flipping
