@@ -26,6 +26,15 @@ export const i18branches = {
   errorBranch: false,
 };
 
+export const geometryBranches = {
+  inForLoop: false,
+  inValidBounds: false,
+  atXMinEdge: false,
+  atXMaxEdge: false,
+  atYMinEdge: false,
+  atYMaxEdge: false,
+};
+
 export const setDateTimeForTests = (dateTime: string) => {
   mockDateTime = dateTime;
 };

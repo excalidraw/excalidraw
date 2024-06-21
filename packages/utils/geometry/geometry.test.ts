@@ -13,6 +13,7 @@ import {
   pointRotate,
 } from "./geometry";
 import type { Curve, Ellipse, Line, Point, Polygon, Polyline } from "./shape";
+import { geometryBranches } from "../../excalidraw/utils";
 
 describe("point and line", () => {
   const line: Line = [
@@ -246,4 +247,13 @@ describe("line and line", () => {
     expect(lineIntersectsLine(lineE, lineD)).toBe(false);
     expect(lineIntersectsLine(lineF, lineG)).toBe(true);
   });
+});
+
+afterAll(() => {
+  const branchCount = Object.keys(geometryBranches).length;
+  const takenBranchCount = Object.values(geometryBranches).filter(branch => branch).length;
+  const branchPercent = (takenBranchCount / branchCount) * 100;
+
+  console.log('Branches taken for geometry.ts (polygonBounds): ', geometryBranches);
+  console.log(`\nBranch percentage: ${branchPercent.toFixed(2)}%`);
 });
