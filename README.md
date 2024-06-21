@@ -155,9 +155,26 @@ The code coverage results changed in the following way:
 
 The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/d6fc61657b6a7e69bd683085e76026cb101af7cb).
 
-#### Test 2: ???
+#### Test 2: polygonBounds
 
-TODO
+> path: **packages/utils/geometry/geometry.test.ts**
+
+After the following slew of tests was implemented:
+
+<p align="center">
+	<img src="./readme-assets/polyTests.png" alt="polyTests" width="800"/>
+</p>
+
+The code coverage results changed in the following way:
+
+| | Before tests      | After tests      |
+| -- | ------------- | ------------- |
+| Self-made tool | <img src="./readme-assets/branchgeo-pre.png" alt="branchgeo-pre" width="500"/> | <img src="./readme-assets/branchgeo-post.png" alt="" width="500"/>  |
+| Istanbul report* | <img src="./readme-assets/branchgeo-pre-ist.png" alt="" width="500"/> | <img src="./readme-assets/branchgeo-post-ist.png" alt="" width="500"/>  |
+
+> **as above*
+
+The link to the unit test commit that generated these results can be found [here]().
 
 Team member name: Kacper
 
