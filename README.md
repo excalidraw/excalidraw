@@ -13,6 +13,7 @@ Programming language: **TypeScript**
 > *note: The main language core can be seen as either TypeScript (393 KLOC) or JavaScript (5,440 KLOC). We decided to highlight TypeScript, as the unit tests are written in a TypeScript React (.tsx) dialect.*
 
 ## Coverage measurement
+---
 
 ### Existing tool
 
@@ -35,6 +36,7 @@ The following is the outcome of running the existing tool on an unchanged versio
 ![Image](istanbul_main.png "Istanbul")
 
 ### Your own coverage tool
+---
 
 Team member name: Jakub
 
@@ -80,6 +82,8 @@ The link to the coverage test commit that generated these results can be found [
 
 The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/a7bba101110cba548852932cbeb93e5dec37e66f).
 
+---
+
 Team member name: Kacper
 
 #### Function 1: restoreLibraryItems
@@ -122,7 +126,10 @@ Team member name: Kacper
 #### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211e5ae8b9b535cb26c27c
 
+
 ## Coverage improvement
+
+---
 
 ### Individual tests
 
@@ -174,7 +181,9 @@ The code coverage results changed in the following way:
 
 > **as above*
 
-The link to the unit test commit that generated these results can be found [here]().
+The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/db8406446454c863e91860086ff9ea755890d8c7).
+
+---
 
 Team member name: Kacper
 
@@ -236,6 +245,9 @@ New coverage results:
 <Provide a screenshot of the new coverage results by running the existing tool using all test modifications made by the group>
 
 ## Statement of individual contributions
+
+#### Jakub:
+Started the basic README.md structure, responsible for **setLanguage** and **polygonBounds** functions.
 
 #### Kacper:
 I was respobsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
