@@ -78,11 +78,7 @@ The link to the coverage test commit that generated these results can be found [
 	<img src="./readme-assets/branchgeo-pre.png" alt="utils2" width="500"/>
 </p>
 
-The link to the coverage test commit that generated these results can be found [here]().
-
-#### Tool results
-
-TODO
+The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/a7bba101110cba548852932cbeb93e5dec37e66f).
 
 Team member name: Kacper
 
