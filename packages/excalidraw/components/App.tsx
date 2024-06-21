@@ -2446,16 +2446,6 @@ class App extends React.Component<AppProps, AppState> {
       this.history.record(increment.elementsChange, increment.appStateChange);
     });
 
-    this.history.onHistoryChangedEmitter.on(() => {
-      this.scene
-        .getNonDeletedElements()
-        .filter((element) => isArrowElement(element) && element.elbowed)
-        .forEach((arrow) => {
-          isArrowElement(arrow) &&
-            mutateElbowArrow(arrow, this.scene, arrow.points, [0, 0]);
-        });
-    });
-
     this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
 
