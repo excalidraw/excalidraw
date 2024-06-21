@@ -122,9 +122,32 @@ https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211
 
 Team member name: Jakub
 
+> To improve coverage, additional tests were created in the `it()` clauses from vitest's unit-testing suite. Additionally, some small changes were made to conform to code quality standards (for example, a local constant was `export`-ed to avoid multiple definitions).
+
 #### Test 1: setLanguage
 
-TODO
+> path: **excalidraw-app/tests/LanguageList.test.tsx**
+
+After the following two tests were implemented:
+
+<p align="center">
+	<img src="./readme-assets/langlist1.png" alt="langList1" width="800"/>
+</p>
+
+<p align="center">
+	<img src="./readme-assets/langlist2.png" alt="langList2" width="800"/>
+</p>
+
+The code coverage results changed in the following way:
+
+| | Before tests      | After tests      |
+| -- | ------------- | ------------- |
+| Self-made tool | <img src="./readme-assets/branchi18n-pre.png" alt="langList1" width="500"/> | <img src="./readme-assets/branchi18n-post.png" alt="langList1" width="500"/>  |
+| Istanbul report* | <img src="./readme-assets/branchi18n-pre-ist.png" alt="" width="500"/> | <img src="./readme-assets/branchi18n-post-ist.png" alt="langList1" width="500"/>  |
+
+*the ability to isolate functions (especially first-order ones) is not present in istanbul, however a visual inspection of the file itself shows a full coverage, consistent with the results found with the self-made tool.
+
+The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/d6fc61657b6a7e69bd683085e76026cb101af7cb).
 
 #### Test 2: ???
 
