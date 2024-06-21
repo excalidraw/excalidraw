@@ -8,10 +8,10 @@ on:
 jobs:
   publish-docker:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
@@ -30,7 +30,7 @@ jobs:
             type=ref,event=tag
             type=semver,pattern={{version}}
             type=raw,value={{date 'YYYYMMDD'}}
-          
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
