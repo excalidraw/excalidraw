@@ -21,6 +21,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
   PointBinding,
 } from "./types";
 
@@ -507,9 +508,11 @@ export const updateBoundElements = (
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
     scale?: { scaleX: number; scaleY: number };
+    changedElements?: Map<string, OrderedExcalidrawElement>;
   },
 ) => {
-  const { newSize, scale, simultaneouslyUpdated } = options ?? {};
+  const { newSize, scale, simultaneouslyUpdated, changedElements } =
+    options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -603,6 +606,7 @@ export const updateBoundElements = (
       ...(changedElement.id === element.endBinding?.elementId
         ? { endBinding: bindings.endBinding }
         : {}),
+      changedElements,
     });
 
     // updateElbowArrowBindPointsToSnapToElementOutline(

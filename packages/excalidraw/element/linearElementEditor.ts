@@ -8,6 +8,7 @@ import type {
   ElementsMap,
   NonDeletedSceneElementsMap,
   ExcalidrawArrowElement,
+  OrderedExcalidrawElement,
 } from "./types";
 import {
   distance2d,
@@ -1238,6 +1239,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
+      changedElements?: Map<string, OrderedExcalidrawElement>;
     },
   ) {
     const { points } = element;
@@ -1404,6 +1406,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
+      changedElements?: Map<string, OrderedExcalidrawElement>;
     },
     isDragging?: boolean,
   ) {

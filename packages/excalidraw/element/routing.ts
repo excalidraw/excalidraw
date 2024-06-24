@@ -33,6 +33,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  OrderedExcalidrawElement,
   PointBinding,
 } from "./types";
 
@@ -61,6 +62,7 @@ export const mutateElbowArrow = (
   otherUpdates?: {
     startBinding?: PointBinding | null;
     endBinding?: PointBinding | null;
+    changedElements?: Map<string, OrderedExcalidrawElement>;
   },
   isDragging?: boolean,
 ) => {
@@ -74,7 +76,10 @@ export const mutateElbowArrow = (
     ]),
   ];
 
-  const elementsMap = scene.getNonDeletedElementsMap();
+  const elementsMap = new Map(scene.getNonDeletedElementsMap());
+  otherUpdates?.changedElements?.forEach((element) =>
+    elementsMap.set(element.id, element),
+  );
   const [startElement, endElement] = [
     arrow.startBinding && !isDragging
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
@@ -189,12 +194,14 @@ export const mutateElbowArrow = (
     endHeading,
     endGlobalPoint,
   );
-  const boundingBoxes = [...(dynamicAABBs ?? [])]
-    .filter((aabb) => aabb !== null)
-    .map((x) => {
-      debugDrawBounds(x!, "green");
-      return x;
-    }) as Bounds[];
+  const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
+    (aabb) => aabb !== null,
+  );
+  // .map((x) => {
+  //   debugDrawBounds(x!, "green");
+  //   return x;
+  // }) as Bounds[];
+
   // Canculate Grid positions
   const grid = calculateGrid(
     boundingBoxes,
@@ -1150,15 +1157,15 @@ const neighborIndexToHeading = (idx: number): Heading => {
   return HEADING_LEFT;
 };
 
-const boundsOverlap = (a: Bounds, b: Bounds) => {
-  return isAnyTrue(
-    pointInsideBounds([a[0], a[1]], b),
-    pointInsideBounds([a[2], a[1]], b),
-    pointInsideBounds([a[2], a[3]], b),
-    pointInsideBounds([a[0], a[2]], b),
-    pointInsideBounds([b[0], b[1]], a),
-    pointInsideBounds([b[2], b[1]], a),
-    pointInsideBounds([b[2], b[3]], a),
-    pointInsideBounds([b[0], b[2]], a),
-  );
-};
+// const boundsOverlap = (a: Bounds, b: Bounds) => {
+//   return isAnyTrue(
+//     pointInsideBounds([a[0], a[1]], b),
+//     pointInsideBounds([a[2], a[1]], b),
+//     pointInsideBounds([a[2], a[3]], b),
+//     pointInsideBounds([a[0], a[2]], b),
+//     pointInsideBounds([b[0], b[1]], a),
+//     pointInsideBounds([b[2], b[1]], a),
+//     pointInsideBounds([b[2], b[3]], a),
+//     pointInsideBounds([b[0], b[2]], a),
+//   );
+// };
