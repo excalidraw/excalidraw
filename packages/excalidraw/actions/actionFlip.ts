@@ -10,7 +10,6 @@ import { resizeMultipleElements } from "../element/resizeElements";
 import type { AppClassProperties, AppState } from "../types";
 import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
-import { getCommonBoundingBox } from "../element/bounds";
 import {
   bindOrUnbindLinearElements,
   isBindingEnabled,
@@ -109,18 +108,12 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
-  const { minX, minY, maxX, maxY } = getCommonBoundingBox(selectedElements);
-
-  resizeMultipleElements(
-    elementsMap,
-    selectedElements,
-    elementsMap,
-    "nw",
-    true,
-    true,
-    flipDirection === "horizontal" ? maxX : minX,
-    flipDirection === "horizontal" ? minY : maxY,
-  );
+  resizeMultipleElements(selectedElements, elementsMap, "nw", {
+    flipByX: flipDirection === "horizontal",
+    flipByY: flipDirection === "vertical",
+    shouldResizeFromCenter: true,
+    shouldMaintainAspectRatio: true,
+  });
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
