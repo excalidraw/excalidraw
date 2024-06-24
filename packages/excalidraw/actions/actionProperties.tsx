@@ -1,4 +1,4 @@
-import type { AppClassProperties, AppState, Primitive } from "../types";
+import type { AppClassProperties, AppState, Point, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -102,6 +102,8 @@ import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
 import { mutateElbowArrow } from "../element/routing";
+import { debugDrawPoint } from "../visualdebug";
+import { rotatePoint } from "../math";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1265,7 +1267,20 @@ export const actionChangeArrowType = register({
         });
 
         if (value === "elbow") {
-          mutateElbowArrow(newElement, app.scene, newElement.points);
+          const center = [newElement.width / 2, newElement.height / 2] as Point;
+          mutateElbowArrow(
+            newElement,
+            app.scene,
+            [
+              rotatePoint(newElement.points[0], center, newElement.angle),
+              rotatePoint(
+                newElement.points[newElement.points.length - 1],
+                center,
+                newElement.angle,
+              ),
+            ],
+            [0, 0],
+          );
         }
 
         return newElement;
