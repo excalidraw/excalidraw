@@ -25,6 +25,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import {
   hasBoundTextElement,
+  isInitializedImageElement,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
@@ -125,6 +126,10 @@ export const SelectedShapeActions = ({
 
   return (
     <div className="panelColumn">
+      {targetElements.length > 0 &&
+        targetElements.every(isInitializedImageElement) && (
+          <div>{renderAction("removeBackground")}</div>
+        )}
       <div>
         {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}

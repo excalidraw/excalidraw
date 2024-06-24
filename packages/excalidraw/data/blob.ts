@@ -235,7 +235,9 @@ export const canvasToBlob = async (
 
 /** generates SHA-1 digest from supplied file (if not supported, falls back
     to a 40-char base64 random id) */
-export const generateIdFromFile = async (file: File): Promise<FileId> => {
+export const generateIdFromFile = async (
+  file: File | Blob,
+): Promise<FileId> => {
   try {
     const hashBuffer = await window.crypto.subtle.digest(
       "SHA-1",
