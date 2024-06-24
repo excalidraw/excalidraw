@@ -10,7 +10,7 @@ export const actionRemoveBackground = register({
   label: "stats.fullTitle",
   trackEvent: false,
   viewMode: false,
-  async perform(elements, appState, _, app) {
+  async perform(elements, appState, type, app) {
     const selectedElements = app.scene.getSelectedElements(appState);
 
     if (
@@ -63,11 +63,11 @@ export const actionRemoveBackground = register({
 
         for (const [, { file, elements }] of filesToProcess) {
           const res = await backgroundRemoval.removeBackground(file.dataURL, {
-            // debug: true,
+            debug: true,
             progress: (...args) => {
               console.log("progress", args);
             },
-            device: "gpu",
+            device: type === "auto" ? undefined : type,
             proxyToWorker: true,
           });
 
@@ -101,13 +101,29 @@ export const actionRemoveBackground = register({
   },
   PanelComponent: ({ updateData }) => {
     return (
-      <button
-        onClick={() => {
-          updateData();
-        }}
-      >
-        Remove background
-      </button>
+      <>
+        <button
+          onClick={() => {
+            updateData("auto");
+          }}
+        >
+          Remove background (auto)
+        </button>
+        <button
+          onClick={() => {
+            updateData("gpu");
+          }}
+        >
+          Remove background (gpu)
+        </button>
+        <button
+          onClick={() => {
+            updateData("cpu");
+          }}
+        >
+          Remove background (cpu)
+        </button>
+      </>
     );
   },
 });
