@@ -371,8 +371,8 @@ describe("line element", () => {
 
     UI.resize(element, "ne", [30, -60], { shift: true });
 
-    const scaleHeight = element.width / prevHeight;
-    const scaleWidth = element.height / prevWidth;
+    const scaleHeight = element.width / prevWidth;
+    const scaleWidth = element.height / prevHeight;
 
     expect(scaleHeight).toBeCloseTo(scaleWidth);
   });
