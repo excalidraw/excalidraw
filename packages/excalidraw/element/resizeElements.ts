@@ -1171,7 +1171,7 @@ export const resizeMultipleElements = (
       }[],
       element,
     ) => {
-      const origElement = originalElementsMap.get(element.id);
+      const origElement = originalElementsMap!.get(element.id);
       if (origElement) {
         acc.push({ orig: origElement, latest: element });
       }
@@ -1193,7 +1193,7 @@ export const resizeMultipleElements = (
       if (!textId) {
         return acc;
       }
-      const text = originalElementsMap.get(textId) ?? null;
+      const text = originalElementsMap!.get(textId) ?? null;
       if (!isBoundToContainer(text)) {
         return acc;
       }
@@ -1413,31 +1413,4 @@ export const resizeMultipleElements = (
 
     Scene.getScene(elementsAndUpdates[0].element)?.triggerUpdate();
   }
-};
-
-export const getResizingAnchor = (
-  handleDirection: TransformHandleDirection,
-  boundingBox: BoundingBox,
-  shouldResizeFromCenter: boolean,
-): Point => {
-  const { minX, minY, maxX, maxY, midX, midY } = boundingBox;
-  const width = maxX - minX;
-  const height = maxY - minY;
-
-  const direction = handleDirection;
-
-  const anchorsMap: Record<TransformHandleDirection, Point> = {
-    ne: [minX, maxY],
-    se: [minX, minY],
-    sw: [maxX, minY],
-    nw: [maxX, maxY],
-    e: [minX, minY + height / 2],
-    w: [maxX, minY + height / 2],
-    n: [minX + width / 2, maxY],
-    s: [minX + width / 2, minY],
-  };
-
-  // anchor point must be on the opposite side of the dragged selection handle
-  // or be the center of the selection if shouldResizeFromCenter
-  return shouldResizeFromCenter ? [midX, midY] : anchorsMap[direction];
 };
