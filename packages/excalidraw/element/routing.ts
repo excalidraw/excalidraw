@@ -66,8 +66,6 @@ export const mutateElbowArrow = (
   },
   isDragging?: boolean,
 ) => {
-  debugClear();
-
   const [startGlobalPoint, endGlobalPoint] = [
     translatePoint(nextPoints[0], [arrow.x + offset[0], arrow.y + offset[1]]),
     translatePoint(nextPoints[nextPoints.length - 1], [
@@ -548,65 +546,64 @@ const calculateGrid = (
   return {
     row: _vertical.length,
     col: _horizontal.length,
-    data: _vertical
-      .flatMap((y, row) =>
-        _horizontal.map(
-          (x, col): Node => ({
-            f: 0,
-            g: 0,
-            h: 0,
-            closed: false,
-            visited: false,
-            parent: null,
-            addr: [col, row] as [number, number],
-            pos: [x, y] as Point,
-          }),
-        ),
-      )
-      // .map((node) => {
-      //   const valid =
-      //     !overlap ||
-      //     start[0] === node.pos[0] ||
-      //     start[1] === node.pos[1] ||
-      //     end[0] === node.pos[0] ||
-      //     end[1] === node.pos[1] ||
-      //     isAnyTrue(
-      //       ...aabbs
-      //         .map(boundsToLineSegments)
-      //         .flatMap((segments) =>
-      //           segments.map((segment) => isPointOnLine(segment, node.pos)),
-      //         ),
-      //     );
+    data: _vertical.flatMap((y, row) =>
+      _horizontal.map(
+        (x, col): Node => ({
+          f: 0,
+          g: 0,
+          h: 0,
+          closed: false,
+          visited: false,
+          parent: null,
+          addr: [col, row] as [number, number],
+          pos: [x, y] as Point,
+        }),
+      ),
+    ),
+    // .map((node) => {
+    //   const valid =
+    //     !overlap ||
+    //     start[0] === node.pos[0] ||
+    //     start[1] === node.pos[1] ||
+    //     end[0] === node.pos[0] ||
+    //     end[1] === node.pos[1] ||
+    //     isAnyTrue(
+    //       ...aabbs
+    //         .map(boundsToLineSegments)
+    //         .flatMap((segments) =>
+    //           segments.map((segment) => isPointOnLine(segment, node.pos)),
+    //         ),
+    //     );
 
-      //   node.closed = !valid;
-      //   return node;
-      // })
-      // .map((node) => {
-      //   const invalid =
-      //     !overlap &&
-      //     isAnyTrue(...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)));
+    //   node.closed = !valid;
+    //   return node;
+    // })
+    // .map((node) => {
+    //   const invalid =
+    //     !overlap &&
+    //     isAnyTrue(...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)));
 
-      //   node.closed = invalid;
-      //   return node;
-      // })
-      // .map((node) => {
-      //   if (
-      //     !overlap &&
-      //     pointOnBounds(node.pos, common) &&
-      //     (arePointsClose(oppositeStartDongle, node.pos) ||
-      //       arePointsClose(oppositeEndDongle, node.pos))
-      //   ) {
-      //     node.closed = true;
-      //   }
+    //   node.closed = invalid;
+    //   return node;
+    // })
+    // .map((node) => {
+    //   if (
+    //     !overlap &&
+    //     pointOnBounds(node.pos, common) &&
+    //     (arePointsClose(oppositeStartDongle, node.pos) ||
+    //       arePointsClose(oppositeEndDongle, node.pos))
+    //   ) {
+    //     node.closed = true;
+    //   }
 
-      //   return node;
-      // })
-      .map((node) => {
-        node.closed
-          ? debugDrawPoint(node.pos, "red")
-          : debugDrawPoint(node.pos, "green");
-        return node;
-      }),
+    //   return node;
+    // })
+    // .map((node) => {
+    //   node.closed
+    //     ? debugDrawPoint(node.pos, "red")
+    //     : debugDrawPoint(node.pos, "green");
+    //   return node;
+    // }),
   };
 };
 

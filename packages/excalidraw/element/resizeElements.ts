@@ -51,6 +51,7 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
+import { mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -1032,18 +1033,70 @@ const rotateMultipleElements = (
         centerY,
         centerAngle + origAngle - element.angle,
       );
-      mutateElement(
-        element,
-        {
-          x: element.x + (rotatedCX - cx),
-          y: element.y + (rotatedCY - cy),
-          angle:
-            !isArrowElement(element) || !element.elbowed
-              ? normalizeAngle(centerAngle + origAngle)
-              : 0,
-        },
-        false,
-      );
+      if (isArrowElement(element) && element.elbowed) {
+        const startElement =
+          element.startBinding &&
+          elementsMap.get(element.startBinding.elementId);
+        const endElement =
+          element.endBinding && elementsMap.get(element.endBinding.elementId);
+        const startPoint =
+          startElement && element.startBinding
+            ? rotatePoint(
+                [
+                  startElement.x + element.startBinding.fixedPoint[0],
+                  startElement.y + element.startBinding.fixedPoint[1],
+                ],
+                [
+                  startElement.x + startElement.width / 2,
+                  startElement.y + startElement.height / 2,
+                ],
+                startElement.angle,
+              )
+            : [
+                element.x + element.points[0][0],
+                element.y + element.points[0][1],
+              ];
+        const endPoint =
+          endElement && element.endBinding
+            ? rotatePoint(
+                [
+                  endElement.x + element.endBinding.fixedPoint[0],
+                  endElement.y + element.endBinding.fixedPoint[1],
+                ],
+                [
+                  endElement.x + endElement.width / 2,
+                  endElement.y + endElement.height / 2,
+                ],
+                endElement.angle,
+              )
+            : [
+                element.x + element.points[element.points.length - 1][0],
+                element.y + element.points[element.points.length - 1][1],
+              ];
+        mutateElbowArrow(
+          element,
+          scene,
+          [startPoint, endPoint].map((point) => [
+            point[0] - element.x,
+            point[1] - element.y,
+          ]),
+          [0, 0],
+        );
+      } else {
+        mutateElement(
+          element,
+          {
+            x: element.x + (rotatedCX - cx),
+            y: element.y + (rotatedCY - cy),
+            angle:
+              !isArrowElement(element) || !element.elbowed
+                ? normalizeAngle(centerAngle + origAngle)
+                : 0,
+          },
+          false,
+        );
+      }
+
       updateBoundElements(element, elementsMap, scene, {
         simultaneouslyUpdated: elements,
       });

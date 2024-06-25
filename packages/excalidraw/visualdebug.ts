@@ -116,6 +116,7 @@ export const renderVisualDebug = (
   context.lineTo(-10 * appState.zoom.value, 10 * appState.zoom.value);
   context.stroke();
   context.restore();
+  debugClear();
 };
 
 export function debugClear() {
