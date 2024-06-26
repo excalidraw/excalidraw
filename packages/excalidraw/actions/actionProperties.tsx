@@ -1024,8 +1024,12 @@ export const actionChangeRoundness = register({
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isArrowElement(el) && el.elbowed) {
+          return el;
+        }
+
+        return newElementWith(el, {
           roundness:
             value === "round"
               ? {
@@ -1034,8 +1038,8 @@ export const actionChangeRoundness = register({
                     : ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
               : null,
-        }),
-      ),
+        });
+      }),
       appState: {
         ...appState,
         currentItemRoundness: value,
