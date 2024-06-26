@@ -140,6 +140,7 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
+  updateBoundElements(latestElement, elementsMap);
 
   if (boundTextElement) {
     boundTextFont = {
@@ -218,6 +219,7 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
+  updateBoundElements(latestElement, elementsMap);
 
   const boundTextElement = getBoundTextElement(
     originalElement,

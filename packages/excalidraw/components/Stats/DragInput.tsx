@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { EVENT } from "../../constants";
-import { KEYS } from "../../keys";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { deepCopyElement } from "../../element/newElement";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import { KEYS } from "../../keys";
 
-import "./DragInput.scss";
 import clsx from "clsx";
+import { StoreAction } from "../../store";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
+import "./DragInput.scss";
 import { SMALLEST_DELTA } from "./utils";
-import { StoreAction } from "../../store";
 
 export type DragInputCallbackType = ({
   accumulatedChange,

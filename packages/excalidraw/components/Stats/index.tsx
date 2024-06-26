@@ -206,11 +206,13 @@ export const StatsInner = memo(
                         element={singleElement}
                         property="x"
                         elementsMap={elementsMap}
+                        scene={scene}
                       />
                       <Position
                         element={singleElement}
                         property="y"
                         elementsMap={elementsMap}
+                        scene={scene}
                       />
                       <Dimension
                         property="width"
@@ -225,11 +227,13 @@ export const StatsInner = memo(
                       <Angle
                         element={singleElement}
                         elementsMap={elementsMap}
+                        scene={scene}
                       />
                       {singleElement.type === "text" && (
                         <FontSize
                           element={singleElement}
                           elementsMap={elementsMap}
+                          scene={scene}
                         />
                       )}
                     </div>

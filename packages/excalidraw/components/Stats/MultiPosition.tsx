@@ -27,6 +27,7 @@ const moveElements = (
   originalElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   for (let i = 0; i < elements.length; i++) {
     const origElement = originalElements[i];
@@ -69,6 +70,7 @@ const moveGroupTo = (
   originalElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   const [x1, y1, ,] = getCommonBounds(originalElements);
   const offsetX = nextX - x1;
@@ -166,6 +168,7 @@ const MultiPosition = ({
             elementsInUnit.map((el) => el.original),
             elementsMap,
             originalElementsMap,
+            scene,
           );
         } else {
           const origElement = elementsInUnit[0]?.original;
@@ -221,6 +224,7 @@ const MultiPosition = ({
       originalElements,
       elementsMap,
       originalElementsMap,
+      scene,
     );
 
     scene.triggerUpdate();

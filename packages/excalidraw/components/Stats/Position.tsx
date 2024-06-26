@@ -1,5 +1,6 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { rotate } from "../../math";
+import type Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
@@ -8,11 +9,12 @@ interface PositionProps {
   property: "x" | "y";
   element: ExcalidrawElement;
   elementsMap: ElementsMap;
+  scene: Scene;
 }
 
 const STEP_SIZE = 10;
 
-const Position = ({ property, element, elementsMap }: PositionProps) => {
+const Position = ({ property, element, elementsMap, scene }: PositionProps) => {
   const [topLeftX, topLeftY] = rotate(
     element.x,
     element.y,

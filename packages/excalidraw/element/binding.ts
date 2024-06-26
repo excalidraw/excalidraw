@@ -36,12 +36,12 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import { KEYS } from "../keys";
+import Scene from "../scene/Scene";
 import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
-import Scene from "../scene/Scene";
-import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
-import { KEYS } from "../keys";
+import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 
 export type SuggestedBinding =
