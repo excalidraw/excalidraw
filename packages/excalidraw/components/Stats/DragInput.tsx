@@ -3,23 +3,19 @@ import { EVENT } from "../../constants";
 import { KEYS } from "../../keys";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { deepCopyElement } from "../../element/newElement";
-
-import "./DragInput.scss";
 import clsx from "clsx";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
+import type { StatsInputProperty } from "./utils";
 import { SMALLEST_DELTA } from "./utils";
 import { StoreAction } from "../../store";
+import type Scene from "../../scene/Scene";
 
-export type DragInputCallbackType = ({
-  accumulatedChange,
-  instantChange,
-  originalElements,
-  originalElementsMap,
-  shouldKeepAspectRatio,
-  shouldChangeByStepSize,
-  nextValue,
-}: {
+import "./DragInput.scss";
+import type { AppState } from "../../types";
+import { cloneJSON } from "../../utils";
+
+export type DragInputCallbackType<T extends StatsInputProperty> = (props: {
   accumulatedChange: number;
   instantChange: number;
   originalElements: readonly ExcalidrawElement[];
@@ -27,19 +23,25 @@ export type DragInputCallbackType = ({
   shouldKeepAspectRatio: boolean;
   shouldChangeByStepSize: boolean;
   nextValue?: number;
+  property: T;
+  scene: Scene;
+  originalAppState: AppState;
 }) => void;
 
-interface StatsDragInputProps {
+interface StatsDragInputProps<T extends StatsInputProperty> {
   label: string | React.ReactNode;
   icon?: React.ReactNode;
   value: number | "Mixed";
   elements: readonly ExcalidrawElement[];
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
-  dragInputCallback: DragInputCallbackType;
+  dragInputCallback: DragInputCallbackType<T>;
+  property: T;
+  scene: Scene;
+  appState: AppState;
 }
 
-const StatsDragInput = ({
+const StatsDragInput = <T extends StatsInputProperty>({
   label,
   icon,
   dragInputCallback,
@@ -47,19 +49,48 @@ const StatsDragInput = ({
   elements,
   editable = true,
   shouldKeepAspectRatio,
-}: StatsDragInputProps) => {
+  property,
+  scene,
+  appState,
+}: StatsDragInputProps<T>) => {
   const app = useApp();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
   const [inputValue, setInputValue] = useState(value.toString());
 
-  useEffect(() => {
-    setInputValue(value.toString());
-  }, [value, elements]);
+  const stateRef = useRef<{
+    originalAppState: AppState;
+    originalElements: readonly ExcalidrawElement[];
+    lastUpdatedValue: string;
+    updatePending: boolean;
+  }>(null!);
+  if (!stateRef.current) {
+    stateRef.current = {
+      originalAppState: cloneJSON(appState),
+      originalElements: elements,
+      lastUpdatedValue: inputValue,
+      updatePending: false,
+    };
+  }
 
-  const handleInputValue = (v: string) => {
-    const parsed = Number(v);
+  useEffect(() => {
+    const inputValue = value.toString();
+    setInputValue(inputValue);
+    stateRef.current.lastUpdatedValue = inputValue;
+  }, [value]);
+
+  const handleInputValue = (
+    updatedValue: string,
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+  ) => {
+    if (!stateRef.current.updatePending) {
+      return false;
+    }
+    stateRef.current.updatePending = false;
+
+    const parsed = Number(updatedValue);
     if (isNaN(parsed)) {
       setInputValue(value.toString());
       return;
@@ -74,6 +105,7 @@ const StatsDragInput = ({
     //    than the smallest delta allowed, which is 0.01
     // reason: idempotent to avoid unnecessary
     if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
+      stateRef.current.lastUpdatedValue = updatedValue;
       dragInputCallback({
         accumulatedChange: 0,
         instantChange: 0,
@@ -82,6 +114,9 @@ const StatsDragInput = ({
         shouldKeepAspectRatio: shouldKeepAspectRatio!!,
         shouldChangeByStepSize: false,
         nextValue: rounded,
+        property,
+        scene,
+        originalAppState: appState,
       });
       app.syncActionResult({ storeAction: StoreAction.CAPTURE });
     }
@@ -97,12 +132,28 @@ const StatsDragInput = ({
     return () => {
       const nextValue = input?.value;
       if (nextValue) {
-        handleInputValueRef.current(nextValue);
+        handleInputValueRef.current(
+          nextValue,
+          stateRef.current.originalElements,
+          stateRef.current.originalAppState,
+        );
       }
     };
-  }, []);
+  }, [
+    // we need to track change of `editable` state as mount/unmount
+    // because react doesn't trigger `blur` when a an input is blurred due
+    // to being disabled (https://github.com/facebook/react/issues/9142).
+    // As such, if we keep rendering disabled inputs, then change in selection
+    // to an element that has a given property as non-editable would not trigger
+    // blur/unmount and wouldn't update the value.
+    editable,
+  ]);
 
-  return editable ? (
+  if (!editable) {
+    return null;
+  }
+
+  return (
     <div
       className={clsx("drag-input-container", !editable && "disabled")}
       data-testid={label}
@@ -125,6 +176,7 @@ const StatsDragInput = ({
             let originalElements: ExcalidrawElement[] | null = null;
             let originalElementsMap: Map<string, ExcalidrawElement> | null =
               null;
+            const originalAppState: AppState = cloneJSON(appState);
 
             let accumulatedChange: number | null = null;
 
@@ -165,6 +217,9 @@ const StatsDragInput = ({
                   originalElementsMap,
                   shouldKeepAspectRatio: shouldKeepAspectRatio!!,
                   shouldChangeByStepSize: event.shiftKey,
+                  property,
+                  scene,
+                  originalAppState,
                 });
               }
 
@@ -216,7 +271,7 @@ const StatsDragInput = ({
               eventTarget instanceof HTMLInputElement &&
               event.key === KEYS.ENTER
             ) {
-              handleInputValue(eventTarget.value);
+              handleInputValue(eventTarget.value, elements, appState);
               app.focusContainer();
             }
           }
@@ -224,23 +279,28 @@ const StatsDragInput = ({
         ref={inputRef}
         value={inputValue}
         onChange={(event) => {
+          stateRef.current.updatePending = true;
           setInputValue(event.target.value);
         }}
         onFocus={(event) => {
           event.target.select();
+          stateRef.current.originalElements = elements;
+          stateRef.current.originalAppState = cloneJSON(appState);
         }}
         onBlur={(event) => {
           if (!inputValue) {
             setInputValue(value.toString());
           } else if (editable) {
-            handleInputValue(event.target.value);
+            handleInputValue(
+              event.target.value,
+              stateRef.current.originalElements,
+              stateRef.current.originalAppState,
+            );
           }
         }}
         disabled={!editable}
       />
     </div>
-  ) : (
-    <></>
   );
 };
 
