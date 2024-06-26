@@ -161,7 +161,9 @@ describe("element locking", () => {
       API.setSelectedElements([rect, text]);
 
       expect(queryByTestId(document.body, `strokeWidth-bold`)).toBeChecked();
-      expect(queryByTestId(document.body, `font-family-code`)).toBeChecked();
+      expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
+        "active",
+      );
     });
   });
 });

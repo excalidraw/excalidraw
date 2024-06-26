@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { ButtonIcon } from "./ButtonIcon";
 
 // TODO: It might be "clever" to add option.icon to the existing component <ButtonSelect />
 export const ButtonIconSelect = <T extends Object>(
@@ -24,21 +25,17 @@ export const ButtonIconSelect = <T extends Object>(
       }
   ),
 ) => (
-  <div className="buttonList buttonListIcon">
+  <div className="buttonList">
     {props.options.map((option) =>
       props.type === "button" ? (
-        <button
-          type="button"
+        <ButtonIcon
           key={option.text}
-          onClick={(event) => props.onClick(option.value, event)}
-          className={clsx({
-            active: option.active ?? props.value === option.value,
-          })}
-          data-testid={option.testId}
+          icon={option.icon}
           title={option.text}
-        >
-          {option.icon}
-        </button>
+          testId={option.testId}
+          active={option.active ?? props.value === option.value}
+          onClick={(event) => props.onClick(option.value, event)}
+        />
       ) : (
         <label
           key={option.text}

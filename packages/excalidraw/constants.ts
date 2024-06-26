@@ -114,12 +114,26 @@ export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
 };
 
-// 1-based in case we ever do `if(element.fontFamily)`
+/**
+ * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
+ *
+ * Let's think this through and consider:
+ * - https://developer.mozilla.org/en-US/docs/Web/CSS/generic-family
+ * - https://drafts.csswg.org/css-fonts-4/#font-family-prop
+ * - https://learn.microsoft.com/en-us/typography/opentype/spec/ibmfc
+ */
 export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
   Assistant: 4,
+  Excalifont: 5,
+  Nunito: 6,
+  Pacifico: 7,
+  Bangers: 8,
+  "Comic Shanns": 9,
+  "Permanent Marker": 10,
+  "Liberation Sans": 11,
 };
 
 export const THEME = {
@@ -147,7 +161,7 @@ export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
+export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";

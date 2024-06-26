@@ -1,3 +1,4 @@
+import { DEFAULT_FONT_FAMILY } from "../../constants";
 import type { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
@@ -48,4 +49,18 @@ export const rectangleWithLinkFixture: ExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
   link: "excalidraw.com",
+};
+
+export const textFixture: ExcalidrawElement = {
+  ...elementBase,
+  type: "text",
+  fontSize: 20,
+  fontFamily: DEFAULT_FONT_FAMILY,
+  text: "original text",
+  originalText: "original text",
+  textAlign: "left",
+  verticalAlign: "top",
+  containerId: null,
+  lineHeight: 1.25 as any,
+  autoResize: false,
 };

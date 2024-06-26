@@ -12,8 +12,10 @@
     "typescript": "^5"
   },
   "scripts": {
-    "start": "yarn workspace @excalidraw/excalidraw run build:esm && vite",
-    "build": "yarn workspace @excalidraw/excalidraw run build:esm && vite build",
+    "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm && yarn copy:assets",
+    "copy:assets": "cp ../../../packages/excalidraw/dist/browser/prod/excalidraw-assets/*.woff2 ./public",
+    "start": "yarn build:workspace && vite",
+    "build": "yarn build:workspace && vite build",
     "build:preview": "yarn build && vite preview --port 5002"
   }
 }

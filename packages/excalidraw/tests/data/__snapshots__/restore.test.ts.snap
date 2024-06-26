@@ -351,7 +351,7 @@ exports[`restoreElements > should restore text element correctly with unknown fo
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 10,
   "frameId": null,
   "groupIds": [],

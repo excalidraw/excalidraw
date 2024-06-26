@@ -1,4 +1,6 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppClassProperties, AppState, Primitive } from "../types";
+import type { StoreActionType } from "../store";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -9,6 +11,7 @@ import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
+import { FontPicker } from "../components/FontPicker/FontPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
@@ -38,9 +41,6 @@ import {
   FontSizeExtraLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
-  FreedrawIcon,
-  FontFamilyNormalIcon,
-  FontFamilyCodeIcon,
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
@@ -54,7 +54,6 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  FONT_FAMILY,
   ROUNDNESS,
   STROKE_WIDTH,
   VERTICAL_ALIGN,
@@ -65,10 +64,7 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import {
-  getBoundTextElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+import { getBoundTextElement } from "../element/textElement";
 import {
   isBoundToContainer,
   isLinearElement,
@@ -97,6 +93,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
+import { getLineHeight } from "../fonts";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -729,104 +726,307 @@ export const actionIncreaseFontSize = register({
   },
 });
 
+type ChangeFontFamilyData = Partial<
+  Pick<
+    AppState,
+    "openPopup" | "currentItemFontFamily" | "currentHoveredFontFamily"
+  >
+> & {
+  /** cache of selected & editing elements populated on opened popup */
+  cachedElements?: Map<string, ExcalidrawElement>;
+  /** flag to reset all elements to their cached versions  */
+  resetAll?: true;
+  /** flag to reset all containers to their cached versions */
+  resetContainers?: true;
+};
+
 export const actionChangeFontFamily = register({
   name: "changeFontFamily",
   label: "labels.fontFamily",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return {
-      elements: changeProperty(
+    const { cachedElements, resetAll, resetContainers, ...nextAppState } =
+      value as ChangeFontFamilyData;
+
+    if (resetAll) {
+      const nextElements = changeProperty(
         elements,
         appState,
-        (oldElement) => {
-          if (isTextElement(oldElement)) {
-            const newElement: ExcalidrawTextElement = newElementWith(
-              oldElement,
-              {
-                fontFamily: value,
-                lineHeight: getDefaultLineHeight(value),
-              },
-            );
-            redrawTextBoundingBox(
-              newElement,
-              app.scene.getContainerElement(oldElement),
-              app.scene.getNonDeletedElementsMap(),
-            );
+        (element) => {
+          const cachedElement = cachedElements?.get(element.id);
+          if (cachedElement) {
+            const newElement = newElementWith(element, {
+              ...cachedElement,
+            });
+
             return newElement;
           }
 
-          return oldElement;
+          return element;
         },
         true,
-      ),
+      );
+
+      return {
+        elements: nextElements,
+        appState: {
+          ...appState,
+          ...nextAppState,
+        },
+        storeAction: StoreAction.UPDATE,
+      };
+    }
+
+    const { currentItemFontFamily, currentHoveredFontFamily } = value;
+
+    let nexStoreAction: StoreActionType = StoreAction.NONE;
+    let fontFamilyChanged: FontFamilyValues | undefined;
+    let skipRender: boolean = false;
+
+    if (
+      currentItemFontFamily &&
+      currentItemFontFamily !== appState.currentItemFontFamily
+    ) {
+      fontFamilyChanged = currentItemFontFamily;
+      nexStoreAction = StoreAction.CAPTURE;
+    } else if (
+      currentHoveredFontFamily &&
+      currentHoveredFontFamily !== appState.currentHoveredFontFamily
+    ) {
+      fontFamilyChanged = currentHoveredFontFamily;
+      nexStoreAction = StoreAction.NONE;
+
+      const selectedElements = getSelectedElements(elements, appState, {
+        includeBoundTextElement: true,
+      });
+
+      // skip hover re-render for more than 100 elements
+      if (selectedElements.length > 100) {
+        skipRender = true;
+      }
+    }
+
+    const result = {
       appState: {
         ...appState,
-        currentItemFontFamily: value,
+        ...nextAppState,
       },
-      storeAction: StoreAction.CAPTURE,
+      storeAction: nexStoreAction,
     };
+
+    if (fontFamilyChanged && !skipRender) {
+      // following causes re-render so make sure we changed the family
+      // otherwise it could cause unexpected issues, such as preventing opening the popover when in wysiwyg
+      Object.assign(result, {
+        elements: changeProperty(
+          elements,
+          appState,
+          (oldElement) => {
+            if (isTextElement(oldElement)) {
+              const newElement: ExcalidrawTextElement = newElementWith(
+                oldElement,
+                {
+                  fontFamily: fontFamilyChanged,
+                  lineHeight: getLineHeight(fontFamilyChanged!),
+                },
+              );
+
+              const cachedContainer =
+                cachedElements?.get(oldElement.containerId || "") || {};
+
+              const container = app.scene.getContainerElement(oldElement);
+
+              if (resetContainers && container && cachedContainer) {
+                // reset the container back to it's cached version
+                mutateElement(container, { ...cachedContainer }, false);
+              }
+
+              redrawTextBoundingBox(
+                newElement,
+                container,
+                app.scene.getNonDeletedElementsMap(),
+                false,
+              );
+              return newElement;
+            }
+
+            return oldElement;
+          },
+          true,
+        ),
+      });
+    }
+
+    return result;
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
-    const options: {
-      value: FontFamilyValues;
-      text: string;
-      icon: JSX.Element;
-      testId: string;
-    }[] = [
-      {
-        value: FONT_FAMILY.Virgil,
-        text: t("labels.handDrawn"),
-        icon: FreedrawIcon,
-        testId: "font-family-virgil",
-      },
-      {
-        value: FONT_FAMILY.Helvetica,
-        text: t("labels.normal"),
-        icon: FontFamilyNormalIcon,
-        testId: "font-family-normal",
-      },
-      {
-        value: FONT_FAMILY.Cascadia,
-        text: t("labels.code"),
-        icon: FontFamilyCodeIcon,
-        testId: "font-family-code",
-      },
-    ];
+  PanelComponent: ({ elements, appState, app, updateData }) => {
+    const cachedElementsRef = useRef<Map<string, ExcalidrawElement>>(new Map());
+    const prevSelectedFontFamilyRef = useRef<number | null>(null);
+    // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
+    const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
+    const isUnmounted = useRef(true);
+
+    const selectedFontFamily = useMemo(() => {
+      const getFontFamily = (
+        elementsArray: readonly ExcalidrawElement[],
+        elementsMap: Map<string, ExcalidrawElement>,
+      ) =>
+        getFormValue(
+          elementsArray,
+          appState,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.fontFamily;
+            }
+            const boundTextElement = getBoundTextElement(element, elementsMap);
+            if (boundTextElement) {
+              return boundTextElement.fontFamily;
+            }
+            return null;
+          },
+          (element) =>
+            isTextElement(element) ||
+            getBoundTextElement(element, elementsMap) !== null,
+          (hasSelection) =>
+            hasSelection
+              ? null
+              : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+        );
+
+      // popup opened, use cached elements
+      if (
+        batchedData.openPopup === "fontFamily" &&
+        appState.openPopup === "fontFamily"
+      ) {
+        return getFontFamily(
+          Array.from(cachedElementsRef.current?.values() ?? []),
+          cachedElementsRef.current,
+        );
+      }
+
+      // popup closed, use all elements
+      if (!batchedData.openPopup && appState.openPopup !== "fontFamily") {
+        return getFontFamily(elements, app.scene.getNonDeletedElementsMap());
+      }
+
+      // popup props are not in sync, hence we are in the middle of an update, so keeping the previous value we've had
+      return prevSelectedFontFamilyRef.current;
+    }, [batchedData.openPopup, appState, elements, app.scene]);
+
+    useEffect(() => {
+      prevSelectedFontFamilyRef.current = selectedFontFamily;
+    }, [selectedFontFamily]);
+
+    useEffect(() => {
+      if (Object.keys(batchedData).length) {
+        updateData(batchedData);
+        // reset the data after we've used the data
+        setBatchedData({});
+      }
+      // call update only on internal state changes
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [batchedData]);
+
+    useEffect(() => {
+      isUnmounted.current = false;
+
+      return () => {
+        isUnmounted.current = true;
+      };
+    }, []);
 
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamilyValues | false>
-          group="font-family"
-          options={options}
-          value={getFormValue(
-            elements,
-            appState,
-            (element) => {
-              if (isTextElement(element)) {
-                return element.fontFamily;
+        <FontPicker
+          isOpened={appState.openPopup === "fontFamily"}
+          selectedFontFamily={selectedFontFamily}
+          hoveredFontFamily={appState.currentHoveredFontFamily}
+          onSelect={(fontFamily) => {
+            setBatchedData({
+              openPopup: null,
+              currentHoveredFontFamily: null,
+              currentItemFontFamily: fontFamily,
+            });
+
+            // defensive clear so immediate close won't abuse the cached elements
+            cachedElementsRef.current.clear();
+          }}
+          onHover={(fontFamily) => {
+            setBatchedData({
+              currentHoveredFontFamily: fontFamily,
+              cachedElements: new Map(cachedElementsRef.current),
+              resetContainers: true,
+            });
+          }}
+          onLeave={() => {
+            setBatchedData({
+              currentHoveredFontFamily: null,
+              cachedElements: new Map(cachedElementsRef.current),
+              resetAll: true,
+            });
+          }}
+          onPopupChange={(open) => {
+            if (open) {
+              // open, populate the cache from scratch
+              cachedElementsRef.current.clear();
+
+              const { editingElement } = appState;
+
+              if (editingElement?.type === "text") {
+                // retrieve the latest version from the scene, as `editingElement` isn't mutated
+                const latestEditingElement = app.scene.getElement(
+                  editingElement.id,
+                );
+
+                // inside the wysiwyg editor
+                cachedElementsRef.current.set(
+                  editingElement.id,
+                  newElementWith(
+                    latestEditingElement || editingElement,
+                    {},
+                    true,
+                  ),
+                );
+              } else {
+                const selectedElements = getSelectedElements(
+                  elements,
+                  appState,
+                  {
+                    includeBoundTextElement: true,
+                  },
+                );
+
+                for (const element of selectedElements) {
+                  cachedElementsRef.current.set(
+                    element.id,
+                    newElementWith(element, {}, true),
+                  );
+                }
               }
-              const boundTextElement = getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              );
-              if (boundTextElement) {
-                return boundTextElement.fontFamily;
+
+              setBatchedData({
+                openPopup: "fontFamily",
+              });
+            } else {
+              // close, use the cache and clear it afterwards
+              const data = {
+                openPopup: null,
+                currentHoveredFontFamily: null,
+                cachedElements: new Map(cachedElementsRef.current),
+                resetAll: true,
+              } as ChangeFontFamilyData;
+
+              if (isUnmounted.current) {
+                // in case the component was unmounted by the parent, trigger the update directly
+                updateData({ ...batchedData, ...data });
+              } else {
+                setBatchedData(data);
               }
-              return null;
-            },
-            (element) =>
-              isTextElement(element) ||
-              getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              ) !== null,
-            (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
-          )}
-          onChange={(value) => updateData(value)}
+
+              cachedElementsRef.current.clear();
+            }
+          }}
         />
       </fieldset>
     );

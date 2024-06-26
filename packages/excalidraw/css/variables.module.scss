@@ -124,6 +124,16 @@
   }
 }
 
+@mixin outlineButtonIconStyles {
+  @include outlineButtonStyles;
+  padding: 0;
+
+  svg {
+    width: var(--default-icon-size);
+    height: var(--default-icon-size);
+  }
+}
+
 @mixin avatarStyles {
   width: var(--avatar-size, 1.5rem);
   height: var(--avatar-size, 1.5rem);

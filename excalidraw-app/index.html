@@ -124,22 +124,34 @@
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
 
+    <!-- Preload Excalifont, Virgil (canvas fonts) and Assistant (ui font) with the high priority and in the quickest way possible -->
+    <!-- Preload from the package, as fonts inside /public are deprecated and left just for backwards compatibility in old svgs  -->
     <link
       rel="preload"
-      href="/Virgil.woff2"
+      href="../packages/excalidraw/fonts/Excalifont.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
     />
     <link
       rel="preload"
-      href="/Cascadia.woff2"
+      href="../packages/excalidraw/fonts/Virgil.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="../packages/excalidraw/fonts/Assistant-Regular.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"
     />
 
-    <link rel="stylesheet" href="/fonts/fonts.css" type="text/css" />
+    <!-- Warmup the connection for Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
     VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
     <script>
@@ -158,9 +170,10 @@
     </script>
     <% } %>
     <script>
-      window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
+      // set assets env variable
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
