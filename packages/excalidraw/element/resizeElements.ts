@@ -1080,6 +1080,11 @@ const rotateMultipleElements = (
             point[0] - element.x,
             point[1] - element.y,
           ]),
+          undefined,
+          undefined,
+          {
+            disableBinding: true,
+          },
         );
       } else {
         mutateElement(

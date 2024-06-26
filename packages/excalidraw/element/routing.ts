@@ -65,6 +65,7 @@ export const mutateElbowArrow = (
   options?: {
     changedElements?: Map<string, OrderedExcalidrawElement>;
     isDragging?: boolean;
+    disableBinding?: boolean;
   },
 ) => {
   const [startGlobalPoint, endGlobalPoint] = [
@@ -83,18 +84,22 @@ export const mutateElbowArrow = (
     elementsMap.set(element.id, element),
   );
   const [startElement, endElement] = [
-    arrow.startBinding && !options?.isDragging
-      ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
-      : getHoveredElementForBinding(
-          { x: startGlobalPoint[0], y: startGlobalPoint[1] },
-          scene,
-        ),
-    arrow.endBinding && !options?.isDragging
-      ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
-      : getHoveredElementForBinding(
-          { x: endGlobalPoint[0], y: endGlobalPoint[1] },
-          scene,
-        ),
+    !options?.disableBinding
+      ? arrow.startBinding && !options?.isDragging
+        ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
+        : getHoveredElementForBinding(
+            { x: startGlobalPoint[0], y: startGlobalPoint[1] },
+            scene,
+          )
+      : null,
+    !options?.disableBinding
+      ? arrow.endBinding && !options?.isDragging
+        ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
+        : getHoveredElementForBinding(
+            { x: endGlobalPoint[0], y: endGlobalPoint[1] },
+            scene,
+          )
+      : null,
   ];
   const [startHeading, endHeading] = [
     startElement
