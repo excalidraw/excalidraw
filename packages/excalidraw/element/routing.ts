@@ -57,34 +57,39 @@ export const mutateElbowArrow = (
   arrow: ExcalidrawArrowElement,
   scene: Scene,
   nextPoints: readonly Point[],
-  offset: Point,
+  offset?: Point,
   otherUpdates?: {
     startBinding?: PointBinding | null;
     endBinding?: PointBinding | null;
-    changedElements?: Map<string, OrderedExcalidrawElement>;
   },
-  isDragging?: boolean,
+  options?: {
+    changedElements?: Map<string, OrderedExcalidrawElement>;
+    isDragging?: boolean;
+  },
 ) => {
   const [startGlobalPoint, endGlobalPoint] = [
-    translatePoint(nextPoints[0], [arrow.x + offset[0], arrow.y + offset[1]]),
+    translatePoint(nextPoints[0], [
+      arrow.x + (offset ? offset[0] : 0),
+      arrow.y + (offset ? offset[1] : 0),
+    ]),
     translatePoint(nextPoints[nextPoints.length - 1], [
-      arrow.x + offset[0],
-      arrow.y + offset[1],
+      arrow.x + (offset ? offset[0] : 0),
+      arrow.y + (offset ? offset[1] : 0),
     ]),
   ];
 
   const elementsMap = new Map(scene.getNonDeletedElementsMap());
-  otherUpdates?.changedElements?.forEach((element) =>
+  options?.changedElements?.forEach((element) =>
     elementsMap.set(element.id, element),
   );
   const [startElement, endElement] = [
-    arrow.startBinding && !isDragging
+    arrow.startBinding && !options?.isDragging
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
       : getHoveredElementForBinding(
           { x: startGlobalPoint[0], y: startGlobalPoint[1] },
           scene,
         ),
-    arrow.endBinding && !isDragging
+    arrow.endBinding && !options?.isDragging
       ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
       : getHoveredElementForBinding(
           { x: endGlobalPoint[0], y: endGlobalPoint[1] },

@@ -1080,7 +1080,6 @@ const rotateMultipleElements = (
             point[0] - element.x,
             point[1] - element.y,
           ]),
-          [0, 0],
         );
       } else {
         mutateElement(

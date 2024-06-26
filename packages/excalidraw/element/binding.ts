@@ -599,15 +599,22 @@ export const updateBoundElements = (
       }> => update !== null,
     );
 
-    LinearElementEditor.movePoints(element, updates, scene, {
-      ...(changedElement.id === element.startBinding?.elementId
-        ? { startBinding: bindings.startBinding }
-        : {}),
-      ...(changedElement.id === element.endBinding?.elementId
-        ? { endBinding: bindings.endBinding }
-        : {}),
-      changedElements,
-    });
+    LinearElementEditor.movePoints(
+      element,
+      updates,
+      scene,
+      {
+        ...(changedElement.id === element.startBinding?.elementId
+          ? { startBinding: bindings.startBinding }
+          : {}),
+        ...(changedElement.id === element.endBinding?.elementId
+          ? { endBinding: bindings.endBinding }
+          : {}),
+      },
+      {
+        changedElements,
+      },
+    );
 
     // updateElbowArrowBindPointsToSnapToElementOutline(
     //   element,

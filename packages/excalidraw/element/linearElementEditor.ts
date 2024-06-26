@@ -35,7 +35,6 @@ import type {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
-  AppClassProperties,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -1239,7 +1238,10 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
+    },
+    options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
+      isDragging?: boolean;
     },
   ) {
     const { points } = element;
@@ -1290,11 +1292,14 @@ export class LinearElementEditor {
       offsetY,
       scene,
       otherUpdates,
-      targetPoints.reduce(
-        (dragging, targetPoint): boolean =>
-          dragging || targetPoint.isDragging === true,
-        false,
-      ),
+      {
+        isDragging: targetPoints.reduce(
+          (dragging, targetPoint): boolean =>
+            dragging || targetPoint.isDragging === true,
+          false,
+        ),
+        changedElements: options?.changedElements,
+      },
     );
   }
 
@@ -1406,9 +1411,11 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      changedElements?: Map<string, OrderedExcalidrawElement>;
     },
-    isDragging?: boolean,
+    options?: {
+      changedElements?: Map<string, OrderedExcalidrawElement>;
+      isDragging?: boolean;
+    },
   ) {
     if (isArrowElement(element) && element.elbowed) {
       mutateElbowArrow(
@@ -1417,7 +1424,7 @@ export class LinearElementEditor {
         nextPoints,
         [offsetX, offsetY],
         otherUpdates,
-        isDragging,
+        options,
       );
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);

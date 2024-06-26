@@ -255,7 +255,6 @@ import {
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import type {
-  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawEmbeddableElement,
@@ -5342,18 +5341,13 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isArrowElement(multiElement) && multiElement.elbowed) {
-          mutateElbowArrow(
-            multiElement,
-            this.scene,
+          mutateElbowArrow(multiElement, this.scene, [
+            ...points.slice(0, -1),
             [
-              ...points.slice(0, -1),
-              [
-                lastCommittedX + dxFromLastCommitted,
-                lastCommittedY + dyFromLastCommitted,
-              ],
+              lastCommittedX + dxFromLastCommitted,
+              lastCommittedY + dyFromLastCommitted,
             ],
-            [0, 0],
-          );
+          ]);
         } else {
           // update last uncommitted point
           mutateElement(multiElement, {
@@ -7718,7 +7712,9 @@ class App extends React.Component<AppProps, AppState> {
             [...points.slice(0, -1), [dx, dy]],
             [0, 0],
             undefined,
-            true,
+            {
+              isDragging: true,
+            },
           );
         } else if (points.length === 2) {
           mutateElement(draggingElement, {
