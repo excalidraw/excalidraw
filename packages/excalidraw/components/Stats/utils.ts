@@ -17,8 +17,22 @@ import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../../element/types";
+import {
+  getSelectedGroupIds,
+  getElementsInGroup,
+  isInGroup,
+} from "../../groups";
 import { rotate } from "../../math";
+import type { AppState } from "../../types";
 import { getFontString } from "../../utils";
+
+export type StatsInputProperty =
+  | "x"
+  | "y"
+  | "width"
+  | "height"
+  | "angle"
+  | "fontSize";
 
 export const SMALLEST_DELTA = 0.01;
 
@@ -100,12 +114,14 @@ export const resizeElement = (
   nextWidth: number,
   nextHeight: number,
   keepAspectRatio: boolean,
-  latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
   elementsMap: ElementsMap,
-  originalElementsMap: Map<string, ExcalidrawElement>,
   shouldInformMutation = true,
 ) => {
+  const latestElement = elementsMap.get(origElement.id);
+  if (!latestElement) {
+    return;
+  }
   let boundTextFont: { fontSize?: number } = {};
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
 
@@ -181,12 +197,15 @@ export const resizeElement = (
 export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
-  latestElement: ExcalidrawElement,
   originalElement: ExcalidrawElement,
   elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
+  const latestElement = elementsMap.get(originalElement.id);
+  if (!latestElement) {
+    return;
+  }
   const [cx, cy] = [
     originalElement.x + originalElement.width / 2,
     originalElement.y + originalElement.height / 2,
@@ -235,4 +254,25 @@ export const moveElement = (
         shouldInformMutation,
       );
   }
+};
+
+export const getAtomicUnits = (
+  targetElements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedGroupIds = getSelectedGroupIds(appState);
+  const _atomicUnits = selectedGroupIds.map((gid) => {
+    return getElementsInGroup(targetElements, gid).reduce((acc, el) => {
+      acc[el.id] = true;
+      return acc;
+    }, {} as AtomicUnit);
+  });
+  targetElements
+    .filter((el) => !isInGroup(el))
+    .forEach((el) => {
+      _atomicUnits.push({
+        [el.id]: true,
+      });
+    });
+  return _atomicUnits;
 };
