@@ -30,6 +30,12 @@ const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 let stats: HTMLElement | null = null;
 let elementStats: HTMLElement | null | undefined = null;
 
+const editInput = (input: HTMLInputElement, value: string) => {
+  input.focus();
+  fireEvent.change(input, { target: { value } });
+  input.blur();
+};
+
 const getStatsProperty = (label: string) => {
   if (elementStats) {
     const properties = elementStats?.querySelector(".statsItem");
@@ -53,9 +59,7 @@ const testInputProperty = (
   ) as HTMLInputElement;
   expect(input).not.toBeNull();
   expect(input.value).toBe(initialValue.toString());
-  input?.focus();
-  input.value = nextValue.toString();
-  input?.blur();
+  editInput(input, String(nextValue));
   if (property === "angle") {
     expect(element[property]).toBe(degreeToRadian(Number(nextValue)));
   } else if (property === "fontSize" && isTextElement(element)) {
@@ -172,17 +176,13 @@ describe("stats for a generic element", () => {
     ) as HTMLInputElement;
     expect(input).not.toBeNull();
     expect(input.value).toBe(rectangle.width.toString());
-    input?.focus();
-    input.value = "123.123";
-    input?.blur();
+    editInput(input, "123.123");
     expect(h.elements.length).toBe(1);
     expect(rectangle.id).toBe(rectangleId);
     expect(input.value).toBe("123.12");
     expect(rectangle.width).toBe(123.12);
 
-    input?.focus();
-    input.value = "88.98766";
-    input?.blur();
+    editInput(input, "88.98766");
     expect(input.value).toBe("88.99");
     expect(rectangle.width).toBe(88.99);
   });
@@ -335,9 +335,7 @@ describe("stats for a non-generic element", () => {
     ) as HTMLInputElement;
     expect(input).not.toBeNull();
     expect(input.value).toBe(text.fontSize.toString());
-    input?.focus();
-    input.value = "36";
-    input?.blur();
+    editInput(input, "36");
     expect(text.fontSize).toBe(36);
 
     // cannot change width or height
@@ -347,9 +345,7 @@ describe("stats for a non-generic element", () => {
     expect(height).toBeUndefined();
 
     // min font size is 4
-    input.focus();
-    input.value = "0";
-    input.blur();
+    editInput(input, "0");
     expect(text.fontSize).not.toBe(0);
     expect(text.fontSize).toBe(4);
   });
@@ -471,16 +467,12 @@ describe("stats for multiple elements", () => {
     ) as HTMLInputElement;
     expect(angle.value).toBe("0");
 
-    width.focus();
-    width.value = "250";
-    width.blur();
+    editInput(width, "250");
     h.elements.forEach((el) => {
       expect(el.width).toBe(250);
     });
 
-    height.focus();
-    height.value = "450";
-    height.blur();
+    editInput(height, "450");
     h.elements.forEach((el) => {
       expect(el.height).toBe(450);
     });
@@ -501,7 +493,6 @@ describe("stats for multiple elements", () => {
     mouse.up(200, 100);
 
     const frame = API.createElement({
-      id: "id0",
       type: "frame",
       x: 150,
       width: 150,
@@ -545,17 +536,13 @@ describe("stats for multiple elements", () => {
     expect(fontSize).not.toBeNull();
 
     // changing width does not affect text
-    width.focus();
-    width.value = "200";
-    width.blur();
+    editInput(width, "200");
 
     expect(rectangle?.width).toBe(200);
     expect(frame.width).toBe(200);
     expect(text?.width).not.toBe(200);
 
-    angle.focus();
-    angle.value = "40";
-    angle.blur();
+    editInput(angle, "40");
 
     const angleInRadian = degreeToRadian(40);
     expect(rectangle?.angle).toBeCloseTo(angleInRadian, 4);
@@ -595,9 +582,7 @@ describe("stats for multiple elements", () => {
     expect(x).not.toBeNull();
     expect(Number(x.value)).toBe(x1);
 
-    x.focus();
-    x.value = "300";
-    x.blur();
+    editInput(x, "300");
 
     expect(h.elements[0].x).toBe(300);
     expect(h.elements[1].x).toBe(400);
@@ -610,9 +595,7 @@ describe("stats for multiple elements", () => {
     expect(y).not.toBeNull();
     expect(Number(y.value)).toBe(y1);
 
-    y.focus();
-    y.value = "200";
-    y.blur();
+    editInput(y, "200");
 
     expect(h.elements[0].y).toBe(200);
     expect(h.elements[1].y).toBe(300);
@@ -630,26 +613,20 @@ describe("stats for multiple elements", () => {
     expect(height).not.toBeNull();
     expect(Number(height.value)).toBe(200);
 
-    width.focus();
-    width.value = "400";
-    width.blur();
+    editInput(width, "400");
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     let newGroupWidth = x2 - x1;
 
     expect(newGroupWidth).toBeCloseTo(400, 4);
 
-    width.focus();
-    width.value = "300";
-    width.blur();
+    editInput(width, "300");
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     newGroupWidth = x2 - x1;
     expect(newGroupWidth).toBeCloseTo(300, 4);
 
-    height.focus();
-    height.value = "500";
-    height.blur();
+    editInput(height, "500");
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     const newGroupHeight = y2 - y1;
