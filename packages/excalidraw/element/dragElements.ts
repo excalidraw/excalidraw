@@ -20,7 +20,6 @@ export const dragSelectedElements = (
   pointerDownState: PointerDownState,
   selectedElements: NonDeletedExcalidrawElement[],
   offset: { x: number; y: number },
-  appState: AppState,
   scene: Scene,
   snapOffset: {
     x: number;

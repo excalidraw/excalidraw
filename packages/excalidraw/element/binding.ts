@@ -553,10 +553,7 @@ export const updateBoundElements = (
     };
 
     // `linearElement` is being moved/scaled already, just update the binding
-    if (
-      simultaneouslyUpdatedElementIds.has(element.id) &&
-      !(isArrowElement(element) && element.elbowed)
-    ) {
+    if (simultaneouslyUpdatedElementIds.has(element.id)) {
       mutateElement(element, bindings);
       return;
     }

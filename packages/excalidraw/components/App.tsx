@@ -7543,7 +7543,6 @@ class App extends React.Component<AppProps, AppState> {
               pointerDownState,
               selectedElements,
               dragOffset,
-              this.state,
               this.scene,
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
