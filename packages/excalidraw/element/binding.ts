@@ -40,6 +40,7 @@ import Scene from "../scene/Scene";
 import { getElementShape } from "../shapes";
 import type { AppState, Point } from "../types";
 import { arrayToMap, tupleToCoors } from "../utils";
+import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import type { ElementUpdate } from "./mutateElement";
@@ -858,7 +859,12 @@ const calculateFixedPointForElbowArrowBinding = (
     };
   }
 
-  const bounds = getElementBounds(hoveredElement, elementsMap);
+  const bounds = [
+    hoveredElement.x,
+    hoveredElement.y,
+    hoveredElement.x + hoveredElement.width,
+    hoveredElement.y + hoveredElement.height,
+  ] as Bounds;
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
 
