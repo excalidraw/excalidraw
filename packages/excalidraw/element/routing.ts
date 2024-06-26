@@ -19,7 +19,6 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugClear, debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -195,10 +194,6 @@ export const mutateElbowArrow = (
   const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
     (aabb) => aabb !== null,
   );
-  // .map((x) => {
-  //   debugDrawBounds(x!, "green");
-  //   return x;
-  // }) as Bounds[];
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -431,6 +426,9 @@ const pathTo = (start: Node, node: Node) => {
 const m_dist = (a: Point, b: Point) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
+/**
+ * Create a dynamically resizing bounding box for the given heading
+ */
 const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
@@ -526,23 +524,6 @@ const calculateGrid = (
   const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
   const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
 
-  // const oppositeStartDongle: Point =
-  //   startHeading === HEADING_UP
-  //     ? [start[0], aabbs[0][3]]
-  //     : startHeading === HEADING_RIGHT
-  //     ? [aabbs[0][0], start[1]]
-  //     : startHeading === HEADING_DOWN
-  //     ? [start[0], aabbs[0][1]]
-  //     : [aabbs[0][2], start[1]];
-  // const oppositeEndDongle: Point =
-  //   endHeading === HEADING_UP
-  //     ? [end[0], aabbs[1][3]]
-  //     : endHeading === HEADING_RIGHT
-  //     ? [aabbs[1][0], end[1]]
-  //     : endHeading === HEADING_DOWN
-  //     ? [end[0], aabbs[1][1]]
-  //     : [aabbs[1][2], end[1]];
-
   return {
     row: _vertical.length,
     col: _horizontal.length,
@@ -560,50 +541,6 @@ const calculateGrid = (
         }),
       ),
     ),
-    // .map((node) => {
-    //   const valid =
-    //     !overlap ||
-    //     start[0] === node.pos[0] ||
-    //     start[1] === node.pos[1] ||
-    //     end[0] === node.pos[0] ||
-    //     end[1] === node.pos[1] ||
-    //     isAnyTrue(
-    //       ...aabbs
-    //         .map(boundsToLineSegments)
-    //         .flatMap((segments) =>
-    //           segments.map((segment) => isPointOnLine(segment, node.pos)),
-    //         ),
-    //     );
-
-    //   node.closed = !valid;
-    //   return node;
-    // })
-    // .map((node) => {
-    //   const invalid =
-    //     !overlap &&
-    //     isAnyTrue(...aabbs.map((aabb) => pointInsideBounds(node.pos, aabb)));
-
-    //   node.closed = invalid;
-    //   return node;
-    // })
-    // .map((node) => {
-    //   if (
-    //     !overlap &&
-    //     pointOnBounds(node.pos, common) &&
-    //     (arePointsClose(oppositeStartDongle, node.pos) ||
-    //       arePointsClose(oppositeEndDongle, node.pos))
-    //   ) {
-    //     node.closed = true;
-    //   }
-
-    //   return node;
-    // })
-    // .map((node) => {
-    //   node.closed
-    //     ? debugDrawPoint(node.pos, "red")
-    //     : debugDrawPoint(node.pos, "green");
-    //   return node;
-    // }),
   };
 };
 
@@ -772,149 +709,6 @@ const estimateSegmentCount = (
   }
   return 0;
 };
-
-/**
- * Create a dynamically resizing bounding box for the given heading
- */
-// const extendedAABB = (
-//   aabb: Bounds,
-//   heading: Heading,
-//   avoidBounds: Bounds[],
-//   maxOffset: number = 50,
-// ): Bounds | null => {
-//   switch (heading) {
-//     case HEADING_UP:
-//       const extendedY0 = [
-//         aabb[0],
-//         aabb[1] - maxOffset,
-//         aabb[2],
-//         aabb[1],
-//       ] as Bounds;
-//       const y0 = Math.max(
-//         ...avoidBounds.map((bounds) => {
-//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
-//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
-
-//           return Math.max(
-//             pointInsideOrOnBounds(avoidTopLeft, extendedY0)
-//               ? avoidTopLeft[1]
-//               : extendedY0[1],
-//             pointInsideOrOnBounds(avoidTopRight, extendedY0)
-//               ? avoidTopRight[1]
-//               : extendedY0[1],
-//             pointInsideOrOnBounds(avoidBottomRight, extendedY0)
-//               ? avoidBottomRight[1]
-//               : extendedY0[1],
-//             pointInsideOrOnBounds(avoidBottomLeft, extendedY0)
-//               ? avoidBottomLeft[1]
-//               : extendedY0[1],
-//           );
-//         }),
-//       );
-
-//       return [aabb[0], (aabb[1] + y0) / 2 + 1, aabb[2], aabb[3]] as Bounds;
-//     case HEADING_RIGHT:
-//       const extendedX1 = [
-//         aabb[2],
-//         aabb[1],
-//         aabb[2] + maxOffset,
-//         aabb[3],
-//       ] as Bounds;
-//       const x1 = Math.min(
-//         ...avoidBounds.map((bounds) => {
-//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
-//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
-
-//           return Math.min(
-//             pointInsideOrOnBounds(avoidTopLeft, extendedX1)
-//               ? avoidTopLeft[0]
-//               : extendedX1[2],
-//             pointInsideOrOnBounds(avoidTopRight, extendedX1)
-//               ? avoidTopRight[0]
-//               : extendedX1[2],
-//             pointInsideOrOnBounds(avoidBottomRight, extendedX1)
-//               ? avoidBottomRight[0]
-//               : extendedX1[2],
-//             pointInsideOrOnBounds(avoidBottomLeft, extendedX1)
-//               ? avoidBottomLeft[0]
-//               : extendedX1[2],
-//           );
-//         }),
-//       );
-
-//       return [aabb[0], aabb[1], (x1 + aabb[2]) / 2 - 1, aabb[3]] as Bounds;
-//     case HEADING_DOWN:
-//       const extendedY1 = [
-//         aabb[0],
-//         aabb[3],
-//         aabb[2],
-//         aabb[3] + maxOffset,
-//       ] as Bounds;
-//       const y1 = Math.min(
-//         ...avoidBounds.map((bounds) => {
-//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
-//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
-
-//           return Math.min(
-//             pointInsideOrOnBounds(avoidTopLeft, extendedY1)
-//               ? avoidTopLeft[1]
-//               : extendedY1[3],
-//             pointInsideOrOnBounds(avoidTopRight, extendedY1)
-//               ? avoidTopRight[1]
-//               : extendedY1[3],
-//             pointInsideOrOnBounds(avoidBottomRight, extendedY1)
-//               ? avoidBottomRight[1]
-//               : extendedY1[3],
-//             pointInsideOrOnBounds(avoidBottomLeft, extendedY1)
-//               ? avoidBottomLeft[1]
-//               : extendedY1[3],
-//           );
-//         }),
-//       );
-
-//       return [aabb[0], aabb[1], aabb[2], (y1 + aabb[3]) / 2 - 1] as Bounds;
-//     case HEADING_LEFT:
-//       const extendedX0 = [
-//         aabb[0] - maxOffset,
-//         aabb[1],
-//         aabb[0],
-//         aabb[3],
-//       ] as Bounds;
-//       const x0 = Math.max(
-//         ...avoidBounds.map((bounds) => {
-//           const avoidTopLeft = [bounds[0], bounds[1]] as Point;
-//           const avoidTopRight = [bounds[2], bounds[1]] as Point;
-//           const avoidBottomRight = [bounds[2], bounds[3]] as Point;
-//           const avoidBottomLeft = [bounds[0], bounds[3]] as Point;
-
-//           return Math.max(
-//             pointInsideOrOnBounds(avoidTopLeft, extendedX0)
-//               ? avoidTopLeft[0]
-//               : extendedX0[0],
-//             pointInsideOrOnBounds(avoidTopRight, extendedX0)
-//               ? avoidTopRight[0]
-//               : extendedX0[0],
-//             pointInsideOrOnBounds(avoidBottomRight, extendedX0)
-//               ? avoidBottomRight[0]
-//               : extendedX0[0],
-//             pointInsideOrOnBounds(avoidBottomLeft, extendedX0)
-//               ? avoidBottomLeft[0]
-//               : extendedX0[0],
-//           );
-//         }),
-//       );
-
-//       return [(x0 + aabb[0]) / 2 + 1, aabb[1], aabb[2], aabb[3]] as Bounds;
-//   }
-
-//   return null;
-// };
 
 /**
  * Get neighboring points for a gived grid address
@@ -1153,16 +947,3 @@ const neighborIndexToHeading = (idx: number): Heading => {
   }
   return HEADING_LEFT;
 };
-
-// const boundsOverlap = (a: Bounds, b: Bounds) => {
-//   return isAnyTrue(
-//     pointInsideBounds([a[0], a[1]], b),
-//     pointInsideBounds([a[2], a[1]], b),
-//     pointInsideBounds([a[2], a[3]], b),
-//     pointInsideBounds([a[0], a[2]], b),
-//     pointInsideBounds([b[0], b[1]], a),
-//     pointInsideBounds([b[2], b[1]], a),
-//     pointInsideBounds([b[2], b[3]], a),
-//     pointInsideBounds([b[0], b[2]], a),
-//   );
-// };
