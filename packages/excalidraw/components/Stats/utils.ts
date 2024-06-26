@@ -141,6 +141,13 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
+  updateBoundElements(latestElement, elementsMap, scene, {
+    newSize: { width: nextWidth, height: nextHeight },
+    scale: {
+      scaleX: latestElement.width / nextWidth,
+      scaleY: latestElement.height / nextHeight,
+    },
+  });
 
   if (boundTextElement) {
     boundTextFont = {
@@ -186,6 +193,7 @@ export const moveElement = (
   originalElement: ExcalidrawElement,
   elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
   shouldInformMutation = true,
 ) => {
   const [cx, cy] = [
@@ -219,6 +227,7 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
+  updateBoundElements(latestElement, elementsMap, scene);
 
   const boundTextElement = getBoundTextElement(
     originalElement,

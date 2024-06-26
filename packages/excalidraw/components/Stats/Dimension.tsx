@@ -122,6 +122,7 @@ const DimensionDragInput = ({
       dragInputCallback={handleDimensionChange}
       value={value}
       editable={isPropertyEditable(element, property)}
+      scene={scene}
     />
   );
 };

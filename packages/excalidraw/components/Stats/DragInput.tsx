@@ -10,6 +10,7 @@ import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 import { SMALLEST_DELTA } from "./utils";
 import { StoreAction } from "../../store";
+import type Scene from "../../scene/Scene";
 
 export type DragInputCallbackType = ({
   accumulatedChange,
@@ -18,6 +19,7 @@ export type DragInputCallbackType = ({
   originalElementsMap,
   shouldKeepAspectRatio,
   shouldChangeByStepSize,
+  scene,
   nextValue,
 }: {
   accumulatedChange: number;
@@ -26,6 +28,7 @@ export type DragInputCallbackType = ({
   originalElementsMap: ElementsMap;
   shouldKeepAspectRatio: boolean;
   shouldChangeByStepSize: boolean;
+  scene: Scene;
   nextValue?: number;
 }) => void;
 
@@ -37,6 +40,7 @@ interface StatsDragInputProps {
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
   dragInputCallback: DragInputCallbackType;
+  scene: Scene;
 }
 
 const StatsDragInput = ({
@@ -47,6 +51,7 @@ const StatsDragInput = ({
   elements,
   editable = true,
   shouldKeepAspectRatio,
+  scene,
 }: StatsDragInputProps) => {
   const app = useApp();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,6 +86,7 @@ const StatsDragInput = ({
         originalElementsMap: app.scene.getNonDeletedElementsMap(),
         shouldKeepAspectRatio: shouldKeepAspectRatio!!,
         shouldChangeByStepSize: false,
+        scene,
         nextValue: rounded,
       });
       app.syncActionResult({ storeAction: StoreAction.CAPTURE });
@@ -165,6 +171,7 @@ const StatsDragInput = ({
                   originalElementsMap,
                   shouldKeepAspectRatio: shouldKeepAspectRatio!!,
                   shouldChangeByStepSize: event.shiftKey,
+                  scene,
                 });
               }
 

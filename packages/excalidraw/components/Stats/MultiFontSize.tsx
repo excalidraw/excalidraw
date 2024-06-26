@@ -108,6 +108,7 @@ const MultiFontSize = ({
       dragInputCallback={handleFontSizeChange}
       value={value}
       editable={editable}
+      scene={scene}
     />
   );
 };

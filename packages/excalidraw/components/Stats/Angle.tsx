@@ -1,8 +1,10 @@
+import { updateBoundElements } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
 import { getBoundTextElement } from "../../element/textElement";
 import { isArrowElement } from "../../element/typeChecks";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
+import type Scene from "../../scene/Scene";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -11,11 +13,12 @@ import { getStepSizedValue, isPropertyEditable } from "./utils";
 interface AngleProps {
   element: ExcalidrawElement;
   elementsMap: ElementsMap;
+  scene: Scene;
 }
 
 const STEP_SIZE = 15;
 
-const Angle = ({ element, elementsMap }: AngleProps) => {
+const Angle = ({ element, elementsMap, scene }: AngleProps) => {
   const handleDegreeChange: DragInputCallbackType = ({
     accumulatedChange,
     originalElements,
@@ -23,7 +26,7 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
     nextValue,
   }) => {
     const origElement = originalElements[0];
-    if (origElement) {
+    if (origElement && !(isArrowElement(origElement) && origElement.elbowed)) {
       if (nextValue !== undefined) {
         const nextAngle = degreeToRadian(nextValue);
         mutateElement(element, {
@@ -54,6 +57,7 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
       mutateElement(element, {
         angle: nextAngle,
       });
+      updateBoundElements(element, elementsMap, scene);
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {
@@ -70,6 +74,7 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
       elements={[element]}
       dragInputCallback={handleDegreeChange}
       editable={isPropertyEditable(element, "angle")}
+      scene={scene}
     />
   );
 };

@@ -41,7 +41,7 @@ import { getElementShape } from "../shapes";
 import type { AppState, Point } from "../types";
 import { arrayToMap, tupleToCoors } from "../utils";
 import type { Bounds } from "./bounds";
-import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import { getElementAbsoluteCoords } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
@@ -54,6 +54,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

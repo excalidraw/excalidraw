@@ -107,6 +107,7 @@ const MultiAngle = ({ elements, elementsMap, scene }: MultiAngleProps) => {
       elements={elements}
       dragInputCallback={handleDegreeChange}
       editable={editable}
+      scene={scene}
     />
   );
 };

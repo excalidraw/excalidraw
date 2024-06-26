@@ -374,6 +374,7 @@ const MultiDimension = ({
       dragInputCallback={handleDimensionChange}
       value={value}
       editable={editable}
+      scene={scene}
     />
   );
 };
