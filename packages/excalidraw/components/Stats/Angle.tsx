@@ -1,67 +1,77 @@
 import { mutateElement } from "../../element/mutateElement";
 import { getBoundTextElement } from "../../element/textElement";
 import { isArrowElement } from "../../element/typeChecks";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import type { ExcalidrawElement } from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
+import type Scene from "../../scene/Scene";
+import type { AppState } from "../../types";
 
 interface AngleProps {
   element: ExcalidrawElement;
-  elementsMap: ElementsMap;
+  scene: Scene;
+  appState: AppState;
+  property: "angle";
 }
 
 const STEP_SIZE = 15;
 
-const Angle = ({ element, elementsMap }: AngleProps) => {
-  const handleDegreeChange: DragInputCallbackType = ({
-    accumulatedChange,
-    originalElements,
-    shouldChangeByStepSize,
-    nextValue,
-  }) => {
-    const origElement = originalElements[0];
-    if (origElement) {
-      if (nextValue !== undefined) {
-        const nextAngle = degreeToRadian(nextValue);
-        mutateElement(element, {
-          angle: nextAngle,
-        });
-
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement && !isArrowElement(element)) {
-          mutateElement(boundTextElement, { angle: nextAngle });
-        }
-
-        return;
-      }
-
-      const originalAngleInDegrees =
-        Math.round(radianToDegree(origElement.angle) * 100) / 100;
-      const changeInDegrees = Math.round(accumulatedChange);
-      let nextAngleInDegrees = (originalAngleInDegrees + changeInDegrees) % 360;
-      if (shouldChangeByStepSize) {
-        nextAngleInDegrees = getStepSizedValue(nextAngleInDegrees, STEP_SIZE);
-      }
-
-      nextAngleInDegrees =
-        nextAngleInDegrees < 0 ? nextAngleInDegrees + 360 : nextAngleInDegrees;
-
-      const nextAngle = degreeToRadian(nextAngleInDegrees);
-
-      mutateElement(element, {
+const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
+  accumulatedChange,
+  originalElements,
+  shouldChangeByStepSize,
+  nextValue,
+  scene,
+}) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const origElement = originalElements[0];
+  if (origElement) {
+    const latestElement = elementsMap.get(origElement.id);
+    if (!latestElement) {
+      return;
+    }
+    if (nextValue !== undefined) {
+      const nextAngle = degreeToRadian(nextValue);
+      mutateElement(latestElement, {
         angle: nextAngle,
       });
 
-      const boundTextElement = getBoundTextElement(element, elementsMap);
-      if (boundTextElement && !isArrowElement(element)) {
+      const boundTextElement = getBoundTextElement(latestElement, elementsMap);
+      if (boundTextElement && !isArrowElement(latestElement)) {
         mutateElement(boundTextElement, { angle: nextAngle });
       }
-    }
-  };
 
+      return;
+    }
+
+    const originalAngleInDegrees =
+      Math.round(radianToDegree(origElement.angle) * 100) / 100;
+    const changeInDegrees = Math.round(accumulatedChange);
+    let nextAngleInDegrees = (originalAngleInDegrees + changeInDegrees) % 360;
+    if (shouldChangeByStepSize) {
+      nextAngleInDegrees = getStepSizedValue(nextAngleInDegrees, STEP_SIZE);
+    }
+
+    nextAngleInDegrees =
+      nextAngleInDegrees < 0 ? nextAngleInDegrees + 360 : nextAngleInDegrees;
+
+    const nextAngle = degreeToRadian(nextAngleInDegrees);
+
+    mutateElement(latestElement, {
+      angle: nextAngle,
+    });
+
+    const boundTextElement = getBoundTextElement(latestElement, elementsMap);
+    if (boundTextElement && !isArrowElement(latestElement)) {
+      mutateElement(boundTextElement, { angle: nextAngle });
+    }
+  }
+};
+
+const Angle = ({ element, scene, appState, property }: AngleProps) => {
   return (
     <DragInput
       label="A"
@@ -70,6 +80,9 @@ const Angle = ({ element, elementsMap }: AngleProps) => {
       elements={[element]}
       dragInputCallback={handleDegreeChange}
       editable={isPropertyEditable(element, "angle")}
+      scene={scene}
+      appState={appState}
+      property={property}
     />
   );
 };

@@ -3,11 +3,12 @@ import { rotate } from "../../math";
 import type Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
+import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getCommonBounds, isTextElement } from "../../element";
 import { useMemo } from "react";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 import type { AtomicUnit } from "./utils";
+import type { AppState } from "../../types";
 
 interface MultiPositionProps {
   property: "x" | "y";
@@ -15,6 +16,7 @@ interface MultiPositionProps {
   elementsMap: ElementsMap;
   atomicUnits: AtomicUnit[];
   scene: Scene;
+  appState: AppState;
 }
 
 const STEP_SIZE = 10;
@@ -30,7 +32,6 @@ const moveElements = (
 ) => {
   for (let i = 0; i < elements.length; i++) {
     const origElement = originalElements[i];
-    const latestElement = elements[i];
 
     const [cx, cy] = [
       origElement.x + origElement.width / 2,
@@ -53,7 +54,6 @@ const moveElements = (
     moveElement(
       newTopLeftX,
       newTopLeftY,
-      latestElement,
       origElement,
       elementsMap,
       originalElementsMap,
@@ -65,7 +65,6 @@ const moveElements = (
 const moveGroupTo = (
   nextX: number,
   nextY: number,
-  latestElements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
@@ -74,9 +73,13 @@ const moveGroupTo = (
   const offsetX = nextX - x1;
   const offsetY = nextY - y1;
 
-  for (let i = 0; i < latestElements.length; i++) {
+  for (let i = 0; i < originalElements.length; i++) {
     const origElement = originalElements[i];
-    const latestElement = latestElements[i];
+
+    const latestElement = elementsMap.get(origElement.id);
+    if (!latestElement) {
+      continue;
+    }
 
     // bound texts are moved with their containers
     if (!isTextElement(latestElement) || !latestElement.containerId) {
@@ -96,7 +99,6 @@ const moveGroupTo = (
       moveElement(
         topLeftX + offsetX,
         topLeftY + offsetY,
-        latestElement,
         origElement,
         elementsMap,
         originalElementsMap,
@@ -106,12 +108,110 @@ const moveGroupTo = (
   }
 };
 
+const handlePositionChange: DragInputCallbackType<
+  MultiPositionProps["property"]
+> = ({
+  accumulatedChange,
+  originalElements,
+  originalElementsMap,
+  shouldChangeByStepSize,
+  nextValue,
+  property,
+  scene,
+  originalAppState,
+}) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (nextValue !== undefined) {
+    for (const atomicUnit of getAtomicUnits(
+      originalElements,
+      originalAppState,
+    )) {
+      const elementsInUnit = getElementsInAtomicUnit(
+        atomicUnit,
+        elementsMap,
+        originalElementsMap,
+      );
+
+      if (elementsInUnit.length > 1) {
+        const [x1, y1, ,] = getCommonBounds(
+          elementsInUnit.map((el) => el.latest!),
+        );
+        const newTopLeftX = property === "x" ? nextValue : x1;
+        const newTopLeftY = property === "y" ? nextValue : y1;
+
+        moveGroupTo(
+          newTopLeftX,
+          newTopLeftY,
+          elementsInUnit.map((el) => el.original),
+          elementsMap,
+          originalElementsMap,
+        );
+      } else {
+        const origElement = elementsInUnit[0]?.original;
+        const latestElement = elementsInUnit[0]?.latest;
+        if (
+          origElement &&
+          latestElement &&
+          isPropertyEditable(latestElement, property)
+        ) {
+          const [cx, cy] = [
+            origElement.x + origElement.width / 2,
+            origElement.y + origElement.height / 2,
+          ];
+          const [topLeftX, topLeftY] = rotate(
+            origElement.x,
+            origElement.y,
+            cx,
+            cy,
+            origElement.angle,
+          );
+
+          const newTopLeftX = property === "x" ? nextValue : topLeftX;
+          const newTopLeftY = property === "y" ? nextValue : topLeftY;
+          moveElement(
+            newTopLeftX,
+            newTopLeftY,
+            origElement,
+            elementsMap,
+            originalElementsMap,
+            false,
+          );
+        }
+      }
+    }
+
+    scene.triggerUpdate();
+    return;
+  }
+
+  const change = shouldChangeByStepSize
+    ? getStepSizedValue(accumulatedChange, STEP_SIZE)
+    : accumulatedChange;
+
+  const changeInTopX = property === "x" ? change : 0;
+  const changeInTopY = property === "y" ? change : 0;
+
+  moveElements(
+    property,
+    changeInTopX,
+    changeInTopY,
+    originalElements,
+    originalElements,
+    elementsMap,
+    originalElementsMap,
+  );
+
+  scene.triggerUpdate();
+};
+
 const MultiPosition = ({
   property,
   elements,
   elementsMap,
   atomicUnits,
   scene,
+  appState,
 }: MultiPositionProps) => {
   const positions = useMemo(
     () =>
@@ -137,101 +237,15 @@ const MultiPosition = ({
 
   const value = new Set(positions).size === 1 ? positions[0] : "Mixed";
 
-  const handlePositionChange: DragInputCallbackType = ({
-    accumulatedChange,
-    originalElements,
-    originalElementsMap,
-    shouldChangeByStepSize,
-    nextValue,
-  }) => {
-    if (nextValue !== undefined) {
-      for (const atomicUnit of atomicUnits) {
-        const elementsInUnit = getElementsInAtomicUnit(
-          atomicUnit,
-          elementsMap,
-          originalElementsMap,
-        );
-
-        if (elementsInUnit.length > 1) {
-          const [x1, y1, ,] = getCommonBounds(
-            elementsInUnit.map((el) => el.latest!),
-          );
-          const newTopLeftX = property === "x" ? nextValue : x1;
-          const newTopLeftY = property === "y" ? nextValue : y1;
-
-          moveGroupTo(
-            newTopLeftX,
-            newTopLeftY,
-            elementsInUnit.map((el) => el.latest),
-            elementsInUnit.map((el) => el.original),
-            elementsMap,
-            originalElementsMap,
-          );
-        } else {
-          const origElement = elementsInUnit[0]?.original;
-          const latestElement = elementsInUnit[0]?.latest;
-          if (
-            origElement &&
-            latestElement &&
-            isPropertyEditable(latestElement, property)
-          ) {
-            const [cx, cy] = [
-              origElement.x + origElement.width / 2,
-              origElement.y + origElement.height / 2,
-            ];
-            const [topLeftX, topLeftY] = rotate(
-              origElement.x,
-              origElement.y,
-              cx,
-              cy,
-              origElement.angle,
-            );
-
-            const newTopLeftX = property === "x" ? nextValue : topLeftX;
-            const newTopLeftY = property === "y" ? nextValue : topLeftY;
-            moveElement(
-              newTopLeftX,
-              newTopLeftY,
-              latestElement,
-              origElement,
-              elementsMap,
-              originalElementsMap,
-              false,
-            );
-          }
-        }
-      }
-
-      scene.triggerUpdate();
-      return;
-    }
-
-    const change = shouldChangeByStepSize
-      ? getStepSizedValue(accumulatedChange, STEP_SIZE)
-      : accumulatedChange;
-
-    const changeInTopX = property === "x" ? change : 0;
-    const changeInTopY = property === "y" ? change : 0;
-
-    moveElements(
-      property,
-      changeInTopX,
-      changeInTopY,
-      elements,
-      originalElements,
-      elementsMap,
-      originalElementsMap,
-    );
-
-    scene.triggerUpdate();
-  };
-
   return (
     <StatsDragInput
       label={property === "x" ? "X" : "Y"}
       elements={elements}
       dragInputCallback={handlePositionChange}
       value={value}
+      property={property}
+      scene={scene}
+      appState={appState}
     />
   );
 };
