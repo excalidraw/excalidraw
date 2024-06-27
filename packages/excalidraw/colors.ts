@@ -167,4 +167,9 @@ export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) =>
 export const rgbToHex = (r: number, g: number, b: number) =>
   `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 
+export const hexToRgba = (color: string, alpha: number) => {
+	const c = parseInt(color.slice(1), 16);
+  return `rgba(${c>>16}, ${c & 0xff00 >> 8}, ${c & 0xff}, ${alpha})`;
+}
+
 // -----------------------------------------------------------------------------
