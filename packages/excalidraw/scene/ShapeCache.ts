@@ -38,6 +38,11 @@ export class ShapeCache {
 
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
+    if(elementWithCanvasCache) { //zsviczian
+      Object.values(elementWithCanvasCache).forEach((value) => {
+        elementWithCanvasCache.delete(value);
+      });
+    }
   };
 
   /**

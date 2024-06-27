@@ -66,11 +66,33 @@ export class AnimatedTrail implements Trail {
   }
 
   stop() {
-    this.animationFrameHandler.stop(this);
+    this.animationFrameHandler?.stop(this); //zsviczian
 
-    if (this.trailElement.parentNode === this.container) {
+    if (this.trailElement?.parentNode === this.container) { //zsviczian
       this.container?.removeChild(this.trailElement);
     }
+  }
+
+  terminate() { //zsviczian
+    if(this.trailElement?.parentElement) {//zsviczian
+      this.trailElement.parentElement.removeChild(this.trailElement);
+    }
+    if(this.container?.parentElement) { //zsviczian
+      this.container.parentElement.removeChild(this.container);
+    }
+    //@ts-ignore
+    this.trailElement = null; //zsviczian
+    //@ts-ignore
+    this.container = null; //zsviczian
+    //@ts-ignore
+    this.app = null; //zsviczian
+    //@ts-ignore
+    this.animationFrameHandler = null; //zsviczian
+    //@ts-ignore
+    this.options = null; //zsviczian
+    //@ts-ignore
+    this.currentTrail = null; //zsviczian
+    this.pastTrails = []; //zsviczian
   }
 
   startPath(x: number, y: number) {

@@ -80,8 +80,26 @@ export class LaserTrails implements Trail {
   }
 
   stop() {
-    this.animationFrameHandler.stop(this);
-    this.localTrail.stop();
+    this.animationFrameHandler?.stop(this); //zsviczian
+    this.localTrail?.stop(); //zsviczian
+  }
+
+  terminate() { //zsviczian
+    this.localTrail.terminate();
+    //@ts-ignore
+    this.localTrail = null;
+    //@ts-ignore
+    this.collabTrails = null;
+    
+    if (this.container?.parentElement) {
+      this.container.parentElement.removeChild(this.container);
+    }
+    //@ts-ignore
+    this.container = null;
+    //@ts-ignore
+    this.animationFrameHandler = null;
+    //@ts-ignore
+    this.app = null;
   }
 
   onFrame() {

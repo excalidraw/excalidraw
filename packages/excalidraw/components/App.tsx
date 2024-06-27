@@ -39,7 +39,7 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import type { Action, ActionResult } from "../actions/types";
+import type { Action, ActionName, ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
@@ -411,6 +411,7 @@ import {
   setCursor,
   resetCursor,
   setCursorForShape,
+  clearEraserCanvasCache,
 } from "../cursor";
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
@@ -449,6 +450,7 @@ import { resizeSingleElement } from "../element/resizeElements"; //zsviczian
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
+import { getTooltipDiv } from "./Tooltip";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2589,6 +2591,52 @@ class App extends React.Component<AppProps, AppState> {
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
     document.documentElement.style.overscrollBehaviorX = "";
+    document.body.removeChild(getTooltipDiv());
+    //clearRenderCache(); //zsviczian
+    clearEraserCanvasCache(); //zsviczian
+    this.interactiveCanvas = null; //zsviczian
+    this.iFrameRefs.clear(); //zsviczian
+    //@ts-ignore
+    this.iFrameRefs = null; //zsviczian
+    this.embedsValidationStatus.clear(); //zsviczian
+    //@ts-ignore
+    this.embedsValidationStatus = null; //zsviczian
+    this.initializedEmbeds.clear(); //zsviczian
+    //@ts-ignore
+    this.initializedEmbeds = null; //zsviczian
+    this.elementsPendingErasure.clear(); //zsviczian 
+    //@ts-ignore
+    this.elementsPendingErasure = null; //zsviczian    
+    this.lastPointerDownEvent = null; //zsviczian
+    this.lastPointerUpEvent = null; //zsviczian
+    this.lastPointerMoveEvent = null; //zsviczian
+    this.actionManager.actions = {} as Record<ActionName, Action>; //zsviczian
+    this.history.clear(); //zsviczian
+    //@ts-ignore
+    this.history = null; //zsviczian
+    this.store.clear(); //zsviczian
+    //@ts-ignore
+    this.store = null; //zsviczian
+    //@ts-ignore
+    this.library = null; //zsviczian
+    //@ts-ignore
+    this.canvas = null; //zsviczian
+    //@ts-ignore
+    this.rc = null; //zsviczian
+    //@ts-ignore
+    this.excalidrawContainerRef.current = undefined; //zsviczian
+    this.nearestScrollableContainer = undefined; //zsviczian
+    this.excalidrawContainerValue = { container: null, id:"unknown" }; //zsviczian
+    //@ts-ignore
+    this.props = null; //zsviczian
+    hostPlugin = null; //zsviczian
+    this.laserTrails.terminate(); //zsviczian
+    this.eraserTrail.terminate(); //zsviczian
+  
+    Object.keys(this).forEach((key) => {
+      //@ts-ignore    
+      delete this[key];
+    });
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -10441,6 +10489,7 @@ declare global {
   }
 }
 
+/*  //zsviczian
 export const createTestHook = () => {
   if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
     window.h = window.h || ({} as Window["h"]);
@@ -10461,5 +10510,5 @@ export const createTestHook = () => {
   }
 };
 
-createTestHook();
+createTestHook();*/
 export default App;

@@ -229,6 +229,8 @@ class Library {
     //   isInitialized: false,
     //   libraryItems: [],
     // });
+    //@ts-ignore
+    this.app = null; //zsviczian
   };
 
   resetLibrary = () => {

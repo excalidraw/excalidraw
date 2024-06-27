@@ -34,6 +34,11 @@ export const setCursor = (
 };
 
 let eraserCanvasCache: any;
+
+export const clearEraserCanvasCache = () => { //zsviczian
+  eraserCanvasCache = null;
+}
+
 let previewDataURL: string;
 export const setEraserCursor = (
   interactiveCanvas: HTMLCanvasElement | null,
