@@ -471,19 +471,36 @@ export const polygonScaleY = (
   return p;
 };
 
+export const polygonReflectXBranches = {
+
+  polygonVertexIteration: false,
+  reflectFactorIs0: false,
+  reflectFactorIs1: false,
+  arbitraryReflectFactor: false
+
+
+
+
+};
+
 export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
   const [[min], [max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
+    polygonReflectXBranches.polygonVertexIteration = true;
+
     const [x, y] = polygon[i];
     const r: Point = [min + max - x, y];
 
     if (reflectFactor === 0) {
+      polygonReflectXBranches.reflectFactorIs0 = true;
       p[i] = [x, y];
     } else if (reflectFactor === 1) {
+      polygonReflectXBranches.reflectFactorIs1 = true;
       p[i] = r;
     } else {
+      polygonReflectXBranches.arbitraryReflectFactor = true;
       const t = lineInterpolate([[x, y], r]);
       p[i] = t(Math.max(Math.min(reflectFactor, 1), 0));
     }

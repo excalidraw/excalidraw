@@ -12,6 +12,8 @@ import {
   pointRightofLine,
   pointRotate,
   polygonBounds,
+  polygonReflectX,
+  polygonReflectXBranches
 } from "./geometry";
 import type { Curve, Ellipse, Line, Point, Polygon, Polyline } from "./shape";
 import { geometryBranches } from "../../excalidraw/utils";
@@ -312,6 +314,93 @@ describe("polygon bounds checking", () => {
 
     testBounds(poly, expected);
   });
+});
+
+describe("polygon reflection in x bisector", () => {
+
+  it("dummy test", () => {
+    expect(0).toBe(0);
+  });
+
+  it("Reflection factor 0 leaves polygon unchanged", () => {
+
+    const reflectionFactor = 0;
+    const polygon : Polygon = [
+      [0, 0],
+      [2, 0],
+      [3, 1],
+      [2, 2],
+      [0, 2]
+    ];
+    const expectedResult : Polygon = [
+      [0, 0],
+      [2, 0],
+      [3, 1],
+      [2, 2],
+      [0, 2]
+    ];
+
+    expect(polygonReflectX(polygon, reflectionFactor)).toEqual(expectedResult);
+  });
+
+  it("Reflection factor 1 reflects polygon fully", () => {
+
+    const reflectionFactor = 1;
+    const polygon : Polygon = [
+      [0, 0],
+      [2, 0],
+      [3, 1],
+      [2, 2],
+      [0, 2]
+    ];
+    const expectedResult : Polygon = [
+      [3, 0],
+      [1, 0],
+      [0, 1],
+      [1, 2],
+      [3, 2]
+    ];
+
+    expect(polygonReflectX(polygon, reflectionFactor)).toEqual(expectedResult);
+
+  });
+
+  it("Reflection factor 0.5 collapses polygon", () => {
+
+    const reflectionFactor = 0.5;
+    const polygon : Polygon = [
+      [0, 0],
+      [2, 0],
+      [3, 1],
+      [2, 2],
+      [0, 2]
+    ];
+    const expectedResult : Polygon = [
+      [1.5, 0],
+      [1.5, 0],
+      [1.5, 1],
+      [1.5, 2],
+      [1.5, 2]
+    ];
+
+    expect(polygonReflectX(polygon, reflectionFactor)).toEqual(expectedResult);
+
+  });
+
+  afterAll(() => {
+
+
+    const totalBranches = Object.keys(polygonReflectXBranches).length;
+    const trueBranches = Object.values(polygonReflectXBranches).filter(branch => {
+      return branch === true;
+    }).length;
+    const branchPercent = (trueBranches / totalBranches) * 100;
+
+    console.log('Branch coverage of polygonReflectX: ', polygonReflectXBranches);
+    console.log(`Coverage: ${trueBranches} of ${totalBranches} (${branchPercent.toFixed(2)})%`);
+
+  });
+
 });
 
 afterAll(() => {
