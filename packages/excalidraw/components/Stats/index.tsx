@@ -22,6 +22,7 @@ import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
 import { isTextElement } from "../../element";
+import { hasBoundTextElement } from "../../element/typeChecks";
 
 interface StatsProps {
   scene: Scene;
@@ -216,14 +217,12 @@ export const StatsInner = memo(
                         scene={scene}
                         appState={appState}
                       />
-                      {singleElement.type === "text" && (
-                        <FontSize
-                          property="fontSize"
-                          element={singleElement}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      )}
+                      <FontSize
+                        property="fontSize"
+                        element={singleElement}
+                        scene={scene}
+                        appState={appState}
+                      />
                     </div>
                   </div>
                 )}
@@ -278,14 +277,13 @@ export const StatsInner = memo(
                         scene={scene}
                         appState={appState}
                       />
-                      {multipleElements.some((el) => isTextElement(el)) && (
-                        <MultiFontSize
-                          property="fontSize"
-                          elements={multipleElements}
-                          scene={scene}
-                          appState={appState}
-                        />
-                      )}
+                      <MultiFontSize
+                        property="fontSize"
+                        elements={multipleElements}
+                        scene={scene}
+                        appState={appState}
+                        elementsMap={elementsMap}
+                      />
                     </div>
                   </div>
                 )}
