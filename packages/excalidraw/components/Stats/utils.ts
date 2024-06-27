@@ -1,4 +1,7 @@
-import { updateBoundElements } from "../../element/binding";
+import {
+  bindOrUnbindLinearElements,
+  updateBoundElements,
+} from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
 import {
   measureFontSizeFromWidth,
@@ -11,11 +14,16 @@ import {
   getBoundTextMaxWidth,
   handleBindTextResize,
 } from "../../element/textElement";
-import { isFrameLikeElement, isTextElement } from "../../element/typeChecks";
+import {
+  isFrameLikeElement,
+  isLinearElement,
+  isTextElement,
+} from "../../element/typeChecks";
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../../element/types";
 import { rotate } from "../../math";
 import { getFontString } from "../../utils";
@@ -102,7 +110,7 @@ export const resizeElement = (
   keepAspectRatio: boolean,
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: Map<string, ExcalidrawElement>,
   shouldInformMutation = true,
 ) => {
@@ -140,7 +148,6 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
-  updateBoundElements(latestElement, elementsMap);
 
   if (boundTextElement) {
     boundTextFont = {
@@ -164,12 +171,16 @@ export const resizeElement = (
     }
   }
 
-  updateBoundElements(latestElement, elementsMap, {
-    newSize: {
-      width: nextWidth,
-      height: nextHeight,
-    },
-  });
+  if (isLinearElement(latestElement)) {
+    bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
+  } else {
+    updateBoundElements(latestElement, elementsMap, {
+      newSize: {
+        width: nextWidth,
+        height: nextHeight,
+      },
+    });
+  }
 
   if (boundTextElement && boundTextFont) {
     mutateElement(boundTextElement, {

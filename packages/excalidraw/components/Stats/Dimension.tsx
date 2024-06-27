@@ -1,13 +1,16 @@
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable, resizeElement } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
+import type {
+  ExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
+import type { DragInputCallbackType } from "./DragInput";
+import DragInput from "./DragInput";
+import { getStepSizedValue, isPropertyEditable, resizeElement } from "./utils";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
   element: ExcalidrawElement;
-  elementsMap: ElementsMap;
+  elementsMap: NonDeletedSceneElementsMap;
 }
 
 const STEP_SIZE = 10;

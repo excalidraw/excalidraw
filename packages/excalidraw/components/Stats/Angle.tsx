@@ -1,10 +1,15 @@
-import { updateBoundElements } from "../../element/binding";
+import {
+  bindOrUnbindLinearElements,
+  updateBoundElements,
+} from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
 import { getBoundTextElement } from "../../element/textElement";
-import { isArrowElement } from "../../element/typeChecks";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import { isArrowElement, isLinearElement } from "../../element/typeChecks";
+import type {
+  ExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
-import type Scene from "../../scene/Scene";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -12,13 +17,12 @@ import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 interface AngleProps {
   element: ExcalidrawElement;
-  elementsMap: ElementsMap;
-  scene: Scene;
+  elementsMap: NonDeletedSceneElementsMap;
 }
 
 const STEP_SIZE = 15;
 
-const Angle = ({ element, elementsMap, scene }: AngleProps) => {
+const Angle = ({ element, elementsMap }: AngleProps) => {
   const handleDegreeChange: DragInputCallbackType = ({
     accumulatedChange,
     originalElements,
@@ -57,7 +61,11 @@ const Angle = ({ element, elementsMap, scene }: AngleProps) => {
       mutateElement(element, {
         angle: nextAngle,
       });
-      updateBoundElements(element, elementsMap);
+      if (isLinearElement(element)) {
+        bindOrUnbindLinearElements([element], elementsMap, true, []);
+      } else {
+        updateBoundElements(element, elementsMap);
+      }
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {

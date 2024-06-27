@@ -5,18 +5,16 @@ import type { DragInputCallbackType } from "./DragInput";
 import { mutateElement } from "../../element/mutateElement";
 import { getStepSizedValue } from "./utils";
 import { fontSizeIcon } from "../icons";
-import type Scene from "../../scene/Scene";
 
 interface FontSizeProps {
   element: ExcalidrawTextElement;
   elementsMap: ElementsMap;
-  scene: Scene;
 }
 
 const MIN_FONT_SIZE = 4;
 const STEP_SIZE = 4;
 
-const FontSize = ({ element, elementsMap, scene }: FontSizeProps) => {
+const FontSize = ({ element, elementsMap }: FontSizeProps) => {
   const handleFontSizeChange: DragInputCallbackType = ({
     accumulatedChange,
     originalElements,
