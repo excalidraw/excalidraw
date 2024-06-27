@@ -44,7 +44,7 @@ Team member name: Jakub
 > </p>
 >
 > Printing this object is done within the ***.test.tsx** file associated with unit testing that specific function (here, **LanguageList.test.tsx** is shown):
-> 
+>
 > <p align="center">
 > 	<img src="./readme-assets/utils2.png" alt="utils2" width="900"/>
 > </p>
@@ -143,7 +143,7 @@ Team member name: Yassir
 </table>
 </div>
 
-#### Tool results 
+#### Tool results
 <div align="center">
   <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
 </div>
@@ -163,7 +163,7 @@ Team member name: Yassir
 </table>
 </div>
 
-#### Tool results 
+#### Tool results
 <div align="center">
   <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
 </div>
@@ -341,7 +341,7 @@ Team member name: Yassir
 
 There were no previous tests, so I wrote tests for both functions in a single file at the following path: `packages/excalidraw/tests/orientationAndIntersect.test.tsx`.
 
-#### Link to the files changes: 
+#### Link to the files changes:
 https://github.com/GacuGacu/excalidraw-SEP/commit/10ded5ce886048d3031609a093d3eef87db7ebb0
 
 ### Old coverage results vs new coverage results
@@ -403,6 +403,16 @@ Team member name: Filip
     </td>
   </tr>
 </table>
+
+### Overall
+
+Old coverage results:
+
+![Image](./readme-assets/Istanbul-main.png "Istanbul")
+
+New coverage results:
+
+![Image](./readme-assets/coverage-new.png "Istanbul")
 
 ## Statement of individual contributions
 
