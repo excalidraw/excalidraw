@@ -404,6 +404,8 @@ Team member name: Filip
   </tr>
 </table>
 
+All tests are available at this commit: `1e46cf14c594be3722480e05d5b1ac54ff9dfdde`
+
 ### Overall
 
 Old coverage results:
