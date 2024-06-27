@@ -1,4 +1,5 @@
 import { distance2d } from "../../excalidraw/math";
+import { geometryBranches } from "../../excalidraw/utils";
 import type {
   Point,
   Line,
@@ -348,21 +349,27 @@ export const polygonBounds = (polygon: Polygon) => {
   let yMax = -Infinity;
 
   for (let i = 0, l = polygon.length; i < l; i++) {
+    geometryBranches.inForLoop = true;
     const p = polygon[i];
     const x = p[0];
     const y = p[1];
 
     if (x != null && isFinite(x) && y != null && isFinite(y)) {
+      geometryBranches.inValidBounds = true;
       if (x < xMin) {
+        geometryBranches.atXMinEdge = true;
         xMin = x;
       }
       if (x > xMax) {
+        geometryBranches.atXMaxEdge = true;
         xMax = x;
       }
       if (y < yMin) {
+        geometryBranches.atYMinEdge = true;
         yMin = y;
       }
       if (y > yMax) {
+        geometryBranches.atYMaxEdge = true;
         yMax = y;
       }
     }

@@ -11,8 +11,10 @@ import {
   pointOnPolyline,
   pointRightofLine,
   pointRotate,
+  polygonBounds,
 } from "./geometry";
 import type { Curve, Ellipse, Line, Point, Polygon, Polyline } from "./shape";
+import { geometryBranches } from "../../excalidraw/utils";
 
 describe("point and line", () => {
   const line: Line = [
@@ -246,4 +248,77 @@ describe("line and line", () => {
     expect(lineIntersectsLine(lineE, lineD)).toBe(false);
     expect(lineIntersectsLine(lineF, lineG)).toBe(true);
   });
+});
+
+describe("polygon bounds checking", () => {
+  const testBounds = (poly: Polygon, expectedRes: [Point, Point]) => {
+    expect(polygonBounds(poly)).toEqual(expectedRes);
+  }
+
+  it("should return full space for empty polygon", () => {
+    testBounds([], [
+      [Infinity, Infinity],
+      [-Infinity, -Infinity],
+    ]);
+  });
+
+  it("should return correctly for single point", () => {
+    testBounds([[1, -1]], [
+      [1, -1],
+      [1, -1],
+    ]);
+  });
+
+  it("should return correct for basic quadrilateral", () => {
+    const poly: Polygon = [
+      [1, 3],
+      [3, 5],
+      [6, 8],
+      [0, -1],
+    ];
+
+    const expected: [Point, Point] = [
+      [0, -1],
+      [6, 8],
+    ];
+
+    testBounds(poly, expected);
+  });
+
+  it("should not explode with weird values", () => {
+    const poly: Polygon = [
+      [1, 3],
+      [null, 5],
+      [6, null],
+      [NaN, -Infinity],
+    ];
+
+    const expected: [Point, Point] = [
+      [1, 3],
+      [1, 3],
+    ];
+
+    testBounds(poly, expected);
+  });
+
+  it("should work with huge polygon", () => {
+    // create a 100001-agon with clear bounds of [0, 0] - [100000, 1000000]
+    const poly: Polygon = [...Array(100001)].map((_, i) => [i, i * 10]);;
+
+    const expected: [Point, Point] = [
+      [0, 0],
+      [100000, 1000000]
+    ];
+
+    testBounds(poly, expected);
+  });
+});
+
+afterAll(() => {
+  const branchCount = Object.keys(geometryBranches).length;
+  const takenBranchCount = Object.values(geometryBranches).filter(branch => branch).length;
+  const branchPercent = (takenBranchCount / branchCount) * 100;
+
+  console.log('Branches taken for geometry.ts (polygonBounds): ', geometryBranches);
+  console.log(`\nBranch percentage: ${branchPercent.toFixed(2)}%`);
 });

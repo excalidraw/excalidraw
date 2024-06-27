@@ -36,6 +36,52 @@ The following is the outcome of running the existing tool on an unchanged versio
 
 ### Your own coverage tool
 
+Team member name: Jakub
+
+> The created coverage tool functions on the basis of a global object with multiple branches. Whenever said branch is taken in a function, its value is set to 'true'. The objects exist inside of **packages/excalidraw/utils.ts** in the form of **[associatedFile]branches**, as seen here:
+> <p align="center">
+> 	<img src="./readme-assets/utils1.png" alt="utils1" width="500"/>
+> </p>
+>
+> Printing this object is done within the ***.test.tsx** file associated with unit testing that specific function (here, **LanguageList.test.tsx** is shown):
+> 
+> <p align="center">
+> 	<img src="./readme-assets/utils2.png" alt="utils2" width="900"/>
+> </p>
+>
+> For the following functions, lines highlighted in gray have either been added or changed to contain an update to the corresponding branch within the global object.
+
+
+#### Function 1: setLanguage
+
+> path: **packages/excalidraw/i18n.ts::setLanguage**
+
+![setLang](./readme-assets/setLang.png "setLanguage function with instrumented code")
+
+#### Tool results
+
+<p align="center">
+	<img src="./readme-assets/branchi18n-pre.png" alt="utils2" width="500"/>
+</p>
+
+The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/ace05b9685e53ef6df59aaabdbbfac0472bcc14f).
+
+#### Function 2: polygonBounds
+
+> path: **packages/utils/geometry/geometry.ts::polygonBounds**
+
+![polyBounds](./readme-assets/polygonBounds.png "polygonBounds function with instrumented code")
+
+#### Tool results
+
+<p align="center">
+	<img src="./readme-assets/branchgeo-pre.png" alt="utils2" width="500"/>
+</p>
+
+The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/a7bba101110cba548852932cbeb93e5dec37e66f).
+
+---
+
 Team member name: Kacper
 
 #### Function 1: restoreLibraryItems
@@ -51,11 +97,10 @@ Team member name: Kacper
   </tr>
 </table>
 
-#### Tool results 
+#### Tool results
 <div align="center">
   <img src="./readme-assets/Coverage-result-restore.png" alt="Result-coverage restore" title="Pre-coverage restore" width="300" />
 </div>
-
 
 
 #### Function 2: shouldDiscardRemoteElement
@@ -71,12 +116,12 @@ Team member name: Kacper
   </tr>
 </table>
 
-#### Tool results 
+#### Tool results
 <div align="center">
   <img src="./readme-assets/Coverage-result-reconcile.png" alt="Pre-coverage restore" title="Result-coverage reconcile" width="300" />
 </div>
 
-#### Link to the files changes: 
+#### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211e5ae8b9b535cb26c27c
 
 ---
@@ -127,6 +172,58 @@ Team member name: Yassir
 
 ### Individual tests
 
+Team member name: Jakub
+
+> To improve coverage, additional tests were created in the `it()` clauses from vitest's unit-testing suite. Additionally, some small changes were made to conform to code quality standards (for example, a local constant was `export`-ed to avoid multiple definitions).
+
+#### Test 1: setLanguage
+
+> path: **excalidraw-app/tests/LanguageList.test.tsx**
+
+After the following two tests were implemented:
+
+<p align="center">
+	<img src="./readme-assets/langlist1.png" alt="langList1" width="800"/>
+</p>
+
+<p align="center">
+	<img src="./readme-assets/langlist2.png" alt="langList2" width="800"/>
+</p>
+
+The code coverage results changed in the following way:
+
+| | Before tests      | After tests      |
+| -- | ------------- | ------------- |
+| Self-made tool | <img src="./readme-assets/branchi18n-pre.png" alt="langList1" width="500"/> | <img src="./readme-assets/branchi18n-post.png" alt="langList1" width="500"/>  |
+| Istanbul report* | <img src="./readme-assets/branchi18n-pre-ist.png" alt="" width="500"/> | <img src="./readme-assets/branchi18n-post-ist.png" alt="langList1" width="500"/>  |
+
+> **the ability to isolate functions (especially first-order ones) is not present in istanbul, however a visual inspection of the file itself shows a full coverage, consistent with the results found with the self-made tool.*
+
+The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/d6fc61657b6a7e69bd683085e76026cb101af7cb).
+
+#### Test 2: polygonBounds
+
+> path: **packages/utils/geometry/geometry.test.ts**
+
+After the following slew of tests was implemented:
+
+<p align="center">
+	<img src="./readme-assets/polyTests.png" alt="polyTests" width="800"/>
+</p>
+
+The code coverage results changed in the following way:
+
+| | Before tests      | After tests      |
+| -- | ------------- | ------------- |
+| Self-made tool | <img src="./readme-assets/branchgeo-pre.png" alt="branchgeo-pre" width="500"/> | <img src="./readme-assets/branchgeo-post.png" alt="" width="500"/>  |
+| Istanbul report* | <img src="./readme-assets/branchgeo-pre-ist.png" alt="" width="500"/> | <img src="./readme-assets/branchgeo-post-ist.png" alt="" width="500"/>  |
+
+> **as above*
+
+The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/db8406446454c863e91860086ff9ea755890d8c7).
+
+---
+
 Team member name: Kacper
 
 #### Test 1 restoreLibraryElements
@@ -173,7 +270,7 @@ The previous tests for these functions were not existing, so by writing new test
 
 The previous tests were accounting that the function <i>shouldDiscardRemoteElement</i> was tested with other test cases. Nevertheless as it was visible with the custom coverage some branches of the function were not tested. By creating custom tests for each of the "if statement" conditions I was able to improve the coverage to 100%.
 
-#### Link to the files changes: 
+#### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/f42b37c9a2c1418c71b0d81ff039d93983feaae1
 
 ---
@@ -228,6 +325,9 @@ New coverage results:
 <Provide a screenshot of the new coverage results by running the existing tool using all test modifications made by the group>
 
 ## Statement of individual contributions
+
+#### Jakub:
+Started the basic README.md structure, responsible for **setLanguage** and **polygonBounds** functions.
 
 #### Kacper:
 I was responsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
