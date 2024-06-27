@@ -707,6 +707,9 @@ export const fixBindingsAfterDuplication = (
   const allBoundElementIds: Set<ExcalidrawElement["id"]> = new Set();
   const allBindableElementIds: Set<ExcalidrawElement["id"]> = new Set();
   const shouldReverseRoles = duplicatesServeAsOld === "duplicatesServeAsOld";
+  const duplicateIdToOldId = new Map(
+    [...oldIdToDuplicatedId].map(([key, value]) => [value, key]),
+  );
   oldElements.forEach((oldElement) => {
     const { boundElements } = oldElement;
     if (boundElements != null && boundElements.length > 0) {
@@ -756,7 +759,10 @@ export const fixBindingsAfterDuplication = (
   sceneElements
     .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
-      const { boundElements } = bindableElement;
+      const oldElementId = duplicateIdToOldId.get(bindableElement.id);
+      const { boundElements } = sceneElements.filter(
+        ({ id }) => id === oldElementId,
+      )[0];
       if (boundElements != null && boundElements.length > 0) {
         mutateElement(bindableElement, {
           boundElements: boundElements.map((boundElement) =>
