@@ -125,6 +125,70 @@ Team member name: Kacper
 https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211e5ae8b9b535cb26c27c
 
 
+Team member name: Filip
+
+#### Function 1: polygonReflectX
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonReflectX.png" alt="Pre-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonReflectX.png" alt="Post-coverage polygonReflectX" title="Post-coverage polygonReflectX" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonReflectX.png" alt="Result-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300" />
+</div>
+
+#### Function 2: polygonReflectY
+*this is practically identical to the last one, but doing one and not the other just felt wrong*
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonReflectY.png" alt="Pre-coverage polygonReflectY" title="Pre-coverage polygonReflectY" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonReflectY.png" alt="Post-coverage polygonReflectY" title="Post-coverage polygonReflectY" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonReflectY.png" alt="Result-coverage polygonReflectY" title="Pre-coverage polygonReflectY" width="300" />
+</div>
+
+#### Function 3: polygonInPolygon
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonInPolygon.png" alt="Pre-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonInPolygon.png" alt="Post-coverage polygonInPolygon" title="Post-coverage polygonInPolygon" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonInPolygon.png" alt="Result-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300" />
+</div>
+
+#### Link to file changes:
+TODO
+
+
+
+
+
 ## Coverage improvement
 
 ### Individual tests
@@ -230,6 +294,20 @@ The previous tests were accounting that the function <i>shouldDiscardRemoteEleme
 #### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/f42b37c9a2c1418c71b0d81ff039d93983feaae1
 
+
+Team member name: Filip
+
+#### Test 1: polygonReflectX
+
+
+
+#### Test 2: polygonReflectY
+
+#### Test 3: polygonInPolygon
+
+
+
+
 ### Overall
 
 Old coverage results:
@@ -247,3 +325,6 @@ Started the basic README.md structure, responsible for **setLanguage** and **pol
 
 #### Kacper:
 I was respobsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
+
+#### Filip:
+Responsible for **polygonReflectX**, **polygonReflectY**, and **polygonInPolygon**.
