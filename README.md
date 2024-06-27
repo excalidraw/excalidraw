@@ -379,7 +379,7 @@ The coverage improved by 100% for `orderedColinearOrientation` and by 83.33% for
 
 Old coverage results:
 
-![Image](./readme-assets/Istanbul_main.png "Istanbul")
+![Image](./readme-assets/Istanbul-main.png "Istanbul")
 
 New coverage results:
 
