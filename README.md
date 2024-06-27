@@ -32,7 +32,7 @@ yarn test:coverage /path/to/tests/*
 
 The following is the outcome of running the existing tool on an unchanged version of excalibur cloned from https://github.com/excalidraw/excalidraw/commit/22b39277f5f4a6b125e170ab14238b084719cb2d, or the most recent commit at time of writing.
 
-![Image](istanbul_main.png "Istanbul")
+![Image](readme-assets/Istanbul-main.png "Istanbul")
 
 ### Your own coverage tool
 
@@ -124,6 +124,49 @@ Team member name: Kacper
 #### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211e5ae8b9b535cb26c27c
 
+---
+
+Team member name: Yassir
+
+#### Function 1: orderedColinearOrientation
+
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./readme-assets/Before-coverage-orientation.png" alt="Pre-coverage orientation" title="Pre-coverage orientation" width="300"/>
+    <div align="center">Pre-coverage orientation</div>
+    </td>
+    <td><img src="./readme-assets/After-coverage-orientation.png" alt="Post-coverage orientation" title="Post-coverage orientation" width="300"/>
+    <div align="center">Post-coverage orientation</div>
+    </td>
+  </tr>
+</table>
+</div>
+
+#### Tool results 
+<div align="center">
+  <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
+</div>
+
+#### Function 2: doSegmentsIntersect
+
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./readme-assets/Before-coverage-intersect.png" alt="Pre-coverage intersect" title="Pre-coverage intersect" width="300"/>
+    <div align="center">Pre-coverage intersect</div>
+    </td>
+    <td><img src="./readme-assets/After-coverage-intersect.png" alt="Post-coverage intersect" title="Post-coverage intersect" width="300"/>
+    <div align="center">Post-coverage intersect</div>
+    </td>
+  </tr>
+</table>
+</div>
+
+#### Tool results 
+<div align="center">
+  <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
+</div>
 
 Team member name: Filip
 
@@ -294,25 +337,49 @@ The previous tests were accounting that the function <i>shouldDiscardRemoteEleme
 #### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/f42b37c9a2c1418c71b0d81ff039d93983feaae1
 
+Team member name: Yassir
 
-Team member name: Filip
+There were no previous tests, so I wrote tests for both functions in a single file at the following path: `packages/excalidraw/tests/orientationAndIntersect.test.tsx`.
 
-#### Test 1: polygonReflectX
+#### Link to the files changes: 
+https://github.com/GacuGacu/excalidraw-SEP/commit/10ded5ce886048d3031609a093d3eef87db7ebb0
 
+### Old coverage results vs new coverage results
 
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./readme-assets/Coverage-result.png" alt="Old coverage results" title="Old coverage results" width="300"/>
+    <div align="center">Old coverage results</div>
+    </td>
+    <td><img src="./readme-assets/Improved-coverage.png" alt="New coverage results" title="New coverage results" width="300"/>
+    <div align="center">New coverage results</div>
+    </td>
+  </tr>
+</table>
+</div>
 
-#### Test 2: polygonReflectY
+The external tool also reflects the fact that the 2 functions have been covered.
 
-#### Test 3: polygonInPolygon
+<div align="center">
+<img src="./readme-assets/Istanbul-math-old.png" alt="Old coverage results" title="Old coverage results"/>
+<div align="center">Old coverage results</div>
 
+<div style="height: 40px;"></div>
 
+<img src="./readme-assets/Istanbul-math-new.png" alt="New coverage results" title="New coverage results"/>
+<div align="center">New coverage results</div>
+</div>
 
+<div style="height: 40px;"></div>
+
+The coverage improved by 100% for `orderedColinearOrientation` and by 83.33% for `doSegmentsIntersect`. For the first function, we added tests covering all three cases: colinear, clockwise, and counterclockwise points. For `doSegmentsIntersect`, coverage is limited to 83.33% because one branch is impossible to reach. The tests cover all other branches.
 
 ### Overall
 
 Old coverage results:
 
-![Image](istanbul_main.png "Istanbul")
+![Image](./readme-assets/istanbul_main.png "Istanbul")
 
 New coverage results:
 
@@ -328,3 +395,6 @@ I was respobsible for the functions restoreLibraryItem and shouldDiscardElement 
 
 #### Filip:
 Responsible for **polygonReflectX**, **polygonReflectY**, and **polygonInPolygon**.
+
+#### Yassir:
+I was responsible for the functions colinearOrderedOrientation and doSegmentsIntersect as described above.
