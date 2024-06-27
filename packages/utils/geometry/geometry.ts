@@ -471,19 +471,33 @@ export const polygonScaleY = (
   return p;
 };
 
+export const polygonReflectXBranches = {
+
+  polygonVertexIteration: false,
+  reflectFactorIs0: false,
+  reflectFactorIs1: false,
+  arbitraryReflectFactor: false
+
+};
+
 export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
   const [[min], [max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
+    polygonReflectXBranches.polygonVertexIteration = true;
+
     const [x, y] = polygon[i];
     const r: Point = [min + max - x, y];
 
     if (reflectFactor === 0) {
+      polygonReflectXBranches.reflectFactorIs0 = true;
       p[i] = [x, y];
     } else if (reflectFactor === 1) {
+      polygonReflectXBranches.reflectFactorIs1 = true;
       p[i] = r;
     } else {
+      polygonReflectXBranches.arbitraryReflectFactor = true;
       const t = lineInterpolate([[x, y], r]);
       p[i] = t(Math.max(Math.min(reflectFactor, 1), 0));
     }
@@ -492,19 +506,32 @@ export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
   return p;
 };
 
+export const polygonReflectYBranches = {
+
+  polygonVertexIteration: false,
+  reflectFactorIs0: false,
+  reflectFactorIs1: false,
+  arbitraryReflectFactor: false
+  
+};
+
 export const polygonReflectY = (polygon: Polygon, reflectFactor = 1) => {
   const [[, min], [, max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
+    polygonReflectYBranches.polygonVertexIteration = true;
     const [x, y] = polygon[i];
     const r: Point = [x, min + max - y];
 
     if (reflectFactor === 0) {
+      polygonReflectYBranches.reflectFactorIs0 = true;
       p[i] = [x, y];
     } else if (reflectFactor === 1) {
+      polygonReflectYBranches.reflectFactorIs1 = true;
       p[i] = r;
     } else {
+      polygonReflectYBranches.arbitraryReflectFactor = true;
       const t = lineInterpolate([[x, y], r]);
       p[i] = t(Math.max(Math.min(reflectFactor, 1), 0));
     }
@@ -839,21 +866,30 @@ export const pointOnPolygon = (
   return on;
 };
 
+export const polygonInPolygonBranches = {
+  pointsIterated: false,
+  pointsTestTrigger: false,
+  linesTestTrigger: false,
+};
+
 export const polygonInPolygon = (polygonA: Polygon, polygonB: Polygon) => {
   let inside = true;
   const closed = close(polygonA);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
+    polygonInPolygonBranches.pointsIterated = true;
     const v0 = closed[i];
 
     // Points test
     if (!pointInPolygon(v0, polygonB)) {
+      polygonInPolygonBranches.pointsTestTrigger = true;
       inside = false;
       break;
     }
 
     // Lines test
     if (lineIntersectsPolygon([v0, closed[i + 1]], polygonB)) {
+      polygonInPolygonBranches.linesTestTrigger = true;
       inside = false;
       break;
     }

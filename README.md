@@ -168,6 +168,70 @@ Team member name: Yassir
   <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
 </div>
 
+Team member name: Filip
+
+#### Function 1: polygonReflectX
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonReflectX.png" alt="Pre-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonReflectX.png" alt="Post-coverage polygonReflectX" title="Post-coverage polygonReflectX" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonReflectX.png" alt="Result-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300" />
+</div>
+
+#### Function 2: polygonReflectY
+*this is practically identical to the last one, but doing one and not the other just felt wrong*
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonReflectY.png" alt="Pre-coverage polygonReflectY" title="Pre-coverage polygonReflectY" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonReflectY.png" alt="Post-coverage polygonReflectY" title="Post-coverage polygonReflectY" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonReflectY.png" alt="Result-coverage polygonReflectY" title="Pre-coverage polygonReflectY" width="300" />
+</div>
+
+#### Function 3: polygonInPolygon
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonInPolygon.png" alt="Pre-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonInPolygon.png" alt="Post-coverage polygonInPolygon" title="Post-coverage polygonInPolygon" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonInPolygon.png" alt="Result-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300" />
+</div>
+
+#### Link to file changes:
+TODO
+
+
+
+
+
 ## Coverage improvement
 
 ### Individual tests
@@ -273,8 +337,6 @@ The previous tests were accounting that the function <i>shouldDiscardRemoteEleme
 #### Link to the files changes:
 https://github.com/excalidraw/excalidraw/pull/8150/commits/f42b37c9a2c1418c71b0d81ff039d93983feaae1
 
----
-
 Team member name: Yassir
 
 There were no previous tests, so I wrote tests for both functions in a single file at the following path: `packages/excalidraw/tests/orientationAndIntersect.test.tsx`.
@@ -313,7 +375,6 @@ The external tool also reflects the fact that the 2 functions have been covered.
 
 The coverage improved by 100% for `orderedColinearOrientation` and by 83.33% for `doSegmentsIntersect`. For the first function, we added tests covering all three cases: colinear, clockwise, and counterclockwise points. For `doSegmentsIntersect`, coverage is limited to 83.33% because one branch is impossible to reach. The tests cover all other branches.
 
-
 ### Overall
 
 Old coverage results:
@@ -330,7 +391,10 @@ New coverage results:
 Started the basic README.md structure, responsible for **setLanguage** and **polygonBounds** functions.
 
 #### Kacper:
-I was responsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
+I was respobsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
+
+#### Filip:
+Responsible for **polygonReflectX**, **polygonReflectY**, and **polygonInPolygon**.
 
 #### Yassir:
 I was responsible for the functions colinearOrderedOrientation and doSegmentsIntersect as described above.
