@@ -177,7 +177,7 @@ Team member name: Filip
     <td><img src="./readme-assets/pre-coverage polygonReflectX.png" alt="Pre-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300"/>
     <div align="center">Pre-coverage restore</div>
     </td>
-    <td><img src="./readme-assets/post-coverage polygonReflectX.png" alt="Post-coverage polygonReflectX" title="Post-coverage polygonReflectX" width="300"/>
+    <td><img src="./readme-assets/post-converage polygonReflectX.png" alt="Post-coverage polygonReflectX" title="Post-coverage polygonReflectX" width="300"/>
     <div align="center">Post-coverage restore</div>
     </td>
   </tr>
@@ -225,8 +225,8 @@ Team member name: Filip
   <img src="./readme-assets/init-coverage-polygonInPolygon.png" alt="Result-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300" />
 </div>
 
-#### Link to file changes:
-TODO
+<!-- #### Link to file changes:
+TODO -->
 
 
 
@@ -375,15 +375,34 @@ The external tool also reflects the fact that the 2 functions have been covered.
 
 The coverage improved by 100% for `orderedColinearOrientation` and by 83.33% for `doSegmentsIntersect`. For the first function, we added tests covering all three cases: colinear, clockwise, and counterclockwise points. For `doSegmentsIntersect`, coverage is limited to 83.33% because one branch is impossible to reach. The tests cover all other branches.
 
-### Overall
+---
 
-Old coverage results:
+Team member name: Filip
 
-![Image](./readme-assets/istanbul_main.png "Istanbul")
+#### Test 1 polygonReflectY
 
-New coverage results:
+<table>
+  <tr>
+    <td><img src="./readme-assets/reflectybefore.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Before coverage improvement</div>
+    </td>
+    <td><img src="./readme-assets/reflectyafter.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">After coverage improvement</div>
+    </td>
+  </tr>
+</table>
 
-<Provide a screenshot of the new coverage results by running the existing tool using all test modifications made by the group>
+#### Test 2 shouldDiscardRemoteElement
+<table>
+  <tr>
+    <td><img src="./readme-assets/polygonbefore.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Before coverage improvement</div>
+    </td>
+    <td><img src="./readme-assets/polygonafter.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">After coverage improvement</div>
+    </td>
+  </tr>
+</table>
 
 ## Statement of individual contributions
 
