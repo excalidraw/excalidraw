@@ -262,6 +262,66 @@ describe("polygon in polygon", () => {
     expect(0).toBe(0);
   });
 
+  it("detects vertex outside polygon", () => {
+
+    const poly1 : Polygon = [
+      [-4.5, 0.5],
+      [-4.5, 3.5],
+      [-7.5, 3.5],
+      [-7.5, 0.5]
+    ]
+    const poly2 : Polygon = [
+      [-6, 0],
+      [-4, 2],
+      [-4, 4],
+      [-8, 4],
+      [-8, 0]
+    ]
+    
+    expect(polygonInPolygon(poly1, poly2)).toBe(false);
+  });
+
+  it("detects line intersection in polygon", () => {
+    const poly1 : Polygon = [
+      [3.5, 0.5],
+      [3.5, 2],
+      [0.5, 2],
+      [0.5, 0.5]
+    ]
+    const poly2 : Polygon = [
+      [2, 1],
+      [4, 0],
+      [4, 3],
+      [0, 3],
+      [0, 0]
+    ]
+
+    expect(polygonInPolygon(poly1, poly2)).toBe(false);
+
+  });
+
+  it("detects enclosed polygon", () => {
+    const poly1 : Polygon = [
+      [1, 1],
+      [1, 2],
+      [2, 2],
+      [2, 1]
+    ]
+    const poly2 : Polygon = [
+      [0, 0],
+      [0, 3],
+      [3, 3],
+      [3, 0]
+    ]
+
+    expect(polygonInPolygon(poly1, poly2)).toBe(true);
+
+
+
+  });
+
+
+
   afterAll(() => {
 
     const totalBranches = Object.keys(polygonInPolygonBranches).length;
@@ -514,8 +574,6 @@ describe("polygon reflection in y coordinate", () => {
   });
 
 });
-
-
 
 afterAll(() => {
   const branchCount = Object.keys(geometryBranches).length;
