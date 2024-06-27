@@ -13,7 +13,11 @@ import {
   pointRotate,
   polygonBounds,
   polygonReflectX,
-  polygonReflectXBranches
+  polygonReflectXBranches,
+  polygonReflectY,
+  polygonReflectYBranches,
+  polygonInPolygon,
+  polygonInPolygonBranches
 } from "./geometry";
 import type { Curve, Ellipse, Line, Point, Polygon, Polyline } from "./shape";
 import { geometryBranches } from "../../excalidraw/utils";
@@ -252,6 +256,28 @@ describe("line and line", () => {
   });
 });
 
+describe("polygon in polygon", () => {
+
+  it("dummy test", () => {
+    expect(0).toBe(0);
+  });
+
+  afterAll(() => {
+
+    const totalBranches = Object.keys(polygonInPolygonBranches).length;
+    const trueBranches = Object.values(polygonInPolygonBranches).filter(branch => {
+      return branch === true;
+    }).length;
+    const branchPercent = (trueBranches / totalBranches) * 100;
+
+    console.log('Branch coverage of polygonInPolygon: ', polygonInPolygonBranches);
+    console.log(`Coverage: ${trueBranches} of ${totalBranches} (${branchPercent.toFixed(2)})%`);
+
+  });
+
+
+});
+
 describe("polygon bounds checking", () => {
   const testBounds = (poly: Polygon, expectedRes: [Point, Point]) => {
     expect(polygonBounds(poly)).toEqual(expectedRes);
@@ -316,7 +342,7 @@ describe("polygon bounds checking", () => {
   });
 });
 
-describe("polygon reflection in x bisector", () => {
+describe("polygon reflection of x coordinate", () => {
 
   it("dummy test", () => {
     expect(0).toBe(0);
@@ -402,6 +428,94 @@ describe("polygon reflection in x bisector", () => {
   });
 
 });
+
+describe("polygon reflection in y coordinate", () => {
+
+  it("dummy test", () => {
+    expect(0).toBe(0);
+  });
+
+  it("Reflection factor 0 leaves polygon unchanged", () => {
+
+    const reflectionFactor = 0;
+    const polygon : Polygon = [
+      [0, 0],
+      [0, 2],
+      [1, 3],
+      [2, 2],
+      [2, 0]
+    ];
+    const expectedResult : Polygon = [
+      [0, 0],
+      [0, 2],
+      [1, 3],
+      [2, 2],
+      [2, 0]
+    ];
+
+    expect(polygonReflectY(polygon, reflectionFactor)).toEqual(expectedResult);
+  });
+
+  it("Reflection factor 1 reflects polygon fully", () => {
+
+    const reflectionFactor = 1;
+    const polygon : Polygon = [
+      [0, 0],
+      [0, 2],
+      [1, 3],
+      [2, 2],
+      [2, 0]
+    ];
+    const expectedResult : Polygon = [
+      [0, 3],
+      [0, 1],
+      [1, 0],
+      [2, 1],
+      [2, 3]
+    ];
+
+    expect(polygonReflectY(polygon, reflectionFactor)).toEqual(expectedResult);
+
+  });
+
+  it("Reflection factor 0.5 collapses polygon", () => {
+
+    const reflectionFactor = 0.5;
+    const polygon : Polygon = [
+      [0, 0],
+      [0, 2],
+      [1, 3],
+      [2, 2],
+      [2, 0]
+    ];
+    const expectedResult : Polygon = [
+      [0, 1.5],
+      [0, 1.5],
+      [1, 1.5],
+      [2, 1.5],
+      [2, 1.5]
+    ];
+
+    expect(polygonReflectY(polygon, reflectionFactor)).toEqual(expectedResult);
+
+  });
+
+  afterAll(() => {
+
+    const totalBranches = Object.keys(polygonReflectYBranches).length;
+    const trueBranches = Object.values(polygonReflectYBranches).filter(branch => {
+      return branch === true;
+    }).length;
+    const branchPercent = (trueBranches / totalBranches) * 100;
+
+    console.log('Branch coverage of polygonReflectY: ', polygonReflectYBranches);
+    console.log(`Coverage: ${trueBranches} of ${totalBranches} (${branchPercent.toFixed(2)})%`);
+
+  });
+
+});
+
+
 
 afterAll(() => {
   const branchCount = Object.keys(geometryBranches).length;
