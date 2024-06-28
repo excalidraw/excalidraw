@@ -15,33 +15,42 @@ import "./DragInput.scss";
 import type { AppState } from "../../types";
 import { cloneJSON } from "../../utils";
 
-export type DragInputCallbackType<T extends StatsInputProperty> = (props: {
+export type DragInputCallbackType<
+  P extends StatsInputProperty,
+  E = ExcalidrawElement,
+> = (props: {
   accumulatedChange: number;
   instantChange: number;
-  originalElements: readonly ExcalidrawElement[];
+  originalElements: readonly E[];
   originalElementsMap: ElementsMap;
   shouldKeepAspectRatio: boolean;
   shouldChangeByStepSize: boolean;
   nextValue?: number;
-  property: T;
+  property: P;
   scene: Scene;
   originalAppState: AppState;
 }) => void;
 
-interface StatsDragInputProps<T extends StatsInputProperty> {
+interface StatsDragInputProps<
+  T extends StatsInputProperty,
+  E = ExcalidrawElement,
+> {
   label: string | React.ReactNode;
   icon?: React.ReactNode;
   value: number | "Mixed";
-  elements: readonly ExcalidrawElement[];
+  elements: readonly E[];
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
-  dragInputCallback: DragInputCallbackType<T>;
+  dragInputCallback: DragInputCallbackType<T, E>;
   property: T;
   scene: Scene;
   appState: AppState;
 }
 
-const StatsDragInput = <T extends StatsInputProperty>({
+const StatsDragInput = <
+  T extends StatsInputProperty,
+  E extends ExcalidrawElement = ExcalidrawElement,
+>({
   label,
   icon,
   dragInputCallback,
@@ -52,7 +61,7 @@ const StatsDragInput = <T extends StatsInputProperty>({
   property,
   scene,
   appState,
-}: StatsDragInputProps<T>) => {
+}: StatsDragInputProps<T, E>) => {
   const app = useApp();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -61,7 +70,7 @@ const StatsDragInput = <T extends StatsInputProperty>({
 
   const stateRef = useRef<{
     originalAppState: AppState;
-    originalElements: readonly ExcalidrawElement[];
+    originalElements: readonly E[];
     lastUpdatedValue: string;
     updatePending: boolean;
   }>(null!);
@@ -82,7 +91,7 @@ const StatsDragInput = <T extends StatsInputProperty>({
 
   const handleInputValue = (
     updatedValue: string,
-    elements: readonly ExcalidrawElement[],
+    elements: readonly E[],
     appState: AppState,
   ) => {
     if (!stateRef.current.updatePending) {
@@ -173,9 +182,18 @@ const StatsDragInput = <T extends StatsInputProperty>({
               y: number;
             } | null = null;
 
-            let originalElements: ExcalidrawElement[] | null = null;
             let originalElementsMap: Map<string, ExcalidrawElement> | null =
-              null;
+              app.scene
+                .getNonDeletedElements()
+                .reduce((acc: ElementsMap, element) => {
+                  acc.set(element.id, deepCopyElement(element));
+                  return acc;
+                }, new Map());
+
+            let originalElements: readonly E[] | null = elements.map(
+              (element) => originalElementsMap!.get(element.id) as E,
+            );
+
             const originalAppState: AppState = cloneJSON(appState);
 
             let accumulatedChange: number | null = null;
@@ -183,21 +201,6 @@ const StatsDragInput = <T extends StatsInputProperty>({
             document.body.classList.add("excalidraw-cursor-resize");
 
             const onPointerMove = (event: PointerEvent) => {
-              if (!originalElementsMap) {
-                originalElementsMap = app.scene
-                  .getNonDeletedElements()
-                  .reduce((acc, element) => {
-                    acc.set(element.id, deepCopyElement(element));
-                    return acc;
-                  }, new Map() as ElementsMap);
-              }
-
-              if (!originalElements) {
-                originalElements = elements.map(
-                  (element) => originalElementsMap!.get(element.id)!,
-                );
-              }
-
               if (!accumulatedChange) {
                 accumulatedChange = 0;
               }
@@ -205,6 +208,7 @@ const StatsDragInput = <T extends StatsInputProperty>({
               if (
                 lastPointer &&
                 originalElementsMap !== null &&
+                originalElements !== null &&
                 accumulatedChange !== null
               ) {
                 const instantChange = event.clientX - lastPointer.x;
