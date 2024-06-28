@@ -1,41 +1,33 @@
 import * as GA from "../ga";
+import * as GAPoint from "../gapoints";
 import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
-import * as GAPoint from "../gapoints";
 import * as GATransform from "../gatransforms";
 
 import type {
-  ElementsMap,
-  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
-  ExcalidrawDiamondElement,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawIframeLikeElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
-  ExcalidrawTextElement,
+  ExcalidrawDiamondElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawIframeLikeElement,
   NonDeleted,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
+  ExcalidrawLinearElement,
   PointBinding,
+  NonDeletedExcalidrawElement,
+  ElementsMap,
+  NonDeletedSceneElementsMap,
+  ExcalidrawTextElement,
+  ExcalidrawArrowElement,
 } from "./types";
 
-import { isPointOnShape } from "../../utils/collision";
-import { KEYS } from "../keys";
-import { getElementAtPosition } from "../scene";
-import Scene from "../scene/Scene";
-import { getElementShape } from "../shapes";
-import type { AppState, Point } from "../types";
-import { arrayToMap, tupleToCoors } from "../utils";
 import { getElementAbsoluteCoords } from "./bounds";
-import { LinearElementEditor } from "./linearElementEditor";
-import type { ElementUpdate } from "./mutateElement";
-import { mutateElement } from "./mutateElement";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import type { AppState, Point } from "../types";
+import { isPointOnShape } from "../../utils/collision";
+import { getElementAtPosition } from "../scene";
 import {
   isArrowElement,
   isBindableElement,
@@ -44,6 +36,14 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import type { ElementUpdate } from "./mutateElement";
+import { mutateElement } from "./mutateElement";
+import Scene from "../scene/Scene";
+import { LinearElementEditor } from "./linearElementEditor";
+import { arrayToMap, tupleToCoors } from "../utils";
+import { KEYS } from "../keys";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { getElementShape } from "../shapes";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

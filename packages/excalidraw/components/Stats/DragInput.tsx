@@ -1,19 +1,19 @@
-import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { EVENT } from "../../constants";
+import { KEYS } from "../../keys";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { deepCopyElement } from "../../element/newElement";
-import type Scene from "../../scene/Scene";
-import { StoreAction } from "../../store";
+import clsx from "clsx";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 import type { StatsInputProperty } from "./utils";
 import { SMALLEST_DELTA } from "./utils";
+import { StoreAction } from "../../store";
+import type Scene from "../../scene/Scene";
 
+import "./DragInput.scss";
 import type { AppState } from "../../types";
 import { cloneJSON } from "../../utils";
-import "./DragInput.scss";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import { KEYS } from "../../keys";
 
 export type DragInputCallbackType<T extends StatsInputProperty> = (props: {
   accumulatedChange: number;
