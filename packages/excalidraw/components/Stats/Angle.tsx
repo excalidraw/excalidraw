@@ -37,11 +37,18 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     if (!latestElement) {
       return;
     }
+
     if (nextValue !== undefined) {
       const nextAngle = degreeToRadian(nextValue);
       mutateElement(latestElement, {
         angle: nextAngle,
       });
+
+      if (isLinearElement(latestElement)) {
+        bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
+      } else {
+        updateBoundElements(latestElement, elementsMap);
+      }
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
