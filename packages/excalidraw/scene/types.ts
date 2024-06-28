@@ -1,4 +1,5 @@
 import type { UserIdleState } from "@excalidraw/common";
+import type { ColorRGBTuple } from "@excalidraw/common/colors";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
@@ -65,7 +66,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
-  selectionColor: string;
+  selectionColor: ColorRGBTuple;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;

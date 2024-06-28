@@ -5,6 +5,7 @@ import {
   isShallowEqual,
   sceneCoordsToViewportCoords,
 } from "@excalidraw/common";
+import { colorToRgb } from "@excalidraw/common/colors";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -121,12 +122,13 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       remotePointerButton.set(socketId, user.button);
     });
 
-    const selectionColor =
+    const selectionColor = colorToRgb(
       (props.containerRef?.current &&
         getComputedStyle(props.containerRef.current).getPropertyValue(
           "--color-selection",
         )) ||
-      "#6965db";
+        "#6965db",
+    );
 
     renderInteractiveScene(
       {

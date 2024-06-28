@@ -15,6 +15,7 @@ import {
   isRTL,
   getVerticalOffset,
 } from "@excalidraw/common";
+import { rgbToString } from "@excalidraw/common/colors";
 
 import type {
   AppState,
@@ -697,7 +698,7 @@ export const renderSelectionElement = (
 ) => {
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
-  context.fillStyle = "rgba(0, 0, 200, 0.04)";
+  context.fillStyle = rgbToString(selectionColor, 0.07);
 
   // render from 0.5px offset  to get 1px wide line
   // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
@@ -707,7 +708,7 @@ export const renderSelectionElement = (
 
   context.fillRect(offset, offset, element.width, element.height);
   context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = selectionColor;
+  context.strokeStyle = rgbToString(selectionColor);
   context.strokeRect(offset, offset, element.width, element.height);
 
   context.restore();
