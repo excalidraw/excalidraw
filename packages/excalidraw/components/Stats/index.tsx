@@ -21,8 +21,6 @@ import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
-import { isTextElement } from "../../element";
-import { hasBoundTextElement } from "../../element/typeChecks";
 
 interface StatsProps {
   scene: Scene;
