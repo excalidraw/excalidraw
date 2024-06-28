@@ -26,7 +26,6 @@ import type {
 } from "./types";
 
 import { isPointOnShape } from "../../utils/collision";
-import type { Vector } from "../../utils/geometry/shape";
 import { KEYS } from "../keys";
 import {
   pointToVector,
@@ -54,7 +53,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
+import { mutateElbowArrow } from "./routing";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -367,6 +366,9 @@ export const maybeBindLinearElement = (
       scene.getNonDeletedElementsMap(),
     );
   }
+  if (isArrowElement(linearElement) && linearElement.elbowed) {
+    mutateElbowArrow(linearElement, scene, linearElement.points);
+  }
 };
 
 export const bindLinearElement = (
@@ -615,12 +617,6 @@ export const updateBoundElements = (
       },
     );
 
-    // updateElbowArrowBindPointsToSnapToElementOutline(
-    //   element,
-    //   elementsMap,
-    //   scene,
-    // );
-
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
       handleBindTextResize(element, elementsMap, false);
@@ -644,83 +640,10 @@ const getSimultaneouslyUpdatedElementIds = (
   return new Set((simultaneouslyUpdated || []).map((element) => element.id));
 };
 
-const updateElbowArrowBindPointsToSnapToElementOutline = (
-  linearElement: ExcalidrawLinearElement,
-  elementsMap: ElementsMap,
-  scene: Scene,
-) => {
-  if (
-    isArrowElement(linearElement) &&
-    linearElement.elbowed &&
-    linearElement.points.length > 2
-  ) {
-    // Need to update elbow arrow snapping separately to avoid jumping
-    let offset = [0, 0] as Point;
-    const updates: { index: number; point: Point; isDragging?: boolean }[] = [];
-    if (linearElement.startBinding) {
-      const startElement = elementsMap.get(
-        linearElement.startBinding.elementId,
-      );
-      if (startElement) {
-        const newStartPoint = updateBindPointToSnapToElementOutline(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            linearElement,
-            0,
-            elementsMap,
-          ),
-          "startBinding",
-          linearElement,
-          startElement as ExcalidrawBindableElement,
-          elementsMap,
-        );
-        offset = [
-          linearElement.x - linearElement.points[0][0] - newStartPoint[0],
-          linearElement.y - linearElement.points[0][1] - newStartPoint[1],
-        ];
-        updates.push({
-          index: 0,
-          point: LinearElementEditor.pointFromAbsoluteCoords(
-            linearElement,
-            newStartPoint,
-            elementsMap,
-          ),
-        });
-      }
-    }
-    if (linearElement.endBinding) {
-      const endElement = elementsMap.get(linearElement.endBinding.elementId);
-      if (endElement) {
-        updates.push({
-          index: linearElement.points.length - 1,
-          point: LinearElementEditor.pointFromAbsoluteCoords(
-            linearElement,
-            translatePoint(
-              updateBindPointToSnapToElementOutline(
-                LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                  linearElement,
-                  -1,
-                  elementsMap,
-                ),
-                "endBinding",
-                linearElement,
-                endElement as ExcalidrawBindableElement,
-                elementsMap,
-              ),
-              offset as Vector,
-            ),
-            elementsMap,
-          ),
-        });
-      }
-    }
-    LinearElementEditor.movePoints(linearElement, updates, scene);
-  }
-};
-
-const updateBindPointToSnapToElementOutline = (
+export const bindPointToSnapToElementOutline = (
   point: Point,
   startOrEnd: "startBinding" | "endBinding",
-  arrow: ExcalidrawArrowElement,
+  arrow: ExcalidrawLinearElement,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): Point => {
@@ -769,18 +692,23 @@ const updateBoundPoint = (
           startOrEnd === "startBinding" ? "start" : "end",
           elementsMap,
         );
-    const [globalX, globalY] = [
-      bindableElement.x + fixedPoint[0],
-      bindableElement.y + fixedPoint[1],
-    ];
     const globalMidPoint = [
       bindableElement.x + bindableElement.width / 2,
       bindableElement.y + bindableElement.height / 2,
     ] as Point;
+    const global = [
+      bindableElement.x + fixedPoint[0],
+      bindableElement.y + fixedPoint[1],
+    ] as Point;
+    const rotatedGlobal = rotatePoint(
+      global,
+      globalMidPoint,
+      bindableElement.angle,
+    );
 
     return LinearElementEditor.pointFromAbsoluteCoords(
       linearElement,
-      rotatePoint([globalX, globalY], globalMidPoint, bindableElement.angle),
+      rotatedGlobal,
       elementsMap,
     );
   }
@@ -883,9 +811,17 @@ const calculateFixedPointForElbowArrowBinding = (
     globalMidPoint,
     -hoveredElement.angle,
   );
+  const snappedGlobalPoint = bindPointToSnapToElementOutline(
+    nonRotatedGlobalPoint,
+    startOrEnd === "start" ? "startBinding" : "endBinding",
+    linearElement,
+    hoveredElement,
+    elementsMap,
+  );
+
   fixedPoint = [
-    nonRotatedGlobalPoint[0] - bounds[0],
-    nonRotatedGlobalPoint[1] - bounds[1],
+    snappedGlobalPoint[0] - bounds[0],
+    snappedGlobalPoint[1] - bounds[1],
   ] as Point;
 
   return { fixedPoint };

@@ -20,6 +20,7 @@ import {
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import {
+  bindPointToSnapToElementOutline,
   distanceToBindableElement,
   getHoveredElementForBinding,
   maxBindingGap,
@@ -68,7 +69,20 @@ export const mutateElbowArrow = (
     disableBinding?: boolean;
   },
 ) => {
-  const [startGlobalPoint, endGlobalPoint] = [
+  const elementsMap = options?.changedElements
+    ? // Only relevant at redrawBoundArrows during history actions
+      new Map([
+        ...scene.getNonDeletedElementsMap(),
+        ...options?.changedElements,
+      ])
+    : scene.getNonDeletedElementsMap();
+  const [origStartElement, origEndElement] = [
+    arrow.startBinding &&
+      getBindableElementForId(arrow.startBinding.elementId, elementsMap),
+    arrow.endBinding &&
+      getBindableElementForId(arrow.endBinding.elementId, elementsMap),
+  ];
+  const [origStartGlobalPoint, origEndGlobalPoint] = [
     translatePoint(nextPoints[0], [
       arrow.x + (offset ? offset[0] : 0),
       arrow.y + (offset ? offset[1] : 0),
@@ -78,23 +92,32 @@ export const mutateElbowArrow = (
       arrow.y + (offset ? offset[1] : 0),
     ]),
   ];
-
-  const elementsMap = new Map(scene.getNonDeletedElementsMap());
-  options?.changedElements?.forEach((element) =>
-    elementsMap.set(element.id, element),
-  );
+  const [startGlobalPoint, endGlobalPoint] = [
+    origStartElement && arrow.startBinding
+      ? ([
+          origStartElement.x + arrow.startBinding.fixedPoint[0],
+          origStartElement.y + arrow.startBinding.fixedPoint[1],
+        ] as Point)
+      : origStartGlobalPoint,
+    origEndElement && arrow.endBinding
+      ? ([
+          origEndElement.x + arrow.endBinding.fixedPoint[0],
+          origEndElement.y + arrow.endBinding.fixedPoint[1],
+        ] as Point)
+      : origEndGlobalPoint,
+  ];
   const [startElement, endElement] = [
     !options?.disableBinding
-      ? arrow.startBinding && !options?.isDragging
-        ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
+      ? !options?.isDragging
+        ? origStartElement
         : getHoveredElementForBinding(
             { x: startGlobalPoint[0], y: startGlobalPoint[1] },
             scene,
           )
       : null,
     !options?.disableBinding
-      ? arrow.endBinding && !options?.isDragging
-        ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
+      ? !options?.isDragging
+        ? origEndElement
         : getHoveredElementForBinding(
             { x: endGlobalPoint[0], y: endGlobalPoint[1] },
             scene,
