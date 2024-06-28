@@ -227,14 +227,7 @@ import type {
 import { getStateForZoom } from "../scene/zoom";
 import { findShapeByKey, getElementShape } from "../shapes";
 import type { GeometricShape } from "../../utils/geometry/shape";
-import {
-  getClosedCurveShape,
-  getCurveShape,
-  getEllipseShape,
-  getFreedrawShape,
-  getPolygonShape,
-  getSelectionBoxShape,
-} from "../../utils/geometry/shape";
+import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import type {
   AppClassProperties,
@@ -424,7 +417,6 @@ import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-  shouldTestInside,
 } from "../element/collision";
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
