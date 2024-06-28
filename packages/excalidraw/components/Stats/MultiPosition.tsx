@@ -1,4 +1,8 @@
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
 import { rotate } from "../../math";
 import type Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
@@ -27,9 +31,8 @@ const moveElements = (
   changeInTopY: number,
   elements: readonly ExcalidrawElement[],
   originalElements: readonly ExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
-  scene: Scene,
 ) => {
   for (let i = 0; i < elements.length; i++) {
     const origElement = originalElements[i];
@@ -67,7 +70,7 @@ const moveGroupTo = (
   nextX: number,
   nextY: number,
   originalElements: ExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
@@ -203,7 +206,6 @@ const handlePositionChange: DragInputCallbackType<
     originalElements,
     elementsMap,
     originalElementsMap,
-    scene,
   );
 
   scene.triggerUpdate();
