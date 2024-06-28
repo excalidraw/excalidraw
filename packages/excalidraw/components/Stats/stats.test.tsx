@@ -11,7 +11,7 @@ import * as StaticScene from "../../renderer/staticScene";
 import { vi } from "vitest";
 import { reseed } from "../../random";
 import { setDateTimeForTests } from "../../utils";
-import { Excalidraw } from "../..";
+import { Excalidraw, mutateElement } from "../..";
 import { t } from "../../i18n";
 import type {
   ExcalidrawElement,
@@ -37,10 +37,14 @@ const editInput = (input: HTMLInputElement, value: string) => {
 };
 
 const getStatsProperty = (label: string) => {
+  const elementStats = UI.queryStats()?.querySelector("#elementStats");
+
   if (elementStats) {
     const properties = elementStats?.querySelector(".statsItem");
-    return properties?.querySelector?.(
-      `.drag-input-container[data-testid="${label}"]`,
+    return (
+      properties?.querySelector?.(
+        `.drag-input-container[data-testid="${label}"]`,
+      ) || null
     );
   }
 
@@ -57,7 +61,7 @@ const testInputProperty = (
   const input = getStatsProperty(label)?.querySelector(
     ".drag-input",
   ) as HTMLInputElement;
-  expect(input).not.toBeNull();
+  expect(input).toBeDefined();
   expect(input.value).toBe(initialValue.toString());
   editInput(input, String(nextValue));
   if (property === "angle") {
@@ -131,8 +135,8 @@ describe("stats for a generic element", () => {
   });
 
   it("should open stats", () => {
-    expect(stats).not.toBeNull();
-    expect(elementStats).not.toBeNull();
+    expect(stats).toBeDefined();
+    expect(elementStats).toBeDefined();
 
     // title
     const title = elementStats?.querySelector("h3");
@@ -140,18 +144,18 @@ describe("stats for a generic element", () => {
 
     // element type
     const elementType = elementStats?.querySelector(".elementType");
-    expect(elementType).not.toBeNull();
+    expect(elementType).toBeDefined();
     expect(elementType?.lastChild?.nodeValue).toBe(t("element.rectangle"));
 
     // properties
     const properties = elementStats?.querySelector(".statsItem");
-    expect(properties?.childNodes).not.toBeNull();
+    expect(properties?.childNodes).toBeDefined();
     ["X", "Y", "W", "H", "A"].forEach((label) => () => {
       expect(
         properties?.querySelector?.(
           `.drag-input-container[data-testid="${label}"]`,
         ),
-      ).not.toBeNull();
+      ).toBeDefined();
     });
   });
 
@@ -174,7 +178,7 @@ describe("stats for a generic element", () => {
     const input = getStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(input).not.toBeNull();
+    expect(input).toBeDefined();
     expect(input.value).toBe(rectangle.width.toString());
     editInput(input, "123.123");
     expect(h.elements.length).toBe(1);
@@ -333,7 +337,7 @@ describe("stats for a non-generic element", () => {
     const input = getStatsProperty("F")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(input).not.toBeNull();
+    expect(input).toBeDefined();
     expect(input.value).toBe(text.fontSize.toString());
     editInput(input, "36");
     expect(text.fontSize).toBe(36);
@@ -366,7 +370,7 @@ describe("stats for a non-generic element", () => {
 
     elementStats = stats?.querySelector("#elementStats");
 
-    expect(elementStats).not.toBeNull();
+    expect(elementStats).toBeDefined();
 
     // cannot change angle
     const angle = getStatsProperty("A")?.querySelector(".drag-input");
@@ -387,7 +391,7 @@ describe("stats for a non-generic element", () => {
       },
     });
     elementStats = stats?.querySelector("#elementStats");
-    expect(elementStats).not.toBeNull();
+    expect(elementStats).toBeDefined();
     const widthToHeight = image.width / image.height;
 
     // when width or height is changed, the aspect ratio is preserved
@@ -398,6 +402,35 @@ describe("stats for a non-generic element", () => {
     testInputProperty(image, "height", "H", image.height, 80);
     expect(image.height).toBe(80);
     expect(image.width / image.height).toBe(widthToHeight);
+  });
+
+  it("should display fontSize for bound text", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    const text = API.createElement({
+      type: "text",
+      width: 200,
+      height: 100,
+      containerId: container.id,
+      fontSize: 20,
+    });
+    mutateElement(container, {
+      boundElements: [{ type: "text", id: text.id }],
+    });
+    h.elements = [container, text];
+
+    API.setSelectedElements([container]);
+    const fontSize = getStatsProperty("F")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(fontSize).toBeDefined();
+
+    editInput(fontSize, "40");
+
+    expect(text.fontSize).toBe(40);
   });
 });
 
@@ -515,25 +548,25 @@ describe("stats for multiple elements", () => {
     const width = getStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(width).not.toBeNull();
+    expect(width).toBeDefined();
     expect(width.value).toBe("Mixed");
 
     const height = getStatsProperty("H")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(height).not.toBeNull();
+    expect(height).toBeDefined();
     expect(height.value).toBe("Mixed");
 
     const angle = getStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(angle).not.toBeNull();
+    expect(angle).toBeDefined();
     expect(angle.value).toBe("0");
 
     const fontSize = getStatsProperty("F")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(fontSize).not.toBeNull();
+    expect(fontSize).toBeDefined();
 
     // changing width does not affect text
     editInput(width, "200");
@@ -579,7 +612,7 @@ describe("stats for multiple elements", () => {
       ".drag-input",
     ) as HTMLInputElement;
 
-    expect(x).not.toBeNull();
+    expect(x).toBeDefined();
     expect(Number(x.value)).toBe(x1);
 
     editInput(x, "300");
@@ -592,7 +625,7 @@ describe("stats for multiple elements", () => {
       ".drag-input",
     ) as HTMLInputElement;
 
-    expect(y).not.toBeNull();
+    expect(y).toBeDefined();
     expect(Number(y.value)).toBe(y1);
 
     editInput(y, "200");
@@ -604,13 +637,13 @@ describe("stats for multiple elements", () => {
     const width = getStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(width).not.toBeNull();
+    expect(width).toBeDefined();
     expect(Number(width.value)).toBe(200);
 
     const height = getStatsProperty("H")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    expect(height).not.toBeNull();
+    expect(height).toBeDefined();
     expect(Number(height.value)).toBe(200);
 
     editInput(width, "400");
