@@ -209,7 +209,7 @@ export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
@@ -248,7 +248,11 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
-  updateBoundElements(latestElement, elementsMap);
+  if (isLinearElement(latestElement)) {
+    bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
+  } else {
+    updateBoundElements(latestElement, elementsMap);
+  }
 
   const boundTextElement = getBoundTextElement(
     originalElement,
