@@ -114,8 +114,9 @@ export const changeProperty = (
 
   return elements.map((element) => {
     if (
-      selectedElementIds.get(element.id) ||
-      element.id === appState.editingElement?.id
+      (selectedElementIds.get(element.id) ||
+      element.id === appState.editingElement?.id)
+      && !element.locked
     ) {
       return callback(element);
     }
