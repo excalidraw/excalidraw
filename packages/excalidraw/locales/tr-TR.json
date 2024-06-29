@@ -564,25 +564,25 @@
     },
     "hint": {
       "text": "Takip etmek için kullanıcıya tıklayın",
-      "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "followStatus": "Şu anda bu kullanıcıyı takip ediyorsunuz",
+      "inCall": "Kullanıcı bir sesli aramada",
+      "micMuted": "Kullanıcının mikrofonu kapalı",
+      "isSpeaking": "Kullanıcı konuşuyor"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Komut paleti",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Seç",
+      "confirm": "Onayla",
+      "close": "Kapat"
     },
-    "recents": "",
+    "recents": "Son kullanılan",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Menülerde, komutlarda arama yapın ve saklı kalmış hazineleri keşfedin",
+      "noMatch": "Eşleşen komut yok..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Komut mevcut değil...",
+    "shortcutHint": "Komut paleti için {{shortcut}} kullanın"
   }
 }
