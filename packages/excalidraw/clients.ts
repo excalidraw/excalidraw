@@ -29,6 +29,9 @@ export const getClientColor = (
   socketId: SocketId,
   collaborator: Collaborator | undefined,
 ) => {
+  if (collaborator?.color) {
+    return collaborator.color.background;
+  }
   // to get more even distribution in case `id` is not uniformly distributed to
   // begin with, we hash it
   const hash = Math.abs(hashToInteger(collaborator?.id || socketId));
