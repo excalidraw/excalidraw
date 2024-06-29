@@ -188,13 +188,13 @@ export const colorToRgb = (color: string) => {
   if (color[0] === "#") {
     let c = parseInt(color.slice(1), 16);
     switch (color.length) {
-      // @ts-expect-error
+      // @ts-ignore
       case 5:
         c = c >> 4;
       // eslint-disable-next-line no-fallthrough
       case 4:
         return [(c & 0xf00) >> 4, c & 0xf0, (c & 0xf) << 4] as ColorRGBTuple;
-      // @ts-expect-error
+      // @ts-ignore
       case 9:
         c = c >> 8;
       // eslint-disable-next-line no-fallthrough
