@@ -697,7 +697,7 @@ export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
 };
 
 export const updateObject = <T extends Record<string, any>>(
-  obj: T,
+  object: T,
   updates: Partial<T>,
 ): T => {
   let didChange = false;
@@ -705,7 +705,7 @@ export const updateObject = <T extends Record<string, any>>(
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
       if (
-        (obj as any)[key] === value &&
+        (object as any)[key] === value &&
         // if object, always update because its attrs could have changed
         (typeof value !== "object" || value === null)
       ) {
@@ -716,11 +716,11 @@ export const updateObject = <T extends Record<string, any>>(
   }
 
   if (!didChange) {
-    return obj;
+    return object;
   }
 
   return {
-    ...obj,
+    ...object,
     ...updates,
   };
 };
@@ -795,10 +795,10 @@ export const isShallowEqual = <
         ? K extends readonly (keyof T)[]
           ? K
           : {
-              _error: "keys are either missing or include keys not in compared obj";
+      _error: "keys are either missing or include keys not in compared object";
             }
         : {
-            _error: "keys are either missing or include keys not in compared obj";
+      _error: "keys are either missing or include keys not in compared object";
           }),
   debug = false,
 ) => {
@@ -951,7 +951,8 @@ export const isMemberOf = <T extends string>(
     : collection.hasOwnProperty(value);
 };
 
-export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
+export const cloneJSON = <T>(object: T): T =>
+  JSON.parse(JSON.stringify(object));
 
 export const isFiniteNumber = (value: any): value is number => {
   return typeof value === "number" && Number.isFinite(value);
