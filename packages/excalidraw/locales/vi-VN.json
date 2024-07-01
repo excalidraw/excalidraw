@@ -11,8 +11,8 @@
     "copyAsPng": "Sao chép vào bộ nhớ tạm dưới dạng PNG",
     "copyAsSvg": "Sao chép vào bộ nhớ tạm dưới dạng SVG",
     "copyText": "Sao chép vào bộ nhớ tạm dưới dạng chữ",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Sao chép vào bộ nhớ tạm",
+    "convertToCode": "Chuyển thành mã",
     "bringForward": "Đưa ra trước",
     "sendToBack": "Hạ xuống dưới",
     "bringToFront": "Đưa ra đầu tiên",
@@ -21,8 +21,10 @@
     "copyStyles": "Sao chép định dạng",
     "pasteStyles": "Dán định dạng",
     "stroke": "Nét",
+    "changeStroke": "Đổi màu nét vẽ",
     "background": "Nền",
-    "fill": "Fill",
+    "changeBackground": "Thay đổi màu nền",
+    "fill": "Đổ màu",
     "strokeWidth": "Độ dày nét",
     "strokeStyle": "Kiểu nét",
     "strokeStyle_solid": "Khối",
@@ -38,12 +40,12 @@
     "arrowhead_none": "Không",
     "arrowhead_arrow": "Mũi tên",
     "arrowhead_bar": "Thanh",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Hình tròn",
+    "arrowhead_circle_outline": "Hình tròn (đường viền)",
     "arrowhead_triangle": "Tam giác",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Tam giác (đường viền)",
+    "arrowhead_diamond": "Kim cương",
+    "arrowhead_diamond_outline": "Kim cương (đường viền)",
     "fontSize": "Cỡ chữ",
     "fontFamily": "Phông chữ",
     "addWatermark": "Làm với Excalidraw\"",
@@ -56,7 +58,7 @@
     "veryLarge": "Rất lớn",
     "solid": "Đặc",
     "hachure": "Nét gạch gạch",
-    "zigzag": "Zigzag",
+    "zigzag": "Zig-zag",
     "crossHatch": "Nét gạch chéo",
     "thin": "Mỏng",
     "bold": "In đậm",
@@ -72,6 +74,7 @@
     "canvasColors": "Đã dùng trên canvas",
     "canvasBackground": "Nền canvas",
     "drawingCanvas": "Canvas vẽ",
+    "clearCanvas": "",
     "layers": "Lớp",
     "actions": "Chức năng",
     "language": "Ngôn ngữ",
@@ -84,12 +87,13 @@
     "group": "Gộp nhóm lại lựa chọn",
     "ungroup": "Tách nhóm lựa chọn",
     "collaborators": "Cộng tác viên",
-    "showGrid": "Hiển thị lưới",
+    "toggleGrid": "",
     "addToLibrary": "Thêm vào thư viện",
     "removeFromLibrary": "Xóa khỏi thư viện",
     "libraryLoadingMessage": "Đang tải thư viện…",
     "libraries": "Xem thư viện",
     "loadingScene": "Đang tải về…",
+    "loadScene": "",
     "align": "Căn chỉnh",
     "alignTop": "Căn trên",
     "alignBottom": "Căn dưới",
@@ -106,6 +110,7 @@
     "showStroke": "Hiển thị chọn màu",
     "showBackground": "Hiện thị chọn màu nền",
     "toggleTheme": "",
+    "theme": "",
     "personalLib": "Thư viện cá nhân",
     "excalidrawLib": "Thư viện Excalidraw",
     "decreaseFontSize": "Giảm cỡ chữ",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Điều chỉnh nét",
-      "exit": "Thoát chỉnh nét"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Khoá",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Chưa có món nào...",
@@ -171,6 +183,7 @@
     "fullScreen": "Toàn màn hình",
     "darkMode": "Chế độ tối",
     "lightMode": "Chế độ sáng",
+    "systemMode": "",
     "zenMode": "Chế độ zen",
     "objectsSnapMode": "",
     "exitZenMode": "Thoát chể độ zen",
@@ -212,9 +225,9 @@
     "fileTooBig": "Tệp tin quá lớn. Dung lượng tối đa cho phép là {{maxSize}}.",
     "svgImageInsertError": "Không thể thêm ảnh SVG. Mã SVG có vẻ sai.",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG không hợp lệ.",
     "cannotResolveCollabServer": "Không thể kết nối với máy chủ hợp tác. Hãy tải lại trang và thử lại.",
     "importLibraryError": "Không thể tải thư viện",
+    "saveLibraryError": "",
     "collabSaveFailed": "Không thể lưu vào cơ sở dữ liệu. Nếu vấn đề tiếp tục xảy ra, bạn nên lưu tệp vào máy để đảm bảo bạn không bị mất công việc.",
     "collabSaveFailed_sizeExceeded": "Không thể lưu vào cơ sở dữ liệu, canvas có vẻ quá lớn. Bạn nên lưu tệp cục bộ để đảm bảo bạn không bị mất công việc.",
     "imageToolNotSupported": "",
@@ -246,7 +259,7 @@
     "library": "Thư viện",
     "lock": "Giữ dụng cũ hiện tại sau khi vẽ",
     "penMode": "Chế độ bút vẽ - ngăn ngừa chạm nhầm",
-    "link": "Thêm/ Chỉnh sửa liên kết cho hình được chọn",
+    "link": "",
     "eraser": "Xóa",
     "frame": "",
     "magicframe": "",
@@ -256,6 +269,22 @@
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Hành động canvas",
@@ -299,11 +328,14 @@
     "openIssueMessage": "",
     "sceneContent": ""
   },
+  "shareDialog": {
+    "or": "Hoặc"
+  },
   "roomDialog": {
     "desc_intro": "",
     "desc_privacy": "",
-    "button_startSession": "",
-    "button_stopSession": "",
+    "button_startSession": "Bắt đầu phiên",
+    "button_stopSession": "Kết thúc phiên",
     "desc_inProgressIntro": "",
     "desc_shareLink": "",
     "desc_exitSession": "",
@@ -427,7 +459,10 @@
     "scene": "",
     "selected": "",
     "storage": "",
+    "fullTitle": "",
     "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "",
     "version": "",
     "versionCopy": "",
@@ -441,7 +476,7 @@
     "copyToClipboardAsPng": "",
     "fileSaved": "",
     "fileSavedToFilename": "",
-    "canvas": "canvas",
+    "canvas": "",
     "selection": "",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

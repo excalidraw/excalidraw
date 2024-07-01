@@ -11,8 +11,8 @@
     "copyAsPng": "نسخ إلى الحافظة بصيغة PNG",
     "copyAsSvg": "نسخ إلى الحافظة بصيغة SVG",
     "copyText": "نسخ إلى الحافظة كنص",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "نسخ المصدر إلى الحافظة",
+    "convertToCode": "تحويل إلى كود",
     "bringForward": "جلب للأمام",
     "sendToBack": "أرسل للخلف",
     "bringToFront": "أحضر للأمام",
@@ -21,7 +21,9 @@
     "copyStyles": "نسخ الأنماط",
     "pasteStyles": "لصق الأنماط",
     "stroke": "الخط",
+    "changeStroke": "تغيير لون القلم",
     "background": "الخلفية",
+    "changeBackground": "تغيير لون الخلفية",
     "fill": "التعبئة",
     "strokeWidth": "سُمك الخط",
     "strokeStyle": "نمط الخط",
@@ -38,12 +40,12 @@
     "arrowhead_none": "لا شيء",
     "arrowhead_arrow": "سهم",
     "arrowhead_bar": "شريط",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "دائرة",
+    "arrowhead_circle_outline": "دائرة (مخططة)",
     "arrowhead_triangle": "مثلث",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "مثلث (مخطط)",
+    "arrowhead_diamond": "ألماسة",
+    "arrowhead_diamond_outline": "ألماسة (مخططة)",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
@@ -72,6 +74,7 @@
     "canvasColors": "تستخدم على القماش",
     "canvasBackground": "خلفية اللوحة",
     "drawingCanvas": "لوحة الرسم",
+    "clearCanvas": "مسح الكل",
     "layers": "الطبقات",
     "actions": "الإجراءات",
     "language": "اللغة",
@@ -84,12 +87,13 @@
     "group": "تحديد مجموعة",
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
-    "showGrid": "إظهار الشبكة",
+    "toggleGrid": "بدل الشبكة",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة…",
     "libraries": "تصفح المكتبات",
     "loadingScene": "جاري تحميل المشهد…",
+    "loadScene": "تحميل المشهد من ملف",
     "align": "محاذاة",
     "alignTop": "محاذاة إلى اﻷعلى",
     "alignBottom": "محاذاة إلى اﻷسفل",
@@ -105,7 +109,8 @@
     "share": "مشاركة",
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
-    "toggleTheme": "غير النمط",
+    "toggleTheme": "تبديل السمة الفاتحة/الغامقة",
+    "theme": "السمة",
     "personalLib": "المكتبة الشخصية",
     "excalidrawLib": "مكتبتنا",
     "decreaseFontSize": "تصغير حجم الخط",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "تحرير السطر",
-      "exit": "الخروج من المُحرر"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "قفل",
@@ -137,8 +142,15 @@
     "selectAllElementsInFrame": "تحديد جميع العناصر في الإطار",
     "removeAllElementsFromFrame": "إزالة جميع العناصر من الإطار",
     "eyeDropper": "اختيار اللون من القماش",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "نص إلى رسم بياني",
+    "prompt": "تعليمات",
+    "followUs": "تابعنا",
+    "discordChat": "دردشة ديسكورد",
+    "zoomToFitViewport": "التكبير لتناسب العرض",
+    "zoomToFitSelection": "تكبير للعنصر المحدد",
+    "zoomToFit": "تكبير لتلائم جميع العناصر",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -171,6 +183,7 @@
     "fullScreen": "شاشة كاملة",
     "darkMode": "الوضع المظلم",
     "lightMode": "الوضع المضيء",
+    "systemMode": "وضع النظام",
     "zenMode": "وضع التأمل",
     "objectsSnapMode": "التقط إلى العناصر",
     "exitZenMode": "إلغاء الوضع الليلى",
@@ -211,13 +224,13 @@
     "imageInsertError": "تعذر إدراج الصورة. حاول مرة أخرى لاحقاً...",
     "fileTooBig": "الملف كبير جداً. الحد الأقصى المسموح به للحجم هو {{maxSize}}.",
     "svgImageInsertError": "تعذر إدراج صورة SVG. يبدو أن ترميز SVG غير صحيح.",
-    "failedToFetchImage": "",
-    "invalidSVGString": "SVG غير صالح.",
+    "failedToFetchImage": "فشل تحميل الصورة.",
     "cannotResolveCollabServer": "تعذر الاتصال بخادم التعاون. الرجاء إعادة تحميل الصفحة والمحاولة مرة أخرى.",
     "importLibraryError": "تعذر تحميل المكتبة",
+    "saveLibraryError": "تعذر حفظ المكتبة. الرجاء حفظ المكتبة الخاصة بك في ملف محلي للتأكد من أنك لا تفقد التغييرات.",
     "collabSaveFailed": "تعذر الحفظ في قاعدة البيانات. إذا استمرت المشاكل، يفضل أن تحفظ ملفك محليا كي لا تفقد عملك.",
     "collabSaveFailed_sizeExceeded": "تعذر الحفظ في قاعدة البيانات، يبدو أن القماش كبير للغاية، يفضّل حفظ الملف محليا كي لا تفقد عملك.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "تم تعطيل الصور.",
     "brave_measure_text_error": {
       "line1": "يبدو أنك تستخدم متصفح Brave مع إعداد <bold>حظر صارم لتتبع البصمة</bold>.",
       "line2": "قد يؤدي هذا إلى كسر <bold>عناصر النص</bold> في الرسومات الخاصة بك.",
@@ -229,9 +242,9 @@
       "iframe": "",
       "image": "سوف يتم دعم إضافة صور إلى المكتبة قريباً!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "تعذر لصق (تعذر القراءة من حافظة النظام).",
+    "asyncPasteFailedOnParse": "تعذر اللصق.",
+    "copyToSystemClipboardFailed": "تعذر النسخ إلى الحافظة."
   },
   "toolBar": {
     "selection": "تحديد",
@@ -254,8 +267,24 @@
     "laser": "مؤشر ليزر",
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من أﻷدوات",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "من Mermaid إلى Excalidraw",
+    "magicSettings": "إعدادات الذكاء الاصطناعي"
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "إجراءات اللوحة",
@@ -299,9 +328,12 @@
     "openIssueMessage": "حرصنا على عدم إضافة معلومات المشهد في بلاغ الخطأ. في حال كون مشهدك لا يحمل أي معلومات خاصة نرجو المتابعة على <button>نظام تتبع الأخطاء</button>. نرجو إضافة المعلومات أدناه بنسخها ولصقها في محتوى البلاغ على GitHub.",
     "sceneContent": "محتوى المشهد:"
   },
+  "shareDialog": {
+    "or": "أو"
+  },
   "roomDialog": {
-    "desc_intro": "يمكنك دعوة الآخرين لمشاركتك نفس الجلسة التي تعمل عليها.",
-    "desc_privacy": "لا تقلق، الجلسة تستخدم التشفير من النهاية إلى النهاية، لذلك فإن أي شيء ترسمه سيبقى خاصاً. لن يتمكن حتى الخادوم الخاص بنا من رؤية ما توصلت إليه.",
+    "desc_intro": "دعوة الناس للتعاون في الرسم الخاص بك.",
+    "desc_privacy": "لا تقلق، الجلسة مشفرة من النهاية إلى النهاية وخصوصية تماماً. حتى خادمنا لا يستطيع أن يرى ما ترسمه.",
     "button_startSession": "بدء الجلسة",
     "button_stopSession": "إيقاف الجلسة",
     "desc_inProgressIntro": "تجري الآن المشاركة الحية.",
@@ -427,7 +459,10 @@
     "scene": "المشهد",
     "selected": "المحدد",
     "storage": "التخزين",
-    "title": "إحصائيات للمهووسين",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "المجموع",
     "version": "الإصدار",
     "versionCopy": "انقر للنسخ",
@@ -517,9 +552,37 @@
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "أَدخِل",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "معاينة"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "بحث سريع",
+      "empty": "لم يُعثر على أيّ مستخدم"
+    },
+    "hint": {
+      "text": "انقر على المستخدم للمتابعة",
+      "followStatus": "أنت حاليا تتابع هذا المستخدم",
+      "inCall": "المستخدم في مكالمة صوتية",
+      "micMuted": "ميكروفون المستخدم مكتم",
+      "isSpeaking": "المستخدم يتحدث"
+    }
+  },
+  "commandPalette": {
+    "title": "لوحة الأوامر",
+    "shortcuts": {
+      "select": "اختر",
+      "confirm": "تأكيد",
+      "close": "اغلق"
+    },
+    "recents": "المستخدمة مؤخراً",
+    "search": {
+      "placeholder": "قوائم البحث، الأوامر، واكتشف الجواهر المخفية",
+      "noMatch": "لا توجد أوامر مطابقة..."
+    },
+    "itemNotAvailable": "الأمر غير متوفر...",
+    "shortcutHint": "للحصول على لوحة الأوامر، استخدم {{shortcut}}"
   }
 }

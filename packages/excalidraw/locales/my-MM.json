@@ -21,7 +21,9 @@
     "copyStyles": "ပုံစံကူး",
     "pasteStyles": "ပုံစံထား",
     "stroke": "မျဉ်း",
+    "changeStroke": "",
     "background": "နောက်ခံ",
+    "changeBackground": "",
     "fill": "ဖြည့်",
     "strokeWidth": "မျဉ်းအထူ",
     "strokeStyle": "မျဉ်းပုံစံ",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "ကားချပ်နောက်ခံ",
     "drawingCanvas": "ပုံဆွဲကားချပ်",
+    "clearCanvas": "",
     "layers": "အလွှာများ",
     "actions": "လုပ်ဆောင်ချက်များ",
     "language": "ဘာသာစကား",
@@ -84,12 +87,13 @@
     "group": "အုပ်စုဖွဲ့",
     "ungroup": "အုပ်စုဖျက်သိမ်း",
     "collaborators": "ပူးပေါင်းပါဝင်သူများ",
-    "showGrid": "",
+    "toggleGrid": "",
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
     "libraryLoadingMessage": "မှတ်တမ်းအား တင်သွင်းနေသည်…",
     "libraries": "စာကြည့်တိုက်တွင်ရှာဖွေပါ",
     "loadingScene": "မြင်ကွင်းဖော်နေသည်…",
+    "loadScene": "",
     "align": "ချိန်ညှိ",
     "alignTop": "ထိပ်ညှိ",
     "alignBottom": "အခြေညှိ",
@@ -106,6 +110,7 @@
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
+    "theme": "",
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "",
-      "exit": ""
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "",
@@ -171,6 +183,7 @@
     "fullScreen": "",
     "darkMode": "",
     "lightMode": "",
+    "systemMode": "",
     "zenMode": "",
     "objectsSnapMode": "",
     "exitZenMode": "ဇင်မြင်ကွင်းမှထွက်",
@@ -212,9 +225,9 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -256,6 +269,22 @@
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "ကားချပ်လုပ်ဆောင်ချက်",
@@ -299,9 +328,12 @@
     "openIssueMessage": "ချို့ယွင်းမှုမှတ်တမ်းတွင် အရေးကြီးအချက်အလက်များပါဝင်မှုမရှိစေရန်အထူးသတိပြုပါသည်။ မပါဝင်ပါက ဆက်လက်ဆောင်ရွက်ရန် <button>ချို့ယွင်းမှုအားခြေရာကောက်ပါ။</button> အောက်ပါအချက်အလက်များအား Github တွင် Issue အနေဖြင့်ဖြည့်သွင်းဖော်ပြပေးပါ။",
     "sceneContent": "မြင်ကွင်းပါအချက်အလက်။ ။"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "လက်ရှိမြင်ကွင်းတွင်ပူးပေါင်းရေးဆွဲရန် အခြားသူများအား ဖိတ်ကြားနိုင်သည်။",
-    "desc_privacy": "နှစ်ဘက်စွန်းတိုင်လျှို့ဝှက်ထားသဖြင့်ရေးဆွဲသမျှအား ဆာဗာပေါ်မှပင်လျှင်ကြည့်ရှုနိုင်မည်မဟုတ်ပါ။ မစိုးရိမ်ပါနှင့်။",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "ပူးပေါင်းမှုစတင်",
     "button_stopSession": "ပူးပေါင်းမှုအဆုံးသတ်",
     "desc_inProgressIntro": "တိုက်ရိုက်ပူးပေါင်းရေးဆွဲမှုများပြုလုပ်နေပါသည်။",
@@ -427,7 +459,10 @@
     "scene": "မြင်ကွင်း",
     "selected": "ရွေးချယ်သည်",
     "storage": "သိုလှောင်ခန်း",
-    "title": "အက္ခရာများအတွက်အချက်အလက်များ",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "စုစုပေါင်း",
     "version": "",
     "versionCopy": "",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

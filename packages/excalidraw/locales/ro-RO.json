@@ -21,7 +21,9 @@
     "copyStyles": "Copiere stiluri",
     "pasteStyles": "Lipire stiluri",
     "stroke": "Contur",
+    "changeStroke": "Modificare culoare contur",
     "background": "Fundal",
+    "changeBackground": "Modificare culoare de contur",
     "fill": "Umplere",
     "strokeWidth": "Lățimea conturului",
     "strokeStyle": "Stilul conturului",
@@ -72,6 +74,7 @@
     "canvasColors": "Folosite pe pânză",
     "canvasBackground": "Fundalul pânzei",
     "drawingCanvas": "Pânză pentru desenat",
+    "clearCanvas": "Ștergere pânză",
     "layers": "Straturi",
     "actions": "Acțiuni",
     "language": "Limbă",
@@ -84,12 +87,13 @@
     "group": "Grupare selecție",
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
-    "showGrid": "Afișare grilă",
+    "toggleGrid": "Comutare grilă",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca…",
     "libraries": "Răsfoiește bibliotecile",
     "loadingScene": "Se încarcă scena…",
+    "loadScene": "Încărcare scenă din fișier",
     "align": "Aliniere",
     "alignTop": "Aliniere sus",
     "alignBottom": "Aliniere jos",
@@ -105,7 +109,8 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
-    "toggleTheme": "Comutare temă",
+    "toggleTheme": "Comutare temă luminoasă/întunecată",
+    "theme": "Temă",
     "personalLib": "Biblioteca personală",
     "excalidrawLib": "Biblioteca Excalidraw",
     "decreaseFontSize": "Micșorează dimensiunea fontului",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Editare linie",
-      "exit": "Părăsire editor de linii"
+      "editArrow": "Editare săgeată"
     },
     "elementLock": {
       "lock": "Blocare",
@@ -134,11 +139,18 @@
     },
     "statusPublished": "Publicat",
     "sidebarLock": "Păstrează deschisă bara laterală",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Selectează toate elementele din cadru",
+    "removeAllElementsFromFrame": "Elimină toate elementele din cadru",
     "eyeDropper": "Alegere culoare din pânză",
     "textToDiagram": "Text la diagramă",
-    "prompt": "Solicitare"
+    "prompt": "Mesaj sistem",
+    "followUs": "Urmărește-ne",
+    "discordChat": "Conversații pe Discord",
+    "zoomToFitViewport": "Transfocare pentru a se potrivi în poarta de vizualizare",
+    "zoomToFitSelection": "Transfocare pentru a cuprinde selecția",
+    "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
+    "installPWA": "Instalează Excalidraw la nivel local (PWA)",
+    "autoResize": "Activare autoredimensionare text"
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -163,7 +175,7 @@
     "resetZoom": "Resetare transfocare",
     "menu": "Meniu",
     "done": "Efectuat",
-    "edit": "Edit",
+    "edit": "Editare",
     "undo": "Anulare",
     "redo": "Refacere",
     "resetLibrary": "Resetare bibliotecă",
@@ -171,6 +183,7 @@
     "fullScreen": "Ecran complet",
     "darkMode": "Mod întunecat",
     "lightMode": "Mod luminos",
+    "systemMode": "Mod de sistem",
     "zenMode": "Mod zen",
     "objectsSnapMode": "Ancorare la obiecte",
     "exitZenMode": "Ieșire din modul zen",
@@ -212,9 +225,9 @@
     "fileTooBig": "Fișierul este prea mare. Dimensiunea maximă permisă este de {{maxSize}}.",
     "svgImageInsertError": "Imaginea SVG nu a putut fi introdus. Marcajul SVG pare invalid.",
     "failedToFetchImage": "Preluarea imaginii a eșuat.",
-    "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Nu a putut fi realizată conexiunea la serverul de colaborare. Reîncarcă pagina și încearcă din nou.",
     "importLibraryError": "Biblioteca nu a putut fi încărcată",
+    "saveLibraryError": "Nu s-a putut salva biblioteca în spațiul de stocare. Salvează-ți biblioteca într-un fișier local pentru a te asigura că nu pierzi modificările.",
     "collabSaveFailed": "Nu s-a putut salva în baza de date la nivel de server. Dacă problemele persistă, ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "collabSaveFailed_sizeExceeded": "Nu s-a putut salva în baza de date la nivel de server, întrucât se pare că pânza este prea mare. Ar trebui să salvezi fișierul la nivel local pentru a te asigura că nu îți pierzi munca.",
     "imageToolNotSupported": "Imaginile sunt dezactivate.",
@@ -246,16 +259,32 @@
     "library": "Bibliotecă",
     "lock": "Menține activ instrumentul selectat după desenare",
     "penMode": "Mod stilou – împiedică atingerea",
-    "link": "Adăugare/actualizare URL pentru forma selectată",
+    "link": "Adăugare/actualizare link pentru o formă selectată",
     "eraser": "Radieră",
-    "frame": "",
+    "frame": "Instrument cadru",
     "magicframe": "Structură-de-fire la cod",
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "hand": "Mână (instrument de panoramare)",
-    "extraTools": "",
+    "extraTools": "Mai multe instrumente",
     "mermaidToExcalidraw": "Mermaid la Excalidraw",
     "magicSettings": "Setări IA"
+  },
+  "element": {
+    "rectangle": "Dreptunghi",
+    "diamond": "Romb",
+    "ellipse": "Elipsă",
+    "arrow": "Săgeată",
+    "line": "Linie",
+    "freedraw": "Desenare liberă",
+    "text": "Text",
+    "image": "Imagine",
+    "group": "Grup",
+    "frame": "Cadru",
+    "magicframe": "Structură-de-fire la cod",
+    "embeddable": "Încorporare web",
+    "selection": "Selecție",
+    "iframe": "iFrame"
   },
   "headings": {
     "canvasActions": "Acțiuni pentru pânză",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Am luat măsuri de precauție pentru a nu include informații despre scenă în eroare. Dacă scena nu este privată, oferă-ne mai multe informații în <button>monitorul nostru pentru erori</button>. Include informațiile de mai jos copiindu-le și lipindu-le în tichetul cu problemă de pe GitHub.",
     "sceneContent": "Conținutul scenei:"
   },
+  "shareDialog": {
+    "or": "Sau"
+  },
   "roomDialog": {
-    "desc_intro": "Poți invita alte persoane pentru a colabora la scena actuală.",
-    "desc_privacy": "Nu te îngrijora. Sesiunea utilizează criptarea integrală, astfel încât orice desenezi va rămâne privat. Nici măcar serverul nostru nu va putea vedea pe ce ai lucrat.",
+    "desc_intro": "Invită persoane să colaboreze la desenul tău.",
+    "desc_privacy": "Nu-ți face griji, sesiunea este criptată integral și complet privată. Nici măcar serverul nostru nu poate vedea ce desenezi.",
     "button_startSession": "Pornire sesiune",
     "button_stopSession": "Oprire sesiune",
     "desc_inProgressIntro": "Sesiunea de colaborare în direct este în curs de desfășurare.",
@@ -346,7 +378,7 @@
     "textNewLine": "Adaugă o linie nouă (editor de text)",
     "title": "Ajutor",
     "view": "Vizualizare",
-    "zoomToFit": "Transfocare pentru a cuprinde totul",
+    "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
     "zoomToSelection": "Transfocare la selecție",
     "toggleElementLock": "Blocare/deblocare selecție",
     "movePageUpDown": "Deplasare pagină sus/jos",
@@ -427,7 +459,10 @@
     "scene": "Scenă",
     "selected": "Selectate",
     "storage": "Stocare",
-    "title": "Statistici pentru pasionați",
+    "fullTitle": "Statistici și proprietăți elemente",
+    "title": "Statistici",
+    "generalStats": "Statistici generale",
+    "elementProperties": "Proprietăți elemente",
     "total": "Total",
     "version": "Versiune",
     "versionCopy": "Clic pentru copiere",
@@ -521,5 +556,33 @@
     "description": "În prezent, numai <flowchartLink>Organigramele</flowchartLink>, <sequenceLink>Diagramele de secvență</sequenceLink> și <classLink>Diagramele de clasă</classLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Căutare rapidă",
+      "empty": "Niciun utilizător găsit"
+    },
+    "hint": {
+      "text": "Dă clic pe un utilizator pentru a-l urmări",
+      "followStatus": "În prezent urmărești acest utilizator",
+      "inCall": "Utilizatorul este angajat într-un apel vocal",
+      "micMuted": "Microfonul utilizatorul este pus pe mut",
+      "isSpeaking": "Utilizatorul vorbește"
+    }
+  },
+  "commandPalette": {
+    "title": "Paletă de comenzi",
+    "shortcuts": {
+      "select": "Selectare",
+      "confirm": "Confirmare",
+      "close": "Închidere"
+    },
+    "recents": "Utilizate recent",
+    "search": {
+      "placeholder": "Caută meniuri, comenzi și descoperă nestemate ascunse",
+      "noMatch": "Nicio comandă potrivită..."
+    },
+    "itemNotAvailable": "Comanda nu este disponibilă...",
+    "shortcutHint": "Pentru paleta de comenzi, folosește {{shortcut}}"
   }
 }

@@ -11,8 +11,8 @@
     "copyAsPng": "클립보드로 PNG 이미지 복사",
     "copyAsSvg": "클립보드로 SVG 이미지 복사",
     "copyText": "클립보드로 텍스트 복사",
-    "copySource": "소스코드를 클립보드로 복사",
-    "convertToCode": "코드로 변환",
+    "copySource": "클립보드에 복사하기",
+    "convertToCode": "코드로 변환하기",
     "bringForward": "앞으로 가져오기",
     "sendToBack": "맨 뒤로 보내기",
     "bringToFront": "맨 앞으로 가져오기",
@@ -21,7 +21,9 @@
     "copyStyles": "스타일 복사하기",
     "pasteStyles": "스타일 붙여넣기",
     "stroke": "선 색상",
+    "changeStroke": "",
     "background": "배경색",
+    "changeBackground": "",
     "fill": "채우기",
     "strokeWidth": "선 굵기",
     "strokeStyle": "선",
@@ -39,11 +41,11 @@
     "arrowhead_arrow": "화살표",
     "arrowhead_bar": "막대",
     "arrowhead_circle": "원",
-    "arrowhead_circle_outline": "원 (외곽선)",
+    "arrowhead_circle_outline": "원(윤곽선)",
     "arrowhead_triangle": "삼각형",
-    "arrowhead_triangle_outline": "삼각형 (외곽선)",
+    "arrowhead_triangle_outline": "삼각형(윤곽선)",
     "arrowhead_diamond": "마름모",
-    "arrowhead_diamond_outline": "마름모 (외곽선)",
+    "arrowhead_diamond_outline": "마름모(윤곽선)",
     "fontSize": "글자 크기",
     "fontFamily": "글꼴",
     "addWatermark": "\"Made with Excalidraw\" 추가",
@@ -72,6 +74,7 @@
     "canvasColors": "캔버스에서 사용되었음",
     "canvasBackground": "캔버스 배경",
     "drawingCanvas": "캔버스 그리기",
+    "clearCanvas": "",
     "layers": "레이어",
     "actions": "동작",
     "language": "언어",
@@ -80,16 +83,17 @@
     "untitled": "제목 없음",
     "name": "이름",
     "yourName": "이름 입력",
-    "madeWithExcalidraw": "Made with Excalidraw",
+    "madeWithExcalidraw": "Excalidraw에서 생성됨",
     "group": "그룹 생성",
     "ungroup": "그룹 해제",
     "collaborators": "공동 작업자",
-    "showGrid": "그리드 보기",
+    "toggleGrid": "",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
     "libraryLoadingMessage": "라이브러리 불러오는 중…",
     "libraries": "라이브러리 찾기",
     "loadingScene": "화면 불러오는 중…",
+    "loadScene": "",
     "align": "정렬",
     "alignTop": "상단 정렬",
     "alignBottom": "하단 정렬",
@@ -105,7 +109,8 @@
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
-    "toggleTheme": "테마 전환",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "개인 라이브러리",
     "excalidrawLib": "Excalidraw 라이브러리",
     "decreaseFontSize": "폰트 사이즈 줄이기",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "선 수정하기",
-      "exit": "선 편집기 종료"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "잠금",
@@ -137,8 +142,15 @@
     "selectAllElementsInFrame": "프레임의 모든 요소 선택",
     "removeAllElementsFromFrame": "프레임의 모든 요소 삭제",
     "eyeDropper": "캔버스에서 색상 고르기",
-    "textToDiagram": "텍스트를 다이어그램으로",
-    "prompt": "프롬프트"
+    "textToDiagram": "텍스트를 표로 만들기",
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -171,6 +183,7 @@
     "fullScreen": "전체화면",
     "darkMode": "다크 모드",
     "lightMode": "밝은 모드",
+    "systemMode": "",
     "zenMode": "젠 모드",
     "objectsSnapMode": "다른 요소들에 정렬시키기",
     "exitZenMode": "젠 모드 종료하기",
@@ -212,12 +225,12 @@
     "fileTooBig": "파일이 너무 큽니다. 최대 크기는 {{maxSize}} 입니다.",
     "svgImageInsertError": "SVG 이미지를 삽입하지 못했습니다. SVG 문법이 유효하지 않은 것 같습니다.",
     "failedToFetchImage": "이미지를 가져오는데 실패했습니다.",
-    "invalidSVGString": "유효하지 않은 SVG입니다.",
     "cannotResolveCollabServer": "협업 서버에 접속하는데 실패했습니다. 페이지를 새로고침하고 다시 시도해보세요.",
     "importLibraryError": "라이브러리를 불러오지 못했습니다.",
+    "saveLibraryError": "",
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
-    "imageToolNotSupported": "이미지가 비활성화 되었습니다.",
+    "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "귀하께서는 <bold>강력한 지문 차단 설정</bold>이 활성화된 Brave browser를 사용하고 계신 것 같습니다.",
       "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
@@ -226,12 +239,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
-      "iframe": "IFrame 요소들은 라이브러리에 추가할 수 없습니다.",
+      "iframe": "",
       "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
     },
-    "asyncPasteFailedOnRead": "붙여넣는데 실패했습니다. (시스템 클립보드를 읽는데 실패했습니다)",
-    "asyncPasteFailedOnParse": "붙여넣는데 실패했습니다.",
-    "copyToSystemClipboardFailed": "클립보드로 복사하는데 실패했습니다."
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "선택",
@@ -246,16 +259,32 @@
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
     "penMode": "펜 모드 - 터치 방지",
-    "link": "선택한 도형에 대해서 링크를 추가/업데이트",
+    "link": "",
     "eraser": "지우개",
     "frame": "프레임 도구",
-    "magicframe": "와이어프레임을 코드로",
+    "magicframe": "",
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
-    "mermaidToExcalidraw": "Mermaid에서 불러오기",
-    "magicSettings": "AI 설정"
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -299,9 +328,12 @@
     "openIssueMessage": "저희는 화면 정보를 오류에 포함하지 않도록 매우 주의하고 있습니다. 혹시 화면에 민감한 내용이 없다면 이곳에 업로드를 고려해주세요.<button>버그 트래커</button> 아래 정보를 GitHub 이슈에 복사 및 붙여넣기해 주세요.",
     "sceneContent": "화면 내용:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "현재 화면에 공동 작업자를 초대해 협업할 수 있습니다.",
-    "desc_privacy": "안심하세요, 세션은 종단 간 암호화를 사용하므로 당신의 작업은 비공개로 유지되며 서버조차도 작업 내용을 알 수 없습니다.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "세션 시작",
     "button_stopSession": "세션 중단",
     "desc_inProgressIntro": "실시간 협업 세션이 진행 중입니다.",
@@ -410,8 +442,8 @@
       "copyPngToClipboard": "클립보드로 PNG 복사"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "클립보드로 복사"
     }
   },
@@ -427,7 +459,10 @@
     "scene": "화면",
     "selected": "선택됨",
     "storage": "저장공간",
-    "title": "덕후들을 위한 통계",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "합계",
     "version": "버전",
     "versionCopy": "복사하려면 클릭",
@@ -497,7 +532,7 @@
         "description": "나중에 다시 불러올 수 있도록 화면 데이터를 내보냅니다."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Excalidraw+로 내보내기",
         "description": "화면을 당신의 Excalidraw+ 작업 공간으로 저장합니다."
       }
@@ -516,10 +551,38 @@
     }
   },
   "mermaid": {
-    "title": "Mermaid에서 불러오기",
-    "button": "삽입하기",
-    "description": "지금은 <flowchartLink>순서도</flowchartLink>,<sequenceLink> 시퀀스</sequenceLink>, <classLink>클래스 </classLink>다이어그램만 지원합니다. 다른 형식들은 Excalidraw에서는 이미지로 표시됩니다.",
-    "syntax": "Mermaid 구문",
-    "preview": "미리보기"
+    "title": "",
+    "button": "",
+    "description": "",
+    "syntax": "",
+    "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "빠른 검색",
+      "empty": "검색된 사용자가 없습니다"
+    },
+    "hint": {
+      "text": "유저를 클릭해서 따라가기",
+      "followStatus": "이 사용자를 따라가고 있습니다",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

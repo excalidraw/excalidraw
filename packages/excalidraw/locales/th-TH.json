@@ -21,7 +21,9 @@
     "copyStyles": "คัดลอกรูปแบบ",
     "pasteStyles": "วางรูปแบบ",
     "stroke": "เส้นขอบ",
+    "changeStroke": "",
     "background": "พื้นหลัง",
+    "changeBackground": "",
     "fill": "เติมสี",
     "strokeWidth": "น้ำหนักเส้นขอบ",
     "strokeStyle": "รูปแบบเส้น",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "",
     "drawingCanvas": "",
+    "clearCanvas": "",
     "layers": "",
     "actions": "การกระทำ",
     "language": "ภาษา",
@@ -84,12 +87,13 @@
     "group": "จัดกลุ่ม",
     "ungroup": "ยกเลิกการจัดกลุ่ม",
     "collaborators": "",
-    "showGrid": "แสดงเส้นตาราง",
+    "toggleGrid": "",
     "addToLibrary": "เพิ่มไปในคลัง",
     "removeFromLibrary": "นำออกจากคลัง",
     "libraryLoadingMessage": "กำลังโหลดคลัง...",
     "libraries": "",
     "loadingScene": "กำลังโหลดฉาก",
+    "loadScene": "",
     "align": "จัดตำแหน่ง",
     "alignTop": "จัดชิดด้านบน",
     "alignBottom": "จัดชิดด้านล่าง",
@@ -105,7 +109,8 @@
     "share": "แชร์",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "สลับธีม",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "คลังของฉัน",
     "excalidrawLib": "คลังของ Excalidraw",
     "decreaseFontSize": "ลดขนาดตัวอักษร",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "แก้ไขเส้น",
-      "exit": ""
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "ล็อก",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
@@ -171,6 +183,7 @@
     "fullScreen": "เต็มหน้าจอ",
     "darkMode": "โหมดกลางคืน",
     "lightMode": "โหมดกลางวัน",
+    "systemMode": "",
     "zenMode": "โหมด Zen",
     "objectsSnapMode": "",
     "exitZenMode": "ออกจากโหมด Zen",
@@ -212,9 +225,9 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "ไฟล์ SVG ผิดพลาด",
     "cannotResolveCollabServer": "ไม่สามารถเชื่อต่อกับ collab เซิร์ฟเวอร์ได้ โปรดลองโหลดหน้านี้ใหม่และลองอีกครั้ง",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -257,6 +270,22 @@
     "mermaidToExcalidraw": "",
     "magicSettings": ""
   },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
+  },
   "headings": {
     "canvasActions": "",
     "selectedShapeActions": "",
@@ -298,6 +327,9 @@
     "trackedToSentry": "",
     "openIssueMessage": "",
     "sceneContent": ""
+  },
+  "shareDialog": {
+    "or": ""
   },
   "roomDialog": {
     "desc_intro": "",
@@ -410,8 +442,8 @@
       "copyPngToClipboard": "คัดลอก PNG ไปยังคลิปบอร์ด"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "คัดลอกไปยังคลิปบอร์ด"
     }
   },
@@ -427,7 +459,10 @@
     "scene": "",
     "selected": "",
     "storage": "",
+    "fullTitle": "",
     "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "",
     "version": "",
     "versionCopy": "",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

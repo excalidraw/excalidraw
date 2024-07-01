@@ -21,7 +21,9 @@
     "copyStyles": "Kopiraj slog",
     "pasteStyles": "Prilepi slog",
     "stroke": "Poteza",
+    "changeStroke": "Spremeni barvo poteze",
     "background": "Ozadje",
+    "changeBackground": "Spremeni barvo ozadja",
     "fill": "Polnilo",
     "strokeWidth": "Debelina poteze",
     "strokeStyle": "Slog poteze",
@@ -72,6 +74,7 @@
     "canvasColors": "Uporabljeno na platnu",
     "canvasBackground": "Ozadje platna",
     "drawingCanvas": "Platno za risanje",
+    "clearCanvas": "Počisti platno",
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
@@ -84,12 +87,13 @@
     "group": "Združi izbor",
     "ungroup": "Razdruži izbor",
     "collaborators": "Sodelavci",
-    "showGrid": "Prikaži mrežo",
+    "toggleGrid": "Preklopi mrežo",
     "addToLibrary": "Dodaj v knjižnico",
     "removeFromLibrary": "Odstrani iz knjižnice",
     "libraryLoadingMessage": "Nalaganje knjižnice ...",
     "libraries": "Brskaj po knjižnicah",
     "loadingScene": "Nalaganje scene...",
+    "loadScene": "Naloži sceno iz datoteke",
     "align": "Poravnava",
     "alignTop": "Poravnaj na vrh",
     "alignBottom": "Poravnaj na dno",
@@ -105,7 +109,8 @@
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
-    "toggleTheme": "Obrni temo",
+    "toggleTheme": "Preklapljanje med svetlo/temno temo",
+    "theme": "Tema",
     "personalLib": "Osebna knjižnica",
     "excalidrawLib": "Knjižnica Excalidraw",
     "decreaseFontSize": "Zmanjšaj velikost pisave",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Uredi črto",
-      "exit": "Zapri urejanje črte"
+      "editArrow": "Uredi puščico"
     },
     "elementLock": {
       "lock": "Zakleni",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
     "eyeDropper": "Izberi barvo s platna",
     "textToDiagram": "Besedilo v diagram",
-    "prompt": "Poziv"
+    "prompt": "Poziv",
+    "followUs": "Sledi nas",
+    "discordChat": "Klepet v Discordu",
+    "zoomToFitViewport": "Približaj na vidno polje",
+    "zoomToFitSelection": "Približaj na izbor",
+    "zoomToFit": "Približaj na vse elemente",
+    "installPWA": "Namesti Excalidraw lokalno (PWA)",
+    "autoResize": "Omogoči samodejno spreminjanje velikosti besedila"
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -171,6 +183,7 @@
     "fullScreen": "Celozaslonski način",
     "darkMode": "Temni način",
     "lightMode": "Svetli način",
+    "systemMode": "Sistemski način",
     "zenMode": "Način Zen",
     "objectsSnapMode": "Pripenjanje na predmete",
     "exitZenMode": "Zapri način Zen",
@@ -212,9 +225,9 @@
     "fileTooBig": "Datoteka je prevelika. Največja dovoljena velikost je {{maxSize}}.",
     "svgImageInsertError": "Vstavljanje slike SVG ni uspelo. Oznake SVG so videti neveljavne.",
     "failedToFetchImage": "Pridobivanje slike ni uspelo.",
-    "invalidSVGString": "Neveljaven SVG.",
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
+    "saveLibraryError": "Knjižnice ni bilo mogoče shraniti v shrambo. Prosimo, shranite svojo knjižnico v datoteko lokalno, da ne boste izgubili sprememb.",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
     "imageToolNotSupported": "Slike so onemogočene.",
@@ -246,7 +259,7 @@
     "library": "Knjižnica",
     "lock": "Ohrani izbrano orodje aktivno po risanju",
     "penMode": "Način peresa - prepreči dotik",
-    "link": "Dodaj/posodobi povezavo za izbrano obliko",
+    "link": "Dodaj / posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
     "magicframe": "Žični okvir v kodo",
@@ -256,6 +269,22 @@
     "extraTools": "Več orodij",
     "mermaidToExcalidraw": "Mermaid v Excalidraw",
     "magicSettings": "Nastavitve AI"
+  },
+  "element": {
+    "rectangle": "Pravokotnik",
+    "diamond": "Diamant",
+    "ellipse": "Elipsa",
+    "arrow": "Puščica",
+    "line": "Črta",
+    "freedraw": "Prosto risanje",
+    "text": "Besedilo",
+    "image": "Slika",
+    "group": "Skupina",
+    "frame": "Okvir",
+    "magicframe": "Žični okvir v kodo",
+    "embeddable": "Spletna vdelava",
+    "selection": "Izbor",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem <button>sledilniku hroščev.</button> Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
     "sceneContent": "Vsebina scene:"
   },
+  "shareDialog": {
+    "or": "Ali"
+  },
   "roomDialog": {
-    "desc_intro": "Na vašo trenutno sceno lahko povabite osebe, ki bodo sodelovale z vami.",
-    "desc_privacy": "Brez skrbi. Seja uporablja šifriranje od konca do konca, tako da bo vse, kar narišete, ostalo zasebno. Niti naš strežnik ne bo mogel videti, kaj si izmislite.",
+    "desc_intro": "Povabite ljudi k sodelovanju pri vaši risbi.",
+    "desc_privacy": "Ne skrbite, seja je šifrirana od konca do konca in popolnoma zasebna. Niti naš strežnik ne vidi, kaj rišete.",
     "button_startSession": "Začni sejo",
     "button_stopSession": "Ustavi sejo",
     "desc_inProgressIntro": "Seja sodelovanja v živo je v teku.",
@@ -427,7 +459,10 @@
     "scene": "Scena",
     "selected": "Izbrano",
     "storage": "Shramba",
-    "title": "Statistika za napredne uporabnike",
+    "fullTitle": "Statistika in lastnosti elementov",
+    "title": "Statistika",
+    "generalStats": "Splošna statistika",
+    "elementProperties": "Lastnosti elementov",
     "total": "Skupaj",
     "version": "Različica",
     "versionCopy": "Kliknite za kopiranje",
@@ -521,5 +556,33 @@
     "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink>, <sequenceLink>diagrami zaporedij</sequenceLink> in <classLink>Razredni diagrami</classLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Hitro iskanje",
+      "empty": "Ni najdenih uporabnikov"
+    },
+    "hint": {
+      "text": "Klikni na uporabnika za sledenje",
+      "followStatus": "Trenutno slediš temu uporabniku",
+      "inCall": "Uporabnik je v glasovnem klicu",
+      "micMuted": "Uporabnikov mikrofon je izklopljen",
+      "isSpeaking": "Uporabnik govori"
+    }
+  },
+  "commandPalette": {
+    "title": "Paleta ukazov",
+    "shortcuts": {
+      "select": "Izberi",
+      "confirm": "Potrdi",
+      "close": "Zapri"
+    },
+    "recents": "Nedavno uporabljeno",
+    "search": {
+      "placeholder": "Išči po menijih, ukazih in odkrij skrite funkcije",
+      "noMatch": "Ni ustreznih ukazov ..."
+    },
+    "itemNotAvailable": "Ukaz ni na voljo ...",
+    "shortcutHint": "Za paleto ukazov uporabi {{shortcut}}"
   }
 }

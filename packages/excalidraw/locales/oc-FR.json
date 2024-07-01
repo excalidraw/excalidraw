@@ -11,8 +11,8 @@
     "copyAsPng": "Copiar al quichapapièrs coma PNG",
     "copyAsSvg": "Copiar al quichapapièrs coma SVG",
     "copyText": "Copiar al quichapapièrs coma tèxt",
-    "copySource": "",
-    "convertToCode": "",
+    "copySource": "Copiar la font al quichapapièrs",
+    "convertToCode": "Convertir lo còdi",
     "bringForward": "En avant",
     "sendToBack": "En arrièr",
     "bringToFront": "A l’endavant",
@@ -21,7 +21,9 @@
     "copyStyles": "Copiar los estiles",
     "pasteStyles": "Pegar los estils",
     "stroke": "Contorn",
+    "changeStroke": "",
     "background": "Rèireplan",
+    "changeBackground": "",
     "fill": "Empliment",
     "strokeWidth": "Largor de contorn",
     "strokeStyle": "Estil de contorn",
@@ -38,12 +40,12 @@
     "arrowhead_none": "Cap",
     "arrowhead_arrow": "Sageta",
     "arrowhead_bar": "Barra",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Cèrcle",
+    "arrowhead_circle_outline": "Cèrcle (contorn)",
     "arrowhead_triangle": "Triangle",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Triangle (contirn)",
+    "arrowhead_diamond": "Lausange",
+    "arrowhead_diamond_outline": "Lausange (contorn)",
     "fontSize": "Talha polissa",
     "fontFamily": "Familha de polissa",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
@@ -72,6 +74,7 @@
     "canvasColors": "Utilizada suls canabassses",
     "canvasBackground": "Rèireplan del canabàs",
     "drawingCanvas": "Zòna de dessenh",
+    "clearCanvas": "Escafar canabàs",
     "layers": "Calques",
     "actions": "Accions",
     "language": "Lenga",
@@ -84,12 +87,13 @@
     "group": "Gropar la seleccion",
     "ungroup": "Desunir la seleccion",
     "collaborators": "Collaborators",
-    "showGrid": "Afichar la gresilha",
+    "toggleGrid": "",
     "addToLibrary": "Apondre a la bibliotèca",
     "removeFromLibrary": "Suprimir de la bibliotèca",
     "libraryLoadingMessage": "Cargament de la bibliotèca…",
     "libraries": "Percórrer las bibliotècas",
     "loadingScene": "Cargament de la scèna…",
+    "loadScene": "",
     "align": "Alinhament",
     "alignTop": "Alinhar ennaut",
     "alignBottom": "Alinhar enbàs",
@@ -105,7 +109,8 @@
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
-    "toggleTheme": "Alternar tèma",
+    "toggleTheme": "",
+    "theme": "Tèma",
     "personalLib": "Bibliotèca personala",
     "excalidrawLib": "Bibliotèca Excalidraw",
     "decreaseFontSize": "Reduire talha polissa",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Modificar la linha",
-      "exit": "Sortir de l’editor de linha"
+      "editArrow": "Modificar sageta"
     },
     "elementLock": {
       "lock": "Verrolhar",
@@ -137,8 +142,15 @@
     "selectAllElementsInFrame": "Seleccionar totes los elements del quadre",
     "removeAllElementsFromFrame": "Tirar totes los elements d’al quadre",
     "eyeDropper": "Prendre la color a partir d’un canabàs",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "Tèxte pel diagram",
+    "prompt": "Fenèstra de dialòg",
+    "followUs": "Seguissètz-nos",
+    "discordChat": "Chat Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -171,6 +183,7 @@
     "fullScreen": "Ecran complèt",
     "darkMode": "Mòde escur",
     "lightMode": "Mòde clar",
+    "systemMode": "Mòde sistèma",
     "zenMode": "Mòde escur",
     "objectsSnapMode": "Ancorar als objèctes",
     "exitZenMode": "Sortir del mòde zen",
@@ -212,16 +225,16 @@
     "fileTooBig": "Fichièr tròp pesuc. La talha maximala autorizada es {{maxSize}}.",
     "svgImageInsertError": "Insercion d’imatge SVG impossibla. Las balisas SVG semblan invalidas.",
     "failedToFetchImage": "Fracàs de la recuperacion de l’imatge.",
-    "invalidSVGString": "SVG invalid.",
     "cannotResolveCollabServer": "Connexion impossibla al servidor collab. Mercés de recargar la pagina e tornar ensajar.",
     "importLibraryError": "Impossible de cargar la bibliotèca",
-    "collabSaveFailed": "",
-    "collabSaveFailed_sizeExceeded": "",
-    "imageToolNotSupported": "",
+    "saveLibraryError": "",
+    "collabSaveFailed": "Enregistrament impossible dins la basa de donada del backend. Se lo problèma persistís, deuriatz enregistrar lo fichièr localament per vos assegurar que perdretz pas vòstre trabalh.",
+    "collabSaveFailed_sizeExceeded": "Enregistrament impossible dins la basa de donada del backend, lo canabàs sembla tròp pesuc. Deuriatz enregistrar lo fichièr localament per vos assegurar que perdretz pas vòstre trabalh.",
+    "imageToolNotSupported": "Los imatges son desactivats.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
+      "line1": "Semblatz utilizar lo navegador Brave amb lo paramètre <bold>Blocatge agressiu de las emprentas numericas</bold> activat.",
+      "line2": "Aquò pòt menar a copar <bold>l’element Tèxte</bold> de vòstres dessenhs.",
+      "line3": "Recomandam fòrt de desactivar aqueste paramètre. Podètz seguir <link>aquestas etapas</link> per veire cossí o far.",
       "line4": ""
     },
     "libraryElementTypeError": {
@@ -229,7 +242,7 @@
       "iframe": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "Empegatge impossible (lectura impossibla a partir del quichapapièrs).",
+    "asyncPasteFailedOnRead": "",
     "asyncPasteFailedOnParse": "Empegatge impossible.",
     "copyToSystemClipboardFailed": "Còpia impossibla al quichapapièrs."
   },
@@ -246,7 +259,7 @@
     "library": "Bibliotèca",
     "lock": "Mantenir activa l’aisina aprèp dessenhar",
     "penMode": "Mòde estilo - empachar lo contact",
-    "link": "Apondre/Actualizar lo ligam per una fòrma seleccionada",
+    "link": "",
     "eraser": "Goma",
     "frame": "Esplech quadre",
     "magicframe": "",
@@ -255,7 +268,23 @@
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
     "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
-    "magicSettings": ""
+    "magicSettings": "Paramètres IA"
+  },
+  "element": {
+    "rectangle": "Rectangle",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "Sageta",
+    "line": "Linha",
+    "freedraw": "",
+    "text": "Tèxt",
+    "image": "Imatge",
+    "group": "Grop",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "Seleccion",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Accions del canabàs",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Èrem plan prudents per inclure pas d’informacions de la scèna vòstra sus l’error. Se vòstra scèna es pas privada, volgatz considerar de perseguir sus nòstre <button>traçadors d’avarias.</button> Volgatz inclure las informacions çai-jos en las copiant e pegant a l’issue GitHub.",
     "sceneContent": "Contengut de la scèna :"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Podètz convidar lo monde a vòstra scèna actuala per participar amb vos.",
-    "desc_privacy": "Vos en fagatz pas, la session utiliza lo chiframent del cap a la fin, çò que dessenetz demorarà privat. Mai nòstres servidors poiràn pas veire vòstra creacion.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Començar la session",
     "button_stopSession": "Arrestar la session",
     "desc_inProgressIntro": "La session de collaboracion es ara en cors.",
@@ -335,7 +367,7 @@
     "drag": "lisar",
     "editor": "Editor",
     "editLineArrowPoints": "",
-    "editText": "Modificar lo tèxte / apondre etiqueta",
+    "editText": "",
     "github": "Problèma trobat ? Senhalatz-lo",
     "howto": "Seguissètz nòstras guidas",
     "or": "o",
@@ -427,7 +459,10 @@
     "scene": "Scèna",
     "selected": "Seleccionat",
     "storage": "Emmagazinatge",
-    "title": "Estatisticas pels nerds",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Clicar per copiar",
@@ -489,7 +524,7 @@
       "exportToImage": {
         "title": "Exportar coma imatge",
         "button": "Exportar coma imatge",
-        "description": ""
+        "description": "Exportar las donadas de la scèna coma un imatge que podètz importar mai tard."
       },
       "saveToDisk": {
         "title": "Salvar al disc",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "Sintaxi Mermaid",
     "preview": "Apercebut"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Recèrca rapida",
+      "empty": "Cap d’utilizaire pas trobat"
+    },
+    "hint": {
+      "text": "Clicar l’utilizaire per lo seguir",
+      "followStatus": "Seguissètz actualament aqueste utilizaire",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": "La persona parla"
+    }
+  },
+  "commandPalette": {
+    "title": "Paleta de comanda",
+    "shortcuts": {
+      "select": "Seleccionar",
+      "confirm": "Confirmar",
+      "close": "Tampar"
+    },
+    "recents": "Utilizada recentament",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "La comanda es pas disponibla...",
+    "shortcutHint": "Per contrarotlar la paleta, utilizatz {{shortcut}}"
   }
 }

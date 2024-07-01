@@ -21,7 +21,9 @@
     "copyStyles": "Kopier stiler",
     "pasteStyles": "Lim inn stiler",
     "stroke": "Strek",
+    "changeStroke": "",
     "background": "Bakgrunn",
+    "changeBackground": "",
     "fill": "Fyll",
     "strokeWidth": "Strektykkelse",
     "strokeStyle": "Strekstil",
@@ -48,10 +50,10 @@
     "fontFamily": "Fontfamilie",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
     "handDrawn": "Håndtegnet",
-    "normal": "Normal",
+    "normal": "",
     "code": "Kode",
     "small": "Liten",
-    "medium": "Medium",
+    "medium": "",
     "large": "Stor",
     "veryLarge": "Svært stor",
     "solid": "Helfarge",
@@ -72,6 +74,7 @@
     "canvasColors": "Brukes på lerretet",
     "canvasBackground": "Lerretsbakgrunn",
     "drawingCanvas": "Lerret",
+    "clearCanvas": "",
     "layers": "Lag",
     "actions": "Handlinger",
     "language": "Språk",
@@ -84,12 +87,13 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
-    "showGrid": "Vis rutenett",
+    "toggleGrid": "",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek…",
     "libraries": "Bla gjennom biblioteker",
     "loadingScene": "Laster inn scene…",
+    "loadScene": "",
     "align": "Juster",
     "alignTop": "Juster øverst",
     "alignBottom": "Juster nederst",
@@ -105,7 +109,8 @@
     "share": "Del",
     "showStroke": "Vis fargevelger for kantfarge",
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
-    "toggleTheme": "Veksle tema",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "Personlig bibliotek",
     "excalidrawLib": "Excalidraw-bibliotek",
     "decreaseFontSize": "Reduser skriftstørrelse",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Rediger linje",
-      "exit": "Avslutt linjeredigering"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Lås",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "Fjern alle elementer fra rammen",
     "eyeDropper": "Velg farge fra lerretet",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
@@ -171,6 +183,7 @@
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
     "lightMode": "Lys modus",
+    "systemMode": "",
     "zenMode": "Zen-modus",
     "objectsSnapMode": "",
     "exitZenMode": "Avslutt zen-modus",
@@ -212,9 +225,9 @@
     "fileTooBig": "Filen er for stor. Maksimal tillatt størrelse er {{maxSize}}.",
     "svgImageInsertError": "Kunne ikke sette inn SVG-bilde. SVG-koden ser ugyldig ut.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Ugyldig SVG.",
     "cannotResolveCollabServer": "Kunne ikke koble til samarbeidsserveren. Vennligst oppdater siden og prøv på nytt.",
     "importLibraryError": "Kunne ikke laste bibliotek",
+    "saveLibraryError": "",
     "collabSaveFailed": "Kan ikke lagre i backend-databasen. Hvis problemer vedvarer, bør du lagre filen lokalt for å sikre at du ikke mister arbeidet.",
     "collabSaveFailed_sizeExceeded": "Kunne ikke lagre til backend-databasen, lerretet ser ut til å være for stort. Du bør lagre filen lokalt for å sikre at du ikke mister arbeidet ditt.",
     "imageToolNotSupported": "",
@@ -238,7 +251,7 @@
     "image": "Sett inn bilde",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
-    "ellipse": "Ellipse",
+    "ellipse": "",
     "arrow": "Pil",
     "line": "Linje",
     "freedraw": "Tegn",
@@ -246,7 +259,7 @@
     "library": "Bibliotek",
     "lock": "Behold merket verktøy som aktivt",
     "penMode": "Pennemodus - forhindre berøring",
-    "link": "Legg til / oppdater link for en valgt figur",
+    "link": "",
     "eraser": "Viskelær",
     "frame": "Rammeverktøy",
     "magicframe": "",
@@ -256,6 +269,22 @@
     "extraTools": "Flere verktøy",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Handlinger: lerret",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Vi er veldig nøye med å ikke inkludere dine scene-opplysninger i feilen. Hvis din scene ikke er privat, vurder å følge opp i vårt <button>feilrapporteringssystem.</button> Ta med opplysningene nedenfor ved å kopiere og lime inn i GitHub-saken.",
     "sceneContent": "Scene-innhold:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Du kan invitere personer til scenen din for å samarbeide med deg.",
-    "desc_privacy": "Ta det med ro, sesjonen bruker ende-til-ende-kryptering, så alt du tegner forblir privat. Ikke en gang serveren vår kan se hva du lager.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Start økt",
     "button_stopSession": "Stopp sesjon",
     "desc_inProgressIntro": "Sanntids-samarbeidsøkt er nå i gang.",
@@ -410,8 +442,8 @@
       "copyPngToClipboard": "Kopier PNG til utklippstavlen"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Kopier til utklippstavle"
     }
   },
@@ -421,13 +453,16 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "element": "Element",
+    "element": "",
     "elements": "Elementer",
     "height": "Høyde",
-    "scene": "Scene",
+    "scene": "",
     "selected": "Valgt",
     "storage": "Lagring",
-    "title": "Statistikk for nerder",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Totalt",
     "version": "Versjon",
     "versionCopy": "Klikk for å kopiere",
@@ -497,7 +532,7 @@
         "description": "Eksporter scene-dataene til en fil som du kan importere fra senere."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Eksporter til Excalidraw+",
         "description": "Lagre scenen til ditt Excalidraw+-arbeidsområde."
       }
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

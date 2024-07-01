@@ -21,7 +21,9 @@
     "copyStyles": "Formatierung kopieren",
     "pasteStyles": "Formatierung übernehmen",
     "stroke": "Strich",
+    "changeStroke": "Strichfarbe ändern",
     "background": "Hintergrund",
+    "changeBackground": "Hintergrundfarbe ändern",
     "fill": "Füllung",
     "strokeWidth": "Strichstärke",
     "strokeStyle": "Konturstil",
@@ -72,6 +74,7 @@
     "canvasColors": "Auf Leinwand verwendet",
     "canvasBackground": "Zeichenflächenhintergrund",
     "drawingCanvas": "Leinwand",
+    "clearCanvas": "Zeichenfläche löschen",
     "layers": "Ebenen",
     "actions": "Aktionen",
     "language": "Sprache",
@@ -84,12 +87,13 @@
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
-    "showGrid": "Raster anzeigen",
+    "toggleGrid": "Raster umschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
     "libraryLoadingMessage": "Lade Bibliothek…",
     "libraries": "Bibliotheken durchsuchen",
     "loadingScene": "Lade Zeichnung…",
+    "loadScene": "Szene aus Datei laden",
     "align": "Ausrichten",
     "alignTop": "Obere Kanten",
     "alignBottom": "Untere Kanten",
@@ -105,7 +109,8 @@
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
-    "toggleTheme": "Design umschalten",
+    "toggleTheme": "Helles/dunkles Design umschalten",
+    "theme": "Design",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw Bibliothek",
     "decreaseFontSize": "Schriftgröße verkleinern",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Linie bearbeiten",
-      "exit": "Linieneditor verlassen"
+      "editArrow": "Pfeil bearbeiten"
     },
     "elementLock": {
       "lock": "Sperren",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "Alle Elemente aus dem Rahmen entfernen",
     "eyeDropper": "Farbe von der Zeichenfläche auswählen",
     "textToDiagram": "Text zu Diagramm",
-    "prompt": "Eingabe"
+    "prompt": "Eingabe",
+    "followUs": "Folge uns",
+    "discordChat": "Discord-Chat",
+    "zoomToFitViewport": "Zoom auf Ansicht anpassen",
+    "zoomToFitSelection": "Zoom auf Auswahl anpassen",
+    "zoomToFit": "Zoom auf alle Elemente anpassen",
+    "installPWA": "Excalidraw lokal installieren (PWA)",
+    "autoResize": "Aktiviere automatische Textgrößenanpassung"
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
@@ -171,6 +183,7 @@
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
     "lightMode": "Helles Design",
+    "systemMode": "System-Modus",
     "zenMode": "Zen-Modus",
     "objectsSnapMode": "Einrasten an Objekten",
     "exitZenMode": "Zen-Modus verlassen",
@@ -212,9 +225,9 @@
     "fileTooBig": "Die Datei ist zu groß. Die maximal zulässige Größe ist {{maxSize}}.",
     "svgImageInsertError": "SVG-Bild konnte nicht eingefügt werden. Das SVG-Markup sieht ungültig aus.",
     "failedToFetchImage": "Bild konnte nicht abgerufen werden.",
-    "invalidSVGString": "Ungültige SVG.",
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
+    "saveLibraryError": "Bibliothek konnte nicht gespeichert werden. Bitte speichere deine Bibliothek lokal in einer Datei, um sicherzustellen, dass keine Änderungen verloren gehen.",
     "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
     "imageToolNotSupported": "Bilder sind deaktiviert.",
@@ -256,6 +269,22 @@
     "extraTools": "Weitere Werkzeuge",
     "mermaidToExcalidraw": "Mermaid zu Excalidraw",
     "magicSettings": "KI-Einstellungen"
+  },
+  "element": {
+    "rectangle": "Rechteck",
+    "diamond": "Raute",
+    "ellipse": "Ellipse",
+    "arrow": "Pfeil",
+    "line": "Linie",
+    "freedraw": "Frei zeichnen",
+    "text": "Text",
+    "image": "Bild",
+    "group": "Gruppe",
+    "frame": "Rahmen",
+    "magicframe": "Wireframe zu Code",
+    "embeddable": "Web-Einbettung",
+    "selection": "Auswahl",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Aktionen für Zeichenfläche",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Wir waren sehr vorsichtig und haben deine Zeichnungsinformationen nicht in die Fehlerinformationen aufgenommen. Wenn deine Zeichnung nicht privat ist, unterstütze uns bitte über unseren <button>Bug-Tracker</button>. Bitte teile die unten stehenden Informationen mit uns im GitHub Issue (Kopieren und Einfügen).",
     "sceneContent": "Zeichnungsinhalt:"
   },
+  "shareDialog": {
+    "or": "Oder"
+  },
   "roomDialog": {
-    "desc_intro": "Du kannst Leute zu deiner aktuellen Zeichnung einladen um mit ihnen zusammenzuarbeiten.",
-    "desc_privacy": "Keine Sorge, die Sitzung nutzt eine Ende-zu-Ende-Verschlüsselung. Alles was du zeichnest, bleibt privat. Auch unser Server sieht nicht, was du dir einfallen lässt.",
+    "desc_intro": "Lade Leute ein, an deiner Zeichnung mitzuarbeiten.",
+    "desc_privacy": "Keine Sorge, die Sitzung ist Ende-zu-Ende verschlüsselt und vollständig privat. Nicht einmal unser Server kann sehen, was du zeichnest.",
     "button_startSession": "Sitzung starten",
     "button_stopSession": "Sitzung beenden",
     "desc_inProgressIntro": "Die Live-Sitzung wird nun ausgeführt.",
@@ -427,7 +459,10 @@
     "scene": "Zeichnung",
     "selected": "Ausgewählt",
     "storage": "Speicher",
-    "title": "Statistiken für Nerds",
+    "fullTitle": "Statistik & Elementeigenschaften",
+    "title": "Statistiken",
+    "generalStats": "Allgemeine Statistiken",
+    "elementProperties": "Elementeigenschaften",
     "total": "Gesamt",
     "version": "Version",
     "versionCopy": "Zum Kopieren klicken",
@@ -521,5 +556,33 @@
     "description": "Derzeit werden nur <flowchartLink>Flussdiagramme</flowchartLink>, <sequenceLink>Sequenzdiagramme</sequenceLink> und <classLink>Klassendiagramme</classLink> unterstützt. Die anderen Typen werden als Bild in Excalidraw dargestellt.",
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "Schnelle Suche",
+      "empty": "Keine Benutzer gefunden"
+    },
+    "hint": {
+      "text": "Klicke auf Benutzer um zu folgen",
+      "followStatus": "Du folgst derzeit diesem Benutzer",
+      "inCall": "Benutzer ist in einem Sprachanruf",
+      "micMuted": "Mikrofon des Benutzers ist stumm geschaltet",
+      "isSpeaking": "Benutzer spricht"
+    }
+  },
+  "commandPalette": {
+    "title": "Befehlspalette",
+    "shortcuts": {
+      "select": "Auswählen",
+      "confirm": "Bestätigen",
+      "close": "Schließen"
+    },
+    "recents": "Zuletzt verwendet",
+    "search": {
+      "placeholder": "Suche in Menüs und Befehlen, entdecke versteckte Funktionen",
+      "noMatch": "Keine passenden Befehle..."
+    },
+    "itemNotAvailable": "Befehl ist nicht verfügbar...",
+    "shortcutHint": "Benutze {{shortcut}} für Befehlspalette"
   }
 }

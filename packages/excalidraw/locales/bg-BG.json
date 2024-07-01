@@ -21,7 +21,9 @@
     "copyStyles": "Копирайте стилове",
     "pasteStyles": "Постави стилове",
     "stroke": "Щрих",
+    "changeStroke": "",
     "background": "Фон",
+    "changeBackground": "",
     "fill": "Наситеност",
     "strokeWidth": "Ширина на щриха",
     "strokeStyle": "Стил на линия",
@@ -72,6 +74,7 @@
     "canvasColors": "Използван на платно",
     "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
+    "clearCanvas": "",
     "layers": "Слоеве",
     "actions": "Действия",
     "language": "Език",
@@ -84,12 +87,13 @@
     "group": "Групирай селекцията",
     "ungroup": "Спри групирането на селекцията",
     "collaborators": "Сътрудници",
-    "showGrid": "Показване на мрежа",
+    "toggleGrid": "",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
     "libraryLoadingMessage": "Зареждане на библиотеката…",
     "libraries": "Разглеждане на библиотеките",
     "loadingScene": "Зареждане на сцена…",
+    "loadScene": "",
     "align": "Подравняване",
     "alignTop": "Подравняване отгоре",
     "alignBottom": "Подравняване отдолу",
@@ -105,7 +109,8 @@
     "share": "Сподели",
     "showStroke": "",
     "showBackground": "",
-    "toggleTheme": "Включи тема",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "Лична Библиотека",
     "excalidrawLib": "Excalidraw Библиотека",
     "decreaseFontSize": "Намали размера на шрифта",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "",
-      "exit": ""
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Заключи",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Избери цвят от платното",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Няма добавени неща все още...",
@@ -171,6 +183,7 @@
     "fullScreen": "На цял екран",
     "darkMode": "Тъмен режим",
     "lightMode": "Светъл режим",
+    "systemMode": "",
     "zenMode": "Режим Zen",
     "objectsSnapMode": "",
     "exitZenMode": "Спиране на Zen режим",
@@ -212,9 +225,9 @@
     "fileTooBig": "Файлът е твърде голям. Максималния допустим размер е {{maxSize}}.",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "Невалиден SVG.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "Не можем да заредим библиотеката",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -256,6 +269,22 @@
     "extraTools": "Още инструменти",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Бяхме много предпазливи да не включите информацията за вашата сцена при грешката. Ако сцената ви не е частна, моля, помислете за последващи действия на нашата <button>тракер за грешки.</button> Моля, включете информация по-долу, като я копирате и добавите в GitHub.",
     "sceneContent": "Съдържание на сцената:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Можете да поканите хора на текущата си сцена да си сътрудничат с вас.",
-    "desc_privacy": "Не се притеснявайте, сесията използва криптиране от край до край, така че каквото нарисувате ще остане частно. Дори нашият сървър няма да може да види какво предлагате.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Стартирайте сесията",
     "button_stopSession": "Стоп на сесията",
     "desc_inProgressIntro": "Сесията за сътрудничество на живо е в ход.",
@@ -410,8 +442,8 @@
       "copyPngToClipboard": "Копирай PNG в клипборда"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Копиране в клипборда"
     }
   },
@@ -427,7 +459,10 @@
     "scene": "Сцена",
     "selected": "Селектирано",
     "storage": "Съхранение на данни",
-    "title": "Статистика за хакери",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Общо",
     "version": "Версия",
     "versionCopy": "Настисни за да копираш",
@@ -497,7 +532,7 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Експортирай към Excalidraw+",
         "description": "Запази сцената към Excalidraw+ работното място."
       }
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

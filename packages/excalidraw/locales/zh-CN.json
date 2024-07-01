@@ -21,7 +21,9 @@
     "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
+    "changeStroke": "更改描边颜色",
     "background": "背景",
+    "changeBackground": "更改背景颜色",
     "fill": "填充",
     "strokeWidth": "描边宽度",
     "strokeStyle": "边框样式",
@@ -72,6 +74,7 @@
     "canvasColors": "画布上的",
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
+    "clearCanvas": "清除画布",
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
@@ -84,12 +87,13 @@
     "group": "编组",
     "ungroup": "解除编组",
     "collaborators": "协作者",
-    "showGrid": "显示网格",
+    "toggleGrid": "切换网格显示",
     "addToLibrary": "添加到素材库中",
     "removeFromLibrary": "从素材库中移除",
     "libraryLoadingMessage": "正在加载素材库…",
     "libraries": "浏览素材库",
     "loadingScene": "正在加载绘图…",
+    "loadScene": "从文件加载绘图",
     "align": "对齐",
     "alignTop": "顶部对齐",
     "alignBottom": "底端对齐",
@@ -105,7 +109,8 @@
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
-    "toggleTheme": "切换主题",
+    "toggleTheme": "切换浅色/深色主题",
+    "theme": "主题",
     "personalLib": "个人素材库",
     "excalidrawLib": "Excalidraw 素材库",
     "decreaseFontSize": "缩小字体大小",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "编辑线条",
-      "exit": "退出线条编辑"
+      "editArrow": "编辑箭头"
     },
     "elementLock": {
       "lock": "锁定",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "分离出画框中的所有元素",
     "eyeDropper": "从画布上取色",
     "textToDiagram": "文字至图表",
-    "prompt": "Prompt"
+    "prompt": "Prompt",
+    "followUs": "关注我们",
+    "discordChat": "Discord 群组",
+    "zoomToFitViewport": "缩放以适应视图",
+    "zoomToFitSelection": "缩放以适应选区",
+    "zoomToFit": "缩放以适应所有元素",
+    "installPWA": "在本地安装 Excalidraw (PWA)",
+    "autoResize": "启用文本自动缩放"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -171,6 +183,7 @@
     "fullScreen": "全屏",
     "darkMode": "深色模式",
     "lightMode": "浅色模式",
+    "systemMode": "系统模式",
     "zenMode": "禅模式",
     "objectsSnapMode": "吸附至对象",
     "exitZenMode": "退出禅模式",
@@ -212,9 +225,9 @@
     "fileTooBig": "文件过大。最大允许的大小为 {{maxSize}}。",
     "svgImageInsertError": "无法插入 SVG 图像。该 SVG 标记似乎是无效的。",
     "failedToFetchImage": "无法获取图片。",
-    "invalidSVGString": "无效的 SVG。",
     "cannotResolveCollabServer": "无法连接到实时协作服务器。请重新加载页面并重试。",
     "importLibraryError": "无法加载素材库",
+    "saveLibraryError": "无法将库保存至存储。请将库保存为本地文件，以确保您的更改不被丢失。",
     "collabSaveFailed": "无法保存到后端数据库。如果问题持续存在，您应该保存文件到本地，以确保您的工作不会丢失。",
     "collabSaveFailed_sizeExceeded": "无法保存到后端数据库，画布似乎过大。您应该保存文件到本地，以确保您的工作不会丢失。",
     "imageToolNotSupported": "图片已被禁用。",
@@ -225,7 +238,7 @@
       "line4": "如果禁用此设置无法修复文本元素的显示，请在 GitHub 上提交一个 <issueLink>issue</issueLink> ，或者在 <discordLink>Discord</discordLink> 上反馈"
     },
     "libraryElementTypeError": {
-      "embeddable": "嵌入的元素不能被添加到素材库。",
+      "embeddable": "嵌入元素不能添加到素材库。",
       "iframe": "不能将 IFrame 元素添加到素材库中。",
       "image": "我们不久将支持添加图片到素材库"
     },
@@ -246,7 +259,7 @@
     "library": "素材库",
     "lock": "绘制后保持所选的工具栏状态",
     "penMode": "笔模式 – 避免误触",
-    "link": "为选中的形状添加/更新链接",
+    "link": "为选定的形状添加或更改链接",
     "eraser": "橡皮",
     "frame": "画框工具",
     "magicframe": "线框图至代码",
@@ -256,6 +269,22 @@
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
     "magicSettings": "AI 设置"
+  },
+  "element": {
+    "rectangle": "矩形",
+    "diamond": "菱形",
+    "ellipse": "椭圆",
+    "arrow": "箭头",
+    "line": "线条",
+    "freedraw": "自由书写",
+    "text": "文字",
+    "image": "图片",
+    "group": "组",
+    "frame": "画框",
+    "magicframe": "线框图至代码",
+    "embeddable": "嵌入网页",
+    "selection": "选择",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "画布动作",
@@ -284,7 +313,7 @@
     "deepBoxSelect": "按住 CtrlOrCmd 以深度选择，并避免拖拽",
     "eraserRevert": "按住 Alt 以反选被标记删除的元素",
     "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.clipboardItem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。",
-    "disableSnapping": "按住 Ctrl 或 Cmd 以禁用吸附"
+    "disableSnapping": "按住 CtrlOrCmd 以禁用吸附"
   },
   "canvasError": {
     "cannotShowPreview": "无法显示预览",
@@ -299,9 +328,12 @@
     "openIssueMessage": "我们非常谨慎地处理错误信息，您的画布内容不会被包含在错误报告中。如果您的画布内容不需要保持私密，请考虑在我们的 <button>bug 跟踪系统</button>上提供更多信息。请复制粘贴以下信息到 GitHub Issue 中。",
     "sceneContent": "画布内容:"
   },
+  "shareDialog": {
+    "or": "或"
+  },
   "roomDialog": {
-    "desc_intro": "你可以邀请其他人到目前的画面中与你协作。",
-    "desc_privacy": "别担心，该会话使用端到端加密，无论绘制什么都将保持私密，甚至连我们的服务器也无法查看。",
+    "desc_intro": "邀请他人协作绘图。",
+    "desc_privacy": "别担心，会话是端到端加密、完全私密的。即使是我们的服务器也无法看到您绘制的内容。",
     "button_startSession": "开始会话",
     "button_stopSession": "结束会话",
     "desc_inProgressIntro": "实时协作会话进行中。",
@@ -336,7 +368,7 @@
     "editor": "编辑器",
     "editLineArrowPoints": "编辑线条或箭头的点",
     "editText": "添加或编辑文本",
-    "github": "发现问题？提交反馈",
+    "github": "提交问题",
     "howto": "帮助文档",
     "or": "或",
     "preventBinding": "禁用箭头吸附",
@@ -427,7 +459,10 @@
     "scene": "画布",
     "selected": "选中",
     "storage": "存储",
-    "title": "详细统计信息",
+    "fullTitle": "统计信息与元素属性",
+    "title": "统计信息",
+    "generalStats": "统计信息",
+    "elementProperties": "元素属性",
     "total": "总计",
     "version": "版本",
     "versionCopy": "点击复制",
@@ -521,5 +556,33 @@
     "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>和<classLink>类图</classLink>。其他类型在 Excalidraw 中将以图像呈现。",
     "syntax": "Mermaid 语法",
     "preview": "预览"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "快速搜索",
+      "empty": "未找到用户"
+    },
+    "hint": {
+      "text": "点击关注用户",
+      "followStatus": "您已关注此用户",
+      "inCall": "用户在语音通话中",
+      "micMuted": "用户的麦克风已静音",
+      "isSpeaking": "用户正在说话"
+    }
+  },
+  "commandPalette": {
+    "title": "命令面板",
+    "shortcuts": {
+      "select": "选择",
+      "confirm": "确定",
+      "close": "关闭"
+    },
+    "recents": "最近使用",
+    "search": {
+      "placeholder": "搜索菜单、命令、探索隐藏功能",
+      "noMatch": "没有匹配的命令……"
+    },
+    "itemNotAvailable": "命令不可用……",
+    "shortcutHint": "用 {{shortcut}} 打开命令面板"
   }
 }

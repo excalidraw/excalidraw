@@ -21,7 +21,9 @@
     "copyStyles": "複製樣式",
     "pasteStyles": "貼上樣式",
     "stroke": "筆畫",
+    "changeStroke": "變更筆畫顏色",
     "background": "背景",
+    "changeBackground": "變更背景顏色",
     "fill": "填滿",
     "strokeWidth": "筆跡寬度",
     "strokeStyle": "筆畫樣式",
@@ -72,6 +74,7 @@
     "canvasColors": "使用於畫布",
     "canvasBackground": "Canvas 背景",
     "drawingCanvas": "繪圖 canvas",
+    "clearCanvas": "清除畫布",
     "layers": "圖層",
     "actions": "動作",
     "language": "語言",
@@ -84,12 +87,13 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
-    "showGrid": "顯示格線",
+    "toggleGrid": "切換網格",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
     "libraryLoadingMessage": "資料庫讀取中…",
     "libraries": "瀏覽資料庫",
     "loadingScene": "場景讀取中…",
+    "loadScene": "從檔案載入場景",
     "align": "對齊",
     "alignTop": "對齊頂部",
     "alignBottom": "對齊底部",
@@ -105,7 +109,8 @@
     "share": "共享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
-    "toggleTheme": "切換主題",
+    "toggleTheme": "切換 亮色/暗色 主題",
+    "theme": "佈景主題",
     "personalLib": "個人資料庫",
     "excalidrawLib": "Excalidraw 資料庫",
     "decreaseFontSize": "縮小文字",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "編輯線條",
-      "exit": "結束線條編輯"
+      "editArrow": "編輯箭頭"
     },
     "elementLock": {
       "lock": "鎖定",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "從框架內移除所有元素",
     "eyeDropper": "從畫布中選取顏色",
     "textToDiagram": "文字轉圖表",
-    "prompt": "提示詞"
+    "prompt": "提示詞",
+    "followUs": "追蹤我們",
+    "discordChat": "Discord 聊天室",
+    "zoomToFitViewport": "縮放至符合 viewport",
+    "zoomToFitSelection": "縮放至符合選取區",
+    "zoomToFit": "縮放至顯示所有元素",
+    "installPWA": "於本機安裝 Excalidraw (PWA)",
+    "autoResize": "啟用文字自動縮放"
   },
   "library": {
     "noItems": "尚未加入任何物件...",
@@ -171,6 +183,7 @@
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
     "lightMode": "淺色模式",
+    "systemMode": "系統模式",
     "zenMode": "專注模式",
     "objectsSnapMode": "吸附至物件",
     "exitZenMode": "離開專注模式",
@@ -212,9 +225,9 @@
     "fileTooBig": "檔案過大。可接受的最大尺寸為 {{maxSize}} 。",
     "svgImageInsertError": "無法插入 SVG 圖片。此 SVG 檔案有問題。",
     "failedToFetchImage": "無法獲取圖片。",
-    "invalidSVGString": "無效的 SVG。",
     "cannotResolveCollabServer": "無法連結至 collab 伺服器。請重新整理後再試一次。",
     "importLibraryError": "無法載入資料庫",
+    "saveLibraryError": "無法將資料庫存至儲存區。請將資料庫存至本機檔案以確保不會失去已變更的部分。",
     "collabSaveFailed": "無法儲存至後端資料庫。若此問題持續發生，請將檔案儲存於本機以確保資料不會遺失。",
     "collabSaveFailed_sizeExceeded": "無法儲存至後端資料庫，可能的原因為畫布尺寸過大。請將檔案儲存於本機以確保資料不會遺失。",
     "imageToolNotSupported": "圖片已停用",
@@ -256,6 +269,22 @@
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
     "magicSettings": "AI 設定"
+  },
+  "element": {
+    "rectangle": "矩形",
+    "diamond": "菱形",
+    "ellipse": "橢圓形",
+    "arrow": "箭頭",
+    "line": "線條",
+    "freedraw": "自由繪圖",
+    "text": "文字",
+    "image": "圖片",
+    "group": "群組",
+    "frame": "框架",
+    "magicframe": "線框稿轉為程式碼",
+    "embeddable": "嵌入網站",
+    "selection": "已選項目",
+    "iframe": "IFrame框架"
   },
   "headings": {
     "canvasActions": "canvas 動作",
@@ -299,9 +328,12 @@
     "openIssueMessage": "我們將謹慎處理，你的作品內容不會被包含在錯誤報告中。若你的作品不需保持私密，請考慮使用我們的<button>bug tracker。</button>請將下列資訊複製貼上至 GitHub issue 中。",
     "sceneContent": "作品內容："
   },
+  "shareDialog": {
+    "or": "或"
+  },
   "roomDialog": {
-    "desc_intro": "你可以邀請其他人一起協作目前的作品。",
-    "desc_privacy": "連線使用 end-to-end 加密故無須擔心作品的安全性。即使是我們的伺服器也無法取得其內容。",
+    "desc_intro": "邀請其他人一起協作",
+    "desc_privacy": "不用擔心，此連線為端到端加密且完全私有，即使是我們的伺服器也無法看見您的繪圖。",
     "button_startSession": "開始連線",
     "button_stopSession": "停止連線",
     "desc_inProgressIntro": "即時協作連線正在進行中。",
@@ -427,7 +459,10 @@
     "scene": "場景",
     "selected": "已選",
     "storage": "儲存",
-    "title": "詳細統計",
+    "fullTitle": "統計資訊與元件屬性",
+    "title": "統計資訊",
+    "generalStats": "總體統計資訊",
+    "elementProperties": "元件屬性",
     "total": "合計",
     "version": "版本",
     "versionCopy": "點擊複製",
@@ -521,5 +556,33 @@
     "description": "目前僅支援 <flowchartLink>Flowchart</flowchartLink> 、 <sequenceLink>Sequence</sequenceLink> 及 <classLink>Class </classLink> 圖表。其餘檔案類型在 Excalidraw 將會以圖像呈現。",
     "syntax": "Mermaid 語法",
     "preview": "預覽"
+  },
+  "userList": {
+    "search": {
+      "placeholder": "快速搜尋",
+      "empty": "沒有找到使用者"
+    },
+    "hint": {
+      "text": "點擊使用者以進行追蹤",
+      "followStatus": "您正在追蹤此使用者",
+      "inCall": "使用者正在語音通話中",
+      "micMuted": "使用者的麥克風已靜音",
+      "isSpeaking": "使用者說話中"
+    }
+  },
+  "commandPalette": {
+    "title": "指令面板",
+    "shortcuts": {
+      "select": "選取",
+      "confirm": "確認",
+      "close": "關閉"
+    },
+    "recents": "最近使用",
+    "search": {
+      "placeholder": "搜尋選單與指令並找出隱藏功能",
+      "noMatch": "沒有符合的指令…"
+    },
+    "itemNotAvailable": "指令無法使用…",
+    "shortcutHint": ""
   }
 }

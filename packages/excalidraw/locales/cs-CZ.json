@@ -21,7 +21,9 @@
     "copyStyles": "Kopírovat styly",
     "pasteStyles": "Vložit styly",
     "stroke": "Obrys",
+    "changeStroke": "",
     "background": "Pozadí",
+    "changeBackground": "",
     "fill": "Výplň",
     "strokeWidth": "Tloušťka tahu",
     "strokeStyle": "Styl tahu",
@@ -55,7 +57,7 @@
     "large": "Velké",
     "veryLarge": "Velmi velké",
     "solid": "Plný",
-    "hachure": "Hachure",
+    "hachure": "",
     "zigzag": "Klikatě",
     "crossHatch": "Křížový šrafování",
     "thin": "Tenký",
@@ -72,6 +74,7 @@
     "canvasColors": "Použito na plátně",
     "canvasBackground": "Pozadí plátna",
     "drawingCanvas": "Kreslicí plátno",
+    "clearCanvas": "",
     "layers": "Vrstvy",
     "actions": "Akce",
     "language": "Jazyk",
@@ -84,12 +87,13 @@
     "group": "Sloučit výběr do skupiny",
     "ungroup": "Zrušit sloučení skupiny",
     "collaborators": "Spolupracovníci",
-    "showGrid": "Zobrazit mřížku",
+    "toggleGrid": "",
     "addToLibrary": "Přidat do knihovny",
     "removeFromLibrary": "Odebrat z knihovny",
     "libraryLoadingMessage": "Načítání knihovny…",
     "libraries": "Procházet knihovny",
     "loadingScene": "Načítání scény…",
+    "loadScene": "",
     "align": "Zarovnání",
     "alignTop": "Zarovnat nahoru",
     "alignBottom": "Zarovnat dolů",
@@ -105,7 +109,8 @@
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
-    "toggleTheme": "Přepnout tmavý řežim",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "Osobní knihovna",
     "excalidrawLib": "Exkalidraw knihovna",
     "decreaseFontSize": "Zmenšit písmo",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Upravit čáru",
-      "exit": "Ukončit editor řádků"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Uzamknout",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Vyberte barvu z plátna",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
@@ -161,7 +173,7 @@
     "zoomIn": "Přiblížit",
     "zoomOut": "Oddálit",
     "resetZoom": "Resetovat přiblížení",
-    "menu": "Menu",
+    "menu": "",
     "done": "Hotovo",
     "edit": "Upravit",
     "undo": "Zpět",
@@ -171,6 +183,7 @@
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
     "lightMode": "Světlý režim",
+    "systemMode": "",
     "zenMode": "Zen mód",
     "objectsSnapMode": "",
     "exitZenMode": "Opustit zen mód",
@@ -212,9 +225,9 @@
     "fileTooBig": "Soubor je příliš velký. Maximální povolená velikost je {{maxSize}}.",
     "svgImageInsertError": "Nelze vložit SVG obrázek. Značení SVG je neplatné.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Neplatný SVG.",
     "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
     "importLibraryError": "Nelze načíst knihovnu",
+    "saveLibraryError": "",
     "collabSaveFailed": "Nelze uložit do databáze na serveru. Pokud problémy přetrvávají, měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "collabSaveFailed_sizeExceeded": "Nelze uložit do databáze na serveru, plátno se zdá být příliš velké. Měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "imageToolNotSupported": "",
@@ -242,11 +255,11 @@
     "arrow": "Šipka",
     "line": "Čára",
     "freedraw": "Kreslení",
-    "text": "Text",
+    "text": "",
     "library": "Knihovna",
     "lock": "Po kreslení ponechat vybraný nástroj aktivní",
     "penMode": "Režim Pera - zabránit dotyku",
-    "link": "Přidat/aktualizovat odkaz pro vybraný tvar",
+    "link": "",
     "eraser": "Guma",
     "frame": "",
     "magicframe": "",
@@ -256,6 +269,22 @@
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Akce plátna",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Byli jsme velmi opatrní, abychom neuváděli informace o Vaší scéně. Pokud vaše scéna není soukromá, zvažte prosím sledování na našem <button>bug trackeru</button>. Uveďte prosím níže uvedené informace kopírováním a vložením do problému na GitHubu.",
     "sceneContent": "Obsah scény:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Můžete pozvat lidi na vaši aktuální scénu ke spolupráci s vámi.",
-    "desc_privacy": "Nebojte se, relace používá end-to-end šifrování, takže cokoliv nakreslíte zůstane soukromé. Ani náš server nebude schopen vidět, s čím budete pracovat.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Zahájit relaci",
     "button_stopSession": "Ukončit relaci",
     "desc_inProgressIntro": "Živá spolupráce právě probíhá.",
@@ -333,7 +365,7 @@
     "documentation": "Dokumentace",
     "doubleClick": "dvojklik",
     "drag": "tažení",
-    "editor": "Editor",
+    "editor": "",
     "editLineArrowPoints": "Upravit body linií/šipek",
     "editText": "Upravit text / přidat popis",
     "github": "Našel jsi problém? Nahlaš ho",
@@ -410,8 +442,8 @@
       "copyPngToClipboard": "Kopírovat PNG do schránky"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Kopírovat do schránky"
     }
   },
@@ -427,7 +459,10 @@
     "scene": "Scéna",
     "selected": "Vybráno",
     "storage": "Úložiště",
-    "title": "Statistika pro nerdy",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Celkem",
     "version": "Verze",
     "versionCopy": "Kliknutím zkopírujete",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

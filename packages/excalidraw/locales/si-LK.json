@@ -21,7 +21,9 @@
     "copyStyles": "",
     "pasteStyles": "",
     "stroke": "",
+    "changeStroke": "",
     "background": "",
+    "changeBackground": "",
     "fill": "",
     "strokeWidth": "",
     "strokeStyle": "",
@@ -72,6 +74,7 @@
     "canvasColors": "",
     "canvasBackground": "කැන්වස පසුබිම",
     "drawingCanvas": "චිත්‍රක කැන්වසය",
+    "clearCanvas": "",
     "layers": "ලේයර",
     "actions": "ක්‍රියාකාරකම",
     "language": "භාෂාව ",
@@ -84,12 +87,13 @@
     "group": "",
     "ungroup": "",
     "collaborators": "",
-    "showGrid": "",
+    "toggleGrid": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
     "libraries": "",
     "loadingScene": "",
+    "loadScene": "",
     "align": "",
     "alignTop": "",
     "alignBottom": "",
@@ -106,6 +110,7 @@
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
+    "theme": "",
     "personalLib": "",
     "excalidrawLib": "",
     "decreaseFontSize": "",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "",
-      "exit": ""
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "",
@@ -171,6 +183,7 @@
     "fullScreen": "",
     "darkMode": "",
     "lightMode": "",
+    "systemMode": "",
     "zenMode": "",
     "objectsSnapMode": "",
     "exitZenMode": "",
@@ -212,9 +225,9 @@
     "fileTooBig": "",
     "svgImageInsertError": "",
     "failedToFetchImage": "",
-    "invalidSVGString": "",
     "cannotResolveCollabServer": "",
     "importLibraryError": "",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -257,6 +270,22 @@
     "mermaidToExcalidraw": "",
     "magicSettings": ""
   },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
+  },
   "headings": {
     "canvasActions": "",
     "selectedShapeActions": "",
@@ -298,6 +327,9 @@
     "trackedToSentry": "",
     "openIssueMessage": "",
     "sceneContent": ""
+  },
+  "shareDialog": {
+    "or": ""
   },
   "roomDialog": {
     "desc_intro": "",
@@ -427,7 +459,10 @@
     "scene": "",
     "selected": "",
     "storage": "",
+    "fullTitle": "",
     "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "",
     "version": "",
     "versionCopy": "",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

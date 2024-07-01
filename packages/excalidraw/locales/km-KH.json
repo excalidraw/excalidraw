@@ -21,7 +21,9 @@
     "copyStyles": "ចម្លងរចនាប័ទ្ម",
     "pasteStyles": "បិទភ្ជាប់រចនាប័ទ្ម",
     "stroke": "ខ្វាច់",
+    "changeStroke": "",
     "background": "ផ្ទៃខាងក្រោយ",
+    "changeBackground": "",
     "fill": "បំពេញ",
     "strokeWidth": "ទទឹងខ្វាច់",
     "strokeStyle": "រចនាប័ទ្មរបស់ខ្វាច់",
@@ -55,8 +57,8 @@
     "large": "ធំ",
     "veryLarge": "ធំខ្លាំង",
     "solid": "តាន់",
-    "hachure": "Hachure",
-    "zigzag": "Zigzag",
+    "hachure": "",
+    "zigzag": "",
     "crossHatch": "បន្ទាត់ឆ្នូតៗ",
     "thin": "ស្តើង",
     "bold": "ដឹត",
@@ -72,6 +74,7 @@
     "canvasColors": "ប្រើលើបាវ",
     "canvasBackground": "ផ្ទៃខាងក្រោយបាវ",
     "drawingCanvas": "តំបន់គំនូរ",
+    "clearCanvas": "",
     "layers": "ស្រទាប់",
     "actions": "សកម្មភាព",
     "language": "ភាសា",
@@ -84,12 +87,13 @@
     "group": "ការជ្រើសរើសជាក្រុម",
     "ungroup": "បំបែកក្រុមការជ្រើសរើសជាក្រុម",
     "collaborators": "អ្នកសហការ",
-    "showGrid": "បង្ហាញក្រឡាចត្រង្គ",
+    "toggleGrid": "",
     "addToLibrary": "បន្ថែមទៅបណ្ណាល័យ",
     "removeFromLibrary": "លុបចេញពីបណ្ណាល័យ",
     "libraryLoadingMessage": "កំពុងផ្ទុកបណ្ណាល័យ...",
     "libraries": "រកមើលបណ្ណាល័យ",
     "loadingScene": "កំពុង​ផ្ទុក​ស៊ីន...",
+    "loadScene": "",
     "align": "តម្រឹម",
     "alignTop": "តម្រឹមផ្នែកខាងលើ",
     "alignBottom": "តម្រឹមផ្នែកខាងក្រោម",
@@ -105,7 +109,8 @@
     "share": "ចែករំលែក",
     "showStroke": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ខ្វាច់",
     "showBackground": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ផ្ទៃខាងក្រោយ",
-    "toggleTheme": "បិទ/បើកប្រធានបទ",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "បណ្ណាល័យផ្ទាល់ខ្លួន",
     "excalidrawLib": "បណ្ណាល័យ Excalidraw",
     "decreaseFontSize": "បន្ថយទំហំពុម្ពអក្សរ",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "កែសម្រួលបន្ទាត់",
-      "exit": "ចាកចេញពីការកែសម្រួលបន្ទាត់"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "ចាក់សោ",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
@@ -171,6 +183,7 @@
     "fullScreen": "ពេញ​អេក្រង់",
     "darkMode": "ម៉ូដងងឹត",
     "lightMode": "ម៉ូដភ្លឺ",
+    "systemMode": "",
     "zenMode": "ម៉ូត Zen",
     "objectsSnapMode": "",
     "exitZenMode": "ចេញពី zen​ ម៉ូត",
@@ -212,9 +225,9 @@
     "fileTooBig": "ឯកសារធំពេក។ ទំហំអតិបរមាដែលអនុញ្ញាតគឺ {{maxSize}}។",
     "svgImageInsertError": "មិនអាចបញ្ចូលរូបភាព SVG បានទេ។ ស្លាក SVG ហាក់ដូចជាមិនត្រឹមត្រូវ។",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG មិន​ត្រឹមត្រូវ។",
     "cannotResolveCollabServer": "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេសហការផ្ទាល់បានទេ។ សូមផ្ទុកទំព័រឡើងវិញ ហើយព្យាយាមម្តងទៀត។",
     "importLibraryError": "មិនអាចផ្ទុកបណ្ណាល័យបានទេ។",
+    "saveLibraryError": "",
     "collabSaveFailed": "មិនអាចរក្សាទុកទៅម៉ាស៊ីនមេបានទេ។ ប្រសិនបើបញ្ហានៅតែបន្តកើតមាន​ អ្នកគួរតែរក្សាទុកឯកសាររបស់អ្នកនៅលើកុំព្យូទ័ររបស់អ្នកសិន ដើម្បីធានាថាការងាររបស់អ្នកមិនបាត់បង់។",
     "collabSaveFailed_sizeExceeded": "មិនអាចរក្សាទុកទៅម៉ាស៊ីនមេបានទេ, ផ្ទាំងបាវហាក់ដូចជាធំពេក។ អ្នកគួរតែរក្សាទុកឯកសាររបស់អ្នកនៅលើកុំព្យូទ័ររបស់អ្នកសិន ដើម្បីធានាថាការងាររបស់អ្នកមិនបាត់បង់។",
     "imageToolNotSupported": "",
@@ -246,7 +259,7 @@
     "library": "បណ្ណាល័យ",
     "lock": "រក្សារឧបករណ៍ដែលបានជ្រើសរើសបន្ទាប់ពីគូររួច",
     "penMode": "របៀបប៊ិច - ជៀសវាងការប៉ះ",
-    "link": "បន្ថែម/ធ្វើបច្ចុប្បន្នភាពតំណភ្ជាប់សម្រាប់រូបរាងដែលបានជ្រើសរើស",
+    "link": "",
     "eraser": "ជ័រលុប",
     "frame": "",
     "magicframe": "",
@@ -256,6 +269,22 @@
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "សកម្មភាពបាវ",
@@ -299,9 +328,12 @@
     "openIssueMessage": "យើងមានការប្រុងប្រយ័ត្នខ្លាំងណាស់ក្នុងការមិនបញ្ចូលព័ត៌មានរបស់ស៊ីនរបស់អ្នកទៅលើកំហុស។ ប្រសិនបើស៊ីនរបស់អ្នកមិនមានលក្ខណៈឯកជនទេ សូមពិចារណាបន្តទៅកាន់ <button>កម្មវិធីតាមដានកំហុសរបស់យើង។</button> សូមបញ្ចូលព័ត៌មានខាងក្រោមដោយចម្លង និងបិទភ្ជាប់វាទៅក្នុងបញ្ហារបស់ GitHub។",
     "sceneContent": "មាតិកាបាវ៖"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "អ្នកអាចអញ្ជើញអ្នកដទៃឱ្យសហការជាមួយអ្នកនៅលើស៊ីនបច្ចុប្បន្ន។",
-    "desc_privacy": "កុំបារម្ភ វគ្គប្រើការអ៊ិនគ្រីបពីចុងដល់ចប់ ដូច្នេះអ្វីដែលអ្នកគូរនឹងនៅតែជាឯកជន។ សូម្បីតែម៉ាស៊ីនមេរបស់យើងក៏នឹងមិនអាចមើលឃើញអ្វីដែលអ្នកកំពុងធ្វើដែរ។",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "ចាប់ផ្តើមវគ្គ",
     "button_stopSession": "បញ្ឈប់វគ្គ",
     "desc_inProgressIntro": "វគ្គសហការផ្ទាល់ឥឡូវនេះកំពុងដំណើរការ។",
@@ -427,7 +459,10 @@
     "scene": "ស៊ីន",
     "selected": "បានជ្រើសរើស",
     "storage": "ការផ្ទុក",
-    "title": "ស្ថិតិសម្រាប់ nerds",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "សរុប",
     "version": "ជំនាន់:",
     "versionCopy": "ចុចដើម្បីចម្លង",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

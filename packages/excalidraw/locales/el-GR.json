@@ -21,7 +21,9 @@
     "copyStyles": "Αντιγραφή εμφάνισης",
     "pasteStyles": "Επικόλληση εμφάνισης",
     "stroke": "Μολυβιά",
+    "changeStroke": "",
     "background": "Φόντο",
+    "changeBackground": "",
     "fill": "Γέμισμα",
     "strokeWidth": "Πάχος μολυβιάς",
     "strokeStyle": "Στυλ περιγράμματος",
@@ -72,6 +74,7 @@
     "canvasColors": "Χρησιμοποείται στον καμβά",
     "canvasBackground": "Φόντο καμβά",
     "drawingCanvas": "Σχεδίαση καμβά",
+    "clearCanvas": "",
     "layers": "Στρώματα",
     "actions": "Ενέργειες",
     "language": "Γλώσσα",
@@ -84,12 +87,13 @@
     "group": "Δημιουργία ομάδας από επιλογή",
     "ungroup": "Κατάργηση ομάδας από επιλογή",
     "collaborators": "Συνεργάτες",
-    "showGrid": "Προβολή πλέγματος",
+    "toggleGrid": "",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
     "libraryLoadingMessage": "Φόρτωση βιβλιοθήκης…",
     "libraries": "Άλλες βιβλιοθήκες",
     "loadingScene": "Φόρτωση σκηνής…",
+    "loadScene": "",
     "align": "Στοίχιση",
     "alignTop": "Στοίχιση πάνω",
     "alignBottom": "Στοίχιση κάτω",
@@ -105,7 +109,8 @@
     "share": "Κοινοποίηση",
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
-    "toggleTheme": "Εναλλαγή θέματος",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "Προσωπική Βιβλιοθήκη",
     "excalidrawLib": "Βιβλιοθήκη Excalidraw",
     "decreaseFontSize": "Μείωση μεγέθους γραμματοσειράς",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "Επεξεργασία γραμμής",
-      "exit": "Έξοδος επεξεργαστή κειμένου"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "Κλείδωμα",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
@@ -171,6 +183,7 @@
     "fullScreen": "Πλήρης οθόνη",
     "darkMode": "Σκοτεινή λειτουργία",
     "lightMode": "Φωτεινή λειτουργία",
+    "systemMode": "",
     "zenMode": "Λειτουργία Zεν",
     "objectsSnapMode": "",
     "exitZenMode": "Έξοδος από την λειτουργία Zen",
@@ -212,9 +225,9 @@
     "fileTooBig": "Το αρχείο είναι πολύ μεγάλο. Το μέγιστο επιτρεπόμενο μέγεθος είναι {{maxSize}}.",
     "svgImageInsertError": "Αδυναμία εισαγωγής εικόνας SVG. Η σήμανση της SVG δεν φαίνεται έγκυρη.",
     "failedToFetchImage": "",
-    "invalidSVGString": "Μη έγκυρο SVG.",
     "cannotResolveCollabServer": "Αδυναμία σύνδεσης με τον διακομιστή συνεργασίας. Παρακαλώ ανανεώστε τη σελίδα και προσπαθήστε ξανά.",
     "importLibraryError": "Αδυναμία φόρτωσης βιβλιοθήκης",
+    "saveLibraryError": "",
     "collabSaveFailed": "Η αποθήκευση στη βάση δεδομένων δεν ήταν δυνατή. Αν το προβλήματα παραμείνει, θα πρέπει να αποθηκεύσετε το αρχείο σας τοπικά για να βεβαιωθείτε ότι δεν χάνετε την εργασία σας.",
     "collabSaveFailed_sizeExceeded": "Η αποθήκευση στη βάση δεδομένων δεν ήταν δυνατή, ο καμβάς φαίνεται να είναι πολύ μεγάλος. Θα πρέπει να αποθηκεύσετε το αρχείο τοπικά για να βεβαιωθείτε ότι δεν θα χάσετε την εργασία σας.",
     "imageToolNotSupported": "",
@@ -246,7 +259,7 @@
     "library": "Βιβλιοθήκη",
     "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο",
     "penMode": "Λειτουργία μολυβιού - αποτροπή αφής",
-    "link": "Προσθήκη/ Ενημέρωση συνδέσμου για ένα επιλεγμένο σχήμα",
+    "link": "",
     "eraser": "Γόμα",
     "frame": "",
     "magicframe": "",
@@ -256,6 +269,22 @@
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",
@@ -299,9 +328,12 @@
     "openIssueMessage": "Ήμασταν πολύ προσεκτικοί για να μην συμπεριλάβουμε τις πληροφορίες της σκηνής σου στο σφάλμα. Αν η σκηνή σου δεν είναι ιδιωτική, παρακαλώ σκέψου να ακολουθήσεις το δικό μας <button>ανιχνευτής σφαλμάτων.</button> Παρακαλώ να συμπεριλάβετε τις παρακάτω πληροφορίες, αντιγράφοντας και επικολλώντας το ζήτημα στο GitHub.",
     "sceneContent": "Περιεχόμενο σκηνής:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "Μπορείς να προσκαλέσεις άλλους να δουλέψουν μαζί σου.",
-    "desc_privacy": "Μην ανησυχείς, η συνεδρία χρησιμοποιεί κρυπτογράφηση από σημείο σε σημείο, άρα οτιδήποτε κάνεις θα παραμείνει ανοιχτό μόνο σε εσένα. Ούτε οι μηχανές μας μπορούν να δουν τι κάνεις.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Έναρξη Συνεδρίας",
     "button_stopSession": "Τερματισμός Συνεδρίας",
     "desc_inProgressIntro": "Η ζωντανή συνεργασία με άλλους είναι σε ενεργή.",
@@ -359,8 +391,8 @@
     "title": "Δημοσίευση βιβλιοθήκης",
     "itemName": "Όνομα αντικειμένου",
     "authorName": "Όνομα δημιουργού",
-    "githubUsername": "GitHub username",
-    "twitterUsername": "Twitter username",
+    "githubUsername": "",
+    "twitterUsername": "",
     "libraryName": "Όνομα βιβλιοθήκης",
     "libraryDesc": "Περιγραφή βιβλιοθήκης",
     "website": "Ιστοσελίδα",
@@ -427,7 +459,10 @@
     "scene": "Σκηνή",
     "selected": "Επιλεγμένα",
     "storage": "Χώρος",
-    "title": "Στατιστικά για σπασίκλες",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Σύνολο ",
     "version": "Έκδοση",
     "versionCopy": "Κάνε κλικ για αντιγραφή",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }

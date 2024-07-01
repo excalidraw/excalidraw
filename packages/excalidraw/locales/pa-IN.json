@@ -21,7 +21,9 @@
     "copyStyles": "ਸਟਾਇਲ ਕਾਪੀ ਕਰੋ",
     "pasteStyles": "ਸਟਾਇਲ ਪੇਸਟ ਕਰੋ",
     "stroke": "ਰੇਖਾ",
+    "changeStroke": "",
     "background": "ਬੈਕਗਰਾਉਂਡ",
+    "changeBackground": "",
     "fill": "ਭਰਨਾ",
     "strokeWidth": "ਰੇਖਾ ਦੀ ਚੌੜਾਈ",
     "strokeStyle": "ਰੇਖਾ ਦਾ ਸਟਾਇਲ",
@@ -72,6 +74,7 @@
     "canvasColors": "ਕੈਨਵਸ 'ਤੇ ਵਰਤਿਆ",
     "canvasBackground": "ਕੈਨਵਸ ਦਾ ਬੈਕਗਰਾਉਂਡ",
     "drawingCanvas": "ਡਰਾਇੰਗ ਕੈਨਵਸ",
+    "clearCanvas": "",
     "layers": "ਪਰਤਾਂ",
     "actions": "ਕਾਰਵਾਈਆਂ",
     "language": "ਭਾਸ਼ਾ",
@@ -84,12 +87,13 @@
     "group": "ਚੋਣ ਦਾ ਗਰੁੱਪ ਬਣਾਓ",
     "ungroup": "ਚੋਣ ਦਾ ਗਰੁੱਪ ਤੋੜੋ",
     "collaborators": "ਸਹਿਯੋਗੀ",
-    "showGrid": "ਜਾਲੀ ਦਿਖਾਓ",
+    "toggleGrid": "",
     "addToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜੋ",
     "removeFromLibrary": "ਲਾਇਬ੍ਰੇਰੀ 'ਚੋਂ ਹਟਾਓ",
     "libraryLoadingMessage": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ…",
     "libraries": "ਲਾਇਬ੍ਰੇਰੀਆਂ ਬਰਾਉਜ਼ ਕਰੋ",
     "loadingScene": "ਦ੍ਰਿਸ਼ ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ…",
+    "loadScene": "",
     "align": "ਇਕਸਾਰ",
     "alignTop": "ਉੱਪਰ ਇਕਸਾਰ ਕਰੋ",
     "alignBottom": "ਹੇਠਾਂ ਇਕਸਾਰ ਕਰੋ",
@@ -105,7 +109,8 @@
     "share": "ਸਾਂਝਾ ਕਰੋ",
     "showStroke": "ਰੇਖਾ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
     "showBackground": "ਬੈਕਗਰਾਉਂਡ ਦਾ ਰੰਗ ਚੋਣਕਾਰ ਦਿਖਾਓ",
-    "toggleTheme": "ਥੀਮ ਬਦਲੋ",
+    "toggleTheme": "",
+    "theme": "",
     "personalLib": "ਨਿੱਜੀ ਲਾਇਬ੍ਰੇਰੀ",
     "excalidrawLib": "ਐਕਸਕਲੀਡਰਾਅ ਲਾਇਬ੍ਰੇਰੀ",
     "decreaseFontSize": "ਫੌਂਟ ਦਾ ਅਕਾਰ ਘਟਾਓ",
@@ -124,7 +129,7 @@
     },
     "lineEditor": {
       "edit": "ਪੰਕਤੀ ਸੋਧੋ",
-      "exit": "ਪੰਕਤੀ ਸੋਧਕ 'ਤੋਂ ਬਾਹਰ ਨਿਕਲੋ"
+      "editArrow": ""
     },
     "elementLock": {
       "lock": "ਲਾਕ ਕਰੋ",
@@ -138,7 +143,14 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
-    "prompt": ""
+    "prompt": "",
+    "followUs": "",
+    "discordChat": "",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "",
+    "zoomToFit": "",
+    "installPWA": "",
+    "autoResize": ""
   },
   "library": {
     "noItems": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਚੀਜ ਜੋੜੀ ਨਹੀਂ ਗਈ...",
@@ -171,6 +183,7 @@
     "fullScreen": "ਪੂਰੀ ਸਕਰੀਨ",
     "darkMode": "ਡਾਰਕ ਮੋਡ",
     "lightMode": "ਲਾਇਟ ਮੋਡ",
+    "systemMode": "",
     "zenMode": "ਜ਼ੈੱਨ ਮੋਡ",
     "objectsSnapMode": "",
     "exitZenMode": "ਜ਼ੈੱਨ ਮੋਡ 'ਚੋਂ ਬਾਹਰ ਨਿਕਲੋ",
@@ -212,9 +225,9 @@
     "fileTooBig": "ਫਾਈਲ ਬਹੁਤ ਜ਼ਿਆਦਾ ਵੱਡੀ ਹੈ। ਵੱਧ-ਤੋਂ-ਵੱਧ ਪ੍ਰਵਾਨਤ ਅਕਾਰ {{maxSize}} ਹੈ।",
     "svgImageInsertError": "SVG ਤਸਵੀਰ ਸ਼ਾਮਲ ਨਹੀਂ ਕਰ ਸਕੇ। SVG ਮਾਰਕ-ਅੱਪ ਨਜਾਇਜ਼ ਲੱਗ ਰਿਹਾ ਹੈ।",
     "failedToFetchImage": "",
-    "invalidSVGString": "SVG ਨਜਾਇਜ਼ ਹੈ।",
     "cannotResolveCollabServer": "",
     "importLibraryError": "ਲਾਇਬ੍ਰੇਰੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
+    "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
@@ -256,6 +269,22 @@
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "",
+    "image": "",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "ਕੈਨਵਸ ਦੀਆਂ ਕਾਰਵਾਈਆਂ",
@@ -299,9 +328,12 @@
     "openIssueMessage": "ਅਸੀਂ ਬੜੇ ਸਾਵਧਾਨ ਸੀ ਕਿ ਗਲਤੀ ਵਿੱਚ ਤੁਹਾਡੇ ਦ੍ਰਿਸ਼ ਦੀ ਜਾਣਕਾਰੀ ਸ਼ਾਮਲ ਨਾ ਕਰੀਏ। ਜੇ ਤੁਹਾਡਾ ਦ੍ਰਿਸ਼ ਨਿੱਜੀ ਨਹੀਂ ਹੈ ਤਾਂ ਇਸ 'ਤੇ ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ ਜੀ <button>ਬੱਗ ਟਰੈਕਰ।</button>ਹੇਠਾਂ ਦਿੱਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਕਾਪੀ ਕਰਕੇ ਗਿੱਟਹੱਬ ਮੁੱਦੇ ਵਿੱਚ ਪੇਸਟ ਕਰਕੇ ਸ਼ਾਮਲ ਕਰੋ ਜੀ।",
     "sceneContent": "ਦ੍ਰਿਸ਼ ਦੀ ਸਮੱਗਰੀ:"
   },
+  "shareDialog": {
+    "or": ""
+  },
   "roomDialog": {
-    "desc_intro": "ਤੁਸੀਂ ਲੋਕਾਂ ਨੂੰ ਆਪਣੇ ਨਾਲ ਮੌਜੂਦਾ ਦ੍ਰਿਸ਼ 'ਤੇ ਸਹਿਯੋਗ ਕਰਨ ਲਈ ਸੱਦਾ ਭੇਜ ਸਕਦੇ ਹੋ।",
-    "desc_privacy": "ਫਿਕਰ ਨਾ ਕਰੋ, ਇਜਲਾਸ ਸਿਰੇ-ਤੋਂ-ਸਿਰੇ ਤੱਕ ਇਨਕਰਿਪਸ਼ਨ ਵਰਤਦਾ ਹੈ, ਸੋ ਜੋ ਕੁਝ ਵੀ ਤੁਸੀਂ ਵਾਹੁੰਦੇ ਹੋ ਉਹ ਨਿੱਜੀ ਹੀ ਰਹਿੰਦਾ ਹੈ। ਇੱਥੋਂ ਤੱਕ ਕਿ ਸਾਡੇ ਸਰਵਰ ਵੀ ਨਹੀਂ ਜਾਣ ਸਕਣਗੇ ਕਿ ਤੁਸੀਂ ਕੀ ਬਣਾਇਆ ਹੈ।",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "ਇਜਲਾਸ ਸ਼ੁਰੂ ਕਰੋ",
     "button_stopSession": "ਇਜਲਾਸ ਰੋਕੋ",
     "desc_inProgressIntro": "ਲਾਇਵ ਸਹਿਯੋਗ ਇਜਲਾਸ ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ।",
@@ -410,8 +442,8 @@
       "copyPngToClipboard": "PNG ਨੂੰ ਕਲਿੱਪੋਬਰਡ ‘ਤੇ ਕਾਪੀ ਕਰੋ"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "ਗੱਤੇ 'ਤੇ ਕਾਪੀ ਕਰੋ"
     }
   },
@@ -427,7 +459,10 @@
     "scene": "ਦ੍ਰਿਸ਼",
     "selected": "ਚੁਣੇ",
     "storage": "ਸਟੋਰੇਜ",
-    "title": "ਪੜਾਕੂਆਂ ਲਈ ਅੰਕੜੇ",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "ਕੁੱਲ",
     "version": "ਸੰਸਕਰਨ",
     "versionCopy": "ਕਾਪੀ ਕਰਨ ਲਈ ਕਲਿੱਕ ਕਰੋ",
@@ -521,5 +556,33 @@
     "description": "",
     "syntax": "",
     "preview": ""
+  },
+  "userList": {
+    "search": {
+      "placeholder": "",
+      "empty": ""
+    },
+    "hint": {
+      "text": "",
+      "followStatus": "",
+      "inCall": "",
+      "micMuted": "",
+      "isSpeaking": ""
+    }
+  },
+  "commandPalette": {
+    "title": "",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": ""
+    },
+    "recents": "",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": ""
   }
 }
