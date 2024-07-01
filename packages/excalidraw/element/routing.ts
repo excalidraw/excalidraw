@@ -20,7 +20,11 @@ import {
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import {
-  bindPointToSnapToElementOutline,
+  debugDrawBoundingBox,
+  debugDrawBounds,
+  debugDrawPoint,
+} from "../visualdebug";
+import {
   distanceToBindableElement,
   getHoveredElementForBinding,
   maxBindingGap,
@@ -94,35 +98,45 @@ export const mutateElbowArrow = (
   ];
   const [startGlobalPoint, endGlobalPoint] = [
     origStartElement && arrow.startBinding
-      ? ([
-          origStartElement.x + arrow.startBinding.fixedPoint[0],
-          origStartElement.y + arrow.startBinding.fixedPoint[1],
-        ] as Point)
+      ? rotatePoint(
+          [
+            origStartElement.x + arrow.startBinding.fixedPoint[0],
+            origStartElement.y + arrow.startBinding.fixedPoint[1],
+          ],
+          [
+            origStartElement.x + origStartElement.width / 2,
+            origStartElement.y + origStartElement.height / 2,
+          ],
+          origStartElement.angle,
+        )
       : origStartGlobalPoint,
     origEndElement && arrow.endBinding
-      ? ([
-          origEndElement.x + arrow.endBinding.fixedPoint[0],
-          origEndElement.y + arrow.endBinding.fixedPoint[1],
-        ] as Point)
+      ? rotatePoint(
+          [
+            origEndElement.x + arrow.endBinding.fixedPoint[0],
+            origEndElement.y + arrow.endBinding.fixedPoint[1],
+          ],
+          [
+            origEndElement.x + origEndElement.width / 2,
+            origEndElement.y + origEndElement.height / 2,
+          ],
+          origEndElement.angle,
+        )
       : origEndGlobalPoint,
   ];
   const [startElement, endElement] = [
-    !options?.disableBinding
-      ? !options?.isDragging
-        ? origStartElement
-        : getHoveredElementForBinding(
-            { x: startGlobalPoint[0], y: startGlobalPoint[1] },
-            scene,
-          )
-      : null,
-    !options?.disableBinding
-      ? !options?.isDragging
-        ? origEndElement
-        : getHoveredElementForBinding(
-            { x: endGlobalPoint[0], y: endGlobalPoint[1] },
-            scene,
-          )
-      : null,
+    options?.isDragging
+      ? getHoveredElementForBinding(
+          { x: startGlobalPoint[0], y: startGlobalPoint[1] },
+          scene,
+        )
+      : origStartElement,
+    options?.isDragging
+      ? getHoveredElementForBinding(
+          { x: endGlobalPoint[0], y: endGlobalPoint[1] },
+          scene,
+        )
+      : origEndElement,
   ];
   const [startHeading, endHeading] = [
     startElement
@@ -227,6 +241,12 @@ export const mutateElbowArrow = (
   const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
     (aabb) => aabb !== null,
   );
+
+  boundingBoxes.forEach((box) => debugDrawBounds(box));
+  startGlobalPoint && debugDrawPoint(startGlobalPoint);
+  startDonglePosition && debugDrawPoint(startDonglePosition, "green");
+  endGlobalPoint && debugDrawPoint(endGlobalPoint);
+  endDonglePosition && debugDrawPoint(endDonglePosition, "green");
 
   // Canculate Grid positions
   const grid = calculateGrid(

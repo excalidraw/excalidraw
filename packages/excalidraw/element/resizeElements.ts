@@ -1,24 +1,37 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import { rotate, centerPoint, rotatePoint } from "../math";
-import type {
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  NonDeletedExcalidrawElement,
-  NonDeleted,
-  ExcalidrawElement,
-  ExcalidrawTextElementWithContainer,
-  ExcalidrawImageElement,
-  ElementsMap,
-} from "./types";
+import { isInGroup } from "../groups";
+import { centerPoint, rotate, rotatePoint } from "../math";
+import Scene from "../scene/Scene";
+import type { Point, PointerDownState } from "../types";
 import type { Mutable } from "../utility-types";
+import { getFontString } from "../utils";
+import { updateBoundElements } from "./binding";
 import {
-  getElementAbsoluteCoords,
-  getCommonBounds,
-  getResizedElementAbsoluteCoords,
   getCommonBoundingBox,
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  getResizedElementAbsoluteCoords,
 } from "./bounds";
+import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
+import {
+  getApproxMinLineHeight,
+  getApproxMinLineWidth,
+  getBoundTextElement,
+  getBoundTextElementId,
+  getBoundTextMaxWidth,
+  getContainerElement,
+  getMinTextElementWidth,
+  handleBindTextResize,
+  measureText,
+  wrapText,
+} from "./textElement";
+import type {
+  MaybeTransformHandleType,
+  TransformHandleDirection,
+} from "./transformHandles";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -28,29 +41,16 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { mutateElement } from "./mutateElement";
-import { getFontString } from "../utils";
-import { updateBoundElements } from "./binding";
 import type {
-  MaybeTransformHandleType,
-  TransformHandleDirection,
-} from "./transformHandles";
-import type { Point, PointerDownState } from "../types";
-import Scene from "../scene/Scene";
-import {
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextElementId,
-  getContainerElement,
-  handleBindTextResize,
-  getBoundTextMaxWidth,
-  getApproxMinLineHeight,
-  wrapText,
-  measureText,
-  getMinTextElementWidth,
-} from "./textElement";
-import { LinearElementEditor } from "./linearElementEditor";
-import { isInGroup } from "../groups";
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+} from "./types";
 import { mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {
@@ -1034,58 +1034,7 @@ const rotateMultipleElements = (
         centerAngle + origAngle - element.angle,
       );
       if (isArrowElement(element) && element.elbowed) {
-        const startElement =
-          element.startBinding &&
-          elementsMap.get(element.startBinding.elementId);
-        const endElement =
-          element.endBinding && elementsMap.get(element.endBinding.elementId);
-        const startPoint =
-          startElement && element.startBinding
-            ? rotatePoint(
-                [
-                  startElement.x + element.startBinding.fixedPoint[0],
-                  startElement.y + element.startBinding.fixedPoint[1],
-                ],
-                [
-                  startElement.x + startElement.width / 2,
-                  startElement.y + startElement.height / 2,
-                ],
-                startElement.angle,
-              )
-            : [
-                element.x + element.points[0][0],
-                element.y + element.points[0][1],
-              ];
-        const endPoint =
-          endElement && element.endBinding
-            ? rotatePoint(
-                [
-                  endElement.x + element.endBinding.fixedPoint[0],
-                  endElement.y + element.endBinding.fixedPoint[1],
-                ],
-                [
-                  endElement.x + endElement.width / 2,
-                  endElement.y + endElement.height / 2,
-                ],
-                endElement.angle,
-              )
-            : [
-                element.x + element.points[element.points.length - 1][0],
-                element.y + element.points[element.points.length - 1][1],
-              ];
-        mutateElbowArrow(
-          element,
-          scene,
-          [startPoint, endPoint].map((point) => [
-            point[0] - element.x,
-            point[1] - element.y,
-          ]),
-          undefined,
-          undefined,
-          {
-            disableBinding: true,
-          },
-        );
+        mutateElbowArrow(element, scene, element.points);
       } else {
         mutateElement(
           element,
