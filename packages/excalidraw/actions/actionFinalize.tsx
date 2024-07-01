@@ -128,7 +128,12 @@ export const actionFinalize = register({
           -1,
           arrayToMap(elements),
         );
-        maybeBindLinearElement(multiPointElement, appState, { x, y }, app);
+        maybeBindLinearElement(
+          multiPointElement,
+          appState,
+          { x, y },
+          elementsMap,
+        );
       }
     }
 

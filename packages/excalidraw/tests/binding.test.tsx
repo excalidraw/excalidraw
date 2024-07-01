@@ -1,5 +1,5 @@
 import { fireEvent, render } from "./test-utils";
-import { Excalidraw } from "../index";
+import { Excalidraw, isLinearElement } from "../index";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
@@ -432,5 +432,50 @@ describe("element binding", () => {
 
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).toBe(null);
+  });
+
+  it("should not unbind when duplicating via selection group", () => {
+    const rectLeft = UI.createElement("rectangle", {
+      x: 0,
+      width: 200,
+      height: 500,
+    });
+    const rectRight = UI.createElement("rectangle", {
+      x: 400,
+      y: 200,
+      width: 200,
+      height: 500,
+    });
+    const arrow = UI.createElement("arrow", {
+      x: 210,
+      y: 250,
+      width: 177,
+      height: 1,
+    });
+    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+
+    mouse.downAt(-100, -100);
+    mouse.moveTo(650, 750);
+    mouse.up(0, 0);
+
+    expect(API.getSelectedElements().length).toBe(3);
+
+    mouse.moveTo(5, 5);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(5, 5);
+      mouse.moveTo(1000, 1000);
+      mouse.up(0, 0);
+
+      expect(window.h.elements.length).toBe(6);
+      window.h.elements.forEach((element) => {
+        if (isLinearElement(element)) {
+          expect(element.startBinding).not.toBe(null);
+          expect(element.endBinding).not.toBe(null);
+        } else {
+          expect(element.boundElements).not.toBe(null);
+        }
+      });
+    });
   });
 });

@@ -381,7 +381,7 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                app,
+                elementsMap,
               )
             : null;
 
@@ -715,7 +715,10 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(scenePointer, app),
+        endBindingElement: getHoveredElementForBinding(
+          scenePointer,
+          elementsMap,
+        ),
       };
 
       ret.didAddPoint = true;
@@ -1165,7 +1168,7 @@ export class LinearElementEditor {
     const nextPoints = points.map((point, idx) => {
       const selectedPointData = targetPoints.find((p) => p.index === idx);
       if (selectedPointData) {
-        if (selectedOriginPoint) {
+        if (selectedPointData.index === 0) {
           return point;
         }
 
@@ -1174,7 +1177,10 @@ export class LinearElementEditor {
         const deltaY =
           selectedPointData.point[1] - points[selectedPointData.index][1];
 
-        return [point[0] + deltaX, point[1] + deltaY] as const;
+        return [
+          point[0] + deltaX - offsetX,
+          point[1] + deltaY - offsetY,
+        ] as const;
       }
       return offsetX || offsetY
         ? ([point[0] - offsetX, point[1] - offsetY] as const)

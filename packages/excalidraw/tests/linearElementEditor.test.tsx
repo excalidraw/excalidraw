@@ -27,6 +27,7 @@ import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
+import React from "react";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -972,10 +973,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
+          "Online whiteboard 
+          collaboration made 
+          easy"
+        `);
     });
 
     it("should bind text to arrow when clicked on arrow and enter pressed", async () => {
@@ -1006,10 +1007,10 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-        "Online whiteboard 
-        collaboration made 
-        easy"
-      `);
+          "Online whiteboard 
+          collaboration made 
+          easy"
+        `);
     });
 
     it("should not bind text to line when double clicked", async () => {
@@ -1347,6 +1348,29 @@ describe("Test Linear Elements", () => {
       expect(arrow.y).toBe(100);
       expect(label.x).toBe(0);
       expect(label.y).toBe(0);
+    });
+  });
+
+  describe("Test moving linear element points", () => {
+    it("should move the endpoint in the negative direction correctly when the start point is also moved in the positive direction", async () => {
+      const line = createThreePointerLinearElement("arrow");
+      const [origStartX, origStartY] = [line.x, line.y];
+
+      LinearElementEditor.movePoints(line, [
+        { index: 0, point: [line.points[0][0] + 10, line.points[0][1] + 10] },
+        {
+          index: line.points.length - 1,
+          point: [
+            line.points[line.points.length - 1][0] - 10,
+            line.points[line.points.length - 1][1] - 10,
+          ],
+        },
+      ]);
+      expect(line.x).toBe(origStartX + 10);
+      expect(line.y).toBe(origStartY + 10);
+
+      expect(line.points[line.points.length - 1][0]).toBe(20);
+      expect(line.points[line.points.length - 1][1]).toBe(-20);
     });
   });
 });
