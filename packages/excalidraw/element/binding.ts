@@ -53,7 +53,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { debugDrawPoint } from "../visualdebug";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -825,28 +825,15 @@ const calculateFixedPointForElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  scale?: { scaleX: number; scaleY: number },
+  newSize?: { width: number; height: number },
 ) => {
-  let { fixedPoint } =
-    startOrEnd === "start"
-      ? linearElement.startBinding ?? {}
-      : linearElement.endBinding ?? {};
-
-  if (fixedPoint && scale) {
-    return {
-      fixedPoint: [
-        fixedPoint[0] * scale.scaleX,
-        fixedPoint[1] * scale.scaleY,
-      ] as Point,
-    };
-  }
-
   const bounds = [
     hoveredElement.x,
     hoveredElement.y,
-    hoveredElement.x + hoveredElement.width,
-    hoveredElement.y + hoveredElement.height,
+    hoveredElement.x + (newSize?.width ?? hoveredElement.width),
+    hoveredElement.y + (newSize?.height ?? hoveredElement.height),
   ] as Bounds;
+  debugDrawBounds([bounds[0] - 5, bounds[1] - 5, bounds[2] + 5, bounds[3] + 5]);
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
 
@@ -872,7 +859,7 @@ const calculateFixedPointForElbowArrowBinding = (
     elementsMap,
   );
 
-  fixedPoint = [
+  const fixedPoint = [
     snappedGlobalPoint[0] - bounds[0],
     snappedGlobalPoint[1] - bounds[1],
   ] as Point;
@@ -908,7 +895,7 @@ const maybeCalculateNewGapWhenScaling = (
     changedElement,
     startOrEnd,
     elementsMap,
-    scale,
+    newSize,
   );
 
   return { elementId, gap: newGap, focus, ...newFixedPointUpdate };
