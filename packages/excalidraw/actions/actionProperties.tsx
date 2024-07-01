@@ -1264,6 +1264,10 @@ export const actionChangeArrowType = register({
                 }
               : null,
           elbowed: value === "elbow",
+          points:
+            value !== "elbow"
+              ? [el.points[0], el.points[el.points.length - 1]]
+              : el.points,
         });
 
         if (value === "elbow") {
