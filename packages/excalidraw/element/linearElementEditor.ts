@@ -381,7 +381,7 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                app,
+                elementsMap,
               )
             : null;
 
@@ -715,7 +715,10 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(scenePointer, app),
+        endBindingElement: getHoveredElementForBinding(
+          scenePointer,
+          elementsMap,
+        ),
       };
 
       ret.didAddPoint = true;

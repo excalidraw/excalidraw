@@ -15,6 +15,7 @@ import { Excalidraw, mutateElement } from "../..";
 import { t } from "../../i18n";
 import type {
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
 import { degreeToRadian, rotate } from "../../math";
@@ -23,6 +24,7 @@ import { getCommonBounds, isTextElement } from "../../element";
 import { API } from "../../tests/helpers/api";
 import { actionGroup } from "../../actions";
 import { isInGroup } from "../../groups";
+import React from "react";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -96,6 +98,92 @@ describe("step sized value", () => {
     values.forEach((value) => {
       expect(getStepSizedValue(value, stepSize)).toEqual(0);
     });
+  });
+});
+
+describe("binding with linear elements", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    renderStaticScene.mockClear();
+    reseed(19);
+    setDateTimeForTests("201933152653");
+
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    h.elements = [];
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    stats = UI.queryStats();
+
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(200, 100);
+
+    UI.clickTool("arrow");
+    mouse.down(5, 0);
+    mouse.up(300, 50);
+
+    elementStats = stats?.querySelector("#elementStats");
+  });
+
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  it("should remain bound to linear element on small position change", async () => {
+    const linear = h.elements[1] as ExcalidrawLinearElement;
+    const inputX = getStatsProperty("X")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(linear.startBinding).not.toBe(null);
+    expect(inputX).not.toBeNull();
+    editInput(inputX, String("204"));
+    expect(linear.startBinding).not.toBe(null);
+  });
+
+  it("should remain bound to linear element on small angle change", async () => {
+    const linear = h.elements[1] as ExcalidrawLinearElement;
+    const inputAngle = getStatsProperty("A")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(linear.startBinding).not.toBe(null);
+    editInput(inputAngle, String("1"));
+    expect(linear.startBinding).not.toBe(null);
+  });
+
+  it("should unbind linear element on large position change", async () => {
+    const linear = h.elements[1] as ExcalidrawLinearElement;
+    const inputX = getStatsProperty("X")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(linear.startBinding).not.toBe(null);
+    expect(inputX).not.toBeNull();
+    editInput(inputX, String("254"));
+    expect(linear.startBinding).toBe(null);
+  });
+
+  it("should remain bound to linear element on small angle change", async () => {
+    const linear = h.elements[1] as ExcalidrawLinearElement;
+    const inputAngle = getStatsProperty("A")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+
+    expect(linear.startBinding).not.toBe(null);
+    editInput(inputAngle, String("45"));
+    expect(linear.startBinding).toBe(null);
   });
 });
 
