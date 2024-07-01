@@ -25,7 +25,7 @@ export type ColorPalette = Merge<
 >;
 
 // used general type instead of specific type (ColorPalette) to support custom colors
-export type ColorPaletteCustom = { [key: string]: ColorTuple | string };
+export type ColorPaletteCustom = Record<string, ColorTuple | string>;
 export type ColorShadesIndexes = [number, number, number, number, number];
 
 export const MAX_CUSTOM_COLORS_USED_IN_CANVAS = 5;

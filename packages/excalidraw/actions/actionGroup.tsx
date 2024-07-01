@@ -253,15 +253,12 @@ export const actionUngroup = register({
     // remove binded text elements from selection
     updateAppState.selectedElementIds = Object.entries(
       updateAppState.selectedElementIds,
-    ).reduce(
-      (acc: { [key: ExcalidrawElement["id"]]: true }, [id, selected]) => {
-        if (selected && !boundTextElementIds.includes(id)) {
-          acc[id] = true;
-        }
-        return acc;
-      },
-      {},
-    );
+    ).reduce((acc: Record<ExcalidrawElement["id"], true>, [id, selected]) => {
+      if (selected && !boundTextElementIds.includes(id)) {
+        acc[id] = true;
+      }
+      return acc;
+    }, {});
 
     return {
       appState: { ...appState, ...updateAppState },
