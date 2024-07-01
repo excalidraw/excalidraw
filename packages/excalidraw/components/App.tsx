@@ -431,7 +431,7 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
-import { getExcalidrawContentEl, hideFreedrawPenmodeCursor } from "../obsidianUtils";
+import { destroyObsidianUtils, getExcalidrawContentEl, hideFreedrawPenmodeCursor, hostPlugin, initializeObsidianUtils } from "../obsidianUtils";
 import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
@@ -524,8 +524,6 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
-
-export let hostPlugin: any; //zsviczian
 
 /**
  * Map of youtube embed video states
@@ -683,7 +681,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-    hostPlugin = obsidianHostPlugin; //zsviczian
+    initializeObsidianUtils(obsidianHostPlugin.deref()); //zsviczian
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -2042,7 +2040,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   //zsviczian - ugly hack
-  private get OPENAI_KEY():string | null { return hostPlugin?.settings?.openAIAPIToken };
+  private get OPENAI_KEY():string | null { return hostPlugin.settings.openAIAPIToken };
   private set OPENAI_KEY(value:string | null) { return; };
   
   private OPENAI_KEY_IS_PERSISTED: boolean =
@@ -2582,7 +2580,7 @@ class App extends React.Component<AppProps, AppState> {
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
-    this.scene.destroy();
+    this.scene.destroy(true); //zsviczian
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
@@ -2614,6 +2612,8 @@ class App extends React.Component<AppProps, AppState> {
     this.lastPointerDownEvent = null; //zsviczian
     this.lastPointerUpEvent = null; //zsviczian
     this.lastPointerMoveEvent = null; //zsviczian
+    //@ts-ignore
+    this.actionManager.app = null; //zsviczian
     this.actionManager.actions = {} as Record<ActionName, Action>; //zsviczian
     this.history.clear(); //zsviczian
     //@ts-ignore
@@ -2633,14 +2633,14 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue = { container: null, id:"unknown" }; //zsviczian
     //@ts-ignore
     this.props = null; //zsviczian
-    hostPlugin = null; //zsviczian
     this.laserTrails.terminate(); //zsviczian
     this.eraserTrail.terminate(); //zsviczian
-  
+    destroyObsidianUtils(); //zsviczian
+    /*
     Object.keys(this).forEach((key) => {
       //@ts-ignore    
       delete this[key];
-    });
+    });*/
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -2697,16 +2697,18 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.POINTER_UP, this.removePointer), // #3553
       addEventListener(document, EVENT.COPY, this.onCopy),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
+      addEventListener(window,"focus", ()=>this.triggerRender(true), { passive: true }), //zsviczian
       addEventListener(
         document,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
       ),
       // rerender text elements on font load to fix #637 && #1553
-      addEventListener(document.fonts, "loadingdone", (event) => {
+      // zsviczian In Obsidian this is not needed as I manage font load separately
+      /*addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
         this.fonts.onFontsLoaded(loadedFontFaces);
-      }),
+      }),*/
       // Safari-only desktop pinch zoom
       addEventListener(
         document,
