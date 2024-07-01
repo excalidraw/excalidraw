@@ -19,7 +19,6 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -829,7 +828,7 @@ const aabbForElement = (
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
-const headingForPointFromElement = (
+export const headingForPointFromElement = (
   element: ExcalidrawBindableElement,
   aabb: Bounds,
   point: Point,

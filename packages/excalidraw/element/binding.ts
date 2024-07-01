@@ -27,13 +27,7 @@ import type {
 
 import { isPointOnShape } from "../../utils/collision";
 import { KEYS } from "../keys";
-import {
-  pointToVector,
-  rotatePoint,
-  scaleVector,
-  translatePoint,
-  vectorToHeading,
-} from "../math";
+import { rotatePoint, scaleVector, translatePoint } from "../math";
 import { getElementAtPosition } from "../scene";
 import type Scene from "../scene/Scene";
 import { getElementShape } from "../shapes";
@@ -44,6 +38,7 @@ import { getElementAbsoluteCoords } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
+import { headingForPointFromElement } from "./routing";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
@@ -53,7 +48,6 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -408,21 +402,25 @@ export const maybeBindLinearElement = (
       scene,
     );
   }
+
   const hoveredElement = getHoveredElementForBinding(pointerCoords, scene);
-  if (
-    hoveredElement != null &&
-    !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
-      linearElement,
-      hoveredElement,
-      "end",
-    )
-  ) {
-    bindLinearElement(
-      linearElement,
-      hoveredElement,
-      "end",
-      scene.getNonDeletedElementsMap(),
-    );
+
+  if (hoveredElement !== null) {
+    if (
+      !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
+        linearElement,
+        hoveredElement,
+        "end",
+      )
+    ) {
+      bindLinearElement(
+        linearElement,
+        hoveredElement,
+        "end",
+        scene.getNonDeletedElementsMap(),
+      );
+    }
+
     snapToElementOutline(
       linearElement,
       "end",
@@ -713,14 +711,19 @@ export const bindPointToSnapToElementOutline = (
   return translatePoint(
     point,
     scaleVector(
-      startOrEnd === "startBinding"
-        ? vectorToHeading(pointToVector(arrow.points[0], arrow.points[1]))
-        : vectorToHeading(
-            pointToVector(
-              arrow.points[arrow.points.length - 1],
-              arrow.points[arrow.points.length - 2],
-            ),
-          ),
+      scaleVector(
+        headingForPointFromElement(
+          bindableElement,
+          [
+            bindableElement.x,
+            bindableElement.y,
+            bindableElement.x + bindableElement.width,
+            bindableElement.y + bindableElement.height,
+          ],
+          point,
+        ),
+        -1,
+      ),
       distanceToBindableElement(bindableElement, point, elementsMap) - 5,
     ),
   );
@@ -768,7 +771,7 @@ const updateBoundPoint = (
       globalMidPoint,
       bindableElement.angle,
     );
-    debugDrawPoint(rotatedGlobal);
+
     return LinearElementEditor.pointFromAbsoluteCoords(
       linearElement,
       rotatedGlobal,
@@ -833,7 +836,7 @@ const calculateFixedPointForElbowArrowBinding = (
     hoveredElement.x + (newSize?.width ?? hoveredElement.width),
     hoveredElement.y + (newSize?.height ?? hoveredElement.height),
   ] as Bounds;
-  debugDrawBounds([bounds[0] - 5, bounds[1] - 5, bounds[2] + 5, bounds[3] + 5]);
+
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
 
