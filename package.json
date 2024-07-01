@@ -10,6 +10,7 @@
     "examples/excalidraw/*"
   ],
   "dependencies": {
+    "@excalidraw/excalidraw": "0.17.1",
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",

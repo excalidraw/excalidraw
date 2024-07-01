@@ -4,6 +4,8 @@ import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
 import type { NestedKeyOf } from "./utility-types";
 
+import { i18branches } from "./utils";
+
 const COMPLETION_THRESHOLD = 85;
 
 export interface Language {
@@ -72,7 +74,8 @@ export const languages: Language[] = [
     .sort((left, right) => (left.label > right.label ? 1 : -1)),
 ];
 
-const TEST_LANG_CODE = "__test__";
+// exporting this constant to not declare it twice
+export const TEST_LANG_CODE = "__test__";
 if (import.meta.env.DEV) {
   languages.unshift(
     { code: TEST_LANG_CODE, label: "test language" },
@@ -89,15 +92,23 @@ let currentLangData = {};
 
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
-  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
+
+  document.documentElement.dir = currentLang.rtl ?
+    (i18branches.rtlBranch = true, "rtl") :
+    (i18branches.ltrBranch = true, "ltr");
+
   document.documentElement.lang = currentLang.code;
 
   if (lang.code.startsWith(TEST_LANG_CODE)) {
+    i18branches.testBranch = true;
     currentLangData = {};
   } else {
+    i18branches.noTestBranch = true;
     try {
       currentLangData = await import(`./locales/${currentLang.code}.json`);
     } catch (error: any) {
+      i18branches.errorBranch = true;
+
       console.error(`Failed to load language ${lang.code}:`, error.message);
       currentLangData = fallbackLangData;
     }
