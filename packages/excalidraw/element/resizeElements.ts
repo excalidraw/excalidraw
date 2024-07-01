@@ -422,6 +422,24 @@ const resizeSingleTextElement = (
   }
 };
 
+function rescalePointsAndTranslateOffset(
+  dimension: 0 | 1,
+  newSize: number,
+  points: readonly Point[],
+): [translation: number, points: Point[]] {
+  const getPointsMinMax = (points: readonly Point[], dimension: 0 | 1) => {
+    const projectedPoints = points.map((point) => point[dimension]);
+    const min = Math.min(...projectedPoints);
+    const max = Math.max(...projectedPoints);
+    return { min, max };
+  };
+
+  const origin = getPointsMinMax(points, dimension);
+  const newPoints = rescalePoints(dimension, newSize, points, false);
+  const { min } = getPointsMinMax(newPoints, dimension);
+  return [origin.min - min, newPoints];
+}
+
 export const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
@@ -638,26 +656,30 @@ export const resizeSingleElement = (
   newOrigin[0] += linearElementXOffset;
   newOrigin[1] += linearElementYOffset;
 
-  const nextX = newOrigin[0];
-  const nextY = newOrigin[1];
+  let nextX = newOrigin[0];
+  let nextY = newOrigin[1];
 
   // Readjust points for linear elements
   let rescaledElementPointsY;
   let rescaledPoints;
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    rescaledElementPointsY = rescalePoints(
+    let xOffset;
+    let yOffset;
+
+    [yOffset, rescaledElementPointsY] = rescalePointsAndTranslateOffset(
       1,
       eleNewHeight,
       (stateAtResizeStart as ExcalidrawLinearElement).points,
-      true,
     );
 
-    rescaledPoints = rescalePoints(
+    [xOffset, rescaledPoints] = rescalePointsAndTranslateOffset(
       0,
       eleNewWidth,
       rescaledElementPointsY,
-      true,
     );
+
+    nextY += yOffset;
+    nextX += xOffset;
   }
 
   const resizedElement = {
