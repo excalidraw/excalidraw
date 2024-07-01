@@ -3892,6 +3892,26 @@ class App extends React.Component<AppProps, AppState> {
         }, 100);
       }
 
+      // remove selections on escape press
+      if (
+        event.key === KEYS.ESCAPE &&
+        // unless we're dragging or finalizing an action
+        !(
+          this.state.draggingElement ||
+          isWritableElement(event.target) ||
+          this.state.editingElement ||
+          ["freedraw", "eraser"].includes(this.state.activeTool.type)
+        )
+      ) {
+        this.setState({
+          selectedElementIds: {},
+          selectedGroupIds: {},
+          editingGroupId: null,
+        });
+        event.preventDefault();
+        return;
+      }
+
       // prevent browser zoom in input fields
       if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
         if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
