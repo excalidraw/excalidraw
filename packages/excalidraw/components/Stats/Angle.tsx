@@ -1,16 +1,12 @@
-import {
-  bindOrUnbindLinearElements,
-  updateBoundElements,
-} from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
 import { getBoundTextElement } from "../../element/textElement";
-import { isArrowElement, isLinearElement } from "../../element/typeChecks";
+import { isArrowElement } from "../../element/typeChecks";
 import type { ExcalidrawElement } from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
+import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
@@ -43,12 +39,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       mutateElement(latestElement, {
         angle: nextAngle,
       });
-
-      if (isLinearElement(latestElement)) {
-        bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
-      } else {
-        updateBoundElements(latestElement, elementsMap);
-      }
+      updateBindings(latestElement, elementsMap);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -74,11 +65,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     mutateElement(latestElement, {
       angle: nextAngle,
     });
-    if (isLinearElement(latestElement)) {
-      bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
-    } else {
-      updateBoundElements(latestElement, elementsMap);
-    }
+    updateBindings(latestElement, elementsMap);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {

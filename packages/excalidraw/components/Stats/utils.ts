@@ -164,16 +164,12 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
-  if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
-  } else {
-    updateBoundElements(latestElement, elementsMap, {
-      newSize: {
-        width: nextWidth,
-        height: nextHeight,
-      },
-    });
-  }
+  updateBindings(latestElement, elementsMap, {
+    newSize: {
+      width: nextWidth,
+      height: nextHeight,
+    },
+  });
 
   if (boundTextElement) {
     boundTextFont = {
@@ -248,11 +244,7 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
-  if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
-  } else {
-    updateBoundElements(latestElement, elementsMap);
-  }
+  updateBindings(latestElement, elementsMap);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -291,4 +283,19 @@ export const getAtomicUnits = (
       });
     });
   return _atomicUnits;
+};
+
+export const updateBindings = (
+  latestElement: ExcalidrawElement,
+  elementsMap: NonDeletedSceneElementsMap,
+  options?: {
+    simultaneouslyUpdated?: readonly ExcalidrawElement[];
+    newSize?: { width: number; height: number };
+  },
+) => {
+  if (isLinearElement(latestElement)) {
+    bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
+  } else {
+    updateBoundElements(latestElement, elementsMap, options);
+  }
 };
