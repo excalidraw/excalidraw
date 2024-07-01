@@ -12,7 +12,7 @@ ARG NODE_ENV=production
 
 RUN yarn build:app:docker
 
-FROM nginx:1.24-alpine
+FROM nginxinc/nginx-unprivileged:alpine3.19
 
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
