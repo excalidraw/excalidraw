@@ -187,37 +187,53 @@ const bindOrUnbindLinearElementEdge = (
     bindLinearElement(linearElement, bindableElement, startOrEnd, elementsMap);
     boundToElementIds.add(bindableElement.id);
 
-    if (isArrowElement(linearElement) && linearElement.elbowed) {
-      LinearElementEditor.movePoints(
-        linearElement,
-        [
-          startOrEnd === "start"
-            ? {
-                index: 0,
-                point: updateBoundPoint(
-                  linearElement,
-                  "startBinding",
-                  linearElement.startBinding,
-                  bindableElement,
-                  elementsMap,
-                  scene,
-                )!,
-              }
-            : {
-                index: linearElement.points.length - 1,
-                point: updateBoundPoint(
-                  linearElement,
-                  "endBinding",
-                  linearElement.endBinding,
-                  bindableElement,
-                  elementsMap,
-                  scene,
-                )!,
-              },
-        ],
-        scene,
-      );
-    }
+    snapToElementOutline(
+      linearElement,
+      startOrEnd,
+      bindableElement,
+      elementsMap,
+      scene,
+    );
+  }
+};
+
+const snapToElementOutline = (
+  linearElement: ExcalidrawLinearElement,
+  startOrEnd: "start" | "end",
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  scene: Scene,
+) => {
+  if (isArrowElement(linearElement) && linearElement.elbowed) {
+    LinearElementEditor.movePoints(
+      linearElement,
+      [
+        startOrEnd === "start"
+          ? {
+              index: 0,
+              point: updateBoundPoint(
+                linearElement,
+                "startBinding",
+                linearElement.startBinding,
+                bindableElement,
+                elementsMap,
+                scene,
+              )!,
+            }
+          : {
+              index: linearElement.points.length - 1,
+              point: updateBoundPoint(
+                linearElement,
+                "endBinding",
+                linearElement.endBinding,
+                bindableElement,
+                elementsMap,
+                scene,
+              )!,
+            },
+      ],
+      scene,
+    );
   }
 };
 
@@ -384,6 +400,13 @@ export const maybeBindLinearElement = (
       "start",
       scene.getNonDeletedElementsMap(),
     );
+    snapToElementOutline(
+      linearElement,
+      "start",
+      appState.startBoundElement,
+      scene.getNonDeletedElementsMap(),
+      scene,
+    );
   }
   const hoveredElement = getHoveredElementForBinding(pointerCoords, scene);
   if (
@@ -399,6 +422,13 @@ export const maybeBindLinearElement = (
       hoveredElement,
       "end",
       scene.getNonDeletedElementsMap(),
+    );
+    snapToElementOutline(
+      linearElement,
+      "end",
+      hoveredElement,
+      scene.getNonDeletedElementsMap(),
+      scene,
     );
   }
 };
