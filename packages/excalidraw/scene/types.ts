@@ -18,6 +18,7 @@ import type {
   Device,
 } from "../types";
 import type { MakeBrand } from "../utility-types";
+import { ColorRGBTuple } from "../colors";
 
 export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;
@@ -54,7 +55,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
-  selectionColor: string;
+  selectionColor: ColorRGBTuple;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;

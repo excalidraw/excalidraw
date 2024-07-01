@@ -67,11 +67,13 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
+import { lightenRgb, rgbToString } from "../colors";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elementsMap: ElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
@@ -94,7 +96,7 @@ const renderLinearElementPointHighlight = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  highlightPoint(point, context, appState);
+  highlightPoint(point, context, appState, selectionColor);
   context.restore();
 };
 
@@ -102,8 +104,9 @@ const highlightPoint = (
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
-  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+  context.fillStyle = rgbToString(selectionColor, 0.4);
 
   fillCircle(
     context,
@@ -170,16 +173,19 @@ const renderSingleLinearPoint = (
   appState: InteractiveCanvasAppState,
   point: Point,
   radius: number,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
   isSelected: boolean,
   isPhantomPoint = false,
 ) => {
-  context.strokeStyle = "#5e5ad8";
+  context.strokeStyle = rgbToString(selectionColor);
   context.setLineDash([]);
   context.fillStyle = "rgba(255, 255, 255, 0.9)";
   if (isSelected) {
-    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+    // context.fillStyle = "rgba(134, 131, 226, 0.9)";
+    context.fillStyle = rgbToString(lightenRgb(selectionColor, 0.1), 0.9);
   } else if (isPhantomPoint) {
-    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+    // context.fillStyle = "rgba(177, 151, 252, 0.7)";
+    context.fillStyle = rgbToString(lightenRgb(selectionColor, 0.25), 0.7);
   }
 
   fillCircle(
@@ -457,6 +463,7 @@ const renderLinearPointHandles = (
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
   elementsMap: RenderableElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   if (!appState.selectedLinearElement) {
     return;
@@ -477,7 +484,14 @@ const renderLinearPointHandles = (
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
-    renderSingleLinearPoint(context, appState, point, radius, isSelected);
+    renderSingleLinearPoint(
+      context,
+      appState,
+      point,
+      radius,
+      selectionColor,
+      isSelected,
+    );
   });
 
   //Rendering segment mid points
@@ -505,16 +519,18 @@ const renderLinearPointHandles = (
           appState,
           segmentMidPoint,
           radius,
+          selectionColor,
           false,
         );
-        highlightPoint(segmentMidPoint, context, appState);
+        highlightPoint(segmentMidPoint, context, appState, selectionColor);
       } else {
-        highlightPoint(segmentMidPoint, context, appState);
+        highlightPoint(segmentMidPoint, context, appState, selectionColor);
         renderSingleLinearPoint(
           context,
           appState,
           segmentMidPoint,
           radius,
+          selectionColor,
           false,
         );
       }
@@ -524,6 +540,7 @@ const renderLinearPointHandles = (
         appState,
         segmentMidPoint,
         POINT_HANDLE_SIZE / 2,
+        selectionColor,
         false,
         true,
       );
@@ -547,9 +564,7 @@ const renderTransformHandles = (
 
       context.save();
       context.lineWidth = 1 / appState.zoom.value;
-      if (renderConfig.selectionColor) {
-        context.strokeStyle = renderConfig.selectionColor;
-      }
+      context.strokeStyle = rgbToString(renderConfig.selectionColor);
       if (key === "rotation") {
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
         // prefer round corners if roundRect API is available
@@ -593,7 +608,7 @@ const renderTextBox = (
   context.translate(cx + appState.scrollX, cy + appState.scrollY);
   context.rotate(text.angle);
   context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = selectionColor;
+  context.strokeStyle = rgbToString(selectionColor);
   context.strokeRect(shiftX, shiftY, width, height);
   context.restore();
 };
@@ -649,6 +664,7 @@ const _renderInteractiveScene = ({
       appState,
       editingLinearElement,
       elementsMap,
+      renderConfig.selectionColor,
     );
   }
 
@@ -722,6 +738,7 @@ const _renderInteractiveScene = ({
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
       elementsMap,
+      renderConfig.selectionColor,
     );
   }
 
@@ -729,7 +746,12 @@ const _renderInteractiveScene = ({
     appState.selectedLinearElement &&
     appState.selectedLinearElement.hoverPointIndex >= 0
   ) {
-    renderLinearElementPointHighlight(context, appState, elementsMap);
+    renderLinearElementPointHighlight(
+      context,
+      appState,
+      elementsMap,
+      renderConfig.selectionColor,
+    );
   }
   // Paint selected elements
   if (!appState.multiElement && !appState.editingLinearElement) {
@@ -748,9 +770,10 @@ const _renderInteractiveScene = ({
         appState,
         selectedElements[0] as ExcalidrawLinearElement,
         elementsMap,
+        renderConfig.selectionColor,
       );
     }
-    const selectionColor = renderConfig.selectionColor || oc.black;
+    const selectionColor = rgbToString(renderConfig.selectionColor);
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
@@ -916,7 +939,7 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  renderSnaps(context, appState);
+  renderSnaps(context, appState, renderConfig.selectionColor);
 
   // Reset zoom
   context.restore();
