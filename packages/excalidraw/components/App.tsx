@@ -7956,6 +7956,7 @@ class App extends React.Component<AppProps, AppState> {
               startBindingElement,
               endBindingElement,
               elementsMap,
+              this.scene,
             );
           }
 

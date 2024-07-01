@@ -35,7 +35,7 @@ import {
   vectorToHeading,
 } from "../math";
 import { getElementAtPosition } from "../scene";
-import Scene from "../scene/Scene";
+import type Scene from "../scene/Scene";
 import { getElementShape } from "../shapes";
 import type { AppState, Point } from "../types";
 import { arrayToMap, tupleToCoors } from "../utils";
@@ -53,7 +53,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { mutateElbowArrow } from "./routing";
+import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -94,6 +94,7 @@ export const bindOrUnbindLinearElement = (
   startBindingElement: ExcalidrawBindableElement | null | "keep",
   endBindingElement: ExcalidrawBindableElement | null | "keep",
   elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
 ): void => {
   const boundToElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
   const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
@@ -105,6 +106,7 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
+    scene,
   );
   bindOrUnbindLinearElementEdge(
     linearElement,
@@ -114,22 +116,21 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
+    scene,
   );
 
   const onlyUnbound = Array.from(unboundFromElementIds).filter(
     (id) => !boundToElementIds.has(id),
   );
 
-  getNonDeletedElements(Scene.getScene(linearElement)!, onlyUnbound).forEach(
-    (element) => {
-      mutateElement(element, {
-        boundElements: element.boundElements?.filter(
-          (element) =>
-            element.type !== "arrow" || element.id !== linearElement.id,
-        ),
-      });
-    },
-  );
+  getNonDeletedElements(scene, onlyUnbound).forEach((element) => {
+    mutateElement(element, {
+      boundElements: element.boundElements?.filter(
+        (element) =>
+          element.type !== "arrow" || element.id !== linearElement.id,
+      ),
+    });
+  });
 };
 
 const bindOrUnbindLinearElementEdge = (
@@ -142,6 +143,7 @@ const bindOrUnbindLinearElementEdge = (
   // Is mutated
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
 ): void => {
   // "keep" is for method chaining convenience, a "no-op", so just bail out
   if (bindableElement === "keep") {
@@ -184,6 +186,38 @@ const bindOrUnbindLinearElementEdge = (
   } else {
     bindLinearElement(linearElement, bindableElement, startOrEnd, elementsMap);
     boundToElementIds.add(bindableElement.id);
+
+    if (isArrowElement(linearElement) && linearElement.elbowed) {
+      LinearElementEditor.movePoints(
+        linearElement,
+        [
+          startOrEnd === "start"
+            ? {
+                index: 0,
+                point: updateBoundPoint(
+                  linearElement,
+                  "startBinding",
+                  linearElement.startBinding,
+                  bindableElement,
+                  elementsMap,
+                  scene,
+                )!,
+              }
+            : {
+                index: linearElement.points.length - 1,
+                point: updateBoundPoint(
+                  linearElement,
+                  "endBinding",
+                  linearElement.endBinding,
+                  bindableElement,
+                  elementsMap,
+                  scene,
+                )!,
+              },
+        ],
+        scene,
+      );
+    }
   }
 };
 
@@ -301,6 +335,7 @@ export const bindOrUnbindLinearElements = (
       start,
       end,
       scene.getNonDeletedElementsMap(),
+      scene,
     );
   });
 };
@@ -365,9 +400,6 @@ export const maybeBindLinearElement = (
       "end",
       scene.getNonDeletedElementsMap(),
     );
-  }
-  if (isArrowElement(linearElement) && linearElement.elbowed) {
-    mutateElbowArrow(linearElement, scene, linearElement.points);
   }
 };
 
@@ -670,7 +702,7 @@ const updateBoundPoint = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   scene: Scene,
-): Point | null | undefined => {
+): Point | null => {
   if (
     binding == null ||
     // We only need to update the other end if this is a 2 point line element
@@ -705,7 +737,7 @@ const updateBoundPoint = (
       globalMidPoint,
       bindableElement.angle,
     );
-
+    debugDrawPoint(rotatedGlobal);
     return LinearElementEditor.pointFromAbsoluteCoords(
       linearElement,
       rotatedGlobal,
@@ -750,20 +782,10 @@ const updateBoundPoint = (
     }
   }
 
-  LinearElementEditor.movePoints(
+  return LinearElementEditor.pointFromAbsoluteCoords(
     linearElement,
-    [
-      {
-        index: edgePointIndex,
-        point: LinearElementEditor.pointFromAbsoluteCoords(
-          linearElement,
-          newEdgePoint,
-          elementsMap,
-        ),
-      },
-    ],
-    scene,
-    { [startOrEnd]: binding },
+    newEdgePoint,
+    elementsMap,
   );
 };
 

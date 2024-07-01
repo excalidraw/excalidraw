@@ -38,6 +38,7 @@ export const actionFinalize = register({
             startBindingElement,
             endBindingElement,
             elementsMap,
+            scene,
           );
         }
         return {

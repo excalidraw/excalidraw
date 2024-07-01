@@ -805,6 +805,7 @@ export class LinearElementEditor {
           startBindingElement,
           endBindingElement,
           elementsMap,
+          scene,
         );
       }
     }

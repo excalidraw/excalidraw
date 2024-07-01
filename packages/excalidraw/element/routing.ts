@@ -19,11 +19,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import {
-  debugDrawBoundingBox,
-  debugDrawBounds,
-  debugDrawPoint,
-} from "../visualdebug";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -86,7 +82,7 @@ export const mutateElbowArrow = (
     arrow.endBinding &&
       getBindableElementForId(arrow.endBinding.elementId, elementsMap),
   ];
-  const [origStartGlobalPoint, origEndGlobalPoint] = [
+  const [startGlobalPoint, endGlobalPoint] = [
     translatePoint(nextPoints[0], [
       arrow.x + (offset ? offset[0] : 0),
       arrow.y + (offset ? offset[1] : 0),
@@ -95,34 +91,6 @@ export const mutateElbowArrow = (
       arrow.x + (offset ? offset[0] : 0),
       arrow.y + (offset ? offset[1] : 0),
     ]),
-  ];
-  const [startGlobalPoint, endGlobalPoint] = [
-    origStartElement && arrow.startBinding
-      ? rotatePoint(
-          [
-            origStartElement.x + arrow.startBinding.fixedPoint[0],
-            origStartElement.y + arrow.startBinding.fixedPoint[1],
-          ],
-          [
-            origStartElement.x + origStartElement.width / 2,
-            origStartElement.y + origStartElement.height / 2,
-          ],
-          origStartElement.angle,
-        )
-      : origStartGlobalPoint,
-    origEndElement && arrow.endBinding
-      ? rotatePoint(
-          [
-            origEndElement.x + arrow.endBinding.fixedPoint[0],
-            origEndElement.y + arrow.endBinding.fixedPoint[1],
-          ],
-          [
-            origEndElement.x + origEndElement.width / 2,
-            origEndElement.y + origEndElement.height / 2,
-          ],
-          origEndElement.angle,
-        )
-      : origEndGlobalPoint,
   ];
   const [startElement, endElement] = [
     options?.isDragging
@@ -241,12 +209,6 @@ export const mutateElbowArrow = (
   const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
     (aabb) => aabb !== null,
   );
-
-  boundingBoxes.forEach((box) => debugDrawBounds(box));
-  startGlobalPoint && debugDrawPoint(startGlobalPoint);
-  startDonglePosition && debugDrawPoint(startDonglePosition, "green");
-  endGlobalPoint && debugDrawPoint(endGlobalPoint);
-  endDonglePosition && debugDrawPoint(endDonglePosition, "green");
 
   // Canculate Grid positions
   const grid = calculateGrid(
