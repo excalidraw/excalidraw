@@ -285,7 +285,7 @@ export const textWysiwyg = ({
     wordBreak = "break-word";
   }
   Object.assign(editable.style, {
-    position: "absolute",
+    position: "fixed",
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
