@@ -19,6 +19,7 @@
     "jotai": "1.13.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-draggable": "4.4.6",
     "socket.io-client": "4.7.2"
   },
   "devDependencies": {
