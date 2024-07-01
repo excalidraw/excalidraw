@@ -7,7 +7,11 @@ import {
   getBoundTextElement,
   handleBindTextResize,
 } from "../../element/textElement";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState, Point } from "../../types";
 import DragInput from "./DragInput";
@@ -20,7 +24,7 @@ import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
 interface MultiDimensionProps {
   property: "width" | "height";
   elements: readonly ExcalidrawElement[];
-  elementsMap: ElementsMap;
+  elementsMap: NonDeletedSceneElementsMap;
   atomicUnits: AtomicUnit[];
   scene: Scene;
   appState: AppState;
@@ -60,7 +64,7 @@ const resizeElementInGroup = (
   scale: number,
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
 ) => {
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
@@ -103,7 +107,7 @@ const resizeGroup = (
   property: MultiDimensionProps["property"],
   latestElements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
 ) => {
   // keep aspect ratio for groups

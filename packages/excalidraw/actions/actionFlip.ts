@@ -124,7 +124,7 @@ const flipElements = (
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
-    app,
+    elementsMap,
     isBindingEnabled(appState),
     [],
   );

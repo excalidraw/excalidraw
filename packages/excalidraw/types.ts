@@ -614,7 +614,6 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
-  getElementShape: App["getElementShape"];
   getName: App["getName"];
 };
 
