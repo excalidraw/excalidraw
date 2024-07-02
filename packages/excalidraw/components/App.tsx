@@ -2490,7 +2490,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    (window as any).launchQueue?.setConsumer(() => {});
     this.renderer.destroy();
+    this.scene.destroy();
     this.scene = new Scene();
     this.fonts = new Fonts({ scene: this.scene });
     this.renderer = new Renderer(this.scene);
@@ -2499,7 +2501,6 @@ class App extends React.Component<AppProps, AppState> {
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
-    this.scene.destroy();
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
