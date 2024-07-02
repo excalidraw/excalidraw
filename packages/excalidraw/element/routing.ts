@@ -770,7 +770,7 @@ const pointToGridNode = (point: Point, grid: Grid): Node | null => {
 /**
  * Get the axis-aligned bounding box for a given element
  */
-const aabbForElement = (
+export const aabbForElement = (
   element: ExcalidrawElement,
   offset?: [number, number, number, number],
 ) => {

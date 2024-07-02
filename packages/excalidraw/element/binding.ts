@@ -38,7 +38,7 @@ import { getElementAbsoluteCoords } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
-import { headingForPointFromElement } from "./routing";
+import { aabbForElement, headingForPointFromElement } from "./routing";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
@@ -714,12 +714,7 @@ export const bindPointToSnapToElementOutline = (
       scaleVector(
         headingForPointFromElement(
           bindableElement,
-          [
-            bindableElement.x,
-            bindableElement.y,
-            bindableElement.x + bindableElement.width,
-            bindableElement.y + bindableElement.height,
-          ],
+          aabbForElement(bindableElement),
           point,
         ),
         -1,
@@ -841,7 +836,6 @@ const calculateFixedPointForElbowArrowBinding = (
 
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
-
   const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     linearElement,
     edgePointIndex,
@@ -857,19 +851,21 @@ const calculateFixedPointForElbowArrowBinding = (
     -hoveredElement.angle,
   );
   const snappedGlobalPoint = bindPointToSnapToElementOutline(
-    nonRotatedGlobalPoint,
+    [
+      bounds[0] + (nonRotatedGlobalPoint[0] - bounds[0]) * scaleX,
+      bounds[1] + (nonRotatedGlobalPoint[1] - bounds[1]) * scaleX,
+    ],
     startOrEnd === "start" ? "startBinding" : "endBinding",
     linearElement,
     hoveredElement,
     elementsMap,
   );
-
-  const fixedPoint = [
-    (snappedGlobalPoint[0] - bounds[0]) * scaleX,
-    (snappedGlobalPoint[1] - bounds[1]) * scaleY,
+  const scaledLocalPoint = [
+    snappedGlobalPoint[0] - bounds[0],
+    snappedGlobalPoint[1] - bounds[1],
   ] as Point;
 
-  return { fixedPoint };
+  return { fixedPoint: scaledLocalPoint };
 };
 
 const maybeCalculateNewGapWhenScaling = (
