@@ -1,12 +1,16 @@
 import { FONT_FAMILY } from "../constants";
 
-/** For head & hhea metrics read the woff2 with https://fontdrop.info/  */
-export interface FontMetrics {
-  /** head.unitsPerEm */
+/**
+ * Encapsulates font metrics with additional font data.
+ *
+ * For head & hhea metrics read the woff2 with https://fontdrop.info/
+ * */
+export interface FontMetadata {
+  /** head.unitsPerEm metric */
   unitsPerEm: 1000 | 1024 | 2048;
-  /** hhea.ascender */
+  /** hhea.ascender metric */
   ascender: number;
-  /** hhea.descender */
+  /** hhea.descender metric */
   descender: number;
   /** harcoded unitless line-height, https://github.com/excalidraw/excalidraw/pull/6360#issuecomment-1477635971 */
   lineHeight: number;
@@ -16,7 +20,7 @@ export interface FontMetrics {
   hidden?: boolean;
 }
 
-export const DEFAULT_FONT_METRICS: Record<number, FontMetrics> = {
+export const FONT_METADATA: Record<number, FontMetadata> = {
   [FONT_FAMILY.Virgil]: {
     unitsPerEm: 1000,
     ascender: 886,
@@ -50,6 +54,7 @@ export const DEFAULT_FONT_METRICS: Record<number, FontMetrics> = {
     descender: -287,
     lineHeight: 1.25,
     badge: "new",
+    hidden: true,
   },
   [FONT_FAMILY.Nunito]: {
     unitsPerEm: 1000,
@@ -65,25 +70,11 @@ export const DEFAULT_FONT_METRICS: Record<number, FontMetrics> = {
     lineHeight: 1.25,
     badge: "new",
   },
-  [FONT_FAMILY.Pacifico]: {
-    unitsPerEm: 1000,
-    ascender: 1303,
-    descender: -453,
-    lineHeight: 1.75,
-    badge: "new",
-  },
   [FONT_FAMILY["Comic Shanns"]]: {
     unitsPerEm: 1000,
     ascender: 750,
     descender: -250,
     lineHeight: 1.2,
-    badge: "new",
-  },
-  [FONT_FAMILY["Permanent Marker"]]: {
-    unitsPerEm: 1024,
-    ascender: 1136,
-    descender: -325,
-    lineHeight: 1.25,
     badge: "new",
   },
   [FONT_FAMILY["Liberation Sans"]]: {

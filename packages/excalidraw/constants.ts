@@ -129,11 +129,9 @@ export const FONT_FAMILY = {
   Assistant: 4,
   Excalifont: 5,
   Nunito: 6,
-  Pacifico: 7,
-  Bangers: 8,
-  "Comic Shanns": 9,
-  "Permanent Marker": 10,
-  "Liberation Sans": 11,
+  Bangers: 7,
+  "Comic Shanns": 8,
+  "Liberation Sans": 9,
 };
 
 export const THEME = {

@@ -6,7 +6,7 @@ import { isTextElement } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { getFontString } from "../utils";
 import { FONT_FAMILY } from "../constants";
-import { DEFAULT_FONT_METRICS, RANGES, type FontMetrics } from "./metrics";
+import { FONT_METADATA, RANGES, type FontMetadata } from "./metadata";
 import { ExcalidrawFont, type Font } from "./ExcalidrawFont";
 
 import Virgil from "./assets/Virgil-Regular.woff2";
@@ -28,13 +28,6 @@ import NunitoLatinExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BK
 import NunitoCyrilic from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTA3j6zbXWjgevT5.woff2";
 import NunitoCyrilicExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTk3j6zbXWjgevT5.woff2";
 import NunitoVietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTs3j6zbXWjgevT5.woff2";
-
-import PacificoLatin from "https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6H6MmBp0u-.woff2";
-import PacificoLatinExt from "https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6J6MmBp0u-zK4.woff2";
-import PacificoCyrlicExt from "https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6K6MmBp0u-zK4.woff2";
-import PacificoVietnamese from "https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ-6I6MmBp0u-zK4.woff2";
-
-import PermanentMarker from "https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cf5b6jlg.woff2";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -147,12 +140,12 @@ export class Fonts {
    * Register a new font.
    *
    * @param family font family
-   * @param metrics font metrics
+   * @param metadata font metadata
    * @param params array of the rest of the FontFace parameters [uri: string, descriptors: FontFaceDescriptors?] ,
    */
   public static register(
     family: string,
-    metrics: FontMetrics,
+    metadata: FontMetadata,
     ...params: Array<{ uri: string; descriptors?: FontFaceDescriptors }>
   ) {
     // TODO: likely we will need to abandon number "id" in order to support custom fonts
@@ -161,7 +154,7 @@ export class Fonts {
 
     if (!registeredFamily) {
       this.registered.set(familyId, {
-        metrics,
+        metadata,
         fontFaces: params.map(
           ({ uri, descriptors }) =>
             new ExcalidrawFont(family, uri, descriptors),
@@ -179,21 +172,21 @@ export class Fonts {
     const fonts = {
       registered: new Map<
         ValueOf<typeof FONT_FAMILY>,
-        { metrics: FontMetrics; fontFaces: Font[] }
+        { metadata: FontMetadata; fontFaces: Font[] }
       >(),
     };
 
     const register = Fonts.register.bind(fonts);
 
-    register("Virgil", DEFAULT_FONT_METRICS[FONT_FAMILY.Virgil], {
+    register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
       uri: Virgil,
     });
-    register("Excalifont", DEFAULT_FONT_METRICS[FONT_FAMILY.Excalifont], {
+    register("Excalifont", FONT_METADATA[FONT_FAMILY.Excalifont], {
       uri: Excalifont,
     });
 
     // keeping for backwards compatibility reasons, uses system font (Helvetica on MacOS, Arial on Win) in browser environment and LiberationSans outside
-    register("Helvetica", DEFAULT_FONT_METRICS[FONT_FAMILY.Helvetica], {
+    register("Helvetica", FONT_METADATA[FONT_FAMILY.Helvetica], {
       uri:
         typeof window !== "undefined" &&
         window.navigator.userAgent !== "node.js" // jsdom
@@ -201,26 +194,22 @@ export class Fonts {
           : LiberationSans,
     });
 
-    register(
-      "Liberation Sans",
-      DEFAULT_FONT_METRICS[FONT_FAMILY["Liberation Sans"]],
-      { uri: LiberationSans },
-    );
+    register("Liberation Sans", FONT_METADATA[FONT_FAMILY["Liberation Sans"]], {
+      uri: LiberationSans,
+    });
 
-    register("Cascadia", DEFAULT_FONT_METRICS[FONT_FAMILY.Cascadia], {
+    register("Cascadia", FONT_METADATA[FONT_FAMILY.Cascadia], {
       uri: Cascadia,
     });
 
-    register(
-      "Comic Shanns",
-      DEFAULT_FONT_METRICS[FONT_FAMILY["Comic Shanns"]],
-      { uri: ComicShanns },
-    );
+    register("Comic Shanns", FONT_METADATA[FONT_FAMILY["Comic Shanns"]], {
+      uri: ComicShanns,
+    });
 
     /** Assistant */
     register(
       "Assistant",
-      DEFAULT_FONT_METRICS[FONT_FAMILY.Assistant],
+      FONT_METADATA[FONT_FAMILY.Assistant],
       { uri: AssistantRegular },
       { uri: AssistantMedium, descriptors: { weight: "500" } },
       { uri: AssistantSemiBold, descriptors: { weight: "600" } },
@@ -230,7 +219,7 @@ export class Fonts {
     /** Bangers */
     register(
       "Bangers",
-      DEFAULT_FONT_METRICS[FONT_FAMILY.Bangers],
+      FONT_METADATA[FONT_FAMILY.Bangers],
       {
         uri: BangersVietnamese,
         descriptors: { unicodeRange: RANGES.VIETNAMESE },
@@ -242,7 +231,7 @@ export class Fonts {
     /** Nunito */
     register(
       "Nunito",
-      DEFAULT_FONT_METRICS[FONT_FAMILY.Nunito],
+      FONT_METADATA[FONT_FAMILY.Nunito],
       {
         uri: NunitoCyrilicExt,
         descriptors: { unicodeRange: RANGES.CYRILIC_EXT },
@@ -254,32 +243,6 @@ export class Fonts {
       },
       { uri: NunitoLatinExt, descriptors: { unicodeRange: RANGES.LATIN_EXT } },
       { uri: NunitoLatin, descriptors: { unicodeRange: RANGES.LATIN } },
-    );
-
-    /** Pacifico */
-    register(
-      "Pacifico",
-      DEFAULT_FONT_METRICS[FONT_FAMILY.Pacifico],
-      {
-        uri: PacificoCyrlicExt,
-        descriptors: { unicodeRange: RANGES.CYRILIC_EXT },
-      },
-      {
-        uri: PacificoVietnamese,
-        descriptors: { unicodeRange: RANGES.VIETNAMESE },
-      },
-      {
-        uri: PacificoLatinExt,
-        descriptors: { unicodeRange: RANGES.LATIN_EXT },
-      },
-      { uri: PacificoLatin, descriptors: { unicodeRange: RANGES.LATIN } },
-    );
-
-    /** Permanent marker */
-    register(
-      "Permanent Marker",
-      DEFAULT_FONT_METRICS[FONT_FAMILY["Permanent Marker"]],
-      { uri: PermanentMarker, descriptors: { unicodeRange: RANGES.LATIN } },
     );
 
     return fonts.registered;
@@ -295,8 +258,8 @@ export const getVerticalOffset = (
   lineHeightPx: number,
 ) => {
   const { unitsPerEm, ascender, descender } =
-    Fonts.registered.get(fontFamily)?.metrics ||
-    DEFAULT_FONT_METRICS[FONT_FAMILY.Virgil];
+    Fonts.registered.get(fontFamily)?.metadata ||
+    FONT_METADATA[FONT_FAMILY.Virgil];
 
   const fontSizeEm = fontSize / unitsPerEm;
   const lineGap =
@@ -311,8 +274,8 @@ export const getVerticalOffset = (
  */
 export const getLineHeight = (fontFamily: FontFamilyValues) => {
   const { lineHeight } =
-    Fonts.registered.get(fontFamily)?.metrics ||
-    DEFAULT_FONT_METRICS[FONT_FAMILY.Excalifont];
+    Fonts.registered.get(fontFamily)?.metadata ||
+    FONT_METADATA[FONT_FAMILY.Excalifont];
 
   return lineHeight as ExcalidrawTextElement["lineHeight"];
 };

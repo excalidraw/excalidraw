@@ -58,8 +58,8 @@ export const FontPickerList = React.memo(
     const allFonts = useMemo(
       () =>
         Array.from(Fonts.registered.entries())
-          .filter(([_, { metrics }]) => !metrics.hidden)
-          .map(([familyId, { metrics, fontFaces }]) => {
+          .filter(([_, { metadata: metrics }]) => !metrics.hidden)
+          .map(([familyId, { metadata: metrics, fontFaces }]) => {
             const font = {
               value: familyId,
               text: fontFaces[0].fontFace.family,
