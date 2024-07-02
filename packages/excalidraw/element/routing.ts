@@ -19,6 +19,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
+import { debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -860,14 +861,15 @@ export const headingForPointFromElement = (
   );
 
   if (element.type === "diamond") {
-    // TODO: Optimize this. No need for triangle searchlights
-    return PointInTriangle(point, topLeft, topRight, midPoint)
-      ? HEADING_RIGHT
-      : PointInTriangle(point, topRight, bottomRight, midPoint)
-      ? HEADING_RIGHT
-      : PointInTriangle(point, bottomRight, bottomLeft, midPoint)
-      ? HEADING_LEFT
-      : HEADING_LEFT;
+    if (point[1] < element.y) {
+      return HEADING_UP;
+    } else if (point[0] > element.x) {
+      return HEADING_RIGHT;
+    } else if (point[1] > element.y) {
+      return HEADING_DOWN;
+    }
+
+    return HEADING_LEFT;
   }
 
   return PointInTriangle(point, topLeft, topRight, midPoint)
