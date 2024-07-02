@@ -1,4 +1,12 @@
+import { DropDownMenuItemBadgeType } from "../components/dropdownMenu/DropdownMenuItem";
+import {
+  FontFamilyCodeIcon,
+  FontFamilyHeadingIcon,
+  FontFamilyNormalIcon,
+  FreedrawIcon,
+} from "../components/icons";
 import { FONT_FAMILY } from "../constants";
+import type { ValueOf } from "../utility-types";
 
 /**
  * Encapsulates font metrics with additional font data.
@@ -14,75 +22,96 @@ export interface FontMetadata {
   descender: number;
   /** harcoded unitless line-height, https://github.com/excalidraw/excalidraw/pull/6360#issuecomment-1477635971 */
   lineHeight: number;
+  icon: JSX.Element;
   /** flag to display a new badge */
-  badge?: "new";
+  badge?: ValueOf<typeof DropDownMenuItemBadgeType>;
   /** flag to hide a font from the picker */
   hidden?: boolean;
 }
 
 export const FONT_METADATA: Record<number, FontMetadata> = {
-  [FONT_FAMILY.Virgil]: {
-    unitsPerEm: 1000,
-    ascender: 886,
-    descender: -374,
-    lineHeight: 1.25,
-    hidden: true,
-  },
   [FONT_FAMILY.Excalifont]: {
     unitsPerEm: 1000,
     ascender: 886,
     descender: -374,
     lineHeight: 1.25,
-    badge: "new",
-  },
-  [FONT_FAMILY.Helvetica]: {
-    unitsPerEm: 2048,
-    ascender: 1577,
-    descender: -471,
-    lineHeight: 1.15,
-    hidden: true,
+    icon: FreedrawIcon,
+    badge: DropDownMenuItemBadgeType.GREEN,
   },
   [FONT_FAMILY.Cascadia]: {
     unitsPerEm: 2048,
     ascender: 1900,
     descender: -480,
     lineHeight: 1.2,
-  },
-  [FONT_FAMILY.Assistant]: {
-    unitsPerEm: 1000,
-    ascender: 1021,
-    descender: -287,
-    lineHeight: 1.25,
-    badge: "new",
-    hidden: true,
+    icon: FontFamilyCodeIcon,
   },
   [FONT_FAMILY.Nunito]: {
     unitsPerEm: 1000,
     ascender: 1011,
     descender: -353,
     lineHeight: 1.25,
-    badge: "new",
+    icon: FontFamilyNormalIcon,
+    badge: DropDownMenuItemBadgeType.GREEN,
   },
   [FONT_FAMILY.Bangers]: {
     unitsPerEm: 1000,
     ascender: 883,
     descender: -181,
     lineHeight: 1.25,
-    badge: "new",
+    icon: FontFamilyHeadingIcon,
+    badge: DropDownMenuItemBadgeType.GREEN,
+  },
+  [FONT_FAMILY.Geist]: {
+    unitsPerEm: 1000,
+    ascender: 920,
+    descender: -220,
+    lineHeight: 1.2,
+    icon: FontFamilyCodeIcon,
+    badge: DropDownMenuItemBadgeType.GREEN,
   },
   [FONT_FAMILY["Comic Shanns"]]: {
     unitsPerEm: 1000,
     ascender: 750,
     descender: -250,
     lineHeight: 1.2,
-    badge: "new",
+    icon: FontFamilyCodeIcon,
+    badge: DropDownMenuItemBadgeType.GREEN,
   },
+  [FONT_FAMILY.Virgil]: {
+    unitsPerEm: 1000,
+    ascender: 886,
+    descender: -374,
+    lineHeight: 1.25,
+    hidden: true,
+    icon: FreedrawIcon,
+    badge: DropDownMenuItemBadgeType.RED,
+  },
+  [FONT_FAMILY.Helvetica]: {
+    unitsPerEm: 2048,
+    ascender: 1577,
+    descender: -471,
+    lineHeight: 1.15,
+    icon: FontFamilyNormalIcon,
+    hidden: true,
+    badge: DropDownMenuItemBadgeType.RED,
+  },
+  /** necessary to keep due to server-side use cases */
+  [FONT_FAMILY.Assistant]: {
+    unitsPerEm: 1000,
+    ascender: 1021,
+    descender: -287,
+    lineHeight: 1.25,
+    icon: FontFamilyNormalIcon,
+    hidden: true,
+  },
+  /** necessary to keep due to Helvetica server-side use cases */
   [FONT_FAMILY["Liberation Sans"]]: {
     unitsPerEm: 2048,
     ascender: 1854,
     descender: -434,
     lineHeight: 1.15,
-    badge: "new",
+    icon: FontFamilyNormalIcon,
+    hidden: true,
   },
 };
 

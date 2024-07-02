@@ -563,7 +563,8 @@
   },
   "fontList": {
     "badge": {
-      "new": "new"
+      "new": "new",
+      "old": "old"
     },
     "sceneFonts": "In this scene",
     "availableFonts": "Available fonts",

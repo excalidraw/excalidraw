@@ -1,7 +1,7 @@
 import * as Popover from "@radix-ui/react-popover";
 import { useMemo } from "react";
 import { ButtonIcon } from "../ButtonIcon";
-import { FontFamilyCustomIcon } from "../icons";
+import { TextIcon } from "../icons";
 import type { FontFamilyValues } from "../../element/types";
 import { t } from "../../i18n";
 import { isDefaultFont } from "./FontPicker";
@@ -24,7 +24,7 @@ export const FontPickerTrigger = ({
       <div>
         <ButtonIcon
           standalone
-          icon={FontFamilyCustomIcon}
+          icon={TextIcon}
           title={t("labels.showFonts")}
           className="properties-trigger"
           testId={"font-family-show-fonts"}

@@ -66,6 +66,7 @@ DropdownMenuItem.displayName = "DropdownMenuItem";
 
 export const DropDownMenuItemBadgeType = {
   GREEN: "green",
+  RED: "red",
   BLUE: "blue",
 } as const;
 
@@ -92,6 +93,12 @@ export const DropDownMenuItemBadge = ({
       Object.assign(style, {
         backgroundColor: "var(--background-color-badge)",
         color: "var(--color-badge)",
+      });
+      break;
+    case DropDownMenuItemBadgeType.RED:
+      Object.assign(style, {
+        backgroundColor: "pink",
+        color: "darkred",
       });
       break;
     case DropDownMenuItemBadgeType.BLUE:

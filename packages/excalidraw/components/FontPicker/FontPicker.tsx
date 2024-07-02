@@ -24,13 +24,13 @@ export const DEFAULT_FONTS = [
     testId: "font-family-handrawn",
   },
   {
-    value: FONT_FAMILY["Liberation Sans"],
+    value: FONT_FAMILY.Nunito,
     icon: FontFamilyNormalIcon,
     text: t("labels.normal"),
     testId: "font-family-normal",
   },
   {
-    value: FONT_FAMILY.Cascadia,
+    value: FONT_FAMILY["Comic Shanns"],
     icon: FontFamilyCodeIcon,
     text: t("labels.code"),
     testId: "font-family-code",

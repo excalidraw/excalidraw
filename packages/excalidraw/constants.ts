@@ -130,8 +130,9 @@ export const FONT_FAMILY = {
   Excalifont: 5,
   Nunito: 6,
   Bangers: 7,
-  "Comic Shanns": 8,
-  "Liberation Sans": 9,
+  Geist: 8,
+  "Comic Shanns": 9,
+  "Liberation Sans": 10,
 };
 
 export const THEME = {

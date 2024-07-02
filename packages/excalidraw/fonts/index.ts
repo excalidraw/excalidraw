@@ -16,6 +16,7 @@ import AssistantMedium from "./assets/Assistant-Medium.woff2";
 import AssistantSemiBold from "./assets/Assistant-SemiBold.woff2";
 import AssistantBold from "./assets/Assistant-Bold.woff2";
 import Cascadia from "./assets/CascadiaMono-Regular.woff2";
+import Geist from "./assets/GeistMono-Regular.woff2";
 import ComicShanns from "./assets/ComicShanns-Regular.woff2";
 import LiberationSans from "./assets/LiberationSans-Regular.woff2";
 
@@ -200,6 +201,10 @@ export class Fonts {
 
     register("Cascadia", FONT_METADATA[FONT_FAMILY.Cascadia], {
       uri: Cascadia,
+    });
+
+    register("Geist", FONT_METADATA[FONT_FAMILY.Geist], {
+      uri: Geist,
     });
 
     register("Comic Shanns", FONT_METADATA[FONT_FAMILY["Comic Shanns"]], {

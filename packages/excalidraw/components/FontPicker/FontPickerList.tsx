@@ -24,7 +24,9 @@ import type { ValueOf } from "../../utility-types";
 
 export interface FontDescriptor {
   value: number;
+  icon: JSX.Element;
   text: string;
+  hidden?: true;
   badge?: {
     type: ValueOf<typeof DropDownMenuItemBadgeType>;
     placeholder: string;
@@ -58,18 +60,31 @@ export const FontPickerList = React.memo(
     const allFonts = useMemo(
       () =>
         Array.from(Fonts.registered.entries())
-          .filter(([_, { metadata: metrics }]) => !metrics.hidden)
-          .map(([familyId, { metadata: metrics, fontFaces }]) => {
+          .map(([familyId, { metadata, fontFaces }]) => {
             const font = {
               value: familyId,
+              icon: metadata.icon,
               text: fontFaces[0].fontFace.family,
             };
 
-            if (metrics.badge === "new") {
+            if (metadata.hidden) {
+              Object.assign(font, {
+                hidden: metadata.hidden,
+              });
+            }
+
+            if (metadata.badge === DropDownMenuItemBadgeType.GREEN) {
               Object.assign(font, {
                 badge: {
-                  type: DropDownMenuItemBadgeType.GREEN,
+                  type: metadata.badge,
                   placeholder: t("fontList.badge.new"),
+                },
+              });
+            } else if (metadata.badge === DropDownMenuItemBadgeType.RED) {
+              Object.assign(font, {
+                badge: {
+                  type: DropDownMenuItemBadgeType.RED,
+                  placeholder: t("fontList.badge.old"),
                 },
               });
             }
@@ -95,7 +110,10 @@ export const FontPickerList = React.memo(
     );
 
     const availableFonts = useMemo(
-      () => allFonts.filter((font) => !sceneFamilies.has(font.value)),
+      () =>
+        allFonts.filter(
+          (font) => !sceneFamilies.has(font.value) && !font.hidden,
+        ),
       [allFonts, sceneFamilies],
     );
 
@@ -180,6 +198,7 @@ export const FontPickerList = React.memo(
     const renderFont = (font: FontDescriptor, index: number) => (
       <DropdownMenuItem
         key={font.value}
+        icon={font.icon}
         value={font.value}
         order={index}
         textStyle={{
