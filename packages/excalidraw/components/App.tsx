@@ -2490,7 +2490,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
-    (window as any).launchQueue.setConsumer(() => {});
+    (window as any).launchQueue?.setConsumer(() => {});
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
