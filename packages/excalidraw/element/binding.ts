@@ -829,7 +829,9 @@ const calculateFixedPointForElbowArrowBinding = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   newSize?: { width: number; height: number },
+  scale?: { scaleX: number; scaleY: number },
 ) => {
+  const { scaleX, scaleY } = scale ?? { scaleX: 1, scaleY: 1 };
   const bounds = [
     hoveredElement.x,
     hoveredElement.y,
@@ -863,8 +865,8 @@ const calculateFixedPointForElbowArrowBinding = (
   );
 
   const fixedPoint = [
-    snappedGlobalPoint[0] - bounds[0],
-    snappedGlobalPoint[1] - bounds[1],
+    (snappedGlobalPoint[0] - bounds[0]) * scaleX,
+    (snappedGlobalPoint[1] - bounds[1]) * scaleY,
   ] as Point;
 
   return { fixedPoint };
@@ -899,6 +901,7 @@ const maybeCalculateNewGapWhenScaling = (
     startOrEnd,
     elementsMap,
     newSize,
+    scale,
   );
 
   return { elementId, gap: newGap, focus, ...newFixedPointUpdate };
