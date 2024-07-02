@@ -27,7 +27,14 @@ import type {
 
 import { isPointOnShape } from "../../utils/collision";
 import { KEYS } from "../keys";
-import { rotatePoint, scaleVector, translatePoint } from "../math";
+import {
+  HEADING_DOWN,
+  HEADING_RIGHT,
+  HEADING_UP,
+  rotatePoint,
+  scaleVector,
+  translatePoint,
+} from "../math";
 import { getElementAtPosition } from "../scene";
 import type Scene from "../scene/Scene";
 import { getElementShape } from "../shapes";
@@ -48,6 +55,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -708,20 +716,21 @@ export const bindPointToSnapToElementOutline = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): Point => {
-  return translatePoint(
-    point,
-    scaleVector(
-      scaleVector(
-        headingForPointFromElement(
-          bindableElement,
-          aabbForElement(bindableElement),
-          point,
-        ),
-        -1,
-      ),
-      distanceToBindableElement(bindableElement, point, elementsMap) - 5,
-    ),
-  );
+  switch (
+    headingForPointFromElement(
+      bindableElement,
+      aabbForElement(bindableElement),
+      point,
+    )
+  ) {
+    case HEADING_UP:
+      return [point[0], bindableElement.y - 5];
+    case HEADING_RIGHT:
+      return [bindableElement.x + bindableElement.width + 5, point[1]];
+    case HEADING_DOWN:
+      return [point[0], bindableElement.y + bindableElement.height + 5];
+  }
+  return [bindableElement.x - 5, point[1]];
 };
 
 const updateBoundPoint = (
@@ -833,7 +842,6 @@ const calculateFixedPointForElbowArrowBinding = (
     hoveredElement.x + (newSize?.width ?? hoveredElement.width),
     hoveredElement.y + (newSize?.height ?? hoveredElement.height),
   ] as Bounds;
-
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
   const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -850,22 +858,27 @@ const calculateFixedPointForElbowArrowBinding = (
     globalMidPoint,
     -hoveredElement.angle,
   );
-  const snappedGlobalPoint = bindPointToSnapToElementOutline(
+  const snappedPoint = bindPointToSnapToElementOutline(
     [
-      bounds[0] + (nonRotatedGlobalPoint[0] - bounds[0]) * scaleX,
-      bounds[1] + (nonRotatedGlobalPoint[1] - bounds[1]) * scaleX,
+      hoveredElement.x + (nonRotatedGlobalPoint[0] - hoveredElement.x) * scaleX,
+      hoveredElement.y + (nonRotatedGlobalPoint[1] - hoveredElement.y) * scaleY,
     ],
     startOrEnd === "start" ? "startBinding" : "endBinding",
     linearElement,
     hoveredElement,
     elementsMap,
   );
-  const scaledLocalPoint = [
-    snappedGlobalPoint[0] - bounds[0],
-    snappedGlobalPoint[1] - bounds[1],
-  ] as Point;
+  // const scaledLocalPoint = [
+  //   snappedGlobalPoint[0] - bounds[0],
+  //   snappedGlobalPoint[1] - bounds[1],
+  // ] as Point;
 
-  return { fixedPoint: scaledLocalPoint };
+  return {
+    fixedPoint: [
+      snappedPoint[0] - hoveredElement.x,
+      snappedPoint[1] - hoveredElement.y,
+    ] as Point,
+  };
 };
 
 const maybeCalculateNewGapWhenScaling = (
