@@ -27,14 +27,7 @@ import type {
 
 import { isPointOnShape } from "../../utils/collision";
 import { KEYS } from "../keys";
-import {
-  HEADING_DOWN,
-  HEADING_RIGHT,
-  HEADING_UP,
-  rotatePoint,
-  scaleVector,
-  translatePoint,
-} from "../math";
+import { HEADING_DOWN, HEADING_RIGHT, HEADING_UP, rotatePoint } from "../math";
 import { getElementAtPosition } from "../scene";
 import type Scene from "../scene/Scene";
 import { getElementShape } from "../shapes";
@@ -55,7 +48,6 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -578,13 +570,11 @@ export const updateBoundElements = (
   scene: Scene,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    newSize?: { width: number; height: number };
-    scale?: { scaleX: number; scaleY: number };
+    oldSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
   },
 ) => {
-  const { newSize, scale, simultaneouslyUpdated, changedElements } =
-    options ?? {};
+  const { oldSize, simultaneouslyUpdated, changedElements } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -609,8 +599,7 @@ export const updateBoundElements = (
         element,
         "start",
         element.startBinding,
-        newSize,
-        scale,
+        oldSize,
         elementsMap,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
@@ -618,8 +607,7 @@ export const updateBoundElements = (
         element,
         "end",
         element.endBinding,
-        newSize,
-        scale,
+        oldSize,
         elementsMap,
       ),
     };
@@ -767,8 +755,8 @@ const updateBoundPoint = (
       bindableElement.y + bindableElement.height / 2,
     ] as Point;
     const global = [
-      bindableElement.x + fixedPoint[0],
-      bindableElement.y + fixedPoint[1],
+      bindableElement.x + fixedPoint[0] * bindableElement.width,
+      bindableElement.y + fixedPoint[1] * bindableElement.height,
     ] as Point;
     const rotatedGlobal = rotatePoint(
       global,
@@ -832,15 +820,13 @@ const calculateFixedPointForElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  newSize?: { width: number; height: number },
-  scale?: { scaleX: number; scaleY: number },
+  oldSize?: { width: number; height: number },
 ) => {
-  const { scaleX, scaleY } = scale ?? { scaleX: 1, scaleY: 1 };
   const bounds = [
     hoveredElement.x,
     hoveredElement.y,
-    hoveredElement.x + (newSize?.width ?? hoveredElement.width),
-    hoveredElement.y + (newSize?.height ?? hoveredElement.height),
+    hoveredElement.x + hoveredElement.width,
+    hoveredElement.y + hoveredElement.height,
   ] as Bounds;
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
@@ -859,24 +845,17 @@ const calculateFixedPointForElbowArrowBinding = (
     -hoveredElement.angle,
   );
   const snappedPoint = bindPointToSnapToElementOutline(
-    [
-      hoveredElement.x + (nonRotatedGlobalPoint[0] - hoveredElement.x) * scaleX,
-      hoveredElement.y + (nonRotatedGlobalPoint[1] - hoveredElement.y) * scaleY,
-    ],
+    [nonRotatedGlobalPoint[0], nonRotatedGlobalPoint[1]],
     startOrEnd === "start" ? "startBinding" : "endBinding",
     linearElement,
     hoveredElement,
     elementsMap,
   );
-  // const scaledLocalPoint = [
-  //   snappedGlobalPoint[0] - bounds[0],
-  //   snappedGlobalPoint[1] - bounds[1],
-  // ] as Point;
 
   return {
     fixedPoint: [
-      snappedPoint[0] - hoveredElement.x,
-      snappedPoint[1] - hoveredElement.y,
+      (snappedPoint[0] - hoveredElement.x) / hoveredElement.width,
+      (snappedPoint[1] - hoveredElement.y) / hoveredElement.height,
     ] as Point,
   };
 };
@@ -887,13 +866,12 @@ const maybeCalculateNewGapWhenScaling = (
   startOrEnd: "start" | "end",
   currentBinding: PointBinding | null | undefined,
   newSize: { width: number; height: number } | undefined,
-  scale: { scaleX: number; scaleY: number } | undefined,
   elementsMap: ElementsMap,
 ): PointBinding | null | undefined => {
   if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
-  const { gap, focus, elementId } = currentBinding;
+  const { gap, focus, elementId, fixedPoint } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
   const newGap = Math.max(
@@ -904,16 +882,7 @@ const maybeCalculateNewGapWhenScaling = (
     ),
   );
 
-  const newFixedPointUpdate = calculateFixedPointForElbowArrowBinding(
-    arrowElement,
-    changedElement,
-    startOrEnd,
-    elementsMap,
-    newSize,
-    scale,
-  );
-
-  return { elementId, gap: newGap, focus, ...newFixedPointUpdate };
+  return { elementId, gap: newGap, focus, fixedPoint };
 };
 
 const getElligibleElementForBindingElement = (

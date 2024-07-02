@@ -123,6 +123,8 @@ export const resizeElement = (
     nextHeight = Math.max(nextHeight, minHeight);
   }
 
+  const { width: oldWidth, height: oldHeight } = latestElement;
+
   mutateElement(
     latestElement,
     {
@@ -141,13 +143,6 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
-  updateBoundElements(latestElement, elementsMap, scene, {
-    newSize: { width: nextWidth, height: nextHeight },
-    scale: {
-      scaleX: latestElement.width / nextWidth,
-      scaleY: latestElement.height / nextHeight,
-    },
-  });
 
   if (boundTextElement) {
     boundTextFont = {
@@ -172,10 +167,7 @@ export const resizeElement = (
   }
 
   updateBoundElements(latestElement, elementsMap, scene, {
-    newSize: {
-      width: nextWidth,
-      height: nextHeight,
-    },
+    oldSize: { width: oldWidth, height: oldHeight },
   });
 
   if (boundTextElement && boundTextFont) {
