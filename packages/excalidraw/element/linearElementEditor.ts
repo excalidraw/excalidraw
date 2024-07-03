@@ -387,6 +387,7 @@ export class LinearElementEditor {
     scene: Scene,
   ): LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
+    const elements = scene.getNonDeletedElements();
 
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -435,7 +436,8 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                scene,
+                elements,
+                elementsMap,
               )
             : null;
 
@@ -706,6 +708,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor | null;
   } {
     const elementsMap = scene.getNonDeletedElementsMap();
+    const elements = scene.getNonDeletedElements();
 
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
@@ -774,7 +777,11 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(scenePointer, scene),
+        endBindingElement: getHoveredElementForBinding(
+          scenePointer,
+          elements,
+          elementsMap,
+        ),
       };
 
       ret.didAddPoint = true;

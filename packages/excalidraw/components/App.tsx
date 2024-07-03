@@ -73,11 +73,11 @@ import {
   showHyperlinkTooltip,
 } from "../components/hyperlink/Hyperlink";
 import type { EXPORT_IMAGE_TYPES } from "../constants";
-import { DEFAULT_FONT_SIZE } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_COLLISION_THRESHOLD,
+  DEFAULT_FONT_SIZE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
@@ -164,7 +164,6 @@ import {
   isInvisiblySmallElement,
   isNonDeletedElement,
   isTextElement,
-  newArrowElement,
   newElement,
   newImageElement,
   newLinearElement,
@@ -210,13 +209,13 @@ import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   deepCopyElement,
   duplicateElements,
+  newArrowElement,
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
   newIframeElement,
   newMagicFrameElement,
 } from "../element/newElement";
-import { mutateElbowArrow } from "../element/routing";
 import { isElementInViewport } from "../element/sizeHelpers";
 import {
   bindTextToShapeAfterDuplication,
@@ -323,6 +322,7 @@ import {
   getGridPoint,
   isPathALoop,
 } from "../math";
+import { isMaybeMermaidDefinition } from "../mermaid";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import {
@@ -430,7 +430,7 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
-import { isMaybeMermaidDefinition } from "../mermaid";
+import { mutateElbowArrow } from "../element/routing";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2285,7 +2285,11 @@ class App extends React.Component<AppProps, AppState> {
     }
     let initialData = null;
     try {
-      initialData = (await this.props.initialData) || null;
+      if (typeof this.props.initialData === "function") {
+        initialData = (await this.props.initialData()) || null;
+      } else {
+        initialData = (await this.props.initialData) || null;
+      }
       if (initialData?.libraryItems) {
         this.library
           .updateLibrary({
@@ -2488,7 +2492,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    (window as any).launchQueue?.setConsumer(() => {});
     this.renderer.destroy();
+    this.scene.destroy();
     this.scene = new Scene();
     this.fonts = new Fonts({ scene: this.scene });
     this.renderer = new Renderer(this.scene);
@@ -2497,7 +2503,6 @@ class App extends React.Component<AppProps, AppState> {
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
-    this.scene.destroy();
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
@@ -2809,6 +2814,8 @@ class App extends React.Component<AppProps, AppState> {
             nonDeletedElementsMap,
           ),
         ),
+        this.scene.getNonDeletedElementsMap(),
+        this.scene.getNonDeletedElements(),
         this.scene,
       );
     }
@@ -4003,7 +4010,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           suggestedBindings: getSuggestedBindingsForArrows(
             selectedElements,
-            this.scene,
+            this.scene.getNonDeletedElementsMap(),
           ),
         });
 
@@ -4174,6 +4181,8 @@ class App extends React.Component<AppProps, AppState> {
     if (isArrowKey(event.key)) {
       bindOrUnbindLinearElements(
         this.scene.getSelectedElements(this.state).filter(isLinearElement),
+        this.scene.getNonDeletedElementsMap(),
+        this.scene.getNonDeletedElements(),
         this.scene,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
@@ -6784,7 +6793,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
-      this.scene,
+      this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
     );
     this.scene.insertElement(element);
     this.setState({
@@ -7082,7 +7092,8 @@ class App extends React.Component<AppProps, AppState> {
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
-        this.scene,
+        this.scene.getNonDeletedElements(),
+        this.scene.getNonDeletedElementsMap(),
       );
 
       this.scene.insertElement(element);
@@ -7548,19 +7559,20 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          if (
-            selectedElements.length !== 1 ||
-            !isArrowElement(selectedElements[0]) ||
-            !pointerDownState.drag.hasOccurred ||
-            !!this.state.editingLinearElement
-          ) {
-            this.setState({
-              suggestedBindings: getSuggestedBindingsForArrows(
-                selectedElements,
-                this.scene,
-              ),
-            });
-          }
+          // TODO: Check if needed to re-add this
+          // if (
+          //   selectedElements.length !== 1 ||
+          //   !isArrowElement(selectedElements[0]) ||
+          //   !pointerDownState.drag.hasOccurred ||
+          //   !!this.state.editingLinearElement
+          // ) {
+          this.setState({
+            suggestedBindings: getSuggestedBindingsForArrows(
+              selectedElements,
+              this.scene.getNonDeletedElementsMap(),
+            ),
+          });
+          //}
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
@@ -8095,6 +8107,8 @@ class App extends React.Component<AppProps, AppState> {
               draggingElement,
               this.state,
               pointerCoords,
+              this.scene.getNonDeletedElementsMap(),
+              this.scene.getNonDeletedElements(),
               this.scene,
             );
           }
@@ -8656,6 +8670,8 @@ class App extends React.Component<AppProps, AppState> {
 
         bindOrUnbindLinearElements(
           linearElements,
+          this.scene.getNonDeletedElementsMap(),
+          this.scene.getNonDeletedElements(),
           this.scene,
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
@@ -9144,7 +9160,8 @@ class App extends React.Component<AppProps, AppState> {
   }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
-      this.scene,
+      this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
     );
     this.setState({
       suggestedBindings:
@@ -9171,7 +9188,8 @@ class App extends React.Component<AppProps, AppState> {
       (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
-          this.scene,
+          this.scene.getNonDeletedElements(),
+          this.scene.getNonDeletedElementsMap(),
         );
         if (
           hoveredBindableElement != null &&
@@ -9704,7 +9722,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
-        this.scene,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();

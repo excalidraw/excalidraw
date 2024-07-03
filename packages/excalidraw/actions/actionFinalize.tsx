@@ -136,6 +136,8 @@ export const actionFinalize = register({
           multiPointElement,
           appState,
           { x, y },
+          elementsMap,
+          elements,
           app.scene,
         );
       }

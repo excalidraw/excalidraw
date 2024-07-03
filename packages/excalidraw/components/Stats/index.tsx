@@ -8,15 +8,9 @@ import { Island } from "../Island";
 import { throttle } from "lodash";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
-
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
-import {
-  elementsAreInSameGroup,
-  getElementsInGroup,
-  getSelectedGroupIds,
-  isInGroup,
-} from "../../groups";
+import { elementsAreInSameGroup } from "../../groups";
 import MultiAngle from "./MultiAngle";
 import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
@@ -24,7 +18,7 @@ import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
 import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
-import type { AtomicUnit } from "./utils";
+import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
 
 interface StatsProps {
@@ -106,21 +100,7 @@ export const StatsInner = memo(
     );
 
     const atomicUnits = useMemo(() => {
-      const selectedGroupIds = getSelectedGroupIds(appState);
-      const _atomicUnits = selectedGroupIds.map((gid) => {
-        return getElementsInGroup(selectedElements, gid).reduce((acc, el) => {
-          acc[el.id] = true;
-          return acc;
-        }, {} as AtomicUnit);
-      });
-      selectedElements
-        .filter((el) => !isInGroup(el))
-        .forEach((el) => {
-          _atomicUnits.push({
-            [el.id]: true,
-          });
-        });
-      return _atomicUnits;
+      return getAtomicUnits(selectedElements, appState);
     }, [selectedElements, appState]);
 
     return (
@@ -207,37 +187,39 @@ export const StatsInner = memo(
                         property="x"
                         elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
                       />
                       <Position
                         element={singleElement}
                         property="y"
                         elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
                       />
                       <Dimension
                         property="width"
                         element={singleElement}
-                        elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
                       />
                       <Dimension
                         property="height"
                         element={singleElement}
-                        elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
                       />
                       <Angle
+                        property="angle"
                         element={singleElement}
-                        elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
                       />
-                      {singleElement.type === "text" && (
-                        <FontSize
-                          element={singleElement}
-                          elementsMap={elementsMap}
-                          scene={scene}
-                        />
-                      )}
+                      <FontSize
+                        property="fontSize"
+                        element={singleElement}
+                        scene={scene}
+                        appState={appState}
+                      />
                     </div>
                   </div>
                 )}
@@ -260,6 +242,7 @@ export const StatsInner = memo(
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
                         scene={scene}
+                        appState={appState}
                       />
                       <MultiPosition
                         property="y"
@@ -267,6 +250,7 @@ export const StatsInner = memo(
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
                         scene={scene}
+                        appState={appState}
                       />
                       <MultiDimension
                         property="width"
@@ -274,6 +258,7 @@ export const StatsInner = memo(
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
                         scene={scene}
+                        appState={appState}
                       />
                       <MultiDimension
                         property="height"
@@ -281,16 +266,20 @@ export const StatsInner = memo(
                         elementsMap={elementsMap}
                         atomicUnits={atomicUnits}
                         scene={scene}
+                        appState={appState}
                       />
                       <MultiAngle
+                        property="angle"
                         elements={multipleElements}
-                        elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
                       />
                       <MultiFontSize
+                        property="fontSize"
                         elements={multipleElements}
-                        elementsMap={elementsMap}
                         scene={scene}
+                        appState={appState}
+                        elementsMap={elementsMap}
                       />
                     </div>
                   </div>
