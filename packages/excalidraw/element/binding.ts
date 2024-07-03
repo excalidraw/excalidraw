@@ -27,7 +27,17 @@ import type {
 
 import { isPointOnShape } from "../../utils/collision";
 import { KEYS } from "../keys";
-import { HEADING_DOWN, HEADING_RIGHT, HEADING_UP, rotatePoint } from "../math";
+import {
+  HEADING_DOWN,
+  HEADING_RIGHT,
+  HEADING_UP,
+  addVectors,
+  pointToVector,
+  rotatePoint,
+  scaleVector,
+  translatePoint,
+  vectorToHeading,
+} from "../math";
 import { getElementAtPosition } from "../scene";
 import type Scene from "../scene/Scene";
 import { getElementShape } from "../shapes";
@@ -48,6 +58,7 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -704,21 +715,14 @@ export const bindPointToSnapToElementOutline = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): Point => {
-  switch (
-    headingForPointFromElement(
-      bindableElement,
-      aabbForElement(bindableElement),
-      point,
-    )
-  ) {
-    case HEADING_UP:
-      return [point[0], bindableElement.y - 5];
-    case HEADING_RIGHT:
-      return [bindableElement.x + bindableElement.width + 5, point[1]];
-    case HEADING_DOWN:
-      return [point[0], bindableElement.y + bindableElement.height + 5];
-  }
-  return [bindableElement.x - 5, point[1]];
+  const heading = headingForPointFromElement(
+    bindableElement,
+    aabbForElement(bindableElement),
+    point,
+  );
+  const distance =
+    distanceToBindableElement(bindableElement, point, elementsMap) - 5;
+  return translatePoint(point, scaleVector(heading, -distance));
 };
 
 const updateBoundPoint = (

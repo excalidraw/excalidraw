@@ -19,7 +19,6 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugDrawPoint } from "../visualdebug";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -837,40 +836,86 @@ export const headingForPointFromElement = (
   const SEARCH_CONE_MULTIPLIER = 2;
 
   const midPoint = getCenterForBounds(aabb);
-  const ROTATION = element.type === "diamond" ? Math.PI / 4 : 0;
-
-  const topLeft = rotatePoint(
-    scalePointFromOrigin([aabb[0], aabb[1]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
-  const topRight = rotatePoint(
-    scalePointFromOrigin([aabb[2], aabb[1]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
-  const bottomLeft = rotatePoint(
-    scalePointFromOrigin([aabb[0], aabb[3]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
-  const bottomRight = rotatePoint(
-    scalePointFromOrigin([aabb[2], aabb[3]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
 
   if (element.type === "diamond") {
-    if (point[1] < element.y) {
+    if (point[0] < element.x) {
+      return HEADING_LEFT;
+    } else if (point[1] < element.y) {
       return HEADING_UP;
-    } else if (point[0] > element.x) {
+    } else if (point[0] > element.x + element.width) {
       return HEADING_RIGHT;
-    } else if (point[1] > element.y) {
+    } else if (point[1] > element.y + element.height) {
       return HEADING_DOWN;
     }
 
-    return HEADING_LEFT;
+    const top = rotatePoint(
+      scalePointFromOrigin(
+        [element.x + element.width / 2, element.y],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+    const right = rotatePoint(
+      scalePointFromOrigin(
+        [element.x + element.width, element.y + element.height / 2],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+    const bottom = rotatePoint(
+      scalePointFromOrigin(
+        [element.x + element.width / 2, element.y + element.height],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+    const left = rotatePoint(
+      scalePointFromOrigin(
+        [element.x, element.y + element.height / 2],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+
+    if (PointInTriangle(point, top, right, midPoint)) {
+      return diamondHeading(top, right);
+    } else if (PointInTriangle(point, right, bottom, midPoint)) {
+      return diamondHeading(right, bottom);
+    } else if (PointInTriangle(point, bottom, left, midPoint)) {
+      return diamondHeading(bottom, left);
+    }
+
+    return diamondHeading(left, top);
   }
+
+  const topLeft = scalePointFromOrigin(
+    [aabb[0], aabb[1]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
+  const topRight = scalePointFromOrigin(
+    [aabb[2], aabb[1]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
+  const bottomLeft = scalePointFromOrigin(
+    [aabb[0], aabb[3]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
+  const bottomRight = scalePointFromOrigin(
+    [aabb[2], aabb[3]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
 
   return PointInTriangle(point, topLeft, topRight, midPoint)
     ? HEADING_UP
@@ -879,6 +924,23 @@ export const headingForPointFromElement = (
     : PointInTriangle(point, bottomRight, bottomLeft, midPoint)
     ? HEADING_DOWN
     : HEADING_LEFT;
+};
+
+const lineAngle = (a: Point, b: Point): number => {
+  const theta = Math.atan2(b[1] - a[1], b[0] - a[0]) * (180 / Math.PI);
+  return theta < 0 ? 360 + theta : theta;
+};
+
+const diamondHeading = (a: Point, b: Point) => {
+  const angle = lineAngle(a, b);
+  if (angle >= 315 || angle < 45) {
+    return HEADING_UP;
+  } else if (angle >= 45 && angle < 135) {
+    return HEADING_RIGHT;
+  } else if (angle >= 135 && angle < 225) {
+    return HEADING_DOWN;
+  }
+  return HEADING_LEFT;
 };
 
 const commonAABB = (aabbs: Bounds[]): Bounds => [
