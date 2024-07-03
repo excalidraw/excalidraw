@@ -19,6 +19,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
+import { toBrandedType } from "../utils";
 import {
   distanceToBindableElement,
   getHoveredElementForBinding,
@@ -27,13 +28,14 @@ import {
 import type { Bounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement } from "./typeChecks";
-import type {
-  ElementsMap,
-  ExcalidrawArrowElement,
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-  PointBinding,
+import type { NonDeletedSceneElementsMap } from "./types";
+import {
+  type ElementsMap,
+  type ExcalidrawArrowElement,
+  type ExcalidrawBindableElement,
+  type ExcalidrawElement,
+  type OrderedExcalidrawElement,
+  type PointBinding,
 } from "./types";
 
 type Node = {
@@ -68,12 +70,20 @@ export const mutateElbowArrow = (
     disableBinding?: boolean;
   },
 ) => {
+  const elements = options?.changedElements
+    ? [
+        ...scene.getNonDeletedElements(),
+        ...[...options?.changedElements].map(([_, value]) => value),
+      ]
+    : scene.getNonDeletedElements();
   const elementsMap = options?.changedElements
     ? // Only relevant at redrawBoundArrows during history actions
-      new Map([
-        ...scene.getNonDeletedElementsMap(),
-        ...options?.changedElements,
-      ])
+      toBrandedType<NonDeletedSceneElementsMap>(
+        new Map([
+          ...scene.getNonDeletedElementsMap(),
+          ...options?.changedElements,
+        ]),
+      )
     : scene.getNonDeletedElementsMap();
   const [origStartElement, origEndElement] = [
     arrow.startBinding &&
@@ -95,13 +105,15 @@ export const mutateElbowArrow = (
     options?.isDragging
       ? getHoveredElementForBinding(
           { x: startGlobalPoint[0], y: startGlobalPoint[1] },
-          scene,
+          elements,
+          elementsMap,
         )
       : origStartElement,
     options?.isDragging
       ? getHoveredElementForBinding(
           { x: endGlobalPoint[0], y: endGlobalPoint[1] },
-          scene,
+          elements,
+          elementsMap,
         )
       : origEndElement,
   ];

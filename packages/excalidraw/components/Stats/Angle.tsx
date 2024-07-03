@@ -27,6 +27,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   scene,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   if (origElement) {
     const latestElement = elementsMap.get(origElement.id);
@@ -39,7 +40,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       mutateElement(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, elementsMap);
+      updateBindings(latestElement, elementsMap, elements, scene);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -65,7 +66,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     mutateElement(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, elementsMap);
+    updateBindings(latestElement, elementsMap, elements, scene);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
