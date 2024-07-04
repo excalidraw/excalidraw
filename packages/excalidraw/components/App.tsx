@@ -3963,12 +3963,22 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
+        const selectedElements = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
+
+        const isElbowArrowOnly =
+          selectedElements.findIndex((e) => isArrowElement(e) && e.elbowed) ===
+          0;
+
         const step =
           (this.state.gridSize &&
-            (event.shiftKey
+            (event.shiftKey || isElbowArrowOnly
               ? ELEMENT_TRANSLATE_AMOUNT
               : this.state.gridSize)) ||
-          (event.shiftKey
+          (event.shiftKey && !isElbowArrowOnly
             ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
             : ELEMENT_TRANSLATE_AMOUNT);
 
@@ -3984,12 +3994,6 @@ class App extends React.Component<AppProps, AppState> {
         } else if (event.key === KEYS.ARROW_DOWN) {
           offsetY = step;
         }
-
-        const selectedElements = this.scene.getSelectedElements({
-          selectedElementIds: this.state.selectedElementIds,
-          includeBoundTextElement: true,
-          includeElementsInFrames: true,
-        });
 
         selectedElements.forEach((element) => {
           mutateElement(element, {
@@ -5325,7 +5329,10 @@ class App extends React.Component<AppProps, AppState> {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+          event[KEYS.CTRL_OR_CMD] ||
+            (isArrowElement(multiElement) && multiElement.elbowed)
+            ? null
+            : this.state.gridSize,
         );
 
         const [lastCommittedX, lastCommittedY] =
@@ -6272,6 +6279,8 @@ class App extends React.Component<AppProps, AppState> {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
+    const isElbowArrowOnly =
+      selectedElements.findIndex((e) => isArrowElement(e) && e.elbowed) === 0;
 
     return {
       origin,
@@ -6280,7 +6289,9 @@ class App extends React.Component<AppProps, AppState> {
         getGridPoint(
           origin.x,
           origin.y,
-          event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+          event[KEYS.CTRL_OR_CMD] || isElbowArrowOnly
+            ? null
+            : this.state.gridSize,
         ),
       ),
       scrollbars: isOverScrollBars(

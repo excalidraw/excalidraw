@@ -928,7 +928,9 @@ export class LinearElementEditor {
         elementsMap,
         scenePointerX - appState.editingLinearElement.pointerOffset.x,
         scenePointerY - appState.editingLinearElement.pointerOffset.y,
-        event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+        event[KEYS.CTRL_OR_CMD] || (isArrowElement(element) && element.elbowed)
+          ? null
+          : appState.gridSize,
       );
     }
 
@@ -1386,7 +1388,9 @@ export class LinearElementEditor {
       elementsMap,
       pointerCoords.x,
       pointerCoords.y,
-      snapToGrid ? appState.gridSize : null,
+      snapToGrid && !(isArrowElement(element) && element.elbowed)
+        ? appState.gridSize
+        : null,
     );
     const points = [
       ...element.points.slice(0, segmentMidpoint.index!),
@@ -1465,6 +1469,13 @@ export class LinearElementEditor {
       referencePoint,
       elementsMap,
     );
+
+    if (isArrowElement(element) && element.elbowed) {
+      return [
+        scenePointer[0] - referencePointCoords[0],
+        scenePointer[1] - referencePointCoords[1],
+      ];
+    }
 
     const [gridX, gridY] = getGridPoint(
       scenePointer[0],
