@@ -261,6 +261,7 @@ export {
   getFontString, //zsviczian
   getBoundTextMaxWidth, //zsviczian
   mermaidToExcalidraw, //zsviczian
+  destroyObsidianUtils, //zsviczian
 } from "../utils/export";
 
 export {

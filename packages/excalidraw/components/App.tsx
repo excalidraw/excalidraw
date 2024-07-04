@@ -424,7 +424,7 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
-import { destroyObsidianUtils, getExcalidrawContentEl, hideFreedrawPenmodeCursor, hostPlugin, initializeObsidianUtils } from "../obsidianUtils";
+import { getExcalidrawContentEl, hideFreedrawPenmodeCursor, hostPlugin, initializeObsidianUtils } from "../obsidianUtils";
 import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
@@ -2563,7 +2563,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    (window as any).launchQueue?.setConsumer(() => {});
     this.renderer.destroy();
+    this.scene.destroy();
     this.scene = new Scene();
     this.fonts = new Fonts({ scene: this.scene });
     this.renderer = new Renderer(this.scene);
@@ -2572,7 +2574,6 @@ class App extends React.Component<AppProps, AppState> {
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
-    this.scene.destroy(true); //zsviczian
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
@@ -2608,8 +2609,6 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.app = null; //zsviczian
     this.actionManager.actions = {} as Record<ActionName, Action>; //zsviczian
     this.history.clear(); //zsviczian
-    //@ts-ignore
-    this.history = null; //zsviczian
     this.store.clear(); //zsviczian
     //@ts-ignore
     this.store = null; //zsviczian
@@ -2624,10 +2623,8 @@ class App extends React.Component<AppProps, AppState> {
     this.nearestScrollableContainer = undefined; //zsviczian
     this.excalidrawContainerValue = { container: null, id:"unknown" }; //zsviczian
     //@ts-ignore
-    this.props = null; //zsviczian
-    this.laserTrails.terminate(); //zsviczian
-    this.eraserTrail.terminate(); //zsviczian
-    destroyObsidianUtils(); //zsviczian
+    // this.laserTrails.terminate(); //zsviczian
+    // this.eraserTrail.terminate(); //zsviczian
     /*
     Object.keys(this).forEach((key) => {
       //@ts-ignore    

@@ -321,7 +321,7 @@ class Scene {
     };
   }
 
-  destroy(force: boolean = false) { //zsviczian
+  destroy() {
     this.elements = [];
     this.nonDeletedElements = [];
     this.nonDeletedFramesLikes = [];
@@ -332,7 +332,7 @@ class Scene {
     this.selectedElementsCache.cache.clear();
 
     Scene.sceneMapById.forEach((scene, elementKey) => {
-      if (force || (scene === this)) { //zsviczian
+      if (scene === this) {
         Scene.sceneMapById.delete(elementKey);
       }
     });

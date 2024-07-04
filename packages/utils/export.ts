@@ -218,3 +218,4 @@ export {
 export { getFontString } from "../excalidraw/utils"; //zsviczian
 export { getBoundTextMaxWidth } from "../excalidraw/element/textElement"; //zsviczian
 export { mermaidToExcalidraw } from "../excalidraw/components/TTDDialog/MermaidToExcalidraw"; //zsviczian
+export { destroyObsidianUtils } from "../excalidraw/obsidianUtils"; //zsviczian
