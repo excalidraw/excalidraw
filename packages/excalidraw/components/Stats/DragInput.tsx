@@ -25,9 +25,9 @@ export type DragInputCallbackType<
   originalElementsMap: ElementsMap;
   shouldKeepAspectRatio: boolean;
   shouldChangeByStepSize: boolean;
+  scene: Scene;
   nextValue?: number;
   property: P;
-  scene: Scene;
   originalAppState: AppState;
 }) => void;
 

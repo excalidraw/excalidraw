@@ -1,9 +1,9 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { rotate } from "../../math";
-import type Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
+import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface PositionProps {

@@ -1,37 +1,24 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import { isInGroup } from "../groups";
-import { centerPoint, rotate, rotatePoint } from "../math";
-import Scene from "../scene/Scene";
-import type { Point, PointerDownState } from "../types";
-import type { Mutable } from "../utility-types";
-import { getFontString } from "../utils";
-import { updateBoundElements } from "./binding";
-import {
-  getCommonBoundingBox,
-  getCommonBounds,
-  getElementAbsoluteCoords,
-  getResizedElementAbsoluteCoords,
-} from "./bounds";
-import { LinearElementEditor } from "./linearElementEditor";
-import { mutateElement } from "./mutateElement";
-import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextElementId,
-  getBoundTextMaxWidth,
-  getContainerElement,
-  getMinTextElementWidth,
-  handleBindTextResize,
-  measureText,
-  wrapText,
-} from "./textElement";
+import { rotate, centerPoint, rotatePoint } from "../math";
 import type {
-  MaybeTransformHandleType,
-  TransformHandleDirection,
-} from "./transformHandles";
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  ExcalidrawElement,
+  ExcalidrawTextElementWithContainer,
+  ExcalidrawImageElement,
+  ElementsMap,
+} from "./types";
+import type { Mutable } from "../utility-types";
+import {
+  getElementAbsoluteCoords,
+  getCommonBounds,
+  getResizedElementAbsoluteCoords,
+  getCommonBoundingBox,
+} from "./bounds";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -41,16 +28,29 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import { mutateElement } from "./mutateElement";
+import { getFontString } from "../utils";
+import { updateBoundElements } from "./binding";
 import type {
-  ElementsMap,
-  ExcalidrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  ExcalidrawTextElementWithContainer,
-  NonDeleted,
-  NonDeletedExcalidrawElement,
-} from "./types";
+  MaybeTransformHandleType,
+  TransformHandleDirection,
+} from "./transformHandles";
+import type { Point, PointerDownState } from "../types";
+import Scene from "../scene/Scene";
+import {
+  getApproxMinLineWidth,
+  getBoundTextElement,
+  getBoundTextElementId,
+  getContainerElement,
+  handleBindTextResize,
+  getBoundTextMaxWidth,
+  getApproxMinLineHeight,
+  wrapText,
+  measureText,
+  getMinTextElementWidth,
+} from "./textElement";
+import { LinearElementEditor } from "./linearElementEditor";
+import { isInGroup } from "../groups";
 import { mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {

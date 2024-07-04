@@ -1,23 +1,18 @@
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 
-import clsx from "clsx";
-import throttle from "lodash.throttle";
-import { nanoid } from "nanoid";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
-import { isPointInShape } from "../../utils/collision";
-import { exportToBlob } from "../../utils/export";
-import type { GeometricShape } from "../../utils/geometry/shape";
-import { getSelectionBoxShape } from "../../utils/geometry/shape";
+import clsx from "clsx";
+import { nanoid } from "nanoid";
 import {
   actionAddToLibrary,
-  actionBindText,
   actionBringForward,
   actionBringToFront,
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
+  copyText,
   actionCopyStyles,
   actionCut,
   actionDeleteSelected,
@@ -26,39 +21,26 @@ import {
   actionFlipHorizontal,
   actionFlipVertical,
   actionGroup,
-  actionLink,
   actionPasteStyles,
   actionSelectAll,
   actionSendBackward,
   actionSendToBack,
-  actionToggleElementLock,
   actionToggleGridMode,
-  actionToggleLinearEditor,
-  actionToggleObjectsSnapMode,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
+  actionBindText,
   actionUngroup,
-  copyText,
+  actionLink,
+  actionToggleElementLock,
+  actionToggleLinearEditor,
+  actionToggleObjectsSnapMode,
 } from "../actions";
-import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
-import { actionPaste } from "../actions/actionClipboard";
-import { actionUnlockAllElements } from "../actions/actionElementLock";
-import {
-  actionRemoveAllElementsFromFrame,
-  actionSelectAllElementsInFrame,
-} from "../actions/actionFrame";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
-import { actionTextAutoResize } from "../actions/actionTextAutoResize";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import type { Action, ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
-import { AnimatedTrail } from "../animated-trail";
-import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
@@ -66,23 +48,14 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { COLOR_PALETTE } from "../colors";
-import {
-  Hyperlink,
-  hideHyperlinkToolip,
-  showHyperlinkTooltip,
-} from "../components/hyperlink/Hyperlink";
 import type { EXPORT_IMAGE_TYPES } from "../constants";
+import { DEFAULT_FONT_SIZE } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
-  DEFAULT_COLLISION_THRESHOLD,
-  DEFAULT_FONT_SIZE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-  DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
-  EDITOR_LS_KEYS,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   ENV,
@@ -91,6 +64,7 @@ import {
   GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
+  isBrave,
   LINE_CONFIRM_THRESHOLD,
   MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
@@ -99,54 +73,28 @@ import {
   MQ_MAX_WIDTH_PORTRAIT,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   POINTER_BUTTON,
-  POINTER_EVENTS,
   ROUNDNESS,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
   THEME_FILTER,
-  TOOL_TYPE,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
   ZOOM_STEP,
-  isBrave,
+  POINTER_EVENTS,
+  TOOL_TYPE,
+  EDITOR_LS_KEYS,
   isIOS,
   supportsResizeObserver,
+  DEFAULT_COLLISION_THRESHOLD,
+  DEFAULT_TEXT_ALIGN,
 } from "../constants";
-import {
-  resetCursor,
-  setCursor,
-  setCursorForShape,
-  setEraserCursor,
-} from "../cursor";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
-import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import {
-  ImageURLToFile,
-  SVGStringToFile,
-  dataURLToFile,
-  generateIdFromFile,
-  getDataURL,
-  getFileFromEvent,
-  isImageFileHandle,
-  isSupportedImageFile,
-  loadSceneOrLibraryFromBlob,
-  normalizeFile,
-  parseLibraryJSON,
-  resizeImageFile,
-} from "../data/blob";
-import type { FileSystemHandle } from "../data/filesystem";
-import { fileOpen } from "../data/filesystem";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import type { MagicCacheData } from "../data/magic";
-import { diagramToHTML } from "../data/magic";
 import { restore, restoreElements } from "../data/restore";
-import type { ExcalidrawElementSkeleton } from "../data/transform";
-import { convertToExcalidrawElements } from "../data/transform";
-import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import {
   dragNewElement,
   dragSelectedElements,
@@ -154,69 +102,220 @@ import {
   getCommonBounds,
   getCursorForResizingElement,
   getDragOffsetXY,
-  getElementAbsoluteCoords,
   getElementWithTransformHandleType,
-  getLockedLinearCursorAlignSize,
   getNormalizedDimensions,
   getResizeArrowDirection,
   getResizeOffsetXY,
+  getLockedLinearCursorAlignSize,
   getTransformHandleTypeFromCoords,
   isInvisiblySmallElement,
   isNonDeletedElement,
   isTextElement,
   newElement,
-  newImageElement,
   newLinearElement,
   newTextElement,
-  redrawTextBoundingBox,
-  refreshTextDimensions,
+  newImageElement,
   transformElements,
+  refreshTextDimensions,
+  redrawTextBoundingBox,
+  getElementAbsoluteCoords,
 } from "../element";
-import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
 import {
   bindOrUnbindLinearElement,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
   fixBindingsAfterDuplication,
   getHoveredElementForBinding,
-  getSuggestedBindingsForArrows,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
   maybeBindLinearElement,
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
+  getSuggestedBindingsForArrows,
 } from "../element/binding";
-import { getVisibleSceneBounds } from "../element/bounds";
-import {
-  hitElementBoundText,
-  hitElementBoundingBoxOnly,
-  hitElementItself,
-} from "../element/collision";
-import {
-  createSrcDoc,
-  embeddableURLValidator,
-  getEmbedLink,
-  maybeParseEmbedSrc,
-} from "../element/embeddable";
-import {
-  updateImageCache as _updateImageCache,
-  getInitializedImageElements,
-  loadHTMLImageElement,
-  normalizeSVG,
-} from "../element/image";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   deepCopyElement,
   duplicateElements,
-  newArrowElement,
-  newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
-  newIframeElement,
+  newEmbeddableElement,
   newMagicFrameElement,
+  newIframeElement,
+  newArrowElement,
 } from "../element/newElement";
+import {
+  hasBoundTextElement,
+  isArrowElement,
+  isBindingElement,
+  isBindingElementType,
+  isBoundToContainer,
+  isFrameLikeElement,
+  isImageElement,
+  isEmbeddableElement,
+  isInitializedImageElement,
+  isLinearElement,
+  isLinearElementType,
+  isUsingAdaptiveRadius,
+  isFrameElement,
+  isIframeElement,
+  isIframeLikeElement,
+  isMagicFrameElement,
+  isTextBindableContainer,
+} from "../element/typeChecks";
+import type {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  InitializedExcalidrawImageElement,
+  ExcalidrawImageElement,
+  FileId,
+  NonDeletedExcalidrawElement,
+  ExcalidrawTextContainer,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawIframeLikeElement,
+  IframeData,
+  ExcalidrawIframeElement,
+  ExcalidrawEmbeddableElement,
+  Ordered,
+} from "../element/types";
+import { getCenter, getDistance } from "../gesture";
+import {
+  editGroupForSelectedElement,
+  getElementsInGroup,
+  getSelectedGroupIdForElement,
+  getSelectedGroupIds,
+  isElementInGroup,
+  isSelectedViaGroup,
+  selectGroupsForSelectedElements,
+} from "../groups";
+import { History } from "../history";
+import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
+import {
+  CODES,
+  shouldResizeFromCenter,
+  shouldMaintainAspectRatio,
+  shouldRotateWithDiscreteAngle,
+  isArrowKey,
+  KEYS,
+} from "../keys";
 import { isElementInViewport } from "../element/sizeHelpers";
+import {
+  distance2d,
+  getCornerRadius,
+  getGridPoint,
+  isPathALoop,
+} from "../math";
+import {
+  calculateScrollCenter,
+  getElementsWithinSelection,
+  getNormalizedZoom,
+  getSelectedElements,
+  hasBackground,
+  isSomeElementSelected,
+} from "../scene";
+import Scene from "../scene/Scene";
+import type {
+  RenderInteractiveSceneCallback,
+  ScrollBars,
+} from "../scene/types";
+import { getStateForZoom } from "../scene/zoom";
+import { findShapeByKey, getElementShape } from "../shapes";
+import type { GeometricShape } from "../../utils/geometry/shape";
+import { getSelectionBoxShape } from "../../utils/geometry/shape";
+import { isPointInShape } from "../../utils/collision";
+import type {
+  AppClassProperties,
+  AppProps,
+  AppState,
+  BinaryFileData,
+  DataURL,
+  ExcalidrawImperativeAPI,
+  BinaryFiles,
+  Gesture,
+  GestureEvent,
+  LibraryItems,
+  PointerDownState,
+  SceneData,
+  Device,
+  FrameNameBoundsCache,
+  SidebarName,
+  SidebarTabName,
+  KeyboardModifiersObject,
+  CollaboratorPointer,
+  ToolType,
+  OnUserFollowedPayload,
+  UnsubscribeCallback,
+  EmbedsValidationStatus,
+  ElementsPendingErasure,
+} from "../types";
+import {
+  debounce,
+  distance,
+  getFontString,
+  getNearestScrollableContainer,
+  isInputLike,
+  isToolIcon,
+  isWritableElement,
+  sceneCoordsToViewportCoords,
+  tupleToCoors,
+  viewportCoordsToSceneCoords,
+  wrapEvent,
+  updateObject,
+  updateActiveTool,
+  getShortcutKey,
+  isTransparent,
+  easeToValuesRAF,
+  muteFSAbortError,
+  isTestEnv,
+  easeOut,
+  updateStable,
+  addEventListener,
+  normalizeEOL,
+  getDateTime,
+  isShallowEqual,
+  arrayToMap,
+} from "../utils";
+import {
+  createSrcDoc,
+  embeddableURLValidator,
+  maybeParseEmbedSrc,
+  getEmbedLink,
+} from "../element/embeddable";
+import type { ContextMenuItems } from "./ContextMenu";
+import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
+import LayerUI from "./LayerUI";
+import { Toast } from "./Toast";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import {
+  dataURLToFile,
+  generateIdFromFile,
+  getDataURL,
+  getFileFromEvent,
+  ImageURLToFile,
+  isImageFileHandle,
+  isSupportedImageFile,
+  loadSceneOrLibraryFromBlob,
+  normalizeFile,
+  parseLibraryJSON,
+  resizeImageFile,
+  SVGStringToFile,
+} from "../data/blob";
+import {
+  getInitializedImageElements,
+  loadHTMLImageElement,
+  normalizeSVG,
+  updateImageCache as _updateImageCache,
+} from "../element/image";
+import throttle from "lodash.throttle";
+import type { FileSystemHandle } from "../data/filesystem";
+import { fileOpen } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
@@ -232,204 +331,105 @@ import {
   measureText,
   wrapText,
 } from "../element/textElement";
-import { textWysiwyg } from "../element/textWysiwyg";
+import {
+  showHyperlinkTooltip,
+  hideHyperlinkToolip,
+  Hyperlink,
+} from "../components/hyperlink/Hyperlink";
+import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
-import {
-  hasBoundTextElement,
-  isArrowElement,
-  isBindingElement,
-  isBindingElementType,
-  isBoundToContainer,
-  isEmbeddableElement,
-  isFrameElement,
-  isFrameLikeElement,
-  isIframeElement,
-  isIframeLikeElement,
-  isImageElement,
-  isInitializedImageElement,
-  isLinearElement,
-  isLinearElementType,
-  isMagicFrameElement,
-  isTextBindableContainer,
-  isUsingAdaptiveRadius,
-} from "../element/typeChecks";
-import type {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawEmbeddableElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawGenericElement,
-  ExcalidrawIframeElement,
-  ExcalidrawIframeLikeElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawMagicFrameElement,
-  ExcalidrawTextContainer,
-  ExcalidrawTextElement,
-  FileId,
-  IframeData,
-  InitializedExcalidrawImageElement,
-  NonDeleted,
-  NonDeletedExcalidrawElement,
-  Ordered,
-} from "../element/types";
-import { Emitter } from "../emitter";
-import { ImageSceneDataError } from "../errors";
-import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
-import {
-  addElementsToFrame,
-  bindElementsToFramesAfterDuplication,
-  elementOverlapsWithFrame,
-  filterElementsEligibleAsFrameChildren,
-  getContainingFrame,
-  getElementsInNewFrame,
-  getElementsInResizingFrame,
-  getElementsOverlappingFrame,
-  getFrameChildren,
-  getFrameLikeTitle,
-  isCursorInFrame,
-  isElementInFrame,
-  removeElementsFromFrame,
-  replaceAllElementsInFrame,
-  updateFrameMembershipOfSelectedElements,
-} from "../frame";
-import { getCenter, getDistance } from "../gesture";
-import {
-  editGroupForSelectedElement,
-  getElementsInGroup,
-  getSelectedGroupIdForElement,
-  getSelectedGroupIds,
-  isElementInGroup,
-  isSelectedViaGroup,
-  selectGroupsForSelectedElements,
-} from "../groups";
-import { History } from "../history";
-import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
-import { jotaiStore } from "../jotai";
-import {
-  CODES,
-  KEYS,
-  isArrowKey,
-  shouldMaintainAspectRatio,
-  shouldResizeFromCenter,
-  shouldRotateWithDiscreteAngle,
-} from "../keys";
-import { LaserTrails } from "../laser-trails";
-import {
-  distance2d,
-  getCornerRadius,
-  getGridPoint,
-  isPathALoop,
-} from "../math";
-import { isMaybeMermaidDefinition } from "../mermaid";
-import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
-import { getRenderOpacity } from "../renderer/renderElement";
-import {
-  calculateScrollCenter,
-  getElementsWithinSelection,
-  getNormalizedZoom,
-  getSelectedElements,
-  hasBackground,
-  isSomeElementSelected,
-} from "../scene";
+import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts } from "../scene/Fonts";
-import { Renderer } from "../scene/Renderer";
-import Scene from "../scene/Scene";
-import { ShapeCache } from "../scene/ShapeCache";
-import { isOverScrollBars } from "../scene/scrollbars";
+import {
+  getFrameChildren,
+  isCursorInFrame,
+  bindElementsToFramesAfterDuplication,
+  addElementsToFrame,
+  replaceAllElementsInFrame,
+  removeElementsFromFrame,
+  getElementsInResizingFrame,
+  getElementsInNewFrame,
+  getContainingFrame,
+  elementOverlapsWithFrame,
+  updateFrameMembershipOfSelectedElements,
+  isElementInFrame,
+  getFrameLikeTitle,
+  getElementsOverlappingFrame,
+  filterElementsEligibleAsFrameChildren,
+} from "../frame";
 import {
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
 } from "../scene/selection";
-import type {
-  RenderInteractiveSceneCallback,
-  ScrollBars,
-} from "../scene/types";
-import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey, getElementShape } from "../shapes";
+import { actionPaste } from "../actions/actionClipboard";
 import {
-  SnapCache,
-  getReferenceSnapPoints,
+  actionRemoveAllElementsFromFrame,
+  actionSelectAllElementsInFrame,
+} from "../actions/actionFrame";
+import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import { jotaiStore } from "../jotai";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { ImageSceneDataError } from "../errors";
+import {
   getSnapLinesAtPointer,
-  getVisibleGaps,
-  isActiveToolNonLinearSnappable,
-  isSnappingEnabled,
   snapDraggedElements,
+  isActiveToolNonLinearSnappable,
   snapNewElement,
   snapResizingElements,
+  isSnappingEnabled,
+  getVisibleGaps,
+  getReferenceSnapPoints,
+  SnapCache,
 } from "../snapping";
-import { Store, StoreAction } from "../store";
-import type {
-  AppClassProperties,
-  AppProps,
-  AppState,
-  BinaryFileData,
-  BinaryFiles,
-  CollaboratorPointer,
-  DataURL,
-  Device,
-  ElementsPendingErasure,
-  EmbedsValidationStatus,
-  ExcalidrawImperativeAPI,
-  FrameNameBoundsCache,
-  Gesture,
-  GestureEvent,
-  KeyboardModifiersObject,
-  LibraryItems,
-  OnUserFollowedPayload,
-  PointerDownState,
-  SceneData,
-  SidebarName,
-  SidebarTabName,
-  ToolType,
-  UnsubscribeCallback,
-} from "../types";
-import type { ValueOf } from "../utility-types";
-import {
-  addEventListener,
-  arrayToMap,
-  debounce,
-  distance,
-  easeOut,
-  easeToValuesRAF,
-  getDateTime,
-  getFontString,
-  getNearestScrollableContainer,
-  getShortcutKey,
-  isInputLike,
-  isShallowEqual,
-  isTestEnv,
-  isToolIcon,
-  isTransparent,
-  isWritableElement,
-  muteFSAbortError,
-  normalizeEOL,
-  sceneCoordsToViewportCoords,
-  tupleToCoors,
-  updateActiveTool,
-  updateObject,
-  updateStable,
-  viewportCoordsToSceneCoords,
-  wrapEvent,
-} from "../utils";
-import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
-import type { ContextMenuItems } from "./ContextMenu";
-import { CONTEXT_MENU_SEPARATOR, ContextMenu } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import FollowMode from "./FollowMode/FollowMode";
-import LayerUI from "./LayerUI";
-import { ElementCanvasButton } from "./MagicButton";
-import { SVGLayer } from "./SVGLayer";
+import type { ExcalidrawElementSkeleton } from "../data/transform";
+import { convertToExcalidrawElements } from "../data/transform";
+import type { ValueOf } from "../utility-types";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { Toast } from "./Toast";
-import { InteractiveCanvas, StaticCanvas } from "./canvases";
+import { StaticCanvas, InteractiveCanvas } from "./canvases";
+import { Renderer } from "../scene/Renderer";
+import { ShapeCache } from "../scene/ShapeCache";
+import { SVGLayer } from "./SVGLayer";
+import {
+  setEraserCursor,
+  setCursor,
+  resetCursor,
+  setCursorForShape,
+} from "../cursor";
+import { Emitter } from "../emitter";
+import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
+import type { MagicCacheData } from "../data/magic";
+import { diagramToHTML } from "../data/magic";
+import { exportToBlob } from "../../utils/export";
+import { COLOR_PALETTE } from "../colors";
+import { ElementCanvasButton } from "./MagicButton";
+import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import FollowMode from "./FollowMode/FollowMode";
+import { Store, StoreAction } from "../store";
+import { AnimationFrameHandler } from "../animation-frame-handler";
+import { AnimatedTrail } from "../animated-trail";
+import { LaserTrails } from "../laser-trails";
+import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
+import { getRenderOpacity } from "../renderer/renderElement";
+import {
+  hitElementBoundText,
+  hitElementBoundingBoxOnly,
+  hitElementItself,
+} from "../element/collision";
+import { textWysiwyg } from "../element/textWysiwyg";
+import { isOverScrollBars } from "../scene/scrollbars";
+import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
 import {
   isPointHittingLink,
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { getVisibleSceneBounds } from "../element/bounds";
+import { isMaybeMermaidDefinition } from "../mermaid";
 import { mutateElbowArrow } from "../element/routing";
 
 const AppContext = React.createContext<AppClassProperties>(null!);

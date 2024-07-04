@@ -8,6 +8,7 @@ import { Island } from "../Island";
 import { throttle } from "lodash";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
+
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
 import { elementsAreInSameGroup } from "../../groups";

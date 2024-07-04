@@ -1,44 +1,35 @@
 import * as GA from "../ga";
+import * as GAPoint from "../gapoints";
 import * as GADirection from "../gadirections";
 import * as GALine from "../galines";
-import * as GAPoint from "../gapoints";
 import * as GATransform from "../gatransforms";
 
 import type {
-  ElementsMap,
-  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
-  ExcalidrawDiamondElement,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawIframeLikeElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
-  ExcalidrawTextElement,
+  ExcalidrawDiamondElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawIframeLikeElement,
   NonDeleted,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
+  ExcalidrawLinearElement,
   PointBinding,
+  NonDeletedExcalidrawElement,
+  ElementsMap,
+  NonDeletedSceneElementsMap,
+  ExcalidrawTextElement,
+  ExcalidrawArrowElement,
+  OrderedExcalidrawElement,
 } from "./types";
 
-import { isPointOnShape } from "../../utils/collision";
-import { KEYS } from "../keys";
-import { rotatePoint, scaleVector, translatePoint } from "../math";
-import { getElementAtPosition } from "../scene";
-import type Scene from "../scene/Scene";
-import type { AppState, Point } from "../types";
-import { arrayToMap, tupleToCoors } from "../utils";
 import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
-import { LinearElementEditor } from "./linearElementEditor";
-import type { ElementUpdate } from "./mutateElement";
-import { mutateElement } from "./mutateElement";
-import { aabbForElement, headingForPointFromElement } from "./routing";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import type { AppState, Point } from "../types";
+import { isPointOnShape } from "../../utils/collision";
+import { getElementAtPosition } from "../scene";
 import {
   isArrowElement,
   isBindableElement,
@@ -47,7 +38,16 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import type { ElementUpdate } from "./mutateElement";
+import { mutateElement } from "./mutateElement";
+import type Scene from "../scene/Scene";
+import { LinearElementEditor } from "./linearElementEditor";
+import { arrayToMap, tupleToCoors } from "../utils";
+import { KEYS } from "../keys";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getElementShape } from "../shapes";
+import { aabbForElement, headingForPointFromElement } from "./routing";
+import { rotatePoint, scaleVector, translatePoint } from "../math";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

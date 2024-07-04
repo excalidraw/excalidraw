@@ -3,11 +3,11 @@ import { getBoundTextElement } from "../../element/textElement";
 import { isArrowElement } from "../../element/typeChecks";
 import type { ExcalidrawElement } from "../../element/types";
 import { degreeToRadian, radianToDegree } from "../../math";
-import type Scene from "../../scene/Scene";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
+import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface AngleProps {
