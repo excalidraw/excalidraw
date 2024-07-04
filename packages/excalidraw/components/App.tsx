@@ -217,7 +217,10 @@ import {
   newMagicFrameElement,
 } from "../element/newElement";
 import { mutateElbowArrow } from "../element/routing";
-import { isElementInViewport } from "../element/sizeHelpers";
+import {
+  isElementCompletelyInViewport,
+  isElementInViewport,
+} from "../element/sizeHelpers";
 import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
@@ -244,6 +247,7 @@ import {
   isEmbeddableElement,
   isFrameElement,
   isFrameLikeElement,
+  isGenericElement,
   isIframeElement,
   isIframeLikeElement,
   isImageElement,
@@ -431,6 +435,7 @@ import {
 } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { isMaybeMermaidDefinition } from "../mermaid";
+import { addNewNode, getSuccessorDirectionFromKey } from "../element/flowchart";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -3862,6 +3867,70 @@ class App extends React.Component<AppProps, AppState> {
               : value;
           },
         });
+      }
+
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        (event.key === KEYS.ARROW_UP ||
+          event.key === KEYS.ARROW_RIGHT ||
+          event.key === KEYS.ARROW_DOWN ||
+          event.key === KEYS.ARROW_LEFT)
+      ) {
+        event.preventDefault();
+
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (
+          selectedElements.length === 1 &&
+          isGenericElement(selectedElements[0])
+        ) {
+          const { nextNode, bindingArrow } = addNewNode(
+            selectedElements[0] as ExcalidrawGenericElement,
+            this.scene.getNonDeletedElementsMap(),
+            this.scene,
+            getSuccessorDirectionFromKey(event.key),
+          );
+
+          if (nextNode && bindingArrow) {
+            this.scene.insertElements([nextNode, bindingArrow]);
+            this.setState((prevState) => ({
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  [nextNode.id]: true,
+                },
+                prevState,
+              ),
+            }));
+
+            // NOTE: not so sure about `isElementCompletelyInViewport`
+            // feels a bit "aggressive"
+            // maybe isElementInViewport is enough
+            if (
+              !isElementCompletelyInViewport(
+                nextNode,
+                this.canvas.width / window.devicePixelRatio,
+                this.canvas.height / window.devicePixelRatio,
+                {
+                  offsetLeft: this.state.offsetLeft,
+                  offsetTop: this.state.offsetTop,
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  zoom: this.state.zoom,
+                },
+                this.scene.getNonDeletedElementsMap(),
+              )
+            ) {
+              this.scrollToContent(nextNode);
+            }
+
+            this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+          }
+        }
+
+        return;
       }
 
       if (

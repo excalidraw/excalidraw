@@ -263,3 +263,12 @@ export const getDefaultRoundnessTypeForElement = (
 
   return null;
 };
+
+export const isGenericElement = (element: ExcalidrawElement) => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond" ||
+    element.type === "selection"
+  );
+};
