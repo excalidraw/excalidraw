@@ -1,5 +1,4 @@
 import polyfill from "../packages/excalidraw/polyfill";
-import LanguageDetector from "i18next-browser-languagedetector";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
@@ -22,7 +21,6 @@ import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRef
 import { t } from "../packages/excalidraw/i18n";
 import {
   Excalidraw,
-  defaultLang,
   LiveCollaborationTrigger,
   TTDDialog,
   TTDDialogTrigger,
@@ -93,7 +91,7 @@ import {
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { AppFooter } from "./components/AppFooter";
-import { atom, Provider, useAtom, useAtomValue } from "jotai";
+import { Provider, useAtom, useAtomValue } from "jotai";
 import { useAtomWithInitialValue } from "../packages/excalidraw/jotai";
 import { appJotaiStore } from "./app-jotai";
 
@@ -121,6 +119,8 @@ import {
   youtubeIcon,
 } from "../packages/excalidraw/components/icons";
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
+import { getPreferredLanguage } from "./app-language/language-detector";
+import { useAppLangCode } from "./app-language/language-state";
 
 polyfill();
 
@@ -171,11 +171,6 @@ if (window.self !== window.top) {
     // ignore
   }
 }
-
-const languageDetector = new LanguageDetector();
-languageDetector.init({
-  languageUtils: {},
-});
 
 const shareableLinkConfirmDialog = {
   title: t("overwriteConfirm.modal.shareableLink.title"),
@@ -322,18 +317,14 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const detectedLangCode = languageDetector.detect() || defaultLang.code;
-export const appLangCodeAtom = atom(
-  Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode,
-);
-
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [langCode, setLangCode] = useAtom(appLangCodeAtom);
   const isCollabDisabled = isRunningInIframe();
 
   const [appTheme, setAppTheme] = useAtom(appThemeAtom);
   const { editorTheme } = useHandleAppTheme();
+
+  const [langCode, setLangCode] = useAppLangCode();
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -490,11 +481,7 @@ const ExcalidrawWrapper = () => {
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
-          let langCode = languageDetector.detect() || defaultLang.code;
-          if (Array.isArray(langCode)) {
-            langCode = langCode[0];
-          }
-          setLangCode(langCode);
+          setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
             storeAction: StoreAction.UPDATE,
@@ -594,10 +581,6 @@ const ExcalidrawWrapper = () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     };
   }, [excalidrawAPI]);
-
-  useEffect(() => {
-    languageDetector.cacheUserLanguage(langCode);
-  }, [langCode]);
 
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
