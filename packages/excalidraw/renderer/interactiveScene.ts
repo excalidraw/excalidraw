@@ -479,7 +479,6 @@ const renderLinearPointHandles = (
     if (
       isArrowElement(element) &&
       element.elbowed &&
-      (element.startBinding || element.endBinding) &&
       idx !== 0 &&
       idx !== points.length - 1
     ) {
