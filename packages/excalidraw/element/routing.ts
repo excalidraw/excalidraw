@@ -420,7 +420,7 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(bendMultiplier, 2) : 0);
+        (directionChange ? Math.pow(bendMultiplier, 3) : 0);
 
       const beenVisited = neighbor.visited;
 
