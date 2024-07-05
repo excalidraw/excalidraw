@@ -193,20 +193,58 @@ export const addNewNode = (
 
   const getOffsets = (
     element: ExcalidrawGenericElement,
-    successors: ExcalidrawElement[],
+    linkedNodes: ExcalidrawElement[],
     direction: SuccessorDirection,
   ) => {
+    const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
+
+    // check if vertical space or horizontal space is available first
     if (direction === "up" || direction === "down") {
-      const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
-      const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height - 10;
-      const y =
-        successors.length === 0 ? _VERTICAL_OFFSET + 10 : _VERTICAL_OFFSET;
+      const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+      // check vertical space
+      const minX = element.x;
+      const maxX = element.x + element.width;
+
+      // vertical space is available
+      if (
+        linkedNodes.every(
+          (linkedNode) =>
+            linkedNode.x + linkedNode.width < minX || linkedNode.x > maxX,
+        )
+      ) {
+        return {
+          x: 0,
+          y: _VERTICAL_OFFSET * (direction === "up" ? -1 : 1),
+        };
+      }
+    } else if (direction === "right" || direction === "left") {
+      const minY = element.y;
+      const maxY = element.y + element.height;
+
+      if (
+        linkedNodes.every(
+          (linkedNode) =>
+            linkedNode.y + linkedNode.height < minY || linkedNode.y > maxY,
+        )
+      ) {
+        return {
+          x:
+            (HORIZONTAL_OFFSET + element.width) *
+            (direction === "left" ? -1 : 1),
+          y: 0,
+        };
+      }
+    }
+
+    if (direction === "up" || direction === "down") {
+      const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+      const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
       const x =
-        successors.length === 0
+        linkedNodes.length === 0
           ? 0
-          : (successors.length + 1) % 2 === 0
-          ? ((successors.length + 1) / 2) * _HORIZONTAL_OFFSET
-          : (successors.length / 2) * _HORIZONTAL_OFFSET * -1;
+          : (linkedNodes.length + 1) % 2 === 0
+          ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
+          : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
 
       if (direction === "up") {
         return {
@@ -223,14 +261,14 @@ export const addNewNode = (
 
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     const x =
-      (successors.length === 0 ? HORIZONTAL_OFFSET + 10 : HORIZONTAL_OFFSET) +
+      (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
       element.width;
     const y =
-      successors.length === 0
+      linkedNodes.length === 0
         ? 0
-        : (successors.length + 1) % 2 === 0
-        ? ((successors.length + 1) / 2) * _VERTICAL_OFFSET
-        : (successors.length / 2) * _VERTICAL_OFFSET * -1;
+        : (linkedNodes.length + 1) % 2 === 0
+        ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
+        : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
 
     if (direction === "left") {
       return {
