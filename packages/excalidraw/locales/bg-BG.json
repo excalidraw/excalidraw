@@ -10,9 +10,9 @@
     "copy": "Копирай",
     "copyAsPng": "Копиране в клипборда",
     "copyAsSvg": "Копирано в клипборда като SVG",
-    "copyText": "",
-    "copySource": "",
-    "convertToCode": "",
+    "copyText": "Копирай в клипборда като текст",
+    "copySource": "Копирай източника в клипборда",
+    "convertToCode": "Конвертирай в код",
     "bringForward": "Преместване напред",
     "sendToBack": "Изнасяне назад",
     "bringToFront": "Изнасяне отпред",
@@ -110,7 +110,7 @@
     "showStroke": "",
     "showBackground": "",
     "toggleTheme": "",
-    "theme": "",
+    "theme": "Тема",
     "personalLib": "Лична Библиотека",
     "excalidrawLib": "Excalidraw Библиотека",
     "decreaseFontSize": "Намали размера на шрифта",
@@ -121,15 +121,15 @@
     "link": {
       "edit": "Редактирай линк",
       "editEmbed": "",
-      "create": "",
+      "create": "Създай линк",
       "createEmbed": "",
       "label": "Линк",
       "labelEmbed": "",
       "empty": ""
     },
     "lineEditor": {
-      "edit": "",
-      "editArrow": ""
+      "edit": "Редактирай линия",
+      "editArrow": "Редактирай стрелка"
     },
     "elementLock": {
       "lock": "Заключи",
@@ -194,7 +194,7 @@
     "publishLibrary": "Публикувай",
     "submit": "Изпрати",
     "confirm": "Потвърждаване",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Натисни, за да взаимодействаш"
   },
   "alerts": {
     "clearReset": "Това ще изчисти цялото платно. Сигурни ли сте?",
@@ -230,7 +230,7 @@
     "saveLibraryError": "",
     "collabSaveFailed": "",
     "collabSaveFailed_sizeExceeded": "",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "Изображенията са изключени.",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
@@ -264,23 +264,23 @@
     "frame": "",
     "magicframe": "",
     "embeddable": "",
-    "laser": "",
+    "laser": "Лазерна показалка",
     "hand": "",
     "extraTools": "Още инструменти",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": "Mermaid към Excalidraw",
+    "magicSettings": "AI настройки"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
+    "rectangle": "Правоъгълник",
+    "diamond": "Диамант",
+    "ellipse": "Елипса",
+    "arrow": "Стрелка",
+    "line": "Линия",
     "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
+    "text": "Текст",
+    "image": "Изображение",
+    "group": "Група",
+    "frame": "Рамка",
     "magicframe": "",
     "embeddable": "",
     "selection": "",
@@ -329,10 +329,10 @@
     "sceneContent": "Съдържание на сцената:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Или"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Поканете хора да работят съвместно на рисунката.",
     "desc_privacy": "",
     "button_startSession": "Стартирайте сесията",
     "button_stopSession": "Стоп на сесията",
@@ -442,8 +442,8 @@
       "copyPngToClipboard": "Копирай PNG в клипборда"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Копиране в клипборда"
     }
   },
@@ -460,8 +460,8 @@
     "selected": "Селектирано",
     "storage": "Съхранение на данни",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
+    "title": "Статистики",
+    "generalStats": "Общи статистики",
     "elementProperties": "",
     "total": "Общо",
     "version": "Версия",
@@ -552,7 +552,7 @@
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "Вмъкни",
     "description": "",
     "syntax": "",
     "preview": ""
