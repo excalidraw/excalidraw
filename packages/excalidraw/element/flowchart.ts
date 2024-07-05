@@ -254,10 +254,14 @@ export const addNewNode = (
     type: element.type,
     x: element.x + offsets.x,
     y: element.y + offsets.y,
+    // TODO: extract this to a util
     width: element.width,
     height: element.height,
     roundness: element.roundness,
     roughness: element.roughness,
+    backgroundColor: element.backgroundColor,
+    strokeColor: element.strokeColor,
+    strokeWidth: element.strokeWidth,
   });
 
   const bindingArrow = createBindingArrow(
