@@ -21,9 +21,9 @@
     "copyStyles": "Копирайте стилове",
     "pasteStyles": "Постави стилове",
     "stroke": "Щрих",
-    "changeStroke": "",
+    "changeStroke": "Смени цвета на щрих",
     "background": "Фон",
-    "changeBackground": "",
+    "changeBackground": "Смени цвета на фон",
     "fill": "Наситеност",
     "strokeWidth": "Ширина на щриха",
     "strokeStyle": "Стил на линия",
@@ -40,12 +40,12 @@
     "arrowhead_none": "Без",
     "arrowhead_arrow": "Стрелка",
     "arrowhead_bar": "Връх на стрелката",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Кръг",
+    "arrowhead_circle_outline": "Окръжност",
     "arrowhead_triangle": "Триъгълник",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Триъгълник (очертание)",
+    "arrowhead_diamond": "Диамант",
+    "arrowhead_diamond_outline": "Диамант (очертание)",
     "fontSize": "Размер на шрифта",
     "fontFamily": "Семейство шрифтове",
     "addWatermark": "Добави \"Направено с Excalidraw\"",
@@ -74,11 +74,11 @@
     "canvasColors": "Използван на платно",
     "canvasBackground": "Фон на платно",
     "drawingCanvas": "Платно за рисуване",
-    "clearCanvas": "",
+    "clearCanvas": "Изчисти платното",
     "layers": "Слоеве",
     "actions": "Действия",
     "language": "Език",
-    "liveCollaboration": "",
+    "liveCollaboration": "Сътрудничество на живо...",
     "duplicateSelection": "Дублирай",
     "untitled": "Неозаглавено",
     "name": "Име",
@@ -87,13 +87,13 @@
     "group": "Групирай селекцията",
     "ungroup": "Спри групирането на селекцията",
     "collaborators": "Сътрудници",
-    "toggleGrid": "",
+    "toggleGrid": "Превключване на мрежа",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
     "libraryLoadingMessage": "Зареждане на библиотеката…",
     "libraries": "Разглеждане на библиотеките",
     "loadingScene": "Зареждане на сцена…",
-    "loadScene": "",
+    "loadScene": "Зареди сцена от файл",
     "align": "Подравняване",
     "alignTop": "Подравняване отгоре",
     "alignBottom": "Подравняване отдолу",
@@ -107,9 +107,9 @@
     "flipVertical": "Вертикално обръщане",
     "viewMode": "Изглед",
     "share": "Сподели",
-    "showStroke": "",
-    "showBackground": "",
-    "toggleTheme": "",
+    "showStroke": "Покажи избора на цвят за щрих",
+    "showBackground": "Покажи избора на цвят за фон",
+    "toggleTheme": "Превключване на светла/тъмна тема",
     "theme": "Тема",
     "personalLib": "Лична Библиотека",
     "excalidrawLib": "Excalidraw Библиотека",
@@ -125,7 +125,7 @@
       "createEmbed": "",
       "label": "Линк",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "Няма зададен линк"
     },
     "lineEditor": {
       "edit": "Редактирай линия",
@@ -139,28 +139,28 @@
     },
     "statusPublished": "Публикувани",
     "sidebarLock": "",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "Избери всички елементи в рамка",
+    "removeAllElementsFromFrame": "Премахни всички елементи от рамка",
     "eyeDropper": "Избери цвят от платното",
-    "textToDiagram": "",
+    "textToDiagram": "Текст към диаграма",
     "prompt": "",
-    "followUs": "",
-    "discordChat": "",
+    "followUs": "Последвайте ни",
+    "discordChat": "Дискорд чат",
     "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
+    "zoomToFitSelection": "Приближи селекцията",
+    "zoomToFit": "Приближи всички елементи",
     "installPWA": "",
     "autoResize": ""
   },
   "library": {
     "noItems": "Няма добавени неща все още...",
-    "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": ""
+    "hint_emptyLibrary": "Избери предмет от платното, за да го добавиш тук или инсталирай библиотека от публичното хранилище по-долу.",
+    "hint_emptyPrivateLibrary": "Избери предмет от платното, за да го добавиш тук."
   },
   "buttons": {
     "clearReset": "Нулиране на платно",
-    "exportJSON": "",
-    "exportImage": "",
+    "exportJSON": "Изнасяна към файл",
+    "exportImage": "Изнеси изображение...",
     "export": "Запази на...",
     "copyToClipboard": "Копиране в клипборда",
     "save": "Запази към текущ файл",
@@ -183,14 +183,14 @@
     "fullScreen": "На цял екран",
     "darkMode": "Тъмен режим",
     "lightMode": "Светъл режим",
-    "systemMode": "",
+    "systemMode": "Системен режим",
     "zenMode": "Режим Zen",
-    "objectsSnapMode": "",
-    "exitZenMode": "Спиране на Zen режим",
+    "objectsSnapMode": "Прилепване към обекти",
+    "exitZenMode": "Спиране на режим Зен",
     "cancel": "Отмени",
     "clear": "Изчисти",
     "remove": "Премахване",
-    "embed": "",
+    "embed": "Включи вмъкване",
     "publishLibrary": "Публикувай",
     "submit": "Изпрати",
     "confirm": "Потвърждаване",
@@ -211,20 +211,20 @@
     "errorAddingToLibrary": "Не можем да заредим от библиотеката",
     "errorRemovingFromLibrary": "Не можем да премахнем елемент от библиотеката",
     "confirmAddLibrary": "Ще се добавят {{numShapes}} фигура(и) във вашата библиотека. Сигурни ли сте?",
-    "imageDoesNotContainScene": "",
+    "imageDoesNotContainScene": "Това изображение не изглежда да съдържа каквито и да е данни за сцена. Искате ли да включите вмъкване на сцени при изнасяне?",
     "cannotRestoreFromImage": "Не може да бъде възстановена сцена от този файл",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
+    "invalidSceneUrl": "Неуспешно поставяне на сцена от предоставения линк. Той е или неправилно оформен, или не съдържа валидни Excalidraw JSON данни.",
+    "resetLibrary": "Това ще изчисти библиотеката ви. Сигурни ли сте?",
     "removeItemsFromsLibrary": "Изтрий {{count}} елемент(а) от библиотеката?",
-    "invalidEncryptionKey": "",
-    "collabOfflineWarning": ""
+    "invalidEncryptionKey": "Ключът за енкрипция трябва да е от 22 знака. Сътрудничеството на живо е изключено.",
+    "collabOfflineWarning": "Няма налична интернет връзка.\nВашите промени няма да бъдат запазени!"
   },
   "errors": {
     "unsupportedFileType": "Този файлов формат не се поддържа.",
-    "imageInsertError": "",
+    "imageInsertError": "Неуспешно поставяне на изображение. Опитайте по-късно...",
     "fileTooBig": "Файлът е твърде голям. Максималния допустим размер е {{maxSize}}.",
-    "svgImageInsertError": "",
-    "failedToFetchImage": "",
+    "svgImageInsertError": "Неуспешно поставяне на SVG изборажение. SVG данните изглеждат невалидни.",
+    "failedToFetchImage": "Неуспешно получаване на изборажение.",
     "cannotResolveCollabServer": "",
     "importLibraryError": "Не можем да заредим библиотеката",
     "saveLibraryError": "",
@@ -235,7 +235,7 @@
       "line1": "",
       "line2": "",
       "line3": "Силно препоръчваме да изключите тази настройка. Можете да следвате <link>тези стъпки</link> за това как да го направите.",
-      "line4": ""
+      "line4": "Ако изключването на тази настройка не оправи изобразяването на текстови елементи, моля отворете <issueLink>проблем</issueLink> на нашия GitHub или ни пишете на <discordLink>Дискорд</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "",
@@ -261,7 +261,7 @@
     "penMode": "",
     "link": "",
     "eraser": "Гума",
-    "frame": "",
+    "frame": "Инструмент за рамки",
     "magicframe": "",
     "embeddable": "",
     "laser": "Лазерна показалка",
@@ -276,7 +276,7 @@
     "ellipse": "Елипса",
     "arrow": "Стрелка",
     "line": "Линия",
-    "freedraw": "",
+    "freedraw": "Свободно рисуване",
     "text": "Текст",
     "image": "Изображение",
     "group": "Група",
@@ -284,7 +284,7 @@
     "magicframe": "",
     "embeddable": "",
     "selection": "",
-    "iframe": ""
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Действия по платното",
@@ -292,12 +292,12 @@
     "shapes": "Фигури"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "За да местите платното, задръжте колелцето на мишката или интервал, докато местите, или използвайте инструмента ръка",
     "linearElement": "Кликнете, за да стартирате няколко точки, плъзнете за една линия",
     "freeDraw": "Натиснете и влачете, пуснете като сте готови",
     "text": "Подсказка: Можете също да добавите текст като натиснете някъде два път с инструмента за селекция",
-    "embeddable": "",
-    "text_selected": "",
+    "embeddable": "Натисни-премести, за да създадеш вметка за уебсайт",
+    "text_selected": "Кликнете два пъти или натиснете ENTER, за да редактирате текст",
     "text_editing": "",
     "linearElementMulti": "Кликнете върху последната точка или натиснете Escape или Enter, за да завършите",
     "lockAngle": "Можете да ограничите ъгъла, като задържите SHIFT",
@@ -308,7 +308,7 @@
     "lineEditor_pointSelected": "Натиснете Delete за да изтриете точка(и), CtrlOrCmd+D за дуплициране, или извлачете за да преместите",
     "lineEditor_nothingSelected": "",
     "placeImage": "",
-    "publishLibrary": "",
+    "publishLibrary": "Публикувайте собствена библиотека",
     "bindTextToElement": "Натиснете Enter, за да добавите",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -345,10 +345,10 @@
     "title": "Грешка"
   },
   "exportDialog": {
-    "disk_title": "",
+    "disk_title": "Запази към диск",
     "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
+    "disk_button": "Запази като файл",
+    "link_title": "Връзка за споделяне",
     "link_details": "",
     "link_button": "",
     "excalidrawplus_description": "",
@@ -532,7 +532,7 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Експортирай към Excalidraw+",
         "description": "Запази сцената към Excalidraw+ работното място."
       }
@@ -554,30 +554,30 @@
     "title": "",
     "button": "Вмъкни",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Mermaid Синтаксис",
+    "preview": "Преглед"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Бързо търсене",
+      "empty": "Няма намерени потребители"
     },
     "hint": {
-      "text": "",
-      "followStatus": "",
+      "text": "Натиснете потребител, за да го следвате",
+      "followStatus": "В момента следвате този потребител",
       "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "micMuted": "Микрофона на потребителят е заглушен",
+      "isSpeaking": "Потребителят говори"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Палитра команди",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Избери",
+      "confirm": "Потвърди",
+      "close": "Затвори"
     },
-    "recents": "",
+    "recents": "Наскоро използвани",
     "search": {
       "placeholder": "",
       "noMatch": ""
