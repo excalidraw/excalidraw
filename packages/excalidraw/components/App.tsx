@@ -184,6 +184,7 @@ import type {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   Ordered,
+  ExcalidrawArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -3969,18 +3970,21 @@ class App extends React.Component<AppProps, AppState> {
           includeElementsInFrames: true,
         });
 
-        const isElbowArrowOnly =
-          selectedElements.findIndex((e) => isArrowElement(e) && e.elbowed) ===
-          0;
+        const elbowArrow = selectedElements.find(
+          (e) => isArrowElement(e) && e.elbowed,
+        ) as ExcalidrawArrowElement | undefined;
 
-        const step =
-          (this.state.gridSize &&
-            (event.shiftKey || isElbowArrowOnly
-              ? ELEMENT_TRANSLATE_AMOUNT
-              : this.state.gridSize)) ||
-          (event.shiftKey && !isElbowArrowOnly
-            ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-            : ELEMENT_TRANSLATE_AMOUNT);
+        const step = elbowArrow
+          ? elbowArrow.startBinding || elbowArrow.endBinding
+            ? 0
+            : ELEMENT_TRANSLATE_AMOUNT
+          : (this.state.gridSize &&
+              (event.shiftKey
+                ? ELEMENT_TRANSLATE_AMOUNT
+                : this.state.gridSize)) ||
+            (event.shiftKey
+              ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+              : ELEMENT_TRANSLATE_AMOUNT);
 
         let offsetX = 0;
         let offsetY = 0;
@@ -4013,7 +4017,9 @@ class App extends React.Component<AppProps, AppState> {
 
         this.setState({
           suggestedBindings: getSuggestedBindingsForArrows(
-            selectedElements,
+            selectedElements.filter(
+              (element) => element.id !== elbowArrow?.id || step !== 0,
+            ),
             this.scene.getNonDeletedElementsMap(),
           ),
         });
