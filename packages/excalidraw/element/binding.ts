@@ -728,8 +728,6 @@ const getSimultaneouslyUpdatedElementIds = (
 
 export const bindPointToSnapToElementOutline = (
   point: Point,
-  startOrEnd: "startBinding" | "endBinding",
-  arrow: ExcalidrawLinearElement,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): Point => {
@@ -867,8 +865,6 @@ const calculateFixedPointForElbowArrowBinding = (
   );
   const snappedPoint = bindPointToSnapToElementOutline(
     [nonRotatedGlobalPoint[0], nonRotatedGlobalPoint[1]],
-    startOrEnd === "start" ? "startBinding" : "endBinding",
-    linearElement,
     hoveredElement,
     elementsMap,
   );

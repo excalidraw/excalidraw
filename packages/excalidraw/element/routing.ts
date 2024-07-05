@@ -21,6 +21,7 @@ import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType } from "../utils";
 import {
+  bindPointToSnapToElementOutline,
   distanceToBindableElement,
   getHoveredElementForBinding,
   maxBindingGap,
@@ -91,7 +92,7 @@ export const mutateElbowArrow = (
     arrow.endBinding &&
       getBindableElementForId(arrow.endBinding.elementId, elementsMap),
   ];
-  const [startGlobalPoint, endGlobalPoint] = [
+  let [startGlobalPoint, endGlobalPoint] = [
     translatePoint(nextPoints[0], [
       arrow.x + (offset ? offset[0] : 0),
       arrow.y + (offset ? offset[1] : 0),
@@ -117,6 +118,20 @@ export const mutateElbowArrow = (
         )
       : origEndElement,
   ];
+
+  if (options?.isDragging) {
+    startGlobalPoint = startElement
+      ? bindPointToSnapToElementOutline(
+          startGlobalPoint,
+          startElement,
+          elementsMap,
+        )
+      : startGlobalPoint;
+    endGlobalPoint = endElement
+      ? bindPointToSnapToElementOutline(endGlobalPoint, endElement, elementsMap)
+      : endGlobalPoint;
+  }
+
   const [startHeading, endHeading] = [
     startElement
       ? headingForPointFromElement(
