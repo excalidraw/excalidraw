@@ -36,7 +36,7 @@ export const getSuccessorDirectionFromKey = (
   }
 };
 
-export const getSuccessors = (
+const getSuccessors = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   direction: SuccessorDirection = "right",
@@ -107,6 +107,81 @@ export const getSuccessors = (
   }
 };
 
+const getPredecessors = (
+  element: ExcalidrawGenericElement,
+  elementsMap: ElementsMap,
+  direction: SuccessorDirection = "right",
+) => {
+  // find elbow arrows whose endBinding is the given element
+  const comingInArrows = [...elementsMap.values()]
+    .filter(
+      (el) =>
+        el.type === "arrow" &&
+        el.startBinding &&
+        el.endBinding?.elementId === element.id,
+    )
+    .map((arrow) => elementsMap.get(arrow.id)) as ExcalidrawArrowElement[];
+
+  const predecessorsAndHeadingFors = comingInArrows.map((elbowArrow) => {
+    const predecessor = elementsMap.get(elbowArrow.startBinding!.elementId)!;
+    const lastPoint = elbowArrow.points[elbowArrow.points.length - 1];
+
+    const headingFor = headingForPointFromElement(
+      element as ExcalidrawBindableElement,
+      aabbForElement(element),
+      [lastPoint[0] + elbowArrow.x, lastPoint[1] + elbowArrow.y],
+    );
+
+    return {
+      predecessor,
+      headingFor,
+    };
+  });
+
+  switch (direction) {
+    case "up":
+      return predecessorsAndHeadingFors
+        .filter(
+          (predecessorAndHeadingFor) =>
+            predecessorAndHeadingFor.headingFor[0] === HEADING_UP[0] &&
+            predecessorAndHeadingFor.headingFor[1] === HEADING_UP[1],
+        )
+        .map(
+          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
+        );
+    case "down":
+      return predecessorsAndHeadingFors
+        .filter(
+          (predecessorAndHeadingFor) =>
+            predecessorAndHeadingFor.headingFor[0] === HEADING_DOWN[0] &&
+            predecessorAndHeadingFor.headingFor[1] === HEADING_DOWN[1],
+        )
+        .map(
+          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
+        );
+    case "right":
+      return predecessorsAndHeadingFors
+        .filter(
+          (predecessorAndHeadingFor) =>
+            predecessorAndHeadingFor.headingFor[0] === HEADING_RIGHT[0] &&
+            predecessorAndHeadingFor.headingFor[1] === HEADING_RIGHT[1],
+        )
+        .map(
+          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
+        );
+    case "left":
+      return predecessorsAndHeadingFors
+        .filter(
+          (predecessorAndHeadingFor) =>
+            predecessorAndHeadingFor.headingFor[0] === HEADING_LEFT[0] &&
+            predecessorAndHeadingFor.headingFor[1] === HEADING_LEFT[1],
+        )
+        .map(
+          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
+        );
+  }
+};
+
 export const addNewNode = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
@@ -114,6 +189,7 @@ export const addNewNode = (
   direction: SuccessorDirection = "right",
 ) => {
   const successors = getSuccessors(element, elementsMap, direction);
+  const predeccessors = getPredecessors(element, elementsMap, direction);
 
   const getOffsets = (
     element: ExcalidrawGenericElement,
@@ -168,7 +244,11 @@ export const addNewNode = (
     };
   };
 
-  const offsets = getOffsets(element, successors, direction);
+  const offsets = getOffsets(
+    element,
+    [...successors, ...predeccessors],
+    direction,
+  );
 
   const nextNode = newElement({
     type: element.type,
