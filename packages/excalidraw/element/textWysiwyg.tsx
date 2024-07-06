@@ -77,19 +77,23 @@ export const textWysiwyg = ({
   canvas,
   excalidrawContainer,
   app,
+  autoSelect = true,
 }: {
   id: ExcalidrawElement["id"];
-  onChange?: (text: string) => void;
-  onSubmit: (data: {
-    text: string;
-    viaKeyboard: boolean;
-    originalText: string;
-  }) => void;
+  /**
+   * textWysiwyg only deals with `originalText`
+   *
+   * Note: `text`, which can be wrapped and therefore different from `originalText`,
+   *       is derived from `originalText`
+   */
+  onChange?: (nextOriginalText: string) => void;
+  onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
   excalidrawContainer: HTMLDivElement | null;
   app: App;
+  autoSelect?: boolean;
 }) => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
@@ -129,11 +133,8 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
       let maxWidth = updatedTextElement.width;
-
       let maxHeight = updatedTextElement.height;
       let textElementWidth = updatedTextElement.width;
-      // Set to element height by default since that's
-      // what is going to be used for unbounded text
       const textElementHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
@@ -226,6 +227,8 @@ export const textWysiwyg = ({
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
+      } else {
+        textElementWidth += 0.5;
       }
 
       // Make sure text editor height doesn't go beyond viewport
@@ -260,6 +263,7 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
+
       mutateElement(updatedTextElement, { x: coordX, y: coordY });
     }
   };
@@ -276,7 +280,7 @@ export const textWysiwyg = ({
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
-  if (isBoundToContainer(element)) {
+  if (isBoundToContainer(element) || !element.autoResize) {
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
@@ -489,6 +493,11 @@ export const textWysiwyg = ({
   // so that we don't need to create separate a callback for event handlers
   let submittedViaKeyboard = false;
   const handleSubmit = () => {
+    // prevent double submit
+    if (isDestroyed) {
+      return;
+    }
+    isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
@@ -499,14 +508,12 @@ export const textWysiwyg = ({
     if (!updateElement) {
       return;
     }
-    let text = editable.value;
     const container = getContainerElement(
       updateElement,
       app.scene.getNonDeletedElementsMap(),
     );
 
     if (container) {
-      text = updateElement.text;
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -538,17 +545,12 @@ export const textWysiwyg = ({
     }
 
     onSubmit({
-      text,
       viaKeyboard: submittedViaKeyboard,
-      originalText: editable.value,
+      nextOriginalText: editable.value,
     });
   };
 
   const cleanup = () => {
-    if (isDestroyed) {
-      return;
-    }
-    isDestroyed = true;
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.oninput = null;
@@ -640,6 +642,22 @@ export const textWysiwyg = ({
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
       window.addEventListener("blur", handleSubmit);
+    } else if (
+      event.target instanceof HTMLElement &&
+      !event.target.contains(editable) &&
+      // Vitest simply ignores stopPropagation, capture-mode, or rAF
+      // so without introducing crazier hacks, nothing we can do
+      !isTestEnv()
+    ) {
+      // On mobile, blur event doesn't seem to always fire correctly,
+      // so we want to also submit on pointerdown outside the wysiwyg.
+      // Done in the next frame to prevent pointerdown from creating a new text
+      // immediately (if tools locked) so that users on mobile have chance
+      // to submit first (to hide virtual keyboard).
+      // Note: revisit if we want to differ this behavior on Desktop
+      requestAnimationFrame(() => {
+        handleSubmit();
+      });
     }
   };
 
@@ -658,9 +676,11 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  // select on init (focusing is done separately inside the bindBlurEvent()
-  // because we need it to happen *after* the blur event from `pointerdown`)
-  editable.select();
+  if (autoSelect) {
+    // select on init (focusing is done separately inside the bindBlurEvent()
+    // because we need it to happen *after* the blur event from `pointerdown`)
+    editable.select();
+  }
   bindBlurEvent();
 
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
@@ -675,7 +695,13 @@ export const textWysiwyg = ({
     window.addEventListener("resize", updateWysiwygStyle);
   }
 
-  window.addEventListener("pointerdown", onPointerDown);
+  editable.onpointerdown = (event) => event.stopPropagation();
+
+  // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
+  // triggered the wysiwyg
+  requestAnimationFrame(() => {
+    window.addEventListener("pointerdown", onPointerDown, { capture: true });
+  });
   window.addEventListener("wheel", stopEvent, {
     passive: false,
     capture: true,

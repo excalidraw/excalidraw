@@ -25,6 +25,11 @@ export const supportsResizeObserver =
 
 export const APP_NAME = "Excalidraw";
 
+// distance when creating text before it's considered `autoResize: false`
+// we're using higher threshold so that clicks that end up being drags
+// don't unintentionally create text elements that are wrapped to a few chars
+// (happens a lot with fast clicks with the text tool)
+export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
 export const DRAGGING_THRESHOLD = 10; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
 export const ELEMENT_SHIFT_TRANSLATE_AMOUNT = 5;
@@ -400,3 +405,7 @@ export const EDITOR_LS_KEYS = {
  * where filename is optional and we can't retrieve name from app state
  */
 export const DEFAULT_FILENAME = "Untitled";
+
+export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
+
+export const MIN_WIDTH_OR_HEIGHT = 1;

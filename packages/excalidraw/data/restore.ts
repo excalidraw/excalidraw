@@ -1,6 +1,7 @@
 import type {
   ExcalidrawElement,
   ExcalidrawElementType,
+  ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -21,7 +22,12 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
+import {
+  isArrowElement,
+  isLinearElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -45,6 +51,7 @@ import {
 } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
+import { getSizeFromPoints } from "../points";
 
 type RestoredAppState = Omit<
   AppState,
@@ -208,7 +215,7 @@ const restoreElement = (
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
         originalText: element.originalText || text,
-
+        autoResize: element.autoResize ?? true,
         lineHeight,
       });
 
@@ -270,6 +277,7 @@ const restoreElement = (
         points,
         x,
         y,
+        ...getSizeFromPoints(points),
       });
     }
 
@@ -457,6 +465,23 @@ export const restoreElements = (
           restoredElementsMap,
         ),
       );
+    }
+
+    if (isLinearElement(element)) {
+      if (
+        element.startBinding &&
+        (!restoredElementsMap.has(element.startBinding.elementId) ||
+          !isArrowElement(element))
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).startBinding = null;
+      }
+      if (
+        element.endBinding &&
+        (!restoredElementsMap.has(element.endBinding.elementId) ||
+          !isArrowElement(element))
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
+      }
     }
   }
 

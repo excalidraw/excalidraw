@@ -1,5 +1,5 @@
 import { isTextElement } from "../element";
-import { newElementWith } from "../element/mutateElement";
+import { getContainerElement } from "../element/textElement";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -46,14 +46,18 @@ export class Fonts {
 
     let didUpdate = false;
 
-    this.scene.mapElements((element) => {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+
+    for (const element of this.scene.getNonDeletedElements()) {
       if (isTextElement(element)) {
         didUpdate = true;
         ShapeCache.delete(element);
-        return newElementWith(element, {}, true);
+        const container = getContainerElement(element, elementsMap);
+        if (container) {
+          ShapeCache.delete(container);
+        }
       }
-      return element;
-    });
+    }
 
     if (didUpdate) {
       this.scene.triggerUpdate();

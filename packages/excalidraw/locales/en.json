@@ -149,7 +149,8 @@
     "zoomToFitViewport": "Zoom to fit in viewport",
     "zoomToFitSelection": "Zoom to fit selection",
     "zoomToFit": "Zoom to fit all elements",
-    "installPWA": "Install Excalidraw locally (PWA)"
+    "installPWA": "Install Excalidraw locally (PWA)",
+    "autoResize": "Enable text auto-resizing"
   },
   "library": {
     "noItems": "No items added yet...",
@@ -268,6 +269,22 @@
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "magicSettings": "AI settings"
+  },
+  "element": {
+    "rectangle": "Rectangle",
+    "diamond": "Diamond",
+    "ellipse": "Ellipse",
+    "arrow": "Arrow",
+    "line": "Line",
+    "freedraw": "Freedraw",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group",
+    "frame": "Frame",
+    "magicframe": "Wireframe to code",
+    "embeddable": "Web Embed",
+    "selection": "Selection",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -442,7 +459,10 @@
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
-    "title": "Stats for nerds",
+    "fullTitle": "Stats & Element properties",
+    "title": "Stats",
+    "generalStats": "General stats",
+    "elementProperties": "Element properties",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",

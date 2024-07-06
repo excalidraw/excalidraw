@@ -24,6 +24,7 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
+  InteractiveCanvasRenderConfig,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
 import { getCornerRadius, isRightAngle } from "../math";
@@ -89,7 +90,7 @@ const shouldResetImageFilter = (
 };
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
+  element.type === "freedraw" ? element.strokeWidth * 12 : 200;
 
 export const getRenderOpacity = (
   element: ExcalidrawElement,
@@ -618,6 +619,7 @@ export const renderSelectionElement = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
 ) => {
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
@@ -631,7 +633,7 @@ export const renderSelectionElement = (
 
   context.fillRect(offset, offset, element.width, element.height);
   context.lineWidth = 1 / appState.zoom.value;
-  context.strokeStyle = " rgb(105, 101, 219)";
+  context.strokeStyle = selectionColor;
   context.strokeRect(offset, offset, element.width, element.height);
 
   context.restore();
