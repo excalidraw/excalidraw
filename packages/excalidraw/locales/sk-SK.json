@@ -271,10 +271,10 @@
     "magicSettings": "AI nastavenia"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
+    "rectangle": "Obdĺžnik",
+    "diamond": "Diamant",
+    "ellipse": "Elipsa",
+    "arrow": "Šípka",
     "line": "",
     "freedraw": "",
     "text": "",
