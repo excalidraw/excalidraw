@@ -338,6 +338,7 @@ const ExcalidrawWrapper = () => {
   }
 
   useEffect(() => {
+    console.log("Hello Excalidraw");
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
     setTimeout(() => {
