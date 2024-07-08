@@ -20,6 +20,7 @@ import {
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType } from "../utils";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -175,52 +176,34 @@ export const mutateElbowArrow = (
       0,
   );
   const [startBounds, endBounds] = [
-    startElement &&
-      aabbForElement(startElement, offsetFromHeading(startHeading, bias)),
-    endElement &&
-      aabbForElement(endElement, offsetFromHeading(endHeading, bias)),
-  ];
-  const common = commonAABB(
-    [
-      startBounds,
-      endBounds,
-      [
-        // Start point
-        startGlobalPoint[0] - 20,
-        startGlobalPoint[1] - 20,
-        startGlobalPoint[0] + 20,
-        startGlobalPoint[1] + 20,
-      ],
-      [
-        // End point
-        endGlobalPoint[0] - 20,
-        endGlobalPoint[1] - 20,
-        endGlobalPoint[0] + 20,
-        endGlobalPoint[1] + 20,
-      ],
-    ].filter((x) => x !== null) as Bounds[],
-  );
-  const dynamicAABBs = generateDynamicAABBs(
-    startBounds
-      ? startBounds
-      : [
+    startElement
+      ? aabbForElement(startElement, offsetFromHeading(startHeading, bias))
+      : ([
           // Start point
-          startGlobalPoint[0] - 20,
-          startGlobalPoint[1] - 20,
-          startGlobalPoint[0] + 20,
-          startGlobalPoint[1] + 20,
-        ],
-    endBounds
-      ? endBounds
-      : [
+          startGlobalPoint[0] - 2,
+          startGlobalPoint[1] - 2,
+          startGlobalPoint[0] + 2,
+          startGlobalPoint[1] + 2,
+        ] as Bounds),
+    endElement
+      ? aabbForElement(endElement, offsetFromHeading(endHeading, bias))
+      : ([
           // End point
-          endGlobalPoint[0] - 20,
-          endGlobalPoint[1] - 20,
-          endGlobalPoint[0] + 20,
-          endGlobalPoint[1] + 20,
-        ],
+          endGlobalPoint[0] - 2,
+          endGlobalPoint[1] - 2,
+          endGlobalPoint[0] + 2,
+          endGlobalPoint[1] + 2,
+        ] as Bounds),
+  ];
+  const common = commonAABB([startBounds, endBounds]);
+  debugDrawBounds(startBounds, "red");
+  debugDrawBounds(endBounds, "red");
+  debugDrawBounds(common);
+  const dynamicAABBs = generateDynamicAABBs(
+    startBounds,
+    endBounds,
     common,
-    10,
+    !startElement && !endElement ? 0 : 20,
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
