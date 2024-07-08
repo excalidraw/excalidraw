@@ -451,10 +451,11 @@ export class FlowChartNavigator {
     element: ExcalidrawGenericElement,
     elementsMap: ElementsMap,
     direction: SuccessorDirection,
-  ) {
+  ): string | null {
     if (
       this.isExploringSameLevelNodes &&
       direction === this.direction &&
+      this.sameLevelNodes.length > 1 &&
       this.sameLevelNodes.some((node) => node.id === element.id)
     ) {
       this.sameLevelIndex =
