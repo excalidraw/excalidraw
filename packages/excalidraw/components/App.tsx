@@ -435,7 +435,11 @@ import {
 } from "./hyperlink/helpers";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { isMaybeMermaidDefinition } from "../mermaid";
-import { addNewNode, getSuccessorDirectionFromKey } from "../element/flowchart";
+import {
+  FlowChartNavigator,
+  addNewNode,
+  getSuccessorDirectionFromKey,
+} from "../element/flowchart";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -569,6 +573,8 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
+
+  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -3869,13 +3875,13 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      if (
-        event[KEYS.CTRL_OR_CMD] &&
-        (event.key === KEYS.ARROW_UP ||
-          event.key === KEYS.ARROW_RIGHT ||
-          event.key === KEYS.ARROW_DOWN ||
-          event.key === KEYS.ARROW_LEFT)
-      ) {
+      const arrowKeyPressed =
+        event.key === KEYS.ARROW_UP ||
+        event.key === KEYS.ARROW_RIGHT ||
+        event.key === KEYS.ARROW_DOWN ||
+        event.key === KEYS.ARROW_LEFT;
+
+      if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed) {
         event.preventDefault();
 
         const selectedElements = getSelectedElements(
@@ -3927,6 +3933,34 @@ class App extends React.Component<AppProps, AppState> {
             }
 
             this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+          }
+        }
+
+        return;
+      }
+
+      if (event.altKey && arrowKeyPressed) {
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (selectedElements.length === 1) {
+          const nextId = this.flowChartNavigator.exploreNode(
+            selectedElements[0] as ExcalidrawGenericElement,
+            this.scene.getNonDeletedElementsMap(),
+            getSuccessorDirectionFromKey(event.key),
+          );
+
+          if (nextId) {
+            this.setState((prevState) => ({
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  [nextId]: true,
+                },
+                prevState,
+              ),
+            }));
           }
         }
 
@@ -4248,6 +4282,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
       );
       this.setState({ suggestedBindings: [] });
+    }
+
+    if (!event.altKey) {
+      if (this.flowChartNavigator.wasExploring()) {
+        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      }
     }
   });
 

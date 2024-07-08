@@ -107,7 +107,7 @@ const getSuccessors = (
   }
 };
 
-const getPredecessors = (
+export const getPredecessors = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   direction: SuccessorDirection = "right",
@@ -432,3 +432,60 @@ const createBindingArrow = (
 
   return bindingArrow;
 };
+
+export class FlowChartNavigator {
+  private isExploringSameLevelNodes: boolean = false;
+  private sameLevelNodes: ExcalidrawElement[] = [];
+  private sameLevelIndex: number = 0;
+  // set it to the opposite of the defalut creation direction
+  private direction: SuccessorDirection = "left";
+
+  clear() {
+    this.isExploringSameLevelNodes = false;
+    this.sameLevelNodes = [];
+    this.sameLevelIndex = 0;
+    this.direction = "left";
+  }
+
+  exploreNode(
+    element: ExcalidrawGenericElement,
+    elementsMap: ElementsMap,
+    direction: SuccessorDirection,
+  ) {
+    if (
+      this.isExploringSameLevelNodes &&
+      direction === this.direction &&
+      this.sameLevelNodes.some((node) => node.id === element.id)
+    ) {
+      this.sameLevelIndex =
+        (this.sameLevelIndex + 1) % this.sameLevelNodes.length;
+
+      return this.sameLevelNodes[this.sameLevelIndex].id;
+    }
+
+    // explore again
+    this.clear();
+    const nodes = [
+      ...getSuccessors(element, elementsMap, direction),
+      ...getPredecessors(element, elementsMap, direction),
+    ];
+
+    if (nodes.length > 0) {
+      this.isExploringSameLevelNodes = true;
+      this.sameLevelNodes = nodes;
+      this.direction = direction;
+
+      return nodes[0].id;
+    }
+
+    return null;
+  }
+
+  wasExploring() {
+    if (this.isExploringSameLevelNodes) {
+      this.clear();
+      return true;
+    }
+    return false;
+  }
+}
