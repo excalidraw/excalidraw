@@ -25,8 +25,10 @@ export interface FontMetadata {
   icon: JSX.Element;
   /** flag to display a new badge */
   badge?: "new" | "old";
-  /** flag to hide a font from the picker */
-  hidden?: boolean;
+  /** flag to indicate a deprecated font */
+  deprecated?: true;
+  /** flag to indicate a server-side only font */
+  serverSide?: true;
 }
 
 export const FONT_METADATA: Record<number, FontMetadata> = {
@@ -87,9 +89,9 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -374,
       lineHeight: 1.25,
     },
-    hidden: true,
     icon: FreedrawIcon,
     badge: "old",
+    deprecated: true,
   },
   [FONT_FAMILY.Helvetica]: {
     metrics: {
@@ -99,8 +101,8 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.15,
     },
     icon: FontFamilyNormalIcon,
-    hidden: true,
     badge: "old",
+    deprecated: true,
   },
   [FONT_FAMILY.Cascadia]: {
     metrics: {
@@ -111,7 +113,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     icon: FontFamilyCodeIcon,
     badge: "old",
-    hidden: true,
+    deprecated: true,
   },
   [FONT_FAMILY.Assistant]: {
     metrics: {
@@ -121,7 +123,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
     icon: FontFamilyNormalIcon,
-    hidden: true,
+    serverSide: true,
   },
   [FONT_FAMILY["Liberation Sans"]]: {
     metrics: {
@@ -131,7 +133,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.15,
     },
     icon: FontFamilyNormalIcon,
-    hidden: true,
+    serverSide: true,
   },
 };
 

@@ -6,7 +6,7 @@ import React, {
   useCallback,
   type KeyboardEventHandler,
 } from "react";
-import { useApp, useExcalidrawContainer } from "../App";
+import { useApp, useAppProps, useExcalidrawContainer } from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
@@ -26,7 +26,7 @@ export interface FontDescriptor {
   value: number;
   icon: JSX.Element;
   text: string;
-  hidden?: true;
+  deprecated?: true;
   badge?: {
     type: ValueOf<typeof DropDownMenuItemBadgeType>;
     placeholder: string;
@@ -55,11 +55,14 @@ export const FontPickerList = React.memo(
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
     const { fonts } = useApp();
+    const { showDeprecatedFonts } = useAppProps();
+
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
     const allFonts = useMemo(
       () =>
         Array.from(Fonts.registered.entries())
+          .filter(([_, { metadata }]) => !metadata.serverSide)
           .map(([familyId, { metadata, fontFaces }]) => {
             const font = {
               value: familyId,
@@ -67,9 +70,9 @@ export const FontPickerList = React.memo(
               text: fontFaces[0].fontFace.family,
             };
 
-            if (metadata.hidden) {
+            if (metadata.deprecated) {
               Object.assign(font, {
-                hidden: metadata.hidden,
+                deprecated: metadata.deprecated,
               });
             }
 
@@ -105,16 +108,18 @@ export const FontPickerList = React.memo(
     );
 
     const sceneFonts = useMemo(
-      () => allFonts.filter((font) => sceneFamilies.has(font.value)),
+      () => allFonts.filter((font) => sceneFamilies.has(font.value)), // always show all the fonts in the scene, even those that were deprecated
       [allFonts, sceneFamilies],
     );
 
     const availableFonts = useMemo(
       () =>
         allFonts.filter(
-          (font) => !sceneFamilies.has(font.value) && !font.hidden,
+          (font) =>
+            !sceneFamilies.has(font.value) &&
+            (showDeprecatedFonts || !font.deprecated), // skip deprecated fonts
         ),
-      [allFonts, sceneFamilies],
+      [allFonts, sceneFamilies, showDeprecatedFonts],
     );
 
     const filteredFonts = useMemo(
