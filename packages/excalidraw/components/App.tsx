@@ -3940,6 +3940,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.altKey && arrowKeyPressed) {
+        event.preventDefault();
+
         const selectedElements = getSelectedElements(
           this.scene.getNonDeletedElementsMap(),
           this.state,
