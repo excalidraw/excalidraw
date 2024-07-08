@@ -465,44 +465,44 @@ const generateDynamicAABBs = (
       a[0] > b[2]
         ? (a[0] + b[2]) / 2
         : a[0] > b[0]
-        ? a[0]
+        ? a[0] - (offset ?? 0)
         : common[0] - (offset ?? 0),
       a[1] > b[3]
         ? (a[1] + b[3]) / 2
         : a[1] > b[1]
-        ? a[1]
+        ? a[1] - (offset ?? 0)
         : common[1] - (offset ?? 0),
       a[2] < b[0]
         ? (a[2] + b[0]) / 2
         : a[2] < b[2]
-        ? a[2]
+        ? a[2] + (offset ?? 0)
         : common[2] + (offset ?? 0),
       a[3] < b[1]
         ? (a[3] + b[1]) / 2
         : a[3] < b[3]
-        ? a[3]
+        ? a[3] + (offset ?? 0)
         : common[3] + (offset ?? 0),
     ] as Bounds,
     [
       b[0] > a[2]
         ? (b[0] + a[2]) / 2
         : b[0] > a[0]
-        ? b[0]
+        ? b[0] - (offset ?? 0)
         : common[0] - (offset ?? 0),
       b[1] > a[3]
         ? (b[1] + a[3]) / 2
         : b[1] > a[1]
-        ? b[1]
+        ? b[1] - (offset ?? 0)
         : common[1] - (offset ?? 0),
       b[2] < a[0]
         ? (b[2] + a[0]) / 2
         : b[2] < a[2]
-        ? b[2]
+        ? b[2] + (offset ?? 0)
         : common[2] + (offset ?? 0),
       b[3] < a[1]
         ? (b[3] + a[1]) / 2
         : b[3] < a[3]
-        ? b[3]
+        ? b[3] + (offset ?? 0)
         : common[3] + (offset ?? 0),
     ] as Bounds,
   ];
