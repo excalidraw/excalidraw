@@ -73,18 +73,6 @@ export const FontPickerList = React.memo(
             if (metadata.deprecated) {
               Object.assign(font, {
                 deprecated: metadata.deprecated,
-              });
-            }
-
-            if (metadata.badge === "new") {
-              Object.assign(font, {
-                badge: {
-                  type: DropDownMenuItemBadgeType.GREEN,
-                  placeholder: t("fontList.badge.new"),
-                },
-              });
-            } else if (metadata.badge === "old") {
-              Object.assign(font, {
                 badge: {
                   type: DropDownMenuItemBadgeType.RED,
                   placeholder: t("fontList.badge.old"),

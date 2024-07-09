@@ -12,6 +12,7 @@ import {
   type FontMetadata,
 } from "./metadata";
 import { ExcalidrawFont, type Font } from "./ExcalidrawFont";
+import { getContainerElement } from "../element/textElement";
 
 import Virgil from "./assets/Virgil-Regular.woff2";
 import Excalifont from "./assets/Excalifont-Regular.woff2";
@@ -30,7 +31,6 @@ import NunitoLatinExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BK
 import NunitoCyrilic from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTA3j6zbXWjgevT5.woff2";
 import NunitoCyrilicExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTk3j6zbXWjgevT5.woff2";
 import NunitoVietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTs3j6zbXWjgevT5.woff2";
-import { getContainerElement } from "../element/textElement";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use

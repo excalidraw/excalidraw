@@ -23,8 +23,6 @@ export interface FontMetadata {
   };
   /** element to be displayed as an icon  */
   icon: JSX.Element;
-  /** flag to display a new badge */
-  badge?: "new" | "old";
   /** flag to indicate a deprecated font */
   deprecated?: true;
   /** flag to indicate a server-side only font */
@@ -40,7 +38,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
     icon: FreedrawIcon,
-    badge: "new",
   },
   [FONT_FAMILY.Nunito]: {
     metrics: {
@@ -50,7 +47,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
     icon: FontFamilyNormalIcon,
-    badge: "new",
   },
   [FONT_FAMILY.Bangers]: {
     metrics: {
@@ -60,7 +56,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
     icon: FontFamilyHeadingIcon,
-    badge: "new",
   },
   [FONT_FAMILY.Geist]: {
     metrics: {
@@ -70,7 +65,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.2,
     },
     icon: FontFamilyCodeIcon,
-    badge: "new",
   },
   [FONT_FAMILY["Comic Shanns"]]: {
     metrics: {
@@ -80,7 +74,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.2,
     },
     icon: FontFamilyCodeIcon,
-    badge: "new",
   },
   [FONT_FAMILY.Virgil]: {
     metrics: {
@@ -90,7 +83,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
     icon: FreedrawIcon,
-    badge: "old",
     deprecated: true,
   },
   [FONT_FAMILY.Helvetica]: {
@@ -101,7 +93,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.15,
     },
     icon: FontFamilyNormalIcon,
-    badge: "old",
     deprecated: true,
   },
   [FONT_FAMILY.Cascadia]: {
@@ -112,7 +103,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.2,
     },
     icon: FontFamilyCodeIcon,
-    badge: "old",
     deprecated: true,
   },
   [FONT_FAMILY.Assistant]: {
