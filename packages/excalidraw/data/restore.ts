@@ -613,12 +613,32 @@ export const restore = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem) => {
+
+export const restoreLibraryItem = (libraryItem: LibraryItem) => {
   const elements = restoreElements(
     getNonDeletedElements(libraryItem.elements),
     null,
   );
-  return elements.length ? { ...libraryItem, elements } : null;
+  let result = null;
+  console.log("length:",elements.length);
+  
+  if (elements.length) {
+    result = { ...libraryItem, elements };
+    globalCoverageData.libraryItem = true;
+    return result;
+  } else {
+    globalCoverageData.non_libraryItem = true;
+    return result;
+  }
+  
+};
+
+export const globalCoverageData = {
+  isArrayBranch: false,
+  elseBranch: false,
+  restoring: false,
+  libraryItem: false,
+  non_libraryItem:false
 };
 
 export const restoreLibraryItems = (
@@ -629,6 +649,7 @@ export const restoreLibraryItems = (
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
+      globalCoverageData.isArrayBranch = true;
       const restoredItem = restoreLibraryItem({
         status: defaultStatus,
         elements: item,
@@ -636,6 +657,7 @@ export const restoreLibraryItems = (
         created: Date.now(),
       });
       if (restoredItem) {
+        globalCoverageData.restoring = true;
         restoredItems.push(restoredItem);
       }
     } else {
@@ -650,8 +672,10 @@ export const restoreLibraryItems = (
         created: _item.created || Date.now(),
       });
       if (restoredItem) {
+        globalCoverageData.restoring = true;
         restoredItems.push(restoredItem);
       }
+      globalCoverageData.elseBranch = true;
     }
   }
   return restoredItems;

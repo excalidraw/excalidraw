@@ -13,6 +13,7 @@ export default defineConfig({
         functions: 68,
         statements: 70,
       },
+      reportsDirectory: './coverage'
     },
   },
 });
