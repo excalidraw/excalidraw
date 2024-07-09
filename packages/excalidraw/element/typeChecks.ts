@@ -150,6 +150,20 @@ export const isBindableElement = (
   );
 };
 
+export const isRectanguloidElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawBindableElement => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "iframe" ||
+      element.type === "embeddable" ||
+      element.type === "frame" ||
+      element.type === "magicframe" ||
+      (element.type === "text" && !element.containerId))
+  );
+};
+
 export const isTextBindableContainer = (
   element: ExcalidrawElement | null,
   includeLocked = true,

@@ -25,11 +25,12 @@ import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   getHoveredElementForBinding,
+  avoidRectangularCorner,
   maxBindingGap,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
-import { isBindableElement } from "./typeChecks";
+import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type { NonDeletedSceneElementsMap } from "./types";
 import {
   type ElementsMap,
@@ -122,14 +123,36 @@ export const mutateElbowArrow = (
 
   if (options?.isDragging) {
     startGlobalPoint = startElement
-      ? bindPointToSnapToElementOutline(
-          startGlobalPoint,
-          startElement,
-          elementsMap,
-        )
+      ? isRectanguloidElement(startElement)
+        ? avoidRectangularCorner(
+            startElement,
+            bindPointToSnapToElementOutline(
+              startGlobalPoint,
+              startElement,
+              elementsMap,
+            ),
+          )
+        : bindPointToSnapToElementOutline(
+            startGlobalPoint,
+            startElement,
+            elementsMap,
+          )
       : startGlobalPoint;
     endGlobalPoint = endElement
-      ? bindPointToSnapToElementOutline(endGlobalPoint, endElement, elementsMap)
+      ? isRectanguloidElement(endElement)
+        ? avoidRectangularCorner(
+            endElement,
+            bindPointToSnapToElementOutline(
+              endGlobalPoint,
+              endElement,
+              elementsMap,
+            ),
+          )
+        : bindPointToSnapToElementOutline(
+            endGlobalPoint,
+            endElement,
+            elementsMap,
+          )
       : endGlobalPoint;
   }
 

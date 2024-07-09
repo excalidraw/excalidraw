@@ -741,6 +741,42 @@ export const bindPointToSnapToElementOutline = (
   return translatePoint(point, scaleVector(heading, -distance));
 };
 
+export const avoidRectangularCorner = (
+  element: ExcalidrawBindableElement,
+  p: Point,
+): Point => {
+  if (p[0] < element.x && p[1] < element.y) {
+    // Top left
+    if (p[1] - element.y > -5) {
+      return [element.x - 5, element.y];
+    }
+    return [element.x, element.y - 5];
+  } else if (p[0] < element.x && p[1] > element.y + element.height) {
+    // Bottom left
+    if (p[0] - element.x > -5) {
+      return [element.x, element.y + element.height + 5];
+    }
+    return [element.x - 5, element.y + element.height];
+  } else if (
+    p[0] > element.x + element.width &&
+    p[1] > element.y + element.height
+  ) {
+    // Bottom right
+    if (p[0] - element.x < element.width + 5) {
+      return [element.x + element.width, element.y + element.height + 5];
+    }
+    return [element.x + element.width + 5, element.y + element.height];
+  } else if (p[0] > element.x + element.width && p[1] < element.y) {
+    // Top right
+    if (p[0] - element.x < element.width + 5) {
+      return [element.x + element.width, element.y - 5];
+    }
+    return [element.x + element.width + 5, element.y];
+  }
+
+  return p;
+};
+
 const updateBoundPoint = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "startBinding" | "endBinding",
