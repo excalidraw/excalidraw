@@ -1,129 +1,431 @@
-<a href="https://excalidraw.com/" target="_blank" rel="noopener">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
-    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png" />
-  </picture>
-</a>
+# Report for Assignment 1
 
-<h4 align="center">
-  <a href="https://excalidraw.com">Excalidraw Editor</a> |
-  <a href="https://blog.excalidraw.com">Blog</a> |
-  <a href="https://docs.excalidraw.com">Documentation</a> |
-  <a href="https://plus.excalidraw.com">Excalidraw+</a>
-</h4>
+## Project chosen
 
-<div align="center">
-  <h2>
-    An open source virtual hand-drawn style whiteboard. </br>
-    Collaborative and end-to-end encrypted. </br>
-  <br />
-  </h2>
-</div>
+Name: **Excalidraw editor**
 
-<br />
+URL: https://github.com/excalidraw/excalidraw
+
+Number of lines of code and the tool used to count it: **393,216** - counted with **Lizard**
+
+Programming language: **TypeScript**
+
+> *note: The main language core can be seen as either TypeScript (393 KLOC) or JavaScript (5,440 KLOC). We decided to highlight TypeScript, as the unit tests are written in a TypeScript React (.tsx) dialect.*
+
+## Coverage measurement
+
+### Existing tool
+
+The tool for unit testing within the repository is **vitest**. A coverage submodule was helpfully provided as part of the existing suite, and could be ran using the following command:
+
+```bash
+yarn test:coverage
+```
+
+Which generates an **Istanbul.js** report of coverage for the application.
+
+For more targeted testing, the same command was used, but with a glob as the third argument:
+
+```bash
+yarn test:coverage /path/to/tests/*
+```
+
+The following is the outcome of running the existing tool on an unchanged version of excalibur cloned from https://github.com/excalidraw/excalidraw/commit/22b39277f5f4a6b125e170ab14238b084719cb2d, or the most recent commit at time of writing.
+
+![Image](readme-assets/Istanbul-main.png "Istanbul")
+
+### Your own coverage tool
+
+Team member name: Jakub
+
+> The created coverage tool functions on the basis of a global object with multiple branches. Whenever said branch is taken in a function, its value is set to 'true'. The objects exist inside of **packages/excalidraw/utils.ts** in the form of **[associatedFile]branches**, as seen here:
+> <p align="center">
+> 	<img src="./readme-assets/utils1.png" alt="utils1" width="500"/>
+> </p>
+>
+> Printing this object is done within the ***.test.tsx** file associated with unit testing that specific function (here, **LanguageList.test.tsx** is shown):
+>
+> <p align="center">
+> 	<img src="./readme-assets/utils2.png" alt="utils2" width="900"/>
+> </p>
+>
+> For the following functions, lines highlighted in gray have either been added or changed to contain an update to the corresponding branch within the global object.
+
+
+#### Function 1: setLanguage
+
+> path: **packages/excalidraw/i18n.ts::setLanguage**
+
+![setLang](./readme-assets/setLang.png "setLanguage function with instrumented code")
+
+#### Tool results
+
 <p align="center">
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
-    <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  />
-  </a>
-  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
-    <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  />
-  </a>
-  <a href="https://docs.excalidraw.com/docs/introduction/contributing">
-    <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  />
-  </a>
-  <a href="https://discord.gg/UexuTaE">
-    <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widge=false"/>
-  </a>
-  <a href="https://twitter.com/excalidraw">
-    <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/>
-  </a>
+	<img src="./readme-assets/branchi18n-pre.png" alt="utils2" width="500"/>
 </p>
 
+The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/ace05b9685e53ef6df59aaabdbbfac0472bcc14f).
+
+#### Function 2: polygonBounds
+
+> path: **packages/utils/geometry/geometry.ts::polygonBounds**
+
+![polyBounds](./readme-assets/polygonBounds.png "polygonBounds function with instrumented code")
+
+#### Tool results
+
+<p align="center">
+	<img src="./readme-assets/branchgeo-pre.png" alt="utils2" width="500"/>
+</p>
+
+The link to the coverage test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/a7bba101110cba548852932cbeb93e5dec37e66f).
+
+---
+
+Team member name: Kacper
+
+#### Function 1: restoreLibraryItems
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/Before-coverage-restore.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/After-coverage-restore.png" alt="Post-coverage restore" title="Post-coverage restore" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
+
+#### Tool results
 <div align="center">
-  <figure>
-    <a href="https://excalidraw.com" target="_blank" rel="noopener">
-      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
-    </a>
-    <figcaption>
-      <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
-      </p>
-    </figcaption>
-  </figure>
+  <img src="./readme-assets/Coverage-result-restore.png" alt="Result-coverage restore" title="Pre-coverage restore" width="300" />
 </div>
 
-## Features
 
-The Excalidraw editor (npm package) supports:
+#### Function 2: shouldDiscardRemoteElement
 
-- 💯&nbsp;Free & open-source.
-- 🎨&nbsp;Infinite, canvas-based whiteboard.
-- ✍️&nbsp;Hand-drawn like style.
-- 🌓&nbsp;Dark mode.
-- 🏗️&nbsp;Customizable.
-- 📷&nbsp;Image support.
-- 😀&nbsp;Shape libraries support.
-- 👅&nbsp;Localization (i18n) support.
-- 🖼️&nbsp;Export to PNG, SVG & clipboard.
-- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
-- ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
-- ➡️&nbsp;Arrow-binding & labeled arrows.
-- 🔙&nbsp;Undo / Redo.
-- 🔍&nbsp;Zoom and panning support.
+<table>
+  <tr>
+    <td><img src="./readme-assets/Before-coverage-reconcile.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="300"/>
+    <div align="center">Pre-coverage reconcile</div>
+    </td>
+    <td><img src="./readme-assets/After-coverage-reconcile.png" alt="Post-coverage restore" title="Post-coverage restore" width="300"/>
+    <div align="center">Post-coverage reconcile</div>
+    </td>
+  </tr>
+</table>
 
-## Excalidraw.com
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/Coverage-result-reconcile.png" alt="Pre-coverage restore" title="Result-coverage reconcile" width="300" />
+</div>
 
-The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
+#### Link to the files changes:
+https://github.com/excalidraw/excalidraw/pull/8150/commits/5cae8a6dad22785109211e5ae8b9b535cb26c27c
 
-- 📡&nbsp;PWA support (works offline).
-- 🤼&nbsp;Real-time collaboration.
-- 🔒&nbsp;End-to-end encryption.
-- 💾&nbsp;Local-first support (autosaves to the browser).
-- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
+---
 
-We'll be adding these features as drop-in plugins for the npm package in the future.
+Team member name: Yassir
 
-## Quick start
+#### Function 1: orderedColinearOrientation
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./readme-assets/Before-coverage-orientation.png" alt="Pre-coverage orientation" title="Pre-coverage orientation" width="300"/>
+    <div align="center">Pre-coverage orientation</div>
+    </td>
+    <td><img src="./readme-assets/After-coverage-orientation.png" alt="Post-coverage orientation" title="Post-coverage orientation" width="300"/>
+    <div align="center">Post-coverage orientation</div>
+    </td>
+  </tr>
+</table>
+</div>
 
-```
-npm install react react-dom @excalidraw/excalidraw
-```
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
+</div>
 
-or via yarn
+#### Function 2: doSegmentsIntersect
 
-```
-yarn add react react-dom @excalidraw/excalidraw
-```
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./readme-assets/Before-coverage-intersect.png" alt="Pre-coverage intersect" title="Pre-coverage intersect" width="300"/>
+    <div align="center">Pre-coverage intersect</div>
+    </td>
+    <td><img src="./readme-assets/After-coverage-intersect.png" alt="Post-coverage intersect" title="Post-coverage intersect" width="300"/>
+    <div align="center">Post-coverage intersect</div>
+    </td>
+  </tr>
+</table>
+</div>
 
-Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/Coverage-result.png" alt="Result-coverage restore" title="Pre-coverage results" width="300" />
+</div>
 
-## Contributing
+Team member name: Filip
 
-- Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
-- Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
-- Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
+#### Function 1: polygonReflectX
 
-## Integrations
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonReflectX.png" alt="Pre-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-converage polygonReflectX.png" alt="Post-coverage polygonReflectX" title="Post-coverage polygonReflectX" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
 
-- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
-- [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonReflectX.png" alt="Result-coverage polygonReflectX" title="Pre-coverage polygonReflectX" width="300" />
+</div>
 
-## Who's integrating Excalidraw
+#### Function 2: polygonReflectY
+*this is practically identical to the last one, but doing one and not the other just felt wrong*
 
-[Google Cloud](https://googlecloudcheatsheet.withgoogle.com/architecture) • [Meta](https://meta.com/) • [CodeSandbox](https://codesandbox.io/) • [Obsidian Excalidraw](https://github.com/zsviczian/obsidian-excalidraw-plugin) • [Replit](https://replit.com/) • [Slite](https://slite.com/) • [Notion](https://notion.so/) • [HackerRank](https://www.hackerrank.com/) • and many others
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonReflectY.png" alt="Pre-coverage polygonReflectY" title="Pre-coverage polygonReflectY" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonReflectY.png" alt="Post-coverage polygonReflectY" title="Post-coverage polygonReflectY" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
 
-## Sponsors & support
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonReflectY.png" alt="Result-coverage polygonReflectY" title="Pre-coverage polygonReflectY" width="300" />
+</div>
 
-If you like the project, you can become a sponsor at [Open Collective](https://opencollective.com/excalidraw) or use [Excalidraw+](https://plus.excalidraw.com/).
+#### Function 3: polygonInPolygon
 
-## Thank you for supporting Excalidraw
+<table>
+  <tr>
+    <td><img src="./readme-assets/pre-coverage polygonInPolygon.png" alt="Pre-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300"/>
+    <div align="center">Pre-coverage restore</div>
+    </td>
+    <td><img src="./readme-assets/post-coverage polygonInPolygon.png" alt="Post-coverage polygonInPolygon" title="Post-coverage polygonInPolygon" width="300"/>
+    <div align="center">Post-coverage restore</div>
+    </td>
+  </tr>
+</table>
 
-[<img src="https://opencollective.com/excalidraw/tiers/sponsors/0/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/0/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/1/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/1/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/2/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/2/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/3/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/3/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/4/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/4/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/5/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/5/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/6/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/6/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/7/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/7/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/8/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/8/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/9/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/9/website) [<img src="https://opencollective.com/excalidraw/tiers/sponsors/10/avatar.svg?avatarHeight=120"/>](https://opencollective.com/excalidraw/tiers/sponsors/10/website)
+#### Tool results
+<div align="center">
+  <img src="./readme-assets/init-coverage-polygonInPolygon.png" alt="Result-coverage polygonInPolygon" title="Pre-coverage polygonInPolygon" width="300" />
+</div>
 
-<a href="https://opencollective.com/excalidraw#category-CONTRIBUTE" target="_blank"><img src="https://opencollective.com/excalidraw/tiers/backers.svg?avatarHeight=32"/></a>
+<!-- #### Link to file changes:
+TODO -->
 
-Last but not least, we're thankful to these companies for offering their services for free:
 
-[![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
+
+
+
+## Coverage improvement
+
+### Individual tests
+
+Team member name: Jakub
+
+> To improve coverage, additional tests were created in the `it()` clauses from vitest's unit-testing suite. Additionally, some small changes were made to conform to code quality standards (for example, a local constant was `export`-ed to avoid multiple definitions).
+
+#### Test 1: setLanguage
+
+> path: **excalidraw-app/tests/LanguageList.test.tsx**
+
+After the following two tests were implemented:
+
+<p align="center">
+	<img src="./readme-assets/langlist1.png" alt="langList1" width="800"/>
+</p>
+
+<p align="center">
+	<img src="./readme-assets/langlist2.png" alt="langList2" width="800"/>
+</p>
+
+The code coverage results changed in the following way:
+
+| | Before tests      | After tests      |
+| -- | ------------- | ------------- |
+| Self-made tool | <img src="./readme-assets/branchi18n-pre.png" alt="langList1" width="500"/> | <img src="./readme-assets/branchi18n-post.png" alt="langList1" width="500"/>  |
+| Istanbul report* | <img src="./readme-assets/branchi18n-pre-ist.png" alt="" width="500"/> | <img src="./readme-assets/branchi18n-post-ist.png" alt="langList1" width="500"/>  |
+
+> **the ability to isolate functions (especially first-order ones) is not present in istanbul, however a visual inspection of the file itself shows a full coverage, consistent with the results found with the self-made tool.*
+
+The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/d6fc61657b6a7e69bd683085e76026cb101af7cb).
+
+#### Test 2: polygonBounds
+
+> path: **packages/utils/geometry/geometry.test.ts**
+
+After the following slew of tests was implemented:
+
+<p align="center">
+	<img src="./readme-assets/polyTests.png" alt="polyTests" width="800"/>
+</p>
+
+The code coverage results changed in the following way:
+
+| | Before tests      | After tests      |
+| -- | ------------- | ------------- |
+| Self-made tool | <img src="./readme-assets/branchgeo-pre.png" alt="branchgeo-pre" width="500"/> | <img src="./readme-assets/branchgeo-post.png" alt="" width="500"/>  |
+| Istanbul report* | <img src="./readme-assets/branchgeo-pre-ist.png" alt="" width="500"/> | <img src="./readme-assets/branchgeo-post-ist.png" alt="" width="500"/>  |
+
+> **as above*
+
+The link to the unit test commit that generated these results can be found [here](https://github.com/GacuGacu/excalidraw-SEP/commit/db8406446454c863e91860086ff9ea755890d8c7).
+
+---
+
+Team member name: Kacper
+
+#### Test 1 restoreLibraryElements
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/Restore P1.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Restore Tests P1</div>
+    </td>
+    <td><img src="./readme-assets/RestoreP2.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">Restore Tests P2</div>
+    </td>
+  </tr>
+</table>
+<img src= "./readme-assets/Restore P3.png" width="400">
+<div>Restore Tests P3</div>
+
+<img src= "./readme-assets/Restore-normal.png">
+<div align="center">Before improvements</div>
+
+<img src= "./readme-assets/Restore-improved.png">
+<div align="center">After improvements</div>
+
+The previous tests for these functions were not existing, so by writing new tests I was able to increase the overall coverage.
+
+#### Test 2 shouldDiscardRemoteElement
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/Reconcile P1.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Reconcile Tests P1</div>
+    </td>
+    <td><img src="./readme-assets/Reconcile P2.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">Reconcile Tests P2</div>
+    </td>
+  </tr>
+</table>
+
+<img src= "./readme-assets/Reconcile-normal.png">
+<div align="center">Before improvements</div>
+
+<img src= "./readme-assets/Reconcile-improved.png">
+<div align="center">After improvements</div>
+
+The previous tests were accounting that the function <i>shouldDiscardRemoteElement</i> was tested with other test cases. Nevertheless as it was visible with the custom coverage some branches of the function were not tested. By creating custom tests for each of the "if statement" conditions I was able to improve the coverage to 100%.
+
+#### Link to the files changes:
+https://github.com/excalidraw/excalidraw/pull/8150/commits/f42b37c9a2c1418c71b0d81ff039d93983feaae1
+
+Team member name: Yassir
+
+There were no previous tests, so I wrote tests for both functions in a single file at the following path: `packages/excalidraw/tests/orientationAndIntersect.test.tsx`.
+
+#### Link to the files changes:
+https://github.com/GacuGacu/excalidraw-SEP/commit/10ded5ce886048d3031609a093d3eef87db7ebb0
+
+### Old coverage results vs new coverage results
+
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./readme-assets/Coverage-result.png" alt="Old coverage results" title="Old coverage results" width="300"/>
+    <div align="center">Old coverage results</div>
+    </td>
+    <td><img src="./readme-assets/Improved-coverage.png" alt="New coverage results" title="New coverage results" width="300"/>
+    <div align="center">New coverage results</div>
+    </td>
+  </tr>
+</table>
+</div>
+
+The external tool also reflects the fact that the 2 functions have been covered.
+
+<div align="center">
+<img src="./readme-assets/Istanbul-math-old.png" alt="Old coverage results" title="Old coverage results"/>
+<div align="center">Old coverage results</div>
+
+<div style="height: 40px;"></div>
+
+<img src="./readme-assets/Istanbul-math-new.png" alt="New coverage results" title="New coverage results"/>
+<div align="center">New coverage results</div>
+</div>
+
+<div style="height: 40px;"></div>
+
+The coverage improved by 100% for `orderedColinearOrientation` and by 83.33% for `doSegmentsIntersect`. For the first function, we added tests covering all three cases: colinear, clockwise, and counterclockwise points. For `doSegmentsIntersect`, coverage is limited to 83.33% because one branch is impossible to reach. The tests cover all other branches.
+
+---
+
+Team member name: Filip
+
+#### Test 1 polygonReflectY
+
+<table>
+  <tr>
+    <td><img src="./readme-assets/reflectybefore.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Before coverage improvement</div>
+    </td>
+    <td><img src="./readme-assets/reflectyafter.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">After coverage improvement</div>
+    </td>
+  </tr>
+</table>
+
+#### Test 2 shouldDiscardRemoteElement
+<table>
+  <tr>
+    <td><img src="./readme-assets/polygonbefore.png" alt="Pre-coverage restore" title="Pre-coverage restore" width="400"/>
+    <div align="center">Before coverage improvement</div>
+    </td>
+    <td><img src="./readme-assets/polygonafter.png" alt="Post-coverage restore" title="Post-coverage restore" width="700"/>
+    <div align="center">After coverage improvement</div>
+    </td>
+  </tr>
+</table>
+
+All tests are available at this commit: `1e46cf14c594be3722480e05d5b1ac54ff9dfdde`
+
+### Overall
+
+Old coverage results:
+
+![Image](./readme-assets/Istanbul-main.png "Istanbul")
+
+New coverage results:
+
+![Image](./readme-assets/coverage-new.png "Istanbul")
+
+## Statement of individual contributions
+
+#### Jakub:
+Started the basic README.md structure, responsible for **setLanguage** and **polygonBounds** functions.
+
+#### Kacper:
+I was respobsible for the functions restoreLibraryItem and shouldDiscardElement as described above.
+
+#### Filip:
+Responsible for **polygonReflectX**, **polygonReflectY**, and **polygonInPolygon**.
+
+#### Yassir:
+I was responsible for the functions colinearOrderedOrientation and doSegmentsIntersect as described above.

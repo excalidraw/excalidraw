@@ -18,6 +18,23 @@ import type { MaybePromise, ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
+export const i18branches = {
+  rtlBranch: false,
+  ltrBranch: false,
+  testBranch: false,
+  noTestBranch: false,
+  errorBranch: false,
+};
+
+export const geometryBranches = {
+  inForLoop: false,
+  inValidBounds: false,
+  atXMinEdge: false,
+  atXMaxEdge: false,
+  atYMinEdge: false,
+  atYMaxEdge: false,
+};
+
 export const setDateTimeForTests = (dateTime: string) => {
   mockDateTime = dateTime;
 };
