@@ -53,7 +53,6 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
 import { mutateElbowArrow } from "./routing";
-import { debugDrawPoint } from "../visualdebug";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -981,7 +980,23 @@ export const resizeMultipleElements = (
     const { angle } = update;
     const { width: oldWidth, height: oldHeight } = element;
 
-    mutateElement(element, update, false);
+    if (isArrowElement(element) && element.elbowed) {
+      const { points } = update;
+
+      points &&
+        mutateElbowArrow(
+          element,
+          scene,
+          getRotatedResizedElbowArrowPoints(element, elementsMap),
+          undefined,
+          undefined,
+          {
+            informMutation: false,
+          },
+        );
+    } else {
+      mutateElement(element, update, false);
+    }
 
     updateBoundElements(element, elementsMap, scene, {
       simultaneouslyUpdated: elementsToUpdate,
@@ -1040,7 +1055,7 @@ const rotateMultipleElements = (
       );
 
       if (isArrowElement(element) && element.elbowed) {
-        const points = getRotatedElbowArrowPoints(element, elementsMap);
+        const points = getRotatedResizedElbowArrowPoints(element, elementsMap);
         mutateElbowArrow(element, scene, points);
       } else {
         mutateElement(
@@ -1075,7 +1090,7 @@ const rotateMultipleElements = (
   Scene.getScene(elements[0])?.triggerUpdate();
 };
 
-const getRotatedElbowArrowPoints = (
+const getRotatedResizedElbowArrowPoints = (
   arrow: ExcalidrawArrowElement,
   elementsMap: ElementsMap,
 ) => {

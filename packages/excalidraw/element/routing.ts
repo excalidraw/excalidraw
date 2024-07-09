@@ -71,6 +71,7 @@ export const mutateElbowArrow = (
     changedElements?: Map<string, OrderedExcalidrawElement>;
     isDragging?: boolean;
     disableBinding?: boolean;
+    informMutation?: boolean;
   },
 ) => {
   const elements = options?.changedElements
@@ -283,49 +284,23 @@ export const mutateElbowArrow = (
   );
 
   if (path) {
-    // startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
-    // path.forEach((node) => debugDrawPoint(node.pos, "red"));
-    // endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
-
     const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
     startDongle && points.unshift(startGlobalPoint);
     endDongle && points.push(endGlobalPoint);
 
-    mutateElement(arrow, {
-      ...otherUpdates,
-      ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
-      angle: 0,
-      roundness: null,
-    });
+    mutateElement(
+      arrow,
+      {
+        ...otherUpdates,
+        ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
+        angle: 0,
+        roundness: null,
+      },
+      options?.informMutation,
+    );
   } else {
     console.error("Elbow arrow cannot find a route");
   }
-
-  // Debug
-  // grid.data.forEach(
-  //   (node) =>
-  //     node &&
-  //     (node.closed
-  //       ? debugDrawPoint(node.pos, "red")
-  //       : debugDrawPoint(
-  //           node.pos,
-  //           `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
-  //             node.addr[1] * (240 / grid.col),
-  //           )}, 255)`,
-  //         )),
-  // );
-
-  // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
 };
 
 const offsetFromHeading = (
