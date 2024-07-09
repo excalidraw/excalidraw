@@ -9,7 +9,11 @@ export const trackEvent = (
   value?: number,
 ) => {
   try {
-    if (typeof window === "undefined" || import.meta.env.VITE_WORKER_ID) {
+    if (
+      typeof window === "undefined" ||
+      import.meta.env.VITE_WORKER_ID ||
+      import.meta.env.VITE_APP_ENABLE_TRACKING !== "true"
+    ) {
       return;
     }
 
