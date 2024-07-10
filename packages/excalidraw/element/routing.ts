@@ -123,38 +123,28 @@ export const mutateElbowArrow = (
   ];
 
   if (options?.isDragging) {
-    startGlobalPoint = startElement
-      ? isRectanguloidElement(startElement)
-        ? avoidRectangularCorner(
-            startElement,
-            bindPointToSnapToElementOutline(
-              startGlobalPoint,
-              startElement,
-              elementsMap,
-            ),
-          )
-        : bindPointToSnapToElementOutline(
-            startGlobalPoint,
-            startElement,
-            elementsMap,
-          )
-      : startGlobalPoint;
-    endGlobalPoint = endElement
-      ? isRectanguloidElement(endElement)
-        ? avoidRectangularCorner(
-            endElement,
-            bindPointToSnapToElementOutline(
-              endGlobalPoint,
-              endElement,
-              elementsMap,
-            ),
-          )
-        : bindPointToSnapToElementOutline(
-            endGlobalPoint,
-            endElement,
-            elementsMap,
-          )
-      : endGlobalPoint;
+    const startSnap =
+      startElement &&
+      bindPointToSnapToElementOutline(
+        startGlobalPoint,
+        startElement,
+        elementsMap,
+      );
+    const endSnap =
+      endElement &&
+      bindPointToSnapToElementOutline(endGlobalPoint, endElement, elementsMap);
+    startGlobalPoint =
+      startElement && startSnap
+        ? isRectanguloidElement(startElement)
+          ? avoidRectangularCorner(startElement, startSnap)
+          : startSnap
+        : startGlobalPoint;
+    endGlobalPoint =
+      endElement && endSnap
+        ? isRectanguloidElement(endElement)
+          ? avoidRectangularCorner(endElement, endSnap)
+          : endSnap
+        : endGlobalPoint;
   }
 
   const [startHeading, endHeading] = [

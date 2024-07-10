@@ -69,6 +69,8 @@ export const isBindingEnabled = (appState: AppState): boolean => {
   return appState.isBindingEnabled;
 };
 
+const FIXED_BINDING_DISTANCE = 5;
+
 const getNonDeletedElements = (
   scene: Scene,
   ids: readonly ExcalidrawElement["id"][],
@@ -737,7 +739,8 @@ export const bindPointToSnapToElementOutline = (
     point,
   );
   const distance =
-    distanceToBindableElement(bindableElement, point, elementsMap) - 5;
+    distanceToBindableElement(bindableElement, point, elementsMap) -
+    FIXED_BINDING_DISTANCE;
   return translatePoint(point, scaleVector(heading, -distance));
 };
 
@@ -875,7 +878,6 @@ const calculateFixedPointForElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  oldSize?: { width: number; height: number },
 ) => {
   const bounds = [
     hoveredElement.x,
@@ -911,6 +913,25 @@ const calculateFixedPointForElbowArrowBinding = (
       (snappedPoint[1] - hoveredElement.y) / hoveredElement.height,
     ] as Point,
   };
+};
+
+export const getGlobalFixedPoint = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "startBinding" | "endBinding",
+  elementsMap: NonDeletedSceneElementsMap,
+) => {
+  const element =
+    arrow[startOrEnd] &&
+    (elementsMap.get(arrow[startOrEnd].elementId) as ExcalidrawBindableElement);
+
+  return (
+    arrow[startOrEnd] &&
+    element &&
+    ([
+      element.x + arrow[startOrEnd].fixedPoint[0] * element.width - arrow.x,
+      element.y + arrow[startOrEnd].fixedPoint[1] * element.height - arrow.y,
+    ] as Point)
+  );
 };
 
 const maybeCalculateNewGapWhenScaling = (

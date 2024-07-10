@@ -102,8 +102,8 @@ import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
 import { mutateElbowArrow } from "../element/routing";
-import { debugDrawPoint } from "../visualdebug";
 import { rotatePoint } from "../math";
+import { getGlobalFixedPoint } from "../element/binding";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1265,23 +1265,41 @@ export const actionChangeArrowType = register({
               : null,
           elbowed: value === "elbow",
           points:
-            value !== "elbow"
+            value === "elbow"
               ? [el.points[0], el.points[el.points.length - 1]]
               : el.points,
         });
 
         if (value === "elbow") {
+          const elementsMap = app.scene.getNonDeletedElementsMap();
+          const startFixedPoint = getGlobalFixedPoint(
+            newElement,
+            "startBinding",
+            elementsMap,
+          );
+          const endFixedPoint = getGlobalFixedPoint(
+            newElement,
+            "endBinding",
+            elementsMap,
+          );
           const center = [newElement.width / 2, newElement.height / 2] as Point;
+          const startPoint = rotatePoint(
+            newElement.points[0],
+            center,
+            newElement.angle,
+          );
+          const endPoint = rotatePoint(
+            newElement.points[newElement.points.length - 1],
+            center,
+            newElement.angle,
+          );
+
           mutateElbowArrow(
             newElement,
             app.scene,
             [
-              rotatePoint(newElement.points[0], center, newElement.angle),
-              rotatePoint(
-                newElement.points[newElement.points.length - 1],
-                center,
-                newElement.angle,
-              ),
+              startFixedPoint ? startFixedPoint : startPoint,
+              endFixedPoint ? endFixedPoint : endPoint,
             ],
             [0, 0],
           );
