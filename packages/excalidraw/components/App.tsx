@@ -436,8 +436,8 @@ import {
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import {
+  FlowChartCreator,
   FlowChartNavigator,
-  addNewNode,
   getSuccessorDirectionFromKey,
 } from "../element/flowchart";
 
@@ -574,6 +574,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
+  private flowChartCreator: FlowChartCreator = new FlowChartCreator();
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
@@ -1697,6 +1698,8 @@ class App extends React.Component<AppProps, AppState> {
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
                             elementsPendingErasure: this.elementsPendingErasure,
+                            pendingFlowchartNodes:
+                              this.flowChartCreator.pendingNodes,
                           }}
                         />
                         <InteractiveCanvas
@@ -3875,11 +3878,13 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      const arrowKeyPressed =
-        event.key === KEYS.ARROW_UP ||
-        event.key === KEYS.ARROW_RIGHT ||
-        event.key === KEYS.ARROW_DOWN ||
-        event.key === KEYS.ARROW_LEFT;
+      if (event.key === KEYS.ESCAPE && this.flowChartCreator.isCreatingChart) {
+        this.flowChartCreator.clear();
+        this.triggerRender();
+        return;
+      }
+
+      const arrowKeyPressed = isArrowKey(event.key);
 
       if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed) {
         event.preventDefault();
@@ -3893,47 +3898,12 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements.length === 1 &&
           isGenericElement(selectedElements[0])
         ) {
-          const { nextNode, bindingArrow } = addNewNode(
+          this.flowChartCreator.createNodes(
             selectedElements[0] as ExcalidrawGenericElement,
             this.scene.getNonDeletedElementsMap(),
             this.scene,
             getSuccessorDirectionFromKey(event.key),
           );
-
-          if (nextNode && bindingArrow) {
-            this.scene.insertElements([nextNode, bindingArrow]);
-            this.setState((prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  [nextNode.id]: true,
-                },
-                prevState,
-              ),
-            }));
-
-            // NOTE: not so sure about `isElementCompletelyInViewport`
-            // feels a bit "aggressive"
-            // maybe isElementInViewport is enough
-            if (
-              !isElementCompletelyInViewport(
-                nextNode,
-                this.canvas.width / window.devicePixelRatio,
-                this.canvas.height / window.devicePixelRatio,
-                {
-                  offsetLeft: this.state.offsetLeft,
-                  offsetTop: this.state.offsetTop,
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  zoom: this.state.zoom,
-                },
-                this.scene.getNonDeletedElementsMap(),
-              )
-            ) {
-              this.scrollToContent(nextNode);
-            }
-
-            this.syncActionResult({ storeAction: StoreAction.CAPTURE });
-          }
         }
 
         return;
@@ -4288,6 +4258,51 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!event.altKey) {
       if (this.flowChartNavigator.wasExploring()) {
+        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      }
+    }
+
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      if (this.flowChartCreator.isCreatingChart) {
+        if (this.flowChartCreator.pendingNodes.length > 0) {
+          this.scene.insertElements(this.flowChartCreator.pendingNodes);
+        }
+
+        const firstNode = this.flowChartCreator.pendingNodes[0];
+
+        if (firstNode) {
+          this.setState((prevState) => ({
+            selectedElementIds: makeNextSelectedElementIds(
+              {
+                [firstNode.id]: true,
+              },
+              prevState,
+            ),
+          }));
+
+          if (
+            !isElementCompletelyInViewport(
+              firstNode,
+              this.canvas.width / window.devicePixelRatio,
+              this.canvas.height / window.devicePixelRatio,
+              {
+                offsetLeft: this.state.offsetLeft,
+                offsetTop: this.state.offsetTop,
+                scrollX: this.state.scrollX,
+                scrollY: this.state.scrollY,
+                zoom: this.state.zoom,
+              },
+              this.scene.getNonDeletedElementsMap(),
+            )
+          ) {
+            this.scrollToContent(firstNode, {
+              animate: true,
+              duration: 300,
+            });
+          }
+        }
+
+        this.flowChartCreator.clear();
         this.syncActionResult({ storeAction: StoreAction.CAPTURE });
       }
     }

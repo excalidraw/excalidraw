@@ -48,7 +48,7 @@ const getSuccessors = (
     )
     .filter(
       (boundArrow) =>
-        boundArrow.elbowed &&
+        boundArrow?.elbowed &&
         boundArrow.startBinding?.elementId === element.id &&
         boundArrow.endBinding,
     );
@@ -182,7 +182,7 @@ export const getPredecessors = (
   }
 };
 
-export const addNewNode = (
+const addNewNode = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   scene: Scene,
@@ -314,6 +314,77 @@ export const addNewNode = (
     nextNode,
     bindingArrow,
   };
+};
+
+export const addNewNodes = (
+  startNode: ExcalidrawGenericElement,
+  elementsMap: ElementsMap,
+  scene: Scene,
+  direction: SuccessorDirection,
+  numberOfNodes: number,
+) => {
+  // always start from 0 and distribute evenly
+  const newNodes: ExcalidrawElement[] = [];
+
+  for (let i = 0; i < numberOfNodes; i++) {
+    let nextX: number;
+    let nextY: number;
+    if (direction === "left" || direction === "right") {
+      const totalHeight =
+        VERTICAL_OFFSET * (numberOfNodes - 1) +
+        numberOfNodes * startNode.height;
+
+      const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
+
+      let offsetX = HORIZONTAL_OFFSET + startNode.width;
+      if (direction === "left") {
+        offsetX *= -1;
+      }
+      nextX = startNode.x + offsetX;
+      const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
+      nextY = startY + offsetY;
+    } else {
+      const totalWidth =
+        HORIZONTAL_OFFSET * (numberOfNodes - 1) +
+        numberOfNodes * startNode.width;
+      const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
+      let offsetY = VERTICAL_OFFSET + startNode.height;
+
+      if (direction === "up") {
+        offsetY *= -1;
+      }
+      nextY = startNode.y + offsetY;
+      const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
+      nextX = startX + offsetX;
+    }
+
+    const nextNode = newElement({
+      type: startNode.type,
+      x: nextX,
+      y: nextY,
+      // TODO: extract this to a util
+      width: startNode.width,
+      height: startNode.height,
+      roundness: startNode.roundness,
+      roughness: startNode.roughness,
+      backgroundColor: startNode.backgroundColor,
+      strokeColor: startNode.strokeColor,
+      strokeWidth: startNode.strokeWidth,
+    });
+
+    const bindingArrow = createBindingArrow(
+      startNode,
+      nextNode,
+      elementsMap,
+      scene,
+      direction,
+    );
+
+    newNodes.push(nextNode);
+    newNodes.push(bindingArrow);
+  }
+
+  return newNodes;
 };
 
 const createBindingArrow = (
@@ -488,5 +559,53 @@ export class FlowChartNavigator {
       return true;
     }
     return false;
+  }
+}
+
+export class FlowChartCreator {
+  isCreatingChart: boolean = false;
+  private numberOfNodes: number = 0;
+  private direction: SuccessorDirection | null = "right";
+  pendingNodes: ExcalidrawElement[] = [];
+
+  createNodes(
+    startNode: ExcalidrawGenericElement,
+    elementsMap: ElementsMap,
+    scene: Scene,
+    direction: SuccessorDirection,
+  ) {
+    if (direction !== this.direction) {
+      const { nextNode, bindingArrow } = addNewNode(
+        startNode,
+        elementsMap,
+        scene,
+        direction,
+      );
+
+      this.numberOfNodes = 1;
+      this.isCreatingChart = true;
+      this.direction = direction;
+      this.pendingNodes = [nextNode, bindingArrow];
+    } else {
+      this.numberOfNodes += 1;
+      const newNodes = addNewNodes(
+        startNode,
+        elementsMap,
+        scene,
+        direction,
+        this.numberOfNodes,
+      );
+
+      this.isCreatingChart = true;
+      this.direction = direction;
+      this.pendingNodes = newNodes;
+    }
+  }
+
+  clear() {
+    this.isCreatingChart = false;
+    this.pendingNodes = [];
+    this.direction = null;
+    this.numberOfNodes = 0;
   }
 }

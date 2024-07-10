@@ -34,6 +34,7 @@ export type StaticCanvasRenderConfig = {
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
+  pendingFlowchartNodes: ExcalidrawElement[];
 };
 
 export type SVGRenderConfig = {
