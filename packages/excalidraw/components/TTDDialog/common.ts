@@ -38,7 +38,7 @@ export interface MermaidToExcalidrawLibProps {
   api: Promise<{
     parseMermaidToExcalidraw: (
       definition: string,
-      options: MermaidConfig,
+      config?: MermaidConfig,
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
 }
@@ -80,14 +80,14 @@ export const convertMermaidToExcalidraw = async ({
     try {
       ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
         themeVariables: {
-          fontSize: DEFAULT_FONT_SIZE,
+          fontSize: `${DEFAULT_FONT_SIZE}px`,
         },
       });
     } catch (err: any) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
         {
-          themeVariables: { fontSize: DEFAULT_FONT_SIZE },
+          themeVariables: { fontSize: `${DEFAULT_FONT_SIZE}px` },
         },
       );
     }
