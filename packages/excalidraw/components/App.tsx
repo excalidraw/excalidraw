@@ -5416,8 +5416,13 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !this.state.selectedLinearElement ||
-        this.state.selectedLinearElement.hoverPointIndex === -1
+        (!this.state.selectedLinearElement ||
+          this.state.selectedLinearElement.hoverPointIndex === -1) &&
+        !(
+          selectedElements.length === 1 &&
+          isArrowElement(selectedElements[0]) &&
+          selectedElements[0].elbowed
+        )
       ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
