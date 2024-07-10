@@ -3933,6 +3933,30 @@ class App extends React.Component<AppProps, AppState> {
                 prevState,
               ),
             }));
+
+            const nextNode = this.scene.getNonDeletedElementsMap().get(nextId);
+
+            if (
+              nextNode &&
+              !isElementCompletelyInViewport(
+                nextNode,
+                this.canvas.width / window.devicePixelRatio,
+                this.canvas.height / window.devicePixelRatio,
+                {
+                  offsetLeft: this.state.offsetLeft,
+                  offsetTop: this.state.offsetTop,
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  zoom: this.state.zoom,
+                },
+                this.scene.getNonDeletedElementsMap(),
+              )
+            ) {
+              this.scrollToContent(nextNode, {
+                animate: true,
+                duration: 300,
+              });
+            }
           }
         }
 
@@ -4257,7 +4281,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (!event.altKey) {
-      if (this.flowChartNavigator.wasExploring()) {
+      if (this.flowChartNavigator.isExploring) {
+        this.flowChartNavigator.clear();
         this.syncActionResult({ storeAction: StoreAction.CAPTURE });
       }
     }

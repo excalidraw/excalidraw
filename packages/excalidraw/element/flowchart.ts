@@ -505,14 +505,14 @@ const createBindingArrow = (
 };
 
 export class FlowChartNavigator {
-  private isExploringSameLevelNodes: boolean = false;
+  isExploring: boolean = false;
   private sameLevelNodes: ExcalidrawElement[] = [];
   private sameLevelIndex: number = 0;
   // set it to the opposite of the defalut creation direction
   private direction: SuccessorDirection = "left";
 
   clear() {
-    this.isExploringSameLevelNodes = false;
+    this.isExploring = false;
     this.sameLevelNodes = [];
     this.sameLevelIndex = 0;
     this.direction = "left";
@@ -524,7 +524,7 @@ export class FlowChartNavigator {
     direction: SuccessorDirection,
   ): string | null {
     if (
-      this.isExploringSameLevelNodes &&
+      this.isExploring &&
       direction === this.direction &&
       this.sameLevelNodes.length > 1 &&
       this.sameLevelNodes.some((node) => node.id === element.id)
@@ -543,7 +543,7 @@ export class FlowChartNavigator {
     ];
 
     if (nodes.length > 0) {
-      this.isExploringSameLevelNodes = true;
+      this.isExploring = true;
       this.sameLevelNodes = nodes;
       this.direction = direction;
 
@@ -551,14 +551,6 @@ export class FlowChartNavigator {
     }
 
     return null;
-  }
-
-  wasExploring() {
-    if (this.isExploringSameLevelNodes) {
-      this.clear();
-      return true;
-    }
-    return false;
   }
 }
 
