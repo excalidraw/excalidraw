@@ -78,17 +78,10 @@ export const convertMermaidToExcalidraw = async ({
 
     let ret;
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
-        themeVariables: {
-          fontSize: `${DEFAULT_FONT_SIZE}px`,
-        },
-      });
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
     } catch (err: any) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
-        {
-          themeVariables: { fontSize: `${DEFAULT_FONT_SIZE}px` },
-        },
       );
     }
     const { elements, files } = ret;
