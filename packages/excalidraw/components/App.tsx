@@ -49,7 +49,6 @@ import {
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import type { EXPORT_IMAGE_TYPES } from "../constants";
-import { DEFAULT_FONT_SIZE } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -3055,9 +3054,7 @@ class App extends React.Component<AppProps, AppState> {
 
           try {
             const { elements: skeletonElements, files } =
-              await api.parseMermaidToExcalidraw(data.text, {
-                fontSize: DEFAULT_FONT_SIZE,
-              });
+              await api.parseMermaidToExcalidraw(data.text);
 
             const elements = convertToExcalidrawElements(skeletonElements, {
               regenerateIds: true,
