@@ -1,10 +1,6 @@
-import type { MermaidOptions } from "@excalidraw/mermaid-to-excalidraw";
+import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-import {
-  DEFAULT_EXPORT_PADDING,
-  DEFAULT_FONT_SIZE,
-  EDITOR_LS_KEYS,
-} from "../../constants";
+import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "../../constants";
 import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import type { AppClassProperties, BinaryFiles } from "../../types";
@@ -38,7 +34,7 @@ export interface MermaidToExcalidrawLibProps {
   api: Promise<{
     parseMermaidToExcalidraw: (
       definition: string,
-      options: MermaidOptions,
+      config?: MermaidConfig,
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
 }
@@ -78,15 +74,10 @@ export const convertMermaidToExcalidraw = async ({
 
     let ret;
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
-        fontSize: DEFAULT_FONT_SIZE,
-      });
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
     } catch (err: any) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
-        {
-          fontSize: DEFAULT_FONT_SIZE,
-        },
       );
     }
     const { elements, files } = ret;
