@@ -628,19 +628,13 @@ export const updateBoundElements = (
     const bindings = {
       startBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
-        element,
-        "start",
         element.startBinding,
         oldSize,
-        elementsMap,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
-        element,
-        "end",
         element.endBinding,
         oldSize,
-        elementsMap,
       ),
     };
 
@@ -936,11 +930,8 @@ export const getGlobalFixedPoint = (
 
 const maybeCalculateNewGapWhenScaling = (
   changedElement: ExcalidrawBindableElement,
-  arrowElement: ExcalidrawLinearElement,
-  startOrEnd: "start" | "end",
   currentBinding: PointBinding | null | undefined,
   newSize: { width: number; height: number } | undefined,
-  elementsMap: ElementsMap,
 ): PointBinding | null | undefined => {
   if (currentBinding == null || newSize == null) {
     return currentBinding;
