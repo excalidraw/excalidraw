@@ -3056,7 +3056,9 @@ class App extends React.Component<AppProps, AppState> {
           try {
             const { elements: skeletonElements, files } =
               await api.parseMermaidToExcalidraw(data.text, {
-                fontSize: DEFAULT_FONT_SIZE,
+                themeVariables: {
+                  fontSize: DEFAULT_FONT_SIZE,
+                },
               });
 
             const elements = convertToExcalidrawElements(skeletonElements, {
