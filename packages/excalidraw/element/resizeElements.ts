@@ -11,7 +11,6 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
   ElementsMap,
-  ExcalidrawArrowElement,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -52,7 +51,7 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
-import { mutateElbowArrow } from "./routing";
+import { getArrowLocalFixedPoints, mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -987,7 +986,7 @@ export const resizeMultipleElements = (
         mutateElbowArrow(
           element,
           scene,
-          getRotatedResizedElbowArrowPoints(element, elementsMap),
+          getArrowLocalFixedPoints(element, elementsMap),
           undefined,
           undefined,
           {
@@ -1055,7 +1054,7 @@ const rotateMultipleElements = (
       );
 
       if (isArrowElement(element) && element.elbowed) {
-        const points = getRotatedResizedElbowArrowPoints(element, elementsMap);
+        const points = getArrowLocalFixedPoints(element, elementsMap);
         mutateElbowArrow(element, scene, points);
       } else {
         mutateElement(
@@ -1088,53 +1087,6 @@ const rotateMultipleElements = (
     });
 
   Scene.getScene(elements[0])?.triggerUpdate();
-};
-
-const getRotatedResizedElbowArrowPoints = (
-  arrow: ExcalidrawArrowElement,
-  elementsMap: ElementsMap,
-) => {
-  const startElement =
-    arrow.startBinding && elementsMap.get(arrow.startBinding.elementId);
-  const endElement =
-    arrow.endBinding && elementsMap.get(arrow.endBinding.elementId);
-  const startPoint: Point =
-    startElement && arrow.startBinding
-      ? rotatePoint(
-          [
-            startElement.x +
-              startElement.width * arrow.startBinding.fixedPoint[0],
-            startElement.y +
-              startElement.height * arrow.startBinding.fixedPoint[1],
-          ],
-          [
-            startElement.x + startElement.width / 2,
-            startElement.y + startElement.height / 2,
-          ],
-          startElement.angle,
-        )
-      : [arrow.x + arrow.points[0][0], arrow.y + arrow.points[0][1]];
-  const endPoint: Point =
-    endElement && arrow.endBinding
-      ? rotatePoint(
-          [
-            endElement.x + endElement.width * arrow.endBinding.fixedPoint[0],
-            endElement.y + endElement.height * arrow.endBinding.fixedPoint[1],
-          ],
-          [
-            endElement.x + endElement.width / 2,
-            endElement.y + endElement.height / 2,
-          ],
-          endElement.angle,
-        )
-      : [
-          arrow.x + arrow.points[arrow.points.length - 1][0],
-          arrow.y + arrow.points[arrow.points.length - 1][1],
-        ];
-  return [
-    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
-    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
-  ];
 };
 
 export const getResizeOffsetXY = (

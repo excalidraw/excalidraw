@@ -19,7 +19,7 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { toBrandedType } from "../utils";
+import { toBrandedType, tupleToCoors } from "../utils";
 import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
@@ -27,8 +27,10 @@ import {
   getHoveredElementForBinding,
   avoidRectangularCorner,
   maxBindingGap,
+  bindingBorderTest,
 } from "./binding";
 import type { Bounds } from "./bounds";
+import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type { NonDeletedSceneElementsMap } from "./types";
@@ -146,6 +148,29 @@ export const mutateElbowArrow = (
         ? isRectanguloidElement(endElement)
           ? avoidRectangularCorner(endElement, endSnap)
           : endSnap
+        : endGlobalPoint;
+  } else {
+    const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
+      arrow,
+      elementsMap,
+    );
+    startGlobalPoint =
+      origStartElement &&
+      bindingBorderTest(
+        origStartElement,
+        tupleToCoors(startGlobalPoint),
+        elementsMap,
+      )
+        ? startFixedPoint
+        : startGlobalPoint;
+    endGlobalPoint =
+      origEndElement &&
+      bindingBorderTest(
+        origEndElement,
+        tupleToCoors(endGlobalPoint),
+        elementsMap,
+      )
+        ? endFixedPoint
         : endGlobalPoint;
   }
 
@@ -1025,4 +1050,61 @@ const neighborIndexToHeading = (idx: number): Heading => {
       return HEADING_DOWN;
   }
   return HEADING_LEFT;
+};
+
+const getGlobalFixedPoints = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+) => {
+  const startElement =
+    arrow.startBinding && elementsMap.get(arrow.startBinding.elementId);
+  const endElement =
+    arrow.endBinding && elementsMap.get(arrow.endBinding.elementId);
+  const startPoint: Point =
+    startElement && arrow.startBinding
+      ? rotatePoint(
+          [
+            startElement.x +
+              startElement.width * arrow.startBinding.fixedPoint[0],
+            startElement.y +
+              startElement.height * arrow.startBinding.fixedPoint[1],
+          ],
+          [
+            startElement.x + startElement.width / 2,
+            startElement.y + startElement.height / 2,
+          ],
+          startElement.angle,
+        )
+      : [arrow.x + arrow.points[0][0], arrow.y + arrow.points[0][1]];
+  const endPoint: Point =
+    endElement && arrow.endBinding
+      ? rotatePoint(
+          [
+            endElement.x + endElement.width * arrow.endBinding.fixedPoint[0],
+            endElement.y + endElement.height * arrow.endBinding.fixedPoint[1],
+          ],
+          [
+            endElement.x + endElement.width / 2,
+            endElement.y + endElement.height / 2,
+          ],
+          endElement.angle,
+        )
+      : [
+          arrow.x + arrow.points[arrow.points.length - 1][0],
+          arrow.y + arrow.points[arrow.points.length - 1][1],
+        ];
+
+  return [startPoint, endPoint];
+};
+
+export const getArrowLocalFixedPoints = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+) => {
+  const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
+
+  return [
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
+  ];
 };

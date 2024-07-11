@@ -909,26 +909,6 @@ const calculateFixedPointForElbowArrowBinding = (
   };
 };
 
-export const getGlobalFixedPoint = (
-  arrow: ExcalidrawArrowElement,
-  startOrEnd: "startBinding" | "endBinding",
-  elementsMap: NonDeletedSceneElementsMap,
-) => {
-  const binding = arrow[startOrEnd];
-  const element =
-    binding &&
-    (elementsMap.get(binding.elementId) as ExcalidrawBindableElement);
-
-  return (
-    arrow[startOrEnd] &&
-    element &&
-    ([
-      element.x + binding.fixedPoint[0] * element.width - arrow.x,
-      element.y + binding.fixedPoint[1] * element.height - arrow.y,
-    ] as Point)
-  );
-};
-
 const maybeCalculateNewGapWhenScaling = (
   changedElement: ExcalidrawBindableElement,
   currentBinding: PointBinding | null | undefined,
@@ -1122,7 +1102,7 @@ const newBoundElements = (
   return nextBoundElements;
 };
 
-const bindingBorderTest = (
+export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
   elementsMap: NonDeletedSceneElementsMap,
