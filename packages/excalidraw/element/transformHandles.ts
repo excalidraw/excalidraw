@@ -320,6 +320,9 @@ export const shouldShowBoundingBox = (
     return true;
   }
   const element = elements[0];
+  if (isElbowArrow(element)) {
+    return false;
+  }
   if (!isLinearElement(element)) {
     return true;
   }
