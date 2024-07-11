@@ -49,6 +49,7 @@ import {
 import oc from "open-color";
 import {
   isArrowElement,
+  isElbowArrow,
   isFrameLikeElement,
   isLinearElement,
   isTextElement,
@@ -476,12 +477,7 @@ const renderLinearPointHandles = (
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
   points.forEach((point, idx) => {
-    if (
-      isArrowElement(element) &&
-      element.elbowed &&
-      idx !== 0 &&
-      idx !== points.length - 1
-    ) {
+    if (isElbowArrow(element) && idx !== 0 && idx !== points.length - 1) {
       return;
     }
 
@@ -739,7 +735,7 @@ const _renderInteractiveScene = ({
   if (
     appState.selectedLinearElement &&
     appState.selectedLinearElement.hoverPointIndex >= 0 &&
-    (!isArrowElement(selectedElements[0]) || !selectedElements[0].elbowed)
+    !isElbowArrow(selectedElements[0])
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
   }
@@ -792,7 +788,7 @@ const _renderInteractiveScene = ({
             (
               isSingleLinearElementSelected &&
               isArrowElement(element) &&
-              element.elbowed &&
+              isElbowArrow(element) &&
               (element.startBinding || element.endBinding)
             )
           )

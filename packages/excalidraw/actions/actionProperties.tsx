@@ -75,6 +75,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isLinearElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
@@ -1025,7 +1026,7 @@ export const actionChangeRoundness = register({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
-        if (isArrowElement(el) && el.elbowed) {
+        if (isElbowArrow(el)) {
           return el;
         }
 

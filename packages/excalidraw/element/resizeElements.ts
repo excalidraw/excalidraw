@@ -22,6 +22,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
@@ -81,7 +82,7 @@ export const transformElements = (
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
-      if (!isArrowElement(element) || !element.elbowed) {
+      if (!isElbowArrow(element)) {
         rotateSingleElement(
           element,
           elementsMap,
@@ -443,7 +444,7 @@ export const resizeSingleElement = (
   // Elbow arrows cannot be resized when bound on either end
   if (
     isArrowElement(element) &&
-    element.elbowed &&
+    isElbowArrow(element) &&
     (element.startBinding || element.endBinding)
   ) {
     return;
@@ -979,7 +980,7 @@ export const resizeMultipleElements = (
     const { angle } = update;
     const { width: oldWidth, height: oldHeight } = element;
 
-    if (isArrowElement(element) && element.elbowed) {
+    if (isArrowElement(element) && isElbowArrow(element)) {
       const { points } = update;
 
       points &&
@@ -1053,7 +1054,7 @@ const rotateMultipleElements = (
         centerAngle + origAngle - element.angle,
       );
 
-      if (isArrowElement(element) && element.elbowed) {
+      if (isArrowElement(element) && isElbowArrow(element)) {
         const points = getArrowLocalFixedPoints(element, elementsMap);
         mutateElbowArrow(element, scene, points);
       } else {

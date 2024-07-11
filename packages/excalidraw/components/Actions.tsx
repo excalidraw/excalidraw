@@ -25,7 +25,7 @@ import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import {
   hasBoundTextElement,
-  isArrowElement,
+  isElbowArrow,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
@@ -123,7 +123,7 @@ export const SelectedShapeActions = ({
     !appState.editingLinearElement &&
     targetElements.length === 1 &&
     isLinearElement(targetElements[0]) &&
-    !(isArrowElement(targetElements[0]) && targetElements[0].elbowed);
+    !isElbowArrow(targetElements[0]);
 
   return (
     <div className="panelColumn">

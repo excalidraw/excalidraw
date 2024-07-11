@@ -35,6 +35,7 @@ import {
   isBindableElement,
   isBindingElement,
   isBoundToContainer,
+  isElbowArrow,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
@@ -732,7 +733,7 @@ const updateBoundPoint = (
   const direction = startOrEnd === "startBinding" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
 
-  if (isArrowElement(linearElement) && linearElement.elbowed) {
+  if (isElbowArrow(linearElement)) {
     const { fixedPoint } =
       binding ??
       calculateFixedPointForElbowArrowBinding(

@@ -162,6 +162,7 @@ import {
   isIframeLikeElement,
   isMagicFrameElement,
   isTextBindableContainer,
+  isElbowArrow,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -3967,9 +3968,9 @@ class App extends React.Component<AppProps, AppState> {
           includeElementsInFrames: true,
         });
 
-        const elbowArrow = selectedElements.find(
-          (e) => isArrowElement(e) && e.elbowed,
-        ) as ExcalidrawArrowElement | undefined;
+        const elbowArrow = selectedElements.find(isElbowArrow) as
+          | ExcalidrawArrowElement
+          | undefined;
 
         const step = elbowArrow
           ? elbowArrow.startBinding || elbowArrow.endBinding
@@ -5332,8 +5333,7 @@ class App extends React.Component<AppProps, AppState> {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
           scenePointerY,
-          event[KEYS.CTRL_OR_CMD] ||
-            (isArrowElement(multiElement) && multiElement.elbowed)
+          event[KEYS.CTRL_OR_CMD] || isElbowArrow(multiElement)
             ? null
             : this.state.gridSize,
         );
@@ -5359,8 +5359,8 @@ class App extends React.Component<AppProps, AppState> {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
-        if (isArrowElement(multiElement) && multiElement.elbowed) {
-          mutateElbowArrow(multiElement, this.scene, [
+        if (isElbowArrow(multiElement)) {
+          mutateElbowArrow(multiElement as ExcalidrawArrowElement, this.scene, [
             ...points.slice(0, -1),
             [
               lastCommittedX + dxFromLastCommitted,
@@ -5415,11 +5415,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (!this.state.selectedLinearElement ||
           this.state.selectedLinearElement.hoverPointIndex === -1) &&
-        !(
-          selectedElements.length === 1 &&
-          isArrowElement(selectedElements[0]) &&
-          selectedElements[0].elbowed
-        )
+        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
       ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
@@ -5708,8 +5704,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
-          !isArrowElement(element) ||
-          !element.elbowed ||
+          !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
         ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
@@ -6287,8 +6282,7 @@ class App extends React.Component<AppProps, AppState> {
     const origin = viewportCoordsToSceneCoords(event, this.state);
     const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
-    const isElbowArrowOnly =
-      selectedElements.findIndex((e) => isArrowElement(e) && e.elbowed) === 0;
+    const isElbowArrowOnly = selectedElements.findIndex(isElbowArrow) === 0;
 
     return {
       origin,
@@ -6985,11 +6979,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // Elbow arrows cannot be created by putting down points
       // only the start and end points can be defined
-      if (
-        isArrowElement(multiElement) &&
-        multiElement.elbowed &&
-        multiElement.points.length > 1
-      ) {
+      if (isElbowArrow(multiElement) && multiElement.points.length > 1) {
         mutateElement(multiElement, {
           lastCommittedPoint:
             multiElement.points[multiElement.points.length - 1],
@@ -7731,13 +7721,9 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(draggingElement, {
             points: [...points, [dx, dy]],
           });
-        } else if (
-          points.length > 1 &&
-          isArrowElement(draggingElement) &&
-          draggingElement.elbowed
-        ) {
+        } else if (points.length > 1 && isElbowArrow(draggingElement)) {
           mutateElbowArrow(
-            draggingElement,
+            draggingElement as ExcalidrawArrowElement,
             this.scene,
             [...points.slice(0, -1), [dx, dy]],
             [0, 0],

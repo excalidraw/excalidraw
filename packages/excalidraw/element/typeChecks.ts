@@ -106,6 +106,10 @@ export const isArrowElement = (
   return element != null && element.type === "arrow";
 };
 
+export const isElbowArrow = (element?: ExcalidrawElement): boolean => {
+  return isArrowElement(element) && element.elbowed;
+};
+
 export const isLinearElementType = (
   elementType: ElementOrToolType,
 ): boolean => {
