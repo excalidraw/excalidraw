@@ -914,16 +914,17 @@ export const getGlobalFixedPoint = (
   startOrEnd: "startBinding" | "endBinding",
   elementsMap: NonDeletedSceneElementsMap,
 ) => {
+  const binding = arrow[startOrEnd];
   const element =
-    arrow[startOrEnd] &&
-    (elementsMap.get(arrow[startOrEnd].elementId) as ExcalidrawBindableElement);
+    binding &&
+    (elementsMap.get(binding.elementId) as ExcalidrawBindableElement);
 
   return (
     arrow[startOrEnd] &&
     element &&
     ([
-      element.x + arrow[startOrEnd].fixedPoint[0] * element.width - arrow.x,
-      element.y + arrow[startOrEnd].fixedPoint[1] * element.height - arrow.y,
+      element.x + binding.fixedPoint[0] * element.width - arrow.x,
+      element.y + binding.fixedPoint[1] * element.height - arrow.y,
     ] as Point)
   );
 };
