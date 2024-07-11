@@ -121,7 +121,9 @@ export const mutateElbowArrow = (
         )
       : origEndElement,
   ];
-
+  console.log("startElement", startElement);
+  console.log("endElement", endElement);
+  console.log("changedElements", options?.changedElements);
   if (options?.isDragging) {
     const startSnap =
       startElement &&
