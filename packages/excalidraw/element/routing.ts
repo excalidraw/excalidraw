@@ -19,15 +19,13 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds } from "../visualdebug";
+import { toBrandedType } from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   getHoveredElementForBinding,
   avoidRectangularCorner,
   maxBindingGap,
-  bindingBorderTest,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -123,9 +121,6 @@ export const mutateElbowArrow = (
         )
       : origEndElement,
   ];
-  console.log("startElement", startElement);
-  console.log("endElement", endElement);
-  console.log("changedElements", options?.changedElements);
   if (options?.isDragging) {
     const startSnap =
       startElement &&
@@ -150,28 +145,20 @@ export const mutateElbowArrow = (
           : endSnap
         : endGlobalPoint;
   } else {
-    const [startFixedPoint, endFixedPoint] = getGlobalFixedPoints(
-      arrow,
-      elementsMap,
-    );
-    startGlobalPoint =
-      origStartElement &&
-      bindingBorderTest(
-        origStartElement,
-        tupleToCoors(startGlobalPoint),
-        elementsMap,
-      )
-        ? startFixedPoint
-        : startGlobalPoint;
-    endGlobalPoint =
-      origEndElement &&
-      bindingBorderTest(
-        origEndElement,
-        tupleToCoors(endGlobalPoint),
-        elementsMap,
-      )
-        ? endFixedPoint
-        : endGlobalPoint;
+    startGlobalPoint = origStartElement
+      ? bindPointToSnapToElementOutline(
+          startGlobalPoint,
+          origStartElement,
+          elementsMap,
+        )
+      : startGlobalPoint;
+    endGlobalPoint = origEndElement
+      ? bindPointToSnapToElementOutline(
+          endGlobalPoint,
+          origEndElement,
+          elementsMap,
+        )
+      : endGlobalPoint;
   }
 
   const [startHeading, endHeading] = [
@@ -237,9 +224,6 @@ export const mutateElbowArrow = (
         ] as Bounds),
   ];
   const common = commonAABB([startBounds, endBounds]);
-  debugDrawBounds(startBounds, "red");
-  debugDrawBounds(endBounds, "red");
-  debugDrawBounds(common);
   const dynamicAABBs = generateDynamicAABBs(
     startBounds,
     endBounds,

@@ -182,52 +182,6 @@ const bindOrUnbindLinearElementEdge = (
   } else {
     bindLinearElement(linearElement, bindableElement, startOrEnd, elementsMap);
     boundToElementIds.add(bindableElement.id);
-
-    snapToElementOutline(
-      linearElement,
-      startOrEnd,
-      bindableElement,
-      elementsMap,
-      scene,
-    );
-  }
-};
-
-const snapToElementOutline = (
-  linearElement: ExcalidrawLinearElement,
-  startOrEnd: "start" | "end",
-  bindableElement: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  scene: Scene,
-) => {
-  if (isArrowElement(linearElement) && linearElement.elbowed) {
-    LinearElementEditor.movePoints(
-      linearElement,
-      [
-        startOrEnd === "start"
-          ? {
-              index: 0,
-              point: updateBoundPoint(
-                linearElement,
-                "startBinding",
-                linearElement.startBinding,
-                bindableElement,
-                elementsMap,
-              )!,
-            }
-          : {
-              index: linearElement.points.length - 1,
-              point: updateBoundPoint(
-                linearElement,
-                "endBinding",
-                linearElement.endBinding,
-                bindableElement,
-                elementsMap,
-              )!,
-            },
-      ],
-      scene,
-    );
   }
 };
 
@@ -423,13 +377,6 @@ export const maybeBindLinearElement = (
       "start",
       elementsMap,
     );
-    snapToElementOutline(
-      linearElement,
-      "start",
-      appState.startBoundElement,
-      elementsMap,
-      scene,
-    );
   }
 
   const hoveredElement = getHoveredElementForBinding(
@@ -448,14 +395,6 @@ export const maybeBindLinearElement = (
     ) {
       bindLinearElement(linearElement, hoveredElement, "end", elementsMap);
     }
-
-    snapToElementOutline(
-      linearElement,
-      "end",
-      hoveredElement,
-      elementsMap,
-      scene,
-    );
   }
 };
 
@@ -794,14 +733,14 @@ const updateBoundPoint = (
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
 
   if (isArrowElement(linearElement) && linearElement.elbowed) {
-    const { fixedPoint } = binding
-      ? binding
-      : calculateFixedPointForElbowArrowBinding(
-          linearElement,
-          bindableElement,
-          startOrEnd === "startBinding" ? "start" : "end",
-          elementsMap,
-        );
+    const { fixedPoint } =
+      binding ??
+      calculateFixedPointForElbowArrowBinding(
+        linearElement,
+        bindableElement,
+        startOrEnd === "startBinding" ? "start" : "end",
+        elementsMap,
+      );
     const globalMidPoint = [
       bindableElement.x + bindableElement.width / 2,
       bindableElement.y + bindableElement.height / 2,
