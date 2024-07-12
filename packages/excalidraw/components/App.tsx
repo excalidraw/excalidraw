@@ -438,7 +438,7 @@ import { isMaybeMermaidDefinition } from "../mermaid";
 import {
   FlowChartCreator,
   FlowChartNavigator,
-  getSuccessorDirectionFromKey,
+  getLinkDirectionFromKey,
 } from "../element/flowchart";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -3902,27 +3902,37 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0] as ExcalidrawGenericElement,
             this.scene.getNonDeletedElementsMap(),
             this.scene,
-            getSuccessorDirectionFromKey(event.key),
+            getLinkDirectionFromKey(event.key),
           );
         }
 
         return;
       }
 
-      if (event.altKey && arrowKeyPressed) {
-        event.preventDefault();
-
+      if (event.altKey) {
         const selectedElements = getSelectedElements(
           this.scene.getNonDeletedElementsMap(),
           this.state,
         );
 
         if (selectedElements.length === 1) {
-          const nextId = this.flowChartNavigator.exploreNode(
-            selectedElements[0] as ExcalidrawGenericElement,
-            this.scene.getNonDeletedElementsMap(),
-            getSuccessorDirectionFromKey(event.key),
-          );
+          let nextId: string | null = null;
+
+          if (event.key === KEYS.ENTER) {
+            event.preventDefault();
+            nextId = this.flowChartNavigator.exploreByBreadth(
+              selectedElements[0] as ExcalidrawGenericElement,
+              this.scene.getNonDeletedElementsMap(),
+              // getSuccessorDirectionFromKey(event.key),
+            );
+          } else if (arrowKeyPressed) {
+            event.preventDefault();
+            nextId = this.flowChartNavigator.exploreByDirection(
+              selectedElements[0] as ExcalidrawGenericElement,
+              this.scene.getNonDeletedElementsMap(),
+              getLinkDirectionFromKey(event.key),
+            );
+          }
 
           if (nextId) {
             this.setState((prevState) => ({
@@ -3958,9 +3968,8 @@ class App extends React.Component<AppProps, AppState> {
               });
             }
           }
+          return;
         }
-
-        return;
       }
 
       if (
@@ -4283,6 +4292,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!event.altKey) {
       if (this.flowChartNavigator.isExploring) {
         this.flowChartNavigator.clear();
+        this.flowChartNavigator.clearSearch();
         this.syncActionResult({ storeAction: StoreAction.CAPTURE });
       }
     }

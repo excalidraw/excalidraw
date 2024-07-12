@@ -15,13 +15,24 @@ import type {
 } from "./types";
 import { KEYS } from "../keys";
 
-type SuccessorDirection = "up" | "right" | "down" | "left";
+type LinkDirection = "up" | "right" | "down" | "left";
 const VERTICAL_OFFSET = 100;
 const HORIZONTAL_OFFSET = 100;
 
-export const getSuccessorDirectionFromKey = (
-  key: string,
-): SuccessorDirection => {
+export const oppositeDirection = (direction: LinkDirection): LinkDirection => {
+  switch (direction) {
+    case "up":
+      return "down";
+    case "down":
+      return "up";
+    case "left":
+      return "right";
+    case "right":
+      return "left";
+  }
+};
+
+export const getLinkDirectionFromKey = (key: string): LinkDirection => {
   switch (key) {
     case KEYS.ARROW_UP:
       return "up";
@@ -39,7 +50,7 @@ export const getSuccessorDirectionFromKey = (
 const getSuccessors = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
-  direction: SuccessorDirection = "right",
+  direction: LinkDirection = "right",
 ) => {
   const boundElbowArrows = element.boundElements
     ?.filter((boundEl) => boundEl.type === "arrow")
@@ -110,7 +121,7 @@ const getSuccessors = (
 export const getPredecessors = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
-  direction: SuccessorDirection = "right",
+  direction: LinkDirection = "right",
 ) => {
   // find elbow arrows whose endBinding is the given element
   const comingInArrows = [...elementsMap.values()]
@@ -186,7 +197,7 @@ const addNewNode = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   scene: Scene,
-  direction: SuccessorDirection = "right",
+  direction: LinkDirection = "right",
 ) => {
   const successors = getSuccessors(element, elementsMap, direction);
   const predeccessors = getPredecessors(element, elementsMap, direction);
@@ -194,7 +205,7 @@ const addNewNode = (
   const getOffsets = (
     element: ExcalidrawGenericElement,
     linkedNodes: ExcalidrawElement[],
-    direction: SuccessorDirection,
+    direction: LinkDirection,
   ) => {
     const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
 
@@ -320,7 +331,7 @@ export const addNewNodes = (
   startNode: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   scene: Scene,
-  direction: SuccessorDirection,
+  direction: LinkDirection,
   numberOfNodes: number,
 ) => {
   // always start from 0 and distribute evenly
@@ -392,7 +403,7 @@ const createBindingArrow = (
   endBindingElement: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   scene: Scene,
-  direction: SuccessorDirection,
+  direction: LinkDirection,
 ) => {
   let startX: number;
   let startY: number;
@@ -506,65 +517,199 @@ const createBindingArrow = (
 
 export class FlowChartNavigator {
   isExploring: boolean = false;
+  // nodes that are ONE link away (successor and predecessor both included)
   private sameLevelNodes: ExcalidrawElement[] = [];
   private sameLevelIndex: number = 0;
   // set it to the opposite of the defalut creation direction
-  private direction: SuccessorDirection = "left";
+  private direction: LinkDirection | null = null;
+  // for speedier navigation
+  private visitedNodes: Set<ExcalidrawElement["id"]> = new Set();
 
   clear() {
     this.isExploring = false;
     this.sameLevelNodes = [];
     this.sameLevelIndex = 0;
-    this.direction = "left";
+    this.direction = null;
+    this.visitedNodes.clear();
+    this.queue = [];
+    this.visited = null;
   }
 
-  exploreNode(
+  exploreByDirection(
     element: ExcalidrawGenericElement,
     elementsMap: ElementsMap,
-    direction: SuccessorDirection,
+    direction: LinkDirection,
   ): string | null {
+    if (direction !== this.direction) {
+      this.clear();
+    }
+
+    /**
+     * CASE:
+     * - already started exploring, and
+     * - there are multiple nodes at the same level, and
+     * - still going at the same direction, and
+     *
+     * RESULT:
+     * - loop through nodes at the same level
+     *
+     * WHY:
+     * - provides user the capability to loop through nodes at the same level
+     */
     if (
       this.isExploring &&
       direction === this.direction &&
-      this.sameLevelNodes.length > 1 &&
-      this.sameLevelNodes.some((node) => node.id === element.id)
+      this.sameLevelNodes.length > 1
     ) {
       this.sameLevelIndex =
         (this.sameLevelIndex + 1) % this.sameLevelNodes.length;
-
       return this.sameLevelNodes[this.sameLevelIndex].id;
     }
 
-    // explore again
-    this.clear();
     const nodes = [
       ...getSuccessors(element, elementsMap, direction),
       ...getPredecessors(element, elementsMap, direction),
     ];
 
+    /**
+     * CASE:
+     * - just started exploring at the given direction
+     *
+     * RESULT:
+     * - go to the first node in the given direction
+     */
     if (nodes.length > 0) {
+      this.sameLevelIndex = 0;
       this.isExploring = true;
       this.sameLevelNodes = nodes;
       this.direction = direction;
+      this.visitedNodes.add(nodes[0].id);
 
       return nodes[0].id;
     }
 
+    /**
+     * CASE:
+     * - (just started exploring or still going at the same direction) AND
+     * - there're no nodes at the given direction
+     *
+     * RESULT:
+     * - go to some other unvisited linked node
+     *
+     * WHY:
+     * - provide a speedier navigation from a given node to some predecessor
+     *   without the user having to change arrow key
+     */
+    if (direction === this.direction || !this.isExploring) {
+      if (!this.isExploring) {
+        // just started and no other nodes at the given direction
+        // so the current node is technically the first visited node
+        // (this is needed so that we don't get stuck between looping through )
+        this.visitedNodes.add(element.id);
+      }
+
+      const otherDirections = ["up", "right", "down", "left"].filter(
+        (dir) => dir !== direction,
+      ) as LinkDirection[];
+
+      const otherLinkedNodes = otherDirections
+        .map((dir) => [
+          ...getSuccessors(element, elementsMap, dir as LinkDirection),
+          ...getPredecessors(element, elementsMap, dir as LinkDirection),
+        ])
+        .flat()
+        .filter((linkedNode) => !this.visitedNodes.has(linkedNode.id));
+
+      for (const linkedNode of otherLinkedNodes) {
+        if (!this.visitedNodes.has(linkedNode.id)) {
+          this.visitedNodes.add(linkedNode.id);
+          this.isExploring = true;
+          this.direction = direction;
+          return linkedNode.id;
+        }
+      }
+    }
+
     return null;
+  }
+
+  private queue: ExcalidrawGenericElement[] = [];
+  private visited: Set<ExcalidrawElement["id"]> | null = null;
+
+  exploreByBreadth(
+    element: ExcalidrawGenericElement,
+    elementsMap: ElementsMap,
+  ) {
+    const setUp = (startNode: ExcalidrawGenericElement) => {
+      if (!this.visited) {
+        this.visited = new Set();
+        this.visited.add(startNode.id);
+        this.isExploring = true;
+        addLinkedNodes(element);
+      }
+    };
+
+    const addLinkedNodes = (startNode: ExcalidrawGenericElement) => {
+      (
+        ["up", "right", "down", "left"]
+          .map((direction) => [
+            ...getSuccessors(
+              startNode,
+              elementsMap,
+              direction as LinkDirection,
+            ),
+            ...getPredecessors(
+              startNode,
+              elementsMap,
+              direction as LinkDirection,
+            ),
+          ])
+          .flat() as ExcalidrawGenericElement[]
+      ).forEach((linkedNode) => this.queue.push(linkedNode));
+    };
+
+    const goToNextNode = (elementsMap: ElementsMap) => {
+      while (this.queue.length > 0 && this.visited) {
+        const currentNode = this.queue.shift() as ExcalidrawGenericElement;
+
+        if (!this.visited.has(currentNode.id)) {
+          this.visited.add(currentNode.id);
+          addLinkedNodes(currentNode);
+          return currentNode.id;
+        }
+      }
+
+      return null;
+    };
+
+    setUp(element);
+    const nextNode = goToNextNode(elementsMap);
+
+    if (nextNode) {
+      return nextNode;
+    }
+    this.clear();
+    setUp(element);
+    return goToNextNode(elementsMap);
+  }
+
+  clearSearch() {
+    this.queue = [];
+    this.visited = null;
   }
 }
 
 export class FlowChartCreator {
   isCreatingChart: boolean = false;
   private numberOfNodes: number = 0;
-  private direction: SuccessorDirection | null = "right";
+  private direction: LinkDirection | null = "right";
   pendingNodes: ExcalidrawElement[] = [];
 
   createNodes(
     startNode: ExcalidrawGenericElement,
     elementsMap: ElementsMap,
     scene: Scene,
-    direction: SuccessorDirection,
+    direction: LinkDirection,
   ) {
     if (direction !== this.direction) {
       const { nextNode, bindingArrow } = addNewNode(
