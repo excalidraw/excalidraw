@@ -26,6 +26,7 @@ import {
   getHoveredElementForBinding,
   avoidRectangularCorner,
   maxBindingGap,
+  snapToMid,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -135,13 +136,16 @@ export const mutateElbowArrow = (
     startGlobalPoint =
       startElement && startSnap
         ? isRectanguloidElement(startElement)
-          ? avoidRectangularCorner(startElement, startSnap)
+          ? snapToMid(
+              startElement,
+              avoidRectangularCorner(startElement, startSnap),
+            )
           : startSnap
         : startGlobalPoint;
     endGlobalPoint =
       endElement && endSnap
         ? isRectanguloidElement(endElement)
-          ? avoidRectangularCorner(endElement, endSnap)
+          ? snapToMid(endElement, avoidRectangularCorner(endElement, endSnap))
           : endSnap
         : endGlobalPoint;
   } else {
