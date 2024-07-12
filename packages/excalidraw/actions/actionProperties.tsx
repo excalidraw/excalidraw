@@ -1,4 +1,4 @@
-import type { AppClassProperties, AppState, Point, Primitive } from "../types";
+import type { AppClassProperties, AppState, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -75,6 +75,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isLinearElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
@@ -101,9 +102,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
-import { mutateElbowArrow } from "../element/routing";
-import { debugDrawPoint } from "../visualdebug";
-import { rotatePoint } from "../math";
+import { getArrowLocalFixedPoints, mutateElbowArrow } from "../element/routing";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1027,7 +1026,7 @@ export const actionChangeRoundness = register({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
-        if (isArrowElement(el) && el.elbowed) {
+        if (isElbowArrow(el)) {
           return el;
         }
 
@@ -1265,24 +1264,18 @@ export const actionChangeArrowType = register({
               : null,
           elbowed: value === "elbow",
           points:
-            value !== "elbow"
+            value === "elbow"
               ? [el.points[0], el.points[el.points.length - 1]]
               : el.points,
         });
 
         if (value === "elbow") {
-          const center = [newElement.width / 2, newElement.height / 2] as Point;
+          const elementsMap = app.scene.getNonDeletedElementsMap();
+
           mutateElbowArrow(
             newElement,
             app.scene,
-            [
-              rotatePoint(newElement.points[0], center, newElement.angle),
-              rotatePoint(
-                newElement.points[newElement.points.length - 1],
-                center,
-                newElement.angle,
-              ),
-            ],
+            getArrowLocalFixedPoints(newElement, elementsMap),
             [0, 0],
           );
         }

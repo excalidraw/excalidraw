@@ -10,6 +10,7 @@ import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import {
   isArrowElement,
+  isElbowArrow,
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
@@ -30,7 +31,7 @@ export const dragSelectedElements = (
   if (
     selectedElements.length === 1 &&
     isArrowElement(selectedElements[0]) &&
-    selectedElements[0].elbowed &&
+    isElbowArrow(selectedElements[0]) &&
     (selectedElements[0].startBinding || selectedElements[0].endBinding)
   ) {
     return;

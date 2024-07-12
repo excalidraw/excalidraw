@@ -10,7 +10,7 @@ import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import {
-  isArrowElement,
+  isElbowArrow,
   isFrameLikeElement,
   isLinearElement,
 } from "./typeChecks";
@@ -269,7 +269,7 @@ export const getTransformHandles = (
   if (
     element.locked ||
     // Elbow arrows cannot be rotated
-    (isArrowElement(element) && element.elbowed)
+    isElbowArrow(element)
   ) {
     return {};
   }
@@ -320,6 +320,9 @@ export const shouldShowBoundingBox = (
     return true;
   }
   const element = elements[0];
+  if (isElbowArrow(element)) {
+    return false;
+  }
   if (!isLinearElement(element)) {
     return true;
   }

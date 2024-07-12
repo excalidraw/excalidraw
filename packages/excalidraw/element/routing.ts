@@ -19,22 +19,26 @@ import {
 } from "../math";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { debugDrawPoint } from "../visualdebug";
+import { toBrandedType } from "../utils";
 import {
+  bindPointToSnapToElementOutline,
   distanceToBindableElement,
   getHoveredElementForBinding,
+  avoidRectangularCorner,
   maxBindingGap,
 } from "./binding";
 import type { Bounds } from "./bounds";
+import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
-import { isBindableElement } from "./typeChecks";
-import type {
-  ElementsMap,
-  ExcalidrawArrowElement,
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-  PointBinding,
+import { isBindableElement, isRectanguloidElement } from "./typeChecks";
+import type { NonDeletedSceneElementsMap } from "./types";
+import {
+  type ElementsMap,
+  type ExcalidrawArrowElement,
+  type ExcalidrawBindableElement,
+  type ExcalidrawElement,
+  type OrderedExcalidrawElement,
+  type PointBinding,
 } from "./types";
 
 type Node = {
@@ -67,14 +71,23 @@ export const mutateElbowArrow = (
     changedElements?: Map<string, OrderedExcalidrawElement>;
     isDragging?: boolean;
     disableBinding?: boolean;
+    informMutation?: boolean;
   },
 ) => {
+  const elements = options?.changedElements
+    ? [
+        ...scene.getNonDeletedElements(),
+        ...[...options?.changedElements].map(([_, value]) => value),
+      ]
+    : scene.getNonDeletedElements();
   const elementsMap = options?.changedElements
     ? // Only relevant at redrawBoundArrows during history actions
-      new Map([
-        ...scene.getNonDeletedElementsMap(),
-        ...options?.changedElements,
-      ])
+      toBrandedType<NonDeletedSceneElementsMap>(
+        new Map([
+          ...scene.getNonDeletedElementsMap(),
+          ...options?.changedElements,
+        ]),
+      )
     : scene.getNonDeletedElementsMap();
   const [origStartElement, origEndElement] = [
     arrow.startBinding &&
@@ -82,7 +95,7 @@ export const mutateElbowArrow = (
     arrow.endBinding &&
       getBindableElementForId(arrow.endBinding.elementId, elementsMap),
   ];
-  const [startGlobalPoint, endGlobalPoint] = [
+  let [startGlobalPoint, endGlobalPoint] = [
     translatePoint(nextPoints[0], [
       arrow.x + (offset ? offset[0] : 0),
       arrow.y + (offset ? offset[1] : 0),
@@ -96,16 +109,58 @@ export const mutateElbowArrow = (
     options?.isDragging
       ? getHoveredElementForBinding(
           { x: startGlobalPoint[0], y: startGlobalPoint[1] },
-          scene,
+          elements,
+          elementsMap,
         )
       : origStartElement,
     options?.isDragging
       ? getHoveredElementForBinding(
           { x: endGlobalPoint[0], y: endGlobalPoint[1] },
-          scene,
+          elements,
+          elementsMap,
         )
       : origEndElement,
   ];
+  if (options?.isDragging) {
+    const startSnap =
+      startElement &&
+      bindPointToSnapToElementOutline(
+        startGlobalPoint,
+        startElement,
+        elementsMap,
+      );
+    const endSnap =
+      endElement &&
+      bindPointToSnapToElementOutline(endGlobalPoint, endElement, elementsMap);
+    startGlobalPoint =
+      startElement && startSnap
+        ? isRectanguloidElement(startElement)
+          ? avoidRectangularCorner(startElement, startSnap)
+          : startSnap
+        : startGlobalPoint;
+    endGlobalPoint =
+      endElement && endSnap
+        ? isRectanguloidElement(endElement)
+          ? avoidRectangularCorner(endElement, endSnap)
+          : endSnap
+        : endGlobalPoint;
+  } else {
+    startGlobalPoint = origStartElement
+      ? bindPointToSnapToElementOutline(
+          startGlobalPoint,
+          origStartElement,
+          elementsMap,
+        )
+      : startGlobalPoint;
+    endGlobalPoint = origEndElement
+      ? bindPointToSnapToElementOutline(
+          endGlobalPoint,
+          origEndElement,
+          elementsMap,
+        )
+      : endGlobalPoint;
+  }
+
   const [startHeading, endHeading] = [
     startElement
       ? headingForPointFromElement(
@@ -149,52 +204,31 @@ export const mutateElbowArrow = (
       0,
   );
   const [startBounds, endBounds] = [
-    startElement &&
-      aabbForElement(startElement, offsetFromHeading(startHeading, bias)),
-    endElement &&
-      aabbForElement(endElement, offsetFromHeading(endHeading, bias)),
-  ];
-  const common = commonAABB(
-    [
-      startBounds,
-      endBounds,
-      [
-        // Start point
-        startGlobalPoint[0] - 20,
-        startGlobalPoint[1] - 20,
-        startGlobalPoint[0] + 20,
-        startGlobalPoint[1] + 20,
-      ],
-      [
-        // End point
-        endGlobalPoint[0] - 20,
-        endGlobalPoint[1] - 20,
-        endGlobalPoint[0] + 20,
-        endGlobalPoint[1] + 20,
-      ],
-    ].filter((x) => x !== null) as Bounds[],
-  );
-  const dynamicAABBs = generateDynamicAABBs(
-    startBounds
-      ? startBounds
-      : [
+    startElement
+      ? aabbForElement(startElement, offsetFromHeading(startHeading, bias))
+      : ([
           // Start point
-          startGlobalPoint[0] - 20,
-          startGlobalPoint[1] - 20,
-          startGlobalPoint[0] + 20,
-          startGlobalPoint[1] + 20,
-        ],
-    endBounds
-      ? endBounds
-      : [
+          startGlobalPoint[0] - 2,
+          startGlobalPoint[1] - 2,
+          startGlobalPoint[0] + 2,
+          startGlobalPoint[1] + 2,
+        ] as Bounds),
+    endElement
+      ? aabbForElement(endElement, offsetFromHeading(endHeading, bias))
+      : ([
           // End point
-          endGlobalPoint[0] - 20,
-          endGlobalPoint[1] - 20,
-          endGlobalPoint[0] + 20,
-          endGlobalPoint[1] + 20,
-        ],
+          endGlobalPoint[0] - 2,
+          endGlobalPoint[1] - 2,
+          endGlobalPoint[0] + 2,
+          endGlobalPoint[1] + 2,
+        ] as Bounds),
+  ];
+  const common = commonAABB([startBounds, endBounds]);
+  const dynamicAABBs = generateDynamicAABBs(
+    startBounds,
+    endBounds,
     common,
-    10,
+    !startElement && !endElement ? 0 : 20,
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -251,49 +285,23 @@ export const mutateElbowArrow = (
   );
 
   if (path) {
-    // startGlobalPoint && debugDrawPoint(startGlobalPoint, "green");
-    // path.forEach((node) => debugDrawPoint(node.pos, "red"));
-    // endGlobalPoint && debugDrawPoint(endGlobalPoint, "green");
-
     const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
     startDongle && points.unshift(startGlobalPoint);
     endDongle && points.push(endGlobalPoint);
 
-    mutateElement(arrow, {
-      ...otherUpdates,
-      ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
-      angle: 0,
-      roundness: null,
-    });
+    mutateElement(
+      arrow,
+      {
+        ...otherUpdates,
+        ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
+        angle: 0,
+        roundness: null,
+      },
+      options?.informMutation,
+    );
   } else {
     console.error("Elbow arrow cannot find a route");
   }
-
-  // Debug
-  // grid.data.forEach(
-  //   (node) =>
-  //     node &&
-  //     (node.closed
-  //       ? debugDrawPoint(node.pos, "red")
-  //       : debugDrawPoint(
-  //           node.pos,
-  //           `rgb(${Math.floor(node.addr[0] * (240 / grid.row))}, ${Math.floor(
-  //             node.addr[1] * (240 / grid.col),
-  //           )}, 255)`,
-  //         )),
-  // );
-
-  // Debug: Grid visualization
-  // for (let col = 0; col < grid.col; col++) {
-  //   const a = gridNodeFromAddr([col, 0], grid)?.pos;
-  //   const b = gridNodeFromAddr([col, grid.row - 1], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
-  // for (let row = 0; row < grid.row; row++) {
-  //   const a = gridNodeFromAddr([0, row], grid)?.pos;
-  //   const b = gridNodeFromAddr([grid.col - 1, row], grid)?.pos;
-  //   a && b && debugDrawSegments([a, b], "#DDD");
-  // }
 };
 
 const offsetFromHeading = (
@@ -394,7 +402,7 @@ const astar = (
       const gScore =
         current.g +
         m_dist(neighbor.pos, current.pos) +
-        (directionChange ? Math.pow(bendMultiplier, 2) : 0);
+        (directionChange ? Math.pow(bendMultiplier, 3) : 0);
 
       const beenVisited = neighbor.visited;
 
@@ -456,44 +464,44 @@ const generateDynamicAABBs = (
       a[0] > b[2]
         ? (a[0] + b[2]) / 2
         : a[0] > b[0]
-        ? a[0]
+        ? a[0] - (offset ?? 0)
         : common[0] - (offset ?? 0),
       a[1] > b[3]
         ? (a[1] + b[3]) / 2
         : a[1] > b[1]
-        ? a[1]
+        ? a[1] - (offset ?? 0)
         : common[1] - (offset ?? 0),
       a[2] < b[0]
         ? (a[2] + b[0]) / 2
         : a[2] < b[2]
-        ? a[2]
+        ? a[2] + (offset ?? 0)
         : common[2] + (offset ?? 0),
       a[3] < b[1]
         ? (a[3] + b[1]) / 2
         : a[3] < b[3]
-        ? a[3]
+        ? a[3] + (offset ?? 0)
         : common[3] + (offset ?? 0),
     ] as Bounds,
     [
       b[0] > a[2]
         ? (b[0] + a[2]) / 2
         : b[0] > a[0]
-        ? b[0]
+        ? b[0] - (offset ?? 0)
         : common[0] - (offset ?? 0),
       b[1] > a[3]
         ? (b[1] + a[3]) / 2
         : b[1] > a[1]
-        ? b[1]
+        ? b[1] - (offset ?? 0)
         : common[1] - (offset ?? 0),
       b[2] < a[0]
         ? (b[2] + a[0]) / 2
         : b[2] < a[2]
-        ? b[2]
+        ? b[2] + (offset ?? 0)
         : common[2] + (offset ?? 0),
       b[3] < a[1]
         ? (b[3] + a[1]) / 2
         : b[3] < a[3]
-        ? b[3]
+        ? b[3] + (offset ?? 0)
         : common[3] + (offset ?? 0),
     ] as Bounds,
   ];
@@ -837,40 +845,86 @@ export const headingForPointFromElement = (
   const SEARCH_CONE_MULTIPLIER = 2;
 
   const midPoint = getCenterForBounds(aabb);
-  const ROTATION = element.type === "diamond" ? Math.PI / 4 : 0;
-
-  const topLeft = rotatePoint(
-    scalePointFromOrigin([aabb[0], aabb[1]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
-  const topRight = rotatePoint(
-    scalePointFromOrigin([aabb[2], aabb[1]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
-  const bottomLeft = rotatePoint(
-    scalePointFromOrigin([aabb[0], aabb[3]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
-  const bottomRight = rotatePoint(
-    scalePointFromOrigin([aabb[2], aabb[3]], midPoint, SEARCH_CONE_MULTIPLIER),
-    midPoint,
-    ROTATION,
-  );
 
   if (element.type === "diamond") {
-    if (point[1] < element.y) {
+    if (point[0] < element.x) {
+      return HEADING_LEFT;
+    } else if (point[1] < element.y) {
       return HEADING_UP;
-    } else if (point[0] > element.x) {
+    } else if (point[0] > element.x + element.width) {
       return HEADING_RIGHT;
-    } else if (point[1] > element.y) {
+    } else if (point[1] > element.y + element.height) {
       return HEADING_DOWN;
     }
 
-    return HEADING_LEFT;
+    const top = rotatePoint(
+      scalePointFromOrigin(
+        [element.x + element.width / 2, element.y],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+    const right = rotatePoint(
+      scalePointFromOrigin(
+        [element.x + element.width, element.y + element.height / 2],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+    const bottom = rotatePoint(
+      scalePointFromOrigin(
+        [element.x + element.width / 2, element.y + element.height],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+    const left = rotatePoint(
+      scalePointFromOrigin(
+        [element.x, element.y + element.height / 2],
+        midPoint,
+        SEARCH_CONE_MULTIPLIER,
+      ),
+      midPoint,
+      element.angle,
+    );
+
+    if (PointInTriangle(point, top, right, midPoint)) {
+      return diamondHeading(top, right);
+    } else if (PointInTriangle(point, right, bottom, midPoint)) {
+      return diamondHeading(right, bottom);
+    } else if (PointInTriangle(point, bottom, left, midPoint)) {
+      return diamondHeading(bottom, left);
+    }
+
+    return diamondHeading(left, top);
   }
+
+  const topLeft = scalePointFromOrigin(
+    [aabb[0], aabb[1]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
+  const topRight = scalePointFromOrigin(
+    [aabb[2], aabb[1]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
+  const bottomLeft = scalePointFromOrigin(
+    [aabb[0], aabb[3]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
+  const bottomRight = scalePointFromOrigin(
+    [aabb[2], aabb[3]],
+    midPoint,
+    SEARCH_CONE_MULTIPLIER,
+  );
 
   return PointInTriangle(point, topLeft, topRight, midPoint)
     ? HEADING_UP
@@ -879,6 +933,23 @@ export const headingForPointFromElement = (
     : PointInTriangle(point, bottomRight, bottomLeft, midPoint)
     ? HEADING_DOWN
     : HEADING_LEFT;
+};
+
+const lineAngle = (a: Point, b: Point): number => {
+  const theta = Math.atan2(b[1] - a[1], b[0] - a[0]) * (180 / Math.PI);
+  return theta < 0 ? 360 + theta : theta;
+};
+
+const diamondHeading = (a: Point, b: Point) => {
+  const angle = lineAngle(a, b);
+  if (angle >= 315 || angle < 45) {
+    return HEADING_UP;
+  } else if (angle >= 45 && angle < 135) {
+    return HEADING_RIGHT;
+  } else if (angle >= 135 && angle < 225) {
+    return HEADING_DOWN;
+  }
+  return HEADING_LEFT;
 };
 
 const commonAABB = (aabbs: Bounds[]): Bounds => [
@@ -963,4 +1034,61 @@ const neighborIndexToHeading = (idx: number): Heading => {
       return HEADING_DOWN;
   }
   return HEADING_LEFT;
+};
+
+const getGlobalFixedPoints = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+) => {
+  const startElement =
+    arrow.startBinding && elementsMap.get(arrow.startBinding.elementId);
+  const endElement =
+    arrow.endBinding && elementsMap.get(arrow.endBinding.elementId);
+  const startPoint: Point =
+    startElement && arrow.startBinding
+      ? rotatePoint(
+          [
+            startElement.x +
+              startElement.width * arrow.startBinding.fixedPoint[0],
+            startElement.y +
+              startElement.height * arrow.startBinding.fixedPoint[1],
+          ],
+          [
+            startElement.x + startElement.width / 2,
+            startElement.y + startElement.height / 2,
+          ],
+          startElement.angle,
+        )
+      : [arrow.x + arrow.points[0][0], arrow.y + arrow.points[0][1]];
+  const endPoint: Point =
+    endElement && arrow.endBinding
+      ? rotatePoint(
+          [
+            endElement.x + endElement.width * arrow.endBinding.fixedPoint[0],
+            endElement.y + endElement.height * arrow.endBinding.fixedPoint[1],
+          ],
+          [
+            endElement.x + endElement.width / 2,
+            endElement.y + endElement.height / 2,
+          ],
+          endElement.angle,
+        )
+      : [
+          arrow.x + arrow.points[arrow.points.length - 1][0],
+          arrow.y + arrow.points[arrow.points.length - 1][1],
+        ];
+
+  return [startPoint, endPoint];
+};
+
+export const getArrowLocalFixedPoints = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+) => {
+  const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
+
+  return [
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
+  ];
 };

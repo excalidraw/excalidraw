@@ -2,7 +2,6 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -96,10 +95,6 @@ export type SceneScroll = {
   scrollX: number;
   scrollY: number;
 };
-
-export interface Scene {
-  elements: ExcalidrawTextElement[];
-}
 
 export type ExportType =
   | "png"

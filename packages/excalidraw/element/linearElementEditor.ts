@@ -44,7 +44,7 @@ import {
   isBindingEnabled,
 } from "./binding";
 import { tupleToCoors } from "../utils";
-import { isArrowElement, isBindingElement } from "./typeChecks";
+import { isBindingElement, isElbowArrow } from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
@@ -185,8 +185,7 @@ export class LinearElementEditor {
       }, [])
       .filter((index) => {
         if (
-          isArrowElement(element) &&
-          element.elbowed &&
+          isElbowArrow(element) &&
           index !== 0 &&
           index !== element.points.length - 1
         ) {
@@ -229,37 +228,34 @@ export class LinearElementEditor {
     }
 
     if (
-      isArrowElement(element) &&
-      element.elbowed &&
+      isElbowArrow(element) &&
       !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
       linearElementEditor.pointerDownState.lastClickedPoint !== 0
     ) {
       return false;
     }
 
-    const selectedPointsIndices =
-      isArrowElement(element) && element.elbowed
-        ? linearElementEditor.selectedPointsIndices
-            ?.reduce(
-              (startEnd, index) =>
-                (index === 0
-                  ? [0, startEnd[1]]
-                  : [startEnd[0], element.points.length - 1]) as [
-                  boolean | number,
-                  boolean | number,
-                ],
-              [false, false] as [number | boolean, number | boolean],
-            )
-            .filter(
-              (idx: number | boolean): idx is number => typeof idx === "number",
-            )
-        : linearElementEditor.selectedPointsIndices;
-    const lastClickedPoint =
-      isArrowElement(element) && element.elbowed
-        ? linearElementEditor.pointerDownState.lastClickedPoint > 0
-          ? element.points.length - 1
-          : 0
-        : linearElementEditor.pointerDownState.lastClickedPoint;
+    const selectedPointsIndices = isElbowArrow(element)
+      ? linearElementEditor.selectedPointsIndices
+          ?.reduce(
+            (startEnd, index) =>
+              (index === 0
+                ? [0, startEnd[1]]
+                : [startEnd[0], element.points.length - 1]) as [
+                boolean | number,
+                boolean | number,
+              ],
+            [false, false] as [number | boolean, number | boolean],
+          )
+          .filter(
+            (idx: number | boolean): idx is number => typeof idx === "number",
+          )
+      : linearElementEditor.selectedPointsIndices;
+    const lastClickedPoint = isElbowArrow(element)
+      ? linearElementEditor.pointerDownState.lastClickedPoint > 0
+        ? element.points.length - 1
+        : 0
+      : linearElementEditor.pointerDownState.lastClickedPoint;
 
     // point that's being dragged (out of all selected points)
     const draggingPoint = element.points[lastClickedPoint] as
@@ -387,6 +383,7 @@ export class LinearElementEditor {
     scene: Scene,
   ): LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
+    const elements = scene.getNonDeletedElements();
 
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -435,7 +432,8 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
-                scene,
+                elements,
+                elementsMap,
               )
             : null;
 
@@ -706,6 +704,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor | null;
   } {
     const elementsMap = scene.getNonDeletedElementsMap();
+    const elements = scene.getNonDeletedElements();
 
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
@@ -741,8 +740,7 @@ export class LinearElementEditor {
     if (event.altKey && appState.editingLinearElement) {
       if (
         linearElementEditor.lastUncommittedPoint == null ||
-        !isArrowElement(element) ||
-        !element.elbowed
+        !isElbowArrow(element)
       ) {
         mutateElement(element, {
           points: [
@@ -774,7 +772,11 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
-        endBindingElement: getHoveredElementForBinding(scenePointer, scene),
+        endBindingElement: getHoveredElementForBinding(
+          scenePointer,
+          elements,
+          elementsMap,
+        ),
       };
 
       ret.didAddPoint = true;
@@ -921,7 +923,9 @@ export class LinearElementEditor {
         elementsMap,
         scenePointerX - appState.editingLinearElement.pointerOffset.x,
         scenePointerY - appState.editingLinearElement.pointerOffset.y,
-        event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+        event[KEYS.CTRL_OR_CMD] || isElbowArrow(element)
+          ? null
+          : appState.gridSize,
       );
     }
 
@@ -1006,7 +1010,7 @@ export class LinearElementEditor {
     absoluteCoords: Point,
     elementsMap: ElementsMap,
   ): Point {
-    if (isArrowElement(element) && element.elbowed) {
+    if (isElbowArrow(element)) {
       // No rotation for elbow arrows
       return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
     }
@@ -1316,7 +1320,7 @@ export class LinearElementEditor {
     );
 
     // Elbow arrows don't allow midpoints
-    if (isArrowElement(element) && element.elbowed) {
+    if (element && isElbowArrow(element)) {
       return false;
     }
 
@@ -1379,7 +1383,7 @@ export class LinearElementEditor {
       elementsMap,
       pointerCoords.x,
       pointerCoords.y,
-      snapToGrid ? appState.gridSize : null,
+      snapToGrid && !isElbowArrow(element) ? appState.gridSize : null,
     );
     const points = [
       ...element.points.slice(0, segmentMidpoint.index!),
@@ -1418,7 +1422,7 @@ export class LinearElementEditor {
       isDragging?: boolean;
     },
   ) {
-    if (isArrowElement(element) && element.elbowed) {
+    if (isElbowArrow(element)) {
       mutateElbowArrow(
         element as ExcalidrawArrowElement,
         scene,
@@ -1458,6 +1462,13 @@ export class LinearElementEditor {
       referencePoint,
       elementsMap,
     );
+
+    if (isElbowArrow(element)) {
+      return [
+        scenePointer[0] - referencePointCoords[0],
+        scenePointer[1] - referencePointCoords[1],
+      ];
+    }
 
     const [gridX, gridY] = getGridPoint(
       scenePointer[0],

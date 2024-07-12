@@ -1,4 +1,7 @@
-import { updateBoundElements } from "../../element/binding";
+import {
+  bindOrUnbindLinearElements,
+  updateBoundElements,
+} from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
 import {
   measureFontSizeFromWidth,
@@ -11,15 +14,34 @@ import {
   getBoundTextMaxWidth,
   handleBindTextResize,
 } from "../../element/textElement";
-import { isFrameLikeElement, isTextElement } from "../../element/typeChecks";
+import {
+  isFrameLikeElement,
+  isLinearElement,
+  isTextElement,
+} from "../../element/typeChecks";
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../../element/types";
+import {
+  getSelectedGroupIds,
+  getElementsInGroup,
+  isInGroup,
+} from "../../groups";
 import { rotate } from "../../math";
 import type Scene from "../../scene/Scene";
+import type { AppState } from "../../types";
 import { getFontString } from "../../utils";
+
+export type StatsInputProperty =
+  | "x"
+  | "y"
+  | "width"
+  | "height"
+  | "angle"
+  | "fontSize";
 
 export const SMALLEST_DELTA = 0.01;
 
@@ -101,12 +123,16 @@ export const resizeElement = (
   nextWidth: number,
   nextHeight: number,
   keepAspectRatio: boolean,
-  latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
   shouldInformMutation = true,
 ) => {
+  const latestElement = elementsMap.get(origElement.id);
+  if (!latestElement) {
+    return;
+  }
   let boundTextFont: { fontSize?: number } = {};
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
 
@@ -143,6 +169,12 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
+  updateBindings(latestElement, elementsMap, elements, scene, {
+    newSize: {
+      width: nextWidth,
+      height: nextHeight,
+    },
+  });
 
   if (boundTextElement) {
     boundTextFont = {
@@ -181,13 +213,17 @@ export const resizeElement = (
 export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
-  latestElement: ExcalidrawElement,
   originalElement: ExcalidrawElement,
-  elementsMap: ElementsMap,
-  originalElementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
+  originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
+  const latestElement = elementsMap.get(originalElement.id);
+  if (!latestElement) {
+    return;
+  }
   const [cx, cy] = [
     originalElement.x + originalElement.width / 2,
     originalElement.y + originalElement.height / 2,
@@ -219,7 +255,7 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
-  updateBoundElements(latestElement, elementsMap, scene);
+  updateBindings(latestElement, elementsMap, elements, scene);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -236,5 +272,50 @@ export const moveElement = (
         },
         shouldInformMutation,
       );
+  }
+};
+
+export const getAtomicUnits = (
+  targetElements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const selectedGroupIds = getSelectedGroupIds(appState);
+  const _atomicUnits = selectedGroupIds.map((gid) => {
+    return getElementsInGroup(targetElements, gid).reduce((acc, el) => {
+      acc[el.id] = true;
+      return acc;
+    }, {} as AtomicUnit);
+  });
+  targetElements
+    .filter((el) => !isInGroup(el))
+    .forEach((el) => {
+      _atomicUnits.push({
+        [el.id]: true,
+      });
+    });
+  return _atomicUnits;
+};
+
+export const updateBindings = (
+  latestElement: ExcalidrawElement,
+  elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
+  scene: Scene,
+  options?: {
+    simultaneouslyUpdated?: readonly ExcalidrawElement[];
+    newSize?: { width: number; height: number };
+  },
+) => {
+  if (isLinearElement(latestElement)) {
+    bindOrUnbindLinearElements(
+      [latestElement],
+      elementsMap,
+      elements,
+      scene,
+      true,
+      [],
+    );
+  } else {
+    updateBoundElements(latestElement, elementsMap, scene, options);
   }
 };

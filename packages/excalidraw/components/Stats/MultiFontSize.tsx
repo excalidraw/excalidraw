@@ -1,10 +1,10 @@
-import { isTextElement, refreshTextDimensions } from "../../element";
+import { isTextElement, redrawTextBoundingBox } from "../../element";
 import { mutateElement } from "../../element/mutateElement";
-import { isBoundToContainer } from "../../element/typeChecks";
+import { hasBoundTextElement } from "../../element/typeChecks";
 import type {
-  ElementsMap,
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeletedSceneElementsMap,
 } from "../../element/types";
 import { isInGroup } from "../../groups";
 import type Scene from "../../scene/Scene";
@@ -12,62 +12,87 @@ import { fontSizeIcon } from "../icons";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue } from "./utils";
+import type { AppState } from "../../types";
+import { getBoundTextElement } from "../../element/textElement";
 
 interface MultiFontSizeProps {
   elements: readonly ExcalidrawElement[];
-  elementsMap: ElementsMap;
   scene: Scene;
+  elementsMap: NonDeletedSceneElementsMap;
+  appState: AppState;
+  property: "fontSize";
 }
 
 const MIN_FONT_SIZE = 4;
 const STEP_SIZE = 4;
 
-const MultiFontSize = ({
-  elements,
-  elementsMap,
-  scene,
-}: MultiFontSizeProps) => {
-  const latestTextElements = elements.filter(
-    (el) => !isInGroup(el) && isTextElement(el) && !isBoundToContainer(el),
-  ) as ExcalidrawTextElement[];
-  const fontSizes = latestTextElements.map(
-    (textEl) => Math.round(textEl.fontSize * 10) / 10,
-  );
-  const value = new Set(fontSizes).size === 1 ? fontSizes[0] : "Mixed";
-  const editable = fontSizes.length > 0;
-
-  const handleFontSizeChange: DragInputCallbackType = ({
-    accumulatedChange,
-    originalElements,
-    shouldChangeByStepSize,
-    nextValue,
-  }) => {
-    if (nextValue) {
-      const nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
-
-      for (const textElement of latestTextElements) {
-        const newElement = {
-          ...textElement,
-          fontSize: nextFontSize,
-        };
-        const updates = refreshTextDimensions(newElement, null, elementsMap);
-        mutateElement(
-          textElement,
-          {
-            ...updates,
-            fontSize: nextFontSize,
-          },
-          false,
-        );
+const getApplicableTextElements = (
+  elements: readonly (ExcalidrawElement | undefined)[],
+  elementsMap: NonDeletedSceneElementsMap,
+) =>
+  elements.reduce(
+    (acc: ExcalidrawTextElement[], el) => {
+      if (!el || isInGroup(el)) {
+        return acc;
+      }
+      if (isTextElement(el)) {
+        acc.push(el);
+        return acc;
+      }
+      if (hasBoundTextElement(el)) {
+        const boundTextElement = getBoundTextElement(el, elementsMap);
+        if (boundTextElement) {
+          acc.push(boundTextElement);
+          return acc;
+        }
       }
 
-      scene.triggerUpdate();
-      return;
+      return acc;
+    },
+
+    [],
+  );
+
+const handleFontSizeChange: DragInputCallbackType<
+  MultiFontSizeProps["property"],
+  ExcalidrawTextElement
+> = ({
+  accumulatedChange,
+  originalElements,
+  shouldChangeByStepSize,
+  nextValue,
+  scene,
+}) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const latestTextElements = originalElements.map((el) =>
+    elementsMap.get(el.id),
+  ) as ExcalidrawTextElement[];
+
+  let nextFontSize;
+
+  if (nextValue) {
+    nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
+
+    for (const textElement of latestTextElements) {
+      mutateElement(
+        textElement,
+        {
+          fontSize: nextFontSize,
+        },
+        false,
+      );
+
+      redrawTextBoundingBox(
+        textElement,
+        scene.getContainerElement(textElement),
+        elementsMap,
+        false,
+      );
     }
 
-    const originalTextElements = originalElements.filter(
-      (el) => !isInGroup(el) && isTextElement(el) && !isBoundToContainer(el),
-    ) as ExcalidrawTextElement[];
+    scene.triggerUpdate();
+  } else {
+    const originalTextElements = originalElements as ExcalidrawTextElement[];
 
     for (let i = 0; i < latestTextElements.length; i++) {
       const latestElement = latestTextElements[i];
@@ -82,33 +107,56 @@ const MultiFontSize = ({
       if (shouldChangeByStepSize) {
         nextFontSize = getStepSizedValue(nextFontSize, STEP_SIZE);
       }
-      const newElement = {
-        ...latestElement,
-        fontSize: nextFontSize,
-      };
-      const updates = refreshTextDimensions(newElement, null, elementsMap);
       mutateElement(
         latestElement,
         {
-          ...updates,
           fontSize: nextFontSize,
         },
+        false,
+      );
+
+      redrawTextBoundingBox(
+        latestElement,
+        scene.getContainerElement(latestElement),
+        elementsMap,
         false,
       );
     }
 
     scene.triggerUpdate();
-  };
+  }
+};
+
+const MultiFontSize = ({
+  elements,
+  scene,
+  appState,
+  property,
+  elementsMap,
+}: MultiFontSizeProps) => {
+  const latestTextElements = getApplicableTextElements(elements, elementsMap);
+
+  if (!latestTextElements.length) {
+    return null;
+  }
+
+  const fontSizes = latestTextElements.map(
+    (textEl) => Math.round(textEl.fontSize * 10) / 10,
+  );
+  const value = new Set(fontSizes).size === 1 ? fontSizes[0] : "Mixed";
+  const editable = fontSizes.length > 0;
 
   return (
     <StatsDragInput
       label="F"
       icon={fontSizeIcon}
-      elements={elements}
+      elements={latestTextElements}
       dragInputCallback={handleFontSizeChange}
       value={value}
       editable={editable}
       scene={scene}
+      property={property}
+      appState={appState}
     />
   );
 };

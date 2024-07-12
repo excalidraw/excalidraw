@@ -90,7 +90,7 @@ const shouldResetImageFilter = (
 };
 
 const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
+  element.type === "freedraw" ? element.strokeWidth * 12 : 200;
 
 export const getRenderOpacity = (
   element: ExcalidrawElement,

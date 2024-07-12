@@ -232,7 +232,7 @@ export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;
   gap: number;
-  fixedPoint: Point;
+  fixedPoint: [number, number];
 };
 
 export type Arrowhead =

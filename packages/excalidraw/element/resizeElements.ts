@@ -1,57 +1,58 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
 
-import { isInGroup } from "../groups";
-import { centerPoint, rotate, rotatePoint } from "../math";
-import Scene from "../scene/Scene";
-import type { Point, PointerDownState } from "../types";
-import type { Mutable } from "../utility-types";
-import { getFontString } from "../utils";
-import { updateBoundElements } from "./binding";
-import {
-  getCommonBoundingBox,
-  getCommonBounds,
-  getElementAbsoluteCoords,
-  getResizedElementAbsoluteCoords,
-} from "./bounds";
-import { LinearElementEditor } from "./linearElementEditor";
-import { mutateElement } from "./mutateElement";
-import {
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
-  getBoundTextElement,
-  getBoundTextElementId,
-  getBoundTextMaxWidth,
-  getContainerElement,
-  getMinTextElementWidth,
-  handleBindTextResize,
-  measureText,
-  wrapText,
-} from "./textElement";
+import { rotate, centerPoint, rotatePoint } from "../math";
 import type {
-  MaybeTransformHandleType,
-  TransformHandleDirection,
-} from "./transformHandles";
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  ExcalidrawElement,
+  ExcalidrawTextElementWithContainer,
+  ExcalidrawImageElement,
+  ElementsMap,
+} from "./types";
+import type { Mutable } from "../utility-types";
+import {
+  getElementAbsoluteCoords,
+  getCommonBounds,
+  getResizedElementAbsoluteCoords,
+  getCommonBoundingBox,
+} from "./bounds";
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+import { mutateElement } from "./mutateElement";
+import { getFontString } from "../utils";
+import { updateBoundElements } from "./binding";
 import type {
-  ElementsMap,
-  ExcalidrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  ExcalidrawTextElementWithContainer,
-  NonDeleted,
-  NonDeletedExcalidrawElement,
-} from "./types";
-import { mutateElbowArrow } from "./routing";
+  MaybeTransformHandleType,
+  TransformHandleDirection,
+} from "./transformHandles";
+import type { Point, PointerDownState } from "../types";
+import Scene from "../scene/Scene";
+import {
+  getApproxMinLineWidth,
+  getBoundTextElement,
+  getBoundTextElementId,
+  getContainerElement,
+  handleBindTextResize,
+  getBoundTextMaxWidth,
+  getApproxMinLineHeight,
+  wrapText,
+  measureText,
+  getMinTextElementWidth,
+} from "./textElement";
+import { LinearElementEditor } from "./linearElementEditor";
+import { isInGroup } from "../groups";
+import { getArrowLocalFixedPoints, mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -81,7 +82,7 @@ export const transformElements = (
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
-      if (!isArrowElement(element) || !element.elbowed) {
+      if (!isElbowArrow(element)) {
         rotateSingleElement(
           element,
           elementsMap,
@@ -443,7 +444,7 @@ export const resizeSingleElement = (
   // Elbow arrows cannot be resized when bound on either end
   if (
     isArrowElement(element) &&
-    element.elbowed &&
+    isElbowArrow(element) &&
     (element.startBinding || element.endBinding)
   ) {
     return;
@@ -979,7 +980,23 @@ export const resizeMultipleElements = (
     const { angle } = update;
     const { width: oldWidth, height: oldHeight } = element;
 
-    mutateElement(element, update, false);
+    if (isArrowElement(element) && isElbowArrow(element)) {
+      const { points } = update;
+
+      points &&
+        mutateElbowArrow(
+          element,
+          scene,
+          getArrowLocalFixedPoints(element, elementsMap),
+          undefined,
+          undefined,
+          {
+            informMutation: false,
+          },
+        );
+    } else {
+      mutateElement(element, update, false);
+    }
 
     updateBoundElements(element, elementsMap, scene, {
       simultaneouslyUpdated: elementsToUpdate,
@@ -1036,18 +1053,17 @@ const rotateMultipleElements = (
         centerY,
         centerAngle + origAngle - element.angle,
       );
-      if (isArrowElement(element) && element.elbowed) {
-        mutateElbowArrow(element, scene, element.points);
+
+      if (isArrowElement(element) && isElbowArrow(element)) {
+        const points = getArrowLocalFixedPoints(element, elementsMap);
+        mutateElbowArrow(element, scene, points);
       } else {
         mutateElement(
           element,
           {
             x: element.x + (rotatedCX - cx),
             y: element.y + (rotatedCY - cy),
-            angle:
-              !isArrowElement(element) || !element.elbowed
-                ? normalizeAngle(centerAngle + origAngle)
-                : 0,
+            angle: normalizeAngle(centerAngle + origAngle),
           },
           false,
         );
