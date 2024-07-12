@@ -4035,11 +4035,13 @@ class App extends React.Component<AppProps, AppState> {
                   selectedElements[0].id
               ) {
                 this.store.shouldCaptureIncrement();
-                this.setState({
-                  editingLinearElement: new LinearElementEditor(
-                    selectedElement,
-                  ),
-                });
+                if (!isElbowArrow(selectedElement)) {
+                  this.setState({
+                    editingLinearElement: new LinearElementEditor(
+                      selectedElement,
+                    ),
+                  });
+                }
               }
             }
           } else if (
