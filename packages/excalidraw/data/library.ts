@@ -404,6 +404,11 @@ export const useHandleLibrary = ({
       idToken: string | null;
     }) => {
 
+      /*
+      Function disabled for security reasons
+      https://app.snyk.io/org/ari-UoihpBRrBnRFxXPPwgLNEK/project/0df37972-656d-4ffe-a691-2ab3e8c83770#issue-ac232ae4-2ad3-43af-8b95-04be121b4eab
+      */
+
       // const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
       //   try {
       //     const request = await fetch(decodeURIComponent(libraryUrl));
