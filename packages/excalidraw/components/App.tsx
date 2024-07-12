@@ -3944,7 +3944,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((prevState) => ({
               selectedElementIds: makeNextSelectedElementIds(
                 {
-                  [nextId]: true,
+                  [nextId as string]: true,
                 },
                 prevState,
               ),
