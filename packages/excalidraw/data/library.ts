@@ -395,13 +395,6 @@ export const useHandleLibrary = ({
       return;
     }
 
-    const importLibraryFromURL = async () => {
-      /*
-      Function disabled for security reasons
-      https://app.snyk.io/org/ari-UoihpBRrBnRFxXPPwgLNEK/project/0df37972-656d-4ffe-a691-2ab3e8c83770#issue-ac232ae4-2ad3-43af-8b95-04be121b4eab
-      */
-    };
-
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
       const libraryUrlTokens = parseLibraryTokensFromUrl();
@@ -412,8 +405,6 @@ export const useHandleLibrary = ({
         // and similar).
         // Using history API won't trigger another hashchange.
         window.history.replaceState({}, "", event.oldURL);
-
-        importLibraryFromURL(libraryUrlTokens);
       }
     };
 
@@ -425,11 +416,6 @@ export const useHandleLibrary = ({
       });
     }
 
-    const libraryUrlTokens = parseLibraryTokensFromUrl();
-
-    if (libraryUrlTokens) {
-      importLibraryFromURL(libraryUrlTokens);
-    }
     // --------------------------------------------------------- init load -----
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange);
