@@ -6,6 +6,9 @@ import type {
   OrderedExcalidrawElement,
 } from "./element/types";
 import { InvalidFractionalIndexError } from "./errors";
+import { hasBoundTextElement } from "./element/typeChecks";
+import { getBoundTextElement } from "./element/textElement";
+import { arrayToMap } from "./utils";
 
 /**
  * Envisioned relation between array order and fractional indices:
@@ -30,17 +33,51 @@ import { InvalidFractionalIndexError } from "./errors";
  * @throws `InvalidFractionalIndexError` if invalid index is detected.
  */
 export const validateFractionalIndices = (
-  indices: (ExcalidrawElement["index"] | undefined)[],
+  elements: readonly ExcalidrawElement[],
+  { shouldThrow = false, includeBoundTextValidation = false },
 ) => {
+  let foundError = false;
+
+  const indices = elements.map((x) => x.index);
   for (const [i, index] of indices.entries()) {
     const predecessorIndex = indices[i - 1];
     const successorIndex = indices[i + 1];
 
     if (!isValidFractionalIndex(index, predecessorIndex, successorIndex)) {
-      throw new InvalidFractionalIndexError(
-        `Fractional indices invariant for element has been compromised - ["${predecessorIndex}", "${index}", "${successorIndex}"] [predecessor, current, successor]`,
+      foundError = true;
+      console.error(
+        `Fractional indices invariant for element has been compromised: "${
+          elements[i - 1]?.index
+        }", "${elements[i]?.index}", "${elements[i + 1]?.index}"`,
+        elements[i - 1],
+        elements[i],
+        elements[i + 1],
       );
     }
+
+    // disabled by default, as we don't fix it
+    if (includeBoundTextValidation && hasBoundTextElement(elements[i])) {
+      const container = elements[i];
+      const text = getBoundTextElement(container, arrayToMap(elements));
+
+      if (text && text.index! <= container.index!) {
+        foundError = true;
+        console.error(
+          `Fractional indices invariant for bound elements has been compromised: : "${text.index}", "${container.index}"`,
+          text,
+          container,
+        );
+      }
+    }
+  }
+
+  if (foundError) {
+    console.error("Passed elements:", elements);
+  }
+
+  if (shouldThrow && foundError) {
+    // if enabled, gather all the errors first, throw once
+    throw new InvalidFractionalIndexError();
   }
 };
 
@@ -83,10 +120,15 @@ export const syncMovedIndices = (
 
     // try generatating indices, throws on invalid movedElements
     const elementsUpdates = generateIndices(elements, indicesGroups);
+    const elementsCandidates = elements.map((x) =>
+      elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
+    );
 
     // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
-      elements.map((x) => elementsUpdates.get(x)?.index || x.index),
+      elementsCandidates,
+      // we don't autofix invalid bound text indices, hence don't include it in the validation
+      { includeBoundTextValidation: false, shouldThrow: true },
     );
 
     // split mutation so we don't end up in an incosistent state

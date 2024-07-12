@@ -1,5 +1,10 @@
+import { ENV } from "../constants";
 import type { OrderedExcalidrawElement } from "../element/types";
-import { orderByFractionalIndex, syncInvalidIndices } from "../fractionalIndex";
+import {
+  orderByFractionalIndex,
+  syncInvalidIndices,
+  validateFractionalIndices,
+} from "../fractionalIndex";
 import type { AppState } from "../types";
 import type { MakeBrand } from "../utility-types";
 import { arrayToMap } from "../utils";
@@ -71,6 +76,32 @@ export const reconcileElements = (
   }
 
   const orderedElements = orderByFractionalIndex(reconciledElements);
+
+  if (
+    import.meta.env.DEV ||
+    import.meta.env.MODE === ENV.TEST ||
+    window?.DEBUG_FRACTIONAL_INDICES
+  ) {
+    try {
+      const elements = syncInvalidIndices(
+        // create new instances due to the mutation
+        orderedElements.map((x) => ({ ...x })),
+      );
+
+      validateFractionalIndices(elements, {
+        shouldThrow: true,
+        includeBoundTextValidation: true,
+      });
+    } catch (e) {
+      console.error("Local elements:", localElements);
+      console.error("Remote elements:", remoteElements);
+
+      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+        // re-throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        throw e;
+      }
+    }
+  }
 
   // de-duplicate indices
   syncInvalidIndices(orderedElements);
