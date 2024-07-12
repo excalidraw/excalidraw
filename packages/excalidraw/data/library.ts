@@ -17,7 +17,6 @@ import { useEffect, useRef } from "react";
 import {
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
-  // APP_NAME,
   EVENT,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
@@ -396,63 +395,13 @@ export const useHandleLibrary = ({
       return;
     }
 
-    const importLibraryFromURL = async ({
-      // libraryUrl,
-      // idToken,
-    }: {
-      libraryUrl: string;
-      idToken: string | null;
-    }) => {
-
+    const importLibraryFromURL = async () => {
       /*
       Function disabled for security reasons
       https://app.snyk.io/org/ari-UoihpBRrBnRFxXPPwgLNEK/project/0df37972-656d-4ffe-a691-2ab3e8c83770#issue-ac232ae4-2ad3-43af-8b95-04be121b4eab
       */
-
-      // const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
-      //   try {
-      //     const request = await fetch(decodeURIComponent(libraryUrl));
-      //     const blob = await request.blob();
-      //     resolve(blob);
-      //   } catch (error: any) {
-      //     reject(error);
-      //   }
-      // });
-
-      // const shouldPrompt = idToken !== excalidrawAPI.id;
-
-      // // wait for the tab to be focused before continuing in case we'll prompt
-      // // for confirmation
-      // await (shouldPrompt && document.hidden
-      //   ? new Promise<void>((resolve) => {
-      //       window.addEventListener("focus", () => resolve(), {
-      //         once: true,
-      //       });
-      //     })
-      //   : null);
-
-      // try {
-      //   await excalidrawAPI.updateLibrary({
-      //     libraryItems: libraryPromise,
-      //     prompt: shouldPrompt,
-      //     merge: true,
-      //     defaultStatus: "published",
-      //     openLibraryMenu: true,
-      //   });
-      // } catch (error) {
-      //   throw error;
-      // } finally {
-      //   if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
-      //     const hash = new URLSearchParams(window.location.hash.slice(1));
-      //     hash.delete(URL_HASH_KEYS.addLibrary);
-      //     window.history.replaceState({}, APP_NAME, `#${hash.toString()}`);
-      //   } else if (window.location.search.includes(URL_QUERY_KEYS.addLibrary)) {
-      //     const query = new URLSearchParams(window.location.search);
-      //     query.delete(URL_QUERY_KEYS.addLibrary);
-      //     window.history.replaceState({}, APP_NAME, `?${query.toString()}`);
-      //   }
-      // }
     };
+
     const onHashChange = (event: HashChangeEvent) => {
       event.preventDefault();
       const libraryUrlTokens = parseLibraryTokensFromUrl();
