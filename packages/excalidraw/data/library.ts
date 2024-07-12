@@ -17,7 +17,7 @@ import { useEffect, useRef } from "react";
 import {
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
-  APP_NAME,
+  // APP_NAME,
   EVENT,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
@@ -397,8 +397,8 @@ export const useHandleLibrary = ({
     }
 
     const importLibraryFromURL = async ({
-      libraryUrl,
-      idToken,
+      // libraryUrl,
+      // idToken,
     }: {
       libraryUrl: string;
       idToken: string | null;
