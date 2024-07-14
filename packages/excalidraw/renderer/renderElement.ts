@@ -471,16 +471,7 @@ const drawElementFromCanvas = (
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
   const zoom = elementWithCanvas.scale;
-  let [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-
-  // Free draw elements will otherwise "shuffle" as the min x and y change
-  if (isFreeDrawElement(element)) {
-    x1 = Math.floor(x1);
-    x2 = Math.ceil(x2);
-    y1 = Math.floor(y1);
-    y2 = Math.ceil(y2);
-  }
-
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
   const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
 
