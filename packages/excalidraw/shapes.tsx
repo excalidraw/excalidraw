@@ -19,6 +19,7 @@ import {
   TextIcon,
 } from "./components/icons";
 import { getElementAbsoluteCoords } from "./element";
+import { getFreeDrawElementAbsoluteCoords } from "./element/bounds";
 import { shouldTestInside } from "./element/collision";
 import type { ElementsMap, ExcalidrawElement } from "./element/types";
 import { KEYS } from "./keys";
@@ -110,6 +111,33 @@ export const findShapeByKey = (key: string) => {
   return shape?.value || null;
 };
 
+interface CachedElementShape {
+  shape: GeometricShape;
+  versionNonce: number;
+}
+
+const elementShapeCache: WeakMap<ExcalidrawElement, CachedElementShape> =
+  new WeakMap();
+
+/** Get element shape from cache, or generate if it doesn't exist */
+const getElementShapeFromCache = (
+  element: ExcalidrawElement,
+  generate: () => GeometricShape,
+): GeometricShape => {
+  const cached = elementShapeCache.get(element);
+  if (cached !== undefined && cached.versionNonce === element.versionNonce) {
+    return cached.shape;
+  }
+
+  const shape = generate();
+  elementShapeCache.set(element, {
+    shape,
+    versionNonce: element.versionNonce,
+  });
+
+  return shape;
+};
+
 /**
  * get the pure geometric shape of an excalidraw element
  * which is then used for hit detection
@@ -128,7 +156,7 @@ export const getElementShape = (
     case "iframe":
     case "text":
     case "selection":
-      return getPolygonShape(element);
+      return getElementShapeFromCache(element, () => getPolygonShape(element));
     case "arrow":
     case "line": {
       const roughShape =
@@ -151,11 +179,13 @@ export const getElementShape = (
     }
 
     case "ellipse":
-      return getEllipseShape(element);
+      return getElementShapeFromCache(element, () => getEllipseShape(element));
 
     case "freedraw": {
-      const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
-      return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
+      return getElementShapeFromCache(element, () => {
+        const [, , , , cx, cy] = getFreeDrawElementAbsoluteCoords(element);
+        return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
+      });
     }
   }
 };
