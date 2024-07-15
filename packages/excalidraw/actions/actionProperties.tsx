@@ -124,7 +124,7 @@ export const changeProperty = (
 };
 
 export const getFormValue = function <T extends Primitive>(
-  nonDeletedElements: readonly ExcalidrawElement[],
+  app: Pick<AppClassProperties, "scene">,
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
@@ -138,6 +138,7 @@ export const getFormValue = function <T extends Primitive>(
   }
 
   if (!ret) {
+    const nonDeletedElements = app.scene.getNonDeletedElements();
     const hasSelection = isSomeElementSelected(nonDeletedElements, appState);
 
     if (hasSelection) {
@@ -274,7 +275,7 @@ export const actionChangeStrokeColor = register({
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
-          app.scene.getNonDeletedElements(),
+          app,
           appState,
           (element) => element.strokeColor,
           true,
@@ -320,7 +321,7 @@ export const actionChangeBackgroundColor = register({
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
-          app.scene.getNonDeletedElements(),
+          app,
           appState,
           (element) => element.backgroundColor,
           true,
@@ -390,7 +391,7 @@ export const actionChangeFillStyle = register({
             },
           ]}
           value={getFormValue(
-            app.scene.getNonDeletedElements(),
+            app,
             appState,
             (element) => element.fillStyle,
             (element) => element.hasOwnProperty("fillStyle"),
@@ -454,7 +455,7 @@ export const actionChangeStrokeWidth = register({
           },
         ]}
         value={getFormValue(
-          app.scene.getNonDeletedElements(),
+          app,
           appState,
           (element) => element.strokeWidth,
           (element) => element.hasOwnProperty("strokeWidth"),
@@ -506,7 +507,7 @@ export const actionChangeSloppiness = register({
           },
         ]}
         value={getFormValue(
-          app.scene.getNonDeletedElements(),
+          app,
           appState,
           (element) => element.roughness,
           (element) => element.hasOwnProperty("roughness"),
@@ -557,7 +558,7 @@ export const actionChangeStrokeStyle = register({
           },
         ]}
         value={getFormValue(
-          app.scene.getNonDeletedElements(),
+          app,
           appState,
           (element) => element.strokeStyle,
           (element) => element.hasOwnProperty("strokeStyle"),
@@ -600,7 +601,7 @@ export const actionChangeOpacity = register({
         onChange={(event) => updateData(+event.target.value)}
         value={
           getFormValue(
-            app.scene.getNonDeletedElements(),
+            app,
             appState,
             (element) => element.opacity,
             true,
@@ -651,7 +652,7 @@ export const actionChangeFontSize = register({
           },
         ]}
         value={getFormValue(
-          app.scene.getNonDeletedElements(),
+          app,
           appState,
           (element) => {
             if (isTextElement(element)) {
@@ -798,7 +799,7 @@ export const actionChangeFontFamily = register({
           group="font-family"
           options={options}
           value={getFormValue(
-            app.scene.getNonDeletedElements(),
+            app,
             appState,
             (element) => {
               if (isTextElement(element)) {
@@ -893,7 +894,7 @@ export const actionChangeTextAlign = register({
             },
           ]}
           value={getFormValue(
-            app.scene.getNonDeletedElements(),
+            app,
             appState,
             (element) => {
               if (isTextElement(element)) {
@@ -981,7 +982,7 @@ export const actionChangeVerticalAlign = register({
             },
           ]}
           value={getFormValue(
-            app.scene.getNonDeletedElements(),
+            app,
             appState,
             (element) => {
               if (isTextElement(element) && element.containerId) {
@@ -1064,7 +1065,7 @@ export const actionChangeRoundness = register({
             },
           ]}
           value={getFormValue(
-            app.scene.getNonDeletedElements(),
+            app,
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
@@ -1190,7 +1191,6 @@ export const actionChangeArrowhead = register({
   },
   PanelComponent: ({ app, elements, appState, updateData }) => {
     const isRTL = getLanguage().rtl;
-    const nonDeletedElements = app.scene.getNonDeletedElements();
 
     return (
       <fieldset>
@@ -1200,7 +1200,7 @@ export const actionChangeArrowhead = register({
             label="arrowhead_start"
             options={getArrowheadOptions(!isRTL)}
             value={getFormValue<Arrowhead | null>(
-              nonDeletedElements,
+              app,
               appState,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
@@ -1216,7 +1216,7 @@ export const actionChangeArrowhead = register({
             group="arrowheads"
             options={getArrowheadOptions(!!isRTL)}
             value={getFormValue<Arrowhead | null>(
-              nonDeletedElements,
+              app,
               appState,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
