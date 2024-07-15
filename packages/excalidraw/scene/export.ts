@@ -43,7 +43,7 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
-import { EMPTY_PROTOCOL } from "../fonts/metadata";
+import { LOCAL_FONT_PROTOCOL } from "../fonts/metadata";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -390,7 +390,7 @@ export const exportToSvg = async (
               .filter(
                 (font) =>
                   font.fontFace.weight === "400" &&
-                  font.url.protocol !== EMPTY_PROTOCOL,
+                  font.url.protocol !== LOCAL_FONT_PROTOCOL,
               )
               .map(async (font) => {
                 try {

@@ -152,7 +152,7 @@ body.excalidraw-cursor-resize * {
       margin-bottom: 0.25rem;
       font-size: 0.75rem;
       color: var(--text-primary-color);
-      font-weight: normal;
+      font-weight: 400;
       display: block;
     }
 
@@ -754,7 +754,7 @@ body.excalidraw-cursor-resize * {
     padding: 1rem 1.6rem;
     border-radius: 12px;
     color: #fff;
-    font-weight: bold;
+    font-weight: 700;
     letter-spacing: 0.6px;
     font-family: "Assistant";
   }

@@ -6,7 +6,7 @@ import { isTextElement } from "../element";
 import { getFontString } from "../utils";
 import { FONT_FAMILY } from "../constants";
 import {
-  EMPTY_PROTOCOL,
+  LOCAL_FONT_PROTOCOL,
   FONT_METADATA,
   RANGES,
   type FontMetadata,
@@ -107,8 +107,11 @@ export class Fonts {
   public load = async () => {
     // Add all registered font faces into the `document.fonts` (if not added already)
     for (const { fontFaces } of Fonts.registered.values()) {
-      for (const { fontFace } of fontFaces) {
-        if (!window.document.fonts.has(fontFace)) {
+      for (const { fontFace, url } of fontFaces) {
+        if (
+          url.protocol !== LOCAL_FONT_PROTOCOL &&
+          !window.document.fonts.has(fontFace)
+        ) {
           window.document.fonts.add(fontFace);
         }
       }
@@ -195,7 +198,7 @@ export class Fonts {
 
     // keeping for backwards compatibility reasons, uses system font (Helvetica on MacOS, Arial on Win)
     register("Helvetica", FONT_METADATA[FONT_FAMILY.Helvetica], {
-      uri: EMPTY_PROTOCOL,
+      uri: LOCAL_FONT_PROTOCOL,
     });
 
     // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept for consistency)
