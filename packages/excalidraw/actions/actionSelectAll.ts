@@ -1,7 +1,7 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
 import { selectGroupsForSelectedElements } from "../groups";
-import { getNonDeletedElements, isTextElement } from "../element";
+import { isTextElement } from "../element";
 import type { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -40,7 +40,7 @@ export const actionSelectAll = register({
             editingGroupId: null,
             selectedElementIds,
           },
-          getNonDeletedElements(elements),
+          app.scene.getNonDeletedElements(),
           appState,
           app,
         ),

@@ -65,7 +65,7 @@ export const actionDuplicateSelection = register({
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, appState, updateData }) => (
     <ToolButton
       type="button"
       icon={DuplicateIcon}
@@ -74,7 +74,10 @@ export const actionDuplicateSelection = register({
       )}`}
       aria-label={t("labels.duplicateSelection")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });

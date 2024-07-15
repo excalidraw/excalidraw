@@ -9,7 +9,6 @@ import {
   CenterVerticallyIcon,
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
@@ -87,7 +86,10 @@ export const actionAlignTop = register({
         "CtrlOrCmd+Shift+Up",
       )}`}
       aria-label={t("labels.alignTop")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
@@ -120,7 +122,10 @@ export const actionAlignBottom = register({
         "CtrlOrCmd+Shift+Down",
       )}`}
       aria-label={t("labels.alignBottom")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
@@ -153,7 +158,10 @@ export const actionAlignLeft = register({
         "CtrlOrCmd+Shift+Left",
       )}`}
       aria-label={t("labels.alignLeft")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
@@ -186,7 +194,10 @@ export const actionAlignRight = register({
         "CtrlOrCmd+Shift+Right",
       )}`}
       aria-label={t("labels.alignRight")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
@@ -215,7 +226,10 @@ export const actionAlignVerticallyCentered = register({
       onClick={() => updateData(null)}
       title={t("labels.centerVertically")}
       aria-label={t("labels.centerVertically")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
@@ -244,7 +258,10 @@ export const actionAlignHorizontallyCentered = register({
       onClick={() => updateData(null)}
       title={t("labels.centerHorizontally")}
       aria-label={t("labels.centerHorizontally")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });

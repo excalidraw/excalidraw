@@ -124,15 +124,13 @@ export const changeProperty = (
 };
 
 export const getFormValue = function <T extends Primitive>(
-  elements: readonly ExcalidrawElement[],
+  nonDeletedElements: readonly ExcalidrawElement[],
   appState: AppState,
   getAttribute: (element: ExcalidrawElement) => T,
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
   const editingElement = appState.editingElement;
-  const nonDeletedElements = getNonDeletedElements(elements);
-
   let ret: T | null = null;
 
   if (editingElement) {
@@ -267,7 +265,7 @@ export const actionChangeStrokeColor = register({
         : StoreAction.NONE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
+  PanelComponent: ({ app, elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       <ColorPicker
@@ -276,7 +274,7 @@ export const actionChangeStrokeColor = register({
         type="elementStroke"
         label={t("labels.stroke")}
         color={getFormValue(
-          elements,
+          app.scene.getNonDeletedElements(),
           appState,
           (element) => element.strokeColor,
           true,
@@ -313,7 +311,7 @@ export const actionChangeBackgroundColor = register({
         : StoreAction.NONE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, appProps }) => (
+  PanelComponent: ({ app, elements, appState, updateData, appProps }) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       <ColorPicker
@@ -322,7 +320,7 @@ export const actionChangeBackgroundColor = register({
         type="elementBackground"
         label={t("labels.background")}
         color={getFormValue(
-          elements,
+          app.scene.getNonDeletedElements(),
           appState,
           (element) => element.backgroundColor,
           true,
@@ -357,7 +355,7 @@ export const actionChangeFillStyle = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ app, elements, appState, updateData }) => {
     const selectedElements = getSelectedElements(elements, appState);
     const allElementsZigZag =
       selectedElements.length > 0 &&
@@ -392,7 +390,7 @@ export const actionChangeFillStyle = register({
             },
           ]}
           value={getFormValue(
-            elements,
+            app.scene.getNonDeletedElements(),
             appState,
             (element) => element.fillStyle,
             (element) => element.hasOwnProperty("fillStyle"),
@@ -430,7 +428,7 @@ export const actionChangeStrokeWidth = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
       <ButtonIconSelect
@@ -456,7 +454,7 @@ export const actionChangeStrokeWidth = register({
           },
         ]}
         value={getFormValue(
-          elements,
+          app.scene.getNonDeletedElements(),
           appState,
           (element) => element.strokeWidth,
           (element) => element.hasOwnProperty("strokeWidth"),
@@ -485,7 +483,7 @@ export const actionChangeSloppiness = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.sloppiness")}</legend>
       <ButtonIconSelect
@@ -508,7 +506,7 @@ export const actionChangeSloppiness = register({
           },
         ]}
         value={getFormValue(
-          elements,
+          app.scene.getNonDeletedElements(),
           appState,
           (element) => element.roughness,
           (element) => element.hasOwnProperty("roughness"),
@@ -536,7 +534,7 @@ export const actionChangeStrokeStyle = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeStyle")}</legend>
       <ButtonIconSelect
@@ -559,7 +557,7 @@ export const actionChangeStrokeStyle = register({
           },
         ]}
         value={getFormValue(
-          elements,
+          app.scene.getNonDeletedElements(),
           appState,
           (element) => element.strokeStyle,
           (element) => element.hasOwnProperty("strokeStyle"),
@@ -591,7 +589,7 @@ export const actionChangeOpacity = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, elements, appState, updateData }) => (
     <label className="control-label">
       {t("labels.opacity")}
       <input
@@ -602,7 +600,7 @@ export const actionChangeOpacity = register({
         onChange={(event) => updateData(+event.target.value)}
         value={
           getFormValue(
-            elements,
+            app.scene.getNonDeletedElements(),
             appState,
             (element) => element.opacity,
             true,
@@ -653,7 +651,7 @@ export const actionChangeFontSize = register({
           },
         ]}
         value={getFormValue(
-          elements,
+          app.scene.getNonDeletedElements(),
           appState,
           (element) => {
             if (isTextElement(element)) {
@@ -800,7 +798,7 @@ export const actionChangeFontFamily = register({
           group="font-family"
           options={options}
           value={getFormValue(
-            elements,
+            app.scene.getNonDeletedElements(),
             appState,
             (element) => {
               if (isTextElement(element)) {
@@ -895,7 +893,7 @@ export const actionChangeTextAlign = register({
             },
           ]}
           value={getFormValue(
-            elements,
+            app.scene.getNonDeletedElements(),
             appState,
             (element) => {
               if (isTextElement(element)) {
@@ -983,7 +981,7 @@ export const actionChangeVerticalAlign = register({
             },
           ]}
           value={getFormValue(
-            elements,
+            app.scene.getNonDeletedElements(),
             appState,
             (element) => {
               if (isTextElement(element) && element.containerId) {
@@ -1038,7 +1036,7 @@ export const actionChangeRoundness = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ app, elements, appState, updateData }) => {
     const targetElements = getTargetElements(
       getNonDeletedElements(elements),
       appState,
@@ -1066,7 +1064,7 @@ export const actionChangeRoundness = register({
             },
           ]}
           value={getFormValue(
-            elements,
+            app.scene.getNonDeletedElements(),
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
@@ -1190,8 +1188,9 @@ export const actionChangeArrowhead = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ app, elements, appState, updateData }) => {
     const isRTL = getLanguage().rtl;
+    const nonDeletedElements = app.scene.getNonDeletedElements();
 
     return (
       <fieldset>
@@ -1201,7 +1200,7 @@ export const actionChangeArrowhead = register({
             label="arrowhead_start"
             options={getArrowheadOptions(!isRTL)}
             value={getFormValue<Arrowhead | null>(
-              elements,
+              nonDeletedElements,
               appState,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)
@@ -1217,7 +1216,7 @@ export const actionChangeArrowhead = register({
             group="arrowheads"
             options={getArrowheadOptions(!!isRTL)}
             value={getFormValue<Arrowhead | null>(
-              elements,
+              nonDeletedElements,
               appState,
               (element) =>
                 isLinearElement(element) && canHaveArrowheads(element.type)

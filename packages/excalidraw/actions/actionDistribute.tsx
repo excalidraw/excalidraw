@@ -5,7 +5,6 @@ import {
 import { ToolButton } from "../components/ToolButton";
 import type { Distribution } from "../distribute";
 import { distributeElements } from "../distribute";
-import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
@@ -65,7 +64,7 @@ export const distributeHorizontally = register({
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ appState, updateData, app }) => (
     <ToolButton
       hidden={!enableActionGroup(appState, app)}
       type="button"
@@ -75,7 +74,10 @@ export const distributeHorizontally = register({
         "Alt+H",
       )}`}
       aria-label={t("labels.distributeHorizontally")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
@@ -96,7 +98,7 @@ export const distributeVertically = register({
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
-  PanelComponent: ({ elements, appState, updateData, app }) => (
+  PanelComponent: ({ appState, updateData, app }) => (
     <ToolButton
       hidden={!enableActionGroup(appState, app)}
       type="button"
@@ -104,7 +106,10 @@ export const distributeVertically = register({
       onClick={() => updateData(null)}
       title={`${t("labels.distributeVertically")} — ${getShortcutKey("Alt+V")}`}
       aria-label={t("labels.distributeVertically")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });
