@@ -5277,14 +5277,14 @@ class App extends React.Component<AppProps, AppState> {
     if (isBindingElementType(this.state.activeTool.type)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
-      const { draggingElement } = this.state;
+      const { draggingElement, activeTool, currentItemElbowArrow } = this.state;
       if (isBindingElement(draggingElement, false)) {
         this.maybeSuggestBindingsForLinearElementAtCoords(
           draggingElement,
           [scenePointer],
           this.state.startBoundElement,
         );
-      } else {
+      } else if (activeTool.type !== "arrow" || !currentItemElbowArrow) {
         this.maybeSuggestBindingAtCursor(scenePointer);
       }
     }
@@ -9204,7 +9204,8 @@ class App extends React.Component<AppProps, AppState> {
             linearElement,
             oppositeBindingBoundElement?.id,
             hoveredBindableElement,
-          )
+          ) &&
+          !isElbowArrow(linearElement)
         ) {
           acc.push(hoveredBindableElement);
         }
