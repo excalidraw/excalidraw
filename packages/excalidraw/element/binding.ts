@@ -70,7 +70,7 @@ export const isBindingEnabled = (appState: AppState): boolean => {
   return appState.isBindingEnabled;
 };
 
-const FIXED_BINDING_DISTANCE = 5;
+export const FIXED_BINDING_DISTANCE = 5;
 
 const getNonDeletedElements = (
   scene: Scene,

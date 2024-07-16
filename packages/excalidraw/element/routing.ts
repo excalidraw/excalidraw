@@ -20,13 +20,14 @@ import {
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType } from "../utils";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   getHoveredElementForBinding,
   avoidRectangularCorner,
-  maxBindingGap,
   snapToMid,
+  FIXED_BINDING_DISTANCE,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -199,17 +200,12 @@ export const mutateElbowArrow = (
         )
       : vectorToHeading(pointToVector(startGlobalPoint, endGlobalPoint)),
   ];
-  const bias = Math.max(
-    (startElement &&
-      maxBindingGap(startElement, startElement.width, startElement.height)) ??
-      0,
-    (endElement &&
-      maxBindingGap(endElement, endElement.width, endElement.height)) ??
-      0,
-  );
   const [startBounds, endBounds] = [
     startElement
-      ? aabbForElement(startElement, offsetFromHeading(startHeading, bias))
+      ? aabbForElement(
+          startElement,
+          offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 2),
+        )
       : ([
           // Start point
           startGlobalPoint[0] - 2,
@@ -218,7 +214,10 @@ export const mutateElbowArrow = (
           startGlobalPoint[1] + 2,
         ] as Bounds),
     endElement
-      ? aabbForElement(endElement, offsetFromHeading(endHeading, bias))
+      ? aabbForElement(
+          endElement,
+          offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 2),
+        )
       : ([
           // End point
           endGlobalPoint[0] - 2,
@@ -234,6 +233,10 @@ export const mutateElbowArrow = (
     common,
     !startElement && !endElement ? 0 : 20,
   );
+  startBounds && debugDrawBounds(startBounds, "red");
+  endBounds && debugDrawBounds(endBounds, "red");
+  debugDrawBounds(common, "cyan");
+  dynamicAABBs.forEach((aabb) => debugDrawBounds(aabb));
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -463,47 +466,64 @@ const generateDynamicAABBs = (
   common: Bounds,
   offset?: number,
 ): Bounds[] => {
+  const bump = 20;
   return [
     [
       a[0] > b[2]
-        ? (a[0] + b[2]) / 2
+        ? a[1] > b[3] || a[3] < b[1]
+          ? Math.min((a[0] + b[2]) / 2, a[0] - bump)
+          : (a[0] + b[2]) / 2
         : a[0] > b[0]
         ? a[0] - (offset ?? 0)
         : common[0] - (offset ?? 0),
       a[1] > b[3]
-        ? (a[1] + b[3]) / 2
+        ? a[0] > b[2] || a[2] < b[0] // DONE
+          ? Math.min((a[1] + b[3]) / 2, a[1] - bump)
+          : (a[1] + b[3]) / 2
         : a[1] > b[1]
         ? a[1] - (offset ?? 0)
         : common[1] - (offset ?? 0),
       a[2] < b[0]
-        ? (a[2] + b[0]) / 2
+        ? a[1] > b[3] || a[3] < b[1] // DONE
+          ? Math.max((a[2] + b[0]) / 2, a[2] + bump)
+          : (a[2] + b[0]) / 2
         : a[2] < b[2]
         ? a[2] + (offset ?? 0)
         : common[2] + (offset ?? 0),
       a[3] < b[1]
-        ? (a[3] + b[1]) / 2
+        ? a[0] > b[2] || a[2] < b[0] // DONE
+          ? Math.max((a[3] + b[1]) / 2, a[3] + bump)
+          : (a[3] + b[1]) / 2
         : a[3] < b[3]
         ? a[3] + (offset ?? 0)
         : common[3] + (offset ?? 0),
     ] as Bounds,
     [
       b[0] > a[2]
-        ? (b[0] + a[2]) / 2
+        ? b[1] > a[3] || b[3] < a[1] // DONE
+          ? Math.min((b[0] + a[2]) / 2, b[0] - bump)
+          : (b[0] + a[2]) / 2
         : b[0] > a[0]
         ? b[0] - (offset ?? 0)
         : common[0] - (offset ?? 0),
       b[1] > a[3]
-        ? (b[1] + a[3]) / 2
+        ? b[0] > a[2] || b[2] < a[0] // DONE
+          ? Math.min((b[1] + a[3]) / 2, b[1] - bump)
+          : (b[1] + a[3]) / 2
         : b[1] > a[1]
         ? b[1] - (offset ?? 0)
         : common[1] - (offset ?? 0),
       b[2] < a[0]
-        ? (b[2] + a[0]) / 2
+        ? b[1] > a[3] || b[3] < a[1]
+          ? Math.max((b[2] + a[0]) / 2, b[2] + bump)
+          : (b[2] + a[0]) / 2
         : b[2] < a[2]
         ? b[2] + (offset ?? 0)
         : common[2] + (offset ?? 0),
       b[3] < a[1]
-        ? (b[3] + a[1]) / 2
+        ? b[0] > a[2] || b[2] < a[0] // DONE
+          ? Math.max((b[3] + a[1]) / 2, b[3] + bump)
+          : (b[3] + a[1]) / 2
         : b[3] < a[3]
         ? b[3] + (offset ?? 0)
         : common[3] + (offset ?? 0),
