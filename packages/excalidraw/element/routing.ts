@@ -466,69 +466,99 @@ const generateDynamicAABBs = (
   common: Bounds,
   offset?: number,
 ): Bounds[] => {
-  const bump = 20;
-  return [
-    [
-      a[0] > b[2]
-        ? a[1] > b[3] || a[3] < b[1]
-          ? Math.min((a[0] + b[2]) / 2, a[0] - bump)
-          : (a[0] + b[2]) / 2
-        : a[0] > b[0]
-        ? a[0] - (offset ?? 0)
-        : common[0] - (offset ?? 0),
-      a[1] > b[3]
-        ? a[0] > b[2] || a[2] < b[0] // DONE
-          ? Math.min((a[1] + b[3]) / 2, a[1] - bump)
-          : (a[1] + b[3]) / 2
-        : a[1] > b[1]
-        ? a[1] - (offset ?? 0)
-        : common[1] - (offset ?? 0),
-      a[2] < b[0]
-        ? a[1] > b[3] || a[3] < b[1] // DONE
-          ? Math.max((a[2] + b[0]) / 2, a[2] + bump)
-          : (a[2] + b[0]) / 2
-        : a[2] < b[2]
-        ? a[2] + (offset ?? 0)
-        : common[2] + (offset ?? 0),
-      a[3] < b[1]
-        ? a[0] > b[2] || a[2] < b[0] // DONE
-          ? Math.max((a[3] + b[1]) / 2, a[3] + bump)
-          : (a[3] + b[1]) / 2
-        : a[3] < b[3]
-        ? a[3] + (offset ?? 0)
-        : common[3] + (offset ?? 0),
-    ] as Bounds,
-    [
-      b[0] > a[2]
-        ? b[1] > a[3] || b[3] < a[1] // DONE
-          ? Math.min((b[0] + a[2]) / 2, b[0] - bump)
-          : (b[0] + a[2]) / 2
-        : b[0] > a[0]
-        ? b[0] - (offset ?? 0)
-        : common[0] - (offset ?? 0),
-      b[1] > a[3]
-        ? b[0] > a[2] || b[2] < a[0] // DONE
-          ? Math.min((b[1] + a[3]) / 2, b[1] - bump)
-          : (b[1] + a[3]) / 2
-        : b[1] > a[1]
-        ? b[1] - (offset ?? 0)
-        : common[1] - (offset ?? 0),
-      b[2] < a[0]
-        ? b[1] > a[3] || b[3] < a[1]
-          ? Math.max((b[2] + a[0]) / 2, b[2] + bump)
-          : (b[2] + a[0]) / 2
-        : b[2] < a[2]
-        ? b[2] + (offset ?? 0)
-        : common[2] + (offset ?? 0),
-      b[3] < a[1]
-        ? b[0] > a[2] || b[2] < a[0] // DONE
-          ? Math.max((b[3] + a[1]) / 2, b[3] + bump)
-          : (b[3] + a[1]) / 2
-        : b[3] < a[3]
-        ? b[3] + (offset ?? 0)
-        : common[3] + (offset ?? 0),
-    ] as Bounds,
-  ];
+  const first = [
+    a[0] > b[2]
+      ? a[1] > b[3] || a[3] < b[1]
+        ? Math.min((a[0] + b[2]) / 2, a[0] - (offset ?? 0))
+        : (a[0] + b[2]) / 2
+      : a[0] > b[0]
+      ? a[0] - (offset ?? 0)
+      : common[0] - (offset ?? 0),
+    a[1] > b[3]
+      ? a[0] > b[2] || a[2] < b[0]
+        ? Math.min((a[1] + b[3]) / 2, a[1] - (offset ?? 0))
+        : (a[1] + b[3]) / 2
+      : a[1] > b[1]
+      ? a[1] - (offset ?? 0)
+      : common[1] - (offset ?? 0),
+    a[2] < b[0]
+      ? a[1] > b[3] || a[3] < b[1]
+        ? Math.max((a[2] + b[0]) / 2, a[2] + (offset ?? 0))
+        : (a[2] + b[0]) / 2
+      : a[2] < b[2]
+      ? a[2] + (offset ?? 0)
+      : common[2] + (offset ?? 0),
+    a[3] < b[1]
+      ? a[0] > b[2] || a[2] < b[0]
+        ? Math.max((a[3] + b[1]) / 2, a[3] + (offset ?? 0))
+        : (a[3] + b[1]) / 2
+      : a[3] < b[3]
+      ? a[3] + (offset ?? 0)
+      : common[3] + (offset ?? 0),
+  ] as Bounds;
+  const second = [
+    b[0] > a[2]
+      ? b[1] > a[3] || b[3] < a[1]
+        ? Math.min((b[0] + a[2]) / 2, b[0] - (offset ?? 0))
+        : (b[0] + a[2]) / 2
+      : b[0] > a[0]
+      ? b[0] - (offset ?? 0)
+      : common[0] - (offset ?? 0),
+    b[1] > a[3]
+      ? b[0] > a[2] || b[2] < a[0]
+        ? Math.min((b[1] + a[3]) / 2, b[1] - (offset ?? 0))
+        : (b[1] + a[3]) / 2
+      : b[1] > a[1]
+      ? b[1] - (offset ?? 0)
+      : common[1] - (offset ?? 0),
+    b[2] < a[0]
+      ? b[1] > a[3] || b[3] < a[1]
+        ? Math.max((b[2] + a[0]) / 2, b[2] + (offset ?? 0))
+        : (b[2] + a[0]) / 2
+      : b[2] < a[2]
+      ? b[2] + (offset ?? 0)
+      : common[2] + (offset ?? 0),
+    b[3] < a[1]
+      ? b[0] > a[2] || b[2] < a[0]
+        ? Math.max((b[3] + a[1]) / 2, b[3] + (offset ?? 0))
+        : (b[3] + a[1]) / 2
+      : b[3] < a[3]
+      ? b[3] + (offset ?? 0)
+      : common[3] + (offset ?? 0),
+  ] as Bounds;
+
+  const c = commonAABB([first, second]);
+
+  if (
+    first[2] - first[0] + second[2] - second[0] > c[2] - c[0] + 0.00000000001 &&
+    first[3] - first[1] + second[3] - second[1] > c[3] - c[1] + 0.00000000001
+  ) {
+    const offsetX = Math.min(
+      offset ?? 0,
+      (first[2] - first[0] + (second[2] - second[0]) - (c[2] - c[0])) / 2,
+    );
+    const offsetY = Math.min(
+      offset ?? 0,
+      (first[3] - first[1] + (second[3] - second[1]) - (c[3] - c[1])) / 2,
+    );
+
+    return [
+      [
+        first[0] + (offsetX === (offset ?? 0) ? 0 : offsetX),
+        first[1] + (offsetY === (offset ?? 0) ? 0 : offsetY),
+        first[2] - (offsetX === (offset ?? 0) ? 0 : offsetX),
+        first[3] - (offsetY === (offset ?? 0) ? 0 : offsetY),
+      ],
+      [
+        second[0] + (offsetX === (offset ?? 0) ? 0 : offsetX),
+        second[1] + (offsetY === (offset ?? 0) ? 0 : offsetY),
+        second[2] - (offsetX === (offset ?? 0) ? 0 : offsetX),
+        second[3] - (offsetY === (offset ?? 0) ? 0 : offsetY),
+      ],
+    ];
+  }
+
+  return [first, second];
 };
 
 /**
