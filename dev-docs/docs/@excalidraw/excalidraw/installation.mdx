@@ -34,6 +34,26 @@ Copy these folders to your static assets directory, and add a `window.EXCALIDRAW
 window.EXCALIDRAW_ASSET_PATH = "/";
 ```
 
+or, if you serve your assets from the root of your CDN, you would do:
+
+```js
+// Vanilla
+<head>
+    <script>
+        window.EXCALIDRAW_ASSET_PATH = "https://my.cdn.com/assets/";
+    </script>    
+</head>
+```
+
+or, if you prefer the path to be dynamicly set based on the `location.origin`, you could do the following:
+
+```jsx
+// Next.js
+<Script id="load-env-variables" strategy="beforeInteractive" >
+    { `window["EXCALIDRAW_ASSET_PATH"] = location.origin;` } // or use just "/"!
+</Script>
+```
+
 ### Dimensions of Excalidraw
 
 Excalidraw takes _100%_ of `width` and `height` of the containing block so make sure the container in which you render Excalidraw has non zero dimensions.
