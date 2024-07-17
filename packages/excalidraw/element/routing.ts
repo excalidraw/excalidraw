@@ -18,22 +18,27 @@ import {
   vectorToHeading,
 } from "../math";
 import { getSizeFromPoints } from "../points";
+import { getElementAtPosition } from "../scene/comparisons";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { toBrandedType } from "../utils";
+import { toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
-  getHoveredElementForBinding,
   avoidRectangularCorner,
   snapToMid,
   FIXED_BINDING_DISTANCE,
+  bindingBorderTest,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
-import type { NonDeletedSceneElementsMap } from "./types";
+import type {
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "./types";
 import {
   type ElementsMap,
   type ExcalidrawArrowElement,
@@ -109,18 +114,10 @@ export const mutateElbowArrow = (
   ];
   const [startElement, endElement] = [
     options?.isDragging
-      ? getHoveredElementForBinding(
-          { x: startGlobalPoint[0], y: startGlobalPoint[1] },
-          elements,
-          elementsMap,
-        )
+      ? getHoveredElement(startGlobalPoint, elements, elementsMap)
       : origStartElement,
     options?.isDragging
-      ? getHoveredElementForBinding(
-          { x: endGlobalPoint[0], y: endGlobalPoint[1] },
-          elements,
-          elementsMap,
-        )
+      ? getHoveredElement(endGlobalPoint, elements, elementsMap)
       : origEndElement,
   ];
   if (options?.isDragging) {
@@ -1135,4 +1132,20 @@ export const getArrowLocalFixedPoints = (
     LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
     LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
   ];
+};
+
+const getHoveredElement = (
+  p: Point,
+  elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: NonDeletedSceneElementsMap,
+) => {
+  const hoveredElement = getElementAtPosition(
+    elements,
+    (element) =>
+      isBindableElement(element, false) &&
+      (bindingBorderTest(element, tupleToCoors(p), elementsMap) ||
+        pointInsideBounds(p, aabbForElement(element))),
+  );
+
+  return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
