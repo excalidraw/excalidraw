@@ -17,10 +17,10 @@ import {
   translatePoint,
   vectorToHeading,
 } from "../math";
+import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType } from "../utils";
-import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -233,10 +233,6 @@ export const mutateElbowArrow = (
     common,
     !startElement && !endElement ? 0 : 20,
   );
-  startBounds && debugDrawBounds(startBounds, "red");
-  endBounds && debugDrawBounds(endBounds, "red");
-  debugDrawBounds(common, "cyan");
-  dynamicAABBs.forEach((aabb) => debugDrawBounds(aabb));
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -1036,28 +1032,22 @@ const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
 const normalizedArrowElementUpdate = (
-  points: Point[],
+  global: Point[],
   externalOffsetX?: number,
   externalOffsetY?: number,
 ) => {
-  const offsetX = points[0][0];
-  const offsetY = points[0][1];
-  const [farthestX, farthestY] = points.reduce(
-    (farthest, point) => [
-      farthest[0] < point[0] ? point[0] : farthest[0],
-      farthest[1] < point[1] ? point[1] : farthest[1],
-    ],
-    points[0],
+  const offsetX = global[0][0];
+  const offsetY = global[0][1];
+
+  const points = global.map(
+    (point, _idx) => [point[0] - offsetX, point[1] - offsetY] as const,
   );
 
   return {
-    points: points.map((point, _idx) => {
-      return [point[0] - offsetX, point[1] - offsetY] as const;
-    }),
+    points,
     x: offsetX + (externalOffsetX ?? 0),
     y: offsetY + (externalOffsetY ?? 0),
-    width: farthestX - offsetX + (externalOffsetX ?? 0),
-    height: farthestY - offsetY + (externalOffsetY ?? 0),
+    ...getSizeFromPoints(points),
   };
 };
 
