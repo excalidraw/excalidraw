@@ -1,4 +1,3 @@
-import { ENV } from "../constants";
 import { stringToBase64, toByteString } from "../data/encode";
 
 export interface Font {
@@ -7,24 +6,31 @@ export interface Font {
   getContent(): Promise<string>;
 }
 
-const BASE_URL = `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-  import.meta.env.PKG_VERSION
-}/dist/prod/`;
-
 export class ExcalidrawFont implements Font {
   public readonly url: URL;
   public readonly fontFace: FontFace;
 
   constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
-    // base urls will be applied for relative `uri`'s only
-    this.url = new URL(
-      // absolute paths won't work with baseurl in tests, so we are stripping it away
-      import.meta.env.MODE === ENV.TEST && uri.startsWith("/")
-        ? uri.slice(1)
-        : uri,
-      window.EXCALIDRAW_ASSET_PATH ?? BASE_URL,
-    );
+    // absolute assets paths, which are found in tests and excalidraw-app build, won't work with base url, so we are stripping initial slash away
+    const assetUrl: string = uri.replace(/^\/+/, "");
+    let baseUrl: string | undefined = undefined;
 
+    // fallback to origin to form a valid URL in case of a passed relative assetUrl
+    let baseUrlBuilder =
+      window.EXCALIDRAW_ASSET_PATH || window?.location?.origin;
+
+    // in case user passed a root-relative url (~absolute path), like "/" or "/some/path"; we prepend it with `location.origin`
+    if (baseUrlBuilder.startsWith("/")) {
+      baseUrlBuilder = new URL(
+        baseUrlBuilder.replace(/^\/+/, ""),
+        window?.location?.origin,
+      ).toString();
+    }
+
+    // ensure there is a trailing slash, otherwise url won't be correctly concatinated
+    baseUrl = `${baseUrlBuilder.replace(/\/+$/, "")}/`;
+
+    this.url = new URL(assetUrl, baseUrl);
     this.fontFace = new FontFace(family, `url(${this.url})`, {
       display: "swap",
       style: "normal",
