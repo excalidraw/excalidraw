@@ -114,6 +114,10 @@
       ) {
         window.location.href = "https://app.excalidraw.com";
       }
+
+      // point into our CDN in prod
+      window.EXCALIDRAW_ASSET_PATH =
+        "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
     </script>
     <% } %>
 
@@ -199,8 +203,6 @@
     <script>
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
-      // set assets env variable
-      window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
 
     <!-- FIXME: remove this when we update CRA (fix SW caching) -->
