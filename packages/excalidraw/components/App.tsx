@@ -5362,13 +5362,22 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isElbowArrow(multiElement)) {
-          mutateElbowArrow(multiElement as ExcalidrawArrowElement, this.scene, [
-            ...points.slice(0, -1),
+          mutateElbowArrow(
+            multiElement as ExcalidrawArrowElement,
+            this.scene,
             [
-              lastCommittedX + dxFromLastCommitted,
-              lastCommittedY + dyFromLastCommitted,
+              ...points.slice(0, -1),
+              [
+                lastCommittedX + dxFromLastCommitted,
+                lastCommittedY + dyFromLastCommitted,
+              ],
             ],
-          ]);
+            undefined,
+            undefined,
+            {
+              isDragging: true,
+            },
+          );
         } else {
           // update last uncommitted point
           mutateElement(multiElement, {
