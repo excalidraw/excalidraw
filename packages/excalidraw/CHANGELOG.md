@@ -49,8 +49,6 @@ Please add the latest change on the top under the correct section.
 
 - `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
-- `window.EXCALIDRAW_ASSET_PATH` now needs to be defined before any `@excalidraw/excalidraw` import. It also expects a valid url as defined by the [`URL.base` parameter](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL#base) (e.g. `"/"` isn't valid, but `"https://domain.com/"` or `window.origin` are valid). [#8012](https://github.com/excalidraw/excalidraw/pull/8012)
-
 - `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties.
 
 - Create an `ESM` build for `@excalidraw/excalidraw`. The API is in progress and subject to change before stable release. There are some changes on how the package will be consumed

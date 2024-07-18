@@ -36,13 +36,31 @@ export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
   // a static member to reduce memory footprint
   private static readonly loadedFontsCache = new Set<string>();
-  public static readonly registered = Fonts.init();
 
-  private readonly scene: Scene;
+  private static _registered:
+    | Map<
+        number,
+        {
+          metadata: FontMetadata;
+          fontFaces: Font[];
+        }
+      >
+    | undefined;
+
+  public static get registered() {
+    if (!Fonts._registered) {
+      // lazy load the fonts
+      Fonts._registered = Fonts.init();
+    }
+
+    return Fonts._registered;
+  }
 
   public get registered() {
     return Fonts.registered;
   }
+
+  private readonly scene: Scene;
 
   public get sceneFamilies() {
     return Array.from(
@@ -147,35 +165,6 @@ export class Fonts {
   };
 
   /**
-   * Register a new font.
-   *
-   * @param family font family
-   * @param metadata font metadata
-   * @param params array of the rest of the FontFace parameters [uri: string, descriptors: FontFaceDescriptors?] ,
-   */
-  public static register(
-    family: string,
-    metadata: FontMetadata,
-    ...params: Array<{ uri: string; descriptors?: FontFaceDescriptors }>
-  ) {
-    // TODO: likely we will need to abandon number "id" in order to support custom fonts
-    const familyId = FONT_FAMILY[family as keyof typeof FONT_FAMILY];
-    const registeredFamily = this.registered.get(familyId);
-
-    if (!registeredFamily) {
-      this.registered.set(familyId, {
-        metadata,
-        fontFaces: params.map(
-          ({ uri, descriptors }) =>
-            new ExcalidrawFont(family, uri, descriptors),
-        ),
-      });
-    }
-
-    return this.registered;
-  }
-
-  /**
    * WARN: should be called just once on init, even across multiple instances.
    */
   private static init() {
@@ -186,44 +175,48 @@ export class Fonts {
       >(),
     };
 
-    const register = Fonts.register.bind(fonts);
+    const _register = register.bind(fonts);
 
-    register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
+    _register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
       uri: Virgil,
     });
 
-    register("Excalifont", FONT_METADATA[FONT_FAMILY.Excalifont], {
+    _register("Excalifont", FONT_METADATA[FONT_FAMILY.Excalifont], {
       uri: Excalifont,
     });
 
     // keeping for backwards compatibility reasons, uses system font (Helvetica on MacOS, Arial on Win)
-    register("Helvetica", FONT_METADATA[FONT_FAMILY.Helvetica], {
+    _register("Helvetica", FONT_METADATA[FONT_FAMILY.Helvetica], {
       uri: LOCAL_FONT_PROTOCOL,
     });
 
     // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept for consistency)
-    register("Liberation Sans", FONT_METADATA[FONT_FAMILY["Liberation Sans"]], {
-      uri: LiberationSans,
-    });
+    _register(
+      "Liberation Sans",
+      FONT_METADATA[FONT_FAMILY["Liberation Sans"]],
+      {
+        uri: LiberationSans,
+      },
+    );
 
     // used for frame labels on export
-    register("Assistant", FONT_METADATA[FONT_FAMILY.Assistant], {
+    _register("Assistant", FONT_METADATA[FONT_FAMILY.Assistant], {
       uri: Assistant,
     });
 
-    register("Cascadia", FONT_METADATA[FONT_FAMILY.Cascadia], {
+    _register("Cascadia", FONT_METADATA[FONT_FAMILY.Cascadia], {
       uri: Cascadia,
     });
 
-    register("Geist", FONT_METADATA[FONT_FAMILY.Geist], {
+    _register("Geist", FONT_METADATA[FONT_FAMILY.Geist], {
       uri: Geist,
     });
 
-    register("Comic Shanns", FONT_METADATA[FONT_FAMILY["Comic Shanns"]], {
+    _register("Comic Shanns", FONT_METADATA[FONT_FAMILY["Comic Shanns"]], {
       uri: ComicShanns,
     });
 
-    register(
+    _register(
       "Bangers",
       FONT_METADATA[FONT_FAMILY.Bangers],
       {
@@ -234,7 +227,7 @@ export class Fonts {
       { uri: BangersLatin, descriptors: { unicodeRange: RANGES.LATIN } },
     );
 
-    register(
+    _register(
       "Nunito",
       FONT_METADATA[FONT_FAMILY.Nunito],
       {
@@ -252,6 +245,42 @@ export class Fonts {
 
     return fonts.registered;
   }
+}
+
+/**
+ * Register a new font.
+ *
+ * @param family font family
+ * @param metadata font metadata
+ * @param params array of the rest of the FontFace parameters [uri: string, descriptors: FontFaceDescriptors?] ,
+ */
+function register(
+  this:
+    | Fonts
+    | {
+        registered: Map<
+          ValueOf<typeof FONT_FAMILY>,
+          { metadata: FontMetadata; fontFaces: Font[] }
+        >;
+      },
+  family: string,
+  metadata: FontMetadata,
+  ...params: Array<{ uri: string; descriptors?: FontFaceDescriptors }>
+) {
+  // TODO: likely we will need to abandon number "id" in order to support custom fonts
+  const familyId = FONT_FAMILY[family as keyof typeof FONT_FAMILY];
+  const registeredFamily = this.registered.get(familyId);
+
+  if (!registeredFamily) {
+    this.registered.set(familyId, {
+      metadata,
+      fontFaces: params.map(
+        ({ uri, descriptors }) => new ExcalidrawFont(family, uri, descriptors),
+      ),
+    });
+  }
+
+  return this.registered;
 }
 
 /**
