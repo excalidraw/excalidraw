@@ -44,6 +44,7 @@ import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
 import { LOCAL_FONT_PROTOCOL } from "../fonts/metadata";
+import { UNPKG_PROD_URL } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -397,8 +398,8 @@ export const exportToSvg = async (
                   const content = await font.getContent();
 
                   return `@font-face {
-            font-family: ${font.fontFace.family};
-            src: url(${content});
+        font-family: ${font.fontFace.family};
+        src: url(${content});
           }`;
                 } catch (e) {
                   console.error(
@@ -412,11 +413,21 @@ export const exportToSvg = async (
         }),
       );
 
+  // TODO: remove Assistant https-based import once we perform glyphs subsetting and include it as dataurl
+
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
     <style class="style-fonts">
+      @font-face {
+        font-family: "Assistant";
+        src: url(${
+          import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE
+            ? `${UNPKG_PROD_URL}/Assistant-Regular-PLF2XOGW.woff2`
+            : `https://excalidraw.com/Assistant-Regular.woff2`
+        });
+      }
       ${fontFaces.flat().filter(Boolean).join("\n")}
     </style>
     ${exportingFrameClipPath}

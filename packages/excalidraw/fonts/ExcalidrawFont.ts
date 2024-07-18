@@ -5,9 +5,9 @@ export interface Font {
   fontFace: FontFace;
   getContent(): Promise<string>;
 }
-const UNPKG_URL = `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-  import.meta.env.PKG_VERSION
-}/dist/prod/`;
+export const UNPKG_PROD_URL = `https://unpkg.com/${
+  import.meta.env.VITE_PKG_NAME
+}@${import.meta.env.PKG_VERSION}/dist/prod/`;
 
 export class ExcalidrawFont implements Font {
   public readonly url: URL;
@@ -19,7 +19,7 @@ export class ExcalidrawFont implements Font {
     let baseUrl: string | undefined = undefined;
 
     // fallback to unpkg to form a valid URL in case of a passed relative assetUrl
-    let baseUrlBuilder = window.EXCALIDRAW_ASSET_PATH || UNPKG_URL;
+    let baseUrlBuilder = window.EXCALIDRAW_ASSET_PATH || UNPKG_PROD_URL;
 
     // in case user passed a root-relative url (~absolute path), like "/" or "/some/path"; we prepend it with `location.origin`
     if (baseUrlBuilder.startsWith("/")) {
