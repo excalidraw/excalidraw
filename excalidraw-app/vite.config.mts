@@ -73,16 +73,26 @@ export default defineConfig({
 
       workbox: {
         // Don't push fonts and locales to app precache
-        globIgnores: ["**/locales/**", "service-worker.js"],
+        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js"],
         runtimeCaching: [
           {
-            urlPattern: /.+\.woff2/,
+            urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
             handler: "CacheFirst",
             options: {
               cacheName: "fonts",
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp("fonts.css"),
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "fonts",
+              expiration: {
+                maxEntries: 50,
               },
             },
           },

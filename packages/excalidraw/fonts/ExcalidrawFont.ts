@@ -5,6 +5,9 @@ export interface Font {
   fontFace: FontFace;
   getContent(): Promise<string>;
 }
+const UNPKG_URL = `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
+  import.meta.env.PKG_VERSION
+}/dist/prod/`;
 
 export class ExcalidrawFont implements Font {
   public readonly url: URL;
@@ -15,9 +18,8 @@ export class ExcalidrawFont implements Font {
     const assetUrl: string = uri.replace(/^\/+/, "");
     let baseUrl: string | undefined = undefined;
 
-    // fallback to origin to form a valid URL in case of a passed relative assetUrl
-    let baseUrlBuilder =
-      window.EXCALIDRAW_ASSET_PATH || window?.location?.origin;
+    // fallback to unpkg to form a valid URL in case of a passed relative assetUrl
+    let baseUrlBuilder = window.EXCALIDRAW_ASSET_PATH || UNPKG_URL;
 
     // in case user passed a root-relative url (~absolute path), like "/" or "/some/path"; we prepend it with `location.origin`
     if (baseUrlBuilder.startsWith("/")) {
@@ -27,7 +29,7 @@ export class ExcalidrawFont implements Font {
       ).toString();
     }
 
-    // ensure there is a trailing slash, otherwise url won't be correctly concatinated
+    // ensure there is a trailing slash, otherwise url won't be correctly concatenated
     baseUrl = `${baseUrlBuilder.replace(/\/+$/, "")}/`;
 
     this.url = new URL(assetUrl, baseUrl);

@@ -119,6 +119,10 @@
       window.EXCALIDRAW_ASSET_PATH =
         "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
     </script>
+    <% } else { %>
+      <script>
+        window.EXCALIDRAW_ASSET_PATH = window.origin;
+      </script>
     <% } %>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -145,39 +149,7 @@
     />
 
     <!-- Register Assistant as the UI font, before the scene inits -->
-    <style>
-      @font-face {
-        font-family: "Assistant";
-        src: url(/Assistant-Regular.woff2) format("woff2");
-        font-weight: 400;
-        style: normal;
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "Assistant";
-        src: url(/Assistant-Medium.woff2) format("woff2");
-        font-weight: 500;
-        style: normal;
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "Assistant";
-        src: url(/Assistant-SemiBold.woff2) format("woff2");
-        font-weight: 600;
-        style: normal;
-        display: swap;
-      }
-
-      @font-face {
-        font-family: "Assistant";
-        src: url(/Assistant-Bold.woff2) format("woff2");
-        font-weight: 700;
-        style: normal;
-        display: swap;
-      }
-    </style>
+    <link rel="stylesheet" href="../packages/excalidraw/fonts/assets/fonts.css" type="text/css" />
 
     <!-- Warmup the connection for Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
