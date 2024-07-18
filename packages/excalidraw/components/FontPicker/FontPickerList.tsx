@@ -219,6 +219,26 @@ export const FontPickerList = React.memo(
       </DropdownMenuItem>
     );
 
+    const groups = [];
+
+    if (sceneFilteredFonts.length) {
+      groups.push(
+        <DropdownMenuGroup title={t("fontList.sceneFonts")} key="group_1">
+          {sceneFilteredFonts.map(renderFont)}
+        </DropdownMenuGroup>,
+      );
+    }
+
+    if (availableFilteredFonts.length) {
+      groups.push(
+        <DropdownMenuGroup title={t("fontList.availableFonts")} key="group_2">
+          {availableFilteredFonts.map((font, index) =>
+            renderFont(font, index + sceneFilteredFonts.length),
+          )}
+        </DropdownMenuGroup>,
+      );
+    }
+
     return (
       <PropertiesPopover
         className="properties-content"
@@ -237,21 +257,7 @@ export const FontPickerList = React.memo(
           className="dropdown-menu fonts manual-hover"
           placeholder={t("fontList.empty")}
         >
-          {!!sceneFilteredFonts.length && (
-            <DropdownMenuGroup title={t("fontList.sceneFonts")} key="group_1">
-              {sceneFilteredFonts.map(renderFont)}
-            </DropdownMenuGroup>
-          )}
-          {!!availableFilteredFonts.length && (
-            <DropdownMenuGroup
-              title={t("fontList.availableFonts")}
-              key="group_2"
-            >
-              {availableFilteredFonts.map((font, index) =>
-                renderFont(font, index + sceneFilteredFonts.length),
-              )}
-            </DropdownMenuGroup>
-          )}
+          {groups.length ? groups : null}
         </ScrollableList>
       </PropertiesPopover>
     );
