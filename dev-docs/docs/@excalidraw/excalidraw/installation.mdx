@@ -28,26 +28,10 @@ By default these assets are loaded from a public CDN [`https://unpkg.com/@excali
 
 However, if you want to host these files yourself, you can find them in your `node_modules/@excalidraw/excalidraw/dist` directory, in folders `excalidraw-assets` (for production) and `excalidraw-assets-dev` (for development).
 
-**Copy** these folders to your static assets directory, and add a `window.EXCALIDRAW_ASSET_PATH` variable in your `index.html`, before any `@excalidraw/excalidraw` import.
-
-For example, if you serve your assets from the root of your CDN, you would do:
+Copy these folders to your static assets directory, and add a `window.EXCALIDRAW_ASSET_PATH` variable in your `index.html` or `index.js` entry file pointing to your public assets path (relative). For example, if you serve your assets from the root of your hostname, you would do:
 
 ```js
-// Vanilla
-<head>
-    <script>
-        window.EXCALIDRAW_ASSET_PATH = "https://my.cdn.com/assets/";
-    </script>    
-</head>
-```
-
-or if you prefer the path to be dynamicly set based on the `window.origin`, you could do the following:
-
-```jsx
-// Next.js
-<Script id="load-env-variables" strategy="beforeInteractive" >
-    { `window["EXCALIDRAW_ASSET_PATH"] = window.origin;` }
-</Script>
+window.EXCALIDRAW_ASSET_PATH = "/";
 ```
 
 ### Dimensions of Excalidraw
