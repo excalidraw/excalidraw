@@ -22,6 +22,7 @@ import { getElementAtPosition } from "../scene/comparisons";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -197,12 +198,35 @@ export const mutateElbowArrow = (
         )
       : vectorToHeading(pointToVector(startGlobalPoint, endGlobalPoint)),
   ];
-  const [startBounds, endBounds] = [
+  // const [startBounds, endBounds] = [
+  //   startElement
+  //     ? aabbForElement(
+  //         startElement,
+  //         offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 2),
+  //       )
+  //     : ([
+  //         // Start point
+  //         startGlobalPoint[0] - 2,
+  //         startGlobalPoint[1] - 2,
+  //         startGlobalPoint[0] + 2,
+  //         startGlobalPoint[1] + 2,
+  //       ] as Bounds),
+  //   endElement
+  //     ? aabbForElement(
+  //         endElement,
+  //         offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 2),
+  //       )
+  //     : ([
+  //         // End point
+  //         endGlobalPoint[0] - 2,
+  //         endGlobalPoint[1] - 2,
+  //         endGlobalPoint[0] + 2,
+  //         endGlobalPoint[1] + 2,
+  //       ] as Bounds),
+  // ];
+  const [startZeroBounds, endZeroBounds] = [
     startElement
-      ? aabbForElement(
-          startElement,
-          offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 2),
-        )
+      ? aabbForElement(startElement)
       : ([
           // Start point
           startGlobalPoint[0] - 2,
@@ -211,10 +235,7 @@ export const mutateElbowArrow = (
           startGlobalPoint[1] + 2,
         ] as Bounds),
     endElement
-      ? aabbForElement(
-          endElement,
-          offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 2),
-        )
+      ? aabbForElement(endElement)
       : ([
           // End point
           endGlobalPoint[0] - 2,
@@ -223,12 +244,12 @@ export const mutateElbowArrow = (
           endGlobalPoint[1] + 2,
         ] as Bounds),
   ];
-  const common = commonAABB([startBounds, endBounds]);
+  const common = commonAABB([startZeroBounds, endZeroBounds]);
   const dynamicAABBs = generateDynamicAABBs(
-    startBounds,
-    endBounds,
+    startZeroBounds,
+    endZeroBounds,
     common,
-    !startElement && !endElement ? 0 : 20,
+    !startElement && !endElement ? 0 : 40,
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
