@@ -38,7 +38,8 @@ export interface MermaidToExcalidrawLibProps {
   api: Promise<{
     parseMermaidToExcalidraw: (
       definition: string,
-      options: MermaidOptions,
+      options: MermaidOptions, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
+      //config?: MermaidConfig, //zsviczian
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
 }
@@ -80,12 +81,13 @@ export const convertMermaidToExcalidraw = async ({
     try {
       ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
         fontSize: DEFAULT_FONT_SIZE,
-      });
+      }); //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
+      //ret = await api.parseMermaidToExcalidraw(mermaidDefinition); //zsviczian
     } catch (err: any) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
         {
-          fontSize: DEFAULT_FONT_SIZE,
+          fontSize: DEFAULT_FONT_SIZE, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226 
         },
       );
     }
