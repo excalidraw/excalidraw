@@ -129,8 +129,8 @@ export const FONT_FAMILY = {
   Assistant: 4,
   Excalifont: 5,
   Nunito: 6,
-  Bangers: 7,
-  Geist: 8,
+  Geist: 7,
+  "Lilita One": 8,
   "Comic Shanns": 9,
   "Liberation Sans": 10,
 };

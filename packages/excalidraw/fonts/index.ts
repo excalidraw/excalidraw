@@ -22,9 +22,8 @@ import Geist from "./assets/GeistMono-Regular.woff2";
 import ComicShanns from "./assets/ComicShanns-Regular.woff2";
 import LiberationSans from "./assets/LiberationSans-Regular.woff2";
 
-import BangersLatin from "https://fonts.gstatic.com/s/bangers/v24/FeVQS0BTqb0h60ACH55Q2J5hm24.woff2";
-import BangersLatinExt from "https://fonts.gstatic.com/s/bangers/v24/FeVQS0BTqb0h60ACH5BQ2J5hm25mww.woff2";
-import BangersVietnamese from "https://fonts.gstatic.com/s/bangers/v24/FeVQS0BTqb0h60ACH5FQ2J5hm25mww.woff2";
+import LilitaLatin from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2";
+import LilitaLatinExt from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2";
 
 import NunitoLatin from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTQ3j6zbXWjgeg.woff2";
 import NunitoLatinExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTo3j6zbXWjgevT5.woff2";
@@ -217,14 +216,10 @@ export class Fonts {
     });
 
     _register(
-      "Bangers",
-      FONT_METADATA[FONT_FAMILY.Bangers],
-      {
-        uri: BangersVietnamese,
-        descriptors: { unicodeRange: RANGES.VIETNAMESE },
-      },
-      { uri: BangersLatinExt, descriptors: { unicodeRange: RANGES.LATIN_EXT } },
-      { uri: BangersLatin, descriptors: { unicodeRange: RANGES.LATIN } },
+      "Lilita One",
+      FONT_METADATA[FONT_FAMILY["Lilita One"]],
+      { uri: LilitaLatinExt, descriptors: { unicodeRange: RANGES.LATIN_EXT } },
+      { uri: LilitaLatin, descriptors: { unicodeRange: RANGES.LATIN } },
     );
 
     _register(
