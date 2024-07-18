@@ -1368,7 +1368,7 @@ describe("textWysiwyg", () => {
       ).toEqual(FONT_FAMILY.Nunito);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
-      ).toEqual(1.25);
+      ).toEqual(1.35);
     });
 
     describe("should align correctly", () => {

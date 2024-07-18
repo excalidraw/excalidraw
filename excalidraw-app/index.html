@@ -120,9 +120,9 @@
         "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
     </script>
     <% } else { %>
-      <script>
-        window.EXCALIDRAW_ASSET_PATH = window.origin;
-      </script>
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
     <% } %>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -149,7 +149,11 @@
     />
 
     <!-- Register Assistant as the UI font, before the scene inits -->
-    <link rel="stylesheet" href="../packages/excalidraw/fonts/assets/fonts.css" type="text/css" />
+    <link
+      rel="stylesheet"
+      href="../packages/excalidraw/fonts/assets/fonts.css"
+      type="text/css"
+    />
 
     <!-- Warmup the connection for Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
