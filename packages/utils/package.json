@@ -49,7 +49,7 @@
     "sass-loader": "13.0.2",
     "ts-loader": "9.3.1",
     "webpack": "5.76.0",
-    "webpack-bundle-analyzer": "4.5.0",
+    "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "4.10.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",

@@ -18,7 +18,7 @@
     "posthog-js": "1.116.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "socket.io-client": "4.7.2"
+    "socket.io-client": "4.7.5"
   },
   "devDependencies": {
     "@excalidraw/eslint-config": "1.0.3",
@@ -39,7 +39,7 @@
     "eslint-plugin-prettier": "3.3.1",
     "http-server": "14.1.1",
     "husky": "7.0.4",
-    "jsdom": "22.1.0",
+    "jsdom": "24.1.0",
     "lint-staged": "12.3.7",
     "pepjs": "0.5.3",
     "prettier": "2.6.2",
@@ -90,6 +90,7 @@
   },
   "resolutions": {
     "@babel/traverse": ">=7.23.2",
-    "node-fetch": "2.6.7"
+    "node-fetch": "2.6.7",
+    "ws": "8.17.1"
   }
 }
