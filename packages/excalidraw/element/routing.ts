@@ -235,6 +235,8 @@ export const mutateElbowArrow = (
     startBounds,
     endBounds,
     common,
+    startGlobalPoint,
+    endGlobalPoint,
     offsetFromHeading(
       startHeading,
       !startElement && !endElement ? 0 : 40 - FIXED_BINDING_DISTANCE * 4,
@@ -479,6 +481,8 @@ const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
   common: Bounds,
+  startGlobalPoint: Point,
+  endGlobalPoint: Point,
   startDifference?: [number, number, number, number],
   endDifference?: [number, number, number, number],
 ): Bounds[] => {
@@ -486,6 +490,24 @@ const generateDynamicAABBs = (
     0, 0, 0, 0,
   ];
   const [endUp, endRight, endDown, endLeft] = endDifference ?? [0, 0, 0, 0];
+
+  if (aabbsOverlapping(a, b)) {
+    return [
+      [
+        a[0] - (common[0] === a[0] ? 40 : 0),
+        a[1] - (common[1] === a[1] ? 40 : 0),
+        a[2] + (common[2] === a[2] ? 40 : 0),
+        a[3] + (common[3] === a[3] ? 40 : 0),
+      ],
+      [
+        b[0] - (common[0] === b[0] ? 40 : 0),
+        b[1] - (common[1] === b[1] ? 40 : 0),
+        b[2] - (common[2] === b[2] ? 40 : 0),
+        b[3] - (common[3] === b[3] ? 40 : 0),
+      ],
+    ];
+  }
+
   const first = [
     a[0] > b[2]
       ? a[1] > b[3] || a[3] < b[1]
@@ -1135,3 +1157,13 @@ export const getArrowLocalFixedPoints = (
     LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
   ];
 };
+
+const aabbsOverlapping = (a: Bounds, b: Bounds) =>
+  pointInsideBounds([a[0], a[1]], b) ||
+  pointInsideBounds([a[2], a[1]], b) ||
+  pointInsideBounds([a[2], a[3]], b) ||
+  pointInsideBounds([a[0], a[3]], b) ||
+  pointInsideBounds([b[0], b[1]], a) ||
+  pointInsideBounds([b[2], b[1]], a) ||
+  pointInsideBounds([b[2], b[3]], a) ||
+  pointInsideBounds([b[0], b[3]], a);
