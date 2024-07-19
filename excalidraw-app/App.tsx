@@ -48,11 +48,7 @@ import {
   getUsernameFromSearchParams,
   getUserColorFromSearchParams,
 } from "../packages/excalidraw/utils";
-import {
-  FIREBASE_STORAGE_PREFIXES,
-  STORAGE_KEYS,
-  SYNC_BROWSER_TABS_TIMEOUT,
-} from "./app_constants";
+import { STORAGE_KEYS, SYNC_BROWSER_TABS_TIMEOUT } from "./app_constants";
 import Collab, {
   CollabAPI,
   collabAPIAtom,
@@ -75,14 +71,9 @@ import {
   restoreAppState,
   RestoredDataState,
 } from "../packages/excalidraw/data/restore";
-import {
-  ExportToExcalidrawPlus,
-  exportToExcalidrawPlus,
-} from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../packages/excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "../packages/excalidraw/element/typeChecks";
-import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
@@ -105,6 +96,7 @@ import { OverwriteConfirmDialog } from "../packages/excalidraw/components/Overwr
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import { usePostHog } from "posthog-js/react";
+import { loadFilesFromHttpStorage } from "./data/httpStorage";
 
 polyfill();
 
@@ -361,18 +353,16 @@ const ExcalidrawWrapper = () => {
           }, [] as FileId[]) || [];
 
         if (data.isExternalScene) {
-          loadFilesFromFirebase(
-            `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
-            data.key,
-            fileIds,
-          ).then(({ loadedFiles, erroredFiles }) => {
-            excalidrawAPI.addFiles(loadedFiles);
-            updateStaleImageStatuses({
-              excalidrawAPI,
-              erroredFiles,
-              elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-            });
-          });
+          loadFilesFromHttpStorage(fileIds, data.id, data.key).then(
+            ({ loadedFiles, erroredFiles }) => {
+              excalidrawAPI.addFiles(loadedFiles);
+              updateStaleImageStatuses({
+                excalidrawAPI,
+                erroredFiles,
+                elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+              });
+            },
+          );
         } else if (isInitialLoad) {
           if (fileIds.length) {
             LocalData.fileStorage
@@ -707,28 +697,8 @@ const ExcalidrawWrapper = () => {
           canvasActions: {
             toggleTheme: true,
             export: {
-              onExportToBackend,
-              renderCustomUI: (elements, appState, files) => {
-                return (
-                  <ExportToExcalidrawPlus
-                    elements={elements}
-                    appState={appState}
-                    files={files}
-                    onError={(error) => {
-                      excalidrawAPI?.updateScene({
-                        appState: {
-                          errorMessage: error.message,
-                        },
-                      });
-                    }}
-                    onSuccess={() => {
-                      excalidrawAPI?.updateScene({
-                        appState: { openDialog: null },
-                      });
-                    }}
-                  />
-                );
-              },
+              // TODO (Jess): Come back to this to enable exporting
+              // onExportToBackend,
             },
           },
           mode: uiMode || "all",
@@ -766,21 +736,6 @@ const ExcalidrawWrapper = () => {
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
           <OverwriteConfirmDialog.Actions.SaveToDisk />
-          {excalidrawAPI && (
-            <OverwriteConfirmDialog.Action
-              title={t("overwriteConfirm.action.excalidrawPlus.title")}
-              actionLabel={t("overwriteConfirm.action.excalidrawPlus.button")}
-              onClick={() => {
-                exportToExcalidrawPlus(
-                  excalidrawAPI.getSceneElements(),
-                  excalidrawAPI.getAppState(),
-                  excalidrawAPI.getFiles(),
-                );
-              }}
-            >
-              {t("overwriteConfirm.action.excalidrawPlus.description")}
-            </OverwriteConfirmDialog.Action>
-          )}
         </OverwriteConfirmDialog>
         <TTDDialog
           onTextSubmit={async (input) => {

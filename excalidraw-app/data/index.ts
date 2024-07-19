@@ -1,26 +1,17 @@
-import {
-  compressData,
-  decompressData,
-} from "../../packages/excalidraw/data/encode";
+import { decompressData } from "../../packages/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
 } from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
 import {
   AppState,
-  BinaryFileData,
   BinaryFiles,
   SocketId,
   UserIdleState,
@@ -28,12 +19,9 @@ import {
 import { bytesToHexString } from "../../packages/excalidraw/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
-  FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
   WS_SUBTYPES,
 } from "../app_constants";
-import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
@@ -58,7 +46,6 @@ export const getSyncableElements = (elements: readonly ExcalidrawElement[]) => {
 };
 
 const BACKEND_V2_GET = import.meta.env.VITE_APP_BACKEND_V2_GET_URL;
-const BACKEND_V2_POST = import.meta.env.VITE_APP_BACKEND_V2_POST_URL;
 
 const generateRoomId = async () => {
   const buffer = new Uint8Array(ROOM_ID_BYTES);
@@ -284,6 +271,9 @@ export const exportToBackend = async (
   appState: Partial<AppState>,
   files: BinaryFiles,
 ): Promise<ExportToBackendResult> => {
+  return { url: null, errorMessage: "Not implemented" };
+
+  /*
   const encryptionKey = await generateEncryptionKey("string");
 
   const payload = await compressData(
@@ -307,6 +297,7 @@ export const exportToBackend = async (
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });
 
+    // TODO (JESS): Replace this with actual backend URL for exporting
     const response = await fetch(BACKEND_V2_POST, {
       method: "POST",
       body: payload.buffer,
@@ -319,10 +310,12 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
-      await saveFilesToFirebase({
-        prefix: `/files/shareLinks/${json.id}`,
-        files: filesToUpload,
-      });
+      // TODO (Jess): Replace this with actual backend URL for exporting
+      // await saveFilesToHttpStorage({
+      //   files: filesToUpload,
+      //   roomId: json.id,
+      //   roomKey: encryptionKey,
+      // });
 
       return { url: urlString, errorMessage: null };
     } else if (json.error_class === "RequestTooLargeError") {
@@ -338,4 +331,5 @@ export const exportToBackend = async (
 
     return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   }
+  */
 };
