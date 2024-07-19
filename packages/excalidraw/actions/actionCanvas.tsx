@@ -7,9 +7,9 @@ import { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
-import { centerScrollOn } from "../scene/scroll";
+import { calculateScrollCenter, centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { AppState, NormalizedZoomValue } from "../types";
+import { AppState, NormalizedZoomValue, UIOptions } from "../types";
 import { getShortcutKey, getUiMode, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
@@ -177,13 +177,10 @@ export const actionResetZoom = register({
     return {
       appState: {
         ...appState,
-        ...getStateForZoom(
-          {
-            viewportX: appState.width / 2 + appState.offsetLeft,
-            viewportY: appState.height / 2 + appState.offsetTop,
-            nextZoom: getNormalizedZoom(1),
-          },
+        ...resetZoomByCalculateScrollCenter(
+          _elements,
           appState,
+          app.props.UIOptions.mode,
         ),
         userToFollow: null,
       },
@@ -209,6 +206,32 @@ export const actionResetZoom = register({
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
+
+const resetZoomByCalculateScrollCenter = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  mode: UIOptions["mode"],
+) => {
+  if (mode === "all") {
+    return getStateForZoom(
+      {
+        viewportX: appState.width / 2 + appState.offsetLeft,
+        viewportY: appState.height / 2 + appState.offsetTop,
+        nextZoom: getNormalizedZoom(1),
+      },
+      appState,
+    );
+  }
+
+  const appStateWithResetZoom = {
+    ...appState,
+    zoom: {
+      value: getNormalizedZoom(1),
+    },
+  };
+
+  return calculateScrollCenter(elements, appStateWithResetZoom, mode);
+};
 
 const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,

@@ -45,7 +45,7 @@ export const importFromLocalStorage = () => {
     }
   }
 
-  console.log("[draw] Loaded from local storage", elements, appState);
+  console.info("[draw] Loaded from local storage", elements, appState);
   return { elements, appState };
 };
 

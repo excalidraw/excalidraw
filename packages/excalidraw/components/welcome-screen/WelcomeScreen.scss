@@ -29,6 +29,8 @@
   // ---------------------------------------------------------------------------
 
   .welcome-screen-decor-hint {
+    display: none !important;
+
     @media (max-height: 599px) {
       display: none !important;
     }
@@ -125,7 +127,8 @@
   // ---------------------------------------------------------------------------
 
   .welcome-screen-center {
-    display: flex;
+    // display: flex;
+    display: none !important;
     flex-direction: column;
     gap: 2rem;
     justify-content: center;

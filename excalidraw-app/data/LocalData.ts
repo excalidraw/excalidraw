@@ -55,7 +55,7 @@ const saveDataStateToLocalStorage = (
   appState: AppState,
 ) => {
   try {
-    console.log(
+    console.info(
       "[data] Saving data state to local storage",
       elements,
       appState,
