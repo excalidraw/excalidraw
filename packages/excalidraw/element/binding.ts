@@ -729,7 +729,7 @@ export const snapToMid = (
   tolerance: number = 10,
 ): Point => {
   const { x, y, width, height, angle } = element;
-  const center = [x + width / 2, y + height / 2] as Point;
+  const center = [x + width / 2 - 0.1, y + height / 2 - 0.1] as Point;
   const nonRotated = rotatePoint(p, center, -angle);
 
   if (
