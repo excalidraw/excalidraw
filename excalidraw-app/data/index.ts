@@ -1,6 +1,4 @@
-import {
-  decompressData,
-} from "../../packages/excalidraw/data/encode";
+import { decompressData } from "../../packages/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
@@ -10,9 +8,7 @@ import { restore } from "../../packages/excalidraw/data/restore";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import {
-  ExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
+import { ExcalidrawElement } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
 import {
   AppState,
