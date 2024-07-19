@@ -359,8 +359,9 @@ const getLineWidth = (
   // retrieve the actual bounding box width if these metrics are available (as of now > 95% coverage)
   if (
     !forceAdvanceWidth &&
-    "actualBoundingBoxLeft" in TextMetrics.prototype &&
-    "actualBoundingBoxRight" in TextMetrics.prototype
+    window.TextMetrics &&
+    "actualBoundingBoxLeft" in window.TextMetrics.prototype &&
+    "actualBoundingBoxRight" in window.TextMetrics.prototype
   ) {
     // could be negative, therefore getting the absolute value
     const actualWidth =
