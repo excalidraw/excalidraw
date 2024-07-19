@@ -2817,7 +2817,6 @@ class App extends React.Component<AppProps, AppState> {
         ),
         this.scene.getNonDeletedElementsMap(),
         this.scene.getNonDeletedElements(),
-        this.scene,
       );
     }
 
@@ -8125,7 +8124,6 @@ class App extends React.Component<AppProps, AppState> {
               pointerCoords,
               this.scene.getNonDeletedElementsMap(),
               this.scene.getNonDeletedElements(),
-              this.scene,
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -9206,6 +9204,7 @@ class App extends React.Component<AppProps, AppState> {
           coords,
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
+          isArrowElement(linearElement) && isElbowArrow(linearElement),
         );
         if (
           hoveredBindableElement != null &&

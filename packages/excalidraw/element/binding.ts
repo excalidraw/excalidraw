@@ -47,8 +47,14 @@ import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getElementShape } from "../shapes";
-import { aabbForElement, headingForPointFromElement } from "./routing";
-import { rotatePoint, scaleVector, translatePoint } from "../math";
+import { headingForPointFromElement } from "./routing";
+import {
+  aabbForElement,
+  pointInsideBounds,
+  rotatePoint,
+  scaleVector,
+  translatePoint,
+} from "../math";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -369,7 +375,6 @@ export const maybeBindLinearElement = (
   pointerCoords: { x: number; y: number },
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
-  scene: Scene,
 ): void => {
   if (appState.startBoundElement != null) {
     bindLinearElement(
@@ -384,6 +389,7 @@ export const maybeBindLinearElement = (
     pointerCoords,
     elements,
     elementsMap,
+    isElbowArrow(linearElement) && isElbowArrow(linearElement),
   );
 
   if (hoveredElement !== null) {
@@ -487,12 +493,13 @@ export const getHoveredElementForBinding = (
   },
   elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
+  fullShape?: boolean,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const hoveredElement = getElementAtPosition(
     elements,
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(element, pointerCoords, elementsMap),
+      bindingBorderTest(element, pointerCoords, elementsMap, fullShape),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
@@ -1098,10 +1105,14 @@ export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
   elementsMap: NonDeletedSceneElementsMap,
+  fullShape?: boolean,
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height);
   const shape = getElementShape(element, elementsMap);
-  return isPointOnShape([x, y], shape, threshold);
+  return (
+    isPointOnShape([x, y], shape, threshold) ||
+    (fullShape === true && pointInsideBounds([x, y], aabbForElement(element)))
+  );
 };
 
 export const maxBindingGap = (

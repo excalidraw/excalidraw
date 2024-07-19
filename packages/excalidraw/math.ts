@@ -10,6 +10,7 @@ import type {
   ExcalidrawLinearElement,
   NonDeleted,
 } from "./element/types";
+import type { Bounds } from "./element/bounds";
 import { getCurvePathOps } from "./element/bounds";
 import type { Mutable } from "./utility-types";
 import { ShapeCache } from "./scene/ShapeCache";
@@ -602,3 +603,64 @@ export const subtractVectors = (
   vec1: Readonly<Vector>,
   vec2: Readonly<Vector>,
 ): Vector => [vec1[0] - vec2[0], vec1[1] - vec2[1]];
+
+export const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
+  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
+
+/**
+ * Get the axis-aligned bounding box for a given element
+ */
+export const aabbForElement = (
+  element: ExcalidrawElement,
+  offset?: [number, number, number, number],
+) => {
+  const bbox = {
+    minX: element.x,
+    minY: element.y,
+    maxX: element.x + element.width,
+    maxY: element.y + element.height,
+    midX: element.x + element.width / 2,
+    midY: element.y + element.height / 2,
+  };
+
+  const center = [bbox.midX, bbox.midY] as Point;
+  const [topLeftX, topLeftY] = rotatePoint(
+    [bbox.minX, bbox.minY],
+    center,
+    element.angle,
+  );
+  const [topRightX, topRightY] = rotatePoint(
+    [bbox.maxX, bbox.minY],
+    center,
+    element.angle,
+  );
+  const [bottomRightX, bottomRightY] = rotatePoint(
+    [bbox.maxX, bbox.maxY],
+    center,
+    element.angle,
+  );
+  const [bottomLeftX, bottomLeftY] = rotatePoint(
+    [bbox.minX, bbox.maxY],
+    center,
+    element.angle,
+  );
+
+  const bounds = [
+    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
+    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
+  ] as Bounds;
+
+  if (offset) {
+    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
+    return [
+      bounds[0] - leftOffset,
+      bounds[1] - topOffset,
+      bounds[2] + rightOffset,
+      bounds[3] + downOffset,
+    ] as Bounds;
+  }
+
+  return bounds;
+};

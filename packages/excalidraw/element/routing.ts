@@ -7,8 +7,10 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
+  aabbForElement,
   addVectors,
   arePointsEqual,
+  pointInsideBounds,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -18,7 +20,6 @@ import {
   vectorToHeading,
 } from "../math";
 import { getSizeFromPoints } from "../points";
-import { getElementAtPosition } from "../scene/comparisons";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
@@ -28,23 +29,17 @@ import {
   distanceToBindableElement,
   avoidRectangularCorner,
   snapToMid,
-  FIXED_BINDING_DISTANCE,
-  bindingBorderTest,
+  getHoveredElementForBinding,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
-import type {
-  NonDeleted,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "./types";
+import type { NonDeletedSceneElementsMap } from "./types";
 import {
   type ElementsMap,
   type ExcalidrawArrowElement,
   type ExcalidrawBindableElement,
-  type ExcalidrawElement,
   type OrderedExcalidrawElement,
   type PointBinding,
 } from "./types";
@@ -115,10 +110,20 @@ export const mutateElbowArrow = (
   ];
   const [startElement, endElement] = [
     options?.isDragging
-      ? getHoveredElement(startGlobalPoint, elements, elementsMap)
+      ? getHoveredElementForBinding(
+          tupleToCoors(startGlobalPoint),
+          elements,
+          elementsMap,
+          true,
+        )
       : origStartElement,
     options?.isDragging
-      ? getHoveredElement(endGlobalPoint, elements, elementsMap)
+      ? getHoveredElementForBinding(
+          tupleToCoors(endGlobalPoint),
+          elements,
+          elementsMap,
+          true,
+        )
       : origEndElement,
   ];
   if (options?.isDragging) {
@@ -844,64 +849,6 @@ const pointToGridNode = (point: Point, grid: Grid): Node | null => {
   return null;
 };
 
-/**
- * Get the axis-aligned bounding box for a given element
- */
-export const aabbForElement = (
-  element: ExcalidrawElement,
-  offset?: [number, number, number, number],
-) => {
-  const bbox = {
-    minX: element.x,
-    minY: element.y,
-    maxX: element.x + element.width,
-    maxY: element.y + element.height,
-    midX: element.x + element.width / 2,
-    midY: element.y + element.height / 2,
-  };
-
-  const center = [bbox.midX, bbox.midY] as Point;
-  const [topLeftX, topLeftY] = rotatePoint(
-    [bbox.minX, bbox.minY],
-    center,
-    element.angle,
-  );
-  const [topRightX, topRightY] = rotatePoint(
-    [bbox.maxX, bbox.minY],
-    center,
-    element.angle,
-  );
-  const [bottomRightX, bottomRightY] = rotatePoint(
-    [bbox.maxX, bbox.maxY],
-    center,
-    element.angle,
-  );
-  const [bottomLeftX, bottomLeftY] = rotatePoint(
-    [bbox.minX, bbox.maxY],
-    center,
-    element.angle,
-  );
-
-  const bounds = [
-    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
-    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
-    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
-    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
-  ] as Bounds;
-
-  if (offset) {
-    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
-    return [
-      bounds[0] - leftOffset,
-      bounds[1] - topOffset,
-      bounds[2] + rightOffset,
-      bounds[3] + downOffset,
-    ] as Bounds;
-  }
-
-  return bounds;
-};
-
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
@@ -1046,9 +993,6 @@ const getBindableElementForId = (
   return null;
 };
 
-const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
-  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
-
 const normalizedArrowElementUpdate = (
   global: Point[],
   externalOffsetX?: number,
@@ -1155,18 +1099,18 @@ export const getArrowLocalFixedPoints = (
   ];
 };
 
-const getHoveredElement = (
-  p: Point,
-  elements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
-) => {
-  const hoveredElement = getElementAtPosition(
-    elements,
-    (element) =>
-      isBindableElement(element, false) &&
-      (bindingBorderTest(element, tupleToCoors(p), elementsMap) ||
-        pointInsideBounds(p, aabbForElement(element))),
-  );
+// const getHoveredElement = (
+//   p: Point,
+//   elements: readonly NonDeletedExcalidrawElement[],
+//   elementsMap: NonDeletedSceneElementsMap,
+// ) => {
+//   const hoveredElement = getElementAtPosition(
+//     elements,
+//     (element) =>
+//       isBindableElement(element, false) &&
+//       (bindingBorderTest(element, tupleToCoors(p), elementsMap) ||
+//         pointInsideBounds(p, aabbForElement(element))),
+//   );
 
-  return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
-};
+//   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
+// };
