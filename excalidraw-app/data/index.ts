@@ -1,5 +1,4 @@
 import {
-  compressData,
   decompressData,
 } from "../../packages/excalidraw/data/encode";
 import {
@@ -7,20 +6,16 @@ import {
   generateEncryptionKey,
   IV_LENGTH_BYTES,
 } from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
 import { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
 import {
   ExcalidrawElement,
-  FileId,
 } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
 import {
   AppState,
-  BinaryFileData,
   BinaryFiles,
   SocketId,
   UserIdleState,
@@ -28,12 +23,9 @@ import {
 import { bytesToHexString } from "../../packages/excalidraw/utils";
 import {
   DELETED_ELEMENT_TIMEOUT,
-  FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
   WS_SUBTYPES,
 } from "../app_constants";
-import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToHttpStorage } from "./httpStorage";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
