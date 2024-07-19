@@ -30,6 +30,7 @@ import {
   avoidRectangularCorner,
   snapToMid,
   getHoveredElementForBinding,
+  FIXED_BINDING_DISTANCE,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -168,7 +169,6 @@ export const mutateElbowArrow = (
         )
       : endGlobalPoint;
   }
-
   const [startHeading, endHeading] = [
     startElement
       ? headingForPointFromElement(
@@ -203,35 +203,12 @@ export const mutateElbowArrow = (
         )
       : vectorToHeading(pointToVector(startGlobalPoint, endGlobalPoint)),
   ];
-  // const [startBounds, endBounds] = [
-  //   startElement
-  //     ? aabbForElement(
-  //         startElement,
-  //         offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 2),
-  //       )
-  //     : ([
-  //         // Start point
-  //         startGlobalPoint[0] - 2,
-  //         startGlobalPoint[1] - 2,
-  //         startGlobalPoint[0] + 2,
-  //         startGlobalPoint[1] + 2,
-  //       ] as Bounds),
-  //   endElement
-  //     ? aabbForElement(
-  //         endElement,
-  //         offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 2),
-  //       )
-  //     : ([
-  //         // End point
-  //         endGlobalPoint[0] - 2,
-  //         endGlobalPoint[1] - 2,
-  //         endGlobalPoint[0] + 2,
-  //         endGlobalPoint[1] + 2,
-  //       ] as Bounds),
-  // ];
-  const [startZeroBounds, endZeroBounds] = [
+  const [startBounds, endBounds] = [
     startElement
-      ? aabbForElement(startElement)
+      ? aabbForElement(
+          startElement,
+          offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 4, 1),
+        )
       : ([
           // Start point
           startGlobalPoint[0] - 2,
@@ -240,7 +217,10 @@ export const mutateElbowArrow = (
           startGlobalPoint[1] + 2,
         ] as Bounds),
     endElement
-      ? aabbForElement(endElement)
+      ? aabbForElement(
+          endElement,
+          offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 4, 1),
+        )
       : ([
           // End point
           endGlobalPoint[0] - 2,
@@ -249,12 +229,21 @@ export const mutateElbowArrow = (
           endGlobalPoint[1] + 2,
         ] as Bounds),
   ];
-  const common = commonAABB([startZeroBounds, endZeroBounds]);
+  const common = commonAABB([startBounds, endBounds]);
   const dynamicAABBs = generateDynamicAABBs(
-    startZeroBounds,
-    endZeroBounds,
+    startBounds,
+    endBounds,
     common,
-    !startElement && !endElement ? 0 : 40,
+    offsetFromHeading(
+      startHeading,
+      !startElement && !endElement ? 0 : 40 - FIXED_BINDING_DISTANCE * 4,
+      40,
+    ),
+    offsetFromHeading(
+      endHeading,
+      !startElement && !endElement ? 0 : 40 - FIXED_BINDING_DISTANCE * 4,
+      40,
+    ),
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -269,6 +258,12 @@ export const mutateElbowArrow = (
   const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
     (aabb) => aabb !== null,
   );
+
+  boundingBoxes.forEach((bbox) => debugDrawBounds(bbox));
+  [startBounds, endBounds]
+    .filter((aabb) => aabb !== null)
+    .forEach((bbox) => debugDrawBounds(bbox, "red"));
+  //debugDrawBounds(common, "cyan");
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -333,8 +328,8 @@ export const mutateElbowArrow = (
 const offsetFromHeading = (
   heading: Heading,
   head: number,
+  side: number,
 ): [number, number, number, number] => {
-  const side = 1;
   switch (heading) {
     case HEADING_UP:
       return [head, side, side, side];
@@ -483,96 +478,95 @@ const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
   common: Bounds,
-  offset?: number,
+  startDifference?: [number, number, number, number],
+  endDifference?: [number, number, number, number],
 ): Bounds[] => {
+  const [startUp, startRight, startDown, startLeft] = startDifference ?? [
+    0, 0, 0, 0,
+  ];
+  const [endUp, endRight, endDown, endLeft] = endDifference ?? [0, 0, 0, 0];
   const first = [
     a[0] > b[2]
       ? a[1] > b[3] || a[3] < b[1]
-        ? Math.min((a[0] + b[2]) / 2, a[0] - (offset ?? 0))
+        ? Math.min((a[0] + b[2]) / 2, a[0] - startLeft)
         : (a[0] + b[2]) / 2
       : a[0] > b[0]
-      ? a[0] - (offset ?? 0)
-      : common[0] - (offset ?? 0),
+      ? a[0] - startLeft
+      : common[0] - startLeft,
     a[1] > b[3]
       ? a[0] > b[2] || a[2] < b[0]
-        ? Math.min((a[1] + b[3]) / 2, a[1] - (offset ?? 0))
+        ? Math.min((a[1] + b[3]) / 2, a[1] - startUp)
         : (a[1] + b[3]) / 2
       : a[1] > b[1]
-      ? a[1] - (offset ?? 0)
-      : common[1] - (offset ?? 0),
+      ? a[1] - startUp
+      : common[1] - startUp,
     a[2] < b[0]
       ? a[1] > b[3] || a[3] < b[1]
-        ? Math.max((a[2] + b[0]) / 2, a[2] + (offset ?? 0))
+        ? Math.max((a[2] + b[0]) / 2, a[2] + startRight)
         : (a[2] + b[0]) / 2
       : a[2] < b[2]
-      ? a[2] + (offset ?? 0)
-      : common[2] + (offset ?? 0),
+      ? a[2] + startRight
+      : common[2] + startRight,
     a[3] < b[1]
       ? a[0] > b[2] || a[2] < b[0]
-        ? Math.max((a[3] + b[1]) / 2, a[3] + (offset ?? 0))
+        ? Math.max((a[3] + b[1]) / 2, a[3] + startDown)
         : (a[3] + b[1]) / 2
       : a[3] < b[3]
-      ? a[3] + (offset ?? 0)
-      : common[3] + (offset ?? 0),
+      ? a[3] + startDown
+      : common[3] + startDown,
   ] as Bounds;
   const second = [
     b[0] > a[2]
       ? b[1] > a[3] || b[3] < a[1]
-        ? Math.min((b[0] + a[2]) / 2, b[0] - (offset ?? 0))
+        ? Math.min((b[0] + a[2]) / 2, b[0] - endLeft)
         : (b[0] + a[2]) / 2
       : b[0] > a[0]
-      ? b[0] - (offset ?? 0)
-      : common[0] - (offset ?? 0),
+      ? b[0] - endLeft
+      : common[0] - endLeft,
     b[1] > a[3]
       ? b[0] > a[2] || b[2] < a[0]
-        ? Math.min((b[1] + a[3]) / 2, b[1] - (offset ?? 0))
+        ? Math.min((b[1] + a[3]) / 2, b[1] - endUp)
         : (b[1] + a[3]) / 2
       : b[1] > a[1]
-      ? b[1] - (offset ?? 0)
-      : common[1] - (offset ?? 0),
+      ? b[1] - endUp
+      : common[1] - endUp,
     b[2] < a[0]
       ? b[1] > a[3] || b[3] < a[1]
-        ? Math.max((b[2] + a[0]) / 2, b[2] + (offset ?? 0))
+        ? Math.max((b[2] + a[0]) / 2, b[2] + endRight)
         : (b[2] + a[0]) / 2
       : b[2] < a[2]
-      ? b[2] + (offset ?? 0)
-      : common[2] + (offset ?? 0),
+      ? b[2] + endRight
+      : common[2] + endRight,
     b[3] < a[1]
       ? b[0] > a[2] || b[2] < a[0]
-        ? Math.max((b[3] + a[1]) / 2, b[3] + (offset ?? 0))
+        ? Math.max((b[3] + a[1]) / 2, b[3] + endDown)
         : (b[3] + a[1]) / 2
       : b[3] < a[3]
-      ? b[3] + (offset ?? 0)
-      : common[3] + (offset ?? 0),
+      ? b[3] + endDown
+      : common[3] + endDown,
   ] as Bounds;
 
   const c = commonAABB([first, second]);
-
+  debugDrawBounds(c, "cyan");
   if (
     first[2] - first[0] + second[2] - second[0] > c[2] - c[0] + 0.00000000001 &&
     first[3] - first[1] + second[3] - second[1] > c[3] - c[1] + 0.00000000001
   ) {
-    const offsetX = Math.min(
-      offset ?? 0,
-      (first[2] - first[0] + (second[2] - second[0]) - (c[2] - c[0])) / 2,
-    );
-    const offsetY = Math.min(
-      offset ?? 0,
-      (first[3] - first[1] + (second[3] - second[1]) - (c[3] - c[1])) / 2,
-    );
+    const cX = (c[0] + c[2]) / 2;
+    const cY = (c[1] + c[3]) / 2;
 
     return [
       [
-        first[0] + (offsetX === (offset ?? 0) ? 0 : offsetX),
-        first[1] + (offsetY === (offset ?? 0) ? 0 : offsetY),
-        first[2] - (offsetX === (offset ?? 0) ? 0 : offsetX),
-        first[3] - (offsetY === (offset ?? 0) ? 0 : offsetY),
+        c[0] === first[0] ? first[0] : cX,
+        c[1] === first[1] ? first[1] : cY,
+        c[2] === first[2] ? first[2] : cX,
+        c[3] === first[3] ? first[3] : cY,
       ],
       [
-        second[0] + (offsetX === (offset ?? 0) ? 0 : offsetX),
-        second[1] + (offsetY === (offset ?? 0) ? 0 : offsetY),
-        second[2] - (offsetX === (offset ?? 0) ? 0 : offsetX),
-        second[3] - (offsetY === (offset ?? 0) ? 0 : offsetY),
+        c[0] === second[0] ? second[0] : cX,
+        c[1] === second[1] ? second[1] : cY,
+        c[2] === second[2] ? second[2] : cX,
+        c[3] === second[3] ? second[3] : cY,
       ],
     ];
   }
