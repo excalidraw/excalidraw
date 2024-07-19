@@ -1,4 +1,5 @@
 import { type LineSegment } from "../../utils";
+import { cross } from "../../utils/geometry/geometry";
 import BinaryHeap from "../binaryheap";
 import type { Heading } from "../math";
 import {
@@ -263,7 +264,7 @@ export const mutateElbowArrow = (
   [startBounds, endBounds]
     .filter((aabb) => aabb !== null)
     .forEach((bbox) => debugDrawBounds(bbox, "red"));
-  //debugDrawBounds(common, "cyan");
+  debugDrawBounds(common, "cyan");
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -547,28 +548,70 @@ const generateDynamicAABBs = (
   ] as Bounds;
 
   const c = commonAABB([first, second]);
-  debugDrawBounds(c, "cyan");
   if (
     first[2] - first[0] + second[2] - second[0] > c[2] - c[0] + 0.00000000001 &&
     first[3] - first[1] + second[3] - second[1] > c[3] - c[1] + 0.00000000001
   ) {
+    const [endCenterX, endCenterY] = [
+      (second[0] + second[2]) / 2,
+      (second[1] + second[3]) / 2,
+    ];
     const cX = (c[0] + c[2]) / 2;
     const cY = (c[1] + c[3]) / 2;
 
-    return [
-      [
-        c[0] === first[0] ? first[0] : cX,
-        c[1] === first[1] ? first[1] : cY,
-        c[2] === first[2] ? first[2] : cX,
-        c[3] === first[3] ? first[3] : cY,
-      ],
-      [
-        c[0] === second[0] ? second[0] : cX,
-        c[1] === second[1] ? second[1] : cY,
-        c[2] === second[2] ? second[2] : cX,
-        c[3] === second[3] ? second[3] : cY,
-      ],
-    ];
+    if (b[0] > a[2] && a[1] > b[3]) {
+      // BOTTOM LEFT
+      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [first[0], first[1], cX, first[3]],
+          [cX, second[1], second[2], second[3]],
+        ];
+      }
+
+      return [
+        [first[0], cY, first[2], first[3]],
+        [second[0], second[1], second[2], cY],
+      ];
+    } else if (a[2] < b[0] && a[3] < b[1]) {
+      // TOP LEFT
+      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [first[0], first[1], cX, first[3]],
+          [cX, second[1], second[2], second[3]],
+        ];
+      }
+
+      return [
+        [first[0], first[1], first[2], cY],
+        [second[0], cY, second[2], second[3]],
+      ];
+    } else if (a[0] > b[2] && a[3] < b[1]) {
+      // TOP RIGHT
+      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [cX, first[1], first[2], first[3]],
+          [second[0], second[1], cX, second[3]],
+        ];
+      }
+
+      return [
+        [first[0], first[1], first[2], cY],
+        [second[0], cY, second[2], second[3]],
+      ];
+    } else if (a[0] > b[2] && a[1] > b[3]) {
+      // BOTTOM RIGHT
+      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [cX, first[1], first[2], first[3]],
+          [second[0], second[1], cX, second[3]],
+        ];
+      }
+
+      return [
+        [first[0], cY, first[2], first[3]],
+        [second[0], second[1], second[2], cY],
+      ];
+    }
   }
 
   return [first, second];
@@ -1092,19 +1135,3 @@ export const getArrowLocalFixedPoints = (
     LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
   ];
 };
-
-// const getHoveredElement = (
-//   p: Point,
-//   elements: readonly NonDeletedExcalidrawElement[],
-//   elementsMap: NonDeletedSceneElementsMap,
-// ) => {
-//   const hoveredElement = getElementAtPosition(
-//     elements,
-//     (element) =>
-//       isBindableElement(element, false) &&
-//       (bindingBorderTest(element, tupleToCoors(p), elementsMap) ||
-//         pointInsideBounds(p, aabbForElement(element))),
-//   );
-
-//   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
-// };
