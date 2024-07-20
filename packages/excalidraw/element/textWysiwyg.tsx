@@ -576,6 +576,12 @@ export const textWysiwyg = ({
     });
   };
 
+  const handleBlur = () => {
+    if (document.activeElement !== editable) {
+      handleSubmit();
+    }
+  };
+
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
@@ -610,7 +616,7 @@ export const textWysiwyg = ({
       target.classList.contains("properties-trigger");
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
 
       // case: clicking on the same property → no change → no update → no focus
       if (!isPropertiesTrigger) {
