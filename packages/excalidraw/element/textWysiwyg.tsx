@@ -550,6 +550,12 @@ export const textWysiwyg = ({
     });
   };
 
+  const handleBlur = () => {
+    if (document.activeElement !== editable) {
+      handleSubmit();
+    }
+  };
+
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
@@ -584,7 +590,7 @@ export const textWysiwyg = ({
       target.classList.contains("active-color");
 
     setTimeout(() => {
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
 
       if (isTargetPickerTrigger) {
         const callback = (
