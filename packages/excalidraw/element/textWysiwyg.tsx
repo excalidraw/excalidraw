@@ -576,10 +576,14 @@ export const textWysiwyg = ({
     });
   };
 
-  const handleBlur = () => {
+  const onBlur = () => {
     if (document.activeElement !== editable) {
       handleSubmit();
     }
+  };
+
+  const handleBlurDuringMenuClick = () => {
+    bindBlurEvent();
   };
 
   const cleanup = () => {
@@ -605,6 +609,7 @@ export const textWysiwyg = ({
 
   const bindBlurEvent = (event?: MouseEvent) => {
     window.removeEventListener("pointerup", bindBlurEvent);
+    window.removeEventListener("blur", handleBlurDuringMenuClick);
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
@@ -616,7 +621,7 @@ export const textWysiwyg = ({
       target.classList.contains("properties-trigger");
 
     setTimeout(() => {
-      editable.onblur = handleBlur;
+      editable.onblur = onBlur;
 
       // case: clicking on the same property → no change → no update → no focus
       if (!isPropertiesTrigger) {
@@ -644,7 +649,7 @@ export const textWysiwyg = ({
       window.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
-      window.addEventListener("blur", handleSubmit);
+      window.addEventListener("blur", handleBlurDuringMenuClick);
     } else if (
       event.target instanceof HTMLElement &&
       event.target instanceof HTMLCanvasElement &&
