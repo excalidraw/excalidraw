@@ -271,11 +271,11 @@
     "magicSettings": "Ustawienia AI"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
+    "rectangle": "Prostokąt",
+    "diamond": "Romb",
+    "ellipse": "Elipsa",
+    "arrow": "Strzałka",
+    "line": "Linia",
     "freedraw": "",
     "text": "",
     "image": "",
