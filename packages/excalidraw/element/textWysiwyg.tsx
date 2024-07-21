@@ -238,7 +238,7 @@ export const textWysiwyg = ({
         font: getFontString(updatedTextElement),
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${textElementWidth}px`,
+        width: `${Math.ceil(textElementWidth)}px`,
         height: `${textElementHeight}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
@@ -337,7 +337,7 @@ export const textWysiwyg = ({
           getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font);
-        editable.style.width = `${width}px`;
+        editable.style.width = `${Math.ceil(width)}px`;
       }
     };
 
