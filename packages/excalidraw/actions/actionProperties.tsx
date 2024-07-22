@@ -783,16 +783,10 @@ export const actionChangeFontFamily = register({
     let fontFamilyChanged: FontFamilyValues | undefined;
     let skipRender: boolean = false;
 
-    if (
-      currentItemFontFamily &&
-      currentItemFontFamily !== appState.currentItemFontFamily
-    ) {
+    if (currentItemFontFamily) {
       fontFamilyChanged = currentItemFontFamily;
       nexStoreAction = StoreAction.CAPTURE;
-    } else if (
-      currentHoveredFontFamily &&
-      currentHoveredFontFamily !== appState.currentHoveredFontFamily
-    ) {
+    } else if (currentHoveredFontFamily) {
       fontFamilyChanged = currentHoveredFontFamily;
       nexStoreAction = StoreAction.NONE;
 
