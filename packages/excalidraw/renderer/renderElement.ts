@@ -296,7 +296,6 @@ const generateElementCanvas = (
         window.devicePixelRatio *
         scale,
     );
-    boundTextCanvasContext.save();
   }
   return {
     element,
