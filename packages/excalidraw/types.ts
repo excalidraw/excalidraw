@@ -179,6 +179,7 @@ export type StaticCanvasAppState = Readonly<
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
     frameRendering: AppState["frameRendering"];
+    isRotating: AppState["isRotating"];
     linkOpacity: AppState["linkOpacity"]; //zsviczian
     gridColor: AppState["gridColor"]; //zsviczian
     frameColor: AppState["frameColor"]; //zsviczian
