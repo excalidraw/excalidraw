@@ -227,15 +227,15 @@
     "failedToFetchImage": "Αποτυχία ανάκτησης εικόνας.",
     "cannotResolveCollabServer": "Αδυναμία σύνδεσης με τον διακομιστή συνεργασίας. Παρακαλώ ανανεώστε τη σελίδα και προσπαθήστε ξανά.",
     "importLibraryError": "Αδυναμία φόρτωσης βιβλιοθήκης",
-    "saveLibraryError": "",
+    "saveLibraryError": "Αδύνατη η αποθήκευση της βιβλιοθήκης στον δίσκο. Παρακαλώ αποθηκεύστε τη βιβλιοθήκη σας σε ένα αρχείο τοπικά για να βεβαιωθείτε ότι δε θα χάσετε τις αλλαγές.",
     "collabSaveFailed": "Η αποθήκευση στη βάση δεδομένων δεν ήταν δυνατή. Αν το προβλήματα παραμείνει, θα πρέπει να αποθηκεύσετε το αρχείο σας τοπικά για να βεβαιωθείτε ότι δεν χάνετε την εργασία σας.",
     "collabSaveFailed_sizeExceeded": "Η αποθήκευση στη βάση δεδομένων δεν ήταν δυνατή, ο καμβάς φαίνεται να είναι πολύ μεγάλος. Θα πρέπει να αποθηκεύσετε το αρχείο τοπικά για να βεβαιωθείτε ότι δεν θα χάσετε την εργασία σας.",
     "imageToolNotSupported": "Οι εικόνες είναι απενεργοποιημένες.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "Φαίνεται ότι χρησιμοποιείτε τον περιηγητή Brave με ενεργοποιημένη τη ρύθμιση <bold>Aggressively Block Fingerprinting</bold>.",
+      "line2": "Αυτό θα μπορεί να οδηγήσει στη διάλυση των <bold>Στοιχείων Κειμένου</bold> στο σχέδιό σας.",
+      "line3": "Σας συνιστούμε να απενεργοποιήσετε αυτή τη ρύθμιση. Μπορείτε να ακολουθήσετε <link>αυτά τα βήματα</link> για το πώς να το κάνετε.",
+      "line4": "Εάν η απενεργοποίηση αυτής της ρύθμισης δε διορθώσει την εμφάνιση των στοιχείων κειμένου, παρακαλώ ανοίξτε ένα <issueLink>θέμα</issueLink> στο GitHub, ή γράψτε μας στο <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "",
@@ -259,28 +259,28 @@
     "library": "Βιβλιοθήκη",
     "lock": "Κράτησε επιλεγμένο το εργαλείο μετά το σχέδιο",
     "penMode": "Λειτουργία μολυβιού - αποτροπή αφής",
-    "link": "",
+    "link": "Προσθήκη / Ενημέρωση συνδέσμου για επιλεγμένο σχήμα",
     "eraser": "Γόμα",
-    "frame": "",
+    "frame": "Εργαλείο πλαισίου",
     "magicframe": "",
     "embeddable": "",
-    "laser": "",
+    "laser": "Δείκτης λέιζερ",
     "hand": "",
-    "extraTools": "",
+    "extraTools": "Περισσότερα εργαλεία",
     "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "magicSettings": "Ρυθμίσεις τεχνητής νοημοσύνης"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
+    "rectangle": "Ορθογώνιο",
+    "diamond": "Ρόμβος",
+    "ellipse": "Έλλειψη",
+    "arrow": "Βέλος",
+    "line": "Γραμμή",
+    "freedraw": "Ελεύθερη σχεδίαση",
+    "text": "Κείμενο",
+    "image": "Εικόνα",
+    "group": "Ομάδα",
+    "frame": "Πλαίσιο",
     "magicframe": "",
     "embeddable": "",
     "selection": "",
@@ -329,10 +329,10 @@
     "sceneContent": "Περιεχόμενο σκηνής:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Ή"
   },
   "roomDialog": {
-    "desc_intro": "",
+    "desc_intro": "Προσκαλέστε άτομα για να συνεργαστείτε στο σχέδιό σας.",
     "desc_privacy": "",
     "button_startSession": "Έναρξη Συνεδρίας",
     "button_stopSession": "Τερματισμός Συνεδρίας",
@@ -367,7 +367,7 @@
     "drag": "σύρε",
     "editor": "Επεξεργαστής",
     "editLineArrowPoints": "",
-    "editText": "",
+    "editText": "Επεξεργασία κειμένου / προσθήκη ετικέτας",
     "github": "Βρήκατε πρόβλημα; Υποβάλετε το",
     "howto": "Ακολουθήστε τους οδηγούς μας",
     "or": "ή",
@@ -391,8 +391,8 @@
     "title": "Δημοσίευση βιβλιοθήκης",
     "itemName": "Όνομα αντικειμένου",
     "authorName": "Όνομα δημιουργού",
-    "githubUsername": "",
-    "twitterUsername": "",
+    "githubUsername": "Όνομα χρήστη GitHub",
+    "twitterUsername": "Όνομα χρήστη Twitter",
     "libraryName": "Όνομα βιβλιοθήκης",
     "libraryDesc": "Περιγραφή βιβλιοθήκης",
     "website": "Ιστοσελίδα",
@@ -424,11 +424,11 @@
     "removeItemsFromLib": "Αφαίρεση επιλεγμένων αντικειμένων από τη βιβλιοθήκη"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "Εξαγωγή εικόνας",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
+      "withBackground": "Παρασκήνιο",
+      "onlySelected": "Μόνο τα επιλεγμένα",
+      "darkMode": "Σκοτεινό θέμα",
       "embedScene": "",
       "scale": "",
       "padding": ""
@@ -437,14 +437,14 @@
       "embedScene": ""
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "Εξαγωγή σε PNG",
+      "exportToSvg": "Εξαγωγή σε SVG",
+      "copyPngToClipboard": "Αντιγραφή PNG στο πρόχειρο"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "Αντιγραφή στο πρόχειρο"
     }
   },
   "encrypted": {
@@ -459,10 +459,10 @@
     "scene": "Σκηνή",
     "selected": "Επιλεγμένα",
     "storage": "Χώρος",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Ιδιότητες Στατιστικών & Στοιχείων",
+    "title": "Στατιστικά",
+    "generalStats": "Γενικά στατιστικά",
+    "elementProperties": "Ιδιότητες στοιχείου",
     "total": "Σύνολο ",
     "version": "Έκδοση",
     "versionCopy": "Κάνε κλικ για αντιγραφή",
@@ -522,67 +522,67 @@
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "Εξαγωγή ως εικόνα",
+        "button": "Εξαγωγή ως εικόνα",
         "description": ""
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
+        "title": "Αποθήκευση στο δίσκο",
+        "button": "Αποθήκευση στο δίσκο",
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
+        "title": "Excalidraw+",
+        "button": "Εξαγωγή σε Excalidraw+",
         "description": ""
       }
     },
     "modal": {
       "loadFromFile": {
-        "title": "",
-        "button": "",
+        "title": "Φόρτωση από αρχείο",
+        "button": "Φόρτωση από αρχείο",
         "description": ""
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
+        "title": "Φόρτωση από σύνδεσμο",
+        "button": "Αντικατάσταση του περιεχομένου μου",
         "description": ""
       }
     }
   },
   "mermaid": {
     "title": "",
-    "button": "",
+    "button": "Εισαγωγή",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "Προεπισκόπηση"
   },
   "userList": {
     "search": {
-      "placeholder": "",
-      "empty": ""
+      "placeholder": "Γρήγορη αναζήτηση",
+      "empty": "Δεν βρέθηκαν χρήστες"
     },
     "hint": {
-      "text": "",
-      "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "text": "Κάντε κλικ στο χρήστη για να τον ακολουθήσετε",
+      "followStatus": "Ακολουθείτε αυτόν τον χρήστη",
+      "inCall": "Ο χρήστης βρίσκεται σε κλήση",
+      "micMuted": "Το μικρόφωνο του χρήστη είναι σε σίγαση",
+      "isSpeaking": "Ο χρήστης μιλάει"
     }
   },
   "commandPalette": {
     "title": "",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Επιλογή",
+      "confirm": "Επιβεβαίωση",
+      "close": "Κλείσιμο"
     },
-    "recents": "",
+    "recents": "Πρόσφατα χρησιμοποιημένα",
     "search": {
       "placeholder": "",
       "noMatch": ""
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Η εντολή δεν είναι διαθέσιμη...",
     "shortcutHint": ""
   }
 }
