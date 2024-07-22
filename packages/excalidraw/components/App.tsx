@@ -3908,6 +3908,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0] as ExcalidrawGenericElement,
             this.scene.getNonDeletedElementsMap(),
             this.scene,
+            this.state,
             getLinkDirectionFromKey(event.key),
           );
         }

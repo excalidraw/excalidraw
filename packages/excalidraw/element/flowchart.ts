@@ -14,6 +14,7 @@ import type {
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
+import { AppState } from "../types";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 const VERTICAL_OFFSET = 100;
@@ -197,6 +198,7 @@ const addNewNode = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   scene: Scene,
+  appState: AppState,
   direction: LinkDirection = "right",
 ) => {
   const successors = getSuccessors(element, elementsMap, direction);
@@ -319,6 +321,7 @@ const addNewNode = (
     elementsMap,
     scene,
     direction,
+    appState,
   );
 
   return {
@@ -331,6 +334,7 @@ export const addNewNodes = (
   startNode: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
   scene: Scene,
+  appState: AppState,
   direction: LinkDirection,
   numberOfNodes: number,
 ) => {
@@ -389,6 +393,7 @@ export const addNewNodes = (
       elementsMap,
       scene,
       direction,
+      appState,
     );
 
     newNodes.push(nextNode);
@@ -404,6 +409,7 @@ const createBindingArrow = (
   elementsMap: ElementsMap,
   scene: Scene,
   direction: LinkDirection,
+  appState: AppState,
 ) => {
   let startX: number;
   let startY: number;
@@ -461,8 +467,11 @@ const createBindingArrow = (
     type: "arrow",
     x: startX,
     y: startY,
-    startArrowhead: null,
-    endArrowhead: "arrow",
+    startArrowhead: appState.currentItemStartArrowhead,
+    endArrowhead: appState.currentItemEndArrowhead,
+    strokeColor: appState.currentItemStrokeColor,
+    strokeStyle: appState.currentItemStrokeStyle,
+    strokeWidth: appState.currentItemStrokeWidth,
     points: [
       [0, 0],
       [endX, endY],
@@ -709,6 +718,7 @@ export class FlowChartCreator {
     startNode: ExcalidrawGenericElement,
     elementsMap: ElementsMap,
     scene: Scene,
+    appState: AppState,
     direction: LinkDirection,
   ) {
     if (direction !== this.direction) {
@@ -716,6 +726,7 @@ export class FlowChartCreator {
         startNode,
         elementsMap,
         scene,
+        appState,
         direction,
       );
 
@@ -729,6 +740,7 @@ export class FlowChartCreator {
         startNode,
         elementsMap,
         scene,
+        appState,
         direction,
         this.numberOfNodes,
       );
