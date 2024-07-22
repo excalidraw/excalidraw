@@ -200,6 +200,96 @@ export const getPredecessors = (
   }
 };
 
+const getOffsets = (
+  element: ExcalidrawGenericElement,
+  linkedNodes: ExcalidrawElement[],
+  direction: LinkDirection,
+) => {
+  const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
+
+  // check if vertical space or horizontal space is available first
+  if (direction === "up" || direction === "down") {
+    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+    // check vertical space
+    const minX = element.x;
+    const maxX = element.x + element.width;
+
+    // vertical space is available
+    if (
+      linkedNodes.every(
+        (linkedNode) =>
+          linkedNode.x + linkedNode.width < minX || linkedNode.x > maxX,
+      )
+    ) {
+      return {
+        x: 0,
+        y: _VERTICAL_OFFSET * (direction === "up" ? -1 : 1),
+      };
+    }
+  } else if (direction === "right" || direction === "left") {
+    const minY = element.y;
+    const maxY = element.y + element.height;
+
+    if (
+      linkedNodes.every(
+        (linkedNode) =>
+          linkedNode.y + linkedNode.height < minY || linkedNode.y > maxY,
+      )
+    ) {
+      return {
+        x:
+          (HORIZONTAL_OFFSET + element.width) * (direction === "left" ? -1 : 1),
+        y: 0,
+      };
+    }
+  }
+
+  if (direction === "up" || direction === "down") {
+    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+    const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
+    const x =
+      linkedNodes.length === 0
+        ? 0
+        : (linkedNodes.length + 1) % 2 === 0
+        ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
+        : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+
+    if (direction === "up") {
+      return {
+        x,
+        y: y * -1,
+      };
+    }
+
+    return {
+      x,
+      y,
+    };
+  }
+
+  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+  const x =
+    (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
+    element.width;
+  const y =
+    linkedNodes.length === 0
+      ? 0
+      : (linkedNodes.length + 1) % 2 === 0
+      ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
+      : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
+
+  if (direction === "left") {
+    return {
+      x: x * -1,
+      y,
+    };
+  }
+  return {
+    x,
+    y,
+  };
+};
+
 const addNewNode = (
   element: ExcalidrawGenericElement,
   elementsMap: ElementsMap,
@@ -209,97 +299,6 @@ const addNewNode = (
 ) => {
   const successors = getSuccessors(element, elementsMap, direction);
   const predeccessors = getPredecessors(element, elementsMap, direction);
-
-  const getOffsets = (
-    element: ExcalidrawGenericElement,
-    linkedNodes: ExcalidrawElement[],
-    direction: LinkDirection,
-  ) => {
-    const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
-
-    // check if vertical space or horizontal space is available first
-    if (direction === "up" || direction === "down") {
-      const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-      // check vertical space
-      const minX = element.x;
-      const maxX = element.x + element.width;
-
-      // vertical space is available
-      if (
-        linkedNodes.every(
-          (linkedNode) =>
-            linkedNode.x + linkedNode.width < minX || linkedNode.x > maxX,
-        )
-      ) {
-        return {
-          x: 0,
-          y: _VERTICAL_OFFSET * (direction === "up" ? -1 : 1),
-        };
-      }
-    } else if (direction === "right" || direction === "left") {
-      const minY = element.y;
-      const maxY = element.y + element.height;
-
-      if (
-        linkedNodes.every(
-          (linkedNode) =>
-            linkedNode.y + linkedNode.height < minY || linkedNode.y > maxY,
-        )
-      ) {
-        return {
-          x:
-            (HORIZONTAL_OFFSET + element.width) *
-            (direction === "left" ? -1 : 1),
-          y: 0,
-        };
-      }
-    }
-
-    if (direction === "up" || direction === "down") {
-      const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-      const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
-      const x =
-        linkedNodes.length === 0
-          ? 0
-          : (linkedNodes.length + 1) % 2 === 0
-          ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
-          : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
-
-      if (direction === "up") {
-        return {
-          x,
-          y: y * -1,
-        };
-      }
-
-      return {
-        x,
-        y,
-      };
-    }
-
-    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-    const x =
-      (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
-      element.width;
-    const y =
-      linkedNodes.length === 0
-        ? 0
-        : (linkedNodes.length + 1) % 2 === 0
-        ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
-        : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
-
-    if (direction === "left") {
-      return {
-        x: x * -1,
-        y,
-      };
-    }
-    return {
-      x,
-      y,
-    };
-  };
 
   const offsets = getOffsets(
     element,
@@ -420,24 +419,26 @@ const createBindingArrow = (
   let startX: number;
   let startY: number;
 
+  const PADDING = 6;
+
   switch (direction) {
     case "up": {
       startX = startBindingElement.x + startBindingElement.width / 2;
-      startY = startBindingElement.y;
+      startY = startBindingElement.y - PADDING;
       break;
     }
     case "down": {
       startX = startBindingElement.x + startBindingElement.width / 2;
-      startY = startBindingElement.y + startBindingElement.height;
+      startY = startBindingElement.y + startBindingElement.height + PADDING;
       break;
     }
     case "right": {
-      startX = startBindingElement.x + startBindingElement.width;
+      startX = startBindingElement.x + startBindingElement.width + PADDING;
       startY = startBindingElement.y + startBindingElement.height / 2;
       break;
     }
     case "left": {
-      startX = startBindingElement.x;
+      startX = startBindingElement.x - PADDING;
       startY = startBindingElement.y + startBindingElement.height / 2;
       break;
     }
@@ -449,21 +450,21 @@ const createBindingArrow = (
   switch (direction) {
     case "up": {
       endX = endBindingElement.x + endBindingElement.width / 2 - startX;
-      endY = endBindingElement.y + endBindingElement.height - startY;
+      endY = endBindingElement.y + endBindingElement.height - startY + PADDING;
       break;
     }
     case "down": {
       endX = endBindingElement.x + endBindingElement.width / 2 - startX;
-      endY = endBindingElement.y - startY;
+      endY = endBindingElement.y - startY - PADDING;
       break;
     }
     case "right": {
-      endX = endBindingElement.x - startX;
+      endX = endBindingElement.x - startX - PADDING;
       endY = endBindingElement.y - startY + endBindingElement.height / 2;
       break;
     }
     case "left": {
-      endX = endBindingElement.x + endBindingElement.width - startX;
+      endX = endBindingElement.x + endBindingElement.width - startX + PADDING;
       endY = endBindingElement.y - startY + endBindingElement.height / 2;
       break;
     }
