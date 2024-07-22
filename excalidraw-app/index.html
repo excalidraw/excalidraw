@@ -132,10 +132,25 @@
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
 
-    <!-- Preload Excalifont & Virgil, but leave the registration on scene init -->
+    <!-- Preload all the default fonts and Virgil (backwards compatibility) to avoid swap and incorrect metrics measurements after init -->
     <link
       rel="preload"
       href="../packages/excalidraw/fonts/assets/Excalifont-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="../packages/excalidraw/fonts/assets/ComicShanns-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <!-- Nunito latin range -->
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2"
       as="font"
       type="font/woff2"
       crossorigin="anonymous"

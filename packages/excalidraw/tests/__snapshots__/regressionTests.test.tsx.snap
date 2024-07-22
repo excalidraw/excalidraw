@@ -14321,7 +14321,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 9,
+  "currentItemFontFamily": 8,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
