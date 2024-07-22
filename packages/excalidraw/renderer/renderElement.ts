@@ -183,7 +183,7 @@ const cappedElementCanvasSize = (
 
 const generateElementCanvas = (
   element: NonDeletedExcalidrawElement,
-  elementsMap: RenderableElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
@@ -237,11 +237,15 @@ const generateElementCanvas = (
   drawElementOnCanvas(element, rc, context, renderConfig, appState);
   context.restore();
   const boundTextElement = getBoundTextElement(element, elementsMap);
-  const boundTextCanvas = document.createElement("canvas");
+  const boundTextCanvas =
+    elementWithCanvasCache.get(element)?.boundTextCanvas ||
+    document.createElement("canvas");
   const boundTextCanvasContext = boundTextCanvas.getContext("2d")!;
-
+  console.log(boundTextElement, element, "hellloooo123");
   if (isArrowElement(element) && boundTextElement) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+    console.log("textttttttt", x1, y1, x2, y2);
+
     // Take max dimensions of arrow canvas so that when canvas is rotated
     // the arrow doesn't get clipped
     const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
@@ -249,7 +253,7 @@ const generateElementCanvas = (
       maxDim * window.devicePixelRatio * scale + padding * scale * 10;
     boundTextCanvas.height =
       maxDim * window.devicePixelRatio * scale + padding * scale * 10;
-
+    console.log(maxDim, boundTextCanvas.width, "MAX DIMENSIONS");
     boundTextCanvasContext.translate(
       boundTextCanvas.width / 2,
       boundTextCanvas.height / 2,
@@ -488,7 +492,7 @@ export const elementWithCanvasCache = new WeakMap<
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
-  elementsMap: RenderableElementsMap,
+  elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
@@ -717,7 +721,7 @@ export const renderElement = (
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
-          elementsMap,
+          allElementsMap,
           renderConfig,
           appState,
         );
@@ -855,7 +859,7 @@ export const renderElement = (
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
-          elementsMap,
+          allElementsMap,
           renderConfig,
           appState,
         );
