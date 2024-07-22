@@ -176,7 +176,6 @@ export type StaticCanvasAppState = Readonly<
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
     frameRendering: AppState["frameRendering"];
-    isRotating: AppState["isRotating"];
   }
 >;
 

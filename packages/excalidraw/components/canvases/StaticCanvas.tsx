@@ -105,7 +105,6 @@ const getRelevantAppStateProps = (
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
-  isRotating: appState.isRotating,
 });
 
 const areEqual = (

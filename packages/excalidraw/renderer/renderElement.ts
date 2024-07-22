@@ -118,6 +118,7 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: AppState["theme"];
   scale: number;
+  angle: number;
   zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -235,10 +236,13 @@ const generateElementCanvas = (
   }
 
   drawElementOnCanvas(element, rc, context, renderConfig, appState);
+
   context.restore();
+
   const boundTextElement = getBoundTextElement(element, elementsMap);
   const boundTextCanvas = document.createElement("canvas");
   const boundTextCanvasContext = boundTextCanvas.getContext("2d")!;
+
   if (isArrowElement(element) && boundTextElement) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     // Take max dimensions of arrow canvas so that when canvas is rotated
@@ -297,6 +301,7 @@ const generateElementCanvas = (
         scale,
     );
   }
+
   return {
     element,
     canvas,
@@ -310,6 +315,7 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     boundTextCanvas,
+    angle: element.angle,
   };
 };
 
@@ -507,7 +513,13 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
-    (isArrowElement(element) && boundTextElement && appState.isRotating)
+    // since we rotate the canvas when copying from cached canvas, we don't
+    // regenerate the cached canvas. But we need to in case of labels which are
+    // cached alongside the arrow, and we want the labels to remain unrotated
+    // with respect to the arrow.
+    (isArrowElement(element) &&
+      boundTextElement &&
+      element.angle !== prevElementWithCanvas.angle)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
