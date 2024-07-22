@@ -496,8 +496,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
-  const boundTextElementVersion =
-    getBoundTextElement(element, elementsMap)?.version || null;
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+  const boundTextElementVersion = boundTextElement?.version || null;
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
@@ -507,7 +507,8 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    (isArrowElement(element) && boundTextElement && appState.isRotating)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
