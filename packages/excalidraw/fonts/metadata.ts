@@ -57,15 +57,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     icon: FontFamilyHeadingIcon,
   },
-  [FONT_FAMILY.Geist]: {
-    metrics: {
-      unitsPerEm: 1000,
-      ascender: 920,
-      descender: -220,
-      lineHeight: 1.2,
-    },
-    icon: FontFamilyCodeIcon,
-  },
   [FONT_FAMILY["Comic Shanns"]]: {
     metrics: {
       unitsPerEm: 1000,

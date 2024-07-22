@@ -129,10 +129,9 @@ export const FONT_FAMILY = {
   Assistant: 4,
   Excalifont: 5,
   Nunito: 6,
-  Geist: 7,
-  "Lilita One": 8,
-  "Comic Shanns": 9,
-  "Liberation Sans": 10,
+  "Lilita One": 7,
+  "Comic Shanns": 8,
+  "Liberation Sans": 9,
 };
 
 export const THEME = {
