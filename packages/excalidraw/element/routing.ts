@@ -1,4 +1,5 @@
 import { type LineSegment } from "../../utils";
+import { cross } from "../../utils/geometry/geometry";
 import BinaryHeap from "../binaryheap";
 import type { Heading } from "../math";
 import {
@@ -7,8 +8,10 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   PointInTriangle,
+  aabbForElement,
   addVectors,
   arePointsEqual,
+  pointInsideBounds,
   pointToVector,
   rotatePoint,
   scalePointFromOrigin,
@@ -17,15 +20,18 @@ import {
   translatePoint,
   vectorToHeading,
 } from "../math";
+import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { toBrandedType } from "../utils";
+import { toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
-  getHoveredElementForBinding,
   avoidRectangularCorner,
-  maxBindingGap,
+  snapToMid,
+  getHoveredElementForBinding,
+  FIXED_BINDING_DISTANCE,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -36,7 +42,6 @@ import {
   type ElementsMap,
   type ExcalidrawArrowElement,
   type ExcalidrawBindableElement,
-  type ExcalidrawElement,
   type OrderedExcalidrawElement,
   type PointBinding,
 } from "./types";
@@ -108,16 +113,18 @@ export const mutateElbowArrow = (
   const [startElement, endElement] = [
     options?.isDragging
       ? getHoveredElementForBinding(
-          { x: startGlobalPoint[0], y: startGlobalPoint[1] },
+          tupleToCoors(startGlobalPoint),
           elements,
           elementsMap,
+          true,
         )
       : origStartElement,
     options?.isDragging
       ? getHoveredElementForBinding(
-          { x: endGlobalPoint[0], y: endGlobalPoint[1] },
+          tupleToCoors(endGlobalPoint),
           elements,
           elementsMap,
+          true,
         )
       : origEndElement,
   ];
@@ -135,13 +142,16 @@ export const mutateElbowArrow = (
     startGlobalPoint =
       startElement && startSnap
         ? isRectanguloidElement(startElement)
-          ? avoidRectangularCorner(startElement, startSnap)
+          ? snapToMid(
+              startElement,
+              avoidRectangularCorner(startElement, startSnap),
+            )
           : startSnap
         : startGlobalPoint;
     endGlobalPoint =
       endElement && endSnap
         ? isRectanguloidElement(endElement)
-          ? avoidRectangularCorner(endElement, endSnap)
+          ? snapToMid(endElement, avoidRectangularCorner(endElement, endSnap))
           : endSnap
         : endGlobalPoint;
   } else {
@@ -160,7 +170,6 @@ export const mutateElbowArrow = (
         )
       : endGlobalPoint;
   }
-
   const [startHeading, endHeading] = [
     startElement
       ? headingForPointFromElement(
@@ -195,17 +204,12 @@ export const mutateElbowArrow = (
         )
       : vectorToHeading(pointToVector(startGlobalPoint, endGlobalPoint)),
   ];
-  const bias = Math.max(
-    (startElement &&
-      maxBindingGap(startElement, startElement.width, startElement.height)) ??
-      0,
-    (endElement &&
-      maxBindingGap(endElement, endElement.width, endElement.height)) ??
-      0,
-  );
   const [startBounds, endBounds] = [
     startElement
-      ? aabbForElement(startElement, offsetFromHeading(startHeading, bias))
+      ? aabbForElement(
+          startElement,
+          offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 4, 1),
+        )
       : ([
           // Start point
           startGlobalPoint[0] - 2,
@@ -214,7 +218,10 @@ export const mutateElbowArrow = (
           startGlobalPoint[1] + 2,
         ] as Bounds),
     endElement
-      ? aabbForElement(endElement, offsetFromHeading(endHeading, bias))
+      ? aabbForElement(
+          endElement,
+          offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 4, 1),
+        )
       : ([
           // End point
           endGlobalPoint[0] - 2,
@@ -228,7 +235,18 @@ export const mutateElbowArrow = (
     startBounds,
     endBounds,
     common,
-    !startElement && !endElement ? 0 : 20,
+    startGlobalPoint,
+    endGlobalPoint,
+    offsetFromHeading(
+      startHeading,
+      !startElement && !endElement ? 0 : 40 - FIXED_BINDING_DISTANCE * 4,
+      40,
+    ),
+    offsetFromHeading(
+      endHeading,
+      !startElement && !endElement ? 0 : 40 - FIXED_BINDING_DISTANCE * 4,
+      40,
+    ),
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -243,6 +261,12 @@ export const mutateElbowArrow = (
   const boundingBoxes = [...(dynamicAABBs ?? [])].filter(
     (aabb) => aabb !== null,
   );
+
+  boundingBoxes.forEach((bbox) => debugDrawBounds(bbox));
+  [startBounds, endBounds]
+    .filter((aabb) => aabb !== null)
+    .forEach((bbox) => debugDrawBounds(bbox, "red"));
+  debugDrawBounds(common, "cyan");
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -307,8 +331,8 @@ export const mutateElbowArrow = (
 const offsetFromHeading = (
   heading: Heading,
   head: number,
+  side: number,
 ): [number, number, number, number] => {
-  const side = 1;
   switch (heading) {
     case HEADING_UP:
       return [head, side, side, side];
@@ -457,54 +481,162 @@ const generateDynamicAABBs = (
   a: Bounds,
   b: Bounds,
   common: Bounds,
-  offset?: number,
+  startGlobalPoint: Point,
+  endGlobalPoint: Point,
+  startDifference?: [number, number, number, number],
+  endDifference?: [number, number, number, number],
 ): Bounds[] => {
-  return [
-    [
-      a[0] > b[2]
-        ? (a[0] + b[2]) / 2
-        : a[0] > b[0]
-        ? a[0] - (offset ?? 0)
-        : common[0] - (offset ?? 0),
-      a[1] > b[3]
-        ? (a[1] + b[3]) / 2
-        : a[1] > b[1]
-        ? a[1] - (offset ?? 0)
-        : common[1] - (offset ?? 0),
-      a[2] < b[0]
-        ? (a[2] + b[0]) / 2
-        : a[2] < b[2]
-        ? a[2] + (offset ?? 0)
-        : common[2] + (offset ?? 0),
-      a[3] < b[1]
-        ? (a[3] + b[1]) / 2
-        : a[3] < b[3]
-        ? a[3] + (offset ?? 0)
-        : common[3] + (offset ?? 0),
-    ] as Bounds,
-    [
-      b[0] > a[2]
-        ? (b[0] + a[2]) / 2
-        : b[0] > a[0]
-        ? b[0] - (offset ?? 0)
-        : common[0] - (offset ?? 0),
-      b[1] > a[3]
-        ? (b[1] + a[3]) / 2
-        : b[1] > a[1]
-        ? b[1] - (offset ?? 0)
-        : common[1] - (offset ?? 0),
-      b[2] < a[0]
-        ? (b[2] + a[0]) / 2
-        : b[2] < a[2]
-        ? b[2] + (offset ?? 0)
-        : common[2] + (offset ?? 0),
-      b[3] < a[1]
-        ? (b[3] + a[1]) / 2
-        : b[3] < a[3]
-        ? b[3] + (offset ?? 0)
-        : common[3] + (offset ?? 0),
-    ] as Bounds,
+  const [startUp, startRight, startDown, startLeft] = startDifference ?? [
+    0, 0, 0, 0,
   ];
+  const [endUp, endRight, endDown, endLeft] = endDifference ?? [0, 0, 0, 0];
+
+  if (aabbsOverlapping(a, b)) {
+    return [
+      [
+        a[0] - (common[0] === a[0] ? 40 : 0),
+        a[1] - (common[1] === a[1] ? 40 : 0),
+        a[2] + (common[2] === a[2] ? 40 : 0),
+        a[3] + (common[3] === a[3] ? 40 : 0),
+      ],
+      [
+        b[0] - (common[0] === b[0] ? 40 : 0),
+        b[1] - (common[1] === b[1] ? 40 : 0),
+        b[2] - (common[2] === b[2] ? 40 : 0),
+        b[3] - (common[3] === b[3] ? 40 : 0),
+      ],
+    ];
+  }
+
+  const first = [
+    a[0] > b[2]
+      ? a[1] > b[3] || a[3] < b[1]
+        ? Math.min((a[0] + b[2]) / 2, a[0] - startLeft)
+        : (a[0] + b[2]) / 2
+      : a[0] > b[0]
+      ? a[0] - startLeft
+      : common[0] - startLeft,
+    a[1] > b[3]
+      ? a[0] > b[2] || a[2] < b[0]
+        ? Math.min((a[1] + b[3]) / 2, a[1] - startUp)
+        : (a[1] + b[3]) / 2
+      : a[1] > b[1]
+      ? a[1] - startUp
+      : common[1] - startUp,
+    a[2] < b[0]
+      ? a[1] > b[3] || a[3] < b[1]
+        ? Math.max((a[2] + b[0]) / 2, a[2] + startRight)
+        : (a[2] + b[0]) / 2
+      : a[2] < b[2]
+      ? a[2] + startRight
+      : common[2] + startRight,
+    a[3] < b[1]
+      ? a[0] > b[2] || a[2] < b[0]
+        ? Math.max((a[3] + b[1]) / 2, a[3] + startDown)
+        : (a[3] + b[1]) / 2
+      : a[3] < b[3]
+      ? a[3] + startDown
+      : common[3] + startDown,
+  ] as Bounds;
+  const second = [
+    b[0] > a[2]
+      ? b[1] > a[3] || b[3] < a[1]
+        ? Math.min((b[0] + a[2]) / 2, b[0] - endLeft)
+        : (b[0] + a[2]) / 2
+      : b[0] > a[0]
+      ? b[0] - endLeft
+      : common[0] - endLeft,
+    b[1] > a[3]
+      ? b[0] > a[2] || b[2] < a[0]
+        ? Math.min((b[1] + a[3]) / 2, b[1] - endUp)
+        : (b[1] + a[3]) / 2
+      : b[1] > a[1]
+      ? b[1] - endUp
+      : common[1] - endUp,
+    b[2] < a[0]
+      ? b[1] > a[3] || b[3] < a[1]
+        ? Math.max((b[2] + a[0]) / 2, b[2] + endRight)
+        : (b[2] + a[0]) / 2
+      : b[2] < a[2]
+      ? b[2] + endRight
+      : common[2] + endRight,
+    b[3] < a[1]
+      ? b[0] > a[2] || b[2] < a[0]
+        ? Math.max((b[3] + a[1]) / 2, b[3] + endDown)
+        : (b[3] + a[1]) / 2
+      : b[3] < a[3]
+      ? b[3] + endDown
+      : common[3] + endDown,
+  ] as Bounds;
+
+  const c = commonAABB([first, second]);
+  if (
+    first[2] - first[0] + second[2] - second[0] > c[2] - c[0] + 0.00000000001 &&
+    first[3] - first[1] + second[3] - second[1] > c[3] - c[1] + 0.00000000001
+  ) {
+    const [endCenterX, endCenterY] = [
+      (second[0] + second[2]) / 2,
+      (second[1] + second[3]) / 2,
+    ];
+    const cX = (c[0] + c[2]) / 2;
+    const cY = (c[1] + c[3]) / 2;
+
+    if (b[0] > a[2] && a[1] > b[3]) {
+      // BOTTOM LEFT
+      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [first[0], first[1], cX, first[3]],
+          [cX, second[1], second[2], second[3]],
+        ];
+      }
+
+      return [
+        [first[0], cY, first[2], first[3]],
+        [second[0], second[1], second[2], cY],
+      ];
+    } else if (a[2] < b[0] && a[3] < b[1]) {
+      // TOP LEFT
+      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [first[0], first[1], cX, first[3]],
+          [cX, second[1], second[2], second[3]],
+        ];
+      }
+
+      return [
+        [first[0], first[1], first[2], cY],
+        [second[0], cY, second[2], second[3]],
+      ];
+    } else if (a[0] > b[2] && a[3] < b[1]) {
+      // TOP RIGHT
+      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [cX, first[1], first[2], first[3]],
+          [second[0], second[1], cX, second[3]],
+        ];
+      }
+
+      return [
+        [first[0], first[1], first[2], cY],
+        [second[0], cY, second[2], second[3]],
+      ];
+    } else if (a[0] > b[2] && a[1] > b[3]) {
+      // BOTTOM RIGHT
+      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+        return [
+          [cX, first[1], first[2], first[3]],
+          [second[0], second[1], cX, second[3]],
+        ];
+      }
+
+      return [
+        [first[0], cY, first[2], first[3]],
+        [second[0], second[1], second[2], cY],
+      ];
+    }
+  }
+
+  return [first, second];
 };
 
 /**
@@ -776,64 +908,6 @@ const pointToGridNode = (point: Point, grid: Grid): Node | null => {
   return null;
 };
 
-/**
- * Get the axis-aligned bounding box for a given element
- */
-export const aabbForElement = (
-  element: ExcalidrawElement,
-  offset?: [number, number, number, number],
-) => {
-  const bbox = {
-    minX: element.x,
-    minY: element.y,
-    maxX: element.x + element.width,
-    maxY: element.y + element.height,
-    midX: element.x + element.width / 2,
-    midY: element.y + element.height / 2,
-  };
-
-  const center = [bbox.midX, bbox.midY] as Point;
-  const [topLeftX, topLeftY] = rotatePoint(
-    [bbox.minX, bbox.minY],
-    center,
-    element.angle,
-  );
-  const [topRightX, topRightY] = rotatePoint(
-    [bbox.maxX, bbox.minY],
-    center,
-    element.angle,
-  );
-  const [bottomRightX, bottomRightY] = rotatePoint(
-    [bbox.maxX, bbox.maxY],
-    center,
-    element.angle,
-  );
-  const [bottomLeftX, bottomLeftY] = rotatePoint(
-    [bbox.minX, bbox.maxY],
-    center,
-    element.angle,
-  );
-
-  const bounds = [
-    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
-    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
-    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
-    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
-  ] as Bounds;
-
-  if (offset) {
-    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
-    return [
-      bounds[0] - leftOffset,
-      bounds[1] - topOffset,
-      bounds[2] + rightOffset,
-      bounds[3] + downOffset,
-    ] as Bounds;
-  }
-
-  return bounds;
-};
-
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
@@ -978,32 +1052,23 @@ const getBindableElementForId = (
   return null;
 };
 
-const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
-  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
-
 const normalizedArrowElementUpdate = (
-  points: Point[],
+  global: Point[],
   externalOffsetX?: number,
   externalOffsetY?: number,
 ) => {
-  const offsetX = points[0][0];
-  const offsetY = points[0][1];
-  const [farthestX, farthestY] = points.reduce(
-    (farthest, point) => [
-      farthest[0] < point[0] ? point[0] : farthest[0],
-      farthest[1] < point[1] ? point[1] : farthest[1],
-    ],
-    points[0],
+  const offsetX = global[0][0];
+  const offsetY = global[0][1];
+
+  const points = global.map(
+    (point, _idx) => [point[0] - offsetX, point[1] - offsetY] as const,
   );
 
   return {
-    points: points.map((point, _idx) => {
-      return [point[0] - offsetX, point[1] - offsetY] as const;
-    }),
+    points,
     x: offsetX + (externalOffsetX ?? 0),
     y: offsetY + (externalOffsetY ?? 0),
-    width: farthestX - offsetX + (externalOffsetX ?? 0),
-    height: farthestY - offsetY + (externalOffsetY ?? 0),
+    ...getSizeFromPoints(points),
   };
 };
 
@@ -1092,3 +1157,13 @@ export const getArrowLocalFixedPoints = (
     LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
   ];
 };
+
+const aabbsOverlapping = (a: Bounds, b: Bounds) =>
+  pointInsideBounds([a[0], a[1]], b) ||
+  pointInsideBounds([a[2], a[1]], b) ||
+  pointInsideBounds([a[2], a[3]], b) ||
+  pointInsideBounds([a[0], a[3]], b) ||
+  pointInsideBounds([b[0], b[1]], a) ||
+  pointInsideBounds([b[2], b[1]], a) ||
+  pointInsideBounds([b[2], b[3]], a) ||
+  pointInsideBounds([b[0], b[3]], a);

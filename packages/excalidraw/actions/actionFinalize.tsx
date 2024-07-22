@@ -138,7 +138,6 @@ export const actionFinalize = register({
           { x, y },
           elementsMap,
           elements,
-          app.scene,
         );
       }
     }

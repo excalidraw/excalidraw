@@ -2831,7 +2831,6 @@ class App extends React.Component<AppProps, AppState> {
         ),
         this.scene.getNonDeletedElementsMap(),
         this.scene.getNonDeletedElements(),
-        this.scene,
       );
     }
 
@@ -4144,11 +4143,13 @@ class App extends React.Component<AppProps, AppState> {
                   selectedElements[0].id
               ) {
                 this.store.shouldCaptureIncrement();
-                this.setState({
-                  editingLinearElement: new LinearElementEditor(
-                    selectedElement,
-                  ),
-                });
+                if (!isElbowArrow(selectedElement)) {
+                  this.setState({
+                    editingLinearElement: new LinearElementEditor(
+                      selectedElement,
+                    ),
+                  });
+                }
               }
             }
           } else if (
@@ -5522,13 +5523,22 @@ class App extends React.Component<AppProps, AppState> {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isElbowArrow(multiElement)) {
-          mutateElbowArrow(multiElement as ExcalidrawArrowElement, this.scene, [
-            ...points.slice(0, -1),
+          mutateElbowArrow(
+            multiElement as ExcalidrawArrowElement,
+            this.scene,
             [
-              lastCommittedX + dxFromLastCommitted,
-              lastCommittedY + dyFromLastCommitted,
+              ...points.slice(0, -1),
+              [
+                lastCommittedX + dxFromLastCommitted,
+                lastCommittedY + dyFromLastCommitted,
+              ],
             ],
-          ]);
+            undefined,
+            undefined,
+            {
+              isDragging: true,
+            },
+          );
         } else {
           // update last uncommitted point
           mutateElement(multiElement, {
@@ -8276,7 +8286,6 @@ class App extends React.Component<AppProps, AppState> {
               pointerCoords,
               this.scene.getNonDeletedElementsMap(),
               this.scene.getNonDeletedElements(),
-              this.scene,
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -9357,6 +9366,7 @@ class App extends React.Component<AppProps, AppState> {
           coords,
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
+          isArrowElement(linearElement) && isElbowArrow(linearElement),
         );
         if (
           hoveredBindableElement != null &&

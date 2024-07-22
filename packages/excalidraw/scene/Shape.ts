@@ -409,8 +409,8 @@ export const _generateElementShape = (
       if (isElbowArrow(element)) {
         shape = [
           generator.path(
-            generateElbowArrowShape(points as [number, number][], 10),
-            options,
+            generateElbowArrowShape(points as [number, number][], 16),
+            generateRoughOptions(element, true),
           ),
         ];
       } else if (!element.roundness) {

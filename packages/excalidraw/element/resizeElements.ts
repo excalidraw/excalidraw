@@ -980,22 +980,12 @@ export const resizeMultipleElements = (
     const { angle } = update;
     const { width: oldWidth, height: oldHeight } = element;
 
-    if (isArrowElement(element) && isElbowArrow(element)) {
-      const { points } = update;
+    mutateElement(element, update, false);
 
-      points &&
-        mutateElbowArrow(
-          element,
-          scene,
-          getArrowLocalFixedPoints(element, elementsMap),
-          undefined,
-          undefined,
-          {
-            informMutation: false,
-          },
-        );
-    } else {
-      mutateElement(element, update, false);
+    if (isArrowElement(element) && isElbowArrow(element)) {
+      mutateElbowArrow(element, scene, element.points, undefined, undefined, {
+        informMutation: false,
+      });
     }
 
     updateBoundElements(element, elementsMap, scene, {

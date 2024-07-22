@@ -1,9 +1,15 @@
-import { HEADING_DOWN, HEADING_LEFT, HEADING_RIGHT, HEADING_UP } from "../math";
+import {
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_RIGHT,
+  HEADING_UP,
+  aabbForElement,
+} from "../math";
 import type Scene from "../scene/Scene";
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement, headingForPointFromElement } from "./routing";
+import { headingForPointFromElement } from "./routing";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -14,7 +20,7 @@ import type {
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 const VERTICAL_OFFSET = 100;
