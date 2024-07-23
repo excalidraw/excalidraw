@@ -563,6 +563,9 @@ export const vectorToHeading = (vec: Vector): Heading => {
   return HEADING_UP;
 };
 
+export const compareHeading = (a: Heading, b: Heading) =>
+  a[0] === b[0] && a[1] === b[1];
+
 export const scalePointFromOrigin = (
   p: Point,
   mid: Point,

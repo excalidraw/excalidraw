@@ -48,12 +48,20 @@ import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getElementShape } from "../shapes";
 import { headingForPointFromElement } from "./routing";
+import type { Heading } from "../math";
 import {
   aabbForElement,
+  compareHeading,
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_RIGHT,
+  HEADING_UP,
   pointInsideBounds,
+  pointToVector,
   rotatePoint,
   scaleVector,
   translatePoint,
+  vectorToHeading,
 } from "../math";
 
 export type SuggestedBinding =
@@ -671,18 +679,53 @@ const getSimultaneouslyUpdatedElementIds = (
 
 export const bindPointToSnapToElementOutline = (
   point: Point,
+  otherPoint: Point,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): Point => {
-  const heading = headingForPointFromElement(
+  const distance = distanceToBindableElement(
     bindableElement,
-    aabbForElement(bindableElement),
     point,
+    elementsMap,
   );
-  const distance =
-    distanceToBindableElement(bindableElement, point, elementsMap) -
+  const bindDistance = maxBindingGap(
+    bindableElement,
+    bindableElement.width,
+    bindableElement.height,
+  );
+
+  if (distance > bindDistance) {
+    return point;
+  }
+
+  const aabb = aabbForElement(bindableElement);
+  const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
+  const otherPointHeading = scaleVector(
+    vectorToHeading(pointToVector(point, otherPoint)),
+    -1,
+  ) as Heading;
+  const isInner =
+    otherPointHeading === HEADING_LEFT || otherPointHeading === HEADING_RIGHT
+      ? distance < bindableElement.width * -0.2
+      : distance < bindableElement.height * -0.2;
+  const heading = isInner ? otherPointHeading : pointHeading;
+  const pointOnAABB: Point = compareHeading(heading, HEADING_UP)
+    ? [point[0], aabb[1]]
+    : compareHeading(heading, HEADING_RIGHT)
+    ? [aabb[2], point[1]]
+    : compareHeading(heading, HEADING_DOWN)
+    ? [point[0], aabb[3]]
+    : [aabb[0], point[1]];
+  const distanceFromAABB =
+    distanceToBindableElement(bindableElement, pointOnAABB, elementsMap) -
     FIXED_BINDING_DISTANCE;
-  return translatePoint(point, scaleVector(heading, -distance));
+
+  const result = translatePoint(
+    pointOnAABB,
+    scaleVector(heading, -distanceFromAABB),
+  );
+
+  return result;
 };
 
 export const avoidRectangularCorner = (
@@ -880,6 +923,8 @@ const calculateFixedPointForElbowArrowBinding = (
   ] as Bounds;
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
+  const otherPointIndex =
+    startOrEnd === "end" ? 0 : linearElement.points.length - 1;
   const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     linearElement,
     edgePointIndex,
@@ -893,9 +938,15 @@ const calculateFixedPointForElbowArrowBinding = (
     globalPoint,
     globalMidPoint,
     -hoveredElement.angle,
+  ) as Point;
+  const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    otherPointIndex,
+    elementsMap,
   );
   const snappedPoint = bindPointToSnapToElementOutline(
-    [nonRotatedGlobalPoint[0], nonRotatedGlobalPoint[1]],
+    nonRotatedGlobalPoint,
+    otherPoint,
     hoveredElement,
     elementsMap,
   );

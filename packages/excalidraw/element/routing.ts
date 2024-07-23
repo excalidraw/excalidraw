@@ -24,7 +24,6 @@ import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -119,15 +118,19 @@ export const mutateElbowArrow = (
 
   const startGlobalPoint = getGlobalPoint(
     origStartGlobalPoint,
+    origEndGlobalPoint,
     elementsMap,
     startElement,
     hoveredStartElement,
+    options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
     origEndGlobalPoint,
+    origStartGlobalPoint,
     elementsMap,
     endElement,
     hoveredEndElement,
+    options?.isDragging,
   );
 
   const startHeading = getBindPointHeading(
@@ -244,11 +247,11 @@ export const mutateElbowArrow = (
     endHeading,
     commonBounds,
   );
-  console.log(boundsOverlap);
-  dynamicAABBs.forEach((bbox) => debugDrawBounds(bbox));
-  [startElementBounds, endElementBounds]
-    .filter((aabb) => aabb !== null)
-    .forEach((bbox) => debugDrawBounds(bbox, "red"));
+
+  // dynamicAABBs.forEach((bbox) => debugDrawBounds(bbox));
+  // [startElementBounds, endElementBounds]
+  //   .filter((aabb) => aabb !== null)
+  //   .forEach((bbox) => debugDrawBounds(bbox, "red"));
   // debugDrawBounds(commonBounds, "cyan");
   // grid.data.forEach((node) => node && debugDrawPoint(node.pos));
 
@@ -1116,15 +1119,15 @@ export const getArrowLocalFixedPoints = (
   ];
 };
 
-const aabbsOverlapping = (a: Bounds, b: Bounds) =>
-  pointInsideBounds([a[0], a[1]], b) ||
-  pointInsideBounds([a[2], a[1]], b) ||
-  pointInsideBounds([a[2], a[3]], b) ||
-  pointInsideBounds([a[0], a[3]], b) ||
-  pointInsideBounds([b[0], b[1]], a) ||
-  pointInsideBounds([b[2], b[1]], a) ||
-  pointInsideBounds([b[2], b[3]], a) ||
-  pointInsideBounds([b[0], b[3]], a);
+// const aabbsOverlapping = (a: Bounds, b: Bounds) =>
+//   pointInsideBounds([a[0], a[1]], b) ||
+//   pointInsideBounds([a[2], a[1]], b) ||
+//   pointInsideBounds([a[2], a[3]], b) ||
+//   pointInsideBounds([a[0], a[3]], b) ||
+//   pointInsideBounds([b[0], b[1]], a) ||
+//   pointInsideBounds([b[2], b[1]], a) ||
+//   pointInsideBounds([b[2], b[3]], a) ||
+//   pointInsideBounds([b[0], b[3]], a);
 
 const getAllElementsMap = (
   scene: Scene,
@@ -1149,6 +1152,7 @@ const getAllElements = (
 
 const getGlobalPoint = (
   initialPoint: Point,
+  otherPoint: Point,
   elementsMap: NonDeletedSceneElementsMap,
   boundElement?: ExcalidrawBindableElement | null,
   hoveredElement?: ExcalidrawBindableElement | null,
@@ -1159,6 +1163,7 @@ const getGlobalPoint = (
       hoveredElement &&
       bindPointToSnapToElementOutline(
         initialPoint,
+        otherPoint,
         hoveredElement,
         elementsMap,
       );
@@ -1172,6 +1177,7 @@ const getGlobalPoint = (
   } else if (boundElement) {
     return bindPointToSnapToElementOutline(
       initialPoint,
+      otherPoint,
       boundElement,
       elementsMap,
     );
