@@ -795,7 +795,7 @@ export const actionChangeFontFamily = register({
         includeBoundTextElement: true,
       }).filter((element) => isTextElement(element));
 
-      // skip on hover re-render for more than 200 text elements or for text element with more than 10000 chars combined
+      // skip on hover re-render for more than 200 text elements or for text element with more than 5000 chars combined
       if (selectedTextElements.length > 200) {
         skipOnHoverRender = true;
       } else {
@@ -804,7 +804,7 @@ export const actionChangeFontFamily = register({
 
         while (
           i < selectedTextElements.length &&
-          textAccumulator.length < 10000
+          textAccumulator.length < 5000
         ) {
           textAccumulator +=
             (selectedTextElements[i] as ExcalidrawTextElement)?.originalText ||
@@ -812,7 +812,7 @@ export const actionChangeFontFamily = register({
           i++;
         }
 
-        if (textAccumulator.length > 10000) {
+        if (textAccumulator.length > 5000) {
           skipOnHoverRender = true;
         }
       }
