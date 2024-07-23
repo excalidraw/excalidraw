@@ -44,7 +44,6 @@ import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
 import { LOCAL_FONT_PROTOCOL } from "../fonts/metadata";
-import { UNPKG_PROD_URL } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
