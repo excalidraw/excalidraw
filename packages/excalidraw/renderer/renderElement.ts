@@ -120,6 +120,7 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: AppState["theme"];
   scale: number;
+  angle: number;
   zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -237,10 +238,13 @@ const generateElementCanvas = (
   }
 
   drawElementOnCanvas(element, rc, context, renderConfig, appState);
+
   context.restore();
+
   const boundTextElement = getBoundTextElement(element, elementsMap);
   const boundTextCanvas = document.createElement("canvas");
   const boundTextCanvasContext = boundTextCanvas.getContext("2d")!;
+
   if (isArrowElement(element) && boundTextElement) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     // Take max dimensions of arrow canvas so that when canvas is rotated
@@ -299,6 +303,7 @@ const generateElementCanvas = (
         scale,
     );
   }
+  
   return {
     element,
     canvas,
@@ -312,6 +317,7 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     boundTextCanvas,
+    angle: element.angle,
   };
 };
 
@@ -507,8 +513,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
-    const boundTextElement = getBoundTextElement(element, elementsMap);
-    const boundTextElementVersion = boundTextElement?.version || null;
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+  const boundTextElementVersion = boundTextElement?.version || null;
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
@@ -519,7 +525,13 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
-    (isArrowElement(element) && boundTextElement && appState.isRotating)
+    // since we rotate the canvas when copying from cached canvas, we don't
+    // regenerate the cached canvas. But we need to in case of labels which are
+    // cached alongside the arrow, and we want the labels to remain unrotated
+    // with respect to the arrow.
+    (isArrowElement(element) &&
+      boundTextElement &&
+      element.angle !== prevElementWithCanvas.angle)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -557,13 +569,13 @@ const drawElementFromCanvas = (
 
   if (isArrowElement(element) && boundTextElement) {
     const offsetX =
-    (elementWithCanvas.boundTextCanvas.width -
-      elementWithCanvas.canvas!.width) /
-    2;
-  const offsetY =
-    (elementWithCanvas.boundTextCanvas.height -
-      elementWithCanvas.canvas!.height) /
-    2;
+      (elementWithCanvas.boundTextCanvas.width -
+        elementWithCanvas.canvas!.width) /
+      2;
+    const offsetY =
+      (elementWithCanvas.boundTextCanvas.height -
+        elementWithCanvas.canvas!.height) /
+      2;
     context.translate(cx, cy);
     context.drawImage(
       elementWithCanvas.boundTextCanvas,
