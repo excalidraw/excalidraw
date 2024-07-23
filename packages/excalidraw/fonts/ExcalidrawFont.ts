@@ -21,10 +21,12 @@ export class ExcalidrawFont implements Font {
     // fallback to unpkg to form a valid URL in case of a passed relative assetUrl
     let baseUrlBuilder = window.EXCALIDRAW_ASSET_PATH || UNPKG_PROD_URL;
 
-    // in case user passed a root-relative url (~absolute path), like "/" or "/some/path"; we prepend it with `location.origin`
-    if (baseUrlBuilder.startsWith("/")) {
+    // in case user passed a root-relative url (~absolute path),
+    // like "/" or "/some/path", or relative (starts with "./"),
+    // prepend it with `location.origin`
+    if (/^\.?\//.test(baseUrlBuilder)) {
       baseUrlBuilder = new URL(
-        baseUrlBuilder.replace(/^\/+/, ""),
+        baseUrlBuilder.replace(/^\.?\/+/, ""),
         window?.location?.origin,
       ).toString();
     }
