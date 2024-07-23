@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES } from "../constants";
+import { CLASSES, isSafari } from "../constants";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -241,8 +241,10 @@ export const textWysiwyg = ({
 
       const font = getFontString(updatedTextElement);
 
-      // adding left and right padding buffer, so that browser does not cut the glyphs
-      const padding = Math.ceil(updatedTextElement.fontSize / 2);
+      // adding left and right padding buffer, so that browser does not cut the glyphs (does not work in Safari)
+      const padding = !isSafari
+        ? Math.ceil(updatedTextElement.fontSize / 2)
+        : 0;
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
