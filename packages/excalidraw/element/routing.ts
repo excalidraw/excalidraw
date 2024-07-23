@@ -24,7 +24,7 @@ import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -168,7 +168,25 @@ export const mutateElbowArrow = (
         offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 4, 1),
       )
     : endPointBounds;
-  const boundsOverlap = aabbsOverlapping(startElementBounds, endElementBounds);
+  const boundsOverlap =
+    pointInsideBounds(
+      startGlobalPoint,
+      hoveredEndElement
+        ? aabbForElement(
+            hoveredEndElement,
+            offsetFromHeading(endHeading, 40, 40),
+          )
+        : endPointBounds,
+    ) ||
+    pointInsideBounds(
+      endGlobalPoint,
+      hoveredStartElement
+        ? aabbForElement(
+            hoveredStartElement,
+            offsetFromHeading(startHeading, 40, 40),
+          )
+        : startPointBounds,
+    );
   const commonBounds = commonAABB(
     boundsOverlap
       ? [startPointBounds, endPointBounds]
@@ -226,11 +244,11 @@ export const mutateElbowArrow = (
     endHeading,
     commonBounds,
   );
-
+  console.log(boundsOverlap);
   dynamicAABBs.forEach((bbox) => debugDrawBounds(bbox));
-  // [startElementBounds, endElementBounds]
-  //   .filter((aabb) => aabb !== null)
-  //   .forEach((bbox) => debugDrawBounds(bbox, "red"));
+  [startElementBounds, endElementBounds]
+    .filter((aabb) => aabb !== null)
+    .forEach((bbox) => debugDrawBounds(bbox, "red"));
   // debugDrawBounds(commonBounds, "cyan");
   // grid.data.forEach((node) => node && debugDrawPoint(node.pos));
 
