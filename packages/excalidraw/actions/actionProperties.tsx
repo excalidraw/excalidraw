@@ -1,4 +1,4 @@
-import type { AppClassProperties, AppState, Primitive } from "../types";
+import type { AppClassProperties, AppState, Point, Primitive } from "../types";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -99,10 +99,15 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap, getShortcutKey } from "../utils";
+import { arrayToMap, getShortcutKey, tupleToCoors } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
 import { getArrowLocalFixedPoints, mutateElbowArrow } from "../element/routing";
+import {
+  bindLinearElement,
+  bindPointToSnapToElementOutline,
+  getHoveredElementForBinding,
+} from "../element/binding";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1271,11 +1276,61 @@ export const actionChangeArrowType = register({
 
         if (value === "elbow") {
           const elementsMap = app.scene.getNonDeletedElementsMap();
-
+          const [startPoint, endPoint] = getArrowLocalFixedPoints(
+            newElement,
+            elementsMap,
+          );
+          const startGlobalPoint = [
+            newElement.x + startPoint[0],
+            newElement.y + startPoint[1],
+          ] as Point;
+          const endGlobalPoint = [
+            newElement.x + endPoint[0],
+            newElement.y + endPoint[1],
+          ] as Point;
+          const startElement =
+            !newElement.startBinding &&
+            getHoveredElementForBinding(
+              tupleToCoors(startGlobalPoint),
+              elements,
+              elementsMap,
+              true,
+            );
+          const finalStartPoint = startElement
+            ? bindPointToSnapToElementOutline(
+                startGlobalPoint,
+                endGlobalPoint,
+                startElement,
+                elementsMap,
+              )
+            : startGlobalPoint;
+          const endElement =
+            !newElement.endBinding &&
+            getHoveredElementForBinding(
+              tupleToCoors(endGlobalPoint),
+              elements,
+              elementsMap,
+              true,
+            );
+          const finalEndPoint = endElement
+            ? bindPointToSnapToElementOutline(
+                endGlobalPoint,
+                startGlobalPoint,
+                endElement,
+                elementsMap,
+              )
+            : endGlobalPoint;
+          startElement &&
+            bindLinearElement(newElement, startElement, "start", elementsMap);
+          endElement &&
+            bindLinearElement(newElement, endElement, "end", elementsMap);
           mutateElbowArrow(
             newElement,
             app.scene,
-            getArrowLocalFixedPoints(newElement, elementsMap),
+            [finalStartPoint, finalEndPoint].map(
+              (point) =>
+                [point[0] - newElement.x, point[1] - newElement.y] as Point,
+            ),
             [0, 0],
           );
         }
