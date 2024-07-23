@@ -176,14 +176,17 @@ export const actionDeleteSelected = register({
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, appState, updateData }) => (
     <ToolButton
       type="button"
       icon={TrashIcon}
       title={t("labels.delete")}
       aria-label={t("labels.delete")}
       onClick={() => updateData(null)}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     />
   ),
 });

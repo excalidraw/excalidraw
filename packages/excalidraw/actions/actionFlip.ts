@@ -1,6 +1,5 @@
 import { register } from "./register";
 import { getSelectedElements } from "../scene";
-import { getNonDeletedElements } from "../element";
 import type {
   ExcalidrawElement,
   NonDeleted,
@@ -79,7 +78,7 @@ const flipSelectedElements = (
   app: AppClassProperties,
 ) => {
   const selectedElements = getSelectedElements(
-    getNonDeletedElements(elements),
+    app.scene.getNonDeletedElements(),
     appState,
     {
       includeBoundTextElement: true,

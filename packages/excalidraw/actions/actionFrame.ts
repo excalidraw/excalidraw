@@ -1,4 +1,3 @@
-import { getNonDeletedElements } from "../element";
 import type { ExcalidrawElement } from "../element/types";
 import { removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
@@ -32,7 +31,7 @@ export const actionSelectAllElementsInFrame = register({
 
     if (isFrameLikeElement(selectedElement)) {
       const elementsInFrame = getFrameChildren(
-        getNonDeletedElements(elements),
+        app.scene.getNonDeletedElements(),
         selectedElement.id,
       ).filter((element) => !(element.type === "text" && element.containerId));
 

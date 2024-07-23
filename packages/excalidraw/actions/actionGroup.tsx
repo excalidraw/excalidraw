@@ -178,7 +178,10 @@ export const actionGroup = register({
       onClick={() => updateData(null)}
       title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
       aria-label={t("labels.group")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     ></ToolButton>
   ),
 });
@@ -275,7 +278,7 @@ export const actionUngroup = register({
     event.key === KEYS.G.toUpperCase(),
   predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ elements, app, appState, updateData }) => (
     <ToolButton
       type="button"
       hidden={getSelectedGroupIds(appState).length === 0}
@@ -283,7 +286,10 @@ export const actionUngroup = register({
       onClick={() => updateData(null)}
       title={`${t("labels.ungroup")} — ${getShortcutKey("CtrlOrCmd+Shift+G")}`}
       aria-label={t("labels.ungroup")}
-      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      visible={isSomeElementSelected(
+        app.scene.getNonDeletedElements(),
+        appState,
+      )}
     ></ToolButton>
   ),
 });

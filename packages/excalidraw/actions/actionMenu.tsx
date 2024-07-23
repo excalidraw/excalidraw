@@ -1,7 +1,7 @@
 import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { showSelectedShapeActions, getNonDeletedElements } from "../element";
+import { showSelectedShapeActions } from "../element";
 import { register } from "./register";
 import { KEYS } from "../keys";
 import { StoreAction } from "../store";
@@ -39,11 +39,11 @@ export const actionToggleEditMenu = register({
     },
     storeAction: StoreAction.NONE,
   }),
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: ({ app, appState, updateData }) => (
     <ToolButton
       visible={showSelectedShapeActions(
         appState,
-        getNonDeletedElements(elements),
+        app.scene.getNonDeletedElements(),
       )}
       type="button"
       icon={palette}

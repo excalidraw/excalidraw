@@ -13,7 +13,6 @@ import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import type { Theme } from "../element/types";
@@ -51,8 +50,8 @@ export const actionChangeExportScale = register({
       storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ elements: allElements, appState, updateData }) => {
-    const elements = getNonDeletedElements(allElements);
+  PanelComponent: ({ app, appState, updateData }) => {
+    const elements = app.scene.getNonDeletedElements();
     const exportSelected = isSomeElementSelected(elements, appState);
     const exportedElements = exportSelected
       ? getSelectedElements(elements, appState)
