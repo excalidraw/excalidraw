@@ -33,7 +33,7 @@ import NunitoVietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
   // a static member to reduce memory footprint
-  private static readonly loadedFontsCache = new Set<string>();
+  public static readonly loadedFontsCache = new Set<string>();
 
   private static _registered:
     | Map<
@@ -188,7 +188,7 @@ export class Fonts {
       uri: LOCAL_FONT_PROTOCOL,
     });
 
-    // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept for consistency)
+    // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept in for consistency)
     _register(
       "Liberation Sans",
       FONT_METADATA[FONT_FAMILY["Liberation Sans"]],
@@ -197,7 +197,7 @@ export class Fonts {
       },
     );
 
-    // used for frame labels on export
+    // used for frame labels on export (~metrics are needed for vertical offset calc.)
     _register("Assistant", FONT_METADATA[FONT_FAMILY.Assistant], {
       uri: Assistant,
     });

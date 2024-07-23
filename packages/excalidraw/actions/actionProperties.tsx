@@ -54,6 +54,7 @@ import {
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
   ROUNDNESS,
   STROKE_WIDTH,
   VERTICAL_ALIGN,
@@ -93,7 +94,7 @@ import { hasStrokeColor } from "../scene/comparisons";
 import { arrayToMap, getFontString, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
-import { getLineHeight } from "../fonts";
+import { Fonts, getLineHeight } from "../fonts";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -781,7 +782,7 @@ export const actionChangeFontFamily = register({
 
     let nexStoreAction: StoreActionType = StoreAction.NONE;
     let nextFontFamily: FontFamilyValues | undefined;
-    let skipRender: boolean = false;
+    let skipOnHoverRender = false;
 
     if (currentItemFontFamily) {
       nextFontFamily = currentItemFontFamily;
@@ -790,13 +791,30 @@ export const actionChangeFontFamily = register({
       nextFontFamily = currentHoveredFontFamily;
       nexStoreAction = StoreAction.NONE;
 
-      const selectedElements = getSelectedElements(elements, appState, {
+      const selectedTextElements = getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
-      });
+      }).filter((element) => isTextElement(element));
 
-      // skip hover re-render for more than 100 elements
-      if (selectedElements.length > 100) {
-        skipRender = true;
+      // skip on hover re-render for more than 200 text elements or for text element with more than 10000 chars combined
+      if (selectedTextElements.length > 200) {
+        skipOnHoverRender = true;
+      } else {
+        let i = 0;
+        let textAccumulator = "";
+
+        while (
+          i < selectedTextElements.length &&
+          textAccumulator.length < 10000
+        ) {
+          textAccumulator +=
+            (selectedTextElements[i] as ExcalidrawTextElement)?.originalText ||
+            "";
+          i++;
+        }
+
+        if (textAccumulator.length > 10000) {
+          skipOnHoverRender = true;
+        }
       }
     }
 
@@ -808,7 +826,7 @@ export const actionChangeFontFamily = register({
       storeAction: nexStoreAction,
     };
 
-    if (nextFontFamily && !skipRender) {
+    if (nextFontFamily && !skipOnHoverRender) {
       // following causes re-render so make sure we changed the family
       // otherwise it could cause unexpected issues, such as preventing opening the popover when in wysiwyg
       Object.assign(result, {
@@ -839,18 +857,29 @@ export const actionChangeFontFamily = register({
               }
 
               const fontString = getFontString(newElement);
+              const fontsCache = Array.from(Fonts.loadedFontsCache.values());
+              const fontFamily = Object.entries(FONT_FAMILY).find(
+                (_, value) => value === nextFontFamily,
+              )?.[0];
 
+              // try to redraw immediately, if we have at least one font face of the given family loaded
+              // not ideal, but `document.fonts.check()` is super slow, so we cannot do it on each change
               if (
-                !window.document.fonts.check(
-                  fontString,
-                  newElement.originalText,
-                )
+                fontFamily &&
+                fontsCache.some((sig) => sig.startsWith(fontFamily))
               ) {
-                // trigger load, don't await, but redraw once our font face loaded (i.e. to update bbox)
+                redrawTextBoundingBox(
+                  newElement,
+                  container,
+                  app.scene.getNonDeletedElementsMap(),
+                  false, // synchronous redraw
+                );
+              } else {
+                // no such font is yet loaded, hence load, don't await, but redraw once our font faces loaded (i.e. to update bbox)
                 window.document.fonts
                   .load(fontString, newElement.originalText)
                   .then(() => {
-                    // use latest element state to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
+                    // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
                     const latestElement = app.scene.getElement(newElement.id);
                     const latestContainer = container
                       ? app.scene.getElement(container.id)
@@ -865,14 +894,6 @@ export const actionChangeFontFamily = register({
                       );
                     }
                   });
-              } else {
-                // redraw immediately if all the font faces have already loaded
-                redrawTextBoundingBox(
-                  newElement,
-                  container,
-                  app.scene.getNonDeletedElementsMap(),
-                  false,
-                );
               }
 
               return newElement;
