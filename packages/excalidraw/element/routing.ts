@@ -168,25 +168,43 @@ export const mutateElbowArrow = (
         offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 4, 1),
       )
     : endPointBounds;
-  const commonBounds = commonAABB([startElementBounds, endElementBounds]);
+  const boundsOverlap = aabbsOverlapping(startElementBounds, endElementBounds);
+  const commonBounds = commonAABB(
+    boundsOverlap
+      ? [startPointBounds, endPointBounds]
+      : [startElementBounds, endElementBounds],
+  );
   const dynamicAABBs = generateDynamicAABBs(
-    startElementBounds,
-    endElementBounds,
+    boundsOverlap ? startPointBounds : startElementBounds,
+    boundsOverlap ? endPointBounds : endElementBounds,
     commonBounds,
-    offsetFromHeading(
-      startHeading,
-      !hoveredStartElement && !hoveredEndElement
-        ? 0
-        : 40 - FIXED_BINDING_DISTANCE * 4,
-      40,
-    ),
-    offsetFromHeading(
-      endHeading,
-      !hoveredStartElement && !hoveredEndElement
-        ? 0
-        : 40 - FIXED_BINDING_DISTANCE * 4,
-      40,
-    ),
+    boundsOverlap
+      ? offsetFromHeading(
+          startHeading,
+          !hoveredStartElement && !hoveredEndElement ? 0 : 40,
+          0,
+        )
+      : offsetFromHeading(
+          startHeading,
+          !hoveredStartElement && !hoveredEndElement
+            ? 0
+            : 40 - FIXED_BINDING_DISTANCE * 4,
+          40,
+        ),
+    boundsOverlap
+      ? offsetFromHeading(
+          endHeading,
+          !hoveredStartElement && !hoveredEndElement ? 0 : 40,
+          0,
+        )
+      : offsetFromHeading(
+          endHeading,
+          !hoveredStartElement && !hoveredEndElement
+            ? 0
+            : 40 - FIXED_BINDING_DISTANCE * 4,
+          40,
+        ),
+    boundsOverlap,
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -199,12 +217,6 @@ export const mutateElbowArrow = (
     endGlobalPoint,
   );
 
-  dynamicAABBs.forEach((bbox) => debugDrawBounds(bbox));
-  [startElementBounds, endElementBounds]
-    .filter((aabb) => aabb !== null)
-    .forEach((bbox) => debugDrawBounds(bbox, "red"));
-  debugDrawBounds(commonBounds, "cyan");
-
   // Canculate Grid positions
   const grid = calculateGrid(
     dynamicAABBs,
@@ -215,7 +227,12 @@ export const mutateElbowArrow = (
     commonBounds,
   );
 
-  grid.data.forEach((node) => node && debugDrawPoint(node.pos));
+  dynamicAABBs.forEach((bbox) => debugDrawBounds(bbox));
+  // [startElementBounds, endElementBounds]
+  //   .filter((aabb) => aabb !== null)
+  //   .forEach((bbox) => debugDrawBounds(bbox, "red"));
+  // debugDrawBounds(commonBounds, "cyan");
+  // grid.data.forEach((node) => node && debugDrawPoint(node.pos));
 
   const startDongle =
     startDonglePosition && pointToGridNode(startDonglePosition, grid);
@@ -423,28 +440,12 @@ const generateDynamicAABBs = (
   common: Bounds,
   startDifference?: [number, number, number, number],
   endDifference?: [number, number, number, number],
+  disableSideHack?: boolean,
 ): Bounds[] => {
   const [startUp, startRight, startDown, startLeft] = startDifference ?? [
     0, 0, 0, 0,
   ];
   const [endUp, endRight, endDown, endLeft] = endDifference ?? [0, 0, 0, 0];
-
-  if (aabbsOverlapping(a, b)) {
-    return [
-      [
-        a[0] - (common[0] === a[0] ? 40 : 0),
-        a[1] - (common[1] === a[1] ? 40 : 0),
-        a[2] + (common[2] === a[2] ? 40 : 0),
-        a[3] + (common[3] === a[3] ? 40 : 0),
-      ],
-      [
-        b[0] - (common[0] === b[0] ? 40 : 0),
-        b[1] - (common[1] === b[1] ? 40 : 0),
-        b[2] + (common[2] === b[2] ? 40 : 0),
-        b[3] + (common[3] === b[3] ? 40 : 0),
-      ],
-    ];
-  }
 
   const first = [
     a[0] > b[2]
@@ -509,6 +510,7 @@ const generateDynamicAABBs = (
 
   const c = commonAABB([first, second]);
   if (
+    !disableSideHack &&
     first[2] - first[0] + second[2] - second[0] > c[2] - c[0] + 0.00000000001 &&
     first[3] - first[1] + second[3] - second[1] > c[3] - c[1] + 0.00000000001
   ) {
