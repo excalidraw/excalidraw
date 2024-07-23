@@ -16,7 +16,6 @@ import { getContainerElement } from "../element/textElement";
 
 import Virgil from "./assets/Virgil-Regular.woff2";
 import Excalifont from "./assets/Excalifont-Regular.woff2";
-import Assistant from "./assets/Assistant-Regular.woff2";
 import Cascadia from "./assets/CascadiaMono-Regular.woff2";
 import ComicShanns from "./assets/ComicShanns-Regular.woff2";
 import LiberationSans from "./assets/LiberationSans-Regular.woff2";
@@ -196,11 +195,6 @@ export class Fonts {
         uri: LiberationSans,
       },
     );
-
-    // used for frame labels on export (~metrics are needed for vertical offset calc.)
-    _register("Assistant", FONT_METADATA[FONT_FAMILY.Assistant], {
-      uri: Assistant,
-    });
 
     _register("Cascadia", FONT_METADATA[FONT_FAMILY.Cascadia], {
       uri: Cascadia,

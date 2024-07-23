@@ -48,7 +48,11 @@ Object.defineProperty(window, "FontFace", {
 });
 
 Object.defineProperty(document, "fonts", {
-  value: new Set(),
+  value: {
+    load: vi.fn().mockResolvedValue(false),
+    has: vi.fn().mockResolvedValue(true),
+    add: vi.fn(),
+  },
 });
 
 Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {

@@ -21,10 +21,6 @@ exports[`exportToSvg > with default arguments 1`] = `
       class="style-fonts"
     >
       
-      @font-face {
-        font-family: "Assistant";
-        src: url(https://excalidraw.com/Assistant-Regular.woff2);
-      }
       
     
     </style>
@@ -115,10 +111,6 @@ exports[`exportToSvg > with elements that have a link 1`] = `
   
   <defs>
     <style class="style-fonts">
-      @font-face {
-        font-family: "Assistant";
-        src: url(https://excalidraw.com/Assistant-Regular.woff2);
-      }
       
     </style>
     
@@ -132,10 +124,6 @@ exports[`exportToSvg > with exportEmbedScene 1`] = `
   <!-- payload-type:application/vnd.excalidraw+json --><!-- payload-version:2 --><!-- payload-start -->eyJ2ZXJzaW9uIjoiMSIsImVuY29kaW5nIjoiYnN0cmluZyIsImNvbXByZXNzZWQiOnRydWUsImVuY29kZWQiOiJ4nO1WW2vbMFx1MDAxNH7vrzDaa1llJ2myvGXrLoWxwTIorPRBtY5tYVlyJTmXhfz3SvJiOV7Z81x1MDAxYeJcdTAwMDfD+c5Vn76DvbuIXCJktjWgeYRgk1x1MDAxMs6oXCJrdOnwXHUwMDE1KM2ksK7E21o2KvWRhTH1/OqKS5tQSG3mI4xxm1x1MDAwNFx1MDAxYypcdTAwMTBG27B7a0fRzr+th1GXurpTT99cdTAwMTdZyVx1MDAwNE2e0mr69Wbx+ZdP9UFcdTAwMWJcdTAwMWIzjsedvXXdR9POXjNqXG6LxVx1MDAxOHdYXHUwMDAxLC/MXHUwMDAwJFwi527WgGijZFx0XHUwMDFmJJfKXHLyXHUwMDA2+ye0fiRpmSvZXGJcdTAwMWFi4lx0IY9ZiMlcdTAwMTjnS7PlLVx1MDAwYiQtXHUwMDFhXHUwMDA1aNDh7jDiXHUwMDAw7/K0tCyHLNsyL1x1MDAwNGh9lCNrkjKzXHUwMDFknMrNV99Sz+5DmEqRXG5uXHUwMDFkvaLhvF9Y0D+Fj1x1MDAxY5Z7cEQj0ju+XHUwMDA2oL7bOL6eTN/hWedcdDqIXHUwMDEzPES/SeE1XHUwMDExx7NcdTAwMTnG42R6XHUwMDFk2uhcdTAwMWKrXHUwMDA248tmhGtcYlS7yT5cdTAwMDalXHUwMDFjTdfUlLRJgVxyzkQ5jLPqK1+ofVAzZaSSglwij+8vz1r837VcdTAwMTifrlx1MDAxNoFzVms4a/G1aDE5XS1cdTAwMWHYmN7FSWGW7Lfz9M7g0E+kYtzxPFx0JVxcqi0hXHUwMDE1y5kgPDqudYB//jvMWVx1MDAwYs5yR1x1MDAxY+KQ9VxcljvD7D9F5zayXHUwMDBl3tRORZhcdTAwMDD195VaXHUwMDFl4Esn97dJmJk0Rv5cdTAwMDDdXHUwMDFl0TNyXsJXsoSj81x1MDAxMnZLXHUwMDE4XHUwMDA2P6UltG8vXHUwMDE0ROp6aSyx1t2uJFoxWL9/QfSZf9yX1K+wXHUwMDEzPbhb2u0v9s9cdTAwMGXWRI8ifQ==<!-- payload-end -->
   <defs>
     <style class="style-fonts">
-      @font-face {
-        font-family: "Assistant";
-        src: url(https://excalidraw.com/Assistant-Regular.woff2);
-      }
       
     </style>
     

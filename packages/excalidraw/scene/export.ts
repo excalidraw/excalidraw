@@ -102,7 +102,7 @@ const addFrameLabelsAsTextElements = (
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: FONT_FAMILY.Assistant,
+        fontFamily: FONT_FAMILY.Helvetica,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
@@ -413,21 +413,11 @@ export const exportToSvg = async (
         }),
       );
 
-  // TODO: remove Assistant https-based import once we perform glyphs subsetting and include it as dataurl
-
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
     <style class="style-fonts">
-      @font-face {
-        font-family: "Assistant";
-        src: url(${
-          import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE
-            ? `${UNPKG_PROD_URL}/Assistant-Regular-PLF2XOGW.woff2`
-            : `https://excalidraw.com/Assistant-Regular.woff2`
-        });
-      }
       ${fontFaces.flat().filter(Boolean).join("\n")}
     </style>
     ${exportingFrameClipPath}

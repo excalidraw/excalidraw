@@ -6,10 +6,6 @@ exports[`export > exporting svg containing transformed images > svg export outpu
   
   <defs>
     <style class="style-fonts">
-      @font-face {
-        font-family: "Assistant";
-        src: url(https://excalidraw.com/Assistant-Regular.woff2);
-      }
       
     </style>
     

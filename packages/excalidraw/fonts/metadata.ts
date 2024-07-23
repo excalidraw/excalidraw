@@ -96,16 +96,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     icon: FontFamilyCodeIcon,
     deprecated: true,
   },
-  [FONT_FAMILY.Assistant]: {
-    metrics: {
-      unitsPerEm: 1000,
-      ascender: 1021,
-      descender: -287,
-      lineHeight: 1.25,
-    },
-    icon: FontFamilyNormalIcon,
-    serverSide: true,
-  },
   [FONT_FAMILY["Liberation Sans"]]: {
     metrics: {
       unitsPerEm: 2048,
