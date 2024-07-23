@@ -90,7 +90,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap, getShortcutKey } from "../utils";
+import { arrayToMap, getFontString, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
 import { getLineHeight } from "../fonts";
@@ -780,14 +780,14 @@ export const actionChangeFontFamily = register({
     const { currentItemFontFamily, currentHoveredFontFamily } = value;
 
     let nexStoreAction: StoreActionType = StoreAction.NONE;
-    let fontFamilyChanged: FontFamilyValues | undefined;
+    let nextFontFamily: FontFamilyValues | undefined;
     let skipRender: boolean = false;
 
     if (currentItemFontFamily) {
-      fontFamilyChanged = currentItemFontFamily;
+      nextFontFamily = currentItemFontFamily;
       nexStoreAction = StoreAction.CAPTURE;
     } else if (currentHoveredFontFamily) {
-      fontFamilyChanged = currentHoveredFontFamily;
+      nextFontFamily = currentHoveredFontFamily;
       nexStoreAction = StoreAction.NONE;
 
       const selectedElements = getSelectedElements(elements, appState, {
@@ -808,7 +808,7 @@ export const actionChangeFontFamily = register({
       storeAction: nexStoreAction,
     };
 
-    if (fontFamilyChanged && !skipRender) {
+    if (nextFontFamily && !skipRender) {
       // following causes re-render so make sure we changed the family
       // otherwise it could cause unexpected issues, such as preventing opening the popover when in wysiwyg
       Object.assign(result, {
@@ -816,12 +816,15 @@ export const actionChangeFontFamily = register({
           elements,
           appState,
           (oldElement) => {
-            if (isTextElement(oldElement)) {
+            if (
+              isTextElement(oldElement) &&
+              oldElement.fontFamily !== nextFontFamily
+            ) {
               const newElement: ExcalidrawTextElement = newElementWith(
                 oldElement,
                 {
-                  fontFamily: fontFamilyChanged,
-                  lineHeight: getLineHeight(fontFamilyChanged!),
+                  fontFamily: nextFontFamily,
+                  lineHeight: getLineHeight(nextFontFamily!),
                 },
               );
 
@@ -835,12 +838,43 @@ export const actionChangeFontFamily = register({
                 mutateElement(container, { ...cachedContainer }, false);
               }
 
-              redrawTextBoundingBox(
-                newElement,
-                container,
-                app.scene.getNonDeletedElementsMap(),
-                false,
-              );
+              const fontString = getFontString(newElement);
+
+              if (
+                !window.document.fonts.check(
+                  fontString,
+                  newElement.originalText,
+                )
+              ) {
+                // trigger load, don't await, but redraw once our font face loaded (i.e. to update bbox)
+                window.document.fonts
+                  .load(fontString, newElement.originalText)
+                  .then(() => {
+                    // use latest element state to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
+                    const latestElement = app.scene.getElement(newElement.id);
+                    const latestContainer = container
+                      ? app.scene.getElement(container.id)
+                      : null;
+
+                    if (latestElement) {
+                      redrawTextBoundingBox(
+                        latestElement as ExcalidrawTextElement,
+                        latestContainer,
+                        app.scene.getNonDeletedElementsMap(),
+                        true,
+                      );
+                    }
+                  });
+              } else {
+                // redraw immediately if all the font faces have already loaded
+                redrawTextBoundingBox(
+                  newElement,
+                  container,
+                  app.scene.getNonDeletedElementsMap(),
+                  false,
+                );
+              }
+
               return newElement;
             }
 
