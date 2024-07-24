@@ -25,7 +25,8 @@ export default defineConfig({
       output: {
         assetFileNames(chunkInfo) {
           if (chunkInfo?.name?.endsWith(".woff2")) {
-            return 'assets/fonts/[name]-[hash][extname]';
+            // put on root so we are flexible about the CDN path
+            return '[name]-[hash][extname]';
           }
 
           return 'assets/[name]-[hash][extname]';
