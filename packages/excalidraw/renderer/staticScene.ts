@@ -40,7 +40,7 @@ const strokeGrid = (
   width: number,
   height: number,
 ) => {
-  const BOLD_LINE_FREQUENCY = 5;
+  const BOLD_LINE_FREQUENCY = 10;
 
   enum GridLineColor {
     Bold = "#cccccc",
