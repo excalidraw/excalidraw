@@ -8303,6 +8303,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             selectedLinearElement: new LinearElementEditor(hitElement),
           });
+          return;
         }
       }
 
