@@ -63,6 +63,7 @@ import {
   translatePoint,
   vectorToHeading,
 } from "../math";
+import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -677,12 +678,13 @@ const getSimultaneouslyUpdatedElementIds = (
   return new Set((simultaneouslyUpdated || []).map((element) => element.id));
 };
 
-export const bindPointToSnapToElementOutline = (
+const getHeadingForElbowArrowSnap = (
   point: Point,
   otherPoint: Point,
   bindableElement: ExcalidrawBindableElement,
+  aabb: Bounds,
   elementsMap: ElementsMap,
-): Point => {
+): Heading | null => {
   const distance = distanceToBindableElement(
     bindableElement,
     point,
@@ -695,10 +697,8 @@ export const bindPointToSnapToElementOutline = (
   );
 
   if (distance > bindDistance) {
-    return point;
+    return null;
   }
-
-  const aabb = aabbForElement(bindableElement);
   const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
   const otherPointHeading = scaleVector(
     vectorToHeading(pointToVector(point, otherPoint)),
@@ -708,24 +708,55 @@ export const bindPointToSnapToElementOutline = (
     otherPointHeading === HEADING_LEFT || otherPointHeading === HEADING_RIGHT
       ? distance < bindableElement.width * -0.2
       : distance < bindableElement.height * -0.2;
-  const heading = isInner ? otherPointHeading : pointHeading;
-  const pointOnAABB: Point = compareHeading(heading, HEADING_UP)
-    ? [point[0], aabb[1]]
-    : compareHeading(heading, HEADING_RIGHT)
-    ? [aabb[2], point[1]]
-    : compareHeading(heading, HEADING_DOWN)
-    ? [point[0], aabb[3]]
-    : [aabb[0], point[1]];
-  const distanceFromAABB =
-    distanceToBindableElement(bindableElement, pointOnAABB, elementsMap) -
-    FIXED_BINDING_DISTANCE;
 
-  const result = translatePoint(
-    pointOnAABB,
-    scaleVector(heading, -distanceFromAABB),
+  return isInner ? otherPointHeading : pointHeading;
+};
+
+export const bindPointToSnapToElementOutline = (
+  point: Point,
+  otherPoint: Point,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): Point => {
+  const aabb = aabbForElement(bindableElement);
+  const heading = getHeadingForElbowArrowSnap(
+    point,
+    otherPoint,
+    bindableElement,
+    aabb,
+    elementsMap,
   );
 
-  return result;
+  if (heading) {
+    if (
+      compareHeading(heading, HEADING_UP) ||
+      compareHeading(heading, HEADING_DOWN)
+    ) {
+      const intersection = intersectElementWithLine(
+        bindableElement,
+        [point[0], aabb[1]],
+        [point[0], aabb[3]],
+        5,
+        elementsMap,
+      );
+
+      return compareHeading(heading, HEADING_UP)
+        ? intersection[0]
+        : intersection[1];
+    }
+    const intersection = intersectElementWithLine(
+      bindableElement,
+      [aabb[0], point[1]],
+      [aabb[2], point[1]],
+      5,
+      elementsMap,
+    );
+    return compareHeading(heading, HEADING_LEFT)
+      ? intersection[0]
+      : intersection[1];
+  }
+
+  return point;
 };
 
 export const avoidRectangularCorner = (
