@@ -387,11 +387,7 @@ export const exportToSvg = async (
 
           return Promise.all(
             fontFaces
-              .filter(
-                (font) =>
-                  font.fontFace.weight === "400" &&
-                  font.url.protocol !== LOCAL_FONT_PROTOCOL,
-              )
+              .filter((font) => font.url.protocol !== LOCAL_FONT_PROTOCOL)
               .map(async (font) => {
                 try {
                   const content = await font.getContent();
