@@ -728,32 +728,34 @@ export const bindPointToSnapToElementOutline = (
   );
 
   if (heading) {
-    if (
+    const headingIsVertical =
       compareHeading(heading, HEADING_UP) ||
-      compareHeading(heading, HEADING_DOWN)
-    ) {
-      const intersection = intersectElementWithLine(
-        bindableElement,
-        [point[0], aabb[1]],
-        [point[0], aabb[3]],
-        5,
-        elementsMap,
-      );
-
-      return compareHeading(heading, HEADING_UP)
-        ? intersection[0]
-        : intersection[1];
-    }
-    const intersection = intersectElementWithLine(
+      compareHeading(heading, HEADING_DOWN);
+    const intersections = intersectElementWithLine(
       bindableElement,
-      [aabb[0], point[1]],
-      [aabb[2], point[1]],
-      5,
+      headingIsVertical ? [point[0], aabb[1]] : [aabb[0], point[1]],
+      headingIsVertical ? [point[0], aabb[3]] : [aabb[2], point[1]],
+      FIXED_BINDING_DISTANCE,
       elementsMap,
     );
-    return compareHeading(heading, HEADING_LEFT)
-      ? intersection[0]
-      : intersection[1];
+
+    if (intersections.length === 2) {
+      // TODO: Hack to circumvent bug in intersectElementWithLine transposing
+      // second intersect point on rectanguloid shapes
+      if (
+        bindableElement.type !== "ellipse" &&
+        bindableElement.type !== "diamond"
+      ) {
+        return compareHeading(heading, HEADING_UP) ||
+          compareHeading(heading, HEADING_LEFT)
+          ? intersections[0]
+          : [-1 * intersections[1][0], -1 * intersections[1][1]];
+      }
+      return compareHeading(heading, HEADING_UP) ||
+        compareHeading(heading, HEADING_LEFT)
+        ? intersections[0]
+        : intersections[1];
+    }
   }
 
   return point;
