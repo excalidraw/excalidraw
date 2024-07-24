@@ -24,6 +24,7 @@ import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -542,7 +543,7 @@ const generateDynamicAABBs = (
     if (b[0] > a[2] && a[1] > b[3]) {
       // BOTTOM LEFT
       const cX = first[2] + (second[0] - first[2]) / 2;
-      const cY = first[3] + (second[1] - first[3]) / 2;
+      const cY = second[3] + (first[1] - second[3]) / 2;
 
       if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
         return [
@@ -573,9 +574,9 @@ const generateDynamicAABBs = (
       ];
     } else if (a[0] > b[2] && a[3] < b[1]) {
       // TOP RIGHT
-      const cX = first[2] + (first[0] - second[2]) / 2;
-      const cY = first[3] + (first[1] - second[3]) / 2;
-
+      const cX = second[2] + (first[0] - second[2]) / 2;
+      const cY = first[3] + (second[1] - first[3]) / 2;
+      debugDrawPoint([cX, cY], "red");
       if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
         return [
           [cX, first[1], first[2], first[3]],
@@ -589,9 +590,9 @@ const generateDynamicAABBs = (
       ];
     } else if (a[0] > b[2] && a[1] > b[3]) {
       // BOTTOM RIGHT
-      const cX = first[2] + (first[0] - second[2]) / 2;
-      const cY = first[3] + (first[1] - second[3]) / 2;
-
+      const cX = second[2] + (first[0] - second[2]) / 2;
+      const cY = second[3] + (first[1] - second[3]) / 2;
+      debugDrawPoint([cX, cY], "red");
       if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
         return [
           [cX, first[1], first[2], first[3]],
