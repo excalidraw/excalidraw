@@ -556,15 +556,21 @@ export class FlowChartNavigator {
     elementsMap: ElementsMap,
     direction: LinkDirection,
   ): string | null {
+    // clear if going at a different direction
     if (direction !== this.direction) {
       this.clear();
     }
 
+    // add the current node to the visited
+    if (!this.visitedNodes.has(element.id)) {
+      this.visitedNodes.add(element.id);
+    }
+
     /**
      * CASE:
-     * - already started exploring, and
-     * - there are multiple nodes at the same level, and
-     * - still going at the same direction, and
+     * - already started exploring, AND
+     * - there are multiple nodes at the same level, AND
+     * - still going at the same direction, AND
      *
      * RESULT:
      * - loop through nodes at the same level
@@ -579,6 +585,7 @@ export class FlowChartNavigator {
     ) {
       this.sameLevelIndex =
         (this.sameLevelIndex + 1) % this.sameLevelNodes.length;
+
       return this.sameLevelNodes[this.sameLevelIndex].id;
     }
 
@@ -606,7 +613,7 @@ export class FlowChartNavigator {
 
     /**
      * CASE:
-     * - (just started exploring or still going at the same direction) AND
+     * - (just started exploring or still going at the same direction) OR
      * - there're no nodes at the given direction
      *
      * RESULT:
