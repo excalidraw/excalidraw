@@ -109,6 +109,7 @@
     "share": "اشتراک‌گذاری",
     "showStroke": "نمایش انتخاب کننده رنگ حاشیه",
     "showBackground": "نمایش انتخاب کننده رنگ پس زمینه",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "کتابخانه شخصی",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
