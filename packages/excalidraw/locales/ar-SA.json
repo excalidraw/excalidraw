@@ -109,6 +109,7 @@
     "share": "مشاركة",
     "showStroke": "إظهار منتقي لون الخط",
     "showBackground": "إظهار منتقي لون الخلفية",
+    "showFonts": "",
     "toggleTheme": "تبديل السمة الفاتحة/الغامقة",
     "theme": "السمة",
     "personalLib": "المكتبة الشخصية",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": "معاينة"
   },
-  "userList": {
-    "search": {
-      "placeholder": "بحث سريع",
-      "empty": "لم يُعثر على أيّ مستخدم"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "انقر على المستخدم للمتابعة",
       "followStatus": "أنت حاليا تتابع هذا المستخدم",
