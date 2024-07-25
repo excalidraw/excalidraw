@@ -109,6 +109,7 @@
     "share": "பகிர்",
     "showStroke": "கீறல் நிற எடுப்பானைக் காட்டு",
     "showBackground": "பின்புலம் நிற எடுப்பானைக் காட்டு",
+    "showFonts": "",
     "toggleTheme": "வெளிர்ந்த/கருமை தோற்றத்தை இருநிலைமாற்று",
     "theme": "தோற்றம்",
     "personalLib": "தனக்குரிய நூலகம்",
@@ -557,11 +558,19 @@
     "syntax": "மெர்மெய்டு தொடரியல்",
     "preview": "முன்னோட்டம்"
   },
-  "userList": {
-    "search": {
-      "placeholder": "விரைவு தேடல்",
-      "empty": "பயனர்கள் இல்லை"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "தற்போது இப்பயனரைப் பின்தொடர்கிறீர்",
