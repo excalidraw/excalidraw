@@ -109,6 +109,7 @@
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
+    "showFonts": "",
     "toggleTheme": "Alternar tema clar i fosc",
     "theme": "",
     "personalLib": "Biblioteca personal",
@@ -557,11 +558,19 @@
     "syntax": "Sintaxi de Mermaid",
     "preview": "Previsualització"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Cerca ràpida",
-      "empty": "No s'han trobat usuaris"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Feu clic sobre un usuari per seguir-lo",
       "followStatus": "Ara per ara seguiu aquest usuari",
