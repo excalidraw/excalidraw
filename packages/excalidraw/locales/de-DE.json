@@ -109,7 +109,7 @@
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
-    "showFonts": "",
+    "showFonts": "Schriftauswahl anzeigen",
     "toggleTheme": "Helles/dunkles Design umschalten",
     "theme": "Design",
     "personalLib": "Persönliche Bibliothek",
@@ -559,18 +559,18 @@
     "preview": "Vorschau"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Schnellsuche"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "alt"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "In dieser Szene",
+    "availableFonts": "Verfügbare Schriftarten",
+    "empty": "Keine Schriftarten gefunden"
   },
   "userList": {
-    "empty": "",
+    "empty": "Keine Benutzer gefunden",
     "hint": {
       "text": "Klicke auf Benutzer um zu folgen",
       "followStatus": "Du folgst derzeit diesem Benutzer",
