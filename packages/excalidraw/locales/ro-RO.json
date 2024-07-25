@@ -109,6 +109,7 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
+    "showFonts": "",
     "toggleTheme": "Comutare temă luminoasă/întunecată",
     "theme": "Temă",
     "personalLib": "Biblioteca personală",
@@ -557,11 +558,19 @@
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Căutare rapidă",
-      "empty": "Niciun utilizător găsit"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Dă clic pe un utilizator pentru a-l urmări",
       "followStatus": "În prezent urmărești acest utilizator",
