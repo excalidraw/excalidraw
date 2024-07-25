@@ -62,7 +62,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       unitsPerEm: 1000,
       ascender: 750,
       descender: -250,
-      lineHeight: 1.2,
+      lineHeight: 1.25,
     },
     icon: FontFamilyCodeIcon,
   },

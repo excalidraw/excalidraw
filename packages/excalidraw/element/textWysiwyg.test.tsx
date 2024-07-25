@@ -1337,7 +1337,7 @@ describe("textWysiwyg", () => {
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
       ).toEqual(36);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(97);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(100);
     });
 
     it("should update line height when font family updated", async () => {
@@ -1360,7 +1360,7 @@ describe("textWysiwyg", () => {
       ).toEqual(FONT_FAMILY["Comic Shanns"]);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
-      ).toEqual(1.2);
+      ).toEqual(1.25);
 
       fireEvent.click(screen.getByTitle(/normal/i));
       expect(
