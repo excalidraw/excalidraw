@@ -109,6 +109,7 @@
     "share": "共享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
+    "showFonts": "",
     "toggleTheme": "切換 亮色/暗色 主題",
     "theme": "佈景主題",
     "personalLib": "個人資料庫",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid 語法",
     "preview": "預覽"
   },
-  "userList": {
-    "search": {
-      "placeholder": "快速搜尋",
-      "empty": "沒有找到使用者"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "點擊使用者以進行追蹤",
       "followStatus": "您正在追蹤此使用者",
