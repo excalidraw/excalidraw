@@ -49,10 +49,10 @@ Object.defineProperty(window, "FontFace", {
 
 Object.defineProperty(document, "fonts", {
   value: {
-    load: vi.fn().mockResolvedValue(false),
+    load: vi.fn().mockResolvedValue([]),
+    check: vi.fn().mockResolvedValue(true),
     has: vi.fn().mockResolvedValue(true),
     add: vi.fn(),
-    check: vi.fn(),
   },
 });
 
