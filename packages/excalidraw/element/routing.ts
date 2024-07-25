@@ -66,6 +66,8 @@ type Grid = {
   data: (Node | null)[];
 };
 
+const BASE_PADDING = 40;
+
 export const mutateElbowArrow = (
   arrow: ExcalidrawArrowElement,
   scene: Scene,
@@ -178,7 +180,7 @@ export const mutateElbowArrow = (
       hoveredEndElement
         ? aabbForElement(
             hoveredEndElement,
-            offsetFromHeading(endHeading, 40, 40),
+            offsetFromHeading(endHeading, BASE_PADDING, BASE_PADDING),
           )
         : endPointBounds,
     ) ||
@@ -187,7 +189,7 @@ export const mutateElbowArrow = (
       hoveredStartElement
         ? aabbForElement(
             hoveredStartElement,
-            offsetFromHeading(startHeading, 40, 40),
+            offsetFromHeading(startHeading, BASE_PADDING, BASE_PADDING),
           )
         : startPointBounds,
     );
@@ -203,28 +205,28 @@ export const mutateElbowArrow = (
     boundsOverlap
       ? offsetFromHeading(
           startHeading,
-          !hoveredStartElement && !hoveredEndElement ? 0 : 40,
+          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
           0,
         )
       : offsetFromHeading(
           startHeading,
           !hoveredStartElement && !hoveredEndElement
             ? 0
-            : 40 - FIXED_BINDING_DISTANCE * 4,
-          40,
+            : BASE_PADDING - FIXED_BINDING_DISTANCE * 4,
+          BASE_PADDING,
         ),
     boundsOverlap
       ? offsetFromHeading(
           endHeading,
-          !hoveredStartElement && !hoveredEndElement ? 0 : 40,
+          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
           0,
         )
       : offsetFromHeading(
           endHeading,
           !hoveredStartElement && !hoveredEndElement
             ? 0
-            : 40 - FIXED_BINDING_DISTANCE * 4,
-          40,
+            : BASE_PADDING - FIXED_BINDING_DISTANCE * 4,
+          BASE_PADDING,
         ),
     boundsOverlap,
   );
