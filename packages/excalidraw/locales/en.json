@@ -109,6 +109,7 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
+    "showFonts": "Show font picker",
     "toggleTheme": "Toggle light/dark theme",
     "theme": "Theme",
     "personalLib": "Personal Library",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Quick search",
-      "empty": "No users found"
+  "quickSearch": {
+    "placeholder": "Quick search"
+  },
+  "fontList": {
+    "badge": {
+      "old": "old"
     },
+    "sceneFonts": "In this scene",
+    "availableFonts": "Available fonts",
+    "empty": "No fonts found"
+  },
+  "userList": {
+    "empty": "No users found",
     "hint": {
       "text": "Click on user to follow",
       "followStatus": "You're currently following this user",
