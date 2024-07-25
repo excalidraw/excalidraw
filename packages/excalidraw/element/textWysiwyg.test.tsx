@@ -916,13 +916,13 @@ describe("textWysiwyg", () => {
       await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello World!");
       editor.blur();
-      expect(text.fontFamily).toEqual(FONT_FAMILY.Virgil);
+      expect(text.fontFamily).toEqual(FONT_FAMILY.Excalifont);
 
       fireEvent.click(screen.getByTitle(/code/i));
 
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY["Comic Shanns"]);
 
       //undo
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -930,7 +930,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Virgil);
+      ).toEqual(FONT_FAMILY.Excalifont);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
@@ -938,7 +938,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY["Comic Shanns"]);
     });
 
     it("should wrap text and vertcially center align once text submitted", async () => {
@@ -1330,14 +1330,14 @@ describe("textWysiwyg", () => {
 
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY["Comic Shanns"]);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
 
       fireEvent.click(screen.getByTitle(/Very large/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontSize,
       ).toEqual(36);
-      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(97);
+      expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(100);
     });
 
     it("should update line height when font family updated", async () => {
@@ -1357,18 +1357,18 @@ describe("textWysiwyg", () => {
       fireEvent.click(screen.getByTitle(/code/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Cascadia);
+      ).toEqual(FONT_FAMILY["Comic Shanns"]);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
-      ).toEqual(1.2);
+      ).toEqual(1.25);
 
       fireEvent.click(screen.getByTitle(/normal/i));
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Helvetica);
+      ).toEqual(FONT_FAMILY.Nunito);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
-      ).toEqual(1.15);
+      ).toEqual(1.35);
     });
 
     describe("should align correctly", () => {

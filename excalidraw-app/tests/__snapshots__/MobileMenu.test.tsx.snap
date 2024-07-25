@@ -5,7 +5,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
   class="welcome-screen-center"
 >
   <div
-    class="welcome-screen-center__logo virgil welcome-screen-decor"
+    class="welcome-screen-center__logo excalifont welcome-screen-decor"
   >
     <div
       class="ExcalidrawLogo is-small"
@@ -48,7 +48,7 @@ exports[`Test MobileMenu > should initialize with welcome screen and hide once u
     </div>
   </div>
   <div
-    class="welcome-screen-center__heading welcome-screen-decor virgil"
+    class="welcome-screen-center__heading welcome-screen-decor excalifont"
   >
     All your data is saved locally in your browser.
   </div>

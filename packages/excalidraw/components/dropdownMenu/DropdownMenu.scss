@@ -4,7 +4,7 @@
   .dropdown-menu {
     position: absolute;
     top: 100%;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
 
     &--mobile {
       left: 0;
@@ -35,31 +35,74 @@
 
     .dropdown-menu-item-base {
       display: flex;
-      padding: 0 0.625rem;
       column-gap: 0.625rem;
       font-size: 0.875rem;
       color: var(--color-on-surface);
       width: 100%;
       box-sizing: border-box;
-      font-weight: normal;
+      font-weight: 400;
       font-family: inherit;
     }
 
+    &.manual-hover {
+      // disable built-in hover due to keyboard navigation
+      .dropdown-menu-item {
+        &:hover {
+          background-color: transparent;
+        }
+
+        &--hovered {
+          background-color: var(--button-hover-bg) !important;
+        }
+
+        &--selected {
+          background-color: var(--color-primary-light) !important;
+        }
+      }
+    }
+
+    &.fonts {
+      margin-top: 1rem;
+      // display max 7 items per list, where each has 2rem (2.25) height and 1px margin top & bottom
+      // count in 2 groups, where each allocates 1.3*0.75rem font-size and 0.5rem margin bottom, plus one extra 1rem margin top
+      max-height: calc(7 * (2rem + 2px) + 2 * (0.5rem + 1.3 * 0.75rem) + 1rem);
+
+      @media screen and (min-width: 1921px) {
+        max-height: calc(
+          7 * (2.25rem + 2px) + 2 * (0.5rem + 1.3 * 0.75rem) + 1rem
+        );
+      }
+
+      .dropdown-menu-item-base {
+        display: inline-flex;
+      }
+
+      .dropdown-menu-group:not(:first-child) {
+        margin-top: 1rem;
+      }
+
+      .dropdown-menu-group-title {
+        font-size: 0.75rem;
+        text-align: left;
+        font-weight: 400;
+        margin: 0 0 0.5rem;
+        line-height: 1.3;
+      }
+    }
+
     .dropdown-menu-item {
+      height: 2rem;
+      margin: 1px;
+      padding: 0 0.5rem;
+      width: calc(100% - 2px);
       background-color: transparent;
       border: 1px solid transparent;
       align-items: center;
-      height: 2rem;
       cursor: pointer;
       border-radius: var(--border-radius-md);
 
       @media screen and (min-width: 1921px) {
         height: 2.25rem;
-      }
-
-      &--selected {
-        background: var(--color-primary-light);
-        --icon-fill-color: var(--color-primary-darker);
       }
 
       &__text {
@@ -81,6 +124,11 @@
           font-size: 0.875rem;
           padding: 0 0.625rem;
         }
+      }
+
+      &--selected {
+        background: var(--color-primary-light);
+        --icon-fill-color: var(--color-primary-darker);
       }
 
       &:hover {

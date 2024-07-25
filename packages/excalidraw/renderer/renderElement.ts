@@ -53,12 +53,12 @@ import {
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
-  getVerticalOffset,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
+import { getVerticalOffset } from "../fonts";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -89,8 +89,16 @@ const shouldResetImageFilter = (
   );
 };
 
-const getCanvasPadding = (element: ExcalidrawElement) =>
-  element.type === "freedraw" ? element.strokeWidth * 12 : 20;
+const getCanvasPadding = (element: ExcalidrawElement) => {
+  switch (element.type) {
+    case "freedraw":
+      return element.strokeWidth * 12;
+    case "text":
+      return element.fontSize / 2;
+    default:
+      return 20;
+  }
+};
 
 export const getRenderOpacity = (
   element: ExcalidrawElement,
@@ -202,7 +210,7 @@ const generateElementCanvas = (
   canvas.width = width;
   canvas.height = height;
 
-  let canvasOffsetX = 0;
+  let canvasOffsetX = -100;
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {

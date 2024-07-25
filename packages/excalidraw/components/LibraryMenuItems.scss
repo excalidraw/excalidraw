@@ -13,7 +13,7 @@
 
     &__label {
       color: var(--color-primary);
-      font-weight: bold;
+      font-weight: 700;
       font-size: 1.125rem;
       margin-bottom: 0.75rem;
     }
@@ -62,7 +62,7 @@
     &__header {
       color: var(--color-primary);
       font-size: 1.125rem;
-      font-weight: bold;
+      font-weight: 700;
       margin-bottom: 0.75rem;
       width: 100%;
       padding-right: 4rem; // due to dropdown button

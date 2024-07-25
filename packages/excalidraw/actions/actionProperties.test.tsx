@@ -155,13 +155,15 @@ describe("element locking", () => {
       });
       const text = API.createElement({
         type: "text",
-        fontFamily: FONT_FAMILY.Cascadia,
+        fontFamily: FONT_FAMILY["Comic Shanns"],
       });
       h.elements = [rect, text];
       API.setSelectedElements([rect, text]);
 
       expect(queryByTestId(document.body, `strokeWidth-bold`)).toBeChecked();
-      expect(queryByTestId(document.body, `font-family-code`)).toBeChecked();
+      expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
+        "active",
+      );
     });
   });
 });

@@ -5,7 +5,7 @@ import { isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
-import "../../public/fonts/fonts.css";
+import "./fonts/assets/fonts.css";
 import polyfill from "./polyfill";
 
 import type { AppProps, ExcalidrawProps } from "./types";
@@ -50,6 +50,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     validateEmbeddable,
     renderEmbeddable,
     aiEnabled,
+    showDeprecatedFonts,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -137,6 +138,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
           aiEnabled={aiEnabled !== false}
+          showDeprecatedFonts={showDeprecatedFonts}
         >
           {children}
         </App>

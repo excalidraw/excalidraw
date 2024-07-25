@@ -36,7 +36,8 @@
     "build:version": "node ../scripts/build-version.js",
     "build": "yarn build:app && yarn build:version",
     "start": "yarn && vite",
-    "start:production": "npm run build && npx http-server build -a localhost -p 5001 -o",
+    "start:production": "yarn build && yarn serve",
+    "serve": "npx http-server build -a localhost -p 5001 -o",
     "build:preview": "yarn build && vite preview --port 5000"
   }
 }

@@ -6,18 +6,7 @@ exports[`export > exporting svg containing transformed images > svg export outpu
   
   <defs>
     <style class="style-fonts">
-      @font-face {
-        font-family: "Virgil";
-        src: url("https://excalidraw.com/Virgil.woff2");
-      }
-      @font-face {
-        font-family: "Cascadia";
-        src: url("https://excalidraw.com/Cascadia.woff2");
-      }
-      @font-face {
-        font-family: "Assistant";
-        src: url("https://excalidraw.com/Assistant-Regular.woff2");
-      }
+      
     </style>
     
   </defs>
