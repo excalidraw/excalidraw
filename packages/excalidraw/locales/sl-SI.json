@@ -109,7 +109,7 @@
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
-    "showFonts": "",
+    "showFonts": "Pokaži izbirnik pisave",
     "toggleTheme": "Preklapljanje med svetlo/temno temo",
     "theme": "Tema",
     "personalLib": "Osebna knjižnica",
@@ -559,18 +559,18 @@
     "preview": "Predogled"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Hitro iskanje"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "stara"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "V tej sceni",
+    "availableFonts": "Razpoložljive pisave",
+    "empty": "Ni pisav"
   },
   "userList": {
-    "empty": "",
+    "empty": "Ni uporabnikov",
     "hint": {
       "text": "Klikni na uporabnika za sledenje",
       "followStatus": "Trenutno slediš temu uporabniku",
