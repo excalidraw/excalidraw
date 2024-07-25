@@ -109,6 +109,7 @@
     "share": "공유",
     "showStroke": "윤곽선 색상 선택기 열기",
     "showBackground": "배경 색상 선택기 열기",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "개인 라이브러리",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "빠른 검색",
-      "empty": "검색된 사용자가 없습니다"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "유저를 클릭해서 따라가기",
       "followStatus": "이 사용자를 따라가고 있습니다",
