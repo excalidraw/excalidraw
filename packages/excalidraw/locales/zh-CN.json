@@ -109,6 +109,7 @@
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
+    "showFonts": "",
     "toggleTheme": "切换浅色/深色主题",
     "theme": "主题",
     "personalLib": "个人素材库",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid 语法",
     "preview": "预览"
   },
-  "userList": {
-    "search": {
-      "placeholder": "快速搜索",
-      "empty": "未找到用户"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "点击关注用户",
       "followStatus": "您已关注此用户",
