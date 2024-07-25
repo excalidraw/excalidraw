@@ -109,6 +109,7 @@
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
+    "showFonts": "",
     "toggleTheme": "Prepnúť svetlú/tmavú tému",
     "theme": "Téma",
     "personalLib": "Moja knižnica",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid syntax",
     "preview": "Ukážka"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Rýchle vyhľadávanie",
-      "empty": "Nenašli sa žiadni používatelia"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Kliknite na používateľa pre jeho sledovanie",
       "followStatus": "Aktuálne sledujete tohto používateľa",
