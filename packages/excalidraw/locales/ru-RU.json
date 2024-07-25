@@ -109,7 +109,7 @@
     "share": "Поделиться",
     "showStroke": "Показать выбор цвета обводки",
     "showBackground": "Показать выбор цвета фона",
-    "showFonts": "",
+    "showFonts": "Показать выбор шрифта",
     "toggleTheme": "Переключить светлую/темную тему",
     "theme": "",
     "personalLib": "Личная библиотека",
@@ -559,18 +559,18 @@
     "preview": ""
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Быстрый поиск"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "старый"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "В этой сцене",
+    "availableFonts": "Доступные шрифты",
+    "empty": "Шрифты не найдены"
   },
   "userList": {
-    "empty": "",
+    "empty": "Пользователи не найдены",
     "hint": {
       "text": "Нажмите на пользователя, чтобы подписаться",
       "followStatus": "Вы подписаны на этого пользователя",
