@@ -109,6 +109,7 @@
     "share": "Bagikan",
     "showStroke": "Tampilkan garis pengambil warna",
     "showBackground": "Tampilkan latar pengambil warna",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Pustaka Pribadi",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
