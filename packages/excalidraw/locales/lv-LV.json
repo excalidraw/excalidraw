@@ -109,6 +109,7 @@
     "share": "Kopīgot",
     "showStroke": "Rādīt svītras krāsas atlasītāju",
     "showBackground": "Rādīt fona krāsas atlasītāju",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Personīgā bibliotēka",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
