@@ -109,6 +109,7 @@
     "share": "Udostępnij",
     "showStroke": "Pokaż próbnik kolorów obrysu",
     "showBackground": "Pokaż próbnik koloru tła",
+    "showFonts": "",
     "toggleTheme": "Przełącz motyw jasny / ciemny",
     "theme": "Motyw",
     "personalLib": "Biblioteka prywatna",
@@ -557,11 +558,19 @@
     "syntax": "Składnia diagramów Mermaid",
     "preview": "Podgląd"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Szybkie wyszukiwanie",
-      "empty": "Nie znaleziono użytkowników"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Kliknij na użytkownika, aby obserwować",
       "followStatus": "Obserwujesz tego użytkownika",
