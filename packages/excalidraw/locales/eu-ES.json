@@ -109,6 +109,7 @@
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
+    "showFonts": "",
     "toggleTheme": "Gaia argia/iluna aktibatu",
     "theme": "Itxura",
     "personalLib": "Liburutegi pertsonala",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Bilaketa Azkarra",
-      "empty": "Ez erabiltzailerik topatu"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Klik erabiltzailean jarraitzeko",
       "followStatus": "Dagoeneko erabiltzaile hau jarraitzen ari zara",
