@@ -667,3 +667,38 @@ export const aabbForElement = (
 
   return bounds;
 };
+
+type PolarCoords = [number, number];
+
+/**
+ * Return the polar coordinates for the given carthesian point represented by
+ * (x, y) for the center point 0,0 where the first number returned is the radius,
+ * the second is the angle in radians.
+ */
+export const carthesian2Polar = ([x, y]: Point): PolarCoords => [
+  Math.hypot(x, y),
+  Math.atan2(y, x),
+];
+
+/**
+ * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
+ * corresponds to (1, 0) carthesian coordinates (point), i.e. to the "right".
+ */
+type SymmetricArc = { radius: number; startAngle: number; endAngle: number };
+
+/**
+ * Determines if a carthesian point lies on a symmetric arc, i.e. an arc which
+ * is part of a circle contour centered on 0, 0.
+ */
+export const isPointOnSymmetricArc = (
+  { radius: arcRadius, startAngle, endAngle }: SymmetricArc,
+  point: Point,
+): boolean => {
+  const [radius, angle] = carthesian2Polar(point);
+
+  return startAngle < endAngle
+    ? Math.abs(radius - arcRadius) < 0.0000001 &&
+        startAngle <= angle &&
+        endAngle >= angle
+    : startAngle <= angle || endAngle >= angle;
+};
