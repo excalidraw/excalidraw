@@ -109,6 +109,7 @@
     "share": "Del",
     "showStroke": "Vis fargevelger for kantfarge",
     "showBackground": "Vis fargevelger for bakgrunnsfarge",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Personlig bibliotek",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
