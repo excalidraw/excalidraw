@@ -18,6 +18,7 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
+import { getBoundTextShape } from "../shapes";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -97,6 +98,12 @@ export const hitElementBoundingBoxOnly = (
 ) => {
   return (
     !hitElementItself(hitArgs) &&
+    // bound text is considered part of the element (even if it's outside the bounding box)
+    !hitElementBoundText(
+      hitArgs.x,
+      hitArgs.y,
+      getBoundTextShape(hitArgs.element, elementsMap),
+    ) &&
     hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element, elementsMap)
   );
 };
