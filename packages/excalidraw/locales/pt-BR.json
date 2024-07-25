@@ -109,6 +109,7 @@
     "share": "Compartilhar",
     "showStroke": "Exibir seletor de cores do traço",
     "showBackground": "Exibir seletor de cores do fundo",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Biblioteca Pessoal",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
