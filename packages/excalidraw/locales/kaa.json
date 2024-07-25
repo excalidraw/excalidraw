@@ -109,6 +109,7 @@
     "share": "Bólisiw",
     "showStroke": "",
     "showBackground": "",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Jeke kitapxana",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
