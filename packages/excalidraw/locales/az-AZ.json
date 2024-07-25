@@ -109,6 +109,7 @@
     "share": "Paylaş",
     "showStroke": "Çevrə rəng seçimini göstər",
     "showBackground": "Fon rəng seçimini göstər",
+    "showFonts": "",
     "toggleTheme": "Gecə/Güzdüz rejiminə dəyiş",
     "theme": "Fon",
     "personalLib": "Şəxsi kitabxana",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
