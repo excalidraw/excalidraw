@@ -109,6 +109,7 @@
     "share": "Κοινοποίηση",
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
+    "showFonts": "",
     "toggleTheme": "Εναλλαγή φωτεινού/σκοτεινού θέματος",
     "theme": "Θέμα",
     "personalLib": "Προσωπική Βιβλιοθήκη",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": "Προεπισκόπηση"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Γρήγορη αναζήτηση",
-      "empty": "Δεν βρέθηκαν χρήστες"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Κάντε κλικ στο χρήστη για να τον ακολουθήσετε",
       "followStatus": "Ακολουθείτε αυτόν τον χρήστη",
