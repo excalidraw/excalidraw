@@ -109,6 +109,7 @@
     "share": "Поділитися",
     "showStroke": "Показати палітру для контура",
     "showBackground": "Показати палітру для фону",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Персональна бібліотека",
@@ -557,11 +558,19 @@
     "syntax": "Синтаксис Mermaid",
     "preview": "Попередній перегляд"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Швидкий пошук",
-      "empty": "Користувачів не знайдено"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Натисніть на користувача, щоб підписатися",
       "followStatus": "Ви вже підписані на цього користувача",
