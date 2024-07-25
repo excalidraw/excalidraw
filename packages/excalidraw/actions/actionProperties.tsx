@@ -800,19 +800,18 @@ export const actionChangeFontFamily = register({
         skipOnHoverRender = true;
       } else {
         let i = 0;
-        let textAccumulator = "";
+        let textLengthAccumulator = 0;
 
         while (
           i < selectedTextElements.length &&
-          textAccumulator.length < 5000
+          textLengthAccumulator < 5000
         ) {
-          textAccumulator +=
-            (selectedTextElements[i] as ExcalidrawTextElement)?.originalText ||
-            "";
+          const textElement = selectedTextElements[i] as ExcalidrawTextElement;
+          textLengthAccumulator += textElement?.originalText.length || 0;
           i++;
         }
 
-        if (textAccumulator.length > 5000) {
+        if (textLengthAccumulator > 5000) {
           skipOnHoverRender = true;
         }
       }
@@ -863,11 +862,15 @@ export const actionChangeFontFamily = register({
               )?.[0];
 
               // try to redraw immediately, if we have at least one font face of the given family loaded
-              // not ideal, but `document.fonts.check()` is super slow, so we cannot do it on each change
-              if (
-                fontFamily &&
-                fontsCache.some((sig) => sig.startsWith(fontFamily))
-              ) {
+              // use check against our cache on hover re-render (fast), fallback to a better `document.fonts.check()` otherwise (slow)
+              const isFontLoaded = currentHoveredFontFamily
+                ? fontFamily && fontsCache.some((sig) => sig.startsWith(fontFamily))
+                : window.document.fonts.check(
+                    fontString,
+                    newElement.originalText,
+                  );
+
+              if (isFontLoaded) {
                 redrawTextBoundingBox(
                   newElement,
                   container,
