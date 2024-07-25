@@ -109,6 +109,7 @@
     "share": "Deel",
     "showStroke": "Toon lijn kleur kiezer",
     "showBackground": "Toon achtergrondkleur kiezer",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Persoonlijke bibliotheek",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
