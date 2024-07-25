@@ -109,6 +109,7 @@
     "share": "هاوبەشی پێکردن",
     "showStroke": "ڕەنگهەڵگری هێڵکار نیشانبدە",
     "showBackground": "ڕەنگهەڵگری باکگراوند نیشانبدە",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "کتێبخانەی کەسی",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
