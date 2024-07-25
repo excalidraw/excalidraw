@@ -109,6 +109,7 @@
     "share": "Сподели",
     "showStroke": "Покажи избора на цвят за щрих",
     "showBackground": "Покажи избора на цвят за фон",
+    "showFonts": "",
     "toggleTheme": "Превключване на светла/тъмна тема",
     "theme": "Тема",
     "personalLib": "Лична Библиотека",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid Синтаксис",
     "preview": "Преглед"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Бързо търсене",
-      "empty": "Няма намерени потребители"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Натиснете потребител, за да го следвате",
       "followStatus": "В момента следвате този потребител",
