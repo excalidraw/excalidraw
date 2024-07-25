@@ -109,6 +109,7 @@
     "share": "ចែករំលែក",
     "showStroke": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ខ្វាច់",
     "showBackground": "បង្ហាញឧបករណ៍ជ្រើសរើសពណ៌ផ្ទៃខាងក្រោយ",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "បណ្ណាល័យផ្ទាល់ខ្លួន",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
