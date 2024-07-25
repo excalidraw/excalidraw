@@ -109,6 +109,7 @@
     "share": "Paylaş",
     "showStroke": "Kontur için renk seçiciyi göster",
     "showBackground": "Arkaplan için renk seçiciyi göster",
+    "showFonts": "",
     "toggleTheme": "Aydınlık/karanlık mod",
     "theme": "Tema",
     "personalLib": "Kişisel Kitaplık",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Hızlı arama",
-      "empty": "Kullanıcı bulunamadı"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Takip etmek için kullanıcıya tıklayın",
       "followStatus": "Şu anda bu kullanıcıyı takip ediyorsunuz",
