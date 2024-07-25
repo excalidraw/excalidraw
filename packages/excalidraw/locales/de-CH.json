@@ -109,6 +109,7 @@
     "share": "Teilen",
     "showStroke": "Auswahl für Strichfarbe anzeigen",
     "showBackground": "Hintergrundfarbe auswählen",
+    "showFonts": "",
     "toggleTheme": "Helles/dunkles Design umschalten",
     "theme": "Design",
     "personalLib": "Persönliche Bibliothek",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Schnelle Suche",
-      "empty": "Keine Benutzer gefunden"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Klicke auf Benutzer um zu folgen",
       "followStatus": "Du folgst derzeit diesem Benutzer",
