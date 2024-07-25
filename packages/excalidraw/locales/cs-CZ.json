@@ -109,6 +109,7 @@
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Osobní knihovna",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
