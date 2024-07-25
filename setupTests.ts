@@ -52,6 +52,7 @@ Object.defineProperty(document, "fonts", {
     load: vi.fn().mockResolvedValue(false),
     has: vi.fn().mockResolvedValue(true),
     add: vi.fn(),
+    check: vi.fn(),
   },
 });
 

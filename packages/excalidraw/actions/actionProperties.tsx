@@ -91,7 +91,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap, getFontString, getShortcutKey } from "../utils";
+import { arrayToMap, getFontFamilyString, getShortcutKey } from "../utils";
 import { register } from "./register";
 import { StoreAction } from "../store";
 import { Fonts, getLineHeight } from "../fonts";
@@ -826,6 +826,27 @@ export const actionChangeFontFamily = register({
     };
 
     if (nextFontFamily && !skipOnHoverRender) {
+      const elementContainerMapping = new Map<
+        ExcalidrawTextElement,
+        ExcalidrawElement | null
+      >();
+      let uniqueGlyphs = new Set<string>();
+      let skipFontFaceCheck = false;
+
+      const fontsCache = Array.from(Fonts.loadedFontsCache.values());
+      const fontFamily = Object.entries(FONT_FAMILY).find(
+        ([_, value]) => value === nextFontFamily,
+      )?.[0];
+
+      // skip `document.font.check` check on hover, if at least one font family has loaded as it's super slow (could result in slightly different bbox, which is fine)
+      if (
+        currentHoveredFontFamily &&
+        fontFamily &&
+        fontsCache.some((sig) => sig.startsWith(fontFamily))
+      ) {
+        skipFontFaceCheck = true;
+      }
+
       // following causes re-render so make sure we changed the family
       // otherwise it could cause unexpected issues, such as preventing opening the popover when in wysiwyg
       Object.assign(result, {
@@ -835,7 +856,8 @@ export const actionChangeFontFamily = register({
           (oldElement) => {
             if (
               isTextElement(oldElement) &&
-              oldElement.fontFamily !== nextFontFamily
+              (oldElement.fontFamily !== nextFontFamily ||
+                currentItemFontFamily) // force update on selection
             ) {
               const newElement: ExcalidrawTextElement = newElementWith(
                 oldElement,
@@ -855,49 +877,14 @@ export const actionChangeFontFamily = register({
                 mutateElement(container, { ...cachedContainer }, false);
               }
 
-              const fontString = getFontString(newElement);
-              const fontsCache = Array.from(Fonts.loadedFontsCache.values());
-              const fontFamily = Object.entries(FONT_FAMILY).find(
-                (_, value) => value === nextFontFamily,
-              )?.[0];
-
-              // try to redraw immediately, if we have at least one font face of the given family loaded
-              // use check against our cache on hover re-render (fast), fallback to a better `document.fonts.check()` otherwise (slow)
-              const isFontLoaded = currentHoveredFontFamily
-                ? fontFamily && fontsCache.some((sig) => sig.startsWith(fontFamily))
-                : window.document.fonts.check(
-                    fontString,
-                    newElement.originalText,
-                  );
-
-              if (isFontLoaded) {
-                redrawTextBoundingBox(
-                  newElement,
-                  container,
-                  app.scene.getNonDeletedElementsMap(),
-                  false, // synchronous redraw
-                );
-              } else {
-                // no such font is yet loaded, hence load, don't await, but redraw once our font faces loaded (i.e. to update bbox)
-                window.document.fonts
-                  .load(fontString, newElement.originalText)
-                  .then(() => {
-                    // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
-                    const latestElement = app.scene.getElement(newElement.id);
-                    const latestContainer = container
-                      ? app.scene.getElement(container.id)
-                      : null;
-
-                    if (latestElement) {
-                      redrawTextBoundingBox(
-                        latestElement as ExcalidrawTextElement,
-                        latestContainer,
-                        app.scene.getNonDeletedElementsMap(),
-                        true,
-                      );
-                    }
-                  });
+              if (!skipFontFaceCheck) {
+                uniqueGlyphs = new Set([
+                  ...uniqueGlyphs,
+                  ...Array.from(newElement.originalText),
+                ]);
               }
+
+              elementContainerMapping.set(newElement, container);
 
               return newElement;
             }
@@ -907,6 +894,52 @@ export const actionChangeFontFamily = register({
           true,
         ),
       });
+
+      // size is irrelevant, but necessary
+      const fontString = `10px ${getFontFamilyString({
+        fontFamily: nextFontFamily,
+      })}`;
+      const glyphs = Array.from(uniqueGlyphs.values()).join();
+
+      if (
+        skipFontFaceCheck ||
+        window.document.fonts.check(fontString, glyphs)
+      ) {
+        // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
+        for (const [element, container] of elementContainerMapping) {
+          // trigger synchronous redraw
+          redrawTextBoundingBox(
+            element,
+            container,
+            app.scene.getNonDeletedElementsMap(),
+            false,
+          );
+        }
+      } else {
+        // otherwise try to load all font faces for the given glyphs and redraw elements once our font faces loaded
+        window.document.fonts.load(fontString, glyphs).then((fontFaces) => {
+          for (const [element, container] of elementContainerMapping) {
+            // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
+            const latestElement = app.scene.getElement(element.id);
+            const latestContainer = container
+              ? app.scene.getElement(container.id)
+              : null;
+
+            if (latestElement) {
+              // trigger async redraw
+              redrawTextBoundingBox(
+                latestElement as ExcalidrawTextElement,
+                latestContainer,
+                app.scene.getNonDeletedElementsMap(),
+                false,
+              );
+            }
+          }
+
+          // trigger update once we've mutated all the elements, which also updates our cache
+          app.fonts.onLoaded(fontFaces);
+        });
+      }
     }
 
     return result;
