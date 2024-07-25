@@ -109,6 +109,7 @@
     "share": "Compartir",
     "showStroke": "Mostrar selector de color de trazo",
     "showBackground": "Mostrar el selector de color de fondo",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Biblioteca personal",
@@ -557,11 +558,19 @@
     "syntax": "Sintaxis Mermaid",
     "preview": "Vista previa"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Búsqueda rápida",
-      "empty": "No se encontraron usuarios"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Haga clic en el usuario para seguir",
       "followStatus": "Ya estás siguiendo a este usuario",
