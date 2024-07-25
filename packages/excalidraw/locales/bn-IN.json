@@ -109,6 +109,7 @@
     "share": "ভাগ করুন",
     "showStroke": "",
     "showBackground": "পটভূমির রঙ নির্বাচনকারী অপশন দেখান",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "ব্যক্তিগত লাইব্রেরি",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
