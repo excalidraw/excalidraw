@@ -109,6 +109,7 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
+    "showFonts": "",
     "toggleTheme": "Växla ljus/mörkt tema",
     "theme": "Tema",
     "personalLib": "Personligt bibliotek",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Snabbsök",
-      "empty": "Inga användare hittades"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Klicka på användaren för att följa",
       "followStatus": "Du följer den här användaren",
