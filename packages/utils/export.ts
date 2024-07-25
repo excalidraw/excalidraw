@@ -216,9 +216,15 @@ export { determineFocusDistance } from "../excalidraw/element/binding"; //zsvicz
 export {
   measureText,
   wrapText,
-  getDefaultLineHeight,
 } from "../excalidraw/element/textElement"; //zsviczian
-export { getFontString } from "../excalidraw/utils"; //zsviczian
+export { getLineHeight } from "../excalidraw/fonts/index"; //zsviczian
+export { getFontString, getFontFamilyString } from "../excalidraw/utils"; //zsviczian
 export { getBoundTextMaxWidth } from "../excalidraw/element/textElement"; //zsviczian
 export { mermaidToExcalidraw } from "../excalidraw/components/TTDDialog/MermaidToExcalidraw"; //zsviczian
-export { destroyObsidianUtils } from "../excalidraw/obsidianUtils"; //zsviczian
+export {
+  destroyObsidianUtils,
+  registerLocalFont,
+  getFontFamilies,
+  registerFontsInCSS,
+  getFontDefinition,
+} from "../excalidraw/obsidianUtils"; //zsviczian

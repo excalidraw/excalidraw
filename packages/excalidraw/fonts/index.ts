@@ -20,14 +20,14 @@ import Cascadia from "./assets/CascadiaMono-Regular.woff2";
 import ComicShanns from "./assets/ComicShanns-Regular.woff2";
 import LiberationSans from "./assets/LiberationSans-Regular.woff2";
 
-import LilitaLatin from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2";
-import LilitaLatinExt from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2";
+import LilitaLatin from "./assets/LilitaLatin.woff2"; //zsviczian
+import LilitaLatinExt from "./assets/LilitaLatinExt.woff2"; //zsviczian
 
-import NunitoLatin from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2";
-import NunitoLatinExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2";
-import NunitoCyrilic from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2";
-import NunitoCyrilicExt from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2";
-import NunitoVietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2";
+import NunitoLatin from "./assets/NunitoLatin.woff2"; //zsviczian
+import NunitoLatinExt from "./assets/NunitoLatinExt.woff2"; //zsviczian
+import NunitoCyrilic from "./assets/NunitoCyrilic.woff2"; //zsviczian
+import NunitoCyrilicExt from "./assets/NunitoCyrilicExt.woff2"; //zsviczian
+import NunitoVietnamese from "./assets/NunitoVietnamese.woff2"; //zsviczian
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -247,7 +247,7 @@ export class Fonts {
  * @param metadata font metadata
  * @param params array of the rest of the FontFace parameters [uri: string, descriptors: FontFaceDescriptors?] ,
  */
-function register(
+export function register( //zsviczian (changed from private to export)
   this:
     | Fonts
     | {

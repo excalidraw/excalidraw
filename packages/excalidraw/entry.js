@@ -1,7 +1,7 @@
 import "./publicPath";
 import polyfill from "./polyfill";
 
-import "../../public/fonts/fonts.css";
+import "./fonts/assets/fonts.css";
 
 polyfill();
 export * from "./index";
