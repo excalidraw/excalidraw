@@ -109,6 +109,7 @@
     "share": "שתף",
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
+    "showFonts": "",
     "toggleTheme": "החלפת מצב מואר/חשוך",
     "theme": "ערכת עיצוב",
     "personalLib": "ספריה פרטית",
@@ -557,11 +558,19 @@
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה"
   },
-  "userList": {
-    "search": {
-      "placeholder": "חיפוש מהיר",
-      "empty": "לא נמצאו משתמשים"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "יש ללחוץ על משתמש כדי לעקוב",
       "followStatus": "המשתמש ברשימת המעקב שלך",
