@@ -109,6 +109,7 @@
     "share": "Megosztás",
     "showStroke": "Körvonal színválasztó megjelenítése",
     "showBackground": "Háttérszín-választó megjelenítése",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Személyes könyvtár",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
