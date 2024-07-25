@@ -802,30 +802,30 @@ export const avoidRectangularCorner = (
 export const snapToMid = (
   element: ExcalidrawBindableElement,
   p: Point,
-  tolerance: number = 10,
+  tolerance: number = 0.05,
 ): Point => {
   const { x, y, width, height, angle } = element;
   const center = [x + width / 2 - 0.1, y + height / 2 - 0.1] as Point;
   const nonRotated = rotatePoint(p, center, -angle);
 
   if (
-    nonRotated[0] <= x &&
-    nonRotated[1] > center[1] - tolerance &&
-    nonRotated[1] < center[1] + tolerance
+    nonRotated[0] <= x + width / 2 &&
+    nonRotated[1] > center[1] - tolerance * height &&
+    nonRotated[1] < center[1] + tolerance * height
   ) {
     // LEFT
     return rotatePoint([x - FIXED_BINDING_DISTANCE, center[1]], center, angle);
   } else if (
-    nonRotated[1] <= y &&
-    nonRotated[0] > center[0] - tolerance &&
-    nonRotated[0] < center[0] + tolerance
+    nonRotated[1] <= y + height / 2 &&
+    nonRotated[0] > center[0] - tolerance * width &&
+    nonRotated[0] < center[0] + tolerance * width
   ) {
     // TOP
     return rotatePoint([center[0], y - FIXED_BINDING_DISTANCE], center, angle);
   } else if (
-    nonRotated[0] >= x + width &&
-    nonRotated[1] > center[1] - tolerance &&
-    nonRotated[1] < center[1] + tolerance
+    nonRotated[0] >= x + width / 2 &&
+    nonRotated[1] > center[1] - tolerance * height &&
+    nonRotated[1] < center[1] + tolerance * height
   ) {
     // RIGHT
     return rotatePoint(
@@ -834,9 +834,9 @@ export const snapToMid = (
       angle,
     );
   } else if (
-    nonRotated[1] >= y + height &&
-    nonRotated[0] > center[0] - tolerance &&
-    nonRotated[0] < center[0] + tolerance
+    nonRotated[1] >= y + height / 2 &&
+    nonRotated[0] > center[0] - tolerance * width &&
+    nonRotated[0] < center[0] + tolerance * width
   ) {
     // DOWN
     return rotatePoint(
