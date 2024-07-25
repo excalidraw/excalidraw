@@ -1,0 +1,12 @@
+@import "../css/theme";
+
+.excalidraw {
+  button.standalone {
+    @include outlineButtonIconStyles;
+
+    & > * {
+      // dissalow pointer events on children, so we always have event.target on the button itself
+      pointer-events: none;
+    }
+  }
+}
