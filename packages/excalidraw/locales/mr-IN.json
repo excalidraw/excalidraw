@@ -109,6 +109,7 @@
     "share": "सामायिक करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
+    "showFonts": "",
     "toggleTheme": "उजेड़ाची किव्हा अंधाराची प्रणाली बदला",
     "theme": "संरचना पद्धति",
     "personalLib": "वैयक्तिक संग्रह",
@@ -557,11 +558,19 @@
     "syntax": "मर्मेड संरचना नियम",
     "preview": "पूर्वावलोकन"
   },
-  "userList": {
-    "search": {
-      "placeholder": "जलद शोध",
-      "empty": "प्रयोक्ते सापडले नाहीत"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "प्रयोक्ताचं अनुकरण करण्या साठी त्या वर क्लिक करा",
       "followStatus": "तुम्हीं सध्या ह्या उपयोक्ता चं अनुकरण करत आहेत",
